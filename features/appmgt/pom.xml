@@ -22,14 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>carbon-features</artifactId>
-        <version>4.2.0</version>
+        <version>4.2.0</version>  
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appmgt-feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - API management Feature Aggregator Module</name>
-    <url>http://wso2.org</url>
+    <name>WSO2 Carbon - APP Management Feature Aggregator Module</name>
 
     <modules>
 	<module>org.wso2.carbon.appmgt.core.feature/4.2.1</module>
@@ -63,9 +62,21 @@
 
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>wso2-nexus</id>
+            <name>WSO2 internal Repository</name>
+            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+
     <properties>
         <apimgt.version>1.2.0</apimgt.version>
     </properties>
-
 </project>
 
