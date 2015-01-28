@@ -1,0 +1,106 @@
+
+<div class="asset-being-added">
+</div>
+
+<div class="asset-thumb-container">
+	{{#if artifacts}}
+        <div class="row-fluid">
+            <table class="table table-striped list-asset-table">
+                <thead>
+                <th colspan="2"><a href="?sortby=name&sort=asc">Name <i class="icon-caret-down"></i></a></th>
+                <th><a href="?sortby=version&sort=asc">Version <i class="icon-caret-down"></i></a></th>
+                <th><a href="?sortby=owner&sort=asc">Owner <i class="icon-caret-down"></i></a></th>
+                <th><a href="?sortby=createdtime&sort=desc">Created <i class="icon-caret-down"></i></a></th>
+                <th><a href="#">Status</i></a></th>
+                <th></th>
+                </thead>
+                <tbody>
+                 {{#each artifacts}}
+                
+                    <tr>
+                        <td>
+                        <img src="{{this.attributes.images_thumbnail}}" class="" />
+                        </td>
+                        <td class="asset-listing-name">
+                            <a href='/publisher/asset/{{../shortName}}/{{this.id}}'>
+                                {{this.attributes.overview_name}}
+                            </a>
+                        </td>
+                        <td>
+                        {{this.attributes.overview_version}}
+                        </td>
+                        <td>
+                        {{this.attributes.overview_provider}}
+                        </td>
+                        <td>
+                        <small>{{this.attributes.overview_createdtime}}</small>
+                        </td>
+                        <td>
+                            <span class="lifecycle-state"><small><i class="icon-circle lc-state-{{this.lifecycleState}}"></i> {{this.lifecycleState}}</small></span>
+                        </td>
+                         <td>
+
+                             {{#this.lifecycleAvailableActions}}
+                                 <a  data-action="{{name}}" data-app="{{../this.id}}" class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
+                             {{/this.lifecycleAvailableActions}}
+
+
+
+                             <input type="button" value="Delete" class="btn btn-danger btn-delete"
+								name="deleteAsset"  data-app-id={{this.id}} />
+						<input
+								type="hidden" value="{{../shortName}}" name="{{../shortName}}"
+								id="meta-asset-type" />
+						</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination">
+                    {{#if leftNav}}
+                    <li><a href="/publisher/assets/webapp/?page={{this.leftNav}}"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+                    {{/if}}
+                    {{#each pageIndices}}
+                         {{#if this.isDisabled}}
+                             <li class="disabled"><a>{{this.index}}</a></li>
+                         {{else}}
+                             <li><a href="/publisher/assets/webapp/?page={{this.index}}">{{this.index}}</a></li>
+                         {{/if}}
+                    {{/each}}
+                    {{#if rightNav}}
+                    <li><a href="/publisher/assets/webapp/?page={{this.rightNav}}"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+                    {{/if}}
+                </ul>
+            </nav>
+        </div>
+	{{else}}
+        <div class="emptyAssets-MsgDiv">
+            <i class="icon-inbox largeMsgIcon"></i>
+            <br />
+            Nothing added yet.
+            <br />
+            <a type="button" class="btn btn-addNewAssetLarge" href="/publisher/asset/{{shortName}}"><i class="icon-plus-sign-alt"></i>Add New Web App</a>
+        </div>
+	{{/if}}
+
+
+
+
+
+<div class="modal fade" id="messageModal2" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Asset Deleted</h4>
+            </div>
+            <div class="modal-body">
+                <h3>Modal Body</h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
