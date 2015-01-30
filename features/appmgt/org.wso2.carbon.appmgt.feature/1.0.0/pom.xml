@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt-feature</artifactId>
         <version>1.0.0</version>
 	<relativePath>../../pom.xml</relativePath>
@@ -36,13 +36,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.core.feature</artifactId>
             <version>1.0.0</version>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.gateway.feature</artifactId>
             <version>1.0.0</version>
             <type>zip</type>
@@ -87,8 +87,8 @@
                                 <importFeatureDef>org.wso2.carbon.core:4.2.0</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.core.feature:1.0.0</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.gateway.feature:1.0.0</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core.feature:1.0.0</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.feature:1.0.0</includedFeatureDef>
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.publisher.feature</includedFeatureDef>
                                 <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.store.feature</includedFeatureDef> -->
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.startup.publisher.feature:1.0.0</includedFeatureDef> -->

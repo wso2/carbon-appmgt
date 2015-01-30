@@ -23,7 +23,7 @@
 -->
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.wso2.carbon</groupId>
+	<groupId>org.wso2.carbon.appmgt</groupId>
 	<artifactId>org.wso2.carbon.appmgt.perf.populator</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0.0</version>

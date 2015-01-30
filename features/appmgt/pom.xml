@@ -26,6 +26,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>appmgt-feature</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0</version>  
