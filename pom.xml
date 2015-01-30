@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
+    <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>carbon-appmgt</artifactId>
     <packaging>pom</packaging>
     <version>4.2.0</version>
