@@ -24,9 +24,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.wso2.carbon</groupId>
-	<artifactId>org.wso2.carbon.apimgt.perf.populator</artifactId>
+	<artifactId>org.wso2.carbon.appmgt.perf.populator</artifactId>
 	<packaging>jar</packaging>
-	<version>1.1.0</version>
+	<version>1.0.0</version>
 	<name>WSO2 Carbon - Perf Data populator</name>
 	<description>Data populator performance testing of API Mgt/Store solution</description>
 	<apiEndpoint>http://wso2.org</apiEndpoint>

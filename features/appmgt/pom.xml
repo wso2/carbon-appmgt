@@ -28,17 +28,18 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appmgt-feature</artifactId>
     <packaging>pom</packaging>
+    <version>1.0.0</version>  
     <name>WSO2 Carbon - APP Management Feature Aggregator Module</name>
 
     <modules>
-	<module>org.wso2.carbon.appmgt.core.feature/4.2.1</module>
-	<module>org.wso2.carbon.appmgt.gateway.feature/4.2.1</module>
-	<!--<module>org.wso2.carbon.appmgt.publisher.feature/4.2.1</module>
-	<module>org.wso2.carbon.appmgt.store.feature/4.2.1</module> -->
-	<!--<module>org.wso2.carbon.appmgt.interceptor.feature/4.2.1</module>-->
-	<!--<module>org.wso2.carbon.appmgt.startup.publisher.feature/4.2.1</module>-->
-	<module>org.wso2.carbon.appmgt.feature/4.2.1</module>
-	<module>org.wso2.carbon.appmgt.mobile/4.2.0</module>
+	<module>org.wso2.carbon.appmgt.core.feature/1.0.0</module>
+	<module>org.wso2.carbon.appmgt.gateway.feature/1.0.0</module>
+	<!--<module>org.wso2.carbon.appmgt.publisher.feature/1.0.0</module>
+	<module>org.wso2.carbon.appmgt.store.feature/1.0.0</module> -->
+	<!--<module>org.wso2.carbon.appmgt.interceptor.feature/1.0.0</module>-->
+	<!--<module>org.wso2.carbon.appmgt.startup.publisher.feature/1.0.0</module>-->
+	<module>org.wso2.carbon.appmgt.feature/1.0.0</module>
+	<module>org.wso2.carbon.appmgt.mobile/1.0.0</module>
     </modules>
 
     <dependencyManagement>
@@ -76,7 +77,7 @@
     </repositories>
 
     <properties>
-        <apimgt.version>1.2.0</apimgt.version>
+        <apimgt.version>1.0.0</apimgt.version>
     </properties>
 </project>
 

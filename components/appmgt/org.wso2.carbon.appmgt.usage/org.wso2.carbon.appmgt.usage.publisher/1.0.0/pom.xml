@@ -21,23 +21,49 @@
         <artifactId>org.wso2.carbon.appmgt.usage</artifactId>
         <groupId>org.wso2.carbon</groupId>
         <version>1.0.0</version>
-<relativePath>../pom.xml</relativePath>
+	<relativePath>../../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>org.wso2.carbon.appmgt.usage.analyzer</artifactId>
-    <name>WSO2 Carbon - APP Management Usage Analyzer</name>
-    <version>1.0.0</version>
     <packaging>bundle</packaging>
+
+    <artifactId>org.wso2.carbon.appmgt.usage.publisher</artifactId>
+   <version>1.0.0</version>
+    <name>WSO2 Carbon - APP Management Usage Publisher</name>
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>2.1.0-wso2v9</version>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.appmgt.impl</artifactId> 
+            <artifactId>org.wso2.carbon.appmgt.impl</artifactId>   
 			<version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.appmgt.gateway</artifactId>     
+			<version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
+			<version>${wso2carbon.version}</version>
+        </dependency>
+		<dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.usage.agent</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ganalytics.publisher</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -46,10 +72,14 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+
+                        <Bundle-SymbolicName>org.wso2.carbon.appmgt.usage.publisher</Bundle-SymbolicName>
+                        <Bundle-Name>org.wso2.carbon.appmgt.usage.publisher</Bundle-Name>
+                        <Private-Package>
+                            org.wso2.carbon.appmgt.usage.publisher.internal
+                        </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.appmgt.usage.analyzer.*
+                            org.wso2.carbon.appmgt.usage.publisher.*
                         </Export-Package>
                         <Import-Package>
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
@@ -63,19 +93,19 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>generate-scr-scrdescriptor</id>
-                        <goals>
-                            <goal>scr</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <version>1.7.4</version>
             </plugin>
         </plugins>
     </build>
-
 </project>
-
