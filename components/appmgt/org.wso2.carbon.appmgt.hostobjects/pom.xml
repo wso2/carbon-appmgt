@@ -2,17 +2,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-       <version>1.0.0</version>
-		<relativePath>../pom.xml</relativePath>
+        <version>1.0.0-SNAPSHOT</version>
+	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - HostObject for API management</name>
+    <name>WSO2 Carbon - HostObject for APP management</name>
     <url>http://wso2.org</url>
 
     <dependencies>
@@ -35,38 +35,38 @@
         <dependency>
             <groupId>org.jaggeryjs</groupId>
             <artifactId>org.jaggeryjs.scriptengine</artifactId>
-            <version>0.9.0-07262013</version>
+            <version>${jaggery.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>  
-			<version>1.0.0</version>
+	    <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.jaggeryjs</groupId>
             <artifactId>org.jaggeryjs.hostobjects.web</artifactId>  
-	   <version>0.9.0-07262013</version>			
+	   <version>${jaggery.version}</version>			
         </dependency>
         <dependency>
             <groupId>org.jaggeryjs</groupId>
             <artifactId>org.jaggeryjs.hostobjects.file</artifactId>
-            <version>0.9.0-07262013</version>
+            <version>${jaggery.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.usage.client</artifactId>   
-	    <version>${wso2carbon.version}</version>			
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
          
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
-			<version>1.0.0</version>
+	    <version>1.0.0-SNAPSHOT</version>
 	</dependency>
         <dependency>
             <groupId>commons-io.wso2</groupId>
@@ -82,6 +82,11 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.user.registration.stub</artifactId>
 			<version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.registry.indexing</artifactId>
+            <version>4.2.1</version>
         </dependency>
     </dependencies>
 
@@ -99,13 +104,16 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+			<Private-Package>
+                            org.wso2.carbon.appmgt.hostobjects.internal
+                        </Private-Package>
                         <Export-Package>
+                            !org.wso2.carbon.appmgt.hostobjects.internal,
                             org.wso2.carbon.appmgt.hostobjects.*;
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.appmgt.api.*,
-                            org.wso2.carbon.appmgt.impl.*,
-							org.wso2.carbon.appmgt.keymgt.client.*,
+			    org.wso2.carbon.appmgt.keymgt.client.*,
                             *;resolution:=optional
                         </Import-Package>
                         <Embed-Dependency>
@@ -113,7 +121,6 @@
                         </Embed-Dependency>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>
-
                     </instructions>
                 </configuration>
             </plugin>
@@ -123,4 +130,3 @@
     <properties>
     </properties>
 </project>
-:

@@ -25,21 +25,21 @@
 
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>appmgt</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <name>APP Management</name>
     <modules>
-        <module>org.wso2.carbon.appmgt.api/1.0.0</module>
-        <module>org.wso2.carbon.appmgt.impl/1.0.0</module>
-        <module>org.wso2.carbon.appmgt.hostobjects/1.0.0</module>
-        <module>org.wso2.carbon.appmgt.keymgt/1.0.0</module>
-	<module>org.wso2.carbon.appmgt.keymgt.client/1.0.0</module>
-        <module>org.wso2.carbon.appmgt.gateway/1.0.0</module>
+        <module>org.wso2.carbon.appmgt.api</module>
+        <module>org.wso2.carbon.appmgt.impl</module>
+        <module>org.wso2.carbon.appmgt.hostobjects</module>
+        <module>org.wso2.carbon.appmgt.keymgt</module>
+	<module>org.wso2.carbon.appmgt.keymgt.client</module>
+        <module>org.wso2.carbon.appmgt.gateway</module>
         <module>org.wso2.carbon.appmgt.usage</module>
-	<module>org.wso2.carbon.appmgt.core/1.0.0</module>
-        <module>org.wso2.carbon.appmgt.oauth.endpoint/1.0.0</module>
-	<module>org.wso2.carbon.appmgt.mobile/1.0.0</module>
+	<module>org.wso2.carbon.appmgt.core</module>
+        <module>org.wso2.carbon.appmgt.oauth.endpoint</module>
+	<module>org.wso2.carbon.appmgt.mobile</module>
     </modules>
     <build>
         <plugins>
