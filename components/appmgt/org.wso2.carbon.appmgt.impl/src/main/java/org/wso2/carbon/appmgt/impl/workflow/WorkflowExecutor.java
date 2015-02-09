@@ -23,12 +23,13 @@ import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.registry.core.utils.UUIDGenerator;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * This is the class that should be extended by each workflow implementation.
  */
-public abstract class WorkflowExecutor {
+public abstract class WorkflowExecutor implements Serializable{
 
     //This variable indicates that the workflow is not dependent
     protected String callbackURL;
