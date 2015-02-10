@@ -6784,7 +6784,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				policyGroup.setThrottlingTier(rs.getString("THROTTLING_TIER"));
 				policyGroup.setUserRoles(rs.getString("USER_ROLES"));
 				policyGroup.setAllowAnonymous(rs.getBoolean("URL_ALLOW_ANONYMOUS"));
-			//	policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),connection));
+				policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),connection));
 				entitlementPolicyGroupList.add(policyGroup);
 			}
 

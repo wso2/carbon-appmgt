@@ -846,6 +846,7 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
         List<EntitlementPolicyGroup> policyGroupList = apiProvider.getPolicyGroupListForApplication(applicationId);
         int count = 0;
+        String policyPartials;
         for (EntitlementPolicyGroup entitlementPolicyGroup : policyGroupList) {
             NativeObject row = new NativeObject();
             row.put("policyGroupId", row, entitlementPolicyGroup.getPolicyGroupId());
@@ -853,7 +854,9 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("throttlingTier", row, entitlementPolicyGroup.getThrottlingTier());
             row.put("userRoles", row, entitlementPolicyGroup.getUserRoles());
             row.put("allowAnonymous", row, entitlementPolicyGroup.isAllowAnonymous());
-            //row.put("policyPartials", row, entitlementPolicyGroup.getPolicyPartials());
+            policyPartials = entitlementPolicyGroup.getPolicyPartials().toString();
+            row.put("policyPartials", row, policyPartials);
+
             count++;
             policyGroupArr.put(count, policyGroupArr, row);
         }
