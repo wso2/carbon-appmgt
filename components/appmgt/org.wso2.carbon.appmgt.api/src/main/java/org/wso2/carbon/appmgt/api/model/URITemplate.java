@@ -39,6 +39,7 @@ public class URITemplate {
 	private String throttlingTier;
 	private List<String> throttlingTiers = new ArrayList<String>();
     private List<EntitlementPolicyPartialMapping> entitlementPolicyPartialMappings;
+	private int policyGroupId; //Policy Group Id
 
     public URITemplate(){
         entitlementPolicyPartialMappings = new ArrayList<EntitlementPolicyPartialMapping>();
@@ -205,4 +206,23 @@ public class URITemplate {
 	public boolean isAllowAnonymousURL() {
 		return allowAnonymousURL;
 	}
+
+	/**
+	 * Get Policy Group Id
+	 *
+	 * @return Policy Group Id
+	 */
+	public int getPolicyGroupId() {
+		return policyGroupId;
+	}
+
+	/**
+	 * Set Policy Group Id
+	 *
+	 * @param policyGroupId :Policy Group Id
+	 */
+	public void setPolicyGroupId(int policyGroupId) {
+		this.policyGroupId = policyGroupId;
+	}
+
 }

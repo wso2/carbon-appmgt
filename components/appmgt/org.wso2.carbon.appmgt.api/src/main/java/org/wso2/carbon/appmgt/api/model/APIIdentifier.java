@@ -27,11 +27,25 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 @SuppressWarnings("unused")
 public class APIIdentifier {
 
-    private final String providerName;
-    private final String apiName;
-    private final String version;
+    private String providerName;
+    private String apiName;
+    private String version;
     private String tier;
     private String applicationId;
+    private Integer policyGroupId; //Policy Group Id
+
+    public APIIdentifier(Integer policyGroupId) {
+        this.policyGroupId = policyGroupId;
+    }
+
+    public void setPolicyGroupId(Integer policyGroupId) {
+        this.policyGroupId = policyGroupId;
+    }
+
+    public Integer getPolicyGroupId() {
+        return policyGroupId;
+    }
+
 
     public String getApplicationId() {
         return applicationId;
