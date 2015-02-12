@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.appmgt.usage.client.dto;
 
+import java.util.Date;
+
 public class APIUsageByUserDTO {
 
     private String apiName;
@@ -29,6 +31,16 @@ public class APIUsageByUserDTO {
     private long count;
 
     private String context;
+
+    private String requestDate;
+
+    public String getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(String requestDate) {
+        this.requestDate = requestDate;
+    }
 
     public String getApiName() {
         return apiName;
