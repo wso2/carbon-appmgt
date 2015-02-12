@@ -52,6 +52,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 
 public class APIUsageStatisticsClient {
@@ -363,6 +364,7 @@ public class APIUsageStatisticsClient {
                     usageDTO.setUserID(usage.userID);
                     usageDTO.setContext(usage.context);
                     usageDTO.setCount(usage.requestCount);
+                    usageDTO.setRequestDate(usage.accessTime);
                     usageByName.add(usageDTO);
                 }
             }
@@ -396,7 +398,7 @@ public class APIUsageStatisticsClient {
                 if (providerAPI.getId().getApiName().equals(responseTime.apiName) &&
                         providerAPI.getId().getVersion().equals(responseTime.apiVersion) &&
                         providerAPI.getContext().equals(responseTime.context)) {
-                    String apiName = responseTime.apiName + " (" + providerAPI.getId().getProviderName() + ")";
+                    String apiName = responseTime.apiName + " ( v" + providerAPI.getId().getVersion() + ")";
                     responseTimeDTO = new APIResponseTimeDTO();
                     responseTimeDTO.setApiName(apiName);
                     responseTimeDTO.setContext(responseTime.context);
@@ -1282,16 +1284,17 @@ public class APIUsageStatisticsClient {
             String query;
             String oracleQuery;
             if (fromDate != null && toDate != null) {
-                query = "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, CONTEXT "+
+                query = "SELECT API, API_VERSION, VERSION, USERID, TOTAL_REQUEST_COUNT AS TOTAL_REQUEST_COUNT, CONTEXT,TIME "+
                         "FROM API_REQUEST_SUMMARY" + " WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" GROUP BY API, API_VERSION, USERID ORDER BY TOTAL_REQUEST_COUNT DESC LIMIT " + resultsLimit;
+                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" GROUP BY API, API_VERSION, USERID,TOTAL_REQUEST_COUNT,TIME ";
 
-                oracleQuery =  "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, CONTEXT "+
+
+                oracleQuery =  "SELECT API, API_VERSION, VERSION, USERID, TOTAL_REQUEST_COUNT AS TOTAL_REQUEST_COUNT, CONTEXT,TIME "+
                         "FROM API_REQUEST_SUMMARY" + " WHERE " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" AND ROWNUM <= " + resultsLimit + " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT ORDER BY TOTAL_REQUEST_COUNT DESC";
+                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" AND ROWNUM <= " + resultsLimit + " GROUP BY API,TIME,API_VERSION, VERSION, USERID, CONTEXT,TOTAL_REQUEST_COUNT,Time ";
             } else {
-                query = "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, CONTEXT "+
-                        "FROM API_REQUEST_SUMMARY GROUP BY API, API_VERSION, USERID ORDER BY TOTAL_REQUEST_COUNT DESC LIMIT " + resultsLimit;
+                query = "SELECT API, API_VERSION, VERSION, USERID, TOTAL_REQUEST_COUNT AS TOTAL_REQUEST_COUNT, CONTEXT,TIME "+
+                        "FROM API_REQUEST_SUMMARY GROUP BY API, API_VERSION, USERID,TOTAL_REQUEST_COUNT,TIME";
 
                 oracleQuery = "SELECT API, API_VERSION, VERSION, USERID, SUM(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT, CONTEXT "+
                         "FROM API_REQUEST_SUMMARY WHERE ROWNUM <= "+ resultsLimit + " GROUP BY API, API_VERSION, VERSION, USERID, CONTEXT ORDER BY TOTAL_REQUEST_COUNT DESC ";
@@ -1638,6 +1641,7 @@ public class APIUsageStatisticsClient {
         private String userID;
         private long requestCount;
         private String context;
+        private String accessTime;
 
         public APIUsageByUserName(OMElement row) {
             apiName = row.getFirstChildWithName(new QName(
@@ -1649,6 +1653,8 @@ public class APIUsageStatisticsClient {
              context = row.getFirstChildWithName(new QName(APIUsageStatisticsClientConstants.CONTEXT)) .getText();
             requestCount = (long) Double.parseDouble(row.getFirstChildWithName(new QName(
                     APIUsageStatisticsClientConstants.REQUEST)).getText());
+            accessTime =row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.TIME)).getText();
         }
     }
 
