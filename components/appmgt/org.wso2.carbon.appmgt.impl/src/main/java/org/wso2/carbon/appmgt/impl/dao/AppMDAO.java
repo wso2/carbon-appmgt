@@ -2384,35 +2384,37 @@ public class AppMDAO {
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<Map<String, String>, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate)
+    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate)
             throws AppManagementException {
+
 
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        Map<Map<String, String>, Long> subscriptions = new HashMap<Map<String, String>, Long>();
+
+        Map<String, Long> subscriptions = new TreeMap<String, Long>();
 
         try {
             connection = APIMgtDBUtil.getConnection();
 
 
             if ("__all_providers__".equals(providerName)) {
-               String sqlQuery =
-                        "SELECT" + "  API.APP_NAME,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID"
+                String sqlQuery =
+                        "SELECT" + "  API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
                                 + " FROM APM_SUBSCRIPTION SUB, APM_APP API"
                                 + " WHERE  API.APP_ID=SUB.APP_ID"
                                 + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
-                                + " GROUP BY API.APP_NAME,API.APP_PROVIDER ";
+                                + " GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION ";
                 ps = connection.prepareStatement(sqlQuery);
                 ps.setString(1, fromDate);
                 ps.setString(2, toDate);
             } else {
                 String sqlQuery =
-                        "SELECT" + "  API.APP_NAME,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID"
+                        "SELECT" + "  API.APP_NAME,APP_VERSION,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
                                 + " FROM APM_SUBSCRIPTION SUB, APM_APP API"
                                 + " WHERE API.APP_PROVIDER = ? " +" AND API.APP_ID=SUB.APP_ID"
                                 + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
-                                + " GROUP BY API.APP_NAME,API.APP_PROVIDER ";
+                                + " GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER ";
                 ps = connection.prepareStatement(sqlQuery);
                 ps.setString(1,providerName);
                 ps.setString(2, fromDate);
@@ -2421,17 +2423,29 @@ public class AppMDAO {
 
 
             result = ps.executeQuery();
+
             if (result == null) {
                 return subscriptions;
             }
+            APIIdentifier appApiIdentifier;
 
-            long count = 0;
-            Map<String, String> providerToAPPName = null;
             while (result.next()) {
-                providerToAPPName = new HashMap<String, String>();
-                count = result.getLong("SUB_ID");
-                providerToAPPName.put(result.getString("APP_PROVIDER"), result.getString("APP_NAME"));
-                subscriptions.put(providerToAPPName, count);
+
+                String appName = result.getString("APP_NAME");
+
+                String appProvider = result.getString("APP_PROVIDER");
+                String appVersion = result.getString("APP_VERSION");
+                String appuuid = result.getString("uuid");
+
+                long count = result.getLong("SUB_ID");
+                appApiIdentifier = new APIIdentifier(appProvider, appName, appVersion);
+                String key = appName +"/"+appVersion+"&"+appuuid;
+                log.info("app details:"+key);
+                // log.info("API NAME :"+appApiIdentifier.getApiName()+"API PROVIDER :"+appProvider+"API VERSION :"+appVersion+"APP count :"+count);
+
+                subscriptions.put(key, count);
+
+
             }
 
 
@@ -2463,14 +2477,15 @@ public class AppMDAO {
                                                                                       AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
-        List<WebAppInfoDTO> webAppInfoDTOList;
+        // List<WebAppInfoDTO> webAppInfoDTOList;
+        List<Subscriber> subscribers;
 
         String sqlQuery =
-                "SELECT " + "SUBR.USER_ID AS USER_ID,  API.APP_NAME AS API, API.APP_PROVIDER AS PROVIDER   "
+                "SELECT " + "SUBR.USER_ID AS USER_ID,  API.APP_NAME AS API,API.APP_VERSION, API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME  "
                         + " FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API "
-                        + " WHERE SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND "
-                        + "APP.APPLICATION_ID  = SUB.APPLICATION_ID  AND "
-                        + "SUB.APP_ID = API.APP_ID AND SUBSCRIPTION_TIME BETWEEN ? AND ? GROUP BY SUBR.USER_ID,API.APP_NAME";
+                        + " WHERE sub.application_id = APP.application_id AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND "
+                        + "SUB.APP_ID = API.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
+
 
         Connection connection = null;
         PreparedStatement ps = null;
@@ -2486,22 +2501,24 @@ public class AppMDAO {
             if (result == null) {
                 return users;
             }
+
+
             while (result.next()) {
-                String userId = result.getString("USER_ID");
-                if (users.containsKey(userId)) {
-                    webAppInfoDTOList = users.get(userId);
-                    WebAppInfoDTO webAppInfoDTO = new WebAppInfoDTO();
-                    webAppInfoDTO.setWebAppName(result.getString("API"));
-                    webAppInfoDTO.setProviderId(result.getString("PROVIDER"));
-                    webAppInfoDTOList.add(webAppInfoDTO);
-                    users.put(userId, webAppInfoDTOList);
+                String app = result.getString("API")+"/"+result.getString("APP_VERSION");
+                if (users.containsKey(app)) {
+                    subscribers = users.get(app);
+                    Subscriber subscriber = new Subscriber(result.getString("USER_ID"));
+                    subscriber.setSubscribedDate(result.getDate("TIME"));
+                    log.info(subscriber.getSubscribedDate());
+
+                    subscribers.add(subscriber);
+                    users.put(app, subscribers);
                 } else {
-                    webAppInfoDTOList = new ArrayList<WebAppInfoDTO>();
-                    WebAppInfoDTO webAppInfoDTO = new WebAppInfoDTO();
-                    webAppInfoDTO.setWebAppName(result.getString("API"));
-                    webAppInfoDTO.setProviderId(result.getString("PROVIDER"));
-                    webAppInfoDTOList.add(webAppInfoDTO);
-                    users.put(userId, webAppInfoDTOList);
+                    subscribers = new ArrayList<Subscriber>();
+                    Subscriber subscriber = new Subscriber(result.getString("USER_ID"));
+                    subscriber.setSubscribedDate(result.getDate("TIME"));
+                    subscribers.add(subscriber);
+                    users.put(app, subscribers);
                 }
             }
         } catch (SQLException e) {
