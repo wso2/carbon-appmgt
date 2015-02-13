@@ -4397,7 +4397,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				",ENT.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,URL.URL_PATTERN AS URL_PATTERN,URL.HTTP_METHOD AS HTTP_METHOD  " +
 				",ENT.EFFECT AS EFFECT,POL.CONTENT AS POLICY_PARTIAL_CONTENT, URL.POLICY_GRP_ID AS POLICY_GRP_ID  " +
 				"FROM APM_APP_URL_MAPPING URL " +
-				"LEFT JOIN APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT ON ENT.POLICY_GRP_ID =URL.POLICY_GRP_ID " +
+				"INNER JOIN APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT ON ENT.POLICY_GRP_ID =URL.POLICY_GRP_ID " +
 				"LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL   POL ON POL.ENTITLEMENT_POLICY_PARTIAL_ID =ENT.POLICY_PARTIAL_ID  " +
 				"WHERE URL.APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) ";
 
@@ -6613,20 +6613,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
-									  String userRoles, String isAnonymousAllowed, Object[] objPartialMappings)
-			throws AppManagementException {
+										  String userRoles, String isAnonymousAllowed, Object[] objPartialMappings) throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
 		ResultSet rs = null;
 		String query = "";
-		String strDataContext = "";
 		int policyGroupId = -1;
 		try {
-			// used for error tracking purposes
-			strDataContext =
-					"(policyGroupName:" + policyGroupName + ", throttlingTier:" +
-							throttlingTier + ", userRoles:" + userRoles +
-							" ,isAnonymousAllowed:" + isAnonymousAllowed + ", Partial Mappings:" + objPartialMappings + ")";
+
 			query =
 					" INSERT INTO APM_POLICY_GROUP(NAME,THROTTLING_TIER,USER_ROLES,URL_ALLOW_ANONYMOUS) "
 							+ "VALUES(?,?,?,?) ";
@@ -6649,25 +6643,29 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			conn.commit();
 			if (log.isDebugEnabled()) {
-				log.debug("Record saved successfully." + strDataContext);
+				StringBuilder strDataContext=new StringBuilder();
+				strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
+						.append(throttlingTier).append(", userRoles:").append(userRoles)
+						.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
+						.append(objPartialMappings).append(")");
+				log.debug("Record saved successfully." + strDataContext.toString());
 			}
 		} catch (SQLException e) {
-			/*
-			only logging the exception because this function is
-			get directly called by the jaggery pages so throwing the exception outside can
-			disturb the users activities
-			*/
 			if (conn != null) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					log.error("Failed to rollback while saving the policy group : " + strDataContext, e);
+					log.error("Failed to rollback while saving the policy group", e);
 				}
-				log.error("SQL Error while executing the query to save Policy Group : " + query + " : " +
-						strDataContext + " : " + e.getMessage(), e);
 			}
-		} catch (AppManagementException e) {
-			log.error("Error while saving policy group : " + e.getMessage(), e);
+			StringBuilder strDataContext=new StringBuilder();
+			strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
+					.append(throttlingTier).append(", userRoles:").append(userRoles)
+					.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
+					.append(objPartialMappings).append(")");
+
+			handleException("SQL Error while executing the query to save Policy Group : " + query + " : " +
+					strDataContext.toString() + " : " + e.getMessage(), e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -6687,19 +6685,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 */
 	public static void updatePolicyGroup(String policyGroupName, String throttlingTier,
 										 String userRoles, String isAnonymousAllowed,
-										 int policyGroupId, Object[] objPartialMappings) {
+										 int policyGroupId, Object[] objPartialMappings) throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
 		String query = "";
-		String strDataContext = "";
 		try {
-			// used for error tracking purposes
-			strDataContext =
-					"(policyGroupName:" + policyGroupName + ", throttlingTier:" +
-							throttlingTier + ", userRoles:" + userRoles +
-							" ,isAnonymousAllowed:" + isAnonymousAllowed +
-							" ,policyGroupId:" + policyGroupId + ", Partial Mappings:" + objPartialMappings + ")";
-			query =
+			 query =
 					" UPDATE APM_POLICY_GROUP SET NAME=? ,THROTTLING_TIER=? ,USER_ROLES=? ,URL_ALLOW_ANONYMOUS=? "
 							+ " WHERE POLICY_GRP_ID=? ";
 			conn = APIMgtDBUtil.getConnection();
@@ -6722,25 +6713,28 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			conn.commit();
 
 			if (log.isDebugEnabled()) {
-				log.debug("Record updated successfully." + strDataContext);
+				StringBuilder strDataContext=new StringBuilder();
+				strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
+						.append(throttlingTier).append(", userRoles:").append(userRoles)
+						.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
+						.append(objPartialMappings).append(")");
+				log.debug("Record updated successfully." + strDataContext.toString());
 			}
 		} catch (SQLException e) {
-			/*
-			only logging the exception because this function is
-			get directly called by the jaggery pages so throwing the exception outside can
-			disturb the users activities
-			*/
 			if (conn != null) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					log.error("Failed to rollback while updating the policy group : " + strDataContext, e);
+					log.error("Failed to rollback while updating the policy group", e);
 				}
-				log.error("SQL Error while executing the query to update Policy Group : " + query + " : " +
-						strDataContext + " : " + e.getMessage(), e);
 			}
-		} catch (AppManagementException e) {
-			log.error("Error while updating policy group update : " + e.getMessage(), e);
+			StringBuilder strDataContext=new StringBuilder();
+			strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
+					.append(throttlingTier).append(", userRoles:").append(userRoles)
+					.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
+					.append(objPartialMappings).append(")");
+			handleException("SQL Error while executing the query to update Policy Group : " + query + " : " +
+					strDataContext.toString() + " : " + e.getMessage(), e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, null);
 		}
@@ -6760,7 +6754,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 		PreparedStatement preparedStatement = null;
 		String query = " INSERT INTO APM_POLICY_GROUP_MAPPING(APP_ID, POLICY_GRP_ID ) VALUES(?,?) ";
-		String strDataContext = "(applicationId:" + applicationId + ", policyGroupIds:" + policyGroupIds + ")";
+
 		try {
 			preparedStatement = connection.prepareStatement(query);
 
@@ -6772,6 +6766,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			preparedStatement.executeBatch();
 
 		} catch (SQLException e) {
+			String strDataContext = "(applicationId:" + applicationId + ", policyGroupIds:" + policyGroupIds + ")";
 			handleException("SQL Error while executing the query to save Policy Group mappings  : " + query + " : " +
 					strDataContext + " : " + e.getMessage(), e);
 		} finally {
@@ -6857,18 +6852,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
 		return arrPartials;
-
 	}
-
 
 	/**
 	 * delete policy groups
 	 *
 	 * @param applicationId : Application Id
 	 * @param policyGroupId : Policy Group Id
-	 * @throws SQLException           if any an error found while executing sql operations
+	 * @throws AppManagementException on error
 	 */
-	public void deletePolicyGroup(String applicationId, String policyGroupId) {
+	public void deletePolicyGroup(String applicationId, String policyGroupId) throws AppManagementException {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		String query = "";
@@ -6919,12 +6912,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					log.error("Failed to rollback while deleting the policy group : " + strDataContext, e);
 				}
 			}
-			/*
-			only logging the exception because this function is
-			get directly called by the jaggery pages so throwing the exception outside can
-			disturb the users activities
-			*/
-			log.error("Error while executing the query to delete XACML policies : " + query + " : " +
+			handleException("Error while executing the query to delete XACML policies : " + query + " : " +
 					strDataContext + " : " + e.getMessage(), e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, null);
@@ -7000,7 +6988,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param uuid : application uuid
 	 * @return : array of policy details objects
 	 */
-	public static JSONArray getPolicyGroupPoliciesApplicationWise(String uuid) {
+	public static JSONArray getPolicyGroupXACMLPoliciesByApplication(String uuid) {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -7033,7 +7021,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} catch (SQLException e) {
 			/*
 			only logging the exception because this function is
-			get directly called by the jaggery pages so throwing the exception outside can
+			get directly called by the jaggery pages only to view the data so throwing the exception outside can
 			disturb the users activities
 			*/
 			log.error("SQL Error while executing the query to get policies under each policy group mapped with the application : " + query + " : (Application UUID:" +
@@ -7041,6 +7029,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			objPartialArr = null;
 		} catch (AppManagementException e) {
 			log.error("Error while fetching policy partial details : " + e.getMessage(), e);
+			objPartialArr = null;
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -7058,10 +7047,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	public static String getPolicyGroupWisePolicyPartials(Integer policyGroupId, Connection conn) throws AppManagementException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String policyNamelist = "";
+		String policyNamelist = ""; //contains policy partial name list
 
 		//query to get policies under each policy group mapped with the application
-		String query = "SELECT MAP.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,POL.NAME AS POLICY_PARTIAL_NAME " +
+		String query = "SELECT MAP.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,POL.NAME AS POLICY_PARTIAL_NAME,MAP.EFFECT AS EFFECT " +
 				"FROM  APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING MAP " +
 				"LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL  POL ON MAP.POLICY_PARTIAL_ID =POL.ENTITLEMENT_POLICY_PARTIAL_ID " +
 				"WHERE MAP.POLICY_GRP_ID = ? ";
@@ -7073,11 +7062,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setInt(1, policyGroupId);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				policyNamelist += rs.getString("POLICY_PARTIAL_NAME") + ",";
+				//creates the policy partial name list with effect
+				policyNamelist += "[ Name: " + rs.getString("POLICY_PARTIAL_NAME") + ", Effect: " + rs.getString("EFFECT") + "], ";
 			}
 
 			if (policyNamelist.endsWith(",")) {
-				policyNamelist = policyNamelist.substring(0,policyNamelist.length()-1);
+				policyNamelist = policyNamelist.substring(0, policyNamelist.length() - 1);
 			}
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get policies under each policy group mapped with the application : " + query + " : (Policy Group Id:" +
