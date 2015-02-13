@@ -2440,8 +2440,6 @@ public class AppMDAO {
                 long count = result.getLong("SUB_ID");
                 appApiIdentifier = new APIIdentifier(appProvider, appName, appVersion);
                 String key = appName +"/"+appVersion+"&"+appuuid;
-                log.info("app details:"+key);
-                // log.info("API NAME :"+appApiIdentifier.getApiName()+"API PROVIDER :"+appProvider+"API VERSION :"+appVersion+"APP count :"+count);
 
                 subscriptions.put(key, count);
 
@@ -2509,8 +2507,7 @@ public class AppMDAO {
                     subscribers = users.get(app);
                     Subscriber subscriber = new Subscriber(result.getString("USER_ID"));
                     subscriber.setSubscribedDate(result.getDate("TIME"));
-                    log.info(subscriber.getSubscribedDate());
-
+                  
                     subscribers.add(subscriber);
                     users.put(app, subscribers);
                 } else {
