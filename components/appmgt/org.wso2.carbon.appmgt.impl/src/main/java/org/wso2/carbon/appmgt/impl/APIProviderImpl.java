@@ -517,9 +517,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public List<EntitlementPolicyGroup> getPolicyGroupListForApplication(Integer appId) throws
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
             AppManagementException {
-        return appMDAO.getPolicyGroupListForApplication(appId);
+        return appMDAO.getPolicyGroupListByApplication(appId);
     }
 
 

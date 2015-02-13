@@ -485,7 +485,7 @@ public interface APIProvider extends APIManager {
      * @return list of policy groups
      * @throws AppManagementException on error
      */
-    public List<EntitlementPolicyGroup> getPolicyGroupListForApplication(Integer appId) throws
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
             AppManagementException;
 
 

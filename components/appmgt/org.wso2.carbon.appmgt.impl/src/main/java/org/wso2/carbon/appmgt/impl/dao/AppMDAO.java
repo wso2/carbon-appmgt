@@ -6613,7 +6613,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
-										  String userRoles, String isAnonymousAllowed, Object[] objPartialMappings) throws AppManagementException {
+										  String userRoles, String isAnonymousAllowed,
+										  Object[] objPartialMappings)
+			throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
 		ResultSet rs = null;
@@ -6636,18 +6638,19 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			if (rs.next()) {
 				policyGroupId = Integer.parseInt(rs.getString(1));
 			}
-			//save partials mapped to policy group
+			// save partials mapped to policy group
 			if (objPartialMappings.length > 0) {
 				savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
 			}
 
 			conn.commit();
 			if (log.isDebugEnabled()) {
-				StringBuilder strDataContext=new StringBuilder();
-				strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
-						.append(throttlingTier).append(", userRoles:").append(userRoles)
-						.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
-						.append(objPartialMappings).append(")");
+				StringBuilder strDataContext = new StringBuilder();
+				strDataContext.append("(policyGroupName:").append(policyGroupName)
+						.append(", throttlingTier:").append(throttlingTier)
+						.append(", userRoles:").append(userRoles)
+						.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed)
+						.append(", Partial Mappings:").append(objPartialMappings).append(")");
 				log.debug("Record saved successfully." + strDataContext.toString());
 			}
 		} catch (SQLException e) {
@@ -6658,19 +6661,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					log.error("Failed to rollback while saving the policy group", e);
 				}
 			}
-			StringBuilder strDataContext=new StringBuilder();
-			strDataContext.append("(policyGroupName:").append(policyGroupName).append(", throttlingTier:")
-					.append(throttlingTier).append(", userRoles:").append(userRoles)
-					.append(" ,isAnonymousAllowed:").append(isAnonymousAllowed).append(", Partial Mappings:")
+			StringBuilder strDataContext = new StringBuilder();
+			strDataContext.append("(policyGroupName:").append(policyGroupName)
+					.append(", throttlingTier:").append(throttlingTier)
+					.append(", userRoles:").append(userRoles).append(" ,isAnonymousAllowed:")
+					.append(isAnonymousAllowed).append(", Partial Mappings:")
 					.append(objPartialMappings).append(")");
 
-			handleException("SQL Error while executing the query to save Policy Group : " + query + " : " +
-					strDataContext.toString() + " : " + e.getMessage(), e);
+			handleException("SQL Error while executing the query to save Policy Group : " + query +
+					" : " + strDataContext.toString() + " : " + e.getMessage(), e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
 		return policyGroupId;
 	}
+
 
 	/**
 	 * Update policy groups
@@ -6781,16 +6786,20 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @return : list of object EntitlementPolicyGroup which contains Policy Group details
 	 * @throws AppManagementException on error
 	 */
-	public List<EntitlementPolicyGroup> getPolicyGroupListForApplication(Integer appId) throws
-			AppManagementException {
+	public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId)
+			throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement ps = null;
-		List<EntitlementPolicyGroup> entitlementPolicyGroupList = new ArrayList<EntitlementPolicyGroup>();
+		List<EntitlementPolicyGroup> entitlementPolicyGroupList =
+				new ArrayList<EntitlementPolicyGroup>();
 		ResultSet rs = null;
 
-		String query = "SELECT POLICY_GRP_ID ,NAME ,THROTTLING_TIER ,USER_ROLES ,COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS  FROM APM_POLICY_GROUP " +
-				"WHERE POLICY_GRP_ID IN (SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?) ";
+		String query =
+				"SELECT POLICY_GRP_ID ,NAME ,THROTTLING_TIER ,USER_ROLES ,"
+						+ "COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') "
+						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS  FROM APM_POLICY_GROUP "
+						+ "WHERE POLICY_GRP_ID IN (SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?) ";
 		try {
 			connection = APIMgtDBUtil.getConnection();
 			ps = connection.prepareStatement(query);
@@ -6804,13 +6813,15 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				policyGroup.setThrottlingTier(rs.getString("THROTTLING_TIER"));
 				policyGroup.setUserRoles(rs.getString("USER_ROLES"));
 				policyGroup.setAllowAnonymous(rs.getBoolean("URL_ALLOW_ANONYMOUS"));
-				policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),connection));
+				policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),
+						connection));
 				entitlementPolicyGroupList.add(policyGroup);
 			}
 
 		} catch (SQLException e) {
-			handleException("SQL Error while executing the query to fetch Application wise policy Group list : " + query + " : (Application Id" +
-					appId + ") : " + e.getMessage(), e);
+			handleException("SQL Error while executing the query to fetch Application wise policy Group list : " +
+							query + " : (Application Id" + appId + ") : " + e.getMessage(),
+					e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, connection, rs);
 		}
@@ -6928,14 +6939,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param conn               :sql connection
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
-	public static void savePolicyPartialMappings(Integer policyGroupId, Object[] objPartialMappings, Connection conn)
-			throws AppManagementException {
+	public static void savePolicyPartialMappings(Integer policyGroupId,
+												 Object[] objPartialMappings, Connection conn)
+			throws SQLException {
 		String query =
-				" INSERT INTO APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING (POLICY_GRP_ID,EFFECT,POLICY_PARTIAL_ID ) VALUES(?,?,?) ";
+				" INSERT INTO APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING (POLICY_GRP_ID,EFFECT,POLICY_PARTIAL_ID ) "
+						+ " VALUES(?,?,?) ";
 		PreparedStatement preparedStatement = null;
-		String strDataContext =
-				"(Policy Group Id:" + policyGroupId + ", Policy Partial Mappings:" + objPartialMappings +
-						")";
+
 		try {
 			preparedStatement = conn.prepareStatement(query);
 
@@ -6943,13 +6954,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				NativeObject objPartial = (NativeObject) objPartialMappings[i];
 				preparedStatement.setInt(1, policyGroupId);
 				preparedStatement.setString(2, objPartial.get("effect", objPartial).toString());
-				preparedStatement.setInt(3, Integer.parseInt(objPartial.get("entitlementPolicyPartialId", objPartial).toString()));
+				preparedStatement.setInt(3,
+						Integer.parseInt(objPartial.get("entitlementPolicyPartialId",
+								objPartial).toString()));
 				preparedStatement.addBatch();
 			}
 			preparedStatement.executeBatch();
 		} catch (SQLException e) {
-			handleException("SQL Error while executing the query to save policy partial mappings: " + query + " : " +
-					strDataContext + " : " + e.getMessage(), e);
+			log.error("SQL Error while executing the query to save policy partial mappings: " +
+					query + " : (Policy Group Id:" + policyGroupId + ", Policy Partial Mappings:" +
+					objPartialMappings + ") : " + e.getMessage(), e);
+			/*
+			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so  the connection will be disposed by the parent function.
+			*/
+			throw e;
 		} finally {
 			APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
 		}

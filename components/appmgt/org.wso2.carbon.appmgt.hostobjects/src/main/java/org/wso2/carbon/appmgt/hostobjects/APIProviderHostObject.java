@@ -27,19 +27,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.woden.WSDLFactory;
 import org.apache.woden.WSDLReader;
-import org.apache.xpath.operations.Bool;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
@@ -839,14 +834,14 @@ public class APIProviderHostObject extends ScriptableObject {
      * @return Policy Group Array
      * @throws AppManagementException on error
      */
-    public static NativeArray jsFunction_getPolicyGroupListForApplication(Context context, Scriptable thisObj,
+    public static NativeArray jsFunction_getPolicyGroupListByApplication(Context context, Scriptable thisObj,
                                                                           Object[] args,
                                                                           Function funObj) throws
             AppManagementException {
         NativeArray policyGroupArr = new NativeArray(0);
         Integer applicationId = Integer.parseInt(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
-        List<EntitlementPolicyGroup> policyGroupList = apiProvider.getPolicyGroupListForApplication(applicationId);
+        List<EntitlementPolicyGroup> policyGroupList = apiProvider.getPolicyGroupListByApplication(applicationId);
         int count = 0;
         String policyPartials;
         for (EntitlementPolicyGroup entitlementPolicyGroup : policyGroupList) {
