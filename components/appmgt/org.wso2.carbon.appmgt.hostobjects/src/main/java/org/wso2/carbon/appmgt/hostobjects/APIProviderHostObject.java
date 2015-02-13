@@ -562,10 +562,10 @@ public class APIProviderHostObject extends ScriptableObject {
      * @param funObj  Function object
      * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
      */
-     public static void jsFunction_generateEntitlementPolicies(Context context, Scriptable thisObj,
+    public static void jsFunction_generateEntitlementPolicies(Context context, Scriptable thisObj,
                                                               Object[] args,
                                                               Function funObj) throws
-                                                                               AppManagementException {      
+            AppManagementException {
         if (args == null || args.length == 0) {
             handleException("Invalid number of input parameters.");
         }
@@ -575,7 +575,9 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeObject appIdentifierNativeObject = (NativeObject) args[0];
         APIIdentifier apiIdentifier = new APIIdentifier(
-                (Integer) (appIdentifierNativeObject.get("policyGroupId", appIdentifierNativeObject)));
+                (String) (appIdentifierNativeObject.get("provider", appIdentifierNativeObject)),
+                (String) (appIdentifierNativeObject.get("name", appIdentifierNativeObject)),
+                (String) (appIdentifierNativeObject.get("version", appIdentifierNativeObject)));
         APIProvider apiProvider = getAPIProvider(thisObj);
         apiProvider.generateEntitlementPolicies(apiIdentifier);
     }
