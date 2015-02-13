@@ -1391,15 +1391,28 @@ public class APIProviderHostObject extends ScriptableObject {
 
             if (providerName != null) {
 
+
                 Map<String, List> subscribedApps = apiProvider.getSubscribedAPPsByUsers(fromDate, toDate);
                 int i = 0;
 
                 for (Map.Entry<String, List> entry : subscribedApps.entrySet()) {
-                    List<WebAppInfoDTO> webAppList = entry.getValue();
-                    for (WebAppInfoDTO webApp : webAppList) {
+                    //                    List<WebAppInfoDTO> webAppList = entry.getValue();
+//                    for (WebAppInfoDTO webApp : webAppList) {
+//                        NativeObject row = new NativeObject();
+//                        row.put("user", row, entry.getKey());
+//                        row.put("apiName", row, webApp.getWebAppName() + "(" + webApp.getProviderId() + ")");
+//                        myn.put(i, myn, row);
+//                        i++;
+//                    }
+
+                    List<Subscriber> subscribers = entry.getValue();
+                    for (Subscriber subscriber : subscribers) {
                         NativeObject row = new NativeObject();
-                        row.put("user", row, entry.getKey());
-                        row.put("apiName", row, webApp.getWebAppName() + "(" + webApp.getProviderId() + ")");
+                        String[] parts = entry.getKey().split("/");
+                        row.put("apiName", row, parts[0]);
+                        row.put("version", row, parts[1]);
+                        row.put("user", row, subscriber.getName());
+                        row.put("subscribeDate", row,(subscriber.getSubscribedDate()+""));
                         myn.put(i, myn, row);
                         i++;
                     }
@@ -1455,28 +1468,33 @@ public class APIProviderHostObject extends ScriptableObject {
 
             if (providerName != null) {
                 // Map consists data as <<appProvider,appName>,subscriptionCount>
-                Map<Map<String, String>, Long> subscriptions = apiProvider.getSubscriptionCountByAPPs(providerName,
+                Map<String ,Long> subscriptions = apiProvider.getSubscriptionCountByAPPs(providerName,
                         fromDate, toDate);
 
                 List<APISubscription> subscriptionData = new ArrayList<APISubscription>();
 
-                String appProvider = null;
-                String appName = null;
-                Map<String, String> providerToAPPName = null;
-                APISubscription apiSub = null;
+                for (Map.Entry<String, Long> entry : subscriptions.entrySet()) {
 
-                for (Map.Entry<Map<String, String>, Long> entry : subscriptions.entrySet()) {
-                    apiSub = new APISubscription();
-                    providerToAPPName = entry.getKey();
-                    apiSub.count = entry.getValue();
-                    //providerToAPPName only have one entry
-                    for (Map.Entry<String, String> mapEntry : providerToAPPName.entrySet()) {
-                        appProvider = mapEntry.getKey();
-                        appName = mapEntry.getKey();
-                    }
+                    String[] parts = entry.getKey().split("/");
+                    String part1 = parts[0];
 
-                    apiSub.name = appName + "(" + appProvider + ")";
-                    subscriptionData.add(apiSub);
+
+                    String part2 = parts[1];
+
+
+                    String[] uuidpart = part2.split("&");
+                    String version = uuidpart[0];
+                    String uuid = uuidpart[1];
+
+
+                    APISubscription sub = new APISubscription();
+                    sub.name = part1;
+                    sub.version = version;
+                    sub.count = entry.getValue();
+                    sub.uuid=uuid;
+                    subscriptionData.add(sub);
+                    //  log.info("app name="+part1+" version="+version+" count="+entry.getValue()+" uuid="+uuid);
+
                 }
                 Collections.sort(subscriptionData, new Comparator<APISubscription>() {
                     public int compare(APISubscription o1, APISubscription o2) {
@@ -1503,6 +1521,9 @@ public class APIProviderHostObject extends ScriptableObject {
                     NativeObject row = new NativeObject();
                     row.put("apiName", row, sub.name);
                     row.put("count", row, sub.count);
+                    row.put("version", row, sub.version);
+                    row.put("uuid", row, sub.uuid);
+
                     myn.put(i, myn, row);
                     i++;
                 }
@@ -2503,6 +2524,10 @@ public class APIProviderHostObject extends ScriptableObject {
                 row.put("userId", row, usage.getUserID());
                 row.put("context",row,usage.getContext());
                 row.put("count", row, usage.getCount());
+                row.put("userId", row, usage.getUserID());
+                row.put("time", row, usage.getRequestDate());
+
+
                 myn.put(i, myn, row);
                 i++;
             }
@@ -2815,6 +2840,8 @@ public class APIProviderHostObject extends ScriptableObject {
     private static class APISubscription {
         private String name;
         private long count;
+        private String version;
+        private String uuid;
     }
 
     /**
