@@ -214,10 +214,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return result : boolean result relevant to registry value
      */
     public boolean isUrlAllowAnonymous(MessageContext messageContext) {
-        boolean result;
+        boolean result = false;
         String httpVerb = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("HTTP_METHOD");
         String fullReqPath = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
-        result = verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + fullReqPath);
+        if (verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + fullReqPath) != null) {
+            result = verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + fullReqPath);
+        }
         //write to messageContext so then the same value can be red as a property in other handlers
         messageContext.setProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS, result);
         return result;
