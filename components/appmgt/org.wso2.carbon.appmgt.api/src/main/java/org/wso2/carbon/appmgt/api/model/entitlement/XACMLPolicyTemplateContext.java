@@ -28,6 +28,7 @@ public class XACMLPolicyTemplateContext {
     private String effect;
     private String policyPartialContent;
     private String policyId;
+    private int policyGroupId; //Policy Group Id
 
     /**
      * Get urlTemplate id
@@ -127,6 +128,7 @@ public class XACMLPolicyTemplateContext {
 
     /**
      * Get entitlement policy id
+     *
      * @return entitlement policy id
      */
     public String getPolicyId() {
@@ -135,9 +137,28 @@ public class XACMLPolicyTemplateContext {
 
     /**
      * Set entitlement policy id
+     *
      * @param policyId entitlement policy id
      */
     public void setPolicyId(String policyId) {
         this.policyId = policyId;
+    }
+
+    /**
+     * Set Policy Group Id
+     *
+     * @param policyGroupId : Policy Group Id
+     */
+    public void setPolicyGroupId(int policyGroupId) {
+        this.policyGroupId = policyGroupId;
+    }
+
+    /**
+     * Get Policy Group Id
+     *
+     * @return Policy Group Id
+     */
+    public int getPolicyGroupId() {
+        return policyGroupId;
     }
 }

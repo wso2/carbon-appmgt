@@ -99,6 +99,7 @@ public class WebApp {
 
     private String uuid;
     private String policyPartials;
+    private String policyGroups; //Policy Groups Id's list
 
     /**
      * The average rating provided by the WebApp subscribers
@@ -606,5 +607,23 @@ public class WebApp {
 
     public void setSsoProviderDetails(SSOProvider ssoProviderDetails) {
         this.ssoProviderDetails = ssoProviderDetails;
+    }
+
+    /**
+     * Set Policy Groups Id's list
+     *
+     * @param policyGroups : Policy group Id's mapped to Application
+     */
+    public void setPolicyGroups(String policyGroups) {
+        this.policyGroups = policyGroups;
+    }
+
+    /**
+     * Get Policy Groups Id's list
+     *
+     * @return : Policy group Id's mapped to Application
+     */
+    public String getPolicyGroups() {
+        return policyGroups;
     }
 }

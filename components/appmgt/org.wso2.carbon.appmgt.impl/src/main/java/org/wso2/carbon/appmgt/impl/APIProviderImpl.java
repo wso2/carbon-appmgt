@@ -508,6 +508,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appMDAO.getSharedEntitlementPolicyPartialsList();
     }
 
+
+    /**
+     * Get Policy Groups Application wise
+     *
+     * @param appId : Application Id
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
+            AppManagementException {
+        return appMDAO.getPolicyGroupListByApplication(appId);
+    }
+
+
     @Override
     public EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial) throws
                                                                                                     AppManagementException {
@@ -1676,4 +1691,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         return subscriptions;
     }
+
+
 }
