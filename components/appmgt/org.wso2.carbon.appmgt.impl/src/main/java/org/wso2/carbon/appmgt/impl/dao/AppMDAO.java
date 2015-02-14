@@ -644,12 +644,6 @@ public class AppMDAO {
         ResultSet rs = null;
         String userRoles = null;
 
-		/*
- 		ADDED POLICY GROUP
-        String ssoInfoSqlQuery = "SELECT USER_ROLES FROM APM_APP_URL_MAPPING WHERE " +
-                                 "APP_ID= ? AND URL_PATTERN= ? AND HTTP_METHOD= ?";
-        */
-
 		String ssoInfoSqlQuery = "SELECT USER_ROLES FROM APM_APP_URL_MAPPING MAP " +
 				"LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID " +
 				"WHERE MAP.APP_ID= ? AND URL_PATTERN= ? AND HTTP_METHOD= ?";
@@ -736,13 +730,6 @@ public class AppMDAO {
 		ResultSet rs = null;
 		VerbInfoDTO verbInfoDTO = new VerbInfoDTO();
 
-		/*
-		ADDED POLICY GROUP
-		String query =
-				"SELECT HTTP_METHOD, URL_PATTERN, COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') URL_ALLOW_ANONYMOUS  "
-						+ " FROM APM_APP_URL_MAPPING "
-						+ " WHERE APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=? ) ";
-						*/
 		String query =
 				"SELECT HTTP_METHOD, URL_PATTERN, COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') URL_ALLOW_ANONYMOUS  "
 						+ " FROM APM_APP_URL_MAPPING MAP "
@@ -4304,14 +4291,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ArrayList<URITemplate> uriTemplates = new ArrayList<URITemplate>();
 
 		// TODO : FILTER RESULTS ONLY FOR ACTIVE APIs
-		/*
-		ADDED POLICY GROUP
-        String query =
-                "SELECT AUM.HTTP_METHOD,AUTH_SCHEME,URL_PATTERN,THROTTLING_TIER,SKIP_THROTTLING,USER_ROLES FROM APM_APP_URL_MAPPING AUM, APM_APP API "
-                        + "WHERE API.CONTEXT= ? "
-                        + "AND API.APP_VERSION = ? "
-                        + "AND AUM.APP_ID = API.APP_ID " + "ORDER BY " + "URL_MAPPING_ID";
-		 */
 
 
 		String query =
@@ -4363,34 +4342,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			throws AppManagementException {
 
 		List<XACMLPolicyTemplateContext> contexts = new ArrayList<XACMLPolicyTemplateContext>();
-
-
-		/*
-		ADDED POLICY GROUP
-		String query = "SELECT " +
-				"APM_APP_URL_MAPPING.APP_ID AS APP_ID, " +
-				"APM_APP_URL_MAPPING.URL_MAPPING_ID AS URL_MAPPING_ID, " +
-				"APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.POLICY_ID AS POLICY_ID, " +
-				"APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID, " +
-				"APM_APP_URL_MAPPING.URL_PATTERN AS URL_PATTERN, " +
-				"APM_APP_URL_MAPPING.HTTP_METHOD AS HTTP_METHOD, " +
-				"APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.EFFECT AS EFFECT, " +
-				"APM_ENTITLEMENT_POLICY_PARTIAL.CONTENT AS POLICY_PARTIAL_CONTENT " +
-				"FROM " +
-				"APM_APP " +
-				"INNER JOIN APM_APP_URL_MAPPING " +
-				"INNER JOIN APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING " +
-				"INNER JOIN APM_ENTITLEMENT_POLICY_PARTIAL " +
-				"ON " +
-				"APM_APP.APP_ID  = APM_APP_URL_MAPPING.APP_ID " +
-				"AND APM_APP_URL_MAPPING.URL_MAPPING_ID = APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.URL_MAPPING_ID " +
-				"AND APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.POLICY_PARTIAL_ID  = " +
-				"APM_ENTITLEMENT_POLICY_PARTIAL.ENTITLEMENT_POLICY_PARTIAL_ID " +
-				"WHERE " +
-				"APM_APP.APP_PROVIDER = ? " +
-				"AND APM_APP.APP_NAME = ? " +
-				"AND APM_APP.APP_VERSION = ? ";
-		 */
 
 
 		String query = "SELECT  URL.APP_ID AS APP_ID,URL.URL_MAPPING_ID AS URL_MAPPING_ID,ENT.POLICY_ID AS POLICY_ID " +
@@ -4797,15 +4748,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 			conn = APIMgtDBUtil.getConnection();
 
-			/*
-			ADDED POLICY GROUP
-			String sqlQuery =
-			                  "SELECT URL_PATTERN ,HTTP_METHOD ,AUTH_SCHEME ,THROTTLING_TIER, USER_ROLES "
-			                          + "FROM  APM_APP_URL_MAPPING INNER JOIN APM_APP "
-			                          + "ON APM_APP_URL_MAPPING.APP_ID = APM_APP.APP_ID "
-			                          + "WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ORDER BY URL_MAPPING_ID ASC ";
-
-*/
 			String sqlQuery =
 					" SELECT URL_PATTERN ,HTTP_METHOD ,AUTH_SCHEME ,THROTTLING_TIER, USER_ROLES "
 							+ " FROM  APM_APP_URL_MAPPING MAP "
@@ -5355,15 +5297,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		List<String> appsNameList = new ArrayList<String>();
 		ResultSet rs = null;
 
-		/*
-		ADDED POLICY GROUP
-		String queryToGetAppsName = "SELECT APM_APP.APP_NAME " +
-				"FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING  ,APM_APP_URL_MAPPING,APM_APP " +
-				"WHERE APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.POLICY_PARTIAL_ID  = ? " +
-				"AND APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.URL_MAPPING_ID = APM_APP_URL_MAPPING.URL_MAPPING_ID " +
-				"AND APM_APP_URL_MAPPING.APP_ID = APM_APP.APP_ID";
-*/
-
 		String queryToGetAppsName = "SELECT APP.APP_NAME " +
 				" FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
 				" LEFT JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
@@ -5534,18 +5467,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                                                                                                  AppManagementException {
 		PreparedStatement statementToRetrievePolicyIds = null;
 		ResultSet rs = null;
-
-		/*
-		ADDED POLICY GROUP
-		String queryToGetPolicyIdList = "SELECT POLICY_ID FROM APM_APP_URL_MAPPING " +
-				"join " +
-				"APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING " +
-				"on " +
-				"APM_APP_URL_MAPPING.URL_MAPPING_ID = APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING.URL_MAPPING_ID " +
-				"AND " +
-				"APM_APP_URL_MAPPING.APP_ID =?";
-		 */
-
 
 		String queryToGetPolicyIdList = "SELECT POLICY_ID " +
 				"FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
@@ -6878,28 +6799,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String query = "";
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
-			conn.setAutoCommit(false); //using sql transactions so setting setAutoCommit as false
 
-
-			//delete from group mapping table
-			query =
-					" DELETE FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=? AND POLICY_GRP_ID =? ";
-			ps = conn.prepareStatement(query);
-			ps.setInt(1, Integer.parseInt(applicationId));
-			ps.setInt(2, Integer.parseInt(policyGroupId));
-			ps.executeUpdate();
-			ps.close();
-
-
-			//delete from partial mapping table
-			query =
-					" DELETE FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING WHERE POLICY_GRP_ID =? ";
-			ps = conn.prepareStatement(query);
-			ps.setInt(1, Integer.parseInt(policyGroupId));
-			ps.executeUpdate();
-			ps.close();
-
-			//delete from master table
+		 	//delete from master table
 			query = " DELETE FROM APM_POLICY_GROUP WHERE POLICY_GRP_ID=? ";
 			ps = conn.prepareStatement(query);
 			ps.setInt(1, Integer.parseInt(policyGroupId));
@@ -6913,13 +6814,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				log.debug("Policy Group deleted successfully. " + strDataContext);
 			}
 		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					conn.rollback();
-				} catch (SQLException e1) {
-					log.error("Failed to rollback while deleting the policy group" , e);
-				}
-			}
 			String strDataContext =
 					"(applicationId:" + applicationId + ", policyGroupId:" + policyGroupId + ")";
 			handleException("Error while executing the query to delete XACML policies : " + query + " : " +
