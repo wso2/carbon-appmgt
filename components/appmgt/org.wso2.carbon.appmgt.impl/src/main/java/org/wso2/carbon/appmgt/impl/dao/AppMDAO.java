@@ -94,8 +94,6 @@ import org.wso2.carbon.identity.oauth.OAuthUtil;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import sun.org.mozilla.javascript.internal.*;
-import sun.org.mozilla.javascript.internal.Context;
 
 /**
  * This class represent the AppMDAO.
