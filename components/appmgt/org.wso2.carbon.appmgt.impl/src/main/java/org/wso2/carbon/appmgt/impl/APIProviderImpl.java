@@ -1680,9 +1680,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public Map<Map<String, String>, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
+    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
             throws AppManagementException {
-        Map<Map<String, String>, Long> subscriptions = null;
+        Map<String,Long> subscriptions = null;
         try {
             subscriptions = appMDAO.GetSubscriptionCountByApp(provider, fromDate, toDate);
         } catch (AppManagementException e) {
