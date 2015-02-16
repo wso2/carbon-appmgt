@@ -226,6 +226,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     public boolean handleResponse(MessageContext messageContext) {
+    	if (isAppAllowAnonymous(messageContext) || isUrlAllowAnonymous(messageContext)) {
+            return true;
+        }
         String appmSamlSsoCookie = (String)messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                 getAxis2MessageContext();
