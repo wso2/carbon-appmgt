@@ -109,6 +109,8 @@ public class WebApp {
 
     private boolean isLatest;
 
+    private boolean skipGateway;
+
     //TODO: missing - total user count, up time statistics,tier
 
 
@@ -635,5 +637,13 @@ public class WebApp {
 
     public String getJavaPolicies() {
         return javaPolicies;
+    }
+
+    public boolean getSkipGateway() {
+        return skipGateway;
+    }
+
+    public void setSkipGateway(boolean skipGateway) {
+        this.skipGateway = skipGateway;
     }
 }
