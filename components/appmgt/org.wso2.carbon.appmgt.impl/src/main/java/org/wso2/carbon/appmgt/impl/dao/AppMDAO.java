@@ -4044,6 +4044,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				saveApplicationPolicyGroupsMappings(connection, webAppId, policyGroupIdList.toArray());
 			}
 
+			//save java policies app wise
+			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
+				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
+				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
+			}
+
 
 			connection.commit();
 		} catch (SQLException e) {
@@ -7018,5 +7024,89 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		return policyNamelist;
 	}
 
+	/**
+	 * Fetch predefined Java policy list
+	 *
+	 * @return array of all available java policies
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
+	 */
+	public static NativeArray getAvailableJavaPolicyList()
+			throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		NativeObject objPolicy;
+		NativeArray arrJavaPolicies = new NativeArray(0);
+		Integer count = 0;
+
+		String query = "SELECT JAVA_POLICY_ID ,DISPLAY_NAME ,FULL_QUALIFI_NAME ,DESCRIPTION ,DISPLAY_ORDER_SEQ_NO , " +
+				" IS_MANDATORY ,POLICY_PROPERTIES " +
+				" FROM APM_APP_JAVA_POLICY ORDER BY DISPLAY_ORDER_SEQ_NO ";
+
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				objPolicy = new NativeObject();
+				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
+				objPolicy.put("displayName", objPolicy, rs.getString("DISPLAY_NAME"));
+				objPolicy.put("fullQualifiedName", objPolicy, rs.getString("FULL_QUALIFI_NAME"));
+				objPolicy.put("description", objPolicy, rs.getString("DESCRIPTION"));
+				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+				objPolicy.put("isMandatory", objPolicy, rs.getBoolean("IS_MANDATORY"));
+				objPolicy.put("policyProperties", objPolicy, rs.getString("POLICY_PROPERTIES"));
+
+				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
+				count++;
+			}
+		} catch (SQLException e) {
+			handleException("SQL Error while executing the query to get available Java Policies : "
+					+ query + e.getMessage(), e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return arrJavaPolicies;
+	}
+
+	/**
+	 * save java policy and application mapping
+	 *
+	 * @param connection    : SQL Connection
+	 * @param applicationId : Application Id
+	 * @param javaPolicyIds : selected Java Policy
+	 * @throws AppManagementException
+	 */
+	public void saveJavaPolicyMappings(Connection connection, int applicationId, Object[] javaPolicyIds)
+			throws SQLException {
+
+		PreparedStatement preparedStatement = null;
+		String query = " INSERT INTO APM_POLICY_GROUP_MAPPING (POLICY_GRP_ID ,APP_ID ) VALUES(?,?) ";
+
+		try {
+			preparedStatement = connection.prepareStatement(query);
+
+			for (Object policyId : javaPolicyIds) {
+				preparedStatement.setInt(1, applicationId);
+				preparedStatement.setInt(2, Integer.parseInt(policyId.toString()));
+				preparedStatement.addBatch();
+			}
+			preparedStatement.executeBatch();
+
+		} catch (SQLException e) {
+			StringBuilder builder = new StringBuilder(); //build log description String
+			builder.append("SQL Error while executing the query to save Java Policy mappings : ").append(query)
+					.append(" : (applicationId:").append(applicationId).append(", Java Policy Ids:")
+					.append(javaPolicyIds).append(") : ").append(e.getMessage());
+			log.error(builder.toString(), e);
+			/*
+			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so the connection will be disposed by the parent function.
+			*/
+			throw e;
+		} finally {
+			APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+		}
+	}
 
 }

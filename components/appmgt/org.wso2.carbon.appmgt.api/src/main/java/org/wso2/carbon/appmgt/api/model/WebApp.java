@@ -100,6 +100,7 @@ public class WebApp {
     private String uuid;
     private String policyPartials;
     private String policyGroups; //Policy Groups Id's list
+    private String javaPolicies; //Java policies(handlers) List
 
     /**
      * The average rating provided by the WebApp subscribers
@@ -625,5 +626,14 @@ public class WebApp {
      */
     public String getPolicyGroups() {
         return policyGroups;
+    }
+
+
+    public void setJavaPolicies(String javaPolicies) {
+        this.javaPolicies = javaPolicies;
+    }
+
+    public String getJavaPolicies() {
+        return javaPolicies;
     }
 }
