@@ -659,7 +659,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if(roles.equalsIgnoreCase("")){
             return true;
         }
-        if(toBeMatchedRoles.equals(" ") || toBeMatchedRoles ==null){
+        if(toBeMatchedRoles.equals("") || toBeMatchedRoles ==null){
             return true;
         }
 
