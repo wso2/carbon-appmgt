@@ -512,4 +512,8 @@ public final class AppMConstants {
     }
     //key  of the endpoint securevault
     public static final String API_SECUREVAULT_ENABLE = "EnableSecureVault";
+    
+    //Directory path and name of the mobile app resources
+    public static final String MOBILE_APPS_DIRECTORY_PATH = "repository/resources";
+    public static final String MOBILE_APPS_DIRECTORY_NAME = "mobileapps";
 }
