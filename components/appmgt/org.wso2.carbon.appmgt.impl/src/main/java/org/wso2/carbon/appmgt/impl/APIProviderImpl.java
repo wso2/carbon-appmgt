@@ -468,15 +468,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-                                            String policyAuthor) throws AppManagementException {
-        return appMDAO.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor);
+                                            String policyAuthor,String policyPartialDesc) throws AppManagementException {
+        return appMDAO.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,policyPartialDesc);
     }
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared) throws
+                                                  String author, boolean isShared,String policyPartialDesc) throws
                                                                                    AppManagementException {
-        return appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared);
+        return appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
     }
 
     @Override

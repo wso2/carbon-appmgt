@@ -146,17 +146,20 @@ public class UserAwareAPIProvider extends APIProviderImpl {
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared) throws
-                                                                                   AppManagementException {
+                                                  String author, boolean isShared, String policyPartialDesc)
+            throws AppManagementException {
         checkCreatePermission();
-        return super.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared);
+        return super.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared,
+                policyPartialDesc);
 
     }
 
     @Override
     public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-                                            String policyAuthor) throws AppManagementException {
+                                            String policyAuthor, String policyPartialDesc)
+            throws AppManagementException {
         checkCreatePermission();
-        return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor);
+        return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
+                policyPartialDesc);
     }
 }

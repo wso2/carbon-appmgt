@@ -5034,7 +5034,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 	public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-											String policyAuthor) throws AppManagementException {
+											String policyAuthor,String policyPartialDesc) throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement statementToInsertRecord = null;
@@ -5049,14 +5049,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 			connection = APIMgtDBUtil.getConnection();
 			String queryToInsertRecord = "INSERT INTO "
-					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR)"
-					+ " VALUES (?,?,?,?)";
+					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION)"
+					+ " VALUES (?,?,?,?,?)";
 
 			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord);
 			statementToInsertRecord.setString(1, policyPartialName);
 			statementToInsertRecord.setString(2, policyPartial);
 			statementToInsertRecord.setBoolean(3, isSharedPartial);
 			statementToInsertRecord.setString(4, policyAuthor);
+			statementToInsertRecord.setString(5, policyPartialDesc);
+
 			statementToInsertRecord.executeUpdate();
 
 			ResultSet rs = statementToInsertRecord.getGeneratedKeys();
@@ -5090,15 +5092,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @param policyPartial
      * @param author
      * @param isShared
+	 * @param policyPartialDesc
      * @return
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial
-            , String author, boolean isShared) throws AppManagementException {
+	public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial
+			, String author, boolean isShared, String policyPartialDesc) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement prepStmt = null;
-        String queryToUpdatePolicyPartial = "UPDATE APM_ENTITLEMENT_POLICY_PARTIAL SET CONTENT=? ,SHARED=?" +
+        String queryToUpdatePolicyPartial = "UPDATE APM_ENTITLEMENT_POLICY_PARTIAL SET CONTENT=? ,SHARED=? ,DESCRIPTION=?" +
                 " WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ? ";
 
         ResultSet rs = null;
@@ -5118,7 +5121,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 prepStmt = connection.prepareStatement(queryToUpdatePolicyPartial);
                 prepStmt.setString(1, policyPartial);
                 prepStmt.setBoolean(2, isShared);
-                prepStmt.setInt(3, policyPartialId);
+				prepStmt.setString(3, policyPartialDesc);
+				prepStmt.setInt(4, policyPartialId);
                 prepStmt.executeUpdate();
                 isSuccess = true;
             }
@@ -5315,9 +5319,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		List<String> appsNameList = new ArrayList<String>();
 		ResultSet rs = null;
 
-		String queryToGetAppsName = "SELECT APP.APP_NAME " +
+		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
 				" FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
-				" LEFT JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
+				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
 				" WHERE ENT.POLICY_PARTIAL_ID = ? ";
 
@@ -5371,6 +5375,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 policyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
                 policyPartial.setShared(rs.getBoolean("SHARED"));
                 policyPartial.setAuthor(rs.getString("AUTHOR"));
+				policyPartial.setDescription(rs.getString("DESCRIPTION"));
                 entitlementPolicyPartialList.add(policyPartial);
 
             }
@@ -6350,6 +6355,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					strDataContext);
 			insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn,
 					strDataContext);
+			conn.commit();
 		} finally {
 			APIMgtDBUtil.closeAllConnections(null, conn, null);
 		}
@@ -7025,12 +7031,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Fetch predefined Java policy list
+	 * Fetch predefined Java policy list with the mapped Application Id
+	 * If each policy is mapped with the given appId it will return the same appId else it will return NULL
 	 *
+	 * @param applicationUUId
 	 * @return array of all available java policies
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
 	 */
-	public static NativeArray getAvailableJavaPolicyList()
+	public static NativeArray getAvailableJavaPolicyList(String applicationUUId)
 			throws AppManagementException {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -7039,13 +7047,18 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		NativeArray arrJavaPolicies = new NativeArray(0);
 		Integer count = 0;
 
-		String query = "SELECT JAVA_POLICY_ID ,DISPLAY_NAME ,FULL_QUALIFI_NAME ,DESCRIPTION ,DISPLAY_ORDER_SEQ_NO , " +
-				" IS_MANDATORY ,POLICY_PROPERTIES " +
-				" FROM APM_APP_JAVA_POLICY ORDER BY DISPLAY_ORDER_SEQ_NO ";
+		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,FULL_QUALIFI_NAME ,DESCRIPTION " +
+				",DISPLAY_ORDER_SEQ_NO ," +
+				"IS_MANDATORY ,POLICY_PROPERTIES ,APP.APP_ID AS APP_ID " +
+				"FROM APM_APP_JAVA_POLICY POL " +
+				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
+				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
+			ps.setString(1, applicationUUId);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				objPolicy = new NativeObject();
@@ -7056,6 +7069,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
 				objPolicy.put("isMandatory", objPolicy, rs.getBoolean("IS_MANDATORY"));
 				objPolicy.put("policyProperties", objPolicy, rs.getString("POLICY_PROPERTIES"));
+				objPolicy.put("applicationId", objPolicy, rs.getString("APP_ID"));
 
 				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
 				count++;
