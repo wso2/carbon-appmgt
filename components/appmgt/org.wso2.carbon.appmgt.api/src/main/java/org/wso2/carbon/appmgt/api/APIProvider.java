@@ -178,11 +178,12 @@ public interface APIProvider extends APIManager {
      * @param policyPartial     policy content
      * @param isSharedPartial   policy status
      * @param policyAuthor      author of the policy
+     * @param policyPartialDesc policy description
      * @return policy id
      * @throws AppManagementException
      */
     int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-                                     String policyAuthor) throws AppManagementException;
+                                     String policyAuthor,String policyPartialDesc) throws AppManagementException;
 
     /**
      * Update the policy partial
@@ -191,11 +192,12 @@ public interface APIProvider extends APIManager {
      * @param policyPartial   policy content
      * @param author          author of the partial
      * @param isShared        policy status
+     * @param policyPartialDesc policy description
      * @return if update success return true else false
      * @throws AppManagementException
      */
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared) throws
+                                                  String author, boolean isShared, String policyPartialDesc) throws
                                                                                    AppManagementException;
 
     /**
