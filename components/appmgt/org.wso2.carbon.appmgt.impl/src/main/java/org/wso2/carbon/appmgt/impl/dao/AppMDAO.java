@@ -680,11 +680,10 @@ public class AppMDAO {
 		WebAppInfoDTO webAppInfoDTO = new WebAppInfoDTO();
 		String saml2SsoIssuer;
 
-		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, COALESCE(app.APP_ALLOW_ANONYMOUS, 'FALSE') APP_ALLOW_ANONYMOUS "
+		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, " +
+				"COALESCE(app.APP_ALLOW_ANONYMOUS, 'FALSE') APP_ALLOW_ANONYMOUS "
 				+ " FROM APM_APP app "
-				+ " WHERE app.CONTEXT = ? "
-				+ " AND " + " app.APP_VERSION = ? ";
-
+				+ " WHERE app.CONTEXT = ? AND app.APP_VERSION = ? ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -704,7 +703,8 @@ public class AppMDAO {
 
 			}
 		} catch (SQLException e) {
-			handleException("Error when executing the SQL ", e);
+			handleException("Error when executing the SQL: " + ssoInfoSqlQuery + " (Context:" +
+					context + " ,Version:" + version + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -756,7 +756,8 @@ public class AppMDAO {
 						Boolean.parseBoolean(rs.getString("URL_ALLOW_ANONYMOUS")));
 			}
 		} catch (SQLException e) {
-			handleException("Error when executing the SQL ", e);
+			handleException("Error when executing the SQL : " + query + " (Context:" + context +
+					" ,Version:" + version + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}

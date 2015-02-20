@@ -95,7 +95,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private SAML2Authenticator saml2Authenticator;
     private String issuer;
 
-    private WebAppInfoDTO webAppInfoDto = null;
+    private WebAppInfoDTO webAppInfoDTO = null;
     private boolean isResourceAccessible=true;
     private VerbInfoDTO verbInfoDTO=null;
 
@@ -128,116 +128,140 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      */
     public boolean handleRequest(MessageContext messageContext) {
 
-        // Get App Info related to SSO handling.
-        if (webAppInfoDto == null) {
-            webAppInfoDto = getSSOInfoForApp(messageContext);
-        }
+        // application context
+        String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
+        // application version
+        String webAppVersion =
+                (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+        // http verb (eg: GET,POST)
+        String httpVerb =
+                (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext()
+                        .getProperty("HTTP_METHOD");
+        // request full path (eg: /context/version/pattern)
+        String fullReqPath =
+                (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
 
-        //check if anonymous mode allowed for the entire app
-        if (isAppAllowAnonymous(messageContext)) {
-            return true;
-        }
-
-        // Get App URL Pattern Info.
-        if (verbInfoDTO == null) {
-            verbInfoDTO = getVerbInfoForApp(messageContext);
-        }
-
-        //check if anonymous mode allowed for particular URL pattern
-        if (isUrlAllowAnonymous(messageContext)) {
-            return true;
-        }
-
-        // If SSO is not enabled skip this authentication handler.
-        if(!isSSOEnabled()){
-            return true;
-        }
-
-        //Construct issue name for saml request. format: AppName-tenantDomain-version
-        issuer = constructIssuerId(messageContext);
-        boolean isAuthorized = false;
-
-        if (shouldAuthenticateWithCookie(messageContext)) {
-            isAuthorized = handleSecurityUsingCookie(messageContext);
-        } else if(shouldAuthenticateWithSAMLResponse(messageContext)){
-            isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
-
-            //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
-            //We validate this SAMLResponse and allow request to go to backend.
-            //This is the first request goes to access the web-app which need to go as a GET request
-            //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
-            //segment is to set the HTTTP_METHOD as GET and set empty body in request. 
-            org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
-                getAxis2MessageContext();
-            axis2MC.setProperty("HTTP_METHOD", "GET");
-            try {
-                SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
-                env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
-                axis2MC.setEnvelope(env);
-            } catch (AxisFault axisFault) {
-                String msg = "Error occurred while constructing SOAPEnvelope for " +
-                             messageContext.getProperty("REST_API_CONTEXT") + "/" +
-                             messageContext.getProperty("SYNAPSE_REST_API_VERSION");
-                log.error(msg, axisFault);
-                throw new SynapseException(msg, axisFault);
+        try {
+            // Get App Info related to SSO handling.
+            if (webAppInfoDTO == null) {
+                webAppInfoDTO = getSSOInfoForApp(webAppContext, webAppVersion);
             }
-        }
 
-        if(isAuthorized){
-            return true;
-        }else if(!isResourceAccessible) {
-            isResourceAccessible=true;
-            handleAuthFailure(messageContext,
-                    new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
-            return false;
-        }else {
-            redirectToIDPLogin(messageContext);
+
+            // check if anonymous mode allowed for the entire app
+            boolean isAllowAnonymousApp = isAllowAnonymousApplication();
+            // write to messageContext so then the same value can be accessed as a
+            // property in other handlers
+            messageContext.setProperty(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, isAllowAnonymousApp);
+            if (isAllowAnonymousApp) {
+                // if anonymous mode is allowed move to next handler
+                return true;
+            }
+
+            // Get App URL Pattern Info
+            if (verbInfoDTO == null) {
+                verbInfoDTO = getVerbInfoForApp(webAppContext, webAppVersion);
+            }
+
+
+            // check if anonymous mode allowed for particular URL pattern
+            boolean isAllowAnonymousUrl = isAllowAnonymousUrlPattern(httpVerb, fullReqPath);
+            // write to messageContext so then the same value can be accessed as a
+            // property in other handlers
+            messageContext.setProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS, isAllowAnonymousUrl);
+            if (isAllowAnonymousUrl) {
+                // if anonymous mode is allowed move to next handler
+                return true;
+            }
+
+            // If SSO is not enabled skip this authentication handler.
+            if (!isSSOEnabled()) {
+                return true;
+            }
+
+            //Construct issue name for saml request. format: AppName-tenantDomain-version
+            issuer = constructIssuerId(messageContext);
+            boolean isAuthorized = false;
+
+            if (shouldAuthenticateWithCookie(messageContext)) {
+                isAuthorized = handleSecurityUsingCookie(messageContext);
+            } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
+                isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
+
+                //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
+                //We validate this SAMLResponse and allow request to go to backend.
+                //This is the first request goes to access the web-app which need to go as a GET request
+                //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
+                //segment is to set the HTTTP_METHOD as GET and set empty body in request.
+                org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
+                        getAxis2MessageContext();
+                axis2MC.setProperty("HTTP_METHOD", "GET");
+                try {
+                    SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
+                    env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
+                    axis2MC.setEnvelope(env);
+                } catch (AxisFault axisFault) {
+                    String msg = "Error occurred while constructing SOAPEnvelope for " +
+                            messageContext.getProperty("REST_API_CONTEXT") + "/" +
+                            messageContext.getProperty("SYNAPSE_REST_API_VERSION");
+                    log.error(msg, axisFault);
+                    throw new SynapseException(msg, axisFault);
+                }
+            }
+
+            if (isAuthorized) {
+                return true;
+            } else if (!isResourceAccessible) {
+                isResourceAccessible = true;
+                handleAuthFailure(messageContext,
+                        new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
+                return false;
+            }    else {
+                redirectToIDPLogin(messageContext);
+                return false;
+            }
+        } catch (AppManagementException e) {
+            log.error(e.getMessage());
             return false;
         }
     }
 
     /**
      * Check if the Anonymous Access is allowed for the overall app
-     * @param messageContext : messageContext parsed to handlerRequest
+     *
      * @return result : boolean result relevant to registry value
      */
-    public boolean isAppAllowAnonymous(MessageContext messageContext) {
-        boolean result = webAppInfoDto.getAllowAnonymous();
-        //write to messageContext so then the same value can be red as a property in other handlers
-        messageContext.setProperty(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, result);
-        return result;
+    public boolean isAllowAnonymousApplication() {
+        return webAppInfoDTO.getAllowAnonymous();
     }
 
     /**
-     * Check if the Anonymous Access is allowed for the particular URL patern
-     * @param messageContext : messageContext parsed to handlerRequest
-     * @return result : boolean result relevant to registry value
+     * Check if the Anonymous Access is allowed for the particular URL pattern
+     *
+     * @return boolean result either anonymous access allowed or not
      */
-    public boolean isUrlAllowAnonymous(MessageContext messageContext) {
-        boolean result = false;
-        String httpVerb = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty("HTTP_METHOD");
-        String fullReqPath = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
-        if (verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + fullReqPath) != null) {
-            result = verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + fullReqPath);
+    public boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) {
+        if (verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + requestPath) == null) {
+            return false;
+        } else {
+            return verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + requestPath);
         }
-        //write to messageContext so then the same value can be red as a property in other handlers
-        messageContext.setProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS, result);
-        return result;
     }
 
     public boolean handleResponse(MessageContext messageContext) {
-    	if (isAppAllowAnonymous(messageContext) || isUrlAllowAnonymous(messageContext)) {
+        if (isAllowAnonymousApplication() || isAllowAnonymousUrlPattern((String) ((Axis2MessageContext) messageContext).getAxis2MessageContext()
+                .getProperty("HTTP_METHOD"), (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
             return true;
         }
-        String appmSamlSsoCookie = (String)messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
+        String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                 getAxis2MessageContext();
         Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        String cookieString = (String)headers.get(HTTPConstants.HEADER_SET_COOKIE);
+        String cookieString = (String) headers.get(HTTPConstants.HEADER_SET_COOKIE);
 
         if (cookieString == null) {
-            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/"  ;
+            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
         } else {
             cookieString = cookieString + " ;" + "\n" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
         }
@@ -248,18 +272,19 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     /**
      * Checks whether the request should be authenticated using the cookie.
+     *
      * @param messageContext
      * @return true if the the request should be authenticated using the cookie, false otherwise.
      */
-    private boolean shouldAuthenticateWithCookie(MessageContext messageContext){
+    private boolean shouldAuthenticateWithCookie(MessageContext messageContext) {
 
         // Cookie should be in the request and there should be an entry in the cache.
         String cookie = getSAMLCookie(messageContext);
 
         // Check the availability of cookie in cache.
-        if(cookie != null && isSamlResponseInCache(cookie)){
+        if (cookie != null && isSamlResponseInCache(cookie)) {
             return true;
-        }else {
+        } else {
             return false;
         }
 
@@ -382,7 +407,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         String inURL = getAxis2MessageContext(messageContext).getProperty("TransportInURL").toString();
 
-        String logoutUrl = webAppInfoDto.getLogoutUrl();
+        String logoutUrl = webAppInfoDTO.getLogoutUrl();
         if (logoutUrl != null && logoutUrl.endsWith(inURL)) {
             log.info("Logout URL Encountered");
             return true;
@@ -402,38 +427,36 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     /**
      * Returns SSO info related to the web app.
-     * @param messageContext
+     *
+     * @param webAppContext : Application Context
+     * @param webAppVersion : Application Version
      * @return SSO info of the app.
+     * @throws AppManagementException when an error returns while fetching data from database
      */
-    private WebAppInfoDTO getSSOInfoForApp(MessageContext messageContext){
-
-        String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
-        String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-
+    private WebAppInfoDTO getSSOInfoForApp(String webAppContext, String webAppVersion) throws AppManagementException {
         try {
             return AppMDAO.getSAML2SSOConfigInfo(webAppContext, webAppVersion);
-            //TODO: Add webAppInfoDto to cache
+            // TODO: Add webAppInfoDTO to cache
         } catch (AppManagementException e) {
             //TODO: Handle exceptions
-            log.error(e);
             return null;
         }
 
     }
 
     /**
-     * Check the messageContext and fetch the url pattern related data for the given url
-     * @param messageContext
+     * Check the context/version and fetch the url pattern related data for the given url
+     *
+     * @param webAppContext : Application Context
+     * @param webAppVersion : Application Version
      * @return VerbInfoDTO class object
+     * @throws AppManagementException when an error returns while fetching data from database
      */
-    private VerbInfoDTO getVerbInfoForApp(MessageContext messageContext) {
+    private VerbInfoDTO getVerbInfoForApp(String webAppContext, String webAppVersion) throws AppManagementException {
         try {
-            String context = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
-            String version = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-            return AppMDAO.getVerbConfigInfo(context,version);
+            return AppMDAO.getVerbConfigInfo(webAppContext, webAppVersion);
         } catch (AppManagementException e) {
-            log.error(e);
-            return null;
+            throw e;
         }
     }
 
@@ -588,7 +611,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         String httpVerb = (String) axis2MsgContext.getProperty(Constants.Configuration.HTTP_METHOD);
 
-        int appID = webAppInfoDto.getAppID();
+        int appID = webAppInfoDTO.getAppID();
 
         ArrayList<String> mappingList = new ArrayList<String>();
         ArrayList<String> mapperList = new ArrayList<String>();
@@ -1311,7 +1334,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private String constructIssuerId(MessageContext messageContext) {
         String assertionConsumerUrl = constructAssertionConsumerUrl(messageContext);
         String tenantDomain = getTenantDomainFromGatewayUrl(assertionConsumerUrl);
-        String issuer = webAppInfoDto.getSaml2SsoIssuer();
+        String issuer = webAppInfoDTO.getSaml2SsoIssuer();
         String version = (String)messageContext.getProperty("SYNAPSE_REST_API_VERSION");
 
         if (!tenantDomain.equals("")) {
