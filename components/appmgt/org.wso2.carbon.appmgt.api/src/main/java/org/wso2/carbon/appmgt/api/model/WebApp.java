@@ -18,6 +18,8 @@
 package org.wso2.carbon.appmgt.api.model;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -100,7 +102,7 @@ public class WebApp {
     private String uuid;
     private String policyPartials;
     private String policyGroups; //Policy Groups Id's list
-    private String javaPolicies; //Java policies(handlers) List
+    private JSONArray javaPolicies; //Java policies(handlers) List
 
     /**
      * The average rating provided by the WebApp subscribers
@@ -631,11 +633,11 @@ public class WebApp {
     }
 
 
-    public void setJavaPolicies(String javaPolicies) {
+    public void setJavaPolicies(JSONArray javaPolicies) {
         this.javaPolicies = javaPolicies;
     }
 
-    public String getJavaPolicies() {
+    public JSONArray getJavaPolicies() {
         return javaPolicies;
     }
 
