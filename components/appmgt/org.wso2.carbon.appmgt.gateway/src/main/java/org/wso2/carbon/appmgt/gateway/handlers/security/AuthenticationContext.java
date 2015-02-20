@@ -24,7 +24,7 @@ import java.io.Serializable;
  * to access WebApp keys and tier information related to already authenticated
  * requests.
  */
-public class AuthenticationContext implements Serializable {
+public class AuthenticationContext implements Serializable{
 
 	private boolean authenticated;
 	private String applicationTier;
