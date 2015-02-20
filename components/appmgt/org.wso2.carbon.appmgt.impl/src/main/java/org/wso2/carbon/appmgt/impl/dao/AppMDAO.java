@@ -4046,7 +4046,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			//save java policies app wise
 			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
-				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
+				JSONArray javaPolicyIdList =  api.getJavaPolicies();
 				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
 			}
 
@@ -6554,12 +6554,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param userRoles          : user roles
 	 * @param isAnonymousAllowed : is anonymous access allowed to URL pattern
 	 * @param objPartialMappings : Object which contains XACML policy partial details arrays
+	 * @param policyGroupDesc    :Policy group Desciption
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
 										  String userRoles, String isAnonymousAllowed,
-										  Object[] objPartialMappings)
+										  Object[] objPartialMappings, String policyGroupDesc)
 			throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
@@ -6569,8 +6570,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 
 			query =
-					" INSERT INTO APM_POLICY_GROUP(NAME,THROTTLING_TIER,USER_ROLES,URL_ALLOW_ANONYMOUS) "
-							+ "VALUES(?,?,?,?) ";
+					" INSERT INTO APM_POLICY_GROUP(NAME,THROTTLING_TIER,USER_ROLES,URL_ALLOW_ANONYMOUS,DESCRIPTION) "
+							+ "VALUES(?,?,?,?,?) ";
 			conn = APIMgtDBUtil.getConnection();
 			conn.setAutoCommit(false);
 			ps = conn.prepareStatement(query, new String[]{"POLICY_GRP_ID"});
@@ -6578,6 +6579,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setString(2, throttlingTier);
 			ps.setString(3, userRoles);
 			ps.setBoolean(4, Boolean.parseBoolean(isAnonymousAllowed));
+			ps.setString(5, policyGroupDesc);
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
 			if (rs.next()) {
@@ -6630,18 +6632,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param userRoles          : user roles
 	 * @param isAnonymousAllowed : is anonymous access allowed to URL pattern
 	 * @param policyGroupId      : policy group id
+	 * @param policyGroupDesc    :policy group Description
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static void updatePolicyGroup(String policyGroupName, String throttlingTier,
 										 String userRoles, String isAnonymousAllowed,
-										 int policyGroupId, Object[] objPartialMappings) throws AppManagementException {
+										 int policyGroupId, Object[] objPartialMappings, String policyGroupDesc)
+			throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
 		String query = "";
 		try {
 			 query =
 					" UPDATE APM_POLICY_GROUP SET NAME=? ,THROTTLING_TIER=? ,USER_ROLES=? ,URL_ALLOW_ANONYMOUS=? "
+							+ " ,DESCRIPTION=?  "
 							+ " WHERE POLICY_GRP_ID=? ";
 			conn = APIMgtDBUtil.getConnection();
 			conn.setAutoCommit(false);
@@ -6650,7 +6655,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setString(2, throttlingTier);
 			ps.setString(3, userRoles);
 			ps.setBoolean(4, Boolean.parseBoolean(isAnonymousAllowed));
-			ps.setInt(5, policyGroupId);
+			ps.setString(5, policyGroupDesc);
+			ps.setInt(6, policyGroupId);
 			ps.executeUpdate();
 
 			//delete partials mapped to group id
