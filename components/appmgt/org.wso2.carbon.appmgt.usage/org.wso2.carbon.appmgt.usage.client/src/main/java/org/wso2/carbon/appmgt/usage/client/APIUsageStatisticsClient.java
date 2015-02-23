@@ -315,7 +315,7 @@ public class APIUsageStatisticsClient {
                         providerAPI.getContext().equals(usage.context)) {
 
                     APIPageUsageDTO usageDTO = new APIPageUsageDTO();
-                    usageDTO.setApiName(usage.apiName +  "(" + providerAPI.getId().getProviderName() + ")");
+                    usageDTO.setApiName(usage.apiName);
                     usageDTO.setVersion(usage.apiVersion);
                     usageDTO.setUserId(usage.userid);
 
