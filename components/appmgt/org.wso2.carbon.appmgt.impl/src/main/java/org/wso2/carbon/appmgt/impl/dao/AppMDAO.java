@@ -7048,7 +7048,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 						+ "WHERE MAP.POLICY_GRP_ID = ? ";
 
 		try {
-			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setInt(1, policyGroupId);
 			rs = ps.executeQuery();
