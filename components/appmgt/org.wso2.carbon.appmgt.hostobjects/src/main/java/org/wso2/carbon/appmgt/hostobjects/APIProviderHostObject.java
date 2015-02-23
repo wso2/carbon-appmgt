@@ -1496,7 +1496,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     sub.count = entry.getValue();
                     sub.uuid=uuid;
                     subscriptionData.add(sub);
-                    //  log.info("app name="+part1+" version="+version+" count="+entry.getValue()+" uuid="+uuid);
+
 
                 }
                 Collections.sort(subscriptionData, new Comparator<APISubscription>() {
@@ -1506,18 +1506,6 @@ public class APIProviderHostObject extends ScriptableObject {
                         return (int) (o2.count - o1.count);
                     }
                 });
-                int limit = AppMConstants.Statistics.SUBSCRIPTION_LIMIT;
-                if (subscriptionData.size() > limit) {
-                    APISubscription other = new APISubscription();
-                    other.name = AppMConstants.Statistics.OTHER_APP;
-                    for (int i = 10; i < subscriptionData.size(); i++) {
-                        other.count = other.count + subscriptionData.get(i).count;
-                    }
-                    while (subscriptionData.size() > limit) {
-                        subscriptionData.remove(10);
-                    }
-                    subscriptionData.add(other);
-                }
 
                 int i = 0;
                 for (APISubscription sub : subscriptionData) {
