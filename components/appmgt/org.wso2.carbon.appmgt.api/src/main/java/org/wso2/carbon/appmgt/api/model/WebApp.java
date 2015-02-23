@@ -18,6 +18,8 @@
 package org.wso2.carbon.appmgt.api.model;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 
@@ -100,6 +102,7 @@ public class WebApp {
     private String uuid;
     private String policyPartials;
     private String policyGroups; //Policy Groups Id's list
+    private JSONArray javaPolicies; //Java policies(handlers) List
 
     /**
      * The average rating provided by the WebApp subscribers
@@ -107,6 +110,8 @@ public class WebApp {
     private float rating;
 
     private boolean isLatest;
+
+    private boolean skipGateway;
 
     //TODO: missing - total user count, up time statistics,tier
 
@@ -625,5 +630,22 @@ public class WebApp {
      */
     public String getPolicyGroups() {
         return policyGroups;
+    }
+
+
+    public void setJavaPolicies(JSONArray javaPolicies) {
+        this.javaPolicies = javaPolicies;
+    }
+
+    public JSONArray getJavaPolicies() {
+        return javaPolicies;
+    }
+
+    public boolean getSkipGateway() {
+        return skipGateway;
+    }
+
+    public void setSkipGateway(boolean skipGateway) {
+        this.skipGateway = skipGateway;
     }
 }

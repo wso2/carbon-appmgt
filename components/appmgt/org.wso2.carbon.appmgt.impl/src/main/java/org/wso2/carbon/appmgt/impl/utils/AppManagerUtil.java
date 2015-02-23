@@ -2675,6 +2675,17 @@ public final class AppManagerUtil {
                 getConfiguration();
     }
 
+    /**
+     * This method creates mobileapps directory if it does not exists
+     */
+    public static void createMobileAppsDirectory() {
+    	File mobileAppDirectory = new File (AppMConstants.MOBILE_APPS_DIRECTORY_PATH , 
+    			AppMConstants.MOBILE_APPS_DIRECTORY_NAME);
+    	if (!mobileAppDirectory.exists()) {
+    		mobileAppDirectory.mkdir();
+    	}
+    	
+    }
 
 
 

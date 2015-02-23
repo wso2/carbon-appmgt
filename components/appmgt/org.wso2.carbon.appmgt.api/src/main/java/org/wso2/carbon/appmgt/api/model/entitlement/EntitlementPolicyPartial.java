@@ -29,6 +29,7 @@ public class EntitlementPolicyPartial {
     private String policyPartialContent;
     private boolean isShared;
     private String author;
+    private String description;
 
     /**
      * Get author of the entitlement policy partial
@@ -108,5 +109,13 @@ public class EntitlementPolicyPartial {
      */
     public void setPolicyPartialContent(String policyPartialContent) {
         this.policyPartialContent = policyPartialContent;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

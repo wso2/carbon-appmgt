@@ -193,6 +193,9 @@ public class AppManagerComponent {
                 }
             }
             new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
+            
+            //create mobileapps directory if it does not exists
+            AppManagerUtil.createMobileAppsDirectory();
         } catch (AppManagementException e) {
             log.error("Error while initializing the WebApp manager component", e);
         }

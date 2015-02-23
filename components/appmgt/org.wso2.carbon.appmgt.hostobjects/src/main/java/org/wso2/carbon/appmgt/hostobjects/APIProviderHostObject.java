@@ -643,7 +643,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                               Object[] args,
                                                               Function funObj) throws
                                                                                AppManagementException { 
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[1] == null ) {
@@ -653,11 +653,12 @@ public class APIProviderHostObject extends ScriptableObject {
         String policyPartialName = args[0].toString();
         String policyPartial = args[1].toString();
         String isShared = args[2].toString();
+        String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, currentUser);
+        return apiProvider.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, currentUser,policyPartialDesc);
     }
 
     /**
@@ -674,7 +675,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                     Object[] args,
                                                                     Function funObj) throws
                                                                                      AppManagementException {
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[1] == null || args[2] == null) {
@@ -684,11 +685,12 @@ public class APIProviderHostObject extends ScriptableObject {
         int policyPartialId = Integer.parseInt(args[0].toString());
         String policyPartial = args[1].toString();
         String isShared = args[2].toString();
+        String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial);
+        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial, policyPartialDesc);
     }
 
     /**
@@ -817,6 +819,7 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
             row.put("isShared", row, entitlementPolicyPartial.isShared());
             row.put("author", row, entitlementPolicyPartial.getAuthor());
+            row.put("description", row, entitlementPolicyPartial.getDescription());
             count++;
             myn.put(count, myn, row);
         }
@@ -1493,7 +1496,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     sub.count = entry.getValue();
                     sub.uuid=uuid;
                     subscriptionData.add(sub);
-                    //  log.info("app name="+part1+" version="+version+" count="+entry.getValue()+" uuid="+uuid);
+
 
                 }
                 Collections.sort(subscriptionData, new Comparator<APISubscription>() {
@@ -1503,18 +1506,6 @@ public class APIProviderHostObject extends ScriptableObject {
                         return (int) (o2.count - o1.count);
                     }
                 });
-                int limit = AppMConstants.Statistics.SUBSCRIPTION_LIMIT;
-                if (subscriptionData.size() > limit) {
-                    APISubscription other = new APISubscription();
-                    other.name = AppMConstants.Statistics.OTHER_APP;
-                    for (int i = 10; i < subscriptionData.size(); i++) {
-                        other.count = other.count + subscriptionData.get(i).count;
-                    }
-                    while (subscriptionData.size() > limit) {
-                        subscriptionData.remove(10);
-                    }
-                    subscriptionData.add(other);
-                }
 
                 int i = 0;
                 for (APISubscription sub : subscriptionData) {

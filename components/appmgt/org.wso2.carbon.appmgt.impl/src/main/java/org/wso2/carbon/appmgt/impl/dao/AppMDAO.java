@@ -680,11 +680,10 @@ public class AppMDAO {
 		WebAppInfoDTO webAppInfoDTO = new WebAppInfoDTO();
 		String saml2SsoIssuer;
 
-		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, COALESCE(app.APP_ALLOW_ANONYMOUS, 'FALSE') APP_ALLOW_ANONYMOUS "
+		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, " +
+				"COALESCE(app.APP_ALLOW_ANONYMOUS, 'FALSE') APP_ALLOW_ANONYMOUS "
 				+ " FROM APM_APP app "
-				+ " WHERE app.CONTEXT = ? "
-				+ " AND " + " app.APP_VERSION = ? ";
-
+				+ " WHERE app.CONTEXT = ? AND app.APP_VERSION = ? ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -704,7 +703,8 @@ public class AppMDAO {
 
 			}
 		} catch (SQLException e) {
-			handleException("Error when executing the SQL ", e);
+			handleException("Error when executing the SQL: " + ssoInfoSqlQuery + " (Context:" +
+					context + " ,Version:" + version + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -756,7 +756,8 @@ public class AppMDAO {
 						Boolean.parseBoolean(rs.getString("URL_ALLOW_ANONYMOUS")));
 			}
 		} catch (SQLException e) {
-			handleException("Error when executing the SQL ", e);
+			handleException("Error when executing the SQL : " + query + " (Context:" + context +
+					" ,Version:" + version + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -4044,6 +4045,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				saveApplicationPolicyGroupsMappings(connection, webAppId, policyGroupIdList.toArray());
 			}
 
+			//save java policies app wise
+			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
+				JSONArray javaPolicyIdList =  api.getJavaPolicies();
+				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
+			}
+
 
 			connection.commit();
 		} catch (SQLException e) {
@@ -5028,7 +5035,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 	public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-											String policyAuthor) throws AppManagementException {
+											String policyAuthor,String policyPartialDesc) throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement statementToInsertRecord = null;
@@ -5043,14 +5050,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 			connection = APIMgtDBUtil.getConnection();
 			String queryToInsertRecord = "INSERT INTO "
-					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR)"
-					+ " VALUES (?,?,?,?)";
+					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION)"
+					+ " VALUES (?,?,?,?,?)";
 
 			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord);
 			statementToInsertRecord.setString(1, policyPartialName);
 			statementToInsertRecord.setString(2, policyPartial);
 			statementToInsertRecord.setBoolean(3, isSharedPartial);
 			statementToInsertRecord.setString(4, policyAuthor);
+			statementToInsertRecord.setString(5, policyPartialDesc);
+
 			statementToInsertRecord.executeUpdate();
 
 			ResultSet rs = statementToInsertRecord.getGeneratedKeys();
@@ -5084,15 +5093,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @param policyPartial
      * @param author
      * @param isShared
+	 * @param policyPartialDesc
      * @return
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial
-            , String author, boolean isShared) throws AppManagementException {
+	public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial
+			, String author, boolean isShared, String policyPartialDesc) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement prepStmt = null;
-        String queryToUpdatePolicyPartial = "UPDATE APM_ENTITLEMENT_POLICY_PARTIAL SET CONTENT=? ,SHARED=?" +
+        String queryToUpdatePolicyPartial = "UPDATE APM_ENTITLEMENT_POLICY_PARTIAL SET CONTENT=? ,SHARED=? ,DESCRIPTION=?" +
                 " WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ? ";
 
         ResultSet rs = null;
@@ -5112,7 +5122,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 prepStmt = connection.prepareStatement(queryToUpdatePolicyPartial);
                 prepStmt.setString(1, policyPartial);
                 prepStmt.setBoolean(2, isShared);
-                prepStmt.setInt(3, policyPartialId);
+				prepStmt.setString(3, policyPartialDesc);
+				prepStmt.setInt(4, policyPartialId);
                 prepStmt.executeUpdate();
                 isSuccess = true;
             }
@@ -5309,9 +5320,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		List<String> appsNameList = new ArrayList<String>();
 		ResultSet rs = null;
 
-		String queryToGetAppsName = "SELECT APP.APP_NAME " +
+		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
 				" FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
-				" LEFT JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
+				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
 				" WHERE ENT.POLICY_PARTIAL_ID = ? ";
 
@@ -5365,6 +5376,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 policyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
                 policyPartial.setShared(rs.getBoolean("SHARED"));
                 policyPartial.setAuthor(rs.getString("AUTHOR"));
+				policyPartial.setDescription(rs.getString("DESCRIPTION"));
                 entitlementPolicyPartialList.add(policyPartial);
 
             }
@@ -6344,6 +6356,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					strDataContext);
 			insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn,
 					strDataContext);
+			conn.commit();
 		} finally {
 			APIMgtDBUtil.closeAllConnections(null, conn, null);
 		}
@@ -6542,12 +6555,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param userRoles          : user roles
 	 * @param isAnonymousAllowed : is anonymous access allowed to URL pattern
 	 * @param objPartialMappings : Object which contains XACML policy partial details arrays
+	 * @param policyGroupDesc    :Policy group Desciption
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
 										  String userRoles, String isAnonymousAllowed,
-										  Object[] objPartialMappings)
+										  Object[] objPartialMappings, String policyGroupDesc)
 			throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
@@ -6557,8 +6571,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 
 			query =
-					" INSERT INTO APM_POLICY_GROUP(NAME,THROTTLING_TIER,USER_ROLES,URL_ALLOW_ANONYMOUS) "
-							+ "VALUES(?,?,?,?) ";
+					" INSERT INTO APM_POLICY_GROUP(NAME,THROTTLING_TIER,USER_ROLES,URL_ALLOW_ANONYMOUS,DESCRIPTION) "
+							+ "VALUES(?,?,?,?,?) ";
 			conn = APIMgtDBUtil.getConnection();
 			conn.setAutoCommit(false);
 			ps = conn.prepareStatement(query, new String[]{"POLICY_GRP_ID"});
@@ -6566,6 +6580,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setString(2, throttlingTier);
 			ps.setString(3, userRoles);
 			ps.setBoolean(4, Boolean.parseBoolean(isAnonymousAllowed));
+			ps.setString(5, policyGroupDesc);
 			ps.executeUpdate();
 			rs = ps.getGeneratedKeys();
 			if (rs.next()) {
@@ -6618,18 +6633,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param userRoles          : user roles
 	 * @param isAnonymousAllowed : is anonymous access allowed to URL pattern
 	 * @param policyGroupId      : policy group id
+	 * @param policyGroupDesc    :policy group Description
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
 	public static void updatePolicyGroup(String policyGroupName, String throttlingTier,
 										 String userRoles, String isAnonymousAllowed,
-										 int policyGroupId, Object[] objPartialMappings) throws AppManagementException {
+										 int policyGroupId, Object[] objPartialMappings, String policyGroupDesc)
+			throws AppManagementException {
 		PreparedStatement ps = null;
 		Connection conn = null;
 		String query = "";
 		try {
 			 query =
 					" UPDATE APM_POLICY_GROUP SET NAME=? ,THROTTLING_TIER=? ,USER_ROLES=? ,URL_ALLOW_ANONYMOUS=? "
+							+ " ,DESCRIPTION=?  "
 							+ " WHERE POLICY_GRP_ID=? ";
 			conn = APIMgtDBUtil.getConnection();
 			conn.setAutoCommit(false);
@@ -6638,7 +6656,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setString(2, throttlingTier);
 			ps.setString(3, userRoles);
 			ps.setBoolean(4, Boolean.parseBoolean(isAnonymousAllowed));
-			ps.setInt(5, policyGroupId);
+			ps.setString(5, policyGroupDesc);
+			ps.setInt(6, policyGroupId);
 			ps.executeUpdate();
 
 			//delete partials mapped to group id
@@ -7018,5 +7037,97 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		return policyNamelist;
 	}
 
+	/**
+	 * Fetch predefined Java policy list with the mapped Application Id
+	 * If each policy is mapped with the given appId it will return the same appId else it will return NULL
+	 *
+	 * @param applicationUUId
+	 * @return array of all available java policies
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
+	 */
+	public static NativeArray getAvailableJavaPolicyList(String applicationUUId)
+			throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		NativeObject objPolicy;
+		NativeArray arrJavaPolicies = new NativeArray(0);
+		Integer count = 0;
+
+		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,FULL_QUALIFI_NAME ,DESCRIPTION " +
+				",DISPLAY_ORDER_SEQ_NO ," +
+				"IS_MANDATORY ,POLICY_PROPERTIES ,APP.APP_ID AS APP_ID " +
+				"FROM APM_APP_JAVA_POLICY POL " +
+				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
+				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
+
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, applicationUUId);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				objPolicy = new NativeObject();
+				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
+				objPolicy.put("displayName", objPolicy, rs.getString("DISPLAY_NAME"));
+				objPolicy.put("fullQualifiedName", objPolicy, rs.getString("FULL_QUALIFI_NAME"));
+				objPolicy.put("description", objPolicy, rs.getString("DESCRIPTION"));
+				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+				objPolicy.put("isMandatory", objPolicy, rs.getBoolean("IS_MANDATORY"));
+				objPolicy.put("policyProperties", objPolicy, rs.getString("POLICY_PROPERTIES"));
+				objPolicy.put("applicationId", objPolicy, rs.getString("APP_ID"));
+
+				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
+				count++;
+			}
+		} catch (SQLException e) {
+			handleException("SQL Error while executing the query to get available Java Policies : "
+					+ query + e.getMessage(), e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return arrJavaPolicies;
+	}
+
+	/**
+	 * save java policy and application mapping
+	 *
+	 * @param connection    : SQL Connection
+	 * @param applicationId : Application Id
+	 * @param javaPolicyIds : selected Java Policy
+	 * @throws AppManagementException
+	 */
+	public void saveJavaPolicyMappings(Connection connection, int applicationId, Object[] javaPolicyIds)
+			throws SQLException {
+
+		PreparedStatement preparedStatement = null;
+		String query = " INSERT INTO APM_POLICY_GROUP_MAPPING (POLICY_GRP_ID ,APP_ID ) VALUES(?,?) ";
+
+		try {
+			preparedStatement = connection.prepareStatement(query);
+
+			for (Object policyId : javaPolicyIds) {
+				preparedStatement.setInt(1, applicationId);
+				preparedStatement.setInt(2, Integer.parseInt(policyId.toString()));
+				preparedStatement.addBatch();
+			}
+			preparedStatement.executeBatch();
+
+		} catch (SQLException e) {
+			StringBuilder builder = new StringBuilder(); //build log description String
+			builder.append("SQL Error while executing the query to save Java Policy mappings : ").append(query)
+					.append(" : (applicationId:").append(applicationId).append(", Java Policy Ids:")
+					.append(javaPolicyIds).append(") : ").append(e.getMessage());
+			log.error(builder.toString(), e);
+			/*
+			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so the connection will be disposed by the parent function.
+			*/
+			throw e;
+		} finally {
+			APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+		}
+	}
 
 }
