@@ -23,6 +23,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.EntitlementService;
@@ -841,7 +843,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     private void checkIfValidTransport(String transport) throws AppManagementException {
         if(!Constants.TRANSPORT_HTTP.equalsIgnoreCase(transport) && !Constants.TRANSPORT_HTTPS.equalsIgnoreCase(transport)){
-            handleException("Unsupported Transport ["+transport+"]");
+            handleException("Unsupported Transport [" + transport + "]");
         }
     }
 
@@ -875,45 +877,62 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 		return false;
     }
 
-	private APITemplateBuilder getAPITemplateBuilder(WebApp api) {
-		APITemplateBuilderImpl vtb = new APITemplateBuilderImpl(api);
+    /**
+     * This method dynamically returns the mandatory and selected java policy handlers list for given app
+     *
+     * @param api :WebApp class which contains details about web applications
+     * @return :handlers list with properties to be applied
+     * @throws AppManagementException on error
+     */
+    private APITemplateBuilder getAPITemplateBuilder(WebApp api) throws AppManagementException {
+        APITemplateBuilderImpl vtb = new APITemplateBuilderImpl(api);
 
-		vtb.addHandler("org.wso2.carbon.appmgt.gateway.handlers.proxy.ReverseProxyHandler",
-		               Collections.EMPTY_MAP);
-		//if ("Enabled".equals(api.isSsoEnabled())) {
-			vtb.addHandler("org.wso2.carbon.appmgt.gateway.handlers.security.saml2.SAML2AuthenticationHandler",
-			               Collections.EMPTY_MAP);
-		//}
-        vtb.addHandler("org.wso2.carbon.appmgt.gateway.handlers.security.entitlement.EntitlementHandler",
-                Collections.EMPTY_MAP);
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("id", "A");
-		properties.put("policyKey", "gov:" + AppMConstants.API_TIER_LOCATION);
-		vtb.addHandler("org.wso2.carbon.appmgt.gateway.handlers.throttling.APIThrottleHandler",
-		               properties);
-        vtb.addHandler("org.wso2.carbon.appmgt.usage.publisher.APPMgtUsageHandler",
-			               Collections.EMPTY_MAP);
-		//vtb.addHandler("org.wso2.carbon.appmgt.usage.publisher.APIMgtGoogleAnalyticsTrackingHandler", Collections.EMPTY_MAP);
-		
-		//
-		// vtb.addHandler("org.wso2.carbon.appmgt.usage.publisher.APIMgtUsageHandler",Collections.EMPTY_MAP);
-		//
-		// vtb.addHandler("org.wso2.carbon.appmgt.usage.publisher.APIMgtGoogleAnalyticsTrackingHandler",Collections.EMPTY_MAP);
-		//
-		// AppManagerConfiguration config =
-		// ServiceReferenceHolder.getInstance().
-		// getAPIManagerConfigurationService().getAPIManagerConfiguration();
-		// String extensionHandlerPosition =
-		// config.getFirstProperty(AppMConstants.EXTENSION_HANDLER_POSITION);
-		// if(extensionHandlerPosition != null &&
-		// "top".equalsIgnoreCase(extensionHandlerPosition)){
-		// vtb.addHandlerPriority("org.wso2.carbon.appmgt.gateway.handlers.ext.APIManagerExtensionHandler",Collections.EMPTY_MAP,0);
-		// }
-		// else{
-		// vtb.addHandler("org.wso2.carbon.appmgt.gateway.handlers.ext.APIManagerExtensionHandler",Collections.EMPTY_MAP);
-		// }
-		return vtb;
-	}
+        //List of JavaPolicy class which contains policy related details
+        List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
+        //contains properties related to all the policies
+        JSONArray objArrPolicyProperties;
+        //contains properties related to relevant policy and will be used to generate the synapse api config file
+        Map<String, String> properties;
+        int counterPolicies; //counter :policies
+        int counterProperties; //counter :properties
+        String propKey; //Property Key name
+        String propVal; //Property value
+
+        try {
+            //fetch all the java policy handlers details which need to be included to synapse api config file
+            policies = appMDAO.getMappedJavaPolicyList(api.getUUID(),true);
+            //loop through each policy
+            for (counterPolicies = 0; counterPolicies < policies.size(); counterPolicies++) {
+                if (policies.get(counterPolicies).getProperties() == null) {
+                    //if policy doesn't contain any properties assign an empty map and add java policy as a handler
+                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), Collections.EMPTY_MAP);
+                } else {
+
+                    objArrPolicyProperties = new JSONArray();
+                    //get property JSON object related to current policy in the loop
+                    objArrPolicyProperties = policies.get(counterPolicies).getProperties();
+                    properties = new HashMap<String, String>();
+                    //if policy contains any properties, run a loop and assign them
+                    for (counterProperties = 0; counterProperties < objArrPolicyProperties.size(); counterProperties++)
+                    {
+                        propKey = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
+                                keySet().toArray()[0].toString();//key
+                        propVal = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
+                                values().toArray()[0].toString();//val
+                        properties.put(propKey, propVal);
+                    }
+                    //add policy as a handler and also the relevant properties
+                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
+                }
+            }
+
+        } catch (AppManagementException e) {
+            handleException("Error occurred while adding java policy handlers to Application : " +
+                    api.getId().toString(), e);
+        }
+        return vtb;
+
+    }
 
     /**
      * Create a new version of the <code>api</code>, with version <code>newVersion</code>
