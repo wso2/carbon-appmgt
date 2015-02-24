@@ -893,8 +893,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         JSONArray objArrPolicyProperties;
         //contains properties related to relevant policy and will be used to generate the synapse api config file
         Map<String, String> properties;
-        Integer i; //counter :policies
-        Integer c; //counter :properties
+        int counterPolicies; //counter :policies
+        int counterProperties; //counter :properties
         String propKey; //Property Key name
         String propVal; //Property value
 
@@ -902,24 +902,27 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             //fetch all the java policy handlers details which need to be included to synapse api config file
             policies = appMDAO.getMappedJavaPolicyList(api.getUUID(),true);
             //loop through each policy
-            for (i = 0; i < policies.size(); i++) {
-                if (policies.get(i).getProperties() == null) {
+            for (counterPolicies = 0; counterPolicies < policies.size(); counterPolicies++) {
+                if (policies.get(counterPolicies).getProperties() == null) {
                     //if policy doesn't contain any properties assign an empty map and add java policy as a handler
-                    vtb.addHandler(policies.get(i).getFullQualifiName(), Collections.EMPTY_MAP);
+                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), Collections.EMPTY_MAP);
                 } else {
 
                     objArrPolicyProperties = new JSONArray();
                     //get property JSON object related to current policy in the loop
-                    objArrPolicyProperties = policies.get(i).getProperties();
+                    objArrPolicyProperties = policies.get(counterPolicies).getProperties();
                     properties = new HashMap<String, String>();
                     //if policy contains any properties, run a loop and assign them
-                    for (c = 0; c < objArrPolicyProperties.size(); c++) {
-                        propKey = ((JSONObject) (objArrPolicyProperties.get(c))).keySet().toArray()[0].toString();//key
-                        propVal = ((JSONObject) (objArrPolicyProperties.get(c))).values().toArray()[0].toString();//val
+                    for (counterProperties = 0; counterProperties < objArrPolicyProperties.size(); counterProperties++)
+                    {
+                        propKey = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
+                                keySet().toArray()[0].toString();//key
+                        propVal = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
+                                values().toArray()[0].toString();//val
                         properties.put(propKey, propVal);
                     }
                     //add policy as a handler and also the relevant properties
-                    vtb.addHandler(policies.get(i).getFullQualifiName(), properties);
+                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
                 }
             }
 

@@ -4513,14 +4513,15 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	/**
 	 * Update Java policies
+	 *
 	 * @param applicationId
 	 * @param javaPolicyList
 	 * @param connection
-	 * @throws AppManagementException on error
+	 * @throws java.sql.SQLException on error
 	 */
 	private void updateJavaPolicies(int applicationId, Object[] javaPolicyList,
 									Connection connection) throws
-			AppManagementException {
+			SQLException {
 
 		PreparedStatement ps = null;
 		String query = "DELETE FROM APM_APP_JAVA_POLICY_MAPPING WHERE APP_ID=? ";
@@ -4537,8 +4538,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			saveJavaPolicyMappings(connection, applicationId, javaPolicyList);
 
 		} catch (SQLException e) {
-			handleException("Error while deleting XACML policy partial mappings for webapp : " +
+			/*
+			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so the connection will be disposed by the parent function.
+			*/
+			log.error("Error while deleting XACML policy partial mappings for webapp : " +
 					applicationId, e);
+			throw e;
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, null);
 		}
