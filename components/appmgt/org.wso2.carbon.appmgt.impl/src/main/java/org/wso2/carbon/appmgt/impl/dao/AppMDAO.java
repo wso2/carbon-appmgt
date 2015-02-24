@@ -993,16 +993,24 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT " +
-                    "* " +
+            String queryToGetSubscriptionId =
+                    "SELECT " +
+                            "SUBSCRIPTION_ID, " +
+                            "APP_ID, " +
+                            "APPLICATION_ID, " +
+                            "SUBSCRIPTION_TYPE, " +
+                            "SUB_STATUS, " +
+                            "TRUSTED_IDP " +
                     "FROM " +
-                    "APM_SUBSCRIPTION SUB," +
-                    "APM_APP APP " +
+                            "APM_SUBSCRIPTION SUB," +
+                            "APM_APP APP " +
                     "WHERE " +
-                    "SUB.APP_ID = APP.APP_ID " +
-                    "AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? AND APP.APP_VERSION = ? " +
-                    "AND SUB.APPLICATION_ID = ? "+
-                    "AND SUB.SUBSCRIPTION_TYPE = ?";
+                            "SUB.APP_ID = APP.APP_ID " +
+                            "AND APP.APP_PROVIDER = ? " +
+                            "AND APP.APP_NAME = ? " +
+                            "AND APP.APP_VERSION = ? " +
+                            "AND SUB.APPLICATION_ID = ? "+
+                            "AND SUB.SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
