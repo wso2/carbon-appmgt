@@ -699,7 +699,7 @@ public class AppMDAO {
                 webAppInfoDTO.setContext(context);
 				webAppInfoDTO.setVersion(version);
                 webAppInfoDTO.setAppID(rs.getInt("APP_ID"));
-				webAppInfoDTO.setAllowAnonymous(Boolean.parseBoolean(rs.getString("APP_ALLOW_ANONYMOUS")));
+				webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
 
 			}
 		} catch (SQLException e) {
