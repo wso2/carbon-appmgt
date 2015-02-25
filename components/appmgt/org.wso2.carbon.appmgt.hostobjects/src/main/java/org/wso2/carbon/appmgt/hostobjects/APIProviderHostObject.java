@@ -1040,6 +1040,10 @@ public class APIProviderHostObject extends ScriptableObject {
             api.setPolicyGroups(apiData.get("uritemplate_policyGroupIds").toString());
         }
 
+        //set the value for Java Policy List property
+        if (apiData.get("uritemplate_javaPolicyIds") != null) {
+            api.setJavaPolicies(apiData.get("uritemplate_javaPolicyIds").toString());
+        }
 
         while((apiData.get("uritemplate_urlPattern"+index)) != null){
             URITemplate uriTemplate = new URITemplate();
