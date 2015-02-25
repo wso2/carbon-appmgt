@@ -19,7 +19,6 @@
 package org.wso2.carbon.appmgt.impl.dao;
 
 import java.math.BigDecimal;
-import java.security.cert.PolicyNode;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -96,10 +95,9 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
- * This class represent the AppMDAO.
+ * Data Access Layer for App Management
  */
 public class AppMDAO {
-    private APIProvider apiProviderImpl;
 
 	private static final Log log = LogFactory.getLog(AppMDAO.class);
 
@@ -112,7 +110,7 @@ public class AppMDAO {
 
     private static final String GATEWAY_URL = "APIGateway.Environments.Environment.GatewayEndpoint";
 
-	// Primary/Secondary Login conifguration
+	// Primary/Secondary Login configuration
 	private static final String USERID_LOGIN = "UserIdLogin";
 	private static final String EMAIL_LOGIN = "EmailLogin";
 	private static final String PRIMARY_LOGIN = "primary";
@@ -995,16 +993,24 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT " +
-                    "* " +
+            String queryToGetSubscriptionId =
+                    "SELECT " +
+                            "SUBSCRIPTION_ID, " +
+                            "APP_ID, " +
+                            "APPLICATION_ID, " +
+                            "SUBSCRIPTION_TYPE, " +
+                            "SUB_STATUS, " +
+                            "TRUSTED_IDP " +
                     "FROM " +
-                    "APM_SUBSCRIPTION SUB," +
-                    "APM_APP APP " +
+                            "APM_SUBSCRIPTION SUB," +
+                            "APM_APP APP " +
                     "WHERE " +
-                    "SUB.APP_ID = APP.APP_ID " +
-                    "AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? AND APP.APP_VERSION = ? " +
-                    "AND SUB.APPLICATION_ID = ? "+
-                    "AND SUB.SUBSCRIPTION_TYPE = ?";
+                            "SUB.APP_ID = APP.APP_ID " +
+                            "AND APP.APP_PROVIDER = ? " +
+                            "AND APP.APP_NAME = ? " +
+                            "AND APP.APP_VERSION = ? " +
+                            "AND SUB.APPLICATION_ID = ? "+
+                            "AND SUB.SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
@@ -1477,7 +1483,7 @@ public class AppMDAO {
 	 * @param applicationName
 	 *            Application Name
 	 * @return Set<WebApp>
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get SubscribedAPIs
 	 */
 	public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber, String applicationName)
@@ -1598,7 +1604,7 @@ public class AppMDAO {
 	 * @param subscriber
 	 *            subscriber
 	 * @return Set<API>
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get SubscribedAPIs
 	 */
 	public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber)
@@ -2551,7 +2557,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            Context of the WebApp
 	 * @param applicationId
 	 *            Application id
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to update subscriber
 	 */
 	public void updateSubscriptions(APIIdentifier identifier, String context, int applicationId)
@@ -2570,7 +2576,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            Subscription Status[BLOCKED/UNBLOCKED]
 	 * @param applicationId
 	 *            Application id
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to update subscriber
 	 */
 	public void updateSubscription(APIIdentifier identifier, String subStatus, int applicationId)
@@ -2669,11 +2675,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Update refreshed ApplicationAccesstoken's usertype
 	 *
 	 * @param keyType
-	 * @param accessToken
-	 * @param validityPeriod
+     * @param newAccessToken
+     * @param validityPeriod
 	 * @return
 	 * @throws IdentityException
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
@@ -2807,7 +2812,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param providerName
 	 *            Name of the provider
 	 * @return UserApplicationAPIUsage of given provider
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get
 	 *             UserApplicationAPIUsage for given provider
 	 */
@@ -3363,9 +3368,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	/**
 	 * @param apiIdentifier
-	 *            WebApp Identifier
-	 * @param userId
-	 *            User Id
+     * @param conn
+     *
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to add Application
 	 */
@@ -3571,7 +3575,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	/**
 	 * get the status of the Application creation process
 	 *
-	 * @param applicationId
+	 * @param appName
+     * @param userId
 	 * @return
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
