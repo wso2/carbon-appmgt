@@ -856,6 +856,7 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("allowAnonymous", row, entitlementPolicyGroup.isAllowAnonymous());
             policyPartials = entitlementPolicyGroup.getPolicyPartials().toString();
             row.put("policyPartials", row, policyPartials);
+            row.put("policyGroupDesc",row,entitlementPolicyGroup.getPolicyDescription());
 
             count++;
             policyGroupArr.put(count, policyGroupArr, row);
