@@ -697,7 +697,7 @@ public class AppMDAO {
                 webAppInfoDTO.setContext(context);
 				webAppInfoDTO.setVersion(version);
                 webAppInfoDTO.setAppID(rs.getInt("APP_ID"));
-				webAppInfoDTO.setAllowAnonymous(Boolean.parseBoolean(rs.getString("APP_ALLOW_ANONYMOUS")));
+				webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
 
 			}
 		} catch (SQLException e) {
@@ -6800,7 +6800,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String query =
 				"SELECT POLICY_GRP_ID ,NAME ,THROTTLING_TIER ,USER_ROLES ,"
 						+ "COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') "
-						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS  FROM APM_POLICY_GROUP "
+						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS ,DESCRIPTION  FROM APM_POLICY_GROUP "
 						+ "WHERE POLICY_GRP_ID IN (SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?) ";
 		try {
 			connection = APIMgtDBUtil.getConnection();
@@ -6817,6 +6817,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				policyGroup.setAllowAnonymous(rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 				policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),
 						connection));
+				policyGroup.setPolicyDescription(rs.getString("DESCRIPTION"));
 				entitlementPolicyGroupList.add(policyGroup);
 			}
 
