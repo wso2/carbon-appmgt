@@ -19,6 +19,8 @@ package org.wso2.carbon.appmgt.usage.publisher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.usage.publisher.dto.CacheStatPublisherDTO;
+import org.wso2.carbon.appmgt.usage.publisher.dto.DataBridgeCacheStatPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.DataBridgeFaultPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.DataBridgeRequestPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.DataBridgeResponsePublisherDTO;
@@ -93,6 +95,19 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
                 		APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerFaultStreamName(),
                 		APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerFaultStreamVersion());
             }
+            
+          //If Cache stat Stream Definition does not exist.
+            if(!dataPublisher.isStreamDefinitionAdded(APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerCacheStatStreamName(),
+            		APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerCacheStatStreamVersion())){
+
+                //Get cache Stream Definition
+                String cacheStatStreamDefinition = DataBridgeCacheStatPublisherDTO.getStreamDefinition();
+
+                //Add cache Stream Definition;
+                dataPublisher.addStreamDefinition(cacheStatStreamDefinition,
+                              APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerCacheStatStreamName(),
+                              APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().getApiManagerCacheStatStreamVersion());
+            }
         }catch (Exception e){
             log.error("Error initializing APIMgtUsageDataBridgeDataPublisher", e);
         }
@@ -143,6 +158,27 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
             log.error("Error while publishing Fault event", e);
         }
     }
+    
+
+	@Override
+	public void publishEvent(CacheStatPublisherDTO cacheDataPublisherDTO) {
+		DataBridgeCacheStatPublisherDTO dataBridgeCacheStatPublisherDTO =
+		                                                                  new DataBridgeCacheStatPublisherDTO(
+		                                                                                                      cacheDataPublisherDTO);
+		try {
+			// Publish Fault Data
+			dataPublisher.publish(APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService()
+			                                                             .getApiManagerCacheStatStreamName(),
+			                      APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService()
+			                                                             .getApiManagerCacheStatStreamVersion(),
+			                      System.currentTimeMillis(), new Object[] { "external" }, null,
+			                      (Object[]) dataBridgeCacheStatPublisherDTO.createPayload());
+
+		} catch (AgentException e) {
+			log.error("Error while publishing Fault event", e);
+		}
+
+	}
 
     private static LoadBalancingDataPublisher getDataPublisher()
             throws AgentException, MalformedURLException, AuthenticationException,
@@ -194,4 +230,5 @@ public class APIMgtUsageDataBridgeDataPublisher implements APIMgtUsageDataPublis
 
         return loadBalancingDataPublisher;
     }
+
 }

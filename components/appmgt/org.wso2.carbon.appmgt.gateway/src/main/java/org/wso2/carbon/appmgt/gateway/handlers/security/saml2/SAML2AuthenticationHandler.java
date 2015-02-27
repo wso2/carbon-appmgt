@@ -184,8 +184,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             boolean isAuthorized = false;
 
             if (shouldAuthenticateWithCookie(messageContext)) {
+            	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
                 isAuthorized = handleSecurityUsingCookie(messageContext);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
+            	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
                 isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
 
                 //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
@@ -263,9 +265,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if (cookieString == null) {
             cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
         } else {
-            cookieString = cookieString + " ;" + "\n" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+        	cookieString = cookieString + " ;" + "," + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
         }
         headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
+        headers.put(HTTPConstants.HEADER_SET_COOKIE, AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/");
         messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
         return true;
     }

@@ -516,4 +516,7 @@ public final class AppMConstants {
     //Directory path and name of the mobile app resources
     public static final String MOBILE_APPS_DIRECTORY_PATH = "repository/resources";
     public static final String MOBILE_APPS_DIRECTORY_NAME = "mobileapps";
+    
+    public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
+    public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
 }

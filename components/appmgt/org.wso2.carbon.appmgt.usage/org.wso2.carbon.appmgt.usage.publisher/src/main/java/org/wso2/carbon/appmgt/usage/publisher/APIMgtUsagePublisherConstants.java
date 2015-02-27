@@ -37,6 +37,7 @@ public final class APIMgtUsagePublisherConstants {
     public static final String API_USAGE_PUBLISHER_CLASS = API_USAGE_TRACKING + "PublisherClass";
 	public static final String API_USAGE_BAM_UI_ACTIVITY_ENABLED = API_USAGE_TRACKING
 			+ "UIActivityBAMPublishEnabled"; 
+	public static final String API_USAGE_CACHE_STATS_ENABLED = API_USAGE_TRACKING + "CacheStatsEnabled";
 
     public static final String CONSUMER_KEY = "api.ut.consumerKey";
     public static final String USER_ID = "api.ut.userId";
@@ -65,6 +66,10 @@ public final class APIMgtUsagePublisherConstants {
 			+ "ApiManagerFaultStreamName";
 	public static final String API_MANAGER_FAULT_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "ApiManagerFaultStreamVersion";
+	public static final String API_MANAGER_CACHE_STAT_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
+			+ "ApiManagerCacheStatStreamName";
+	public static final String API_MANAGER_CACHE_STAT_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
+			+ "ApiManagerCacheStatStreamVersion";
 
 	// To add UI Activity BAM publisher
 	public static final String API_BAM_UI_ACTIVITY_STREAM = API_MANAGER_STREAM_NAME_DEFINITION
