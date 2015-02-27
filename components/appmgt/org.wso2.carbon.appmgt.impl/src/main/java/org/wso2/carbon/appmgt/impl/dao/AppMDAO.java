@@ -7242,5 +7242,46 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 
+	/**
+	 * Get an array of url patterns/ http verbs mapped with policy group
+	 *
+	 * @param policyGroupId
+	 * @return url Pattens/http verbs mapped with policy group
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public NativeArray getPolicyGroupAssociatedApps(int policyGroupId) throws AppManagementException {
+
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT HTTP_METHOD,URL_PATTERN FROM APM_APP_URL_MAPPING WHERE POLICY_GRP_ID= ?";
+		NativeArray arrUrlPatterns = new NativeArray(0); //contains objects of url patterns and will be returned
+		NativeObject objUrlPattern;
+		int count = 0;
+
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setInt(1, policyGroupId);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				objUrlPattern = new NativeObject();
+				objUrlPattern.put("urlPattern", objUrlPattern, rs.getString("URL_PATTERN"));
+				objUrlPattern.put("httpMethod", objUrlPattern, rs.getString("HTTP_METHOD"));
+				count++;
+				arrUrlPatterns.put(count, arrUrlPatterns, objUrlPattern);
+			}
+
+
+		} catch (SQLException e) {
+			handleException("Failed to retrieve url patterns associated with policy group : " +
+					+policyGroupId, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, null);
+		}
+		return arrUrlPatterns;
+
+	}
 
 }
