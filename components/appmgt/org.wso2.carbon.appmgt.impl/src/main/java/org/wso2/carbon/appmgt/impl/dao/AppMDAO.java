@@ -7275,8 +7275,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 
 		} catch (SQLException e) {
-			handleException("Failed to retrieve url patterns associated with policy group : " +
-					+policyGroupId, e);
+			handleException("Failed to retrieve url patterns associated with policy group : " + policyGroupId, e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
