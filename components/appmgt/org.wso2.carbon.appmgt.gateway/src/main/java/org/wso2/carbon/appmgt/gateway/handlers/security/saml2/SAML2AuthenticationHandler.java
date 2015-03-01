@@ -185,9 +185,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
             log.debug("Starting auth handler");
             if (shouldAuthenticateWithCookie(messageContext)) {
+            	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
                 isAuthorized = handleSecurityUsingCookie(messageContext);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
-                log.debug("Processing saml response");
+                log.debug("Processing SAML response");
+            	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
                 isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
 
                 //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.

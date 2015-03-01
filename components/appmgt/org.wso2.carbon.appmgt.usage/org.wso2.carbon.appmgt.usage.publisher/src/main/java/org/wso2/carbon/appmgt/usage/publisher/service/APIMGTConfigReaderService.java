@@ -33,8 +33,10 @@ public class APIMGTConfigReaderService {
     private String publisherClass;
     private boolean googleAnalyticsTrackingEnabled;
     private String googleAnalyticsTrackingID;
+   	private boolean cacheStatsEnabled;   
     
-    private String apiManagerRequestStreamName;
+
+	private String apiManagerRequestStreamName;
     private String apiManagerRequestStreamVersion;
     private String apiManagerResponseStreamName;
     private String apiManagerResponseStreamVersion;
@@ -43,6 +45,9 @@ public class APIMGTConfigReaderService {
     private String apiManagerBamUiActivityStreamName;
     private String apiManagerBamUiActivityStreamVersion; 
 	private boolean uiActivityBamPublishEnabled;
+    private String apiManagerCacheStatStreamName;
+   	private String apiManagerCacheStatStreamVersion;
+   	
  
 
     private Map<String, Boolean> enabledAnalyticsEngines = new HashMap<String, Boolean>();
@@ -71,6 +76,10 @@ public class APIMGTConfigReaderService {
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_FAULT_STREAM_NAME);
 		apiManagerFaultStreamVersion = config
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_FAULT_STREAM_VERSION);
+		apiManagerCacheStatStreamName = config
+				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_CACHE_STAT_STREAM_NAME);
+		apiManagerCacheStatStreamVersion = config
+				.getFirstProperty(APIMgtUsagePublisherConstants.API_MANAGER_CACHE_STAT_VERSION);
 		apiManagerBamUiActivityStreamName = config
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_BAM_UI_ACTIVITY_STREAM);
 		apiManagerBamUiActivityStreamVersion = config
@@ -79,6 +88,9 @@ public class APIMGTConfigReaderService {
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_UI_ACTIVITY_ENABLED);
 		uiActivityBamPublishEnabled = uiActivityBAMPublishEnabledStr != null
 				&& JavaUtils.isTrueExplicitly(uiActivityBAMPublishEnabledStr);
+		String cacheStatsEnabledString = config.
+				getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_CACHE_STATS_ENABLED);
+		cacheStatsEnabled = cacheStatsEnabledString != null && JavaUtils.isTrueExplicitly(cacheStatsEnabledString);
 		
 		
         if(enabled) {
@@ -164,6 +176,18 @@ public class APIMGTConfigReaderService {
 
 	public boolean isUiActivityBamPublishEnabled() {
 		return uiActivityBamPublishEnabled;
+	}
+	
+	public String getApiManagerCacheStatStreamName() {
+		return apiManagerCacheStatStreamName;
+	}
+
+	public String getApiManagerCacheStatStreamVersion() {
+		return apiManagerCacheStatStreamVersion;
+	}
+	
+	public boolean isCacheStatsEnabled() {
+		return cacheStatsEnabled;
 	}
 
 }

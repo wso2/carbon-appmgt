@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.appmgt.usage.publisher;
 
+import org.wso2.carbon.appmgt.usage.publisher.dto.CacheStatPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.FaultPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.RequestPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.dto.ResponsePublisherDTO;
@@ -30,5 +31,7 @@ public interface APIMgtUsageDataPublisher {
     public void publishEvent(ResponsePublisherDTO responsePublisherDTO);
 
     public void publishEvent(FaultPublisherDTO faultPublisherDTO);
+    
+    public void publishEvent(CacheStatPublisherDTO cacheStatPublisherDTO);
 
 }

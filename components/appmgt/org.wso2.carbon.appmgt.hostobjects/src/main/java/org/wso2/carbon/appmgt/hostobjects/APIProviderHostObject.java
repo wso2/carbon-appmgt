@@ -857,6 +857,7 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("allowAnonymous", row, entitlementPolicyGroup.isAllowAnonymous());
             policyPartials = entitlementPolicyGroup.getPolicyPartials().toString();
             row.put("policyPartials", row, policyPartials);
+            row.put("policyGroupDesc",row,entitlementPolicyGroup.getPolicyDescription());
 
             count++;
             policyGroupArr.put(count, policyGroupArr, row);
@@ -1041,6 +1042,10 @@ public class APIProviderHostObject extends ScriptableObject {
             api.setPolicyGroups(apiData.get("uritemplate_policyGroupIds").toString());
         }
 
+        //set the value for Java Policy List property
+        if (apiData.get("uritemplate_javaPolicyIds") != null) {
+            api.setJavaPolicies(apiData.get("uritemplate_javaPolicyIds").toString());
+        }
 
         while((apiData.get("uritemplate_urlPattern"+index)) != null){
             URITemplate uriTemplate = new URITemplate();

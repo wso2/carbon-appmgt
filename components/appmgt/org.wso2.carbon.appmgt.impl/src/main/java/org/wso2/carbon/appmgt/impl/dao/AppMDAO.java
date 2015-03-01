@@ -19,7 +19,6 @@
 package org.wso2.carbon.appmgt.impl.dao;
 
 import java.math.BigDecimal;
-import java.security.cert.PolicyNode;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -96,10 +95,9 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 /**
- * This class represent the AppMDAO.
+ * Data Access Layer for App Management
  */
 public class AppMDAO {
-    private APIProvider apiProviderImpl;
 
 	private static final Log log = LogFactory.getLog(AppMDAO.class);
 
@@ -112,7 +110,7 @@ public class AppMDAO {
 
     private static final String GATEWAY_URL = "APIGateway.Environments.Environment.GatewayEndpoint";
 
-	// Primary/Secondary Login conifguration
+	// Primary/Secondary Login configuration
 	private static final String USERID_LOGIN = "UserIdLogin";
 	private static final String EMAIL_LOGIN = "EmailLogin";
 	private static final String PRIMARY_LOGIN = "primary";
@@ -699,7 +697,7 @@ public class AppMDAO {
                 webAppInfoDTO.setContext(context);
 				webAppInfoDTO.setVersion(version);
                 webAppInfoDTO.setAppID(rs.getInt("APP_ID"));
-				webAppInfoDTO.setAllowAnonymous(Boolean.parseBoolean(rs.getString("APP_ALLOW_ANONYMOUS")));
+				webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
 
 			}
 		} catch (SQLException e) {
@@ -995,16 +993,24 @@ public class AppMDAO {
         try{
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToGetSubscriptionId = "SELECT " +
-                    "* " +
+            String queryToGetSubscriptionId =
+                    "SELECT " +
+                            "SUBSCRIPTION_ID, " +
+                            "APP_ID, " +
+                            "APPLICATION_ID, " +
+                            "SUBSCRIPTION_TYPE, " +
+                            "SUB_STATUS, " +
+                            "TRUSTED_IDP " +
                     "FROM " +
-                    "APM_SUBSCRIPTION SUB," +
-                    "APM_APP APP " +
+                            "APM_SUBSCRIPTION SUB," +
+                            "APM_APP APP " +
                     "WHERE " +
-                    "SUB.APP_ID = APP.APP_ID " +
-                    "AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? AND APP.APP_VERSION = ? " +
-                    "AND SUB.APPLICATION_ID = ? "+
-                    "AND SUB.SUBSCRIPTION_TYPE = ?";
+                            "SUB.APP_ID = APP.APP_ID " +
+                            "AND APP.APP_PROVIDER = ? " +
+                            "AND APP.APP_NAME = ? " +
+                            "AND APP.APP_VERSION = ? " +
+                            "AND SUB.APPLICATION_ID = ? "+
+                            "AND SUB.SUBSCRIPTION_TYPE = ?";
 
             preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
             preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
@@ -1477,7 +1483,7 @@ public class AppMDAO {
 	 * @param applicationName
 	 *            Application Name
 	 * @return Set<WebApp>
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get SubscribedAPIs
 	 */
 	public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber, String applicationName)
@@ -1598,7 +1604,7 @@ public class AppMDAO {
 	 * @param subscriber
 	 *            subscriber
 	 * @return Set<API>
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get SubscribedAPIs
 	 */
 	public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber)
@@ -2551,7 +2557,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            Context of the WebApp
 	 * @param applicationId
 	 *            Application id
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to update subscriber
 	 */
 	public void updateSubscriptions(APIIdentifier identifier, String context, int applicationId)
@@ -2570,7 +2576,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            Subscription Status[BLOCKED/UNBLOCKED]
 	 * @param applicationId
 	 *            Application id
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to update subscriber
 	 */
 	public void updateSubscription(APIIdentifier identifier, String subStatus, int applicationId)
@@ -2669,11 +2675,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Update refreshed ApplicationAccesstoken's usertype
 	 *
 	 * @param keyType
-	 * @param accessToken
-	 * @param validityPeriod
+     * @param newAccessToken
+     * @param validityPeriod
 	 * @return
 	 * @throws IdentityException
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
@@ -2807,7 +2812,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param providerName
 	 *            Name of the provider
 	 * @return UserApplicationAPIUsage of given provider
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to get
 	 *             UserApplicationAPIUsage for given provider
 	 */
@@ -3363,9 +3368,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	/**
 	 * @param apiIdentifier
-	 *            WebApp Identifier
-	 * @param userId
-	 *            User Id
+     * @param conn
+     *
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to add Application
 	 */
@@ -3571,7 +3575,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	/**
 	 * get the status of the Application creation process
 	 *
-	 * @param applicationId
+	 * @param appName
+     * @param userId
 	 * @return
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
@@ -4047,7 +4052,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			//save java policies app wise
 			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
-				JSONArray javaPolicyIdList =  api.getJavaPolicies();
+				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
 				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
 			}
 
@@ -4461,6 +4466,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				updatePolicyGroups(webAppId, policyGroupIdList.toArray(),connection);
 			}
 
+			//update java policy handlers
+			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
+				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
+				updateJavaPolicies(webAppId, javaPolicyIdList.toArray(), connection);
+			}
+
 			updateURLTemplates(api, connection);
 			connection.commit();
 
@@ -4500,6 +4511,45 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} catch (SQLException e) {
 			handleException("Error while deleting XACML policy partial mappings for webapp : " +
 					applicationId, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, null, null);
+		}
+	}
+
+	/**
+	 * Update Java policies
+	 *
+	 * @param applicationId
+	 * @param javaPolicyList
+	 * @param connection
+	 * @throws java.sql.SQLException on error
+	 */
+	private void updateJavaPolicies(int applicationId, Object[] javaPolicyList,
+									Connection connection) throws
+			SQLException {
+
+		PreparedStatement ps = null;
+		String query = "DELETE FROM APM_APP_JAVA_POLICY_MAPPING WHERE APP_ID=? ";
+
+		try {
+			if (log.isDebugEnabled()) {
+				log.debug("Updating Java Policies mappings with webapp id : " + applicationId);
+			}
+			ps = connection.prepareStatement(query);
+			ps.setInt(1, applicationId);
+			ps.executeUpdate();
+
+			//Save application's policy partial mapping data
+			saveJavaPolicyMappings(connection, applicationId, javaPolicyList);
+
+		} catch (SQLException e) {
+			/*
+			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so the connection will be disposed by the parent function.
+			*/
+			log.error("Error while deleting XACML policy partial mappings for webapp : " +
+					applicationId, e);
+			throw e;
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, null);
 		}
@@ -6750,7 +6800,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String query =
 				"SELECT POLICY_GRP_ID ,NAME ,THROTTLING_TIER ,USER_ROLES ,"
 						+ "COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') "
-						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS  FROM APM_POLICY_GROUP "
+						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS ,DESCRIPTION  FROM APM_POLICY_GROUP "
 						+ "WHERE POLICY_GRP_ID IN (SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?) ";
 		try {
 			connection = APIMgtDBUtil.getConnection();
@@ -6767,6 +6817,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				policyGroup.setAllowAnonymous(rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 				policyGroup.setPolicyPartials(getEntitledPartialListForPolicyGroup(rs.getInt("POLICY_GRP_ID"),
 						connection));
+				policyGroup.setPolicyDescription(rs.getString("DESCRIPTION"));
 				entitlementPolicyGroupList.add(policyGroup);
 			}
 
@@ -7009,7 +7060,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 						+ "WHERE MAP.POLICY_GRP_ID = ? ";
 
 		try {
-			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setInt(1, policyGroupId);
 			rs = ps.executeQuery();
@@ -7038,14 +7088,17 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Fetch predefined Java policy list with the mapped Application Id
+	 * Fetch predefined all the non mandatory Java policy list with the mapped Application Id
 	 * If each policy is mapped with the given appId it will return the same appId else it will return NULL
+	 * The mandatory policies are excluded from the returned list
+	 * And also only includes the Global (application level) policies
 	 *
 	 * @param applicationUUId
+	 * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
 	 * @return array of all available java policies
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
 	 */
-	public static NativeArray getAvailableJavaPolicyList(String applicationUUId)
+	public static NativeArray getAvailableJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
 			throws AppManagementException {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -7054,33 +7107,32 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		NativeArray arrJavaPolicies = new NativeArray(0);
 		Integer count = 0;
 
-		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,FULL_QUALIFI_NAME ,DESCRIPTION " +
-				",DISPLAY_ORDER_SEQ_NO ," +
-				"IS_MANDATORY ,POLICY_PROPERTIES ,APP.APP_ID AS APP_ID " +
+		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
+				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
 				"FROM APM_APP_JAVA_POLICY POL " +
 				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
 				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+				"WHERE IS_MANDATORY=FALSE AND IS_GLOBAL= ? " +
 				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setString(1, applicationUUId);
+			ps.setBoolean(2, isGlobalPolicy);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				objPolicy = new NativeObject();
 				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
 				objPolicy.put("displayName", objPolicy, rs.getString("DISPLAY_NAME"));
-				objPolicy.put("fullQualifiedName", objPolicy, rs.getString("FULL_QUALIFI_NAME"));
 				objPolicy.put("description", objPolicy, rs.getString("DESCRIPTION"));
 				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
-				objPolicy.put("isMandatory", objPolicy, rs.getBoolean("IS_MANDATORY"));
-				objPolicy.put("policyProperties", objPolicy, rs.getString("POLICY_PROPERTIES"));
 				objPolicy.put("applicationId", objPolicy, rs.getString("APP_ID"));
 
 				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
 				count++;
 			}
+
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get available Java Policies : "
 					+ query + e.getMessage(), e);
@@ -7102,7 +7154,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			throws SQLException {
 
 		PreparedStatement preparedStatement = null;
-		String query = " INSERT INTO APM_POLICY_GROUP_MAPPING (POLICY_GRP_ID ,APP_ID ) VALUES(?,?) ";
+		String query = " INSERT INTO APM_APP_JAVA_POLICY_MAPPING(APP_ID,JAVA_POLICY_ID) VALUES(?,?) ";
 
 		try {
 			preparedStatement = connection.prepareStatement(query);
@@ -7128,6 +7180,107 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} finally {
 			APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
 		}
+	}
+
+
+	/**
+	 * Fetch all the mandatory and mapped Java policy list with the mapped Application Id
+	 * Only includes the Global (Application level) policies
+	 *
+	 * @param applicationUUId
+	 * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
+	 * @return array of all available java policies
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
+	 */
+	public static List<JavaPolicy> getMappedJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
+			throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
+		String strJavaPolicyProperty = "";
+
+		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME " +
+				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID ,FULL_QUALIFI_NAME ,POLICY_PROPERTIES " +
+				"FROM APM_APP_JAVA_POLICY POL " +
+				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
+				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+				"WHERE (IS_MANDATORY=TRUE OR APP.APP_ID IS NOT NULL) AND IS_GLOBAL= ? " +
+				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
+
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, applicationUUId);
+			ps.setBoolean(2, isGlobalPolicy);
+			rs = ps.executeQuery();
+			JSONParser parser = new JSONParser();
+			while (rs.next()) {
+				JavaPolicy policy = new JavaPolicy();
+
+				policy.setPolicyID(rs.getInt("JAVA_POLICY_ID"));
+				policy.setPolicyName(rs.getString("DISPLAY_NAME"));
+				policy.setFullQualifiName(rs.getString("FULL_QUALIFI_NAME"));
+				policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+				strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
+				if (strJavaPolicyProperty != null) {
+					policy.setProperties((JSONArray) parser.parse(strJavaPolicyProperty));
+				}
+				policies.add(policy);
+			}
+
+		} catch (SQLException e) {
+			handleException("SQL Error while executing the query to get mapped Java Policies : "
+					+ query + e.getMessage(), e);
+		} catch (org.json.simple.parser.ParseException e) {
+			handleException("JSON parsing error while fetching the mapped Java Policy Property : " +
+					strJavaPolicyProperty, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return policies;
+	}
+
+
+	/**
+	 * Get an array of url patterns/ http verbs mapped with policy group
+	 *
+	 * @param policyGroupId
+	 * @return url Pattens/http verbs mapped with policy group
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public NativeArray getPolicyGroupAssociatedApps(int policyGroupId) throws AppManagementException {
+
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT HTTP_METHOD,URL_PATTERN FROM APM_APP_URL_MAPPING WHERE POLICY_GRP_ID= ?";
+		NativeArray arrUrlPatterns = new NativeArray(0); //contains objects of url patterns and will be returned
+		NativeObject objUrlPattern;
+		int count = 0;
+
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setInt(1, policyGroupId);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				objUrlPattern = new NativeObject();
+				objUrlPattern.put("urlPattern", objUrlPattern, rs.getString("URL_PATTERN"));
+				objUrlPattern.put("httpMethod", objUrlPattern, rs.getString("HTTP_METHOD"));
+				count++;
+				arrUrlPatterns.put(count, arrUrlPatterns, objUrlPattern);
+			}
+
+
+		} catch (SQLException e) {
+			handleException("Failed to retrieve url patterns associated with policy group : " + policyGroupId, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return arrUrlPatterns;
+
 	}
 
 }

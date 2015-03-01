@@ -27,6 +27,7 @@ public class EntitlementPolicyGroup {
     private String userRoles;
     private boolean allowAnonymous;
     private JSONArray policyPartials; //XACML policies
+    private String policyDescription;
 
     public void setPolicyGroupId(int policyGroupId) {
         this.policyGroupId = policyGroupId;
@@ -75,5 +76,13 @@ public class EntitlementPolicyGroup {
 
     public JSONArray getPolicyPartials() {
         return policyPartials;
+    }
+
+    public void setPolicyDescription(String policyDescription) {
+        this.policyDescription = policyDescription;
+    }
+
+    public String getPolicyDescription() {
+        return policyDescription;
     }
 }
