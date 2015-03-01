@@ -183,9 +183,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             issuer = constructIssuerId(messageContext);
             boolean isAuthorized = false;
 
+            log.debug("Starting auth handler");
             if (shouldAuthenticateWithCookie(messageContext)) {
                 isAuthorized = handleSecurityUsingCookie(messageContext);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
+                log.debug("Processing saml response");
                 isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
 
                 //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
@@ -253,20 +255,26 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 .getProperty("HTTP_METHOD"), (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
             return true;
         }
+        log.debug("Reading AppMConstants.APPM_SAML2_COOKIE from msg context");
         String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
+        log.debug( AppMConstants.APPM_SAML2_COOKIE + " : " + appmSamlSsoCookie);
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                 getAxis2MessageContext();
         Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         String cookieString = (String) headers.get(HTTPConstants.HEADER_SET_COOKIE);
+        log.debug("Exisiting set cookie string in transport headers : " + cookieString);
 
         if (cookieString == null) {
             cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
         } else {
-            cookieString = cookieString + " ;" + "\n" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+            cookieString = cookieString + " ;" + "," + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
         }
+        log.debug("Updated set cookie string in transport headers : " + cookieString);
         headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
+        headers.put(HTTPConstants.HEADER_SET_COOKIE, AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/");
         messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+        log.debug("Set to set cookies in transport");
         return true;
     }
 
@@ -300,7 +308,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return true if the request should be authenticated using the SAML response from the IDP, false otherwise.
      */
     private boolean shouldAuthenticateWithSAMLResponse(MessageContext messageContext){
+        log.debug("shouldAuthenticateWithSAMLResponse"+ messageContext);
         Map<String, String> idpResponseAttributes = getIDPResponseAttributes(messageContext);
+        log.debug("idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE) : " + idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE));
         return idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE) != null;
     }
 
@@ -321,6 +331,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      */
     private String getSAMLCookie(MessageContext messageContext){
         String cookieString = getCookieString(messageContext);
+        log.debug("Requesting cookie : " + AppMConstants.APPM_SAML2_COOKIE + " value : " + cookieString + " getCookieValue() : " + getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE));
         return getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE);
     }
 
@@ -739,13 +750,16 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
 
         if (isSAMLResponseAuthenticated(samlAttributes)) {
+            log.debug("Saml response is valid");
 
             // Set the cookie value.
             String samlCookieValue = getSAMLCookie(messageContext);
             String samlResponse = idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE);
             if (samlCookieValue == null) {
                 samlCookieValue = UUID.randomUUID().toString();
+                log.debug("generating samlCookieValue : " + samlCookieValue);
                 messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, samlCookieValue);
+                log.debug("Setting into msg context 1");
 
                 //Cache SAML response. Different apps may configured to have different claim values which result in different
                 //SAML responses for each app. Map is required to store SAML responses of apps being invoked. Then set the cache
@@ -754,6 +768,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 samlResponsesMap.put(constructIssuerId(messageContext), samlResponse);
                 getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
             } else {
+                log.debug("samlCookie already exists : " + samlCookieValue);
                 //This logic get executed when accessing an app that haven't accessed previously in the same browser
                 Map<String, String> samlResponsesMap = (HashMap<String, String>) getSAML2ConfigCache().get(samlCookieValue);
                 if (samlResponsesMap != null && !samlResponsesMap.containsKey(issuer)) {
@@ -761,6 +776,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
                 }
                 messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, samlCookieValue);
+                log.debug("Setting into msg context 2");
             }
 
             //APISecurityConstants.SUBJECT maps to authenticated userName

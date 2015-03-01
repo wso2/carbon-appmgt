@@ -46,6 +46,7 @@ import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
@@ -153,21 +154,28 @@ public class AppManagerComponent {
                     configurationService, null);
             APIStatusObserverList.getInstance().init(configuration);
 
-            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
-                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.API_APPLICATION_DATA_LOCATION),
-                    AppMConstants.Permissions.API_CREATE,
-                    UserMgtConstants.EXECUTE_ACTION, null);
-            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_GOVERNANCE_EXECUTION_ID,
-                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + "/trunk"),
-                    AppMConstants.Permissions.API_CREATE,
-                    UserMgtConstants.EXECUTE_ACTION, null);
-            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_PUBLISHER_APIMGT_EXECUTION_ID,
-                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.API_APPLICATION_DATA_LOCATION),
-                    AppMConstants.Permissions.API_PUBLISH,
-                    UserMgtConstants.EXECUTE_ACTION, null);
+            UserRealm realm = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry().getUserRealm();
+            RegistryAuthorizationManager regAuthorizationManager = new RegistryAuthorizationManager(realm);
+            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, "authorize");
+            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.PUT);
+            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.DELETE);
+            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.GET);
+
+//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
+//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
+//                    AppMConstants.Permissions.API_CREATE,
+//                    UserMgtConstants.EXECUTE_ACTION, null);
+//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_GOVERNANCE_EXECUTION_ID,
+//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + "/trunk"),
+//                    AppMConstants.Permissions.API_CREATE,
+//                    UserMgtConstants.EXECUTE_ACTION, null);
+//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_PUBLISHER_APIMGT_EXECUTION_ID,
+//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
+//                    AppMConstants.Permissions.API_PUBLISH,
+//                    UserMgtConstants.EXECUTE_ACTION, null);
 
             setupImagePermissions();
             RemoteAuthorizationManager authorizationManager = RemoteAuthorizationManager.getInstance();

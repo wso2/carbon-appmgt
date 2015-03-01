@@ -97,6 +97,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
         if (args!=null && args.length != 0) {
             String username = (String) args[0];
+            System.out.println("################# CAPTURED USER : "+username);
             return new APIProviderHostObject(username);
         }
         return new APIProviderHostObject();
@@ -2720,20 +2721,20 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
 
-    public static boolean jsFunction_hasCreatePermission(Context cx, Scriptable thisObj,
-                                                         Object[] args,
-                                                         Function funObj) {
-        APIProvider provider = getAPIProvider(thisObj);
-        if (provider instanceof UserAwareAPIProvider) {
-            try {
-                ((UserAwareAPIProvider) provider).checkCreatePermission();
-                return true;
-            } catch (AppManagementException e) {
-                return false;
-            }
-        }
-        return false;
-    }
+//    public static boolean jsFunction_hasCreatePermission(Context cx, Scriptable thisObj,
+//                                                         Object[] args,
+//                                                         Function funObj) {
+//        APIProvider provider = getAPIProvider(thisObj);
+//        if (provider instanceof UserAwareAPIProvider) {
+//            try {
+//                ((UserAwareAPIProvider) provider).checkCreatePermission();
+//                return true;
+//            } catch (AppManagementException e) {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
     public static boolean jsFunction_hasManageTierPermission(Context cx, Scriptable thisObj,
                                                              Object[] args,
@@ -2762,20 +2763,20 @@ public class APIProviderHostObject extends ScriptableObject {
                 AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.API_PUBLISH);
     }
 
-    public static boolean jsFunction_hasPublishPermission(Context cx, Scriptable thisObj,
-                                                          Object[] args,
-                                                          Function funObj) {
-        APIProvider provider = getAPIProvider(thisObj);
-        if (provider instanceof UserAwareAPIProvider) {
-            try {
-                ((UserAwareAPIProvider) provider).checkPublishPermission();
-                return true;
-            } catch (AppManagementException e) {
-                return false;
-            }
-        }
-        return false;
-    }
+//    public static boolean jsFunction_hasPublishPermission(Context cx, Scriptable thisObj,
+//                                                          Object[] args,
+//                                                          Function funObj) {
+//        APIProvider provider = getAPIProvider(thisObj);
+//        if (provider instanceof UserAwareAPIProvider) {
+//            try {
+//                ((UserAwareAPIProvider) provider).checkPublishPermission();
+//                return true;
+//            } catch (AppManagementException e) {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
     public static void jsFunction_loadRegistryOfTenant(Context cx,
                                                        Scriptable thisObj, Object[] args, Function funObj){
