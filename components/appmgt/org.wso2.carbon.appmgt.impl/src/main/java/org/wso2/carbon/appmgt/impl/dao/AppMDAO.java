@@ -996,13 +996,13 @@ public class AppMDAO {
             String queryToGetSubscriptionId =
                     "SELECT " +
                             "SUBSCRIPTION_ID, " +
-                            "APP_ID, " +
+                            "SUB.APP_ID, " +
                             "APPLICATION_ID, " +
                             "SUBSCRIPTION_TYPE, " +
                             "SUB_STATUS, " +
                             "TRUSTED_IDP " +
                     "FROM " +
-                            "APM_SUBSCRIPTION SUB," +
+                            "APM_SUBSCRIPTION SUB, " +
                             "APM_APP APP " +
                     "WHERE " +
                             "SUB.APP_ID = APP.APP_ID " +
