@@ -1890,6 +1890,30 @@ public final class AppManagerUtil {
         }
     }
 
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     *
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void addNewRole(String roleName,
+                                             org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+
+            Permission[] loginPermission = new Permission[]{
+                    new Permission("/permission/admin/login",
+                                   UserMgtConstants.EXECUTE_ACTION)};
+            String tenantAdminName = userRealm.getRealmConfiguration().getAdminUserName();
+            String[] userList = new String[]{tenantAdminName};
+            userRealm.getUserStoreManager().addRole(roleName, userList, loginPermission);
+
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding new role : " + roleName, e);
+        }
+    }
+
 
     /**
      * Add permissions to the appmgt/applicationdata collection for given role.

@@ -153,8 +153,11 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         }
 
         try {
+            //Add the creator & publisher roles if not exists
             //Apply permissons to appmgt collection for creator role
             UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+            AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, realm);
+            AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE, realm);
             AppManagerUtil.applyRolePermissionToCollection(AppMConstants.CREATOR_ROLE, realm);
         } catch(Exception e) {
             log.error("Failed to add permissions of appmgt/application data collection for creator role.");

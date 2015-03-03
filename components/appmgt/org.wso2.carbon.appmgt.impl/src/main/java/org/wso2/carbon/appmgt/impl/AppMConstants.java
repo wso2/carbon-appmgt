@@ -440,6 +440,7 @@ public final class AppMConstants {
 
     public static final String EVERYONE_ROLE = "internal/everyone";
     public static final String CREATOR_ROLE = "internal/creator";
+    public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
