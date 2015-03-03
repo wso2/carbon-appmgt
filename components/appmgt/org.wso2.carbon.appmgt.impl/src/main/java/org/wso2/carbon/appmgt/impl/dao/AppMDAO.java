@@ -4372,7 +4372,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				",ENT.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,URL.URL_PATTERN AS URL_PATTERN,URL.HTTP_METHOD AS HTTP_METHOD  " +
 				",ENT.EFFECT AS EFFECT,POL.CONTENT AS POLICY_PARTIAL_CONTENT, URL.POLICY_GRP_ID AS POLICY_GRP_ID  " +
 				"FROM APM_APP_URL_MAPPING URL " +
-				"INNER JOIN APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT ON ENT.POLICY_GRP_ID =URL.POLICY_GRP_ID " +
+				"INNER JOIN APM_POLICY_GRP_PARTIAL_MAPPING ENT ON ENT.POLICY_GRP_ID =URL.POLICY_GRP_ID " +
 				"LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL   POL ON POL.ENTITLEMENT_POLICY_PARTIAL_ID =ENT.POLICY_PARTIAL_ID  " +
 				"WHERE URL.APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) ";
 
@@ -5371,7 +5371,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 
 		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
-				" FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
+				" FROM APM_POLICY_GRP_PARTIAL_MAPPING ENT " +
 				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
 				" WHERE ENT.POLICY_PARTIAL_ID = ? ";
@@ -5543,7 +5543,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 
 		String queryToGetPolicyIdList = "SELECT POLICY_ID " +
-				"FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING ENT " +
+				"FROM APM_POLICY_GRP_PARTIAL_MAPPING ENT " +
 				"INNER JOIN APM_APP_URL_MAPPING MAP ON MAP.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				"AND  MAP.APP_ID= ? ";
 
@@ -5658,7 +5658,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
     public void updateURLEntitlementPolicyPartialMappings(List<XACMLPolicyTemplateContext> xacmlPolicyTemplateContexts)
             throws AppManagementException {
 
-        String query = "UPDATE APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING SET POLICY_ID = ? " +
+        String query = "UPDATE APM_POLICY_GRP_PARTIAL_MAPPING SET POLICY_ID = ? " +
                 "WHERE POLICY_GRP_ID = ? " +
                 "AND POLICY_PARTIAL_ID = ?";
 
@@ -6845,7 +6845,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 		JSONArray arrPartials = new JSONArray();
 		String query = "SELECT POLICY_PARTIAL_ID, EFFECT, POLICY_ID " +
-				"FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
+				"FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setInt(1, policyGroupId);
@@ -6918,7 +6918,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 												 Object[] objPartialMappings, Connection conn)
 			throws SQLException {
 		String query =
-				" INSERT INTO APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING (POLICY_GRP_ID,EFFECT,POLICY_PARTIAL_ID ) "
+				" INSERT INTO APM_POLICY_GRP_PARTIAL_MAPPING (POLICY_GRP_ID,EFFECT,POLICY_PARTIAL_ID ) "
 						+ " VALUES(?,?,?) ";
 		PreparedStatement preparedStatement = null;
 
@@ -6960,7 +6960,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			throws SQLException {
 
 		String query =
-				" DELETE FROM APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
+				" DELETE FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(query);
@@ -7054,7 +7054,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		// application
 		String query =
 				"SELECT MAP.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,POL.NAME AS POLICY_PARTIAL_NAME,MAP.EFFECT AS EFFECT "
-						+ "FROM  APM_URL_ENTITLEMENT_POLICY_PARTIAL_MAPPING MAP "
+						+ "FROM  APM_POLICY_GRP_PARTIAL_MAPPING MAP "
 						+ "LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL  POL "
 						+ "ON MAP.POLICY_PARTIAL_ID =POL.ENTITLEMENT_POLICY_PARTIAL_ID "
 						+ "WHERE MAP.POLICY_GRP_ID = ? ";
