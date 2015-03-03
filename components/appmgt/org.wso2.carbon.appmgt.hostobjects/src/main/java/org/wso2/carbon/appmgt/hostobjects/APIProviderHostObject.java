@@ -97,7 +97,6 @@ public class APIProviderHostObject extends ScriptableObject {
 
         if (args!=null && args.length != 0) {
             String username = (String) args[0];
-            System.out.println("################# CAPTURED USER : "+username);
             return new APIProviderHostObject(username);
         }
         return new APIProviderHostObject();
