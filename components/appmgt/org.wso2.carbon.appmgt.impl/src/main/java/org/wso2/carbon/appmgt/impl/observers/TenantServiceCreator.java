@@ -36,6 +36,7 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.CarbonBaseUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -44,6 +45,7 @@ import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager
 import org.wso2.carbon.mediation.registry.WSO2Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 
 import javax.xml.stream.XMLStreamException;
@@ -148,6 +150,14 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
         } catch(Exception e) {
             log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry");
+        }
+
+        try {
+            //Apply permissons to appmgt collection for creator role
+            UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+            AppManagerUtil.applyRolePermissionToCollection(AppMConstants.CREATOR_ROLE, realm);
+        } catch(Exception e) {
+            log.error("Failed to add permissions of appmgt/application data collection for creator role.");
         }
 
         try{

@@ -1890,6 +1890,29 @@ public final class AppManagerUtil {
         }
     }
 
+
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void applyRolePermissionToCollection(String roleName, org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, "authorize");
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.PUT);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.DELETE);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.GET);
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding permissions for appmgt/applicationdata collection for role "+roleName, e);
+        }
+    }
+
 	public static void writeDefinedSequencesToTenantRegistry(int tenantID)
 	                                                                      throws
                                                                           AppManagementException {
