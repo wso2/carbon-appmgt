@@ -1890,6 +1890,53 @@ public final class AppManagerUtil {
         }
     }
 
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     *
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void addNewRole(String roleName,
+                                             org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+
+            Permission[] loginPermission = new Permission[]{
+                    new Permission("/permission/admin/login",
+                                   UserMgtConstants.EXECUTE_ACTION)};
+            String tenantAdminName = userRealm.getRealmConfiguration().getAdminUserName();
+            String[] userList = new String[]{tenantAdminName};
+            userRealm.getUserStoreManager().addRole(roleName, userList, loginPermission);
+
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding new role : " + roleName, e);
+        }
+    }
+
+
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void applyRolePermissionToCollection(String roleName, org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, "authorize");
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.PUT);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.DELETE);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.GET);
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding permissions for appmgt/applicationdata collection for role "+roleName, e);
+        }
+    }
+
 	public static void writeDefinedSequencesToTenantRegistry(int tenantID)
 	                                                                      throws
                                                                           AppManagementException {
@@ -2675,6 +2722,17 @@ public final class AppManagerUtil {
                 getConfiguration();
     }
 
+    /**
+     * This method creates mobileapps directory if it does not exists
+     */
+    public static void createMobileAppsDirectory() {
+    	File mobileAppDirectory = new File (AppMConstants.MOBILE_APPS_DIRECTORY_PATH , 
+    			AppMConstants.MOBILE_APPS_DIRECTORY_NAME);
+    	if (!mobileAppDirectory.exists()) {
+    		mobileAppDirectory.mkdir();
+    	}
+    	
+    }
 
 
 

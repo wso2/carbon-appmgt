@@ -16,13 +16,15 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security;
 
+import java.io.Serializable;
+
 /**
  * Contains some context information related to an authenticated request. This
  * can be used
  * to access WebApp keys and tier information related to already authenticated
  * requests.
  */
-public class AuthenticationContext {
+public class AuthenticationContext implements Serializable{
 
 	private boolean authenticated;
 	private String applicationTier;

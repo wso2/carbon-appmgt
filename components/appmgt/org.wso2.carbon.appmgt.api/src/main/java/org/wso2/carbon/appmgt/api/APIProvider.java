@@ -22,7 +22,6 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,9 +136,9 @@ public interface APIProvider extends APIManager {
             throws AppManagementException;
 
     public void addTier(Tier tier) throws AppManagementException;
-    
+
     public void updateTier(Tier tier) throws AppManagementException;
-    
+
     public void removeTier(Tier tier) throws AppManagementException;
 
     /**
@@ -179,11 +178,12 @@ public interface APIProvider extends APIManager {
      * @param policyPartial     policy content
      * @param isSharedPartial   policy status
      * @param policyAuthor      author of the policy
+     * @param policyPartialDesc policy description
      * @return policy id
      * @throws AppManagementException
      */
     int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-                                     String policyAuthor) throws AppManagementException;
+                                     String policyAuthor,String policyPartialDesc) throws AppManagementException;
 
     /**
      * Update the policy partial
@@ -192,11 +192,12 @@ public interface APIProvider extends APIManager {
      * @param policyPartial   policy content
      * @param author          author of the partial
      * @param isShared        policy status
+     * @param policyPartialDesc policy description
      * @return if update success return true else false
      * @throws AppManagementException
      */
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
-                                                  String author, boolean isShared) throws
+                                                  String author, boolean isShared, String policyPartialDesc) throws
                                                                                    AppManagementException;
 
     /**
@@ -226,7 +227,7 @@ public interface APIProvider extends APIManager {
      * @return true if success else false
      * @throws AppManagementException
      */
-    public boolean deleteEntitlementPolicyPartial(int policyPartialId,String author) throws
+    public boolean deleteEntitlementPolicyPartial(int policyPartialId, String author) throws
                                                                                      AppManagementException;
 
     /**
@@ -336,7 +337,7 @@ public interface APIProvider extends APIManager {
      */
     public void addDocumentationContent(APIIdentifier identifier, String documentationName, String text)
             throws AppManagementException;
-    
+
     /**
      * This method used to update the WebApp definition content - Swagger
      *
@@ -346,7 +347,7 @@ public interface APIProvider extends APIManager {
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          if failed to add the document as a resource to registry
      */
-    public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text) 
+    public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text)
     					throws AppManagementException;
 
     /**
@@ -399,24 +400,24 @@ public interface APIProvider extends APIManager {
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          If failed to update subscription status
      */
-    public void updateSubscription(APIIdentifier apiId,String subStatus,int appId) throws
+    public void updateSubscription(APIIdentifier apiId, String subStatus, int appId) throws
                                                                                    AppManagementException;
-    
+
     /**
      * Update the Tier Permissions
      *
      * @param tierName Tier Name
      * @param permissionType Permission Type
-     * @param roles Roles          
+     * @param roles Roles
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          If failed to update subscription status
      */
     public void updateTierPermissions(String tierName, String permissionType, String roles) throws
                                                                                             AppManagementException;
-    
+
     /**
      * Get the list of Tier Permissions
-     * 
+     *
      * @return Tier Permission Set
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          If failed to update subscription status
@@ -432,30 +433,30 @@ public interface APIProvider extends APIManager {
      */
     public boolean deleteApp(APIIdentifier identifier, SSOProvider ssoProvider) throws
                                                                                 AppManagementException;
-    
+
     /**
      * Get the list of Custom InSequences.
      * @return List of available sequences
      * @throws AppManagementException
      */
-    
+
     public List<String> getCustomInSequences()  throws AppManagementException;
-    
-    
+
+
     /**
      * Get the list of Custom OutSequences.
      * @return List of available sequences
      * @throws AppManagementException
      */
-    
+
     public List<String> getCustomOutSequences()  throws AppManagementException;
 
     /**
      * Checks the Gateway Type
-     * 
+     *
      * @return True if gateway is Synpase
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *         
+     *
      */
     public boolean isSynapseGateway() throws AppManagementException;
 
@@ -475,6 +476,22 @@ public interface APIProvider extends APIManager {
      * @return subscription count of apps
      * @throws AppManagementException
      */
-    public Map<String ,Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
+
+    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
+
             throws AppManagementException;
+
+
+    /**
+     * Get Application wise policy group list
+     *
+     * @param appId : Application Id
+     * @return list of policy groups
+     * @throws AppManagementException on error
+     */
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
+            AppManagementException;
+
+
+
 }

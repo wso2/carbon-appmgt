@@ -27,19 +27,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.woden.WSDLFactory;
 import org.apache.woden.WSDLReader;
-import org.apache.xpath.operations.Bool;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
@@ -521,12 +517,12 @@ public class APIProviderHostObject extends ScriptableObject {
 
                 String thumbnailUrl = apiProvider.addIcon(thumbPath, icon);
                 api.setThumbnailUrl(AppManagerUtil.prependTenantPrefix(thumbnailUrl, provider));
-                
+
                 /*Set permissions to anonymous role for thumbPath*/
                 AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), null, null, thumbPath);
                 apiProvider.updateAPI(api);
             }
-            
+
             success = true;
 
         } catch (Exception e) {
@@ -564,7 +560,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static void jsFunction_generateEntitlementPolicies(Context context, Scriptable thisObj,
                                                               Object[] args,
                                                               Function funObj) throws
-                                                                               AppManagementException {
+            AppManagementException {
         if (args == null || args.length == 0) {
             handleException("Invalid number of input parameters.");
         }
@@ -646,8 +642,8 @@ public class APIProviderHostObject extends ScriptableObject {
     public static int jsFunction_saveEntitlementPolicyPartial(Context context, Scriptable thisObj,
                                                               Object[] args,
                                                               Function funObj) throws
-                                                                               AppManagementException {
-        if (args == null || args.length != 3) {
+                                                                               AppManagementException { 
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[1] == null ) {
@@ -657,11 +653,12 @@ public class APIProviderHostObject extends ScriptableObject {
         String policyPartialName = args[0].toString();
         String policyPartial = args[1].toString();
         String isShared = args[2].toString();
+        String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, currentUser);
+        return apiProvider.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, currentUser,policyPartialDesc);
     }
 
     /**
@@ -678,7 +675,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                     Object[] args,
                                                                     Function funObj) throws
                                                                                      AppManagementException {
-        if (args == null || args.length != 3) {
+        if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
         if (args[0] == null || args[1] == null || args[2] == null) {
@@ -688,11 +685,12 @@ public class APIProviderHostObject extends ScriptableObject {
         int policyPartialId = Integer.parseInt(args[0].toString());
         String policyPartial = args[1].toString();
         String isShared = args[2].toString();
+        String policyPartialDesc = args[3].toString();
         boolean isSharedPartial = isShared.equalsIgnoreCase("true");
         String currentUser = ((APIProviderHostObject) thisObj).getUsername();
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial);
+        return apiProvider.updateEntitlementPolicyPartial(policyPartialId, policyPartial, currentUser, isSharedPartial, policyPartialDesc);
     }
 
     /**
@@ -708,7 +706,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static boolean jsFunction_deleteEntitlementPolicyPartial(Context context, Scriptable thisObj,
                                                                     Object[] args,
                                                                     Function funObj) throws
-                                                                                     AppManagementException {
+            AppManagementException {
         if (args == null || args.length != 1) {
             handleException("Invalid number of input parameters.");
         }
@@ -821,11 +819,50 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
             row.put("isShared", row, entitlementPolicyPartial.isShared());
             row.put("author", row, entitlementPolicyPartial.getAuthor());
+            row.put("description", row, entitlementPolicyPartial.getDescription());
             count++;
             myn.put(count, myn, row);
         }
 
         return myn;
+    }
+ 
+
+    /**
+     * Get application wise policy group list
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return Policy Group Array
+     * @throws AppManagementException on error
+     */
+    public static NativeArray jsFunction_getPolicyGroupListByApplication(Context context, Scriptable thisObj,
+                                                                          Object[] args,
+                                                                          Function funObj) throws
+            AppManagementException {
+        NativeArray policyGroupArr = new NativeArray(0);
+        Integer applicationId = Integer.parseInt(args[0].toString());
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        List<EntitlementPolicyGroup> policyGroupList = apiProvider.getPolicyGroupListByApplication(applicationId);
+        int count = 0;
+        String policyPartials;
+        for (EntitlementPolicyGroup entitlementPolicyGroup : policyGroupList) {
+            NativeObject row = new NativeObject();
+            row.put("policyGroupId", row, entitlementPolicyGroup.getPolicyGroupId());
+            row.put("policyGroupName", row, entitlementPolicyGroup.getPolicyGroupName());
+            row.put("throttlingTier", row, entitlementPolicyGroup.getThrottlingTier());
+            row.put("userRoles", row, entitlementPolicyGroup.getUserRoles());
+            row.put("allowAnonymous", row, entitlementPolicyGroup.isAllowAnonymous());
+            policyPartials = entitlementPolicyGroup.getPolicyPartials().toString();
+            row.put("policyPartials", row, policyPartials);
+            row.put("policyGroupDesc",row,entitlementPolicyGroup.getPolicyDescription());
+
+            count++;
+            policyGroupArr.put(count, policyGroupArr, row);
+        }
+
+        return policyGroupArr;
     }
 
 
@@ -904,7 +941,7 @@ public class APIProviderHostObject extends ScriptableObject {
      */
     public static void jsFunction_updateEntitlementPolicies(Context cx, Scriptable thisObj, Object[] args,
                                                             Function funObj) throws
-                                                                             AppManagementException {
+                                                                                 AppManagementException {
         if (args == null || args.length == 0) {
             handleException("Invalid number of input parameters.");
         }
@@ -999,37 +1036,25 @@ public class APIProviderHostObject extends ScriptableObject {
             api.setUUID(uuid);
         }
 
+        //set the value for policy group list property
+        if (apiData.get("uritemplate_policyGroupIds") != null) {
+            api.setPolicyGroups(apiData.get("uritemplate_policyGroupIds").toString());
+        }
+
+        //set the value for Java Policy List property
+        if (apiData.get("uritemplate_javaPolicyIds") != null) {
+            api.setJavaPolicies(apiData.get("uritemplate_javaPolicyIds").toString());
+        }
+
         while((apiData.get("uritemplate_urlPattern"+index)) != null){
             URITemplate uriTemplate = new URITemplate();
-            String uritemplate_urlPattern = (String)apiData.get("uritemplate_urlPattern"+index,apiData);
+            String uritemplate_urlPattern = (String)apiData.get("uritemplate_urlPattern" + index, apiData);
             uriTemplate.setUriTemplate(uritemplate_urlPattern);
-            String uritemplate_httpVerb = (String)apiData.get("uritemplate_httpVerb"+index,apiData);
+            String uritemplate_httpVerb = (String)apiData.get("uritemplate_httpVerb" + index, apiData);
             uriTemplate.setHTTPVerb(uritemplate_httpVerb);
-            String uritemplate_tier = (String)apiData.get("uritemplate_tier"+index,apiData);
-            uriTemplate.setThrottlingTier(uritemplate_tier);
-            String uritemplate_skipthrottle = (String)apiData.get("uritemplate_skipthrottle"+index,apiData);
-            uriTemplate.setSkipThrottling(uritemplate_skipthrottle.equalsIgnoreCase("TRUE"));
-            String uritemplate_user_roles = (String)apiData.get("uritemplate_userRoles"+index,apiData);
-            uriTemplate.setUserRoles(uritemplate_user_roles);
-            String uritemplate_allowAnonymous = (String)apiData.get("uritemplate_allowanonymous"+index,apiData);
-            uriTemplate.setAllowAnonymousURL(uritemplate_allowAnonymous.equalsIgnoreCase("TRUE"));
-
-            //Set policy partial ids
-            JSONArray policyPartialMappings = (JSONArray) JSONValue.parse(
-                    String.valueOf(apiData.get("uritemplate_entitlementPolicyPartialMappings" + index, apiData)));
-            if (policyPartialMappings != null) {
-                for (int i = 0; i < policyPartialMappings.size(); i++) {
-                    EntitlementPolicyPartialMapping entitlementPolicyPartialMapping = new EntitlementPolicyPartialMapping();
-                    JSONObject policyPartialMapping = ((JSONObject) policyPartialMappings.get(i));
-                    entitlementPolicyPartialMapping.setEntitlementPolicyPartialId(
-                            Integer.parseInt(policyPartialMapping.get("entitlementPolicyPartialId").toString()));
-                    entitlementPolicyPartialMapping.setEffect((String) policyPartialMapping.get("effect"));
-                    uriTemplate.addEntitlementPolicyPartialMapping(entitlementPolicyPartialMapping);
-                }
-            }
-
+            Integer uritemplate_policyGroupId = Integer.parseInt((String) apiData.get("uritemplate_policygroupid" + index, apiData));
+            uriTemplate.setPolicyGroupId((int) (uritemplate_policyGroupId));
             uriTemplates.add(uriTemplate);
-
             index++;
         }
 
@@ -2757,20 +2782,20 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
 
-    public static boolean jsFunction_hasCreatePermission(Context cx, Scriptable thisObj,
-                                                         Object[] args,
-                                                         Function funObj) {
-        APIProvider provider = getAPIProvider(thisObj);
-        if (provider instanceof UserAwareAPIProvider) {
-            try {
-                ((UserAwareAPIProvider) provider).checkCreatePermission();
-                return true;
-            } catch (AppManagementException e) {
-                return false;
-            }
-        }
-        return false;
-    }
+//    public static boolean jsFunction_hasCreatePermission(Context cx, Scriptable thisObj,
+//                                                         Object[] args,
+//                                                         Function funObj) {
+//        APIProvider provider = getAPIProvider(thisObj);
+//        if (provider instanceof UserAwareAPIProvider) {
+//            try {
+//                ((UserAwareAPIProvider) provider).checkCreatePermission();
+//                return true;
+//            } catch (AppManagementException e) {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
     public static boolean jsFunction_hasManageTierPermission(Context cx, Scriptable thisObj,
                                                              Object[] args,
@@ -2799,20 +2824,20 @@ public class APIProviderHostObject extends ScriptableObject {
                 AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.API_PUBLISH);
     }
 
-    public static boolean jsFunction_hasPublishPermission(Context cx, Scriptable thisObj,
-                                                          Object[] args,
-                                                          Function funObj) {
-        APIProvider provider = getAPIProvider(thisObj);
-        if (provider instanceof UserAwareAPIProvider) {
-            try {
-                ((UserAwareAPIProvider) provider).checkPublishPermission();
-                return true;
-            } catch (AppManagementException e) {
-                return false;
-            }
-        }
-        return false;
-    }
+//    public static boolean jsFunction_hasPublishPermission(Context cx, Scriptable thisObj,
+//                                                          Object[] args,
+//                                                          Function funObj) {
+//        APIProvider provider = getAPIProvider(thisObj);
+//        if (provider instanceof UserAwareAPIProvider) {
+//            try {
+//                ((UserAwareAPIProvider) provider).checkPublishPermission();
+//                return true;
+//            } catch (AppManagementException e) {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
     public static void jsFunction_loadRegistryOfTenant(Context cx,
                                                        Scriptable thisObj, Object[] args, Function funObj){

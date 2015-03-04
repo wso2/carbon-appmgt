@@ -32,7 +32,7 @@ public final class AppMConstants {
     public static final String API_KEY = "webapp";
     
     //governance registry apimgt root location
-    public static final String APIMGT_REGISTRY_LOCATION = "/apimgt";
+    public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
     
     public static final String API_CONTEXT_ID = "api.context.id";
     //This is the resource name of API
@@ -52,17 +52,17 @@ public final class AppMConstants {
     //registry location of providers
     public static final String PROVIDERS_PATH = "/providers";
     
-    public static final String API_APPLICATION_DATA_LOCATION = APIMGT_REGISTRY_LOCATION +"/applicationdata";
+    public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
     //registry location of WebApp
-    public static final String API_LOCATION = API_APPLICATION_DATA_LOCATION + "/provider";
+    public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
     
-    public static final String API_TIER_LOCATION = API_APPLICATION_DATA_LOCATION + "/tiers.xml";
+    public static final String API_TIER_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/tiers.xml";
 
-    public static final String API_IMAGE_LOCATION = API_APPLICATION_DATA_LOCATION + "/icons";
+    public static final String API_IMAGE_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/icons";
 
     //Workflow Config Location
-    public static final String WORKFLOW_EXECUTOR_LOCATION = API_APPLICATION_DATA_LOCATION + "/workflow-extensions.xml";
+    public static final String WORKFLOW_EXECUTOR_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/workflow-extensions.xml";
 
     public static final String WORKFLOW_MEDIA_TYPE = "workflow-config";
 
@@ -70,13 +70,13 @@ public final class AppMConstants {
     public static final String WORKFLOW_CACHE_NAME = "workflowCache";
 
     //registry location for consumer
-    public static final String API_ROOT_LOCATION = API_APPLICATION_DATA_LOCATION + "/provider";
+    public static final String API_ROOT_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
     
     //registry location for WebApp documentation
-    public static final String API_DOC_LOCATION = API_APPLICATION_DATA_LOCATION + "/api-docs";
+    public static final String API_DOC_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/api-docs";
     
     //registry location for Custom sequences
-    public static final String API_CUSTOM_SEQUENCE_LOCATION = APIMGT_REGISTRY_LOCATION+"/customsequences";
+    public static final String API_CUSTOM_SEQUENCE_LOCATION = APPMGT_REGISTRY_LOCATION +"/customsequences";
     
     public static final String API_CUSTOM_INSEQUENCE_LOCATION = API_CUSTOM_SEQUENCE_LOCATION +"/in/";
   
@@ -86,7 +86,7 @@ public final class AppMConstants {
     public static final String API_SYSTEM_CONFIG_SECURE_VAULT_LOCATION = "/repository/components/secure-vault";
   
    //registry location for wsdl files
-    public static final String API_WSDL_RESOURCE_LOCATION = API_APPLICATION_DATA_LOCATION + "/wsdls/";
+    public static final String API_WSDL_RESOURCE_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/wsdls/";
     
     public static final String API_DOC_RESOURCE_NAME = "api-doc.json";
     
@@ -439,6 +439,8 @@ public final class AppMConstants {
     public static final String NO_MATCHING_AUTH_SCHEME = "noMatchedAuthScheme";
 
     public static final String EVERYONE_ROLE = "internal/everyone";
+    public static final String CREATOR_ROLE = "internal/creator";
+    public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
@@ -512,4 +514,11 @@ public final class AppMConstants {
     }
     //key  of the endpoint securevault
     public static final String API_SECUREVAULT_ENABLE = "EnableSecureVault";
+    
+    //Directory path and name of the mobile app resources
+    public static final String MOBILE_APPS_DIRECTORY_PATH = "repository/resources";
+    public static final String MOBILE_APPS_DIRECTORY_NAME = "mobileapps";
+    
+    public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
+    public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
 }
