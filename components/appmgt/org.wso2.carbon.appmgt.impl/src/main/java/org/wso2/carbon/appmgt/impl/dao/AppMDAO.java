@@ -2507,7 +2507,7 @@ public class AppMDAO {
                     subscribers = users.get(app);
                     Subscriber subscriber = new Subscriber(result.getString("USER_ID"));
                     subscriber.setSubscribedDate(result.getDate("TIME"));
-                  
+
                     subscribers.add(subscriber);
                     users.put(app, subscribers);
                 } else {

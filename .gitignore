@@ -223,3 +223,7 @@ pip-log.txt
 *.ipr
 .idea
 *.iml
+
+
+#Ignore Targets
+target/

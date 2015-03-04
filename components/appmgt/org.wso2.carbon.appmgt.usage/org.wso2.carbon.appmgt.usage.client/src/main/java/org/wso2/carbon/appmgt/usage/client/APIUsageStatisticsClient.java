@@ -372,6 +372,35 @@ public class APIUsageStatisticsClient {
         return usageByName;
     }
 
+    //cacheHitsummary
+
+    public List<APPMCacheCountDTO> getCacheHitCount(String providerName,String fromDate, String toDate)
+            throws APIMgtUsageQueryServiceClientException {
+
+        OMElement omElement = this.queryForCacheHitCount(fromDate, toDate, null);
+        Collection<APPMCacheHitCount> usageData = getCacheHitCount(omElement);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<APPMCacheCountDTO> cacheHit = new ArrayList<APPMCacheCountDTO>();
+
+        for (APPMCacheHitCount usage : usageData) {
+           // for (WebApp providerAPI : providerAPIs) {
+               // if (providerAPI.getId().getApiName().equals(usage.apiName) &&
+                      //  providerAPI.getId().getVersion().equals(usage.version)) {
+
+                    APPMCacheCountDTO usageDTO = new APPMCacheCountDTO();
+                    usageDTO.setApiName(usage.apiName);
+                    usageDTO.setVersion(usage.version);
+                    usageDTO.setCacheHit(usage.cacheHit);
+                    usageDTO.setFullRequestPath(usage.fullRequestPath);
+                    usageDTO.setRequestDate(usage.requestDate);
+                    usageDTO.setTotalRequestCount(usage.totalRequestCount);
+                    cacheHit.add(usageDTO);
+                }
+            //}
+      //  }
+        return cacheHit;
+    }
+
     /**
      * Gets a list of APIResponseTimeDTO objects containing information related to APIs belonging
      * to a particular provider along with their average response times.
@@ -1347,6 +1376,92 @@ public class APIUsageStatisticsClient {
         }
     }
 
+    //cashe satt page quary
+
+    private OMElement queryForCacheHitCount(String fromDate, String toDate, Integer limit)
+            throws APIMgtUsageQueryServiceClientException {
+        if (dataSource == null) {
+            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
+                    "that the data source is properly configured in the APIUsageTracker configuration.");
+        }
+
+        int resultsLimit = APIUsageStatisticsClientConstants.DEFAULT_RESULTS_LIMIT;
+        if(limit!=null){
+            resultsLimit = limit.intValue();
+        }
+
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            String query;
+            String oracleQuery;
+            if (fromDate != null && toDate != null) {
+                query = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME "+
+                        "FROM CACHE_REQUEST_SUMMARY WHERE TIME BETWEEN " +
+                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
+
+
+                oracleQuery =  "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME  "+
+                        "FROM CACHE_REQUEST_SUMMARY WHERE TIME BETWEEN" +
+                        "\'" + fromDate + "\' AND \'" + toDate + "\'" +" AND ROWNUM <= " + resultsLimit + "  GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
+            } else {
+                query = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME"+
+                        "FROM CACHE_REQUEST_SUMMARY GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time ,CACHEHIT DESC";
+
+                oracleQuery = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME "+
+                        "\"FROM CACHE_REQUEST_SUMMARY WHERE ROWNUM <= "+ resultsLimit + " GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
+
+            }
+            if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
+                query = oracleQuery;
+            }
+            rs = statement.executeQuery(query);
+            StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
+            int columnCount = rs.getMetaData().getColumnCount();
+            while (rs.next()) {
+                returnStringBuilder.append("<row>");
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = rs.getMetaData().getColumnName(i);
+                    String columnValue = rs.getString(columnName);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                            "</" + columnName.toLowerCase() + ">");
+                }
+                returnStringBuilder.append("</row>");
+            }
+            returnStringBuilder.append("</rows></omElement>");
+            String returnString = returnStringBuilder.toString();
+            return AXIOMUtil.stringToOM(returnString);
+
+        } catch (Exception e) {
+            throw new APIMgtUsageQueryServiceClientException("Error occurred while querying from JDBC database", e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignore) {
+
+                }
+            }
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+
+                }
+            }
+        }
+    }
+
 
 
     public boolean isTableExist(String tableName, Connection connection) throws SQLException {
@@ -1433,6 +1548,25 @@ public class APIUsageStatisticsClient {
         }
         return usageData;
     }
+    //cacheHit
+
+    private Collection<APPMCacheHitCount> getCacheHitCount(OMElement data) {
+        List<APPMCacheHitCount> usageData = new ArrayList<APPMCacheHitCount>();
+        OMElement rowsElement = data.getFirstChildWithName(new QName(
+                APIUsageStatisticsClientConstants.ROWS));
+        Iterator rowIterator = rowsElement.getChildrenWithName(new QName(
+                APIUsageStatisticsClientConstants.ROW));
+        if (rowIterator != null) {
+            while (rowIterator.hasNext()) {
+                OMElement rowElement = (OMElement) rowIterator.next();
+                usageData.add(new APPMCacheHitCount(rowElement));
+            }
+        }
+        return usageData;
+
+    }
+
+
 
     private Collection<APIResponseFaultCount> getAPIResponseFaultCount(OMElement data) {
         List<APIResponseFaultCount> faultyData = new ArrayList<APIResponseFaultCount>();
@@ -1655,6 +1789,35 @@ public class APIUsageStatisticsClient {
                     APIUsageStatisticsClientConstants.REQUEST)).getText());
             accessTime =row.getFirstChildWithName(new QName(
                     APIUsageStatisticsClientConstants.TIME)).getText();
+        }
+    }
+
+    //cacheHit
+    private static class APPMCacheHitCount {
+
+        private String apiName;
+        private String version;
+        private long cacheHit;
+        private String fullRequestPath;
+        private long totalRequestCount;
+        private String requestDate;
+
+        public APPMCacheHitCount(OMElement row) {
+            apiName = row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.API)).getText();
+            version = row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.VERSION)).getText();
+            totalRequestCount = (long) Double.parseDouble(row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.REQUEST)).getText());
+            cacheHit = (long) Double.parseDouble(row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.CACHEHIT)).getText());
+            requestDate =row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.TIME)).getText();
+            fullRequestPath = row.getFirstChildWithName(new QName(
+                    APIUsageStatisticsClientConstants.FULLREQUESTPATH)) .getText();
+
+
+
         }
     }
 

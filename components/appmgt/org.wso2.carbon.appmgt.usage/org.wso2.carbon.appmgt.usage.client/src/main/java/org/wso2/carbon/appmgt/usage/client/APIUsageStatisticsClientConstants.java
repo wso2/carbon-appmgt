@@ -69,9 +69,9 @@ public final class APIUsageStatisticsClientConstants {
     public static final String METHOD= "method";
 
     public  static final String REFERER = "referer";
-    
+
     public static final String CONTEXT= "context";
-    
+
     public static final String RESPONSE = "total_response_count";
 
 	public static final String INVOCATION_TIME = "requesttime";
@@ -103,5 +103,9 @@ public final class APIUsageStatisticsClientConstants {
     public static final String API_USAGE_JDBC_UserName =  API_USAGE_TRACKING + "JDBCUserName";
 
     public static final String API_USAGE_JDBC_Password =  API_USAGE_TRACKING + "JDBCPassword";
+
+    public static final String FULLREQUESTPATH="fullrequestpath";
+
+    public static final String CACHEHIT ="cachehit";
 
 }
