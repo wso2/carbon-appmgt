@@ -1004,7 +1004,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             //Here we have to set permission specifically to image icon we added
             String iconPath = artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL);
             if (iconPath != null) {
-            	iconPath=iconPath.substring(iconPath.lastIndexOf("/apimgt"));
+            	iconPath=iconPath.substring(iconPath.lastIndexOf("/appmgt"));
                 AppManagerUtil.copyResourcePermissions(api.getId().getProviderName(),thumbUrl,iconPath);
             }
             // Retain the tags

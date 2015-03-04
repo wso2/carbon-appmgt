@@ -17,7 +17,7 @@ package org.wso2.carbon.appmgt.core;
 
 public class AppManagerConstants {
 	
-	public static final String APPLICATION_THROTTLE_POLICY_KEY = "gov:/apimgt/applicationdata/tiers.xml";
+	public static final String APPLICATION_THROTTLE_POLICY_KEY = "gov:/appmgt/applicationdata/tiers.xml";
 
     public static final String GOVERNANCE_REGISTRY_PREFIX = "gov:";
     
