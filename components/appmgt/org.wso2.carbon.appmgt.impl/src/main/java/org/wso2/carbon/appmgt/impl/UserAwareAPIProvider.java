@@ -136,7 +136,7 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     public void checkPublishPermissionTenantMode(String userId) throws AppManagementException {
-        AppManagerUtil.checkPermission(userId, AppMConstants.Permissions.API_PUBLISH);
+        AppManagerUtil.checkPermission(userId, AppMConstants.Permissions.WEB_APP_PUBLISH);
     }
 
     @Override

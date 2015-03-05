@@ -44,7 +44,6 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
@@ -180,8 +179,8 @@ public class APIProviderHostObject extends ScriptableObject {
             }
 
             boolean   authorized =
-                    AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.API_CREATE) ||
-                            AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.API_PUBLISH);
+                    AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.WEB_APP_CREATE) ||
+                            AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.WEB_APP_PUBLISH);
 
 
             if (authorized) {
@@ -2763,8 +2762,8 @@ public class APIProviderHostObject extends ScriptableObject {
             handleException("Invalid input parameters.");
         }
         String username = (String) args[0];
-        return AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.API_CREATE) ||
-                AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.API_PUBLISH);
+        return AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.WEB_APP_CREATE) ||
+                AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.WEB_APP_PUBLISH);
     }
 
 //    public static boolean jsFunction_hasPublishPermission(Context cx, Scriptable thisObj,

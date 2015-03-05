@@ -1896,18 +1896,14 @@ public final class AppManagerUtil {
      * @param roleName
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public static void addNewRole(String roleName,
+    public static void addNewRole(String roleName, Permission[] permissions,
                                              org.wso2.carbon.user.api.UserRealm userRealm)
             throws AppManagementException {
         // TODO: Merge different resource loading methods and create a single method.
         try {
-
-            Permission[] loginPermission = new Permission[]{
-                    new Permission("/permission/admin/login",
-                                   UserMgtConstants.EXECUTE_ACTION)};
             String tenantAdminName = userRealm.getRealmConfiguration().getAdminUserName();
             String[] userList = new String[]{tenantAdminName};
-            userRealm.getUserStoreManager().addRole(roleName, userList, loginPermission);
+            userRealm.getUserStoreManager().addRole(roleName, userList, permissions);
 
         } catch (UserStoreException e) {
             throw new AppManagementException("Error while adding new role : " + roleName, e);
@@ -2087,7 +2083,7 @@ public final class AppManagerUtil {
 		if (create) {
 			String[] permissions =
 			                       new String[] { "/permission/admin/login",
-			                                     AppMConstants.Permissions.API_SUBSCRIBE };
+			                                     AppMConstants.Permissions.WEB_APP_SUBSCRIBE};
 			try {
 				RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
 				UserRealm realm;
@@ -2111,7 +2107,7 @@ public final class AppManagerUtil {
 					                                                                      "/permission/admin/login",
 					                                                                      UserMgtConstants.EXECUTE_ACTION),
 					                                                       new Permission(
-					                                                                      AppMConstants.Permissions.API_SUBSCRIBE,
+					                                                                      AppMConstants.Permissions.WEB_APP_SUBSCRIBE,
 					                                                                      UserMgtConstants.EXECUTE_ACTION) };
 					String tenantAdminName =
 					                         ServiceReferenceHolder.getInstance().getRealmService()
