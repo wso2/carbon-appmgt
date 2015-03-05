@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1903,7 +1904,19 @@ public final class AppManagerUtil {
         try {
             String tenantAdminName = userRealm.getRealmConfiguration().getAdminUserName();
             String[] userList = new String[]{tenantAdminName};
-            userRealm.getUserStoreManager().addRole(roleName, userList, permissions);
+            String[] existingRoles = userRealm.getUserStoreManager().getRoleNames();
+            boolean roleExists = false;
+
+            for(String role : existingRoles){
+                if(role.equalsIgnoreCase(roleName)){
+                    roleExists = true;
+                    break;
+                }
+            }
+
+            if(!roleExists) {
+                userRealm.getUserStoreManager().addRole(roleName, userList, permissions);
+            }
 
         } catch (UserStoreException e) {
             throw new AppManagementException("Error while adding new role : " + roleName, e);
