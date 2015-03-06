@@ -54,7 +54,12 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
         try  {
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String fullName = loggedInUser+"@"+tenantDomain;
+            String fullName;
+            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
+                fullName = loggedInUser + "@" + tenantDomain;
+            }else{
+                fullName = loggedInUser;
+            }
             APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(fullName);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
             WebApp api = provider.getAPI(apiId);
@@ -82,7 +87,12 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             String uId = arr[2];
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String fullName = loggedInUser+"@"+tenantDomain;
+            String fullName;
+            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
+                fullName = loggedInUser + "@" + tenantDomain;
+            }else{
+                fullName = loggedInUser;
+            }
             //make Provider Name (Secondary User Store) registry friendly by replacing '/' with ':'
             uId = AppManagerUtil.makeSecondaryUSNameRegFriendly(uId);
 
