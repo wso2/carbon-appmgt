@@ -29,6 +29,7 @@ import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.dto.PublishApplicationWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.context.CarbonContext;
 
 import java.util.List;
 
@@ -51,13 +52,14 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
         //Update Webapp state to IN-Review till the workflow is approved
         PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
         try  {
-            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(publishAPPDTO.getAppProvider());
+            String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
             WebApp api = provider.getAPI(apiId);
             APIStatus newStatus = null;
             if (api != null) {
                 newStatus = getApiStatus(((PublishApplicationWorkflowDTO) workflowDTO).getNewState());
-                provider.changeAPIStatus(api, newStatus, publishAPPDTO.getAppProvider(), true);
+                provider.changeAPIStatus(api, newStatus, loggedInUser, true);
             }
             super.execute(workflowDTO);
         }catch (AppManagementException e){
@@ -76,15 +78,16 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             String apiName = arr[0];
             String version = arr[1];
             String uId = arr[2];
+            String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
             //make Provider Name (Secondary User Store) registry friendly by replacing '/' with ':'
             uId = AppManagerUtil.makeSecondaryUSNameRegFriendly(uId);
 
             apiIdentifier = new APIIdentifier(uId, apiName, version);
-            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(uId);
+            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
             WebApp app = provider.getAPI(apiIdentifier);
             if (app != null) {
                 APIStatus newStatus = getApiStatus("published");
-                provider.changeAPIStatus(app, newStatus, uId, true);
+                provider.changeAPIStatus(app, newStatus, loggedInUser, true);
             }
         } catch (AppManagementException e) {
             //throw exception

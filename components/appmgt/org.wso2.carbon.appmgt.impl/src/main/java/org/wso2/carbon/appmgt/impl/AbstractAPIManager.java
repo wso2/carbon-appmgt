@@ -576,7 +576,6 @@ public abstract class AbstractAPIManager implements APIManager {
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
                 String artifactContext = artifact.getAttribute(AppMConstants.API_OVERVIEW_CONTEXT);
-                artifactContext=artifactContext.substring(artifactContext.lastIndexOf("/"));
                 if (artifactContext.equalsIgnoreCase(context)) {
                     return true;
                 }

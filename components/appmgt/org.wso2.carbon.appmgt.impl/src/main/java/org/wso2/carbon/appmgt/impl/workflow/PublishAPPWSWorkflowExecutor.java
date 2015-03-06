@@ -40,12 +40,14 @@ import org.wso2.carbon.appmgt.impl.dto.PublishApplicationWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.internal.RegistryCoreServiceComponent;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
@@ -82,17 +84,21 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
         //Update Webapp state to IN-Review till the workflow is approved
         PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
         try  {
-            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(publishAPPDTO.getAppProvider());
+            String adminUserUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName();
+            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
             WebApp api = provider.getAPI(apiId);
             if (api != null) {
                 APIStatus oldState = getApiStatus(publishAPPDTO.getLcState());
                 APIStatus newStatus = getApiStatus("IN-REVIEW");
                 api.setStatus(oldState);
-                provider.changeAPIStatus(api, newStatus, publishAPPDTO.getAppProvider(), true);
+                provider.changeAPIStatus(api, newStatus, adminUserUsername, true);
             }
         }catch (AppManagementException e){
             log.error("Could not update APP lifecycle state to IN-REVIEW", e);
+            throw new WorkflowException("Could not update APP lifecycle state to IN-REVIEW", e);
+        } catch (UserStoreException e) {
+            log.error("Error while retrieving user name of administrative user.", e);
             throw new WorkflowException("Could not update APP lifecycle state to IN-REVIEW", e);
         }
 
@@ -168,14 +174,15 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
             try {
                 WorkflowDTO wfdto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
                 String reference = wfdto.getWorkflowReference();
+                String adminUserUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName();
 
                 String[] arr = decodeValues(reference);
                 APIIdentifier apiIdentifier = new APIIdentifier(arr[2], arr[0], arr[1]);
-                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(arr[2]);
+                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
                 WebApp app = provider.getAPI(apiIdentifier);
                 if (app != null) {
                     APIStatus newStatus = getApiStatus("published");
-                    provider.changeAPIStatus(app, newStatus, arr[2], true);
+                    provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
                 }
 
                 String apiPath = AppManagerUtil.getAPIPath(apiIdentifier);
@@ -201,19 +208,22 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
 
             } catch (AppManagementException e) {
                 log.error("Error while retrieving relevant workflow reference", e);
+            } catch (UserStoreException e) {
+                log.error("Error while trying to complete workflow. Retrieving admin user, username failed.", e);
             }
         } else if (WorkflowStatus.REJECTED.equals(workflowDTO.getStatus())){              //Web App rejection workflow
             try {
                 WorkflowDTO wfdto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
                 String reference = wfdto.getWorkflowReference();
+                String adminUserUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName();
 
                 String[] arr = decodeValues(reference);
                 APIIdentifier apiIdentifier = new APIIdentifier(arr[2], arr[0], arr[1]);
-                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(arr[2]);
+                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
                 WebApp app = provider.getAPI(apiIdentifier);
                 if (app != null) {
                     APIStatus newStatus = getApiStatus("created");
-                    provider.changeAPIStatus(app, newStatus, arr[2], true);
+                    provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
                 }
 
                 String apiPath = AppManagerUtil.getAPIPath(apiIdentifier);
@@ -238,6 +248,8 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
 
             } catch (AppManagementException e) {
                 log.error("Error while retrieving relevant workflow reference", e);
+            } catch (UserStoreException e) {
+                log.error("Error while trying to reject workflow. Retrieving admin user, username failed.", e);
             }
 
         }
