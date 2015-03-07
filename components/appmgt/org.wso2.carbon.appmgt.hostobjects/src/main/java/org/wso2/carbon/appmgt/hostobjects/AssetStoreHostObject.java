@@ -342,12 +342,12 @@ public class AssetStoreHostObject extends ScriptableObject {
             if (isLocalTransport) {
                 UserRealm realm = ServiceReferenceHolder.getInstance().getRealmService().getBootstrapRealm();
                 authorized = realm.getAuthorizationManager().isUserAuthorized(username,
-                        AppMConstants.Permissions.API_SUBSCRIBE,
+                        AppMConstants.Permissions.WEB_APP_SUBSCRIBE,
                         CarbonConstants.UI_PERMISSION_ACTION);
                 roles = realm.getUserStoreManager().getRoleListOfUser(username);
             } else {
                 authorized = AppManagerUtil.checkPermissionQuietly(username,
-                        AppMConstants.Permissions.API_SUBSCRIBE);
+                        AppMConstants.Permissions.WEB_APP_SUBSCRIBE);
                 roles = AppManagerUtil.getListOfRolesQuietly(username);
             }
 

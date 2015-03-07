@@ -36,6 +36,7 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.CarbonBaseUtils;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -44,6 +45,9 @@ import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager
 import org.wso2.carbon.mediation.registry.WSO2Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.Permission;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.mgt.UserMgtConstants;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 
 import javax.xml.stream.XMLStreamException;
@@ -148,6 +152,32 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
         } catch(Exception e) {
             log.error("Failed to load workflow-extension.xml to tenant " + tenantDomain + "'s registry");
+        }
+
+        try {
+            //Add the creator & publisher roles if not exists
+            //Apply permissons to appmgt collection for creator role
+            UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+
+            Permission[] creatorPermissions = new Permission[]{
+                    new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_ADD, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_EDIT, UserMgtConstants.EXECUTE_ACTION)};
+
+            AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, creatorPermissions, realm);
+
+            Permission[] publisherPermissions = new Permission[]{
+                    new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_PUBLISH, UserMgtConstants.EXECUTE_ACTION)};
+
+            AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE,publisherPermissions, realm);
+//            AppManagerUtil.applyRolePermissionToCollection(AppMConstants.CREATOR_ROLE, realm);
+        } catch(Exception e) {
+            log.error("Failed to add permissions of appmgt/application data collection for creator role.");
         }
 
         try{

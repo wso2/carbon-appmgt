@@ -330,7 +330,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
 
             boolean authorized =
-                    AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.API_SUBSCRIBE);
+                    AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.WEB_APP_SUBSCRIBE);
 
 
             if (authorized) {
@@ -425,7 +425,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 usernameWithDomain = usernameWithDomain + "@"+tenantDomain;
             }
 
-            boolean authorized = AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.API_WORKFLOWADMIN);
+            boolean authorized = AppManagerUtil.checkPermissionQuietly(usernameWithDomain, AppMConstants.Permissions.APP_WORKFLOWADMIN);
 
             if (authorized) {
                 row.put("error", row, false);
@@ -2632,7 +2632,7 @@ public class APIStoreHostObject extends ScriptableObject {
             CarbonUtils.setBasicAccessSecurityHeaders(adminUsername, adminPassword,
                     true, userAdminStub._getServiceClient());
             try {
-                    valid = AppManagerUtil.checkPermissionQuietly(userName, AppMConstants.Permissions.API_SUBSCRIBE);
+                    valid = AppManagerUtil.checkPermissionQuietly(userName, AppMConstants.Permissions.WEB_APP_SUBSCRIBE);
                     if(valid){
                         row.put("error", row, false);
                         return row;
@@ -2821,7 +2821,7 @@ public class APIStoreHostObject extends ScriptableObject {
             throws ScriptException, AppManagementException {
         if (args!=null && isStringArray(args)) {
             String username = args[0].toString();
-            return AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.API_SUBSCRIBE);
+            return AppManagerUtil.checkPermissionQuietly(username, AppMConstants.Permissions.WEB_APP_SUBSCRIBE);
         } else {
             handleException("Invalid types of input parameters.");
         }

@@ -48,11 +48,13 @@ import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.registry.core.utils.AuthorizationUtils;
+import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.registry.indexing.service.TenantIndexingLoader;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.Permission;
@@ -155,35 +157,31 @@ public class AppManagerComponent {
                     configurationService, null);
             APIStatusObserverList.getInstance().init(configuration);
 
-            //New role based permission mechanism incorporated. The permission baseed model that was presenet in APIM
-            //has been modified to accommodate this change. Authorize/Add/Delete/Get permissions granted for users of creator role.
+            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
+                                                        RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                                                                                      RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
+                                                        AppMConstants.Permissions.WEB_APP_CREATE,
+                                                        UserMgtConstants.EXECUTE_ACTION, null);
 
-            UserRealm realm = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry().getUserRealm();
-            RegistryAuthorizationManager regAuthorizationManager = new RegistryAuthorizationManager(realm);
-            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
-                                                                              + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, "authorize");
-            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
-                                                                              + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.PUT);
-            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
-                                                                              + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.DELETE);
-            regAuthorizationManager.authorizeRole(AppMConstants.CREATOR_ROLE, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
-                                                                              + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.GET);
+            //Add the creator and publisher roles
+            org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
 
-//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
-//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
-//                    AppMConstants.Permissions.API_CREATE,
-//                    UserMgtConstants.EXECUTE_ACTION, null);
-//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_GOVERNANCE_EXECUTION_ID,
-//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + "/trunk"),
-//                    AppMConstants.Permissions.API_CREATE,
-//                    UserMgtConstants.EXECUTE_ACTION, null);
-//            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_PUBLISHER_APIMGT_EXECUTION_ID,
-//                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-//                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
-//                    AppMConstants.Permissions.API_PUBLISH,
-//                    UserMgtConstants.EXECUTE_ACTION, null);
+            Permission[] creatorPermissions = new Permission[]{
+                    new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_CREATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_UPDATE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_ADD, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_DELETE, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.DOCUMENT_EDIT, UserMgtConstants.EXECUTE_ACTION)};
+
+            AppManagerUtil.addNewRole(AppMConstants.CREATOR_ROLE, creatorPermissions, realm);
+
+            Permission[] publisherPermissions = new Permission[]{
+                    new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION),
+                    new Permission(AppMConstants.Permissions.WEB_APP_PUBLISH, UserMgtConstants.EXECUTE_ACTION)};
+
+            AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE,publisherPermissions, realm);
 
             setupImagePermissions();
             RemoteAuthorizationManager authorizationManager = RemoteAuthorizationManager.getInstance();
@@ -437,7 +435,7 @@ public class AppManagerComponent {
         if (create) {
             String[] permissions = new String[]{
                     "/permission/admin/login",
-                    AppMConstants.Permissions.API_SUBSCRIBE
+                    AppMConstants.Permissions.WEB_APP_SUBSCRIBE
             };
             try {
                 RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
@@ -448,7 +446,7 @@ public class AppManagerComponent {
                         log.debug("Creating subscriber role: " + role);
                     }
                     Permission[] subscriberPermissions = new Permission[]{new Permission("/permission/admin/login",UserMgtConstants.EXECUTE_ACTION),
-                            new Permission(AppMConstants.Permissions.API_SUBSCRIBE, UserMgtConstants.EXECUTE_ACTION)};
+                            new Permission(AppMConstants.Permissions.WEB_APP_SUBSCRIBE, UserMgtConstants.EXECUTE_ACTION)};
                     String superTenantName = ServiceReferenceHolder.getInstance().getRealmService().getBootstrapRealmConfiguration().getAdminUserName();
                     String[] userList = new String[]{superTenantName};
                     manager.addRole(role, userList, subscriberPermissions);

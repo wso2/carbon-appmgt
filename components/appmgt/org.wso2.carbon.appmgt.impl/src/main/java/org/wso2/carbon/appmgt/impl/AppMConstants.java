@@ -236,11 +236,31 @@ public final class AppMConstants {
     public static final int TOP_TATE_MARGIN = 4;
     
     public static final class Permissions {
-        public static final String API_CREATE = "/permission/admin/manage/api/create";
-        public static final String API_PUBLISH = "/permission/admin/manage/api/publish";
-        public static final String API_SUBSCRIBE = "/permission/admin/manage/api/subscribe";
-        public static final String API_WORKFLOWADMIN = "/permission/admin/manage/workflowadmin";
-        public static final String MANAGE_TIERS = "/permission/admin/manage/manage_tiers";
+        //Login permission
+        public static final String LOGIN = "/permission/admin/login";
+
+        //Web App Permissions
+        public static final String WEB_APP_CREATE = "/permission/admin/manage/webapp/create";
+        public static final String WEB_APP_PUBLISH = "/permission/admin/manage/webapp/publish";
+        public static final String WEB_APP_UPDATE = "/permission/admin/manage/webapp/update";
+        public static final String WEB_APP_SUBSCRIBE = "/permission/admin/manage/webapp/subscribe";
+        public static final String WEB_APP_DELETE = "/permission/admin/manage/webapp/delete";
+
+        //Mobile App Permissions
+        public static final String MOBILE_APP_CREATE = "/permission/admin/manage/mobileapp/create";
+        public static final String MOBILE_APP_PUBLISH = "/permission/admin/manage/mobileapp/publish";
+        public static final String MOBILE_APP_UPDATE = "/permission/admin/manage/mobileapp/update";
+        public static final String MOBILE_APP_INSTALL = "/permission/admin/manage/mobileapp/subscribe";
+        public static final String MOBILE_APP_DELETE = "/permission/admin/manage/mobileapp/delete";
+
+        //Document Permissions
+        public static final String DOCUMENT_ADD = "/permission/admin/manage/document/add";
+        public static final String DOCUMENT_EDIT = "/permission/admin/manage/document/edit";
+        public static final String DOCUMENT_DELETE = "/permission/admin/manage/document/delete";
+
+        //Admin Dash Board Permissions
+        public static final String APP_WORKFLOWADMIN = "/permission/admin/manage/appm/workflowadmin";
+        public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
     }
     
     public static final String API_GATEWAY = "APIGateway.";
@@ -440,6 +460,7 @@ public final class AppMConstants {
 
     public static final String EVERYONE_ROLE = "internal/everyone";
     public static final String CREATOR_ROLE = "internal/creator";
+    public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";

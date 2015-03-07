@@ -61,7 +61,7 @@ public class LocalDatabaseCreator extends DatabaseCreator {
         }
         String carbonHome = System.getProperty("carbon.home");
         return  carbonHome +
-                "/dbscripts/apimgt/" + scriptName;
+                "/dbscripts/appmgt/" + scriptName;
 
     }
 }

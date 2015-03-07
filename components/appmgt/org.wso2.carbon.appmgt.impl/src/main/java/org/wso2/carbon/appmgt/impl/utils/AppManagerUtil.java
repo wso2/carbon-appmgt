@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1890,6 +1891,61 @@ public final class AppManagerUtil {
         }
     }
 
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     *
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void addNewRole(String roleName, Permission[] permissions,
+                                             org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+            String tenantAdminName = userRealm.getRealmConfiguration().getAdminUserName();
+            String[] userList = new String[]{tenantAdminName};
+            String[] existingRoles = userRealm.getUserStoreManager().getRoleNames();
+            boolean roleExists = false;
+
+            for(String role : existingRoles){
+                if(role.equalsIgnoreCase(roleName)){
+                    roleExists = true;
+                    break;
+                }
+            }
+
+            if(!roleExists) {
+                userRealm.getUserStoreManager().addRole(roleName, userList, permissions);
+            }
+
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding new role : " + roleName, e);
+        }
+    }
+
+
+    /**
+     * Add permissions to the appmgt/applicationdata collection for given role.
+     * @param roleName
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static void applyRolePermissionToCollection(String roleName, org.wso2.carbon.user.api.UserRealm userRealm)
+            throws AppManagementException {
+        // TODO: Merge different resource loading methods and create a single method.
+        try {
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, "authorize");
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.PUT);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.DELETE);
+            userRealm.getAuthorizationManager().authorizeRole(roleName, RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION, ActionConstants.GET);
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while adding permissions for appmgt/applicationdata collection for role "+roleName, e);
+        }
+    }
+
 	public static void writeDefinedSequencesToTenantRegistry(int tenantID)
 	                                                                      throws
                                                                           AppManagementException {
@@ -2040,7 +2096,7 @@ public final class AppManagerUtil {
 		if (create) {
 			String[] permissions =
 			                       new String[] { "/permission/admin/login",
-			                                     AppMConstants.Permissions.API_SUBSCRIBE };
+			                                     AppMConstants.Permissions.WEB_APP_SUBSCRIBE};
 			try {
 				RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
 				UserRealm realm;
@@ -2064,7 +2120,7 @@ public final class AppManagerUtil {
 					                                                                      "/permission/admin/login",
 					                                                                      UserMgtConstants.EXECUTE_ACTION),
 					                                                       new Permission(
-					                                                                      AppMConstants.Permissions.API_SUBSCRIBE,
+					                                                                      AppMConstants.Permissions.WEB_APP_SUBSCRIBE,
 					                                                                      UserMgtConstants.EXECUTE_ACTION) };
 					String tenantAdminName =
 					                         ServiceReferenceHolder.getInstance().getRealmService()

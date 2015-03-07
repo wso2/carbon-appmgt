@@ -1,28 +1,80 @@
 <component xmlns="http://products.wso2.org/carbon">
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>API</DisplayName>
-            <ResourceId>/permission/admin/manage/api</ResourceId>
+            <DisplayName>Web App</DisplayName>
+            <ResourceId>/permission/admin/manage/webapp</ResourceId>
         </ManagementPermission>
         <ManagementPermission>
             <DisplayName>Create</DisplayName>
-            <ResourceId>/permission/admin/manage/api/create</ResourceId>
+            <ResourceId>/permission/admin/manage/webapp/create</ResourceId>
         </ManagementPermission>
         <ManagementPermission>
             <DisplayName>Publish</DisplayName>
-            <ResourceId>/permission/admin/manage/api/publish</ResourceId>
+            <ResourceId>/permission/admin/manage/webapp/publish</ResourceId>
         </ManagementPermission>
         <ManagementPermission>
             <DisplayName>Subscribe</DisplayName>
-            <ResourceId>/permission/admin/manage/api/subscribe</ResourceId>
+            <ResourceId>/permission/admin/manage/webapp/subscribe</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Update</DisplayName>
+            <ResourceId>/permission/admin/manage/webapp/update</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Delete</DisplayName>
+            <ResourceId>/permission/admin/manage/webapp/delete</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Mobile App</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Create</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp/create</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Update</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp/update</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Publish</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp/publish</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Delete</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp/delete</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Install</DisplayName>
+            <ResourceId>/permission/admin/manage/mobileapp/install</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Documentation</DisplayName>
+            <ResourceId>/permission/admin/manage/document</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Add</DisplayName>
+            <ResourceId>/permission/admin/manage/document/add</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Edit</DisplayName>
+            <ResourceId>/permission/admin/manage/document/edit</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>Delete</DisplayName>
+            <ResourceId>/permission/admin/manage/document/delete</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>APPM Admin</DisplayName>
+            <ResourceId>/permission/admin/manage/appm</ResourceId>
         </ManagementPermission>
         <ManagementPermission>
             <DisplayName>Manage Tiers</DisplayName>
-            <ResourceId>/permission/admin/manage/manage_tiers</ResourceId>
+            <ResourceId>/permission/admin/manage/appm/manage_tiers</ResourceId>
         </ManagementPermission>
-	<ManagementPermission>
-            <DisplayName>Workflows</DisplayName>
-            <ResourceId>/permission/admin/manage/workflowadmin</ResourceId>
+	    <ManagementPermission>
+            <DisplayName>Manage Workflows</DisplayName>
+            <ResourceId>/permission/admin/manage/appm/workflowadmin</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 </component>
