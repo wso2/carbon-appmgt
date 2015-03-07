@@ -894,9 +894,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         //contains properties related to relevant policy and will be used to generate the synapse api config file
         Map<String, String> properties;
         int counterPolicies; //counter :policies
-        int counterProperties; //counter :properties
-        String propKey; //Property Key name
-        String propVal; //Property value
 
         try {
             //fetch all the java policy handlers details which need to be included to synapse api config file
@@ -907,20 +904,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     //if policy doesn't contain any properties assign an empty map and add java policy as a handler
                     vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), Collections.EMPTY_MAP);
                 } else {
-
                     objPolicyProperties = new JSONObject();
+                    properties = new HashMap<String, String>();
+
                     //get property JSON object related to current policy in the loop
                     objPolicyProperties = policies.get(counterPolicies).getProperties();
-                    properties = new HashMap<String, String>();
+
                     //if policy contains any properties, run a loop and assign them
-                    for (counterProperties = 0; counterProperties < objPolicyProperties.size(); counterProperties++)
-                    {
-                        propKey = ((JSONObject) (objPolicyProperties.get(counterProperties))).
-                                keySet().toString();//key
-                        propVal = ((JSONObject) (objPolicyProperties.get(counterProperties))).
-                                values().toString();//val
-                        properties.put(propKey, propVal);
+                    Set<String> keys = objPolicyProperties.keySet();
+                    for (String key : keys) {
+                        properties.put(key, objPolicyProperties.get(key).toString());
                     }
+
                     //add policy as a handler and also the relevant properties
                     vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
                 }
