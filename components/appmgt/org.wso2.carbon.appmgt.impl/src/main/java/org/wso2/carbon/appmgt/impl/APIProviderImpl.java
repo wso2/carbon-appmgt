@@ -890,7 +890,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         //List of JavaPolicy class which contains policy related details
         List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
         //contains properties related to all the policies
-        JSONArray objArrPolicyProperties;
+        JSONObject objPolicyProperties;
         //contains properties related to relevant policy and will be used to generate the synapse api config file
         Map<String, String> properties;
         int counterPolicies; //counter :policies
@@ -908,17 +908,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), Collections.EMPTY_MAP);
                 } else {
 
-                    objArrPolicyProperties = new JSONArray();
+                    objPolicyProperties = new JSONObject();
                     //get property JSON object related to current policy in the loop
-                    objArrPolicyProperties = policies.get(counterPolicies).getProperties();
+                    objPolicyProperties = policies.get(counterPolicies).getProperties();
                     properties = new HashMap<String, String>();
                     //if policy contains any properties, run a loop and assign them
-                    for (counterProperties = 0; counterProperties < objArrPolicyProperties.size(); counterProperties++)
+                    for (counterProperties = 0; counterProperties < objPolicyProperties.size(); counterProperties++)
                     {
-                        propKey = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
-                                keySet().toArray()[0].toString();//key
-                        propVal = ((JSONObject) (objArrPolicyProperties.get(counterProperties))).
-                                values().toArray()[0].toString();//val
+                        propKey = ((JSONObject) (objPolicyProperties.get(counterProperties))).
+                                keySet().toString();//key
+                        propVal = ((JSONObject) (objPolicyProperties.get(counterProperties))).
+                                values().toString();//val
                         properties.put(propKey, propVal);
                     }
                     //add policy as a handler and also the relevant properties
