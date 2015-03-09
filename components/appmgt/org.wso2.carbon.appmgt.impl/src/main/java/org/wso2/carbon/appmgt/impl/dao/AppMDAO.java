@@ -7224,7 +7224,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
 				strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
 				if (strJavaPolicyProperty != null) {
-					policy.setProperties((JSONArray) parser.parse(strJavaPolicyProperty));
+					policy.setProperties((JSONObject) parser.parse(strJavaPolicyProperty));
 				}
 				policies.add(policy);
 			}
