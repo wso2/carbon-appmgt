@@ -102,7 +102,7 @@ public class MobileAppService {
                     }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                         app.setType("public");
                     }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
-                        app.setType("web");
+                        app.setType("webapp");
                         app.setLocation(artifact.getAttribute("overview_url"));
                         app.setIdentifier(artifact.getAttribute("overview_url"));
                     }
