@@ -18,14 +18,14 @@
 
 package org.wso2.carbon.appmgt.api.model;
 
-import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class JavaPolicy {
     private Integer policyID;
     private String policyName;
     private String fullQualifiName; //full qualified name
     private Integer order; //display order
-    private JSONArray properties;
+    private JSONObject properties;
 
     public void setPolicyID(Integer policyID) {
         this.policyID = policyID;
@@ -59,11 +59,11 @@ public class JavaPolicy {
         return order;
     }
 
-    public void setProperties(JSONArray properties) {
+    public void setProperties(JSONObject properties) {
         this.properties = properties;
     }
 
-    public JSONArray getProperties() {
+    public JSONObject getProperties() {
         return properties;
     }
 }

@@ -88,6 +88,6 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     }
 
     public void checkSubscribePermission() throws AppManagementException {
-        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.API_SUBSCRIBE);
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.WEB_APP_SUBSCRIBE);
     }
 }
