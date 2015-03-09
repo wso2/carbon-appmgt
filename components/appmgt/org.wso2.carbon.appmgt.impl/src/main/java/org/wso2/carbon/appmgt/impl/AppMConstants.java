@@ -261,6 +261,7 @@ public final class AppMConstants {
         //Admin Dash Board Permissions
         public static final String APP_WORKFLOWADMIN = "/permission/admin/manage/appm/workflowadmin";
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
+        public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
     }
     
     public static final String API_GATEWAY = "APIGateway.";

@@ -76,5 +76,9 @@
             <DisplayName>Manage Workflows</DisplayName>
             <ResourceId>/permission/admin/manage/appm/workflowadmin</ResourceId>
         </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>View Statistics</DisplayName>
+            <ResourceId>/permission/admin/manage/appm/view_stats</ResourceId>
+        </ManagementPermission>
     </ManagementPermissions>
 </component>

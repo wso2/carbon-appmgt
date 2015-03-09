@@ -65,12 +65,8 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     @Override
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException {
-        if(userId.contains("@")){
-            checkPublishPermissionTenantMode(userId);
-        }else {
         if(APIStatus.PUBLISHED.equals(status)) {
             checkPublishPermission();
-        }
         }
         super.changeAPIStatus(api, status, userId, updateGatewayConfig);
     }

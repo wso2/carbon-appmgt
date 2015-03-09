@@ -53,13 +53,20 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
         PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
         try  {
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
-            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String fullName;
+            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
+                fullName = loggedInUser + "@" + tenantDomain;
+            }else{
+                fullName = loggedInUser;
+            }
+            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(fullName);
             APIIdentifier apiId = new APIIdentifier(publishAPPDTO.getAppProvider(), publishAPPDTO.getAppName(), publishAPPDTO.getAppVersion());
             WebApp api = provider.getAPI(apiId);
             APIStatus newStatus = null;
             if (api != null) {
                 newStatus = getApiStatus(((PublishApplicationWorkflowDTO) workflowDTO).getNewState());
-                provider.changeAPIStatus(api, newStatus, loggedInUser, true);
+                provider.changeAPIStatus(api, newStatus, fullName, true);
             }
             super.execute(workflowDTO);
         }catch (AppManagementException e){
@@ -79,15 +86,22 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             String version = arr[1];
             String uId = arr[2];
             String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String fullName;
+            if(!tenantDomain.equalsIgnoreCase("carbon.super")) {
+                fullName = loggedInUser + "@" + tenantDomain;
+            }else{
+                fullName = loggedInUser;
+            }
             //make Provider Name (Secondary User Store) registry friendly by replacing '/' with ':'
             uId = AppManagerUtil.makeSecondaryUSNameRegFriendly(uId);
 
             apiIdentifier = new APIIdentifier(uId, apiName, version);
-            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
+            APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(fullName);
             WebApp app = provider.getAPI(apiIdentifier);
             if (app != null) {
                 APIStatus newStatus = getApiStatus("published");
-                provider.changeAPIStatus(app, newStatus, loggedInUser, true);
+                provider.changeAPIStatus(app, newStatus, fullName, true);
             }
         } catch (AppManagementException e) {
             //throw exception

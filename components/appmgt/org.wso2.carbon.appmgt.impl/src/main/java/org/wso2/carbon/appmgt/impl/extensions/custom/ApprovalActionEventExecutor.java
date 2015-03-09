@@ -88,6 +88,7 @@ public class ApprovalActionEventExecutor implements Execution
                     getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APP_PUBLISH);
         } catch (WorkflowException e) {
             log.error("Error while initiating workflow",e);
+            return false;
         }
 
         if(appPublishWFExecutor.isAsynchronus()){
@@ -128,13 +129,16 @@ public class ApprovalActionEventExecutor implements Execution
 
                     } catch (WorkflowException e) {
                         log.error("Could not execute Application Publish Workflow", e);
+                        return false;
                     }
 
                 }catch(AppManagementException e){
                     log.error("Error while retrieving workflow details from database");
+                    return false;
                 }
             }catch (RegistryException e){
                 log.error("Error while loading artifact details from registry");
+                return false;
             }
         }
 
@@ -180,15 +184,6 @@ public class ApprovalActionEventExecutor implements Execution
     The method obtains the tenant id from a string tenant id
      */
     private void obtainTenantId(){
-
-//        String stringTenantId=PrivilegedCarbonContext.getCurrentContext().getTenantDomain(false);
-//
-//        try{
-//            this.tenantId=RealmContext.getRealmService().getTenantManager().getTenantId(stringTenantId);
-//        }
-//        catch(Exception e){
-//            log.debug("Failed to obtain Tenant id");
-//        }
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
@@ -196,12 +191,6 @@ public class ApprovalActionEventExecutor implements Execution
     The method is used to obtain the User Realm from the RealmContext
      */
     private void obtainUserRealm(){
-//        try{
-//            this.userRealm=RealmContext.getRealmService().getTenantUserRealm(this.tenantId);
-//        }
-//        catch(Exception e){
-//            log.debug("Failed to load User Realm Manager.");
-//        }
         this.userRealm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
     }
 
