@@ -1,6 +1,35 @@
+/*
+ *
+ *   Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ * /
+ */
+
 package org.wso2.carbon.appmgt.mobile.services.api.v1;
 
-import org.wso2.carbon.appmgt.mobile.services.api.v1.apps.App;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.RegistryType;
+import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.core.session.UserRegistry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -8,40 +37,106 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
 
-/**
- * @scr.component name="org.wso2.carbon.registry.samples.statistics" immediate="true"
- * @scr.reference name="registry.service" interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
- */
-
-
-
 @Produces({ "application/json"})
 @Consumes({ "application/json"})
 public class MobileAppService {
 
+        private static final Log log = LogFactory.getLog(MobileAppService.class);
 
         @GET
         public AppListResponse getApplicationList(@QueryParam("tenantId") int tenantId, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
 
+            boolean noLimit = false;
+
+            int pageIndex = 0;
+            int index = 0;
+            int found = 0;
+
+            if(tenantId == 0) tenantId = -1234;
+            if(limit == 0) noLimit = true;
+
+            log.debug("getApplicationList: Tenant id is " + tenantId);
+
             AppListResponse response= new AppListResponse();
-            response.setApps(new ArrayList<App>());
 
-            App app1 = new App();
-            app1.setPackageName("Hello");
-            response.getApps().add(app1);
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
 
-            App app2 = new App();
-            app2.setAppIdentifier("Hello3");
-            response.getApps().add(app2);
+                CarbonContext cCtx = CarbonContext.getThreadLocalCarbonContext();
+                Registry registry = cCtx.getRegistry(RegistryType.USER_GOVERNANCE);
 
-            AppListQuery appListQuery = new AppListQuery();
-            appListQuery.setStatus("OK");
-            appListQuery.setLimit(limit);
-            appListQuery.setOffset(offset);
-            response.setQuery(appListQuery);
+                GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
+                GenericArtifact[] artifacts = artifactManager.getAllGenericArtifactsByLifecycleStatus("MobileAppLifeCycle", "Published");
 
-            return response;
+
+                response.setApps(new ArrayList<App>());
+
+
+                for(GenericArtifact artifact : artifacts){
+
+                    //  Pagination Logic]
+                    if(offset > index++){
+                        continue;
+                    }
+                    if(!noLimit) {
+                        if(pageIndex == limit){
+                            break;
+                        }
+                    }
+                    found = ++pageIndex;
+
+                    App app = new App();
+                    app.setId(artifact.getId());
+                    app.setName(artifact.getAttribute("overview_name"));
+                    app.setPlatform(artifact.getAttribute("overview_platform"));
+                    app.setVersion(artifact.getAttribute("overview_version"));
+                    app.setType(artifact.getAttribute("overview_type"));
+                    app.setIconImage(artifact.getAttribute("overview_thumbnail"));
+
+                    if("Enterprise".equals(artifact.getAttribute("overview_type"))){
+                        app.setType("enterprise");
+                        app.setLocation(artifact.getAttribute("overview_url"));
+                    }else if ("Market".equals(artifact.getAttribute("overview_type"))){
+                        app.setType("public");
+                    }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
+                        app.setType("web");
+                        app.setLocation(artifact.getAttribute("overview_url"));
+                        app.setIdentifier(artifact.getAttribute("overview_url"));
+                    }
+
+                    if("android".equals(artifact.getAttribute("overview_platform"))){
+                        app.setPackageName(artifact.getAttribute("overview_packagename"));
+                        app.setIdentifier(artifact.getAttribute("overview_packagename"));
+                    }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+                        app.setPackageName(artifact.getAttribute("overview_packagename"));
+                        app.setAppIdentifier(artifact.getAttribute("overview_appid"));
+                        app.setIdentifier(artifact.getAttribute("overview_appid"));
+                    }
+
+                    response.getApps().add(app);
+                }
+
+                AppListQuery appListQuery = new AppListQuery();
+                appListQuery.setStatus("OK");
+                appListQuery.setLimit(limit);
+                appListQuery.setFound(found);
+                appListQuery.setOffset(offset);
+                appListQuery.setTotal(artifacts.length);
+                response.setQuery(appListQuery);
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally{
+                PrivilegedCarbonContext.endTenantFlow();
+                return response;
+            }
+
         }
+
 
 }

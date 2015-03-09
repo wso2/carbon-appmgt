@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.mobile.services.api.v1.apps;
+package org.wso2.carbon.appmgt.mobile.services.api.v1;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
