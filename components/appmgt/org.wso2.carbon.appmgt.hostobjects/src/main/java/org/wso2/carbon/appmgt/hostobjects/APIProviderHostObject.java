@@ -2571,7 +2571,9 @@ public class APIProviderHostObject extends ScriptableObject {
                 NativeObject row = new NativeObject();
                 Object usageObject = it.next();
                 APPMCacheCountDTO usage = (APPMCacheCountDTO) usageObject;
-                row.put("apiName", row, usage.getApiName());
+                String userName[]=usage.getApiName().split("--");
+                String name[]=userName[1].split(":");
+                row.put("apiName", row,  name[0]);
                 row.put("version", row, usage.getVersion());
                 row.put("fullRequestPath", row, usage.getFullRequestPath());
                 row.put("cachetHit",row,usage.getCacheHit());
