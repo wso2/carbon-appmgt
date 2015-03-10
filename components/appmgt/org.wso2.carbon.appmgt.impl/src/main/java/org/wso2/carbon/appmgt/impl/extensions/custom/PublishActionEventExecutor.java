@@ -117,6 +117,7 @@ public class PublishActionEventExecutor implements Execution
         }catch (RegistryException e){
             //Change the interface impl to thorw exception
             log.error("Error while trying to retrieve registry artifact.", e);
+            return false;
         }
 
         WorkflowExecutor appPublishWFExecutor = null;
@@ -125,6 +126,7 @@ public class PublishActionEventExecutor implements Execution
                     getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_APP_PUBLISH);
         } catch (WorkflowException e) {
             log.error("Error while executing workflow.", e);
+            return false;
         }
 
         PublishApplicationWorkflowDTO workflowDTO = new PublishApplicationWorkflowDTO();
@@ -146,6 +148,7 @@ public class PublishActionEventExecutor implements Execution
         } catch (WorkflowException e) {
             log.error("Could not execute Application Publish Workflow", e);
             //throw new AppManagementException("Could not execute Application Publish Workflow", e);
+            return false;
         }
 
 
@@ -157,6 +160,7 @@ public class PublishActionEventExecutor implements Execution
             appMDAO.removeAPISubscription(apiIdentifier);
         } catch (AppManagementException e) {
             log.error("Could not remove subscription when Unpublishing", e);
+            return false;
         }
 
 
@@ -203,15 +207,6 @@ public class PublishActionEventExecutor implements Execution
     The method obtains the tenant id from a string tenant id
      */
     private void obtainTenantId(){
-
-//        String stringTenantId=PrivilegedCarbonContext.getCurrentContext().getTenantDomain(false);
-//
-//        try{
-//            this.tenantId=RealmContext.getRealmService().getTenantManager().getTenantId(stringTenantId);
-//        }
-//        catch(Exception e){
-//            log.debug("Failed to obtain Tenant id");
-//        }
         this.tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
@@ -219,12 +214,6 @@ public class PublishActionEventExecutor implements Execution
     The method is used to obtain the User Realm from the RealmContext
      */
     private void obtainUserRealm(){
-//        try{
-//            this.userRealm=RealmContext.getRealmService().getTenantUserRealm(this.tenantId);
-//        }
-//        catch(Exception e){
-//            log.debug("Failed to load User Realm Manager.");
-//        }
         this.userRealm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
     }
 
