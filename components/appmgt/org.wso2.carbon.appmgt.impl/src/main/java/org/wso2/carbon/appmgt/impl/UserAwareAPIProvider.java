@@ -44,93 +44,109 @@ public class UserAwareAPIProvider extends APIProviderImpl {
 
     @Override
     public void addWebApp(WebApp api) throws AppManagementException {
-//        checkCreatePermission();
+        checkCreatePermission();
         super.addWebApp(api);
     }
 
     @Override
     public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException {
-//        checkCreatePermission();
+        checkDocumentAddPermission();
         super.copyWebappDocumentations(api, newVersion);
     }
 
     @Override
     public void updateAPI(WebApp api) throws AppManagementException {
-//        checkCreatePermission();
+        checkWebappUpdatePermission();
         super.updateAPI(api);
     }
 
     @Override
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException {
-//        if(userId.contains("@")){
-//            checkPublishPermissionTenantMode(userId);
-//        }else {
-//        if(APIStatus.PUBLISHED.equals(status)) {
-//            checkPublishPermission();
-//        }
-//        }
+        if (APIStatus.PUBLISHED.equals(status)) {
+            checkPublishPermission();
+        }
         super.changeAPIStatus(api, status, userId, updateGatewayConfig);
     }
 
     @Override
     public void addDocumentation(APIIdentifier apiId,
                                  Documentation documentation) throws AppManagementException {
-//        checkCreatePermission();
+        checkDocumentAddPermission();
         super.addDocumentation(apiId, documentation);
     }
 
     @Override
     public void removeDocumentation(APIIdentifier apiId, String docName,
                                     String docType) throws AppManagementException {
-//        checkCreatePermission();
+        checkDocumentRemovePermission();
         super.removeDocumentation(apiId, docName, docType);
     }
 
     @Override
     public void updateDocumentation(APIIdentifier apiId,
                                     Documentation documentation) throws AppManagementException {
-//        checkCreatePermission();
+        checkDocumentEditPermission();
         super.updateDocumentation(apiId, documentation);
     }
 
     @Override
     public void addDocumentationContent(APIIdentifier identifier, String documentationName,
                                         String text) throws AppManagementException {
-//        checkCreatePermission();
+        checkDocumentAddPermission();
         super.addDocumentationContent(identifier, documentationName, text);
     }
 
     @Override
     public void copyAllDocumentation(APIIdentifier apiId, String toVersion) throws
                                                                             AppManagementException {
-//        checkCreatePermission();
+        checkDocumentAddPermission();
         super.copyAllDocumentation(apiId, toVersion);
     }
 
-//    public void checkCreatePermission() throws AppManagementException {
-//        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.API_CREATE);
-//    }
-    
+    public void checkDocumentRemovePermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.DOCUMENT_EDIT);
+    }
+
+    public void checkDocumentEditPermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.DOCUMENT_EDIT);
+    }
+
+    public void checkDocumentAddPermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.DOCUMENT_ADD);
+    }
+
+    public void checkCreatePermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.WEB_APP_CREATE);
+    }
+
+    public void checkWebappUpdatePermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.WEB_APP_UPDATE);
+    }
+
+    public void checkWebappDeletePermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.WEB_APP_DELETE);
+    }
+
     public void checkManageTiersPermission() throws AppManagementException {
         AppManagerUtil.checkPermission(username, AppMConstants.Permissions.MANAGE_TIERS);
     }
 
-//    public void checkPublishPermission() throws AppManagementException {
-//        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.API_PUBLISH);
-//    }
+    public void checkPublishPermission() throws AppManagementException {
+        AppManagerUtil.checkPermission(username, AppMConstants.Permissions.WEB_APP_PUBLISH);
+    }
 
     @Override
     public void generateEntitlementPolicies(APIIdentifier apiIdentifier) throws
                                                                          AppManagementException {
-//        checkCreatePermission();
+        checkCreatePermission();
         super.generateEntitlementPolicies(apiIdentifier);
     }
 
     @Override
     public void updateEntitlementPolicies(List<EntitlementPolicy> policies) throws
                                                                             AppManagementException {
-//        checkCreatePermission();
+        checkWebappUpdatePermission();
         super.updateEntitlementPolicies(policies);
     }
 
@@ -141,7 +157,7 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     @Override
     public boolean deleteEntitlementPolicyPartial(int policyPartialId, String author) throws
                                                                                       AppManagementException {
-//        checkCreatePermission();
+        checkWebappDeletePermission();
         return super.deleteEntitlementPolicyPartial(policyPartialId, author);
     }
 
@@ -149,7 +165,7 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
                                                   String author, boolean isShared, String policyPartialDesc)
             throws AppManagementException {
-//        checkCreatePermission();
+        checkWebappUpdatePermission();
         return super.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared,
                 policyPartialDesc);
 
@@ -159,7 +175,7 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
                                             String policyAuthor, String policyPartialDesc)
             throws AppManagementException {
-//        checkCreatePermission();
+        checkCreatePermission();
         return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
                 policyPartialDesc);
     }
