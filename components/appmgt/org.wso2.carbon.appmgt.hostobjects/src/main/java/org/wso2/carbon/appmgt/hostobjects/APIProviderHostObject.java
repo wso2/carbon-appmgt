@@ -393,8 +393,8 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         if (apiProvider.isAPIAvailable(apiId)) {
-            handleException("Error occurred while adding the WebApp. A duplicate WebApp already exists for " +
-                    name + "-" + version);
+            handleException("Error occurred while adding the WebApp. A duplicate WebApp already exists with name - " +
+                    name + " and version -" + version);
         }
 
         WebApp api = new WebApp(apiId);
