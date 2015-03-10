@@ -2116,43 +2116,37 @@ public class APIProviderHostObject extends ScriptableObject {
         return success;
     }
 
-    public static boolean jsFunction_createNewAPIVersion(Context cx, Scriptable thisObj,
-                                                         Object[] args, Function funObj)
+    public static boolean jsFunction_copyWebappDocumentations(Context cx, Scriptable thisObj,
+                                                              Object[] args, Function funObj)
             throws AppManagementException {
 
-        boolean success;
-        if (args == null || !isStringValues(args)) {
+        boolean success = false;
+        if (args == null || args.length == 0) {
             handleException("Invalid number of parameters or their types.");
         }
-        String providerName = (String) args[0];
-        String apiName = (String) args[1];
-        String version = (String) args[2];
-        String newVersion = (String) args[3];
-
-        APIIdentifier apiId = new APIIdentifier(AppManagerUtil.replaceEmailDomain(providerName), apiName, version);
-        WebApp api = new WebApp(apiId);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        boolean isTenantFlowStarted = false;
+        NativeObject appIdentifierNativeObject = (NativeObject) args[0];
+        String providerName = (String) appIdentifierNativeObject.get("provider", appIdentifierNativeObject);
+        String webappName = (String) appIdentifierNativeObject.get("name", appIdentifierNativeObject);
+        String oldVersion = (String) appIdentifierNativeObject.get("oldVersion", appIdentifierNativeObject);
+        String newVersion = (String) appIdentifierNativeObject.get("version", appIdentifierNativeObject);
         try {
+
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, webappName, oldVersion);
+
+            WebApp api = new WebApp(apiIdentifier);
+            APIProvider apiProvider = getAPIProvider(thisObj);
+            boolean isTenantFlowStarted = false;
             String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
-            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                isTenantFlowStarted = true;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            apiProvider.createNewAPIVersion(api, newVersion);
+            apiProvider.copyWebappDocumentations(api, newVersion);
+
             success = true;
-        } catch (DuplicateAPIException e) {
-            handleException("Error occurred while creating a new WebApp version. A duplicate WebApp " +
-                    "already exists by the same name.", e);
-            return false;
-        } catch (Exception e) {
-            handleException("Error occurred while creating a new WebApp version- " + newVersion, e);
-            return false;
-        } finally {
-            if (isTenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
+        } catch (AppManagementException e) {
+            handleException("Error occurred while copying web application : " + webappName +" with new version : "
+                    +newVersion, e);
         }
         return success;
     }

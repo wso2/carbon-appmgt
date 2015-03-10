@@ -49,10 +49,9 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public void createNewAPIVersion(WebApp api, String newVersion) throws DuplicateAPIException,
-                                                                          AppManagementException {
+    public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException {
 //        checkCreatePermission();
-        super.createNewAPIVersion(api, newVersion);
+        super.copyWebappDocumentations(api, newVersion);
     }
 
     @Override
