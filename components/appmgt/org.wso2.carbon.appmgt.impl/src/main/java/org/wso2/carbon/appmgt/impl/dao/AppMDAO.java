@@ -3995,14 +3995,15 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		return events;
 	}
 
-	public void addWebApp(WebApp api) throws AppManagementException {
+	public void addWebApp(WebApp app) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
 
 		String query =
-				"INSERT INTO APM_APP(APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, LOG_OUT_URL,APP_ALLOW_ANONYMOUS)"
-						+ "VALUES (?,?,?,?,?,?,?,?)";
+				"INSERT INTO APM_APP(APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, SAML2_SSO_ISSUER, " +
+                "LOG_OUT_URL,APP_ALLOW_ANONYMOUS) " +
+                "VALUES (?,?,?,?,?,?,?,?,?)";
 
 		try {
 
@@ -4010,23 +4011,23 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			String[] urlArray = gatewayURLs.split(",");
 			String prodURL = urlArray[0];
-			String logoutURL = api.getLogoutURL();
+			String logoutURL = app.getLogoutURL();
 			if (logoutURL != null && !"".equals(logoutURL.trim())) {
-				logoutURL = prodURL.concat(api.getContext()).concat("/" + api.getId().getVersion()).concat(logoutURL);
+				logoutURL = prodURL.concat(app.getContext()).concat("/" + app.getId().getVersion()).concat(logoutURL);
 			}
 
 			connection = APIMgtDBUtil.getConnection();
 			connection.setAutoCommit(false);
 			prepStmt = connection.prepareStatement(query, new String[]{"APP_ID"});
-			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-			prepStmt.setString(2, api.getId().getApiName());
-			prepStmt.setString(3, api.getId().getVersion());
-			prepStmt.setString(4, api.getContext());
-			prepStmt.setString(5, api.getTrackingCode());
-			prepStmt.setString(6, api.getUUID());
-			prepStmt.setString(7, logoutURL);
-			prepStmt.setBoolean(8, api.getAllowAnonymous());
-
+			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()));
+			prepStmt.setString(2, app.getId().getApiName());
+			prepStmt.setString(3, app.getId().getVersion());
+			prepStmt.setString(4, app.getContext());
+			prepStmt.setString(5, app.getTrackingCode());
+			prepStmt.setString(6, app.getUUID());
+            prepStmt.setString(7, app.getSaml2SsoIssuer());
+			prepStmt.setString(8, logoutURL);
+			prepStmt.setBoolean(9, app.getAllowAnonymous());
 
 			prepStmt.execute();
 
@@ -4035,24 +4036,24 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			if (rs.next()) {
 				webAppId = rs.getInt(1);
 			}
-			addURLTemplates(webAppId, api, connection);
-			recordAPILifeCycleEvent(api.getId(), null, APIStatus.CREATED,
-					AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()),
+			addURLTemplates(webAppId, app, connection);
+			recordAPILifeCycleEvent(app.getId(), null, APIStatus.CREATED,
+					AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()),
 					connection);
-			if (api.getPolicyPartials() != null && !api.getPolicyPartials().isEmpty()) {
-				JSONArray policyPartialIdList = (JSONArray) JSONValue.parse(api.getPolicyPartials());
+			if (app.getPolicyPartials() != null && !app.getPolicyPartials().isEmpty()) {
+				JSONArray policyPartialIdList = (JSONArray) JSONValue.parse(app.getPolicyPartials());
 				saveApplicationPolicyPartialsMappings(connection, webAppId, policyPartialIdList.toArray());
 			}
 
 			//save policy groups app wise
-			if (api.getPolicyGroups() != null && !api.getPolicyGroups().isEmpty()) {
-				JSONArray policyGroupIdList = (JSONArray) JSONValue.parse(api.getPolicyGroups());
+			if (app.getPolicyGroups() != null && !app.getPolicyGroups().isEmpty()) {
+				JSONArray policyGroupIdList = (JSONArray) JSONValue.parse(app.getPolicyGroups());
 				saveApplicationPolicyGroupsMappings(connection, webAppId, policyGroupIdList.toArray());
 			}
 
 			//save java policies app wise
-			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
-				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
+			if (app.getJavaPolicies() != null && !app.getJavaPolicies().isEmpty()) {
+				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(app.getJavaPolicies());
 				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
 			}
 
@@ -4063,10 +4064,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				try {
 					connection.rollback();
 				} catch (SQLException e1) {
-					log.error("Failed to rollback the adding the WebApp: " + api.getId() + " to the database", e);
+					log.error("Failed to rollback the adding the WebApp: " + app.getId() + " to the database", e);
 				}
 			}
-			handleException("Error while adding the WebApp: " + api.getId() + " to the database", e);
+			handleException("Error while adding the WebApp: " + app.getId() + " to the database", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
 		}
@@ -6184,8 +6185,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
 
-		String query = "INSERT INTO APM_API_CONSUMER_APPS (APP_CONSUMER_KEY, API_TOKEN_ENDPOINT, " +
-                       "API_CONSUMER_KEY, API_CONSUMER_SECRET, APP_NAME) VALUES (?,?,?,?,?)";
+		String query = "INSERT INTO APM_API_CONSUMER_APPS (SAML2_SSO_ISSUER, APP_CONSUMER_KEY, API_TOKEN_ENDPOINT, " +
+                       "API_CONSUMER_KEY, API_CONSUMER_SECRET, APP_NAME) VALUES (?,?,?,?,?,?)";
 
         //This need to be changed
         String getAppConsumerKeyQuery = "SELECT" + " CONSUMER_KEY " + " FROM"
@@ -6205,11 +6206,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             prepStmt.close();
 
             prepStmt = connection.prepareStatement(query);
-			prepStmt.setString(1, appConsumerKey);
-			prepStmt.setString(2, webApp.getTokenEndpoint());
-			prepStmt.setString(3, webApp.getApiConsumerKey());
-			prepStmt.setString(4, webApp.getApiConsumerSecret());
-			prepStmt.setString(5, webApp.getApiName());
+            prepStmt.setString(1, webApp.getSaml2SsoIssuer());
+			prepStmt.setString(2, appConsumerKey);
+			prepStmt.setString(3, webApp.getTokenEndpoint());
+			prepStmt.setString(4, webApp.getApiConsumerKey());
+			prepStmt.setString(5, webApp.getApiConsumerSecret());
+			prepStmt.setString(6, webApp.getApiName());
 
 			prepStmt.execute();
 
@@ -6297,6 +6299,37 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		}
 
         return registeredAPIs;
+    }
+
+    public static String getSAML2SSOIssuerByAppConsumerKey(String webAppConsumerKey)
+            throws AppManagementException {
+
+        Connection con = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+
+        String query = "SELECT SAML2_SSO_ISSUER " +
+                       "FROM APM_API_CONSUMER_APPS " +
+                       "WHERE APP_CONSUMER_KEY=?";
+
+        String saml2SsoIssuer = null;
+
+        try {
+            con = APIMgtDBUtil.getConnection();
+            prepStmt = con.prepareStatement(query);
+            prepStmt.setString(1, webAppConsumerKey);
+            rs = prepStmt.executeQuery();
+
+            while(rs.next()) {
+                saml2SsoIssuer = rs.getString("SAML2_SSO_ISSUER");
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting SAML2_SSO_ISSUER for webAppConsumerKey = " + webAppConsumerKey, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, con, rs);
+        }
+
+        return saml2SsoIssuer;
     }
 
     public static boolean webAppKeyPairExist(String consumerKey, String consumerSecret) throws

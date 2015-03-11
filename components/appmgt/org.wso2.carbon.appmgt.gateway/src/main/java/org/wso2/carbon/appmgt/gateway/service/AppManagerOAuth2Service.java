@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,10 +57,13 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
         try {
             String webAppConsumerKey = tokenReqDTO.getClientId();
             String webAppConsumerSecret = tokenReqDTO.getClientSecret();
+            String saml2SsoIssuer = null;
 
             if (!AppMDAO.webAppKeyPairExist(webAppConsumerKey, webAppConsumerSecret)) {
                 throw new Exception("Invalid Credentials");
             }
+
+            saml2SsoIssuer = AppMDAO.getSAML2SSOIssuerByAppConsumerKey(webAppConsumerKey);
 
             //scope received as samlssoTokenId,apiAlias
             String[] scopes = tokenReqDTO.getScope();
@@ -76,9 +80,10 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
 
             Map<String, String> registeredAPIs = getRegisteredAPIs(webAppConsumerKey);
             if (isAuthorizedAPI(registeredAPIs, apiAlias)) {
-                String encodedSAMLResponse = (String) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
+                Map<String, String> encodedSAMLResponseMap = (HashMap<String, String>) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
                         .getCache(AppMConstants.SAML2_CONFIG_CACHE).get(samlssoTokenId);
-                String decodedSAMLResponse = getSamlAssetionString(new String(Base64.decode(encodedSAMLResponse)));
+                String samlResponseOfApp = encodedSAMLResponseMap.get(saml2SsoIssuer);
+                String decodedSAMLResponse = getSamlAssetionString(new String(Base64.decode(samlResponseOfApp)));
                 String encodedSamlAssertion = URLEncoder.encode(Base64.encodeBytes(getSamlAssetionString(decodedSAMLResponse).getBytes()), "UTF-8");
               
                 //consumerKey,consumerSecret,tokenEndpoint
