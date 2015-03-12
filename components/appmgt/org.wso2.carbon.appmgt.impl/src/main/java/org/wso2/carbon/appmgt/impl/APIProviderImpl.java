@@ -525,6 +525,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appMDAO.getPolicyGroupListByApplication(appId);
     }
 
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     *@param uuid : Application UUID
+     *@return TRACKING_CODE
+     *@throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    @Override
+    public String getTrackingID(String uuid) throws AppManagementException {
+        return appMDAO.getTrackingID(uuid);
+    }
+
 
     @Override
     public EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial) throws

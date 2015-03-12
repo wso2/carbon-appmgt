@@ -104,6 +104,11 @@ public class UserAwareAPIProvider extends APIProviderImpl {
         super.copyAllDocumentation(apiId, toVersion);
     }
 
+    @Override
+    public String getTrackingID(String uuid) throws AppManagementException {
+       return super.getTrackingID(uuid);
+    }
+
     public void checkDocumentRemovePermission() throws AppManagementException {
         AppManagerUtil.checkPermission(username, AppMConstants.Permissions.DOCUMENT_EDIT);
     }

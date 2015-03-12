@@ -7316,4 +7316,31 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+	/**
+	 * Retrieves TRACKING_CODE sequences from APM_APP Table
+	 *@param uuid : Application UUID
+	 *@return TRACKING_CODE
+	 *@throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public  String getTrackingID(String uuid) throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT TRACKING_CODE  FROM APM_APP WHERE UUID= ?";
+		String value =  null;
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, uuid);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				value=rs.getString("TRACKING_CODE");
+			}
+		} catch (SQLException e) {
+			handleException("Sorry wrong UUID " +uuid, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return value;
+	}
 }
