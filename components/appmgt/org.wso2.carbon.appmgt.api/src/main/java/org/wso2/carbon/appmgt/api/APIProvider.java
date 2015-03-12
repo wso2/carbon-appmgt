@@ -488,6 +488,11 @@ public interface APIProvider extends APIManager {
     public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
             AppManagementException;
 
-
-
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     *@param uuid : Application UUID
+     *@return TRACKING_CODE
+     *@throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public String getTrackingID(String uuid)throws AppManagementException;
 }

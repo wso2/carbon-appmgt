@@ -3390,6 +3390,22 @@ public class APIProviderHostObject extends ScriptableObject {
         return true;
     }
 
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static String jsFunction_getTrackingID(Context cx, Scriptable thisObj,
+                                                  Object[] args, Function funObj) throws AppManagementException {
+        String uuid = (String) args[0];
+        APIProvider apiProvider =  getAPIProvider(thisObj);
+        return apiProvider.getTrackingID(uuid);
+    }
+
 }
 
 
