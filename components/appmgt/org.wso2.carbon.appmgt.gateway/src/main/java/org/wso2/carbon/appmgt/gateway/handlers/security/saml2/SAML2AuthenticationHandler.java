@@ -184,6 +184,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             //Construct issue name for saml request. format: AppName-tenantDomain-version
             issuer = constructIssuerId(messageContext);
             boolean isAuthorized = false;
+            org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
+                        getAxis2MessageContext();
 
             if (shouldAuthenticateWithCookie(messageContext)) {
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
@@ -200,8 +202,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 //This is the first request goes to access the web-app which need to go as a GET request
                 //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
                 //segment is to set the HTTTP_METHOD as GET and set empty body in request.
-                org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
-                        getAxis2MessageContext();
                 axis2MC.setProperty("HTTP_METHOD", "GET");
                 try {
                     SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
@@ -217,6 +217,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
 
             if (isAuthorized) {
+                //Include appmSamlSsoCookie to "Cookie" header before request send to backend
+                setAppmSamlSsoCookie(messageContext);
                 return true;
             } else if (!isResourceAccessible) {
                 isResourceAccessible = true;
@@ -280,7 +282,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if (cookieString == null) {
             cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
         } else {
-            cookieString = cookieString + " ;" + "," + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+            cookieString = cookieString + " ;" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
         }
         if (log.isDebugEnabled()) {
             log.debug("Updated set cookie string in transport headers : " + cookieString);
@@ -376,7 +378,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             String samlResponseOfWebApp = samlResponsesMap.get(issuer);
             if (samlResponseOfWebApp != null) {
                 return samlResponseOfWebApp;
-            }   
+            }
         }
 
         return null;
@@ -1070,7 +1072,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         return null;
     }
-    
+
     /*
 	 * Process the response and returns the results
 	 */
@@ -1397,6 +1399,36 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                                       "/" + messageContext.getProperty("SYNAPSE_REST_API_VERSION") + "/";
 
         return assertionConsumerUrl;
+    }
+
+    /**
+     * This method is used to set the "appmSamlSsoCookie" in the request going to backend app.
+     * Note: This method cannot reuse in the response path, since we updating the "Cookie" header.
+     * "Set-Cookie" header should use in response path to add new cookies to browser.
+     * @param messageContext
+     */
+    private void setAppmSamlSsoCookie(MessageContext messageContext) {
+        String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
+        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
+                getAxis2MessageContext();
+        Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        String cookieString = (String) headers.get(HTTPConstants.HEADER_COOKIE);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Exisiting cookie string in transport headers : " + cookieString);
+        }
+        if (cookieString == null) {
+            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
+        } else {
+            cookieString = cookieString + " ;" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("Updated cookie string in transport headers : " + cookieString);
+        }
+
+        headers.put(HTTPConstants.HEADER_COOKIE, cookieString);
+        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
     }
 
 }
