@@ -9,6 +9,6 @@ public interface MDMOperations {
 
     public void performAction(String ServerUrl, String action, App app, int tenantId, String type, String[] params);
 
-    public JSONArray getDevices(String serverURL, String type, String[] params, String platform, String platformVersion);
+    public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion);
 
 }

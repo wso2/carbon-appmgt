@@ -77,7 +77,7 @@ public class WSO2MDMOperations implements MDMOperations {
     }
 
     @Override
-    public JSONArray getDevices(String serverURL, String type, String[] params, String platform, String platformVersion) {
+    public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion) {
 
         JSONArray jsonArray = null;
         jsonArray = (JSONArray) new JSONValue().parse("[ { \"id\": \"12\", \"name\": \"My Device 1\", \"platform\": \"android\", \"platform_version\": \"4.0\", \"image\": \"https://localhost:9443/store/extensions/assets/mobileapp/resources/models/none.png\", \"model\": \"Nexus\", \"type\": \"tab\" }, { \"id\": \"11\", \"name\": \"My iPhone\", \"platform\": \"android\", \"platform_version\": \"4.0\", \"image\": \"https://localhost:9443/store/extensions/assets/mobileapp/resources/models/none.png\", \"model\": \"iPhone\", \"type\": \"phone\" } ]");
