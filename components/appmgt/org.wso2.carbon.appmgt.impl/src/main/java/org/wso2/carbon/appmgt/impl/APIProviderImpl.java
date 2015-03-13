@@ -48,6 +48,7 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.app.APPConstants;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -524,6 +525,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appMDAO.getPolicyGroupListByApplication(appId);
     }
 
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     *@param uuid : Application UUID
+     *@return TRACKING_CODE
+     *@throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    @Override
+    public String getTrackingID(String uuid) throws AppManagementException {
+        return appMDAO.getTrackingID(uuid);
+    }
+
 
     @Override
     public EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial) throws
@@ -930,118 +942,77 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Create a new version of the <code>api</code>, with version <code>newVersion</code>
-     *
-     * @param api        The WebApp to be copied
+     * @param webapp     origin web application
      * @param newVersion The version of the new WebApp
-     * @throws org.wso2.carbon.apimgt.api.model.DuplicateAPIException
-     *          If the WebApp trying to be created already exists
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *          If an error occurs while trying to create
-     *          the new version of the WebApp
+     * @throws AppManagementException
      */
-    public void createNewAPIVersion(WebApp api, String newVersion) throws DuplicateAPIException,
-                                                                          AppManagementException {
-        String apiSourcePath = AppManagerUtil.getAPIPath(api.getId());
+    public void copyWebappDocumentations(WebApp webapp, String newVersion) throws AppManagementException {
 
-        String targetPath = AppMConstants.API_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                            api.getId().getProviderName() +
-                            RegistryConstants.PATH_SEPARATOR + api.getId().getApiName() +
-                            RegistryConstants.PATH_SEPARATOR + newVersion +
-                            AppMConstants.API_RESOURCE_NAME;
         try {
-            if (registry.resourceExists(targetPath)) {
-                throw new DuplicateAPIException("WebApp version already exist with version :"
-                                                + newVersion);
-            }
-            Resource apiSourceArtifact = registry.get(apiSourcePath);
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                                                                                AppMConstants.API_KEY);
-            GenericArtifact artifact = artifactManager.getGenericArtifact(
-                    apiSourceArtifact.getUUID());
-
-            //Create new WebApp version
-            artifact.setId(UUID.randomUUID().toString());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, newVersion);
-
-            //Check the status of the existing api,if its not in 'CREATED' status set
-            //the new api status as "CREATED"
-            String status = artifact.getAttribute(AppMConstants.API_OVERVIEW_STATUS);
-            if (!status.equals(AppMConstants.CREATED)) {
-                artifact.setAttribute(AppMConstants.API_OVERVIEW_STATUS, AppMConstants.CREATED);
-            }
-            //Check whether the existing api has its own thumbnail resource and if yes,add that image
-            //thumb to new WebApp                                       thumbnail path as well.
-            String thumbUrl = AppMConstants.API_IMAGE_LOCATION + RegistryConstants.PATH_SEPARATOR +
-                              api.getId().getProviderName() + RegistryConstants.PATH_SEPARATOR +
-                              api.getId().getApiName() + RegistryConstants.PATH_SEPARATOR +
-                              api.getId().getVersion() + RegistryConstants.PATH_SEPARATOR + AppMConstants.API_ICON_IMAGE;
-            if (registry.resourceExists(thumbUrl)) {
-                Resource oldImage = registry.get(thumbUrl);
-                apiSourceArtifact.getContentStream();
-                APIIdentifier newApiId = new APIIdentifier(api.getId().getProviderName(),
-                                                           api.getId().getApiName(), newVersion);
-                Icon icon = new Icon(oldImage.getContentStream(), oldImage.getMediaType());
-                artifact.setAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL,
-                                      addIcon(AppManagerUtil.getIconPath(newApiId), icon));
-            }
-            artifactManager.addGenericArtifact(artifact);
-            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
-            registry.addAssociation(AppManagerUtil.getAPIProviderPath(api.getId()), targetPath,
-                                    AppMConstants.PROVIDER_ASSOCIATION);
-            String roles=artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBLE_ROLES);
-            String[] rolesSet = new String[0];
-            if (roles != null) {
-                rolesSet = roles.split(",");
-            }
-            AppManagerUtil.setResourcePermissions(api.getId().getProviderName(),
-            		artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY), rolesSet, artifactPath);
-            //Here we have to set permission specifically to image icon we added
-            String iconPath = artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL);
-            if (iconPath != null) {
-            	iconPath=iconPath.substring(iconPath.lastIndexOf("/appmgt"));
-                AppManagerUtil.copyResourcePermissions(api.getId().getProviderName(),thumbUrl,iconPath);
-            }
-            // Retain the tags
-            org.wso2.carbon.registry.core.Tag[] tags = registry.getTags(apiSourcePath);
-            if (tags != null) {
-                for (org.wso2.carbon.registry.core.Tag tag : tags) {
-                    registry.applyTag(targetPath, tag.getTagName());
-                }
-            }
 
             // Retain the docs
-            List<Documentation> docs = getAllDocumentation(api.getId());
-            APIIdentifier newId = new APIIdentifier(api.getId().getProviderName(),
-                                                    api.getId().getApiName(), newVersion);
-            WebApp newAPI = getAPI(newId,api.getId());
-            for (Documentation doc : docs) {
-            	/* If the document is WebApp Definition for swagger */
-            	if (doc.getName().equals(AppMConstants.API_DEFINITION_DOC_NAME)) {
-            		/* Create the JSON Content again for WebApp with new definition */
-            		String content = AppManagerUtil.createSwaggerJSONContent(newAPI);
-            		addAPIDefinitionContent(newId, doc.getName(), content);
-            	} else {
-	                addDocumentation(newId, doc);
-	                String content = getDocumentationContent(api.getId(), doc.getName());
-	                if (content != null) {
-	                    addDocumentationContent(newId, doc.getName(), content);
-	                }
-            	}
+            List<Documentation> docs = getAllDocumentation(webapp.getId());
+            APIIdentifier newId = new APIIdentifier(webapp.getId().getProviderName(),
+                    webapp.getId().getApiName(), newVersion);
+            WebApp newAPI = getAPI(newId, webapp.getId());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Copying documenatation of the web application - " + webapp.getApiName() +
+                        "with the new version - " + newVersion);
             }
 
-            // Make sure to unset the isLatest flag on the old version
-            GenericArtifact oldArtifact = artifactManager.getGenericArtifact(
-                    apiSourceArtifact.getUUID());
-            oldArtifact.setAttribute(AppMConstants.API_OVERVIEW_IS_LATEST, "false");
-            artifactManager.updateGenericArtifact(oldArtifact);
+            for (Documentation doc : docs) {
 
-            appMDAO.addWebApp(newAPI);
+			    /* copying the file in registry for new api */
+                Documentation.DocumentSourceType sourceType = doc.getSourceType();
+                if (sourceType == Documentation.DocumentSourceType.FILE) {
+                    String absoluteSourceFilePath = doc.getFilePath();
+                    // extract the prepend
+                    // ->/registry/resource/_system/governance/ and for
+                    // tenant
+                    // /t/my.com/registry/resource/_system/governance/
+                    int prependIndex =
+                            absoluteSourceFilePath.indexOf(AppMConstants.API_LOCATION);
+                    String prependPath = absoluteSourceFilePath.substring(0, prependIndex);
+                    // get the file name from absolute file path
+                    int fileNameIndex =
+                            absoluteSourceFilePath.lastIndexOf(RegistryConstants.PATH_SEPARATOR);
+                    String fileName = absoluteSourceFilePath.substring(fileNameIndex + 1);
+                    // create relative file path of old location
+                    String sourceFilePath = absoluteSourceFilePath.substring(prependIndex);
+                    // create the relative file path where file should be
+                    // copied
+                    String targetFilePath =
+                            AppMConstants.API_LOCATION +
+                                    RegistryConstants.PATH_SEPARATOR +
+                                    newId.getProviderName() +
+                                    RegistryConstants.PATH_SEPARATOR +
+                                    newId.getApiName() +
+                                    RegistryConstants.PATH_SEPARATOR +
+                                    newId.getVersion() +
+                                    RegistryConstants.PATH_SEPARATOR +
+                                    AppMConstants.DOC_DIR +
+                                    RegistryConstants.PATH_SEPARATOR +
+                                    AppMConstants.DOCUMENT_FILE_DIR +
+                                    RegistryConstants.PATH_SEPARATOR + fileName;
+                    // copy the file from old location to new location(for
+                    // new api)
 
+                    registry.copy(sourceFilePath, targetFilePath);
+
+                    // update the filepath attribute in doc artifact to
+                    // create new doc artifact for new version of api
+                    doc.setFilePath(prependPath + targetFilePath);
+                }
+
+                createDocumentation(newAPI.getId(), doc);
+                String content = getDocumentationContent(webapp.getId(), doc.getName());
+                if (content != null) {
+                    addDocumentationContent(newAPI.getId(), doc.getName(), content);
+                }
+            }
         } catch (RegistryException e) {
-            String msg = "Failed to create new version : " + newVersion + " of : "
-                         + api.getId().getApiName();
-            handleException(msg, e);
+            handleException("Error occurred while copying web application : " + webapp.getApiName());
         }
     }
 

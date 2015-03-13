@@ -295,16 +295,14 @@ public interface APIProvider extends APIManager {
     public void updateWebAppSynapse(WebApp api) throws AppManagementException;
 
     /**
-     * Create a new version of the <code>api</code>, with version <code>newVersion</code>
+     * Copy web applications documentations
      *
-     * @param api        The WebApp to be copied
+     * @param api        The WebApp id of the copying docs
      * @param newVersion The version of the new WebApp
-     * @throws DuplicateAPIException  If the WebApp trying to be created already exists
      * @throws AppManagementException If an error occurs while trying to create
      *                                the new version of the WebApp
      */
-    public void createNewAPIVersion(WebApp api, String newVersion) throws DuplicateAPIException,
-                                                                          AppManagementException;
+    public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException;
 
     /**
      * Removes a given documentation
@@ -490,6 +488,11 @@ public interface APIProvider extends APIManager {
     public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
             AppManagementException;
 
-
-
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     *@param uuid : Application UUID
+     *@return TRACKING_CODE
+     *@throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public String getTrackingID(String uuid)throws AppManagementException;
 }
