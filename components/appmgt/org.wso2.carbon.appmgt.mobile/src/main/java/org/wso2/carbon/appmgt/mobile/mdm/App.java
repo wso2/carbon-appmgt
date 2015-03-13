@@ -33,7 +33,7 @@ public class App {
     private String location;
 
 
-
+    @Property( name= "id")
     public String getId() {
         return id;
     }
@@ -42,7 +42,7 @@ public class App {
         this.id = id;
     }
 
-
+    @Property( name= "name")
     public String getName() {
         return name;
     }
@@ -51,7 +51,7 @@ public class App {
         this.name = name;
     }
 
-
+    @Property( name= "type")
     public String getType() {
         return type;
     }
@@ -60,7 +60,7 @@ public class App {
         this.type = type;
     }
 
-
+    @Property( name= "platform")
     public String getPlatform() {
         return platform;
     }
@@ -69,7 +69,7 @@ public class App {
         this.platform = platform;
     }
 
-
+    @Property( name= "version")
     public String getVersion() {
         return version;
     }
@@ -78,7 +78,7 @@ public class App {
         this.version = version;
     }
 
-
+    @Property( name= "identifier")
     public String getIdentifier() {
         return identifier;
     }
@@ -87,7 +87,7 @@ public class App {
         this.identifier = identifier;
     }
 
-
+    @Property( name= "iconImage")
     public String getIconImage() {
         return iconImage;
     }
@@ -96,7 +96,7 @@ public class App {
         this.iconImage = iconImage;
     }
 
-
+    @Property( name= "packageName")
     public String getPackageName() {
         return packageName;
     }
@@ -105,7 +105,7 @@ public class App {
         this.packageName = packageName;
     }
 
-
+    @Property( name= "appIdentifier")
     public String getAppIdentifier() {
         return appIdentifier;
     }
@@ -115,6 +115,7 @@ public class App {
         this.appIdentifier = appIdentifier;
     }
 
+    @Property( name= "location")
     public String getLocation() {
         return location;
     }

@@ -63,7 +63,7 @@ public class Operations {
 
             MDMOperations mdmOperations = new WSO2MDMOperations();
             App appToInstall = AppDataLoader.load(new App(), artifact);
-            mdmOperations.installApplication(serverUrl, action, appToInstall, tenantId, type, params);
+            mdmOperations.performAction(serverUrl, action, appToInstall, tenantId, type, params);
 
 
         } catch (UserStoreException e) {

@@ -20,10 +20,44 @@
 
 package org.wso2.carbon.appmgt.mobile.store;
 
-/**
- * Created by dilan on 3/10/15.
- */
+import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
+import org.wso2.carbon.appmgt.mobile.wso2mdm.WSO2MDMOperations;
+
+
 public class Devices {
+
+    public String getDevicesList(String type, String[] params, String platform, String platformVersion){
+
+        MobileConfigurations configurations = MobileConfigurations.getInstance();
+        String serverUrl = configurations.getMDMServerURL();
+
+        MDMOperations mdmOperations = new WSO2MDMOperations();
+        return mdmOperations.getDevices(serverUrl, type, params, platform, platformVersion).toJSONString();
+
+    }
+
+    public String getDevicesList(String type, String[] params, String platform){
+
+        MobileConfigurations configurations = MobileConfigurations.getInstance();
+        String serverUrl = configurations.getMDMServerURL();
+
+        MDMOperations mdmOperations = new WSO2MDMOperations();
+        return mdmOperations.getDevices(serverUrl, type, params, platform, null).toJSONString();
+
+    }
+
+    public String getDevicesList(String type, String[] params){
+
+        MobileConfigurations configurations = MobileConfigurations.getInstance();
+        String serverUrl = configurations.getMDMServerURL();
+
+        MDMOperations mdmOperations = new WSO2MDMOperations();
+        return mdmOperations.getDevices(serverUrl, type, params, null, null).toJSONString();
+
+    }
+
+
 
 
 }
