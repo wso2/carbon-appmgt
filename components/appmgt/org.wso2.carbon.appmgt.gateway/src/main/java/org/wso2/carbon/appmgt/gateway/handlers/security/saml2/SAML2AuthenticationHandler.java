@@ -282,14 +282,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if (cookieString == null) {
             cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
         } else {
-            cookieString = cookieString + " ;" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+            cookieString = cookieString + " ;" + "\nSet-Cookie:" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
         }
         if (log.isDebugEnabled()) {
             log.debug("Updated set cookie string in transport headers : " + cookieString);
         }
         headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
-        headers.put(HTTPConstants.HEADER_SET_COOKIE, AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/");
         messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+
         return true;
     }
 
