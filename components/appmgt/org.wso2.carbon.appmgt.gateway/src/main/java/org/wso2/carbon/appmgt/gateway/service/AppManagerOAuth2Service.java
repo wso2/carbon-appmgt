@@ -14,6 +14,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.gateway.dto.Token;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.identity.oauth.common.OAuth2ErrorCodes;
 import org.wso2.carbon.identity.oauth2.dto.*;
@@ -80,9 +81,9 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
 
             Map<String, String> registeredAPIs = getRegisteredAPIs(webAppConsumerKey);
             if (isAuthorizedAPI(registeredAPIs, apiAlias)) {
-                Map<String, String> encodedSAMLResponseMap = (HashMap<String, String>) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
+                Map<String, SAMLTokenInfoDTO> encodedSAMLResponseMap = (HashMap<String, SAMLTokenInfoDTO>) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
                         .getCache(AppMConstants.SAML2_CONFIG_CACHE).get(samlssoTokenId);
-                String samlResponseOfApp = encodedSAMLResponseMap.get(saml2SsoIssuer);
+                String samlResponseOfApp = encodedSAMLResponseMap.get(saml2SsoIssuer).getEncodedSamlToken();
                 String decodedSAMLResponse = getSamlAssetionString(new String(Base64.decode(samlResponseOfApp)));
                 String encodedSamlAssertion = URLEncoder.encode(Base64.encodeBytes(getSamlAssetionString(decodedSAMLResponse).getBytes()), "UTF-8");
               

@@ -317,7 +317,7 @@ public class JWTGenerator {
      * @return
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public String generateToken(Map<String, String> saml2Assertions, String apiContext, String version) throws
+    public String generateToken(Map<String, Object> saml2Assertions, String apiContext, String version) throws
                                                                                                         AppManagementException {
 
         //generating expiring timestamp
@@ -359,7 +359,7 @@ public class JWTGenerator {
         jwtBody = jwtBuilder.toString();
 
       String jwtHeader = null;
-      String endUserName = saml2Assertions.get("Subject");
+      String endUserName = (String) saml2Assertions.get("Subject");
       //if signature algo==NONE, header without cert
       if(signatureAlgorithm.equals(NONE)){
           jwtHeader = "{\"typ\":\"JWT\"}";
