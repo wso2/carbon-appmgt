@@ -201,22 +201,24 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
                 isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
 
-                //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
-                //We validate this SAMLResponse and allow request to go to backend.
-                //This is the first request goes to access the web-app which need to go as a GET request
-                //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
-                //segment is to set the HTTP_METHOD as GET and set empty body in request.
-                axis2MC.setProperty("HTTP_METHOD", "GET");
-                try {
-                    SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
-                    env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
-                    axis2MC.setEnvelope(env);
-                } catch (AxisFault axisFault) {
-                    String msg = "Error occurred while constructing SOAPEnvelope for " +
-                            messageContext.getProperty("REST_API_CONTEXT") + "/" +
-                            messageContext.getProperty("SYNAPSE_REST_API_VERSION");
-                    log.error(msg, axisFault);
-                    throw new SynapseException(msg, axisFault);
+                if (isAuthorized) {
+                    //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
+                    //We validate this SAMLResponse and allow request to go to backend.
+                    //This is the first request goes to access the web-app which need to go as a GET request
+                    //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
+                    //segment is to set the HTTP_METHOD as GET and set empty body in request.
+                    axis2MC.setProperty("HTTP_METHOD", "GET");
+                    try {
+                        SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
+                        env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
+                        axis2MC.setEnvelope(env);
+                    } catch (AxisFault axisFault) {
+                        String msg = "Error occurred while constructing SOAPEnvelope for " +
+                                     messageContext.getProperty("REST_API_CONTEXT") + "/" +
+                                     messageContext.getProperty("SYNAPSE_REST_API_VERSION");
+                        log.error(msg, axisFault);
+                        throw new SynapseException(msg, axisFault);
+                    }
                 }
             }
 
@@ -808,9 +810,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         Map<String, Object> samlAttributes = getAttributesOfSAMLResponse(idpResponseAttributes);
 
-
         if (isSAMLResponseAuthenticated(samlAttributes)) {
-
             // Set the cookie value.
             String samlCookieValue = getSAMLCookie(messageContext);
             String samlResponse = idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE);
