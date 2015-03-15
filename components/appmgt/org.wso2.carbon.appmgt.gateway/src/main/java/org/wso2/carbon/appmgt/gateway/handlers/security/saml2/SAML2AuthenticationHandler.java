@@ -221,8 +221,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
 
             if (isAuthorized) {
-                //Include appmSamlSsoCookie to "Cookie" header before request send to backend
-                setAppmSamlSsoCookie(messageContext);
+                if (messageContext.getProperty("isLogoutRequest") == null) {
+                    //Include appmSamlSsoCookie to "Cookie" header before request send to backend
+                    setAppmSamlSsoCookie(messageContext);
+                }
                 return true;
             } else if (!isResourceAccessible) {
                 isResourceAccessible = true;
