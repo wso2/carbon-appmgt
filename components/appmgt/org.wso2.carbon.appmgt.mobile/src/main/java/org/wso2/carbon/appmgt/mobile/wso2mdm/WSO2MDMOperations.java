@@ -22,8 +22,13 @@ package org.wso2.carbon.appmgt.mobile.wso2mdm;
 
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -38,6 +43,8 @@ import java.lang.reflect.Method;
 
 
 public class WSO2MDMOperations implements MDMOperations {
+
+    private static final Log log = LogFactory.getLog(WSO2MDMOperations.class);
 
     /**
      * @param serverUrl server URL of the MDM
@@ -91,15 +98,19 @@ public class WSO2MDMOperations implements MDMOperations {
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error(e);
         }
 
         PostMethod postMethod = new PostMethod(serverUrl);
         postMethod.setRequestEntity(requestEntity);
         try {
             int statusCode = httpClient.executeMethod(postMethod);
+            if (statusCode == HttpStatus.SC_OK) {
+                log.debug("Operation performed successfully");
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.info("Could not connect to WSO2 MDM to perform operation");
+            log.error(e);
         }
 
     }
@@ -122,6 +133,30 @@ public class WSO2MDMOperations implements MDMOperations {
         if(isSampleDevicesEnabled){
             jsonArray = (JSONArray) new JSONValue().parse(Sample.SAMPLE_DEVICES_JSON);
             return jsonArray;
+        }else{
+            HttpClient httpClient = new HttpClient();
+            GetMethod getMethod = new GetMethod(serverURL);
+
+            if("user".equals(type)){
+                getMethod.setQueryString(new NameValuePair[]{
+                        new NameValuePair("tenantId", String.valueOf(tenantId)),
+                        new NameValuePair("username", params[0])
+                });
+            }
+
+            try {
+                int statusCode = httpClient.executeMethod(getMethod);
+                if (statusCode == HttpStatus.SC_OK) {
+                    jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
+                }
+            } catch (IOException e) {
+               log.info("Could not connect to WSO2 MDM to get device information");
+               log.error(e);
+            }
+        }
+
+        if(jsonArray == null){
+            jsonArray = (JSONArray) new JSONValue().parse("[]");
         }
 
         return jsonArray;
