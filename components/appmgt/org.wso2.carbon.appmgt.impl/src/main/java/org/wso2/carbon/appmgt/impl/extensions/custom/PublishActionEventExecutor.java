@@ -156,12 +156,12 @@ public class PublishActionEventExecutor implements Execution
         apiIdentifier = new APIIdentifier(appProvider,appName,appVersion);
 
 
-        try {
-            appMDAO.removeAPISubscription(apiIdentifier);
-        } catch (AppManagementException e) {
-            log.error("Could not remove subscription when Unpublishing", e);
-            return false;
-        }
+//        try {
+//            appMDAO.removeAPISubscription(apiIdentifier);
+//        } catch (AppManagementException e) {
+//            log.error("Could not remove subscription when Unpublishing", e);
+//            return false;
+//        }
 
 
         JaggeryThreadContext jaggeryThreadContext=new JaggeryThreadContext();
