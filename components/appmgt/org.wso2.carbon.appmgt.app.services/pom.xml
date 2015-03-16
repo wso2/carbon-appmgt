@@ -12,7 +12,7 @@
   <artifactId>org.wso2.carbon.appmgt.mobile.services</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
-  <name>WSO2 Carbon - AppM Mobile Services</name>
+  <name>WSO2 Carbon - App Manager App Services Component</name>
   <url>http://maven.apache.org</url>
 
     <dependencies>
