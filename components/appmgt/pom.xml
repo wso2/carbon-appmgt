@@ -37,7 +37,7 @@
 	<module>org.wso2.carbon.appmgt.core</module>
         <module>org.wso2.carbon.appmgt.oauth.endpoint</module>
 	<module>org.wso2.carbon.appmgt.mobile</module>
-    <module>org.wso2.carbon.appmgt.mobile.services</module>
+    <module>org.wso2.carbon.appmgt.app.services</module>
   </modules>
     <build>
         <plugins>

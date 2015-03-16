@@ -1,11 +1,8 @@
-package org.wso2.carbon.appmgt.mobile.services.api.v1;
+package org.wso2.carbon.appmgt.app.services.mobile.v1;
 
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
-/**
- * Created by dilan on 3/11/15.
- */
 public class AppDataLoader {
 
     public static App load(App app, GenericArtifact artifact){
@@ -21,12 +18,10 @@ public class AppDataLoader {
 
             if("Enterprise".equals(artifact.getAttribute("overview_type"))){
                 app.setType("enterprise");
-                app.setLocation(artifact.getAttribute("overview_url"));
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                 app.setType("public");
             }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
                 app.setType("webapp");
-                app.setLocation(artifact.getAttribute("overview_url"));
                 app.setIdentifier(artifact.getAttribute("overview_url"));
             }
 

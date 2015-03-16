@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.mobile.services.api.v1;
+package org.wso2.carbon.appmgt.app.services.mobile.v1;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 

@@ -18,7 +18,7 @@
  * /
  */
 
-package org.wso2.carbon.appmgt.mobile.services.api.v1;
+package org.wso2.carbon.appmgt.app.services.mobile.v1;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
