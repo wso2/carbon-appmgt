@@ -22,7 +22,6 @@ package org.wso2.carbon.appmgt.mobile.store;
 
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
-import org.wso2.carbon.appmgt.mobile.wso2mdm.WSO2MDMOperations;
 
 
 public class Devices {
@@ -31,9 +30,8 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
-
-        MDMOperations mdmOperations = new WSO2MDMOperations();
-        return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, platformVersion).toJSONString();
+        MDMOperations mdmOperations = getMDMOperationsInstance(configurations);
+        return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled()).toJSONString();
 
     }
 
@@ -41,9 +39,8 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
-
-        MDMOperations mdmOperations = new WSO2MDMOperations();
-        return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, null).toJSONString();
+        MDMOperations mdmOperations =  getMDMOperationsInstance(configurations);
+        return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled()).toJSONString();
 
     }
 
@@ -51,10 +48,25 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
+        MDMOperations mdmOperations = getMDMOperationsInstance(configurations);
+        return mdmOperations.getDevices(serverUrl, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled()).toJSONString();
 
-        MDMOperations mdmOperations = new WSO2MDMOperations();
-        return mdmOperations.getDevices(serverUrl, tenantId, type, params, null, null).toJSONString();
+    }
 
+    private MDMOperations getMDMOperationsInstance(MobileConfigurations configurations){
+
+        MDMOperations mdmOperations = null;
+        try {
+            Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
+            mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return mdmOperations;
     }
 
 

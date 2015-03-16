@@ -81,5 +81,13 @@ public class MobileConfigurations {
         return Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("Enabled")).getText());
     }
 
+    public String getMDMOperationsClass(){
+        return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("OperationsClass")).getText();
+    }
+
+    public boolean isSampleDevicesEnabled(){
+        return Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("EnableSampleDevices")).getText());
+    }
+
 
 }

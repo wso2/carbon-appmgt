@@ -19,6 +19,14 @@ import java.lang.reflect.Method;
 
 public class WSO2MDMOperations implements MDMOperations {
 
+    /**
+     * @param serverUrl server URL of the MDM
+     * @param action action of the operation. Eg. install, uninstall, update
+     * @param app application object
+     * @param tenantId tenantId
+     * @param type type of the resource. Eg: role, user, device
+     * @param params ids of the resources which belong to type
+     */
     @Override
     public void performAction(String serverUrl, String action, App app, int tenantId, String type, String[] params) {
 
@@ -76,11 +84,25 @@ public class WSO2MDMOperations implements MDMOperations {
 
     }
 
+    /**
+     *
+     * @param serverURL server URL of the MDM
+     * @param tenantId tenantId
+     * @param type type of the resource. Eg: role, user, device
+     * @param params ids of the resources which belong to type
+     * @param platform platform of the devices
+     * @param platformVersion platform version of the devices
+     * @param isSampleDevicesEnabled if MDM is not connected, enable this to display sample devices.
+     * @return
+     */
     @Override
-    public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion) {
+    public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled) {
 
         JSONArray jsonArray = null;
-        jsonArray = (JSONArray) new JSONValue().parse("[ { \"id\": \"12\", \"name\": \"My Device 1\", \"platform\": \"android\", \"platform_version\": \"4.0\", \"image\": \"https://localhost:9443/store/extensions/assets/mobileapp/resources/models/none.png\", \"model\": \"Nexus\", \"type\": \"tab\" }, { \"id\": \"11\", \"name\": \"My iPhone\", \"platform\": \"android\", \"platform_version\": \"4.0\", \"image\": \"https://localhost:9443/store/extensions/assets/mobileapp/resources/models/none.png\", \"model\": \"iPhone\", \"type\": \"phone\" } ]");
+        if(isSampleDevicesEnabled){
+            jsonArray = (JSONArray) new JSONValue().parse(Sample.SAMPLE_DEVICES_JSON);
+            return jsonArray;
+        }
 
         return jsonArray;
     }

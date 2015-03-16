@@ -22,11 +22,10 @@ package org.wso2.carbon.appmgt.mobile.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
-import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.AppDataLoader;
-import org.wso2.carbon.appmgt.mobile.wso2mdm.WSO2MDMOperations;
+import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
@@ -61,7 +60,8 @@ public class Operations {
             GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
             GenericArtifact artifact = artifactManager.getGenericArtifact(app);
 
-            MDMOperations mdmOperations = new WSO2MDMOperations();
+            Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
+            MDMOperations mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
             App appToInstall = AppDataLoader.load(new App(), artifact);
             mdmOperations.performAction(serverUrl, action, appToInstall, tenantId, type, params);
 
@@ -71,6 +71,12 @@ public class Operations {
         } catch (GovernanceException e) {
             e.printStackTrace();
         } catch (RegistryException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
