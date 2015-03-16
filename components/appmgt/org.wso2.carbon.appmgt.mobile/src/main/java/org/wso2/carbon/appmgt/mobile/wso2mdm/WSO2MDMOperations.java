@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class WSO2MDMOperations implements MDMOperations {
@@ -91,24 +93,32 @@ public class WSO2MDMOperations implements MDMOperations {
 
         requestObj.put("app", requestApp);
 
-
         HttpClient httpClient = new HttpClient();
-
         StringRequestEntity requestEntity = null;
+
         try {
+
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
+
         } catch (UnsupportedEncodingException e) {
+
             log.error(e);
         }
 
         PostMethod postMethod = new PostMethod(serverUrl);
         postMethod.setRequestEntity(requestEntity);
+
         try {
+
             int statusCode = httpClient.executeMethod(postMethod);
+
             if (statusCode == HttpStatus.SC_OK) {
+
                 log.debug("Operation performed successfully");
             }
+
         } catch (IOException e) {
+
             log.info("Could not connect to WSO2 MDM to perform operation");
             log.error(e);
         }
@@ -130,19 +140,29 @@ public class WSO2MDMOperations implements MDMOperations {
     public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled) {
 
         JSONArray jsonArray = null;
+
         if(isSampleDevicesEnabled){
+
             jsonArray = (JSONArray) new JSONValue().parse(Sample.SAMPLE_DEVICES_JSON);
             return jsonArray;
+
         }else{
+
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(serverURL);
 
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+            nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
+
             if("user".equals(type)){
-                getMethod.setQueryString(new NameValuePair[]{
-                        new NameValuePair("tenantId", String.valueOf(tenantId)),
-                        new NameValuePair("username", params[0])
-                });
+                nameValuePairs.add(new NameValuePair("username", params[0]));
             }
+
+            if(platform != null) nameValuePairs.add(new NameValuePair("platform", platform));
+
+            if(platformVersion != null) nameValuePairs.add(new NameValuePair("platformVersion", platform));
+
+            getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray());
 
             try {
                 int statusCode = httpClient.executeMethod(getMethod);
