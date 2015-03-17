@@ -6,7 +6,7 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
 public class AppDataLoader {
 
-    public static App load(App app, GenericArtifact artifact){
+    public static App load(App app, GenericArtifact artifact, String action){
 
         try {
             app.setId(artifact.getId());
@@ -25,6 +25,10 @@ public class AppDataLoader {
                 app.setType("webapp");
                 app.setLocation(artifact.getAttribute("overview_url"));
                 app.setIdentifier(artifact.getAttribute("overview_url"));
+            }
+
+            if("install".equals(action)){
+
             }
 
             if("android".equals(artifact.getAttribute("overview_platform"))){

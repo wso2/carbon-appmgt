@@ -62,7 +62,7 @@ public class Operations {
 
             Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
             MDMOperations mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
-            App appToInstall = AppDataLoader.load(new App(), artifact);
+            App appToInstall = AppDataLoader.load(new App(), artifact, action);
             mdmOperations.performAction(serverUrl, action, appToInstall, tenantId, type, params);
 
 
