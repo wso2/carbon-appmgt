@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 @Produces({ "application/json"})
 @Consumes({ "application/json"})
-public class MobileAppService extends AppService {
+public class MobileAppService implements AppService {
 
         private static final Log log = LogFactory.getLog(MobileAppService.class);
 
