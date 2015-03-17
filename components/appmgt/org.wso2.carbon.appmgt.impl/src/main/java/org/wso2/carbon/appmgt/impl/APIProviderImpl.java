@@ -1414,8 +1414,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         try {
             long subsCount = appMDAO.getAPISubscriptionCountByAPI(identifier);
             if (subsCount > 0) {
-                handleException("Cannot remove the application with : " + identifier.getApiName() +
-                        ". Active Subscriptions Exist", null);
+               return isAppDeleted;
             }
 
             //If SSOProvider exists, remove it
