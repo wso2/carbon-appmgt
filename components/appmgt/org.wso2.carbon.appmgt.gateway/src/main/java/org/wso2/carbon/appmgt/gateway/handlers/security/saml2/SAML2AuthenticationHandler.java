@@ -841,6 +841,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if (samlResponsesMap != null && !samlResponsesMap.containsKey(issuer)) {
                     samlResponsesMap.put(issuer, samlTokenInfoDTO);
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
+                } else { //when accessing though my-subscriptions page
+                    samlResponsesMap = new HashMap<String, SAMLTokenInfoDTO>();
+                    samlResponsesMap.put(constructIssuerId(messageContext), samlTokenInfoDTO);
+                    getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
                 }
                 messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, samlCookieValue);
             }

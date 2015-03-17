@@ -6180,7 +6180,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 
 
-    public void addOAuthAPIAccessInfo(WebApp webApp) throws AppManagementException {
+    public void addOAuthAPIAccessInfo(WebApp webApp, int tenantId) throws AppManagementException {
         Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
@@ -6191,12 +6191,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         //This need to be changed
         String getAppConsumerKeyQuery = "SELECT" + " CONSUMER_KEY " + " FROM"
                                         + " IDN_OAUTH_CONSUMER_APPS " + " WHERE"
-                                        + " APP_NAME = ?";
+                                        + " APP_NAME = ? AND TENANT_ID = ?";
 
 		try {
 			connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(getAppConsumerKeyQuery);
 			prepStmt.setString(1, webApp.getId().getApiName());
+			prepStmt.setInt(2, tenantId);
 
 			rs = prepStmt.executeQuery();
             String appConsumerKey = null;
@@ -6223,25 +6224,25 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		}
     }
 
-    public void updateOAuthAPIAccessInfo(WebApp webApp) throws AppManagementException {
+    public void updateOAuthAPIAccessInfo(WebApp webApp,  int tenantId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
 
-
         String getAppConsumerKeyQuery = "SELECT" + " CONSUMER_KEY " + " FROM"
                 + " IDN_OAUTH_CONSUMER_APPS " + " WHERE"
-                + " APP_NAME = ?";
+                + " APP_NAME = ? AND TENANT_ID = ?";
 
 
         // Remove entry from APM_SUBSCRIPTION table
-        String query = "DELETE FROM APM_API_CONSUMER_APPS  WHERE APP_CONSUMER_KEY = ?";
+        String query = "DELETE FROM APM_API_CONSUMER_APPS WHERE APP_CONSUMER_KEY = ?";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(getAppConsumerKeyQuery);
             prepStmt.setString(1, webApp.getId().getApiName());
-
+            prepStmt.setInt(2, tenantId);
+            
             rs = prepStmt.executeQuery();
             String appConsumerKey = null;
             while (rs.next()) {
