@@ -83,9 +83,11 @@ public class WSO2MDMOperations implements MDMOperations {
                         requestApp.put(method.getAnnotation(Property.class).name(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    log.error("Illegal Action");
+                    log.debug("Error: " + e);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    log.error("Target invocation failed");
+                    log.debug("Error: " + e);
                 }
             }
 
@@ -97,11 +99,8 @@ public class WSO2MDMOperations implements MDMOperations {
         StringRequestEntity requestEntity = null;
 
         try {
-
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
-
         } catch (UnsupportedEncodingException e) {
-
             log.error(e);
         }
 
@@ -111,16 +110,13 @@ public class WSO2MDMOperations implements MDMOperations {
         try {
 
             int statusCode = httpClient.executeMethod(postMethod);
-
             if (statusCode == HttpStatus.SC_OK) {
-
-                log.debug("Operation performed successfully");
+                log.debug(action + " operation performed successfully");
             }
 
         } catch (IOException e) {
-
-            log.info("Could not connect to WSO2 MDM to perform operation");
-            log.error(e);
+            log.error("Could not connect to WSO2 MDM to perform operation");
+            log.debug("Error: " + e);
         }
 
     }
@@ -149,20 +145,18 @@ public class WSO2MDMOperations implements MDMOperations {
         }else{
 
             HttpClient httpClient = new HttpClient();
-            GetMethod getMethod = new GetMethod(serverURL);
+
+            String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
+            GetMethod getMethod = new GetMethod(serverURL + deviceListAPI);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
-
-            if("user".equals(type)){
-                nameValuePairs.add(new NameValuePair("username", params[0]));
-            }
 
             if(platform != null) nameValuePairs.add(new NameValuePair("platform", platform));
 
             if(platformVersion != null) nameValuePairs.add(new NameValuePair("platformVersion", platform));
 
-            getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray());
+            getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
 
             try {
                 int statusCode = httpClient.executeMethod(getMethod);
@@ -170,8 +164,8 @@ public class WSO2MDMOperations implements MDMOperations {
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
                 }
             } catch (IOException e) {
-               log.info("Could not connect to WSO2 MDM to get device information");
-               log.error(e);
+               log.error("Could not connect to WSO2 MDM to get device information");
+               log.debug("Error: " + e);
             }
         }
 
@@ -181,6 +175,5 @@ public class WSO2MDMOperations implements MDMOperations {
 
         return jsonArray;
     }
-
 
 }

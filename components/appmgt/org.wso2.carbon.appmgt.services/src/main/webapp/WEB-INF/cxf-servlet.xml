@@ -23,7 +23,7 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 
-    <jaxrs:server id="mobileAppServiceV1" address="/v1/mobile/apps">
+    <jaxrs:server id="mobileAppServiceV1" address="/v1/apps/mobile">
         <jaxrs:serviceBeans>
             <ref bean="mobileAppsServiceBeanV1"/>
         </jaxrs:serviceBeans>
@@ -32,7 +32,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:providers>
     </jaxrs:server>
 
-    <bean id="mobileAppsServiceBeanV1" class="org.wso2.carbon.appmgt.app.services.mobile.v1.MobileAppService"/>
+    <bean id="mobileAppsServiceBeanV1" class="org.wso2.carbon.appmgt.services.v1.apps.mobile.MobileAppService"/>
 
     <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
 

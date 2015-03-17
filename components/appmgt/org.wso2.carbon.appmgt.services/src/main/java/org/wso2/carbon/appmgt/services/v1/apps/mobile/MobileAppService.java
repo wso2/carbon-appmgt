@@ -18,10 +18,14 @@
  * /
  */
 
-package org.wso2.carbon.appmgt.app.services.mobile.v1;
+package org.wso2.carbon.appmgt.services.v1.apps.mobile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.services.v1.apps.App;
+import org.wso2.carbon.appmgt.services.v1.apps.AppListQuery;
+import org.wso2.carbon.appmgt.services.v1.apps.AppListResponse;
+import org.wso2.carbon.appmgt.services.v1.apps.AppService;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
@@ -31,20 +35,18 @@ import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import java.util.ArrayList;
 
 @Produces({ "application/json"})
 @Consumes({ "application/json"})
-public class MobileAppService {
+public class MobileAppService extends AppService {
 
         private static final Log log = LogFactory.getLog(MobileAppService.class);
 
         @GET
-        public AppListResponse getApplicationList(@QueryParam("tenantId") int tenantId, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
+        @Path("list/tenant/{tenantId}")
+        public AppListResponse getApplicationList(@PathParam("tenantId") int tenantId, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
 
             boolean noLimit = false;
 
@@ -86,7 +88,7 @@ public class MobileAppService {
                     }
                     found = ++pageIndex;
 
-                    response.getApps().add(AppDataLoader.load(new App(), artifact));
+                    response.getApps().add(MobileAppDataLoader.load(new MobileApp(), artifact));
                 }
 
                 AppListQuery appListQuery = new AppListQuery();

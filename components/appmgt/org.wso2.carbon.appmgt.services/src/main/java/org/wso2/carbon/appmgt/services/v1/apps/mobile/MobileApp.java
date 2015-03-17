@@ -16,15 +16,16 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.app.services.mobile.v1;
+package org.wso2.carbon.appmgt.services.v1.apps.mobile;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.wso2.carbon.appmgt.services.v1.apps.App;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class App {
+public class MobileApp extends App {
 
     private String id;
     private String name;
