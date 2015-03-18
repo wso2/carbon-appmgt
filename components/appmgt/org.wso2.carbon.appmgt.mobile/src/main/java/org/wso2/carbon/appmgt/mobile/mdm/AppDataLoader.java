@@ -1,5 +1,7 @@
 package org.wso2.carbon.appmgt.mobile.mdm;
 
+import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
+import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
@@ -18,7 +20,12 @@ public class AppDataLoader {
 
             if("Enterprise".equals(artifact.getAttribute("overview_type"))){
                 app.setType("enterprise");
-                app.setLocation(artifact.getAttribute("overview_url"));
+
+
+                if("install".equals(action)){
+                    app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + artifact.getAttribute("overview_url"));
+                }
+
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                 app.setType("public");
             }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
@@ -27,9 +34,6 @@ public class AppDataLoader {
                 app.setIdentifier(artifact.getAttribute("overview_url"));
             }
 
-            if("install".equals(action)){
-
-            }
 
             if("android".equals(artifact.getAttribute("overview_platform"))){
                 app.setPackageName(artifact.getAttribute("overview_packagename"));

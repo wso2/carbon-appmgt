@@ -89,5 +89,11 @@ public class MobileConfigurations {
         return Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("EnableSampleDevices")).getText());
     }
 
+    public String getAppDownloadHost(){
+        return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("AppDownloadURLHost")).getText();
+    }
+
+
+
 
 }
