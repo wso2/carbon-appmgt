@@ -22,22 +22,19 @@ public class HostResolver {
             try {
                 host += "https://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
             } catch (Exception e) {
-               log.error("Error happened getting log");
+               log.error("Error occurred while getting host for install");
                log.debug("Error: " + e);
             }
         }else if("%https%".equals(abbr)){
             try {
                 host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
             } catch (Exception e) {
-                log.error("Error happened getting log");
+                log.error("Error occurred while getting host for install");
                 log.debug("Error: " + e);
             }
         }else{
             host = abbr;
         }
-
-
-
 
         return host;
     }

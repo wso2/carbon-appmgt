@@ -98,6 +98,8 @@ public class WSO2MDMOperations implements MDMOperations {
         HttpClient httpClient = new HttpClient();
         StringRequestEntity requestEntity = null;
 
+        log.debug("Request Payload for MDM: " + requestObj.toJSONString());
+
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -161,7 +163,9 @@ public class WSO2MDMOperations implements MDMOperations {
             try {
                 int statusCode = httpClient.executeMethod(getMethod);
                 if (statusCode == HttpStatus.SC_OK) {
+                    log.debug("Sending request to MDM to get devices.. Request path:  " + getMethod.getPath());
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
+                    log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                 }
             } catch (IOException e) {
                log.error("Could not connect to WSO2 MDM to get device information");
