@@ -45,8 +45,8 @@ public class MobileAppService implements AppService {
         private static final Log log = LogFactory.getLog(MobileAppService.class);
 
         @GET
-        @Path("list/tenant/{tenantId}")
-        public AppListResponse getApplicationList(@PathParam("tenantId") int tenantId, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
+        @Path("list/tenant/{tenantDomain}")
+        public AppListResponse getApplicationList(@PathParam("tenantDomain") String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
 
             boolean noLimit = false;
 
@@ -54,16 +54,16 @@ public class MobileAppService implements AppService {
             int index = 0;
             int found = 0;
 
-            if(tenantId == 0) tenantId = -1234;
+            if(tenantDomain == null ) tenantDomain = "carbon.super";
             if(limit == 0) noLimit = true;
 
-            log.debug("getApplicationList: Tenant id is " + tenantId);
+            log.debug("getApplicationList: Tenant domain is " + tenantDomain);
 
             AppListResponse response= new AppListResponse();
 
             try {
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
 
                 CarbonContext cCtx = CarbonContext.getThreadLocalCarbonContext();
