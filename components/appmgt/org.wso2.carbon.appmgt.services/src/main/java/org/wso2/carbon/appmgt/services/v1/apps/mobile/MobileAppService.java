@@ -64,6 +64,7 @@ public class MobileAppService implements AppService {
             try {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
 
                 CarbonContext cCtx = CarbonContext.getThreadLocalCarbonContext();
