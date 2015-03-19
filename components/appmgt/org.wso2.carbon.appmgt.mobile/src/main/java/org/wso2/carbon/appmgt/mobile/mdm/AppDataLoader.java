@@ -1,5 +1,7 @@
 package org.wso2.carbon.appmgt.mobile.mdm;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.mobile.utils.HostResolver;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -7,6 +9,8 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
 
 public class AppDataLoader {
+
+    private static final Log log = LogFactory.getLog(AppDataLoader.class);
 
     public static App load(App app, GenericArtifact artifact, String action){
 
@@ -44,7 +48,8 @@ public class AppDataLoader {
                 app.setIdentifier(artifact.getAttribute("overview_appid"));
             }
         } catch (GovernanceException e) {
-            e.printStackTrace();
+            log.error("Error occurred while retrieving information from governance registry");
+            log.debug("Error: " + e);
         }finally {
             return app;
         }

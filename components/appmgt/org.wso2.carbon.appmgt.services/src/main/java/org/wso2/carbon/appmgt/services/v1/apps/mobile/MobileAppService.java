@@ -103,7 +103,8 @@ public class MobileAppService implements AppService {
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+               log.error("Error occurred while retrieving information");
+               log.debug("Error: " + e);
             }finally{
                 PrivilegedCarbonContext.endTenantFlow();
                 return response;

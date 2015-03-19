@@ -20,11 +20,15 @@
 
 package org.wso2.carbon.appmgt.mobile.store;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 
 public class Devices {
+
+    private static final Log log = LogFactory.getLog(Devices.class);
 
     public String getDevicesList(int tenantId, String type, String[] params, String platform, String platformVersion){
 
@@ -60,11 +64,14 @@ public class Devices {
             Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
             mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            log.error("InstantiationException occurred");
+            log.debug("Error: " + e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("IllegalAccessException occurred");
+            log.debug("Error: " + e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error("Error occurred while getting the right class for MDM");
+            log.debug("Error: " + e);
         }
         return mdmOperations;
     }

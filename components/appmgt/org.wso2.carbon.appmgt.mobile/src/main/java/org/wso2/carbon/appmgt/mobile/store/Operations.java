@@ -67,17 +67,23 @@ public class Operations {
 
 
         } catch (UserStoreException e) {
-            e.printStackTrace();
+            log.error("error occurred at the user store");
+            log.debug("Error: " + e);
         } catch (GovernanceException e) {
-            e.printStackTrace();
+            log.error("error occurred from governance registry");
+            log.debug("Error: " + e);
         } catch (RegistryException e) {
-            e.printStackTrace();
+            log.error("error occurred from registry");
+            log.debug("Error: " + e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error("ClassNotFoundException occurred");
+            log.debug("Error: " + e);
         } catch (InstantiationException e) {
-            e.printStackTrace();
+            log.error("InstantiationException occurred");
+            log.debug("Error: " + e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            log.error("IllegalAccessException occurred");
+            log.debug("Error: " + e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
