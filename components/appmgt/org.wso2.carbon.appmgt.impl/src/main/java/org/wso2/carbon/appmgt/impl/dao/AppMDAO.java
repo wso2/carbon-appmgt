@@ -5104,7 +5104,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION)"
 					+ " VALUES (?,?,?,?,?)";
 
-			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord);
+			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord, new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
 			statementToInsertRecord.setString(1, policyPartialName);
 			statementToInsertRecord.setString(2, policyPartial);
 			statementToInsertRecord.setBoolean(3, isSharedPartial);
