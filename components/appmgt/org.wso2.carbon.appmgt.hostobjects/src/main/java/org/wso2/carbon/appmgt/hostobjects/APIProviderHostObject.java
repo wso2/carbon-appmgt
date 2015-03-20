@@ -2559,10 +2559,10 @@ public class APIProviderHostObject extends ScriptableObject {
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         } catch (SQLException e) {
-            log.error("Error when executing the SQL", e);
+            log.error("Error while executing the SQL", e);
         } catch (XMLStreamException e) {
-            log.error("Error while reading the xml stream", e);
-                    }
+            log.error("Error while reading the xml-stream", e);
+        }
 
         Iterator it = null;
         if (list != null) {
