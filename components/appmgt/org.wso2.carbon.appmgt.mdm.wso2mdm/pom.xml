@@ -59,6 +59,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>${maven-bundle-plugin.version}</version>
                 <extensions>true</extensions>
@@ -67,8 +71,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Version>1.0.0</Bundle-Version>
-                        <!--Private-Package>org.wso2.mobile.utils.internal</Private-Package>
-                        <Bundle-Activator>org.wso2.mobile.utils.Activator</Bundle-Activator-->
+                        <Private-Package>org.wso2.carbon.appmgt.mdm.wso2mdm.internal</Private-Package>
                         <Import-Package>
                             *
                         </Import-Package>

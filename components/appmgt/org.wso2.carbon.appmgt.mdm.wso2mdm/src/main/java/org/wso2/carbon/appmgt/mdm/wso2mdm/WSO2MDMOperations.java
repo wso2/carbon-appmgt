@@ -35,6 +35,7 @@ import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
+import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

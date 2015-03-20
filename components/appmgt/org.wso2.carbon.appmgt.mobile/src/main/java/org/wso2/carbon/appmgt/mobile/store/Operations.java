@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.AppDataLoader;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -60,8 +61,7 @@ public class Operations {
             GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
             GenericArtifact artifact = artifactManager.getGenericArtifact(app);
 
-            Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
-            MDMOperations mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
+            MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action);
             mdmOperations.performAction(serverUrl, action, appToInstall, tenantId, type, params);
 
@@ -75,16 +75,7 @@ public class Operations {
         } catch (RegistryException e) {
             log.error("error occurred from registry");
             log.debug("Error: " + e);
-        } catch (ClassNotFoundException e) {
-            log.error("ClassNotFoundException occurred");
-            log.debug("Error: " + e);
-        } catch (InstantiationException e) {
-            log.error("InstantiationException occurred");
-            log.debug("Error: " + e);
-        } catch (IllegalAccessException e) {
-            log.error("IllegalAccessException occurred");
-            log.debug("Error: " + e);
-        } finally {
+        }  finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
 

@@ -76,13 +76,8 @@ public class MobileConfigurations {
         return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("ServerUrl")).getText();
     }
 
-
     public boolean isMDMEnabled(){
         return Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("Enabled")).getText());
-    }
-
-    public String getMDMOperationsClass(){
-        return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDM")).getFirstChildWithName(new QName("OperationsClass")).getText();
     }
 
     public boolean isSampleDevicesEnabled(){

@@ -23,6 +23,7 @@ package org.wso2.carbon.appmgt.mobile.store;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 
@@ -34,7 +35,7 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
-        MDMOperations mdmOperations = getMDMOperationsInstance(configurations);
+        MDMOperations mdmOperations = getMDMOperationsInstance();
         return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled()).toJSONString();
 
     }
@@ -43,7 +44,7 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
-        MDMOperations mdmOperations =  getMDMOperationsInstance(configurations);
+        MDMOperations mdmOperations =  getMDMOperationsInstance();
         return mdmOperations.getDevices(serverUrl, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled()).toJSONString();
 
     }
@@ -52,27 +53,13 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
-        MDMOperations mdmOperations = getMDMOperationsInstance(configurations);
+        MDMOperations mdmOperations = getMDMOperationsInstance();
         return mdmOperations.getDevices(serverUrl, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled()).toJSONString();
 
     }
 
-    private MDMOperations getMDMOperationsInstance(MobileConfigurations configurations){
-
-        MDMOperations mdmOperations = null;
-        try {
-            Class<MDMOperations> mdmOperationsClass = (Class<MDMOperations>) Class.forName(configurations.getMDMOperationsClass());
-            mdmOperations = (MDMOperations) mdmOperationsClass.newInstance();
-        } catch (InstantiationException e) {
-            log.error("InstantiationException occurred");
-            log.debug("Error: " + e);
-        } catch (IllegalAccessException e) {
-            log.error("IllegalAccessException occurred");
-            log.debug("Error: " + e);
-        } catch (ClassNotFoundException e) {
-            log.error("Error occurred while getting the right class for MDM");
-            log.debug("Error: " + e);
-        }
+    private MDMOperations getMDMOperationsInstance(){
+        MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
         return mdmOperations;
     }
 
