@@ -20,7 +20,7 @@ public class AppDataLoader {
             app.setPlatform(artifact.getAttribute("overview_platform"));
             app.setVersion(artifact.getAttribute("overview_version"));
             app.setType(artifact.getAttribute("overview_type"));
-            app.setIconImage(artifact.getAttribute("overview_thumbnail"));
+            app.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
             if("Enterprise".equals(artifact.getAttribute("overview_type"))){
                 app.setType("enterprise");

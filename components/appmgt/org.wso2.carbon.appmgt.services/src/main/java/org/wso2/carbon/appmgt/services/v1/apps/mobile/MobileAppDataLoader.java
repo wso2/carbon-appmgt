@@ -1,5 +1,6 @@
 package org.wso2.carbon.appmgt.services.v1.apps.mobile;
 
+import org.wso2.carbon.appmgt.services.v1.apps.utils.HostResolver;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
@@ -14,7 +15,7 @@ public class MobileAppDataLoader {
             mobileApp.setPlatform(artifact.getAttribute("overview_platform"));
             mobileApp.setVersion(artifact.getAttribute("overview_version"));
             mobileApp.setType(artifact.getAttribute("overview_type"));
-            mobileApp.setIconImage(artifact.getAttribute("overview_thumbnail"));
+            mobileApp.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
             if("Enterprise".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("enterprise");

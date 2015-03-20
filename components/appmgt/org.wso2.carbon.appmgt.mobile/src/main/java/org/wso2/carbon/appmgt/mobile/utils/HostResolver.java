@@ -20,20 +20,35 @@ public class HostResolver {
         if("%http%".equals(abbr)){
 
             try {
-                host += "https://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
+                host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
             } catch (Exception e) {
-               log.error("Error occurred while getting host for install");
+               log.error("Error occurred while getting host");
                log.debug("Error: " + e);
             }
         }else if("%https%".equals(abbr)){
             try {
-                host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
+                host += "https://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
             } catch (Exception e) {
-                log.error("Error occurred while getting host for install");
+                log.error("Error occurred while getting host");
                 log.debug("Error: " + e);
             }
         }else{
             host = abbr;
+        }
+
+        return host;
+    }
+
+
+    public static String getHostWithHTTP(){
+
+        String host = "";
+
+        try {
+            host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
+        } catch (Exception e) {
+            log.error("Error occurred while getting host");
+            log.debug("Error: " + e);
         }
 
         return host;
