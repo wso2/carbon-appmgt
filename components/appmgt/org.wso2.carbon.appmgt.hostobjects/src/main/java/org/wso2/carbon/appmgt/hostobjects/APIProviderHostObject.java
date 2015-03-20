@@ -1013,7 +1013,7 @@ public class APIProviderHostObject extends ScriptableObject {
         //String tier = (String) apiData.get("tier", apiData);
         String contextVal = (String) apiData.get("overview_context", apiData);
         String context = contextVal.startsWith("/") ? contextVal : ("/" + contextVal);
-        String providerDomain=MultitenantUtils.getTenantDomain(String.valueOf(apiData.get("overview_provider", apiData)));
+        String providerDomain=MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(String.valueOf(apiData.get("overview_provider", apiData))));
         if(!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) && !context.contains("/t/"+ providerDomain))
         {
             //Create tenant aware context for WebApp
