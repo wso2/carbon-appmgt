@@ -57,9 +57,11 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.net.ssl.SSLHandshakeException;
+import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -2556,6 +2558,11 @@ public class APIProviderHostObject extends ScriptableObject {
             list = client.getCacheHitCount(providerName,fromDate,toDate);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+        } catch (SQLException e) {
+            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+        } catch (XMLStreamException e) {
+            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
         Iterator it = null;
@@ -2576,6 +2583,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 row.put("cachetHit",row,usage.getCacheHit());
                 row.put("totalRequestCount", row, usage.getTotalRequestCount());
                 row.put("time", row, usage.getRequestDate());
+
                 myn.put(i, myn, row);
                 i++;
             }

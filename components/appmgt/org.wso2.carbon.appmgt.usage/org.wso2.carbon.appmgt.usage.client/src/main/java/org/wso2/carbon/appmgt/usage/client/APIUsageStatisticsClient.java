@@ -376,7 +376,7 @@ public class APIUsageStatisticsClient {
     //cacheHitsummary
 
     public List<APPMCacheCountDTO> getCacheHitCount(String providerName,String fromDate, String toDate)
-            throws APIMgtUsageQueryServiceClientException {
+            throws APIMgtUsageQueryServiceClientException, SQLException, XMLStreamException {
 
         OMElement omElement = this.queryForCacheHitCount(fromDate, toDate, null);
         Collection<APPMCacheHitCount> usageData = getCacheHitCount(omElement);
@@ -1375,7 +1375,7 @@ public class APIUsageStatisticsClient {
     //cashe stat page quary
 
     private OMElement queryForCacheHitCount(String fromDate, String toDate, Integer limit)
-            throws APIMgtUsageQueryServiceClientException {
+            throws APIMgtUsageQueryServiceClientException, SQLException, XMLStreamException {
         if (dataSource == null) {
             throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
                     "that the data source is properly configured in the APIUsageTracker configuration.");
@@ -1431,8 +1431,10 @@ public class APIUsageStatisticsClient {
             String returnString = returnStringBuilder.toString();
             return AXIOMUtil.stringToOM(returnString);
 
-        } catch (Exception e) {
-            throw new APIMgtUsageQueryServiceClientException("Error occurred while querying from JDBC database", e);
+        } catch (SQLException e) {
+            throw new SQLException("Error when executing the SQL", e);
+        } catch (XMLStreamException e) {
+            throw new XMLStreamException("Error while reading the xml stream", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, rs);
         }
