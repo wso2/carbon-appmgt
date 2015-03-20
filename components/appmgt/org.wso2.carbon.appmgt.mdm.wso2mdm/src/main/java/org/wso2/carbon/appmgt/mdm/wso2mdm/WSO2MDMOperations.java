@@ -36,6 +36,7 @@ import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
+import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -58,7 +59,7 @@ public class WSO2MDMOperations implements MDMOperations {
      * @param params ids of the resources which belong to type
      */
     @Override
-    public void performAction(String serverUrl, String action, App app, int tenantId, String type, String[] params) {
+    public void performAction(User currentUser, String serverUrl, String action, App app, int tenantId, String type, String[] params) {
 
         JSONArray resources = new JSONArray();
         for(String param : params){
@@ -136,7 +137,7 @@ public class WSO2MDMOperations implements MDMOperations {
      * @return
      */
     @Override
-    public JSONArray getDevices(String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled) {
+    public JSONArray getDevices(User currentUser, String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled) {
 
         JSONArray jsonArray = null;
 

@@ -22,11 +22,14 @@ package org.wso2.carbon.appmgt.mobile.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.AppDataLoader;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
+import org.wso2.carbon.appmgt.mobile.utils.User;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
@@ -43,10 +46,18 @@ public class Operations {
 
     private static final Log log = LogFactory.getLog(Operations.class);
 
-    public void performAction(String action, int tenantId, String type, String app, String[] params ){
+    public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params ){
         log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         String serverUrl = configurations.getMDMServerURL();
+
+
+        User user = new User();
+        JSONObject userObj = (JSONObject) new JSONValue().parse(currentUser);
+        user.setUsername((String) userObj.get("username"));
+        user.setTenantDomain((String) userObj.get("tenantDomain"));
+        user.setTenantId(Integer.valueOf(String.valueOf(userObj.get("tenantId"))));
+
 
         try {
 
@@ -63,7 +74,7 @@ public class Operations {
 
             MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action);
-            mdmOperations.performAction(serverUrl, action, appToInstall, tenantId, type, params);
+            mdmOperations.performAction(user, serverUrl, action, appToInstall, tenantId, type, params);
 
 
         } catch (UserStoreException e) {
