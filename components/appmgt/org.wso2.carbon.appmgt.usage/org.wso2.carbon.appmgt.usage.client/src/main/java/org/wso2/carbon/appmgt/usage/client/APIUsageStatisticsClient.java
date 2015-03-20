@@ -29,6 +29,7 @@ import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.usage.client.billing.PaymentPlan;
 import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
@@ -383,21 +384,16 @@ public class APIUsageStatisticsClient {
         List<APPMCacheCountDTO> cacheHit = new ArrayList<APPMCacheCountDTO>();
 
         for (APPMCacheHitCount usage : usageData) {
-           // for (WebApp providerAPI : providerAPIs) {
-               // if (providerAPI.getId().getApiName().equals(usage.apiName) &&
-                      //  providerAPI.getId().getVersion().equals(usage.version)) {
+            APPMCacheCountDTO usageDTO = new APPMCacheCountDTO();
+            usageDTO.setApiName(usage.apiName);
+            usageDTO.setVersion(usage.version);
+            usageDTO.setCacheHit(usage.cacheHit);
+            usageDTO.setFullRequestPath(usage.fullRequestPath);
+            usageDTO.setRequestDate(usage.requestDate);
+            usageDTO.setTotalRequestCount(usage.totalRequestCount);
+            cacheHit.add(usageDTO);
+        }
 
-                    APPMCacheCountDTO usageDTO = new APPMCacheCountDTO();
-                    usageDTO.setApiName(usage.apiName);
-                    usageDTO.setVersion(usage.version);
-                    usageDTO.setCacheHit(usage.cacheHit);
-                    usageDTO.setFullRequestPath(usage.fullRequestPath);
-                    usageDTO.setRequestDate(usage.requestDate);
-                    usageDTO.setTotalRequestCount(usage.totalRequestCount);
-                    cacheHit.add(usageDTO);
-                }
-            //}
-      //  }
         return cacheHit;
     }
 
@@ -1376,7 +1372,7 @@ public class APIUsageStatisticsClient {
         }
     }
 
-    //cashe satt page quary
+    //cashe stat page quary
 
     private OMElement queryForCacheHitCount(String fromDate, String toDate, Integer limit)
             throws APIMgtUsageQueryServiceClientException {
@@ -1438,27 +1434,7 @@ public class APIUsageStatisticsClient {
         } catch (Exception e) {
             throw new APIMgtUsageQueryServiceClientException("Error occurred while querying from JDBC database", e);
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignore) {
-
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-
-                }
-            }
+            APIMgtDBUtil.closeAllConnections(null, connection, rs);
         }
     }
 
@@ -1815,9 +1791,6 @@ public class APIUsageStatisticsClient {
                     APIUsageStatisticsClientConstants.TIME)).getText();
             fullRequestPath = row.getFirstChildWithName(new QName(
                     APIUsageStatisticsClientConstants.FULLREQUESTPATH)) .getText();
-
-
-
         }
     }
 

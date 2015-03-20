@@ -2551,9 +2551,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-
             //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
             list = client.getCacheHitCount(providerName,fromDate,toDate);
         } catch (APIMgtUsageQueryServiceClientException e) {
@@ -2578,16 +2576,12 @@ public class APIProviderHostObject extends ScriptableObject {
                 row.put("cachetHit",row,usage.getCacheHit());
                 row.put("totalRequestCount", row, usage.getTotalRequestCount());
                 row.put("time", row, usage.getRequestDate());
-
-
                 myn.put(i, myn, row);
                 i++;
             }
         }
         return myn;
     }
-
-
 
     public static NativeArray jsFunction_getProviderAPIVersionUserUsage(Context cx,
                                                                         Scriptable thisObj,
