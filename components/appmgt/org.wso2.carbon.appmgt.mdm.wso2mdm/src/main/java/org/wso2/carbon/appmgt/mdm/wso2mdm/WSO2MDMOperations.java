@@ -18,7 +18,7 @@
  * /
  */
 
-package org.wso2.carbon.appmgt.mobile.wso2mdm;
+package org.wso2.carbon.appmgt.mdm.wso2mdm;
 
 
 import org.apache.commons.httpclient.HttpClient;

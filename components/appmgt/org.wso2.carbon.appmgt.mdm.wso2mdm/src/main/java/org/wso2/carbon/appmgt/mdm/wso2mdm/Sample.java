@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.mobile.wso2mdm;
+package org.wso2.carbon.appmgt.mdm.wso2mdm;
 
 
 public class Sample {
