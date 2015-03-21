@@ -2309,7 +2309,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
 
@@ -2444,10 +2444,9 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
             list = client.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
@@ -2495,12 +2494,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
 
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getAPIUsageByUser(providerName,fromDate,toDate, tenantDomainName);
+            list = client.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         } 
@@ -2591,7 +2589,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
 
@@ -2638,7 +2636,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
             list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
