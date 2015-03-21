@@ -2405,7 +2405,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate)
+    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
             throws AppManagementException {
 
 
@@ -2422,13 +2422,17 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             if ("__all_providers__".equals(providerName)) {
                 String sqlQuery =
                         "SELECT" + "  API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
-                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API"
+                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, APM_APPLICATION  APP"
                                 + " WHERE  API.APP_ID=SUB.APP_ID"
+                                + " AND SUB.APPLICATION_ID=APP.APPLICATION_ID"
+                                + " AND APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID"
+                                + " AND SUBR.TENANT_ID = ?"
                                 + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
                                 + " GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION ";
                 ps = connection.prepareStatement(sqlQuery);
-                ps.setString(1, fromDate);
-                ps.setString(2, toDate);
+                ps.setInt(1, tenantId);
+                ps.setString(2, fromDate);
+                ps.setString(3, toDate);
             } else {
                 String sqlQuery =
                         "SELECT" + "  API.APP_NAME,APP_VERSION,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
@@ -2492,7 +2496,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @return List of apps subscribed by users.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate) throws
+    public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate, int tenantId) throws
                                                                                       AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
@@ -2502,8 +2506,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         String sqlQuery =
                 "SELECT " + "SUBR.USER_ID AS USER_ID,  API.APP_NAME AS API,API.APP_VERSION, API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME  "
                         + " FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API "
-                        + " WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND "
-                        + "SUB.APP_ID = API.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
+                        + " WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND"
+                        + " SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " 
+                        + " GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
 
 
         Connection connection = null;
@@ -2514,8 +2519,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             connection = APIMgtDBUtil.getConnection();
 
             ps = connection.prepareStatement(sqlQuery);
-            ps.setString(1, fromDate);
-            ps.setString(2, toDate);
+            ps.setInt(1, tenantId);
+            ps.setString(2, fromDate);
+            ps.setString(3, toDate);
             result = ps.executeQuery();
             if (result == null) {
                 return users;

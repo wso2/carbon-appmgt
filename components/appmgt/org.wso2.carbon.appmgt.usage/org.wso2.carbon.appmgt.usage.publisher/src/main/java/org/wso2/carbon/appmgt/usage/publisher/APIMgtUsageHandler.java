@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.URL;
+
 import javax.cache.Caching;
 
 import org.apache.axis2.Constants;
@@ -43,9 +44,11 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.usage.publisher.dto.RequestPublisherDTO;
 import org.wso2.carbon.appmgt.usage.publisher.internal.APPManagerConfigurationServiceComponent;
 import org.wso2.carbon.appmgt.usage.publisher.internal.UsageComponent;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.usage.agent.beans.APIManagerRequestStats;
 import org.wso2.carbon.usage.agent.util.PublisherUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -94,16 +97,35 @@ public class APIMgtUsageHandler extends AbstractHandler {
             Map<String, String> headers = (Map<String, String>) axis2MC.getProperty(
                     org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
+            String referer = headers.get("Referer");
+            String contextAndVersion[] = getContextWithVersion(referer);
+            String context = "/" + contextAndVersion[0];
+            String version = contextAndVersion[1];
+            String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            if (context.contains("/t/")) {
+            	tenantDomain = contextAndVersion[2];
+            }
+            
             String cookieString = headers.get(HTTPConstants.COOKIE_STRING);
             String saml2CookieValue = getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE);
-            String loggedUser = (String) Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER).getCache(AppMConstants.KEY_CACHE_NAME).get(saml2CookieValue);
-
-            String referer = headers.get("Referer");
+            boolean isTenantFlowStarted = false;
+            String loggedUser = null;
+            try {            	
+                if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                loggedUser = (String) Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER).
+            			getCache(AppMConstants.KEY_CACHE_NAME).get(saml2CookieValue);
+            } finally {
+            	if (isTenantFlowStarted) {
+            		PrivilegedCarbonContext.endTenantFlow();
+            	}
+            }            
+           
             URL appURL = new URL(referer);
-            String page= appURL.getPath();
-            String tracking_code = headers.get("trackingCode");
-            String[] tracking_code_list;
-            tracking_code_list = tracking_code.split(",");
+            String page= appURL.getPath();                  
 
             String username = "";
             String applicationName = "DefaultApplication";
@@ -111,30 +133,25 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
             username = loggedUser;
 
-            String hostName = DataPublisherUtil.getHostAddress();
-            String context = "/"+getContextWithVersion(referer)[0];
-            String fullRequestPath = (String)mc.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
-            int tenantDomainIndex = fullRequestPath.indexOf("/t/");
-            String apiPublisher = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            String hostName = DataPublisherUtil.getHostAddress();       
 
-            if (tenantDomainIndex != -1) {
-                String temp = fullRequestPath.substring(tenantDomainIndex + 3, fullRequestPath.length());
-                apiPublisher = temp.substring(0, temp.indexOf("/"));
-            }
-
-
-            String version = getContextWithVersion(referer)[1];
+            
             WebApp webApp = getWebApp(context,version);
             String api = webApp.getId().getApiName();
             String api_version =   api + ":" + version;
 
             String hashcode = webApp.getTrackingCode();
-            boolean trackingCodeExist = Arrays.asList(tracking_code_list).contains(hashcode);
-
+            
+            boolean trackingCodeExist = false;
+            String tracking_code = headers.get("trackingCode");    
+            if (tracking_code != null) {
+            	String[] tracking_code_list = tracking_code.split(",");
+            	trackingCodeExist = Arrays.asList(tracking_code_list).contains(hashcode);
+            }
+            
             String resource = extractResource(mc);
             String method =  (String)((Axis2MessageContext) mc).getAxis2MessageContext().getProperty(
                     Constants.Configuration.HTTP_METHOD);
-            String tenantDomain = MultitenantUtils.getTenantDomain(username);
             
             int tenantId = UsageComponent.getRealmService().getTenantManager().
                     getTenantId(tenantDomain);
@@ -172,7 +189,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
                 requestPublisherDTO.setUsername(username);
                 requestPublisherDTO.setTenantDomain(tenantDomain);
                 requestPublisherDTO.setHostName(hostName);
-                requestPublisherDTO.setApiPublisher(apiPublisher);
+                requestPublisherDTO.setApiPublisher(tenantDomain);
                 requestPublisherDTO.setApplicationName(applicationName);
                 requestPublisherDTO.setApplicationId(applicationId);
                 requestPublisherDTO.setTrackingCode(hashcode);
@@ -206,7 +223,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
                 mc.setProperty(APIMgtUsagePublisherConstants.HTTP_METHOD, method);
                 mc.setProperty(APIMgtUsagePublisherConstants.REQUEST_TIME, currentTime);
                 mc.setProperty(APIMgtUsagePublisherConstants.HOST_NAME,hostName);
-                mc.setProperty(APIMgtUsagePublisherConstants.API_PUBLISHER,apiPublisher);
+                mc.setProperty(APIMgtUsagePublisherConstants.API_PUBLISHER,tenantDomain);
                 mc.setProperty(APIMgtUsagePublisherConstants.APPLICATION_NAME, applicationName);
                 mc.setProperty(APIMgtUsagePublisherConstants.APPLICATION_ID, applicationId);
                 mc.setProperty(APIMgtUsagePublisherConstants.TRACKING_CODE,hashcode);
@@ -237,7 +254,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
     }
 
     public String getCookieValue(String cookieString, String cookieName) {
-        if (cookieString.length() > 0) {
+        if (cookieString != null && cookieString.length() > 0) {
             int cStart = cookieString.indexOf(cookieName + "=");
             int cEnd;
             if (cStart != -1) {
@@ -254,13 +271,30 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
 
     public String[] getContextWithVersion(String refer) {
-        String webapp[]= new String[2];
+        String webapp[]= new String[3];
         if (refer.length() > 0) {
-           // e.g URL pattern : "http://localhost:8281/united-airline/1.0.0/";
-            String s[]=refer.split("/");
-
-            webapp[0] = s[3];
-            webapp[1] = s[4];
+           
+        	if (refer.contains("/t/")) {
+        		// e.g URL pattern : "http://localhost:8281/t/lakmali.com/united-airline/1.0.0/";
+        		String s[] = refer.split("/t/");
+        		if (s.length >= 2) {
+        			String stringAfterSlashT = s[1];
+        			String result[] = stringAfterSlashT.split("/");
+        			if (result.length >= 3) {
+        				webapp[0] = "t/" + result[0] + "/" + result[1];
+        				webapp[1] = result[2];
+        				webapp[2] = result[0];
+        			}
+        		}
+        		
+        	} else {
+        		// e.g URL pattern : "http://localhost:8281/united-airline/1.0.0/";
+                String s[]=refer.split("/");
+                if (s.length >= 5) {
+	                webapp[0] = s[3];
+	                webapp[1] = s[4];
+                }
+        	}
              return webapp;
         }
         return webapp;

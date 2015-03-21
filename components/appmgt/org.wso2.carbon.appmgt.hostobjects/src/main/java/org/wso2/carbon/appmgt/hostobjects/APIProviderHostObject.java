@@ -51,12 +51,14 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.net.ssl.SSLHandshakeException;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
@@ -2307,9 +2309,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getUsageByAPIs(providerName, fromDate, toDate, 10);
+        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+
+            list = client.getUsageByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2440,9 +2444,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
+        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
             APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAPIUsageByPage(providerName, fromDate, toDate);
+                    new APIUsageStatisticsClient(userName);
+            list = client.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2489,14 +2495,15 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
+        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
 
             //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getAPIUsageByUser(providerName,fromDate,toDate);
+            list = client.getAPIUsageByUser(providerName,fromDate,toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
-        }
+        } 
 
         Iterator it = null;
         if (list != null) {
@@ -2584,10 +2591,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
+        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
 
-            list = client.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10);
+            list = client.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIVersionLastAccess", e);
         }
@@ -2630,8 +2638,10 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10);
+        	String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIServiceTime", e);
         }

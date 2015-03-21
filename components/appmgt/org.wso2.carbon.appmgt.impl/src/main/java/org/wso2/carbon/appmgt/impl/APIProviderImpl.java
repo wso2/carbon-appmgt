@@ -297,7 +297,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throws AppManagementException {
         Map<String, List> users = new HashMap<String, List>();
         try {
-            users = appMDAO.getSubscribedAPPsByUsers(fromDate, toDate);
+            users = appMDAO.getSubscribedAPPsByUsers(fromDate, toDate, tenantId);
         } catch (AppManagementException e) {
             handleException("Failed to get subscribed apps by users for the period " + fromDate + "to " +
                     toDate, e);
@@ -1668,7 +1668,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throws AppManagementException {
         Map<String,Long> subscriptions = null;
         try {
-            subscriptions = appMDAO.GetSubscriptionCountByApp(provider, fromDate, toDate);
+            subscriptions = appMDAO.GetSubscriptionCountByApp(provider, fromDate, toDate, tenantId);
         } catch (AppManagementException e) {
             handleException("Failed to get subscriptionCount by apps for provider :" + provider + "for the period "
                     + fromDate + "to" + toDate, e);
