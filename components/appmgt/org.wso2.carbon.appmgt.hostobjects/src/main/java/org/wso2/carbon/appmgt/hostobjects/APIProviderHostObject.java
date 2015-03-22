@@ -2036,7 +2036,7 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
         try {
 
-            if (fileHostObject != null && fileHostObject.getJavaScriptFile().getLength() != 0) {
+            if (fileHostObject != null) {
                 Icon icon = new Icon(fileHostObject.getInputStream(),
                         fileHostObject.getJavaScriptFile().getContentType());
                 String filePath = AppManagerUtil.getDocumentationFilePath(apiId, fileHostObject.getName());
