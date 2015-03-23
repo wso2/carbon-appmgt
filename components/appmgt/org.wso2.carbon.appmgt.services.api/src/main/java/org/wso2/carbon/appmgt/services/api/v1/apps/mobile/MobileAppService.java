@@ -157,6 +157,8 @@ public class MobileAppService implements AppService {
             } catch (RegistryException e) {
                 log.error("RegistryException occurred");
                 log.debug("Error: " + e);
+            }catch (Exception e) {
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
             }finally{
                 PrivilegedCarbonContext.endTenantFlow();
                 return response;
