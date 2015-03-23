@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.services.v1.apps;
+package org.wso2.carbon.appmgt.services.api.v1.apps.common;
 
 
 import javax.xml.bind.annotation.XmlElement;

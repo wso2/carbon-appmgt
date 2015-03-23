@@ -1,6 +1,6 @@
-package org.wso2.carbon.appmgt.services.v1.apps.mobile;
+package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
-import org.wso2.carbon.appmgt.services.v1.apps.utils.HostResolver;
+import org.wso2.carbon.appmgt.services.api.v1.utils.HostResolver;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 

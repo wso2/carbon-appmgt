@@ -16,10 +16,10 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.services.v1.apps.mobile;
+package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.wso2.carbon.appmgt.services.v1.apps.App;
+import org.wso2.carbon.appmgt.services.api.v1.apps.common.App;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

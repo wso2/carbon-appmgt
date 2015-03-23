@@ -108,7 +108,7 @@
                             <directory>src/main/webapp</directory>
                         </resource>
                     </webResources>
-                    <warName>appmgt-services</warName>
+                    <warName>api</warName>
                 </configuration>
             </plugin>
         </plugins>

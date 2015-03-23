@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.services.v1.apps.utils;
+package org.wso2.carbon.appmgt.services.api.v1.utils;
 
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
