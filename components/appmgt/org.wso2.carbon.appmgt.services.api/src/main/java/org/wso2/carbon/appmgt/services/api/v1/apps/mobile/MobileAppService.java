@@ -22,10 +22,7 @@ package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.services.api.v1.apps.common.App;
-import org.wso2.carbon.appmgt.services.api.v1.apps.common.AppListQuery;
-import org.wso2.carbon.appmgt.services.api.v1.apps.common.AppListResponse;
-import org.wso2.carbon.appmgt.services.api.v1.apps.common.AppService;
+import org.wso2.carbon.appmgt.services.api.v1.apps.common.*;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
@@ -96,8 +93,8 @@ public class MobileAppService implements AppService {
 
 
                     String[] userList = userStoreManager.getRoleListOfUser(credentials[0]);
-                    String adminRoleName = realmService.getTenantUserRealm(SUPER_USER_TENANT_ID).getRealmConfiguration().getAdminRoleName();
-                    if(!Arrays.asList(userList).contains(adminRoleName)){
+                    String authorizedRole = ServicesApiConfigurations.getInstance().getAuthorizedRole();
+                    if(!Arrays.asList(userList).contains(authorizedRole)){
                         throw new UnauthorizedUserException();
                     }
 
@@ -141,14 +138,11 @@ public class MobileAppService implements AppService {
                 }
 
                 AppListQuery appListQuery = new AppListQuery();
-                appListQuery.setStatus("OK");
                 appListQuery.setLimit(limit);
                 appListQuery.setFound(found);
                 appListQuery.setOffset(offset);
                 appListQuery.setTotal(artifacts.length);
                 response.setQuery(appListQuery);
-
-
 
             } catch (GovernanceException e) {
                 log.error("GovernanceException occurred");
