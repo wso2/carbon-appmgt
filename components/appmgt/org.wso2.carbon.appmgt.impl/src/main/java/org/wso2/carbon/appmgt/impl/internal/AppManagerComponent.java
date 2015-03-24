@@ -163,6 +163,13 @@ public class AppManagerComponent {
                                                         AppMConstants.Permissions.WEB_APP_CREATE,
                                                         UserMgtConstants.EXECUTE_ACTION, null);
 
+            AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_MOBILE_CREATOR_APIMGT_EXECUTION_ID,
+                                                        RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                                                                                      RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +
+                                                                                      AppMConstants.APPMGT_MOBILE_REGISTRY_LOCATION),
+                                                        AppMConstants.Permissions.MOBILE_APP_CREATE,
+                                                        UserMgtConstants.EXECUTE_ACTION, null);
+
             //Add the creator and publisher roles
             org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
 

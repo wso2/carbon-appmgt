@@ -31,8 +31,11 @@ public final class AppMConstants {
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
     
-    //governance registry apimgt root location
+    //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
+
+    //governance registry appmgt root location
+    public static final String APPMGT_MOBILE_REGISTRY_LOCATION = "/mobileapps";
     
     public static final String API_CONTEXT_ID = "api.context.id";
     //This is the resource name of API
@@ -382,6 +385,7 @@ public final class AppMConstants {
     public static final int AM_CREATOR_APIMGT_EXECUTION_ID = 200;
     public static final int AM_CREATOR_GOVERNANCE_EXECUTION_ID = 201;
     public static final int AM_PUBLISHER_APIMGT_EXECUTION_ID = 202;
+    public static final int AM_MOBILE_CREATOR_APIMGT_EXECUTION_ID = 203;
     public static final QName THROTTLE_CONTROL_ELEMENT = new QName("http://www.wso2.org/products/wso2commons/throttle",
                         "Control");
     public static final QName THROTTLE_MAXIMUM_COUNT_ELEMENT = new QName("http://www.wso2"
