@@ -32,6 +32,7 @@ import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.identity.application.common.model.xsd.*;
 import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceIdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceStub;
+import org.wso2.carbon.identity.sso.saml.stub.IdentitySAMLSSOConfigServiceIdentityException;
 import org.wso2.carbon.identity.sso.saml.stub.IdentitySAMLSSOConfigServiceStub;
 import org.wso2.carbon.identity.sso.saml.stub.types.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.stub.types.SAMLSSOServiceProviderInfoDTO;
@@ -120,12 +121,15 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
 
     @Override
     public boolean updateProvider(SSOProvider provider) {
+        SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(provider);
         ServiceProvider serviceProvider = null;
         boolean isUpdated = false;
 
         try {
             serviceProvider = appMgtStub.getApplication(provider.getIssuerName());
             if (serviceProvider != null) {
+                ssoStub.removeServiceProvider(provider.getIssuerName());
+                ssoStub.addRPServiceProvider(serviceProviderDTO);
                 updateServiceProvider(provider, serviceProvider);
                 appMgtStub.updateApplication(serviceProvider);
                 isUpdated = true;
@@ -140,6 +144,9 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
             //An exception is not thrown here in the purpose of continuing in rest of webapp update
             log.error("Error in invoking IdentityApplicationManagementService while updating the provider : " +
                     provider.getProviderName(), e);
+        } catch (IdentitySAMLSSOConfigServiceIdentityException e) {
+            log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : "+
+            provider.getIssuerName(), e);
         }
         return isUpdated;
     }
@@ -297,8 +304,10 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
-        dto.setLogoutURL(provider.getLogoutUrl());
-        dto.setDoSingleLogout(true);
+        if(provider.getLogoutUrl() != null && ) {
+            dto.setLogoutURL(provider.getLogoutUrl());
+            dto.setDoSingleLogout(true);
+        }
         dto.setEnableAttributesByDefault(true);
 
         dto.setAttributeConsumingServiceIndex("");
