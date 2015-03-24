@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
   <groupId>org.wso2.carbon.appmgt</groupId>
-  <artifactId>org.wso2.carbon.appmgt.mobile.services</artifactId>
+  <artifactId>org.wso2.carbon.appmgt.services.api</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>WSO2 Carbon - App Manager App Services Component</name>
