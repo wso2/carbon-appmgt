@@ -23,10 +23,9 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -48,7 +47,6 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.registry.app.APPConstants;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -303,6 +301,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     toDate, e);
         }
         return users;
+    }
+
+    public List<WebApp> getAppsWithEndpoint() throws AppManagementException {
+        List<WebApp> appSortedList = appMDAO.getAllWebApps();;
+        Collections.sort(appSortedList, new APINameComparator());
+        return appSortedList;
     }
 
 
