@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.ssl.Base64;
 import org.wso2.carbon.appmgt.services.api.v1.apps.common.*;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -38,14 +39,12 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import waffle.util.Base64;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +80,7 @@ public class MobileAppService implements AppService {
                 if(authorization != null && authorization.size() != 0){
                    String basicHeader = authorization.get(0);
                     String base64Credentials = basicHeader.substring("Basic".length()).trim();
-                    String credentialsString = new String(Base64.decode(base64Credentials), Charset.forName("UTF-8"));
+                    String credentialsString = new String(Base64.decodeBase64(base64Credentials.getBytes()));
                     final String[] credentials = credentialsString.split(":",2);
                     if(credentials.length < 2){
                         throw new UnauthorizedUserException();

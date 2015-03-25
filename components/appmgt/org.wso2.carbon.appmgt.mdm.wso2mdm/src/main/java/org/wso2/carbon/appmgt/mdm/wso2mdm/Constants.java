@@ -6,6 +6,7 @@ public class Constants {
     public static final String API_DEVICE_LIST = "/mdmimpl-api/devices/listall/user/%s";
 
     public static final String PROPERTY_SERVER_URL = "ServerURL";
+    public static final String PROPERTY_TOKEN_API_URL = "TokenApiURL";
     public static final String PROPERTY_CLIENT_KEY = "ClientKey";
     public static final String PROPERTY_CLIENT_SECRET = "ClientSecret";
 

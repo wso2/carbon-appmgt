@@ -29,6 +29,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.ssl.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -59,6 +60,21 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
      */
     @Override
     public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configProperties) {
+
+
+
+        String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
+        String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
+        String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
+
+        log.debug("Getting API Token");
+        String apiToken = getAPIToken(tokenApiURL, clientKey, clientSecret);
+        log.debug("API token received: " + apiToken);
+
+        if(apiToken == null){
+            log.error("Cannot retrieve API Token to perform MDM operation");
+            return;
+        }
 
         JSONArray resources = new JSONArray();
         for(String param : params){
@@ -118,7 +134,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             }
 
         } catch (IOException e) {
-            log.error("Could not connect to WSO2 MDM to perform operation");
+            log.error("Cannot not connect to WSO2 MDM to perform operation");
             log.debug("Error: " + e);
         }
 
@@ -168,7 +184,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
                     log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                 }
             } catch (IOException e) {
-               log.error("Could not connect to WSO2 MDM to get device information");
+               log.error("Cannot not connect to WSO2 MDM to get device information");
                log.debug("Error: " + e);
             }
         }
@@ -178,6 +194,38 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
         }
 
         return jsonArray;
+    }
+
+
+    private String getAPIToken(String tokenApiURL, String clientKey, String clientSecret){
+        HttpClient httpClient = new HttpClient();
+        PostMethod postMethod = new PostMethod(tokenApiURL);
+
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        nameValuePairs.add(new NameValuePair("grant_type", "client_credentials"));
+        postMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
+        postMethod.addRequestHeader("Authorization" , "Basic " +  new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
+        postMethod.addRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
+        try {
+            int statusCode = httpClient.executeMethod(postMethod);
+        } catch (IOException e) {
+            log.error("Cannot not connect to Token API Endpoint");
+            log.debug("Error: " + e);
+            return null;
+        }
+
+        String response = null;
+        try {
+            response = postMethod.getResponseBodyAsString();
+        } catch (IOException e) {
+            log.error("Cannot not get response body for auth");
+            log.debug("Error: " + e);
+            return null;
+        }
+
+        JSONObject token = (JSONObject) new JSONValue().parse(response);
+
+        return String.valueOf( token.get("access_token"));
     }
 
 }
