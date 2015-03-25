@@ -33,7 +33,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
-import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
@@ -43,15 +42,15 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
-public class WSO2MDMOperations implements MDMOperations {
+public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOperations {
 
-    private static final Log log = LogFactory.getLog(WSO2MDMOperations.class);
+    private static final Log log = LogFactory.getLog(MDMOperations.class);
 
     /**
-     * @param serverUrl server URL of the MDM
      * @param action action of the operation. Eg. install, uninstall, update
      * @param app application object
      * @param tenantId tenantId
@@ -59,7 +58,7 @@ public class WSO2MDMOperations implements MDMOperations {
      * @param params ids of the resources which belong to type
      */
     @Override
-    public void performAction(User currentUser, String serverUrl, String action, App app, int tenantId, String type, String[] params) {
+    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configProperties) {
 
         JSONArray resources = new JSONArray();
         for(String param : params){
@@ -108,7 +107,7 @@ public class WSO2MDMOperations implements MDMOperations {
             log.error(e);
         }
 
-        PostMethod postMethod = new PostMethod(serverUrl);
+        PostMethod postMethod = new PostMethod(configProperties.get("serverURL"));
         postMethod.setRequestEntity(requestEntity);
 
         try {
@@ -127,7 +126,6 @@ public class WSO2MDMOperations implements MDMOperations {
 
     /**
      *
-     * @param serverURL server URL of the MDM
      * @param tenantId tenantId
      * @param type type of the resource. Eg: role, user, device
      * @param params ids of the resources which belong to type
@@ -137,7 +135,7 @@ public class WSO2MDMOperations implements MDMOperations {
      * @return
      */
     @Override
-    public JSONArray getDevices(User currentUser, String serverURL, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled) {
+    public JSONArray getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
 
         JSONArray jsonArray = null;
 
@@ -151,7 +149,7 @@ public class WSO2MDMOperations implements MDMOperations {
             HttpClient httpClient = new HttpClient();
 
             String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
-            GetMethod getMethod = new GetMethod(serverURL + deviceListAPI);
+            GetMethod getMethod = new GetMethod(configProperties.get("serverURL") + deviceListAPI);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));

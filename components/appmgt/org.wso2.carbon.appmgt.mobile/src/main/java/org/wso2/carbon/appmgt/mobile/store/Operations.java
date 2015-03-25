@@ -49,8 +49,6 @@ public class Operations {
     public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params ){
         log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        String serverUrl = configurations.getMDMServerURL();
-
 
         User user = new User();
         JSONObject userObj = (JSONObject) new JSONValue().parse(currentUser);
@@ -74,7 +72,7 @@ public class Operations {
 
             MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action);
-            mdmOperations.performAction(user, serverUrl, action, appToInstall, tenantId, type, params);
+            mdmOperations.performAction(user, action, appToInstall, tenantId, type, params, configurations.getActiveMDMProperties());
 
 
         } catch (UserStoreException e) {

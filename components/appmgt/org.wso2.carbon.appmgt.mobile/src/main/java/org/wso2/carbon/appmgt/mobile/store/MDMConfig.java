@@ -28,10 +28,6 @@ public class MDMConfig {
         return MobileConfigurations.getInstance().isMDMEnabled();
     }
 
-    public String getMDMServerURL(){
-        return MobileConfigurations.getInstance().getMDMServerURL();
-    }
-
     public boolean isSampleDevicesEnabled(){
         return MobileConfigurations.getInstance().isSampleDevicesEnabled();
     }

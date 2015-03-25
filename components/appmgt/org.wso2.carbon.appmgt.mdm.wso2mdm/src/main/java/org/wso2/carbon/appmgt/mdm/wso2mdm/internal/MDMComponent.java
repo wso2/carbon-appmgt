@@ -5,22 +5,21 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mdm.wso2mdm.WSO2MDMOperations;
-import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mdm.wso2mdm.MDMOperations;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.mdm.wso2mdm.AppManagerWSO2MDMComponent" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.mdm.wso2mdm.MDMComponent" immediate="true"
  */
 
-public class AppManagerWSO2MDMComponent {
+public class MDMComponent {
 
-    private static final Log log = LogFactory.getLog(AppManagerWSO2MDMComponent.class);
+    private static final Log log = LogFactory.getLog(MDMComponent.class);
 
     private ServiceRegistration mdmServiceRegistration;
 
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
-        mdmServiceRegistration = bundleContext.registerService(MDMOperations.class.getName(), new WSO2MDMOperations(), null);
+        mdmServiceRegistration = bundleContext.registerService(org.wso2.carbon.appmgt.mobile.mdm.MDMOperations.class.getName(), new MDMOperations(), context.getProperties());
         log.debug("WSO2 MDM Service Registration activated");
     }
 

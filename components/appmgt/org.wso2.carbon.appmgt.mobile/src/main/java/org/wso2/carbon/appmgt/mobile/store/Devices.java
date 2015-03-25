@@ -39,9 +39,8 @@ public class Devices {
         User user = setUserData(new User(), currentUser);
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        String serverUrl = configurations.getMDMServerURL();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, serverUrl, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled()).toJSONString();
+        return mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
 
     }
 
@@ -51,9 +50,8 @@ public class Devices {
 
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        String serverUrl = configurations.getMDMServerURL();
         MDMOperations mdmOperations =  getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, serverUrl, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled()).toJSONString();
+        return mdmOperations.getDevices(user, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
 
     }
 
@@ -62,9 +60,8 @@ public class Devices {
         User user = setUserData(new User(), currentUser);
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        String serverUrl = configurations.getMDMServerURL();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, serverUrl, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled()).toJSONString();
+        return mdmOperations.getDevices(user, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
 
     }
 
