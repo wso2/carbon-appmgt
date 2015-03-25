@@ -304,7 +304,7 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
-        if(provider.getLogoutUrl() != null && ) {
+        if(provider.getLogoutUrl() != null && provider.getLogoutUrl() != " ") {
             dto.setLogoutURL(provider.getLogoutUrl());
             dto.setDoSingleLogout(true);
         }
