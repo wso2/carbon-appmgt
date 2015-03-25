@@ -107,7 +107,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             log.error(e);
         }
 
-        PostMethod postMethod = new PostMethod(configProperties.get("serverURL"));
+        PostMethod postMethod = new PostMethod(configProperties.get(Constants.PROPERTY_SERVER_URL));
         postMethod.setRequestEntity(requestEntity);
 
         try {
@@ -149,7 +149,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             HttpClient httpClient = new HttpClient();
 
             String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
-            GetMethod getMethod = new GetMethod(configProperties.get("serverURL") + deviceListAPI);
+            GetMethod getMethod = new GetMethod(configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
