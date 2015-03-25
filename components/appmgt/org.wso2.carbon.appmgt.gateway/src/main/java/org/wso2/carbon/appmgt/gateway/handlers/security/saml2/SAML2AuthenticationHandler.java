@@ -258,6 +258,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return boolean result either anonymous access allowed or not
      */
     public boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) {
+        //Make request path and verbInfoDTO.mapAllowAnonymousUrl keys consistence.
+        if (!requestPath.endsWith("/")) {
+            requestPath = requestPath + "/";
+        }
         if (verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + requestPath) == null) {
             return false;
         } else {
@@ -266,8 +270,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     public boolean handleResponse(MessageContext messageContext) {
-        if (isAllowAnonymousApplication() || isAllowAnonymousUrlPattern((String) ((Axis2MessageContext) messageContext).getAxis2MessageContext()
-                .getProperty("HTTP_METHOD"), (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
+        if (isAllowAnonymousApplication() ||
+            isAllowAnonymousUrlPattern((String) messageContext.getProperty("REST_METHOD"),
+                                       (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
             return true;
         }
         String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);

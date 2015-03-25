@@ -747,11 +747,21 @@ public class AppMDAO {
 				if ("/*".equals(urlPattern)) {
 					urlPattern = "";
 				}
-				// key is constructed using the http Method + URL pattern
-				mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + "/" + urlPattern;
+
+                // key is constructed using the http Method + URL pattern
+                if (urlPattern != null && urlPattern.startsWith("/")) {
+                    mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + urlPattern;
+                } else {
+                    mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + "/" + urlPattern;
+                }
+
+                //Need to make key consistence with RESTConstants.REST_FULL_REQUEST_PATH
+                if (!mapKey.endsWith("/")) {
+                    mapKey = mapKey + "/";
+                }
+
 				// store the values (is anonymous allowed) per each URL pattern
-				verbInfoDTO.mapAllowAnonymousUrl.put(mapKey,
-						Boolean.parseBoolean(rs.getString("URL_ALLOW_ANONYMOUS")));
+				verbInfoDTO.mapAllowAnonymousUrl.put(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 			}
 		} catch (SQLException e) {
 			handleException("Error when executing the SQL : " + query + " (Context:" + context +

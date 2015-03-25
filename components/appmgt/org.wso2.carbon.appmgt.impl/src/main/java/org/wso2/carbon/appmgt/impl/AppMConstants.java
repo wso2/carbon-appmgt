@@ -34,7 +34,7 @@ public final class AppMConstants {
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 
-    //governance registry appmgt root location
+    //governance registry appmgt mobile apps root location
     public static final String APPMGT_MOBILE_REGISTRY_LOCATION = "/mobileapps";
     
     public static final String API_CONTEXT_ID = "api.context.id";
