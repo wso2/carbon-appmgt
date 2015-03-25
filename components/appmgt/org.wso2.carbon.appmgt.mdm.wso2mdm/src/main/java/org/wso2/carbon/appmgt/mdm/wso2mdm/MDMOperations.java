@@ -123,11 +123,13 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             log.error(e);
         }
 
-        PostMethod postMethod = new PostMethod(configProperties.get(Constants.PROPERTY_SERVER_URL));
+        String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
+
+        PostMethod postMethod = new PostMethod(requestURL);
         postMethod.setRequestEntity(requestEntity);
 
         try {
-            log.debug("Sending POST request to perform operation on MDM. Request path:  "  + postMethod.getPath());
+            log.debug("Sending POST request to perform operation on MDM. Request path:  "  +requestURL);
             int statusCode = httpClient.executeMethod(postMethod);
             if (statusCode == HttpStatus.SC_OK) {
                 log.debug(action + " operation performed successfully");
@@ -165,7 +167,8 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             HttpClient httpClient = new HttpClient();
 
             String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
-            GetMethod getMethod = new GetMethod(configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI);
+            String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
+            GetMethod getMethod = new GetMethod(requestURL);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
@@ -177,7 +180,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
 
             try {
-                log.debug("Sending GET request to MDM to get devices. Request path:  " + getMethod.getPath());
+                log.debug("Sending GET request to MDM to get devices. Request path:  " + requestURL);
                 int statusCode = httpClient.executeMethod(getMethod);
                 if (statusCode == HttpStatus.SC_OK) {
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
@@ -207,7 +210,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
         postMethod.addRequestHeader("Authorization" , "Basic " +  new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
         postMethod.addRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
         try {
-            log.debug("Sending POST request to API Token endpoint. Request path:  "  + postMethod.getPath());
+            log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
             log.error("Cannot not connect to Token API Endpoint");
