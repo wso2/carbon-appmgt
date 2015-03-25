@@ -136,7 +136,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             }
 
         } catch (IOException e) {
-            log.error("Cannot not connect to WSO2 MDM to perform operation");
+            log.error("Cannot connect to WSO2 MDM to perform operation");
             log.debug("Error: " + e);
         }
 
@@ -187,7 +187,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
                     log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                 }
             } catch (IOException e) {
-               log.error("Cannot not connect to WSO2 MDM to get device information");
+               log.error("Cannot connect to WSO2 MDM to get device information");
                log.debug("Error: " + e);
             }
         }
@@ -213,7 +213,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
-            log.error("Cannot not connect to Token API Endpoint");
+            log.error("Cannot connect to Token API Endpoint");
             log.debug("Error: " + e);
             return null;
         }
@@ -222,7 +222,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
         try {
             response = postMethod.getResponseBodyAsString();
         } catch (IOException e) {
-            log.error("Cannot not get response body for auth");
+            log.error("Cannot get response body for auth");
             log.debug("Error: " + e);
             return null;
         }
