@@ -1018,12 +1018,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Removes a given documentation
-     *
      * @param apiId   APIIdentifier
-     * @param docType the type of the documentation
      * @param docName name of the document
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *          if failed to remove documentation
+     * @param docType the type of the documentation
+     * @throws AppManagementException
      */
     public void removeDocumentation(APIIdentifier apiId, String docName, String docType)
             throws AppManagementException {
@@ -1052,6 +1050,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             for (Association association : associations) {
                 registry.delete(association.getDestinationPath());
             }
+            String docContentPath = AppManagerUtil.getAPIDocContentPath(apiId, docName);
+
+            //Remove Inline-documentation contents
+            if (registry.resourceExists(docContentPath)) {
+                registry.delete(docContentPath);
+            }
+
         } catch (RegistryException e) {
             handleException("Failed to delete documentation", e);
         }
