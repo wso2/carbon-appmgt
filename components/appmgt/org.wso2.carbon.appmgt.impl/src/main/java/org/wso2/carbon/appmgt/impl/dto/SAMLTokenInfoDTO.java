@@ -18,7 +18,9 @@ import org.joda.time.DateTime;/*
 *under the License.
 */
 
-public class SAMLTokenInfoDTO {
+import java.io.Serializable;
+
+public class SAMLTokenInfoDTO implements Serializable{
 
     private String encodedSamlToken;
 
