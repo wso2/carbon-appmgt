@@ -77,6 +77,7 @@
                         </Import-Package>
                         <Export-Package>
                             org.wso2.carbon.appmgt.mdm.wso2mdm.*,
+                            javax.ws.rs.*
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -134,6 +135,11 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.mobile</artifactId>
             <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 

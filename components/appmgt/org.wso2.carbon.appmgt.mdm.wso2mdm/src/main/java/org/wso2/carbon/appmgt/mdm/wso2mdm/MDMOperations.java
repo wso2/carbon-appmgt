@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.mdm.wso2mdm;
 
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -38,6 +39,7 @@ import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -66,15 +68,6 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
         String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
-
-        log.debug("Getting API Token");
-        String apiToken = getAPIToken(tokenApiURL, clientKey, clientSecret);
-        log.debug("API token received: " + apiToken);
-
-        if(apiToken == null){
-            log.error("Cannot retrieve API Token to perform MDM operation");
-            return;
-        }
 
         JSONArray resources = new JSONArray();
         for(String param : params){
@@ -155,6 +148,10 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
     @Override
     public JSONArray getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
 
+        String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
+        String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
+        String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
+
         JSONArray jsonArray = null;
 
         if(isSampleDevicesEnabled){
@@ -179,16 +176,18 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
 
             getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
 
-            try {
-                log.debug("Sending GET request to MDM to get devices. Request path:  " + requestURL);
-                int statusCode = httpClient.executeMethod(getMethod);
-                if (statusCode == HttpStatus.SC_OK) {
+
+            if(executeMethod(tokenApiURL, clientKey, clientSecret, httpClient, getMethod)){
+                try {
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
-                    log.debug("Devices received from MDM: " + jsonArray.toJSONString());
+                    if(jsonArray != null){
+                        log.debug("Devices received from MDM: " + jsonArray.toJSONString());
+                    }
+                } catch (IOException e) {
+                    log.error("Invalid response from the devices API");
                 }
-            } catch (IOException e) {
-               log.error("Cannot connect to WSO2 MDM to get device information");
-               log.debug("Error: " + e);
+            }else{
+                log.error("MDM Devices API failed");
             }
         }
 
@@ -200,7 +199,14 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
     }
 
 
-    private String getAPIToken(String tokenApiURL, String clientKey, String clientSecret){
+    private String getAPIToken(String tokenApiURL, String clientKey, String clientSecret, boolean generateNewKey){
+
+        if(!generateNewKey){
+            if(AuthHandler.authKey != null){
+                return AuthHandler.authKey;
+            }
+        }
+
         HttpClient httpClient = new HttpClient();
         PostMethod postMethod = new PostMethod(tokenApiURL);
 
@@ -229,7 +235,33 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
 
         JSONObject token = (JSONObject) new JSONValue().parse(response);
 
-        return String.valueOf( token.get("access_token"));
+        AuthHandler.authKey = String.valueOf( token.get("access_token"));
+        return AuthHandler.authKey;
+    }
+
+
+    private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient, HttpMethodBase httpMethod){
+                String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                try {
+                    int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+                    int tries = 0;
+                    while(statusCode != Response.Status.OK.getStatusCode()){
+                        httpMethod.setRequestHeader("Authorization", "TOKEN :" + authKey);
+                        statusCode = httpClient.executeMethod(httpMethod);
+                        if(statusCode == Response.Status.UNAUTHORIZED.getStatusCode()){
+                            if(++tries > 3){
+                                log.error("API Call failed for the 3rd time: Unauthorized Access Aborting...");
+                                return false;
+                            }
+                            authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, true);
+                        }
+                    }
+                    return true;
+                } catch (IOException e) {
+                    log.error("No OK response received form the API");
+                    log.debug("Error:" + e);
+                    return false;
+                }
     }
 
 }

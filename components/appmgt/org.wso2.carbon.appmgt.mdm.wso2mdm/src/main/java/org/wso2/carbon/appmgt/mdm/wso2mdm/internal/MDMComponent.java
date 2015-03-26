@@ -19,7 +19,7 @@ public class MDMComponent {
 
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
-        mdmServiceRegistration = bundleContext.registerService(org.wso2.carbon.appmgt.mobile.mdm.MDMOperations.class.getName(), new MDMOperations(), context.getProperties());
+        mdmServiceRegistration = bundleContext.registerService(org.wso2.carbon.appmgt.mobile.mdm.MDMOperations.class.getName(), new MDMOperations(), null);
         log.debug("WSO2 MDM Service Registration activated");
     }
 
