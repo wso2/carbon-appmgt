@@ -36,6 +36,7 @@ public class MobileApp extends App {
     private String iconImage;
 
     private String packageName;
+    private String bundleVersion;
     private String appIdentifier;
     private String location;
 
@@ -118,6 +119,16 @@ public class MobileApp extends App {
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
+    }
+
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
+    public String getBundleVersion() {
+        return bundleVersion;
+    }
+
+    public void setBundleVersion(String bundleVersion) {
+        this.bundleVersion = bundleVersion;
     }
 
     @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)

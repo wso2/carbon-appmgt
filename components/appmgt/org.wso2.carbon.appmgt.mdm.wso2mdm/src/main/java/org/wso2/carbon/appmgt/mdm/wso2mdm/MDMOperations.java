@@ -246,7 +246,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
                     int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
                     int tries = 0;
                     while(statusCode != Response.Status.OK.getStatusCode()){
-                        httpMethod.setRequestHeader("Authorization", "TOKEN :" + authKey);
+                        httpMethod.setRequestHeader("Authorization", "Bearer " + authKey);
                         statusCode = httpClient.executeMethod(httpMethod);
                         if(statusCode == Response.Status.UNAUTHORIZED.getStatusCode()){
                             if(++tries > 3){

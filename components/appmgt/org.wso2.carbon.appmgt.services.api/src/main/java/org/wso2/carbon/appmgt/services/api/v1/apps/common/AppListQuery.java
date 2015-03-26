@@ -23,20 +23,10 @@ import javax.xml.bind.annotation.XmlElement;
 
 public class AppListQuery {
 
-    private String status;
     private int found;
     private int limit;
     private int offset;
     private int total;
-
-    @XmlElement
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     @XmlElement
     public int getFound() {

@@ -33,6 +33,7 @@ public class MobileAppDataLoader {
                 mobileApp.setPackageName(artifact.getAttribute("overview_packagename"));
                 mobileApp.setAppIdentifier(artifact.getAttribute("overview_appid"));
                 mobileApp.setIdentifier(artifact.getAttribute("overview_appid"));
+                mobileApp.setBundleVersion(artifact.getAttribute("overview_bundleversion"));
             }
         } catch (GovernanceException e) {
             e.printStackTrace();
