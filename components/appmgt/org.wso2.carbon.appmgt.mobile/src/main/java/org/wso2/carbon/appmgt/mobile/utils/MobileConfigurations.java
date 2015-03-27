@@ -58,6 +58,9 @@ public class MobileConfigurations {
     private static Boolean sampleDevicesEnabled;
     private static Boolean mdmEnabled;
 
+    private static Boolean isEnterpriseOperationsEnabled;
+    private static String  enterpriseAuthorizedRole;
+
     private MobileConfigurations(){
         XMLStreamReader parser = null;
         try {
@@ -84,7 +87,10 @@ public class MobileConfigurations {
 
     public boolean isMDMEnabled(){
         if(mdmEnabled == null){
-            return mdmEnabled =  Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("Enabled")).getText());
+            return mdmEnabled =  Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("Enabled"))
+                    .getText());
 
         }
         return  mdmEnabled;
@@ -92,15 +98,46 @@ public class MobileConfigurations {
 
     public boolean isSampleDevicesEnabled(){
         if(sampleDevicesEnabled == null){
-            return sampleDevicesEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("EnableSampleDevices")).getText());
+            return sampleDevicesEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("EnableSampleDevices"))
+                    .getText());
 
         }
         return  sampleDevicesEnabled;
     }
 
+    public boolean isEnterpriseOperationsEnabled(){
+        if(isEnterpriseOperationsEnabled == null){
+            return isEnterpriseOperationsEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("EnterpriseOperations"))
+                    .getFirstChildWithName(new QName("Enabled"))
+                    .getText());
+
+        }
+        return  isEnterpriseOperationsEnabled;
+    }
+
+
+    public String getEnterpriseAuthorizedRole(){
+        if(enterpriseAuthorizedRole == null){
+            return enterpriseAuthorizedRole = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("EnterpriseOperations"))
+                    .getFirstChildWithName(new QName("AuthorizedRole"))
+                    .getText();
+
+        }
+        return enterpriseAuthorizedRole;
+    }
+
     public String getAppDownloadHost(){
         if(appDownloadHost == null){
-            return appDownloadHost = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("AppDownloadURLHost")).getText();
+            return appDownloadHost = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("AppDownloadURLHost"))
+                    .getText();
 
         }
         return appDownloadHost;
@@ -108,7 +145,10 @@ public class MobileConfigurations {
 
     public String getActiveMDM(){
         if(activeMDM == null){
-            return activeMDM = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("ActiveMDM")).getText();
+            return activeMDM = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("ActiveMDM"))
+                    .getText();
         }
         return activeMDM;
     }
@@ -116,7 +156,10 @@ public class MobileConfigurations {
 
     public String getIosPlistPath(){
         if(iosPlistPath == null){
-            return iosPlistPath = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("IosPlistPath")).getText();
+            return iosPlistPath = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMSettings"))
+                    .getFirstChildWithName(new QName("IosPlistPath"))
+                    .getText();
         }
         return iosPlistPath;
     }
@@ -124,7 +167,8 @@ public class MobileConfigurations {
     public HashMap<String, String> getActiveMDMProperties(){
         if(activeMDMProperties == null){
 
-            OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMProperties"));
+            OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMProperties"));
 
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
             while (iterator.hasNext()){

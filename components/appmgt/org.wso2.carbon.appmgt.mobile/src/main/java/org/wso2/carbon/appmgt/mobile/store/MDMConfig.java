@@ -32,4 +32,12 @@ public class MDMConfig {
         return MobileConfigurations.getInstance().isSampleDevicesEnabled();
     }
 
+    public boolean isEnterpriseOperationsEnabled(){
+        return MobileConfigurations.getInstance().isEnterpriseOperationsEnabled();
+    }
+
+    public String getEnterpriseAuthorizedRole(){
+        return MobileConfigurations.getInstance().getEnterpriseAuthorizedRole();
+    }
+
 }
