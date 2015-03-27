@@ -71,7 +71,7 @@ public class Operations {
             GenericArtifact artifact = artifactManager.getGenericArtifact(app);
 
             MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
-            App appToInstall = AppDataLoader.load(new App(), artifact, action);
+            App appToInstall = AppDataLoader.load(new App(), artifact, action, tenantId);
             mdmOperations.performAction(user, action, appToInstall, tenantId, type, params, configurations.getActiveMDMProperties());
 
 

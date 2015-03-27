@@ -54,6 +54,7 @@ public class MobileConfigurations {
     private static HashMap<String, String> activeMDMProperties;
     private static String activeMDM;
     private static String appDownloadHost;
+    private static String iosPlistPath;
     private static Boolean sampleDevicesEnabled;
     private static Boolean mdmEnabled;
 
@@ -91,7 +92,7 @@ public class MobileConfigurations {
 
     public boolean isSampleDevicesEnabled(){
         if(sampleDevicesEnabled == null){
-            return Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("EnableSampleDevices")).getText());
+            return sampleDevicesEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("EnableSampleDevices")).getText());
 
         }
         return  sampleDevicesEnabled;
@@ -99,7 +100,7 @@ public class MobileConfigurations {
 
     public String getAppDownloadHost(){
         if(appDownloadHost == null){
-            return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("AppDownloadURLHost")).getText();
+            return appDownloadHost = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("AppDownloadURLHost")).getText();
 
         }
         return appDownloadHost;
@@ -107,9 +108,17 @@ public class MobileConfigurations {
 
     public String getActiveMDM(){
         if(activeMDM == null){
-            return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("ActiveMDM")).getText();
+            return activeMDM = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("ActiveMDM")).getText();
         }
         return activeMDM;
+    }
+
+
+    public String getIosPlistPath(){
+        if(iosPlistPath == null){
+            return iosPlistPath = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMSettings")).getFirstChildWithName(new QName("IosPlistPath")).getText();
+        }
+        return iosPlistPath;
     }
 
     public HashMap<String, String> getActiveMDMProperties(){

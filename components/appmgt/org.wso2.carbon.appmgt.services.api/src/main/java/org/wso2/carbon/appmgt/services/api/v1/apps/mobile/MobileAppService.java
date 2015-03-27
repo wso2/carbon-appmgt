@@ -51,7 +51,7 @@ import java.util.List;
 
 @Produces({ "application/json"})
 @Consumes({ "application/json"})
-public class MobileAppService implements AppService {
+public class MobileAppService {
 
         private static final Log log = LogFactory.getLog(MobileAppService.class);
 

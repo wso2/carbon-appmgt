@@ -7,12 +7,14 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
+import java.io.File;
+
 
 public class AppDataLoader {
 
     private static final Log log = LogFactory.getLog(AppDataLoader.class);
 
-    public static App load(App app, GenericArtifact artifact, String action){
+    public static App load(App app, GenericArtifact artifact, String action, int tenantId){
 
         try {
             app.setId(artifact.getId());
@@ -27,7 +29,12 @@ public class AppDataLoader {
 
 
                 if("install".equals(action)){
-                    app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + artifact.getAttribute("overview_url"));
+                    if("android".equals(artifact.getAttribute("overview_platform"))){
+                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + artifact.getAttribute("overview_url"));
+                    }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+                        String fileName = new File(artifact.getAttribute("overview_url")).getName();
+                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + "/" + MobileConfigurations.getInstance().getIosPlistPath() + "/" + tenantId + "/"  + fileName);
+                    }
                 }
 
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
