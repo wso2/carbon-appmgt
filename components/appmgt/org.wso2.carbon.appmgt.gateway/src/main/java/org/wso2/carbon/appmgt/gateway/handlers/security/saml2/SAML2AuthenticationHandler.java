@@ -43,11 +43,18 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.opensaml.Configuration;
+import org.opensaml.DefaultBootstrap;
+import org.opensaml.common.SAMLVersion;
 import org.opensaml.saml2.core.*;
+import org.opensaml.saml2.core.impl.AuthnContextClassRefBuilder;
+import org.opensaml.saml2.core.impl.AuthnRequestBuilder;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.saml2.core.impl.LogoutRequestBuilder;
 import org.opensaml.saml2.core.impl.NameIDBuilder;
+import org.opensaml.saml2.core.impl.NameIDPolicyBuilder;
+import org.opensaml.saml2.core.impl.RequestedAuthnContextBuilder;
 import org.opensaml.saml2.core.impl.SessionIndexBuilder;
+import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallingException;
@@ -364,7 +371,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private String getSAMLCookie(MessageContext messageContext){
         String cookieString = getCookieString(messageContext);
         if (log.isDebugEnabled()) {
-            log.debug("Requesting cookie : " + AppMConstants.APPM_SAML2_COOKIE + " value : " + cookieString + " getCookieValue() : " + getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE));
+            log.debug("Requesting cookie : " + AppMConstants.APPM_SAML2_COOKIE + " value : " + cookieString +
+                      " getCookieValue() : " + getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE));
         }
         return getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE);
     }
@@ -574,7 +582,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     /**
      * Generate, caches and add the JWT to transport headers.
      * @param messageContext
-     * @param samlAttributes SAML attributes extracted from the SAML response. Even though it can be extracted again using the passed message context, It's better to pass already extracted SAML attributes for performance's sake.
+     * @param samlAttributes SAML attributes extracted from the SAML response. Even though it can be extracted again
+     * using the passed message context, It's better to pass already extracted SAML attributes for performance's sake.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException when there is an error in generating JWT.
      */
     private void generateJWTAndAddToTransportHeaders(MessageContext messageContext, Map<String, Object> samlAttributes) throws
@@ -993,42 +1002,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     String encodedSamlLogOutRequest =  encodeRequestMessage(logoutReq);
 
                     if(encodedSamlLogOutRequest!=null){
-//                        messageContext.setProperty("SAMLRequest", encodedSamlRequest);
-//                        Mediator sequence = messageContext.getSequence("saml2_sequence");
                         getSAML2ConfigCache().remove(appmSaml2CookieValue);
-//                        sequence.mediate(messageContext);
-
-                        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
-                                getAxis2MessageContext();
-
-                        axis2MC.setProperty(NhttpConstants.HTTP_SC, "302");
-                        messageContext.setResponse(true);
-                        messageContext.setProperty("RESPONSE", "true");
-                        messageContext.setTo(null);
-                        axis2MC.removeProperty("NO_ENTITY_BODY");
-                        String method = (String) axis2MC.getProperty(Constants.Configuration.HTTP_METHOD);
-                        if (method.matches("^(?!.*(POST|PUT)).*$")) {
-                            // If the request was not an entity enclosing request, send a XML response back
-                            axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/xml");
-                        }
-                        // Always remove the ContentType - Let the formatter do its thing
-                        axis2MC.removeProperty(Constants.Configuration.CONTENT_TYPE);
-                        Map headermap = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-                        headermap.put("Location", getIDPUrl() + "?SAMLRequest="+encodedSamlLogOutRequest);
-                        if (headermap != null) {
-                            headermap.remove(HttpHeaders.AUTHORIZATION);
-                            // headers.remove(HttpHeaders.ACCEPT);
-                            headermap.remove(HttpHeaders.AUTHORIZATION);
-
-                            if (messageContext.getProperty("error_message_type") != null &&
-                                    messageContext.getProperty("error_message_type").toString().equalsIgnoreCase("application/json")) {
-                                axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/json");
-                            }
-
-                            headermap.remove(HttpHeaders.HOST);
-                        }
-                        Axis2Sender.sendBack(messageContext);
-
+                        sendSAMLRequestToIdP(messageContext, encodedSamlLogOutRequest);
                     } else{
                         throw new SynapseException("Error while sending logout request to IDP.");
                     }
@@ -1042,6 +1017,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private String encodeRequestMessage(RequestAbstractType requestMessage){
 
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            log.error("Error while initializing opensaml library", e);
+            return null;
+        }
         Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(requestMessage);
         Element authDOM = null;
         try {
@@ -1183,43 +1164,87 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     private void redirectToIDPLogin(MessageContext messageContext) {
-        String assertionConsumerUrl = constructAssertionConsumerUrl(messageContext);
-        String idpUrl = getIDPUrl();
+        RequestAbstractType authnRequest = buildAuthnRequestObject(messageContext);
+        String encodedSamlRequest = encodeRequestMessage(authnRequest);
+        sendSAMLRequestToIdP(messageContext,encodedSamlRequest);
+    }
 
-        String request = "<samlp:AuthnRequest xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\"" +
-                "   AssertionConsumerServiceURL=\"" + assertionConsumerUrl + "\"" +
-                "   Destination=\"" + idpUrl + "\"" +
-                "   ForceAuthn=\"false\"" +
-                "   ID=\"0\"" +
-                "   IsPassive=\"false\"" +
-                "   IssueInstant=\"2014-02-10T13:59:25.771Z\"" +
-                "   ProtocolBinding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\"" +
-                "   Version=\"2.0\"" +
-                ">" +
-                "<samlp:Issuer xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + issuer + "</samlp:Issuer>" +
-                "<saml2p:NameIDPolicy xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\"" +
-                "   AllowCreate=\"true\"" +
-                "   Format=\"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent\"" +
-                "   SPNameQualifier=\"Issuer\"" +
-                "/>" +
-                "<saml2p:RequestedAuthnContext xmlns:saml2p=\"urn:oasis:names:tc:SAML:2.0:protocol\"" +
-                "   Comparison=\"exact\"" +
-                ">" +
-                "<saml:AuthnContextClassRef xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" +
-                "   urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport</saml:AuthnContextClassRef>" +
-                "</saml2p:RequestedAuthnContext>" +
-                "</samlp:AuthnRequest>";
+    private AuthnRequest buildAuthnRequestObject(MessageContext messageContext) {
 
-        String encodedSamlRequest = Base64.encodeBytes(request.getBytes(), Base64.DONT_BREAK_LINES);
-        try {
-            encodedSamlRequest = URLEncoder.encode(encodedSamlRequest, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        /* Building Issuer object */
+        IssuerBuilder issuerBuilder = new IssuerBuilder();
+        Issuer issuerOb = issuerBuilder.buildObject("urn:oasis:names:tc:SAML:2.0:assertion", "Issuer", "samlp");
+        issuerOb.setValue(issuer);
+
+        /* NameIDPolicy */
+        NameIDPolicyBuilder nameIdPolicyBuilder = new NameIDPolicyBuilder();
+        NameIDPolicy nameIdPolicy = nameIdPolicyBuilder.buildObject();
+        nameIdPolicy.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
+        nameIdPolicy.setSPNameQualifier("Issuer");
+        nameIdPolicy.setAllowCreate(true);
+
+        /* AuthnContextClass */
+        AuthnContextClassRefBuilder authnContextClassRefBuilder = new AuthnContextClassRefBuilder();
+        AuthnContextClassRef authnContextClassRef = authnContextClassRefBuilder.
+                buildObject("urn:oasis:names:tc:SAML:2.0:assertion", "AuthnContextClassRef", "saml");
+        authnContextClassRef.setAuthnContextClassRef("urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport");
+
+        /* AuthnContex */
+        RequestedAuthnContextBuilder requestedAuthnContextBuilder = new RequestedAuthnContextBuilder();
+        RequestedAuthnContext requestedAuthnContext = requestedAuthnContextBuilder.buildObject();
+        requestedAuthnContext.setComparison(AuthnContextComparisonTypeEnumeration.EXACT);
+        requestedAuthnContext.getAuthnContextClassRefs().add(authnContextClassRef);
+
+        DateTime issueInstant = new DateTime();
+        String authReqRandomId = Integer.toHexString(new Double(Math.random()).intValue());
+
+        /* Creation of AuthRequestObject */
+        AuthnRequestBuilder authRequestBuilder = new AuthnRequestBuilder();
+        AuthnRequest authRequest = authRequestBuilder.buildObject("urn:oasis:names:tc:SAML:2.0:protocol",
+                                                                  "AuthnRequest", "samlp");
+        authRequest.setForceAuthn(false);
+        authRequest.setIsPassive(false);
+        authRequest.setIssueInstant(issueInstant);
+        authRequest.setProtocolBinding("urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST");
+        authRequest.setAssertionConsumerServiceURL(constructAssertionConsumerUrl(messageContext));
+        authRequest.setIssuer(issuerOb);
+        authRequest.setNameIDPolicy(nameIdPolicy);
+        authRequest.setRequestedAuthnContext(requestedAuthnContext);
+        authRequest.setID(authReqRandomId);
+        authRequest.setDestination(getIDPUrl());
+        authRequest.setVersion(SAMLVersion.VERSION_20);
+
+        return authRequest;
+    }
+
+    private void sendSAMLRequestToIdP(MessageContext messageContext, String request) {
+
+        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext). getAxis2MessageContext();
+        axis2MC.setProperty(NhttpConstants.HTTP_SC, "302");
+
+        messageContext.setResponse(true);
+        messageContext.setProperty("RESPONSE", "true");
+        messageContext.setTo(null);
+        axis2MC.removeProperty("NO_ENTITY_BODY");
+        String method = (String) axis2MC.getProperty(Constants.Configuration.HTTP_METHOD);
+
+        if (method.matches("^(?!.*(POST|PUT)).*$")) {
+            /* If the request was not an entity enclosing request, send a XML response back */
+            axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/xml");
         }
-        messageContext.setProperty(AppMConstants.APPM_SAML_REQUEST, encodedSamlRequest);
-        messageContext.setProperty(AppMConstants.APPM_IDP_URL, getIDPUrl());
-        Mediator sequence = messageContext.getSequence(AppMConstants.APPM_SAML_SEQUENCE);
-        sequence.mediate(messageContext);
+
+        /* Always remove the ContentType - Let the formatter do its thing */
+        axis2MC.removeProperty(Constants.Configuration.CONTENT_TYPE);
+        Map headerMap = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        headerMap.put("Location", getIDPUrl() + "?SAMLRequest=" + request);
+
+        if (messageContext.getProperty("error_message_type") != null &&
+            messageContext.getProperty("error_message_type").toString().equalsIgnoreCase("application/json")) {
+            axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/json");
+        }
+
+        headerMap.remove(HttpHeaders.HOST);
+        Axis2Sender.sendBack(messageContext);
     }
 
     private LogoutRequest buildLogoutRequest(String user, String sessionIdx, String saml2Issuer){
