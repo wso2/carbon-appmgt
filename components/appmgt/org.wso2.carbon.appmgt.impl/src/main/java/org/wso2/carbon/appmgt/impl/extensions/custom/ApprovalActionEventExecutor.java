@@ -40,6 +40,7 @@ import org.wso2.carbon.registry.core.jdbc.handlers.RequestContext;
 import org.wso2.carbon.registry.core.session.CurrentSession;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.jaggery.scxml.management.DynamicValueInjector;
 import org.wso2.jaggery.scxml.management.StateExecutor;
 import org.wso2.jaggery.scxml.threading.JaggeryThreadLocalMediator;
@@ -151,8 +152,15 @@ public class ApprovalActionEventExecutor implements Execution
 
             DynamicValueInjector dynamicValueInjector=new DynamicValueInjector();
 
+            boolean isEmailEnabled = Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
+            String provider = requestContext.getResource().getProperty("overview_provider");
+            if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
+                provider = provider.substring(0, provider.indexOf("-AT-"));
+
+            }
+
             //Set the asset author key
-            dynamicValueInjector.setDynamicValue(DynamicValueInjector.ASSET_AUTHOR_KEY,requestContext.getResource().getAuthorUserName());
+            dynamicValueInjector.setDynamicValue(DynamicValueInjector.ASSET_AUTHOR_KEY, provider);
 
             //Execute all permissions for the current state
             //this.stateExecutor.executePermissions(this.userRealm,dynamicValueInjector,path,s2);
