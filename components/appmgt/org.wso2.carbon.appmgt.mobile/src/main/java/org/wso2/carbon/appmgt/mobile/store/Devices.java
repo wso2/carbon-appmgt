@@ -22,12 +22,16 @@ package org.wso2.carbon.appmgt.mobile.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.mobile.utils.User;
+
+import java.util.List;
 
 
 public class Devices {
@@ -40,8 +44,8 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
-
+        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        return convertDevicesToJSON(devices).toJSONString();
     }
 
     public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform){
@@ -51,8 +55,8 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations =  getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
-
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        return convertDevicesToJSON(devices).toJSONString();
     }
 
     public String getDevicesList(String currentUser, int tenantId, String type, String[] params){
@@ -61,8 +65,8 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        return mdmOperations.getDevices(user, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties()).toJSONString();
-
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        return convertDevicesToJSON(devices).toJSONString();
     }
 
     private MDMOperations getMDMOperationsInstance(){
@@ -76,6 +80,23 @@ public class Devices {
         user.setTenantDomain((String) userObj.get("tenantDomain"));
         user.setTenantId(Integer.valueOf(String.valueOf(userObj.get("tenantId"))));
         return user;
+    }
+
+    private JSONArray convertDevicesToJSON(List<Device> devices){
+            JSONArray jsonArrayDevices = new JSONArray();
+            for(Device device : devices){
+                JSONObject deviceObj = new JSONObject();
+                deviceObj.put("id", device.getId());
+                deviceObj.put("name", device.getName());
+                deviceObj.put("platform", device.getPlatform());
+                deviceObj.put("platform_version", device.getPlatformVersion());
+                deviceObj.put("image", device.getImage());
+                deviceObj.put("model", device.getModel());
+                deviceObj.put("type", device.getType());
+                jsonArrayDevices.add(deviceObj);
+            }
+
+        return jsonArrayDevices;
     }
 
 

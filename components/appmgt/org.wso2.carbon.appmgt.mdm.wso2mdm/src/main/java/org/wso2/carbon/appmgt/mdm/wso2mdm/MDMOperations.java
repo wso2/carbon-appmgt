@@ -35,6 +35,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
+import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
@@ -60,7 +61,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
      * @param type type of the resource. Eg: role, user, device
      * @param params ids of the resources which belong to type
      */
-    @Override
+
     public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configProperties) {
 
 
@@ -145,8 +146,8 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
      * @param isSampleDevicesEnabled if MDM is not connected, enable this to display sample devices.
      * @return
      */
-    @Override
-    public JSONArray getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
+
+    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
 
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
@@ -155,10 +156,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
         JSONArray jsonArray = null;
 
         if(isSampleDevicesEnabled){
-
-            jsonArray = (JSONArray) new JSONValue().parse(Sample.SAMPLE_DEVICES_JSON);
-            return jsonArray;
-
+            return Sample.getSampleDevices();
         }else{
 
             HttpClient httpClient = new HttpClient();
@@ -195,7 +193,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
             jsonArray = (JSONArray) new JSONValue().parse("[]");
         }
 
-        return jsonArray;
+        return null;
     }
 
 

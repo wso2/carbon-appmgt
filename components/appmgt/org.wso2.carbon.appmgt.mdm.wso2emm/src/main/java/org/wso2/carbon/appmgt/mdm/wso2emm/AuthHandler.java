@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.mdm.wso2mdm;
+package org.wso2.carbon.appmgt.mdm.wso2emm;
 
 /**
  * Created by dilan on 3/26/15.

@@ -8,7 +8,7 @@ import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.mobile" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.mobile" immediate="false"
  * @scr.reference name="mdm.service"
  * interface="org.wso2.carbon.appmgt.mobile.mdm.MDMOperations" cardinality="1..n"
  * policy="dynamic" bind="setMDMService" unbind="unsetMDMService"
