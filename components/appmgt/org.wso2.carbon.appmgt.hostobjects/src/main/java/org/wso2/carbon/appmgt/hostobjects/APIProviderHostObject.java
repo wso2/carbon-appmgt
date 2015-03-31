@@ -51,11 +51,11 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-
 import javax.net.ssl.SSLHandshakeException;
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
@@ -395,8 +395,8 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         if (apiProvider.isAPIAvailable(apiId)) {
-            handleException("Error occurred while adding the WebApp. A duplicate WebApp already exists for " +
-                    name + "-" + version);
+            handleException("Error occurred while adding the WebApp. A duplicate WebApp already exists with name - " +
+                    name + " and version -" + version);
         }
 
         WebApp api = new WebApp(apiId);
@@ -1015,7 +1015,7 @@ public class APIProviderHostObject extends ScriptableObject {
         //String tier = (String) apiData.get("tier", apiData);
         String contextVal = (String) apiData.get("overview_context", apiData);
         String context = contextVal.startsWith("/") ? contextVal : ("/" + contextVal);
-        String providerDomain=MultitenantUtils.getTenantDomain(String.valueOf(apiData.get("overview_provider", apiData)));
+        String providerDomain=MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(String.valueOf(apiData.get("overview_provider", apiData))));
         if(!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(providerDomain) && !context.contains("/t/"+ providerDomain))
         {
             //Create tenant aware context for WebApp
@@ -2038,7 +2038,7 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
         try {
 
-            if (fileHostObject != null && fileHostObject.getJavaScriptFile().getLength() != 0) {
+            if (fileHostObject != null) {
                 Icon icon = new Icon(fileHostObject.getInputStream(),
                         fileHostObject.getJavaScriptFile().getContentType());
                 String filePath = AppManagerUtil.getDocumentationFilePath(apiId, fileHostObject.getName());
@@ -2118,43 +2118,37 @@ public class APIProviderHostObject extends ScriptableObject {
         return success;
     }
 
-    public static boolean jsFunction_createNewAPIVersion(Context cx, Scriptable thisObj,
-                                                         Object[] args, Function funObj)
+    public static boolean jsFunction_copyWebappDocumentations(Context cx, Scriptable thisObj,
+                                                              Object[] args, Function funObj)
             throws AppManagementException {
 
-        boolean success;
-        if (args == null || !isStringValues(args)) {
+        boolean success = false;
+        if (args == null || args.length == 0) {
             handleException("Invalid number of parameters or their types.");
         }
-        String providerName = (String) args[0];
-        String apiName = (String) args[1];
-        String version = (String) args[2];
-        String newVersion = (String) args[3];
-
-        APIIdentifier apiId = new APIIdentifier(AppManagerUtil.replaceEmailDomain(providerName), apiName, version);
-        WebApp api = new WebApp(apiId);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        boolean isTenantFlowStarted = false;
+        NativeObject appIdentifierNativeObject = (NativeObject) args[0];
+        String providerName = (String) appIdentifierNativeObject.get("provider", appIdentifierNativeObject);
+        String webappName = (String) appIdentifierNativeObject.get("name", appIdentifierNativeObject);
+        String oldVersion = (String) appIdentifierNativeObject.get("oldVersion", appIdentifierNativeObject);
+        String newVersion = (String) appIdentifierNativeObject.get("version", appIdentifierNativeObject);
         try {
+
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, webappName, oldVersion);
+
+            WebApp api = new WebApp(apiIdentifier);
+            APIProvider apiProvider = getAPIProvider(thisObj);
+            boolean isTenantFlowStarted = false;
             String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
-            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                isTenantFlowStarted = true;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            apiProvider.createNewAPIVersion(api, newVersion);
+            apiProvider.copyWebappDocumentations(api, newVersion);
+
             success = true;
-        } catch (DuplicateAPIException e) {
-            handleException("Error occurred while creating a new WebApp version. A duplicate WebApp " +
-                    "already exists by the same name.", e);
-            return false;
-        } catch (Exception e) {
-            handleException("Error occurred while creating a new WebApp version- " + newVersion, e);
-            return false;
-        } finally {
-            if (isTenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
+        } catch (AppManagementException e) {
+            handleException("Error occurred while copying web application : " + webappName +" with new version : "
+                    +newVersion, e);
         }
         return success;
     }
@@ -2315,9 +2309,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getUsageByAPIs(providerName, fromDate, toDate, 10);
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+
+            list = client.getUsageByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             handleException("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2448,9 +2444,10 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-            APIUsageStatisticsClient client =
-                    new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAPIUsageByPage(providerName, fromDate, toDate);
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            list = client.getAPIUsageByPage(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
@@ -2497,14 +2494,14 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
 
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            list = client.getAPIUsageByUser(providerName,fromDate,toDate);
+            list = client.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
-        }
+        } 
 
         Iterator it = null;
         if (list != null) {
@@ -2650,10 +2647,11 @@ public class APIProviderHostObject extends ScriptableObject {
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
         try {
-            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
 
-            list = client.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10);
+            list = client.getLastAccessTimesByAPI(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIVersionLastAccess", e);
         }
@@ -2696,8 +2694,10 @@ public class APIProviderHostObject extends ScriptableObject {
         String toDate = (String) args[2];
 
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10);
+            String userName = ((APIProviderHostObject) thisObj).getUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(userName);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            list = client.getResponseTimesByAPIs(providerName, fromDate, toDate, 10, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIServiceTime", e);
         }
@@ -3454,6 +3454,22 @@ public class APIProviderHostObject extends ScriptableObject {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Retrieves TRACKING_CODE sequences from APM_APP Table
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static String jsFunction_getTrackingID(Context cx, Scriptable thisObj,
+                                                  Object[] args, Function funObj) throws AppManagementException {
+        String uuid = (String) args[0];
+        APIProvider apiProvider =  getAPIProvider(thisObj);
+        return apiProvider.getTrackingID(uuid);
     }
 
 }

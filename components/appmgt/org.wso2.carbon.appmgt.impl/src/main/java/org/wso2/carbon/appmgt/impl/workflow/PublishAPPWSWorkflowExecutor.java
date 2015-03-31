@@ -222,7 +222,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
                 WebApp app = provider.getAPI(apiIdentifier);
                 if (app != null) {
-                    APIStatus newStatus = getApiStatus("created");
+                    APIStatus newStatus = getApiStatus("rejected");
                     provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
                 }
 
@@ -241,7 +241,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                     Resource apiResource = registry.get(apiPath);
                     String artifactId = apiResource.getUUID();
                     GenericArtifact webapp = artifactManager.getGenericArtifact(artifactId);
-                    webapp.invokeAction("Create");
+                    webapp.invokeAction("Reject");
                 }catch (RegistryException e){
                     log.error("Error occured while retrieving registry artifact", e);
                 }

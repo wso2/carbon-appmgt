@@ -747,11 +747,21 @@ public class AppMDAO {
 				if ("/*".equals(urlPattern)) {
 					urlPattern = "";
 				}
-				// key is constructed using the http Method + URL pattern
-				mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + "/" + urlPattern;
+
+                // key is constructed using the http Method + URL pattern
+                if (urlPattern != null && urlPattern.startsWith("/")) {
+                    mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + urlPattern;
+                } else {
+                    mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + "/" + urlPattern;
+                }
+
+                //Need to make key consistence with RESTConstants.REST_FULL_REQUEST_PATH
+                if (!mapKey.endsWith("/")) {
+                    mapKey = mapKey + "/";
+                }
+
 				// store the values (is anonymous allowed) per each URL pattern
-				verbInfoDTO.mapAllowAnonymousUrl.put(mapKey,
-						Boolean.parseBoolean(rs.getString("URL_ALLOW_ANONYMOUS")));
+				verbInfoDTO.mapAllowAnonymousUrl.put(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 			}
 		} catch (SQLException e) {
 			handleException("Error when executing the SQL : " + query + " (Context:" + context +
@@ -2405,7 +2415,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate)
+    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
             throws AppManagementException {
 
 
@@ -2422,13 +2432,17 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             if ("__all_providers__".equals(providerName)) {
                 String sqlQuery =
                         "SELECT" + "  API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
-                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API"
+                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, APM_APPLICATION  APP"
                                 + " WHERE  API.APP_ID=SUB.APP_ID"
+                                + " AND SUB.APPLICATION_ID=APP.APPLICATION_ID"
+                                + " AND APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID"
+                                + " AND SUBR.TENANT_ID = ?"
                                 + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
                                 + " GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION ";
                 ps = connection.prepareStatement(sqlQuery);
-                ps.setString(1, fromDate);
-                ps.setString(2, toDate);
+                ps.setInt(1, tenantId);
+                ps.setString(2, fromDate);
+                ps.setString(3, toDate);
             } else {
                 String sqlQuery =
                         "SELECT" + "  API.APP_NAME,APP_VERSION,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
@@ -2492,7 +2506,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @return List of apps subscribed by users.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate) throws
+    public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate, int tenantId) throws
                                                                                       AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
@@ -2502,8 +2516,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         String sqlQuery =
                 "SELECT " + "SUBR.USER_ID AS USER_ID,  API.APP_NAME AS API,API.APP_VERSION, API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME  "
                         + " FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API "
-                        + " WHERE sub.application_id = APP.application_id AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND "
-                        + "SUB.APP_ID = API.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
+                        + " WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND"
+                        + " SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " 
+                        + " GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
 
 
         Connection connection = null;
@@ -2514,8 +2529,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             connection = APIMgtDBUtil.getConnection();
 
             ps = connection.prepareStatement(sqlQuery);
-            ps.setString(1, fromDate);
-            ps.setString(2, toDate);
+            ps.setInt(1, tenantId);
+            ps.setString(2, fromDate);
+            ps.setString(3, toDate);
             result = ps.executeQuery();
             if (result == null) {
                 return users;
@@ -3995,14 +4011,15 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		return events;
 	}
 
-	public void addWebApp(WebApp api) throws AppManagementException {
+	public void addWebApp(WebApp app) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
 
 		String query =
-				"INSERT INTO APM_APP(APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, LOG_OUT_URL,APP_ALLOW_ANONYMOUS)"
-						+ "VALUES (?,?,?,?,?,?,?,?)";
+				"INSERT INTO APM_APP(APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, SAML2_SSO_ISSUER, " +
+                "LOG_OUT_URL,APP_ALLOW_ANONYMOUS) " +
+                "VALUES (?,?,?,?,?,?,?,?,?)";
 
 		try {
 
@@ -4010,23 +4027,23 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			String[] urlArray = gatewayURLs.split(",");
 			String prodURL = urlArray[0];
-			String logoutURL = api.getLogoutURL();
+			String logoutURL = app.getLogoutURL();
 			if (logoutURL != null && !"".equals(logoutURL.trim())) {
-				logoutURL = prodURL.concat(api.getContext()).concat("/" + api.getId().getVersion()).concat(logoutURL);
+				logoutURL = prodURL.concat(app.getContext()).concat("/" + app.getId().getVersion()).concat(logoutURL);
 			}
 
 			connection = APIMgtDBUtil.getConnection();
 			connection.setAutoCommit(false);
 			prepStmt = connection.prepareStatement(query, new String[]{"APP_ID"});
-			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-			prepStmt.setString(2, api.getId().getApiName());
-			prepStmt.setString(3, api.getId().getVersion());
-			prepStmt.setString(4, api.getContext());
-			prepStmt.setString(5, api.getTrackingCode());
-			prepStmt.setString(6, api.getUUID());
-			prepStmt.setString(7, logoutURL);
-			prepStmt.setBoolean(8, api.getAllowAnonymous());
-
+			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()));
+			prepStmt.setString(2, app.getId().getApiName());
+			prepStmt.setString(3, app.getId().getVersion());
+			prepStmt.setString(4, app.getContext());
+			prepStmt.setString(5, app.getTrackingCode());
+			prepStmt.setString(6, app.getUUID());
+            prepStmt.setString(7, app.getSaml2SsoIssuer());
+			prepStmt.setString(8, logoutURL);
+			prepStmt.setBoolean(9, app.getAllowAnonymous());
 
 			prepStmt.execute();
 
@@ -4035,24 +4052,24 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			if (rs.next()) {
 				webAppId = rs.getInt(1);
 			}
-			addURLTemplates(webAppId, api, connection);
-			recordAPILifeCycleEvent(api.getId(), null, APIStatus.CREATED,
-					AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()),
+			addURLTemplates(webAppId, app, connection);
+			recordAPILifeCycleEvent(app.getId(), null, APIStatus.CREATED,
+					AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()),
 					connection);
-			if (api.getPolicyPartials() != null && !api.getPolicyPartials().isEmpty()) {
-				JSONArray policyPartialIdList = (JSONArray) JSONValue.parse(api.getPolicyPartials());
+			if (app.getPolicyPartials() != null && !app.getPolicyPartials().isEmpty()) {
+				JSONArray policyPartialIdList = (JSONArray) JSONValue.parse(app.getPolicyPartials());
 				saveApplicationPolicyPartialsMappings(connection, webAppId, policyPartialIdList.toArray());
 			}
 
 			//save policy groups app wise
-			if (api.getPolicyGroups() != null && !api.getPolicyGroups().isEmpty()) {
-				JSONArray policyGroupIdList = (JSONArray) JSONValue.parse(api.getPolicyGroups());
+			if (app.getPolicyGroups() != null && !app.getPolicyGroups().isEmpty()) {
+				JSONArray policyGroupIdList = (JSONArray) JSONValue.parse(app.getPolicyGroups());
 				saveApplicationPolicyGroupsMappings(connection, webAppId, policyGroupIdList.toArray());
 			}
 
 			//save java policies app wise
-			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
-				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
+			if (app.getJavaPolicies() != null && !app.getJavaPolicies().isEmpty()) {
+				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(app.getJavaPolicies());
 				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
 			}
 
@@ -4063,10 +4080,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				try {
 					connection.rollback();
 				} catch (SQLException e1) {
-					log.error("Failed to rollback the adding the WebApp: " + api.getId() + " to the database", e);
+					log.error("Failed to rollback the adding the WebApp: " + app.getId() + " to the database", e);
 				}
 			}
-			handleException("Error while adding the WebApp: " + api.getId() + " to the database", e);
+			handleException("Error while adding the WebApp: " + app.getId() + " to the database", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
 		}
@@ -5103,7 +5120,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION)"
 					+ " VALUES (?,?,?,?,?)";
 
-			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord);
+			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord, new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
 			statementToInsertRecord.setString(1, policyPartialName);
 			statementToInsertRecord.setString(2, policyPartial);
 			statementToInsertRecord.setBoolean(3, isSharedPartial);
@@ -6179,23 +6196,24 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 
 
-    public void addOAuthAPIAccessInfo(WebApp webApp) throws AppManagementException {
+    public void addOAuthAPIAccessInfo(WebApp webApp, int tenantId) throws AppManagementException {
         Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
 
-		String query = "INSERT INTO APM_API_CONSUMER_APPS (APP_CONSUMER_KEY, API_TOKEN_ENDPOINT, " +
-                       "API_CONSUMER_KEY, API_CONSUMER_SECRET, APP_NAME) VALUES (?,?,?,?,?)";
+		String query = "INSERT INTO APM_API_CONSUMER_APPS (SAML2_SSO_ISSUER, APP_CONSUMER_KEY, API_TOKEN_ENDPOINT, " +
+                       "API_CONSUMER_KEY, API_CONSUMER_SECRET, APP_NAME) VALUES (?,?,?,?,?,?)";
 
         //This need to be changed
         String getAppConsumerKeyQuery = "SELECT" + " CONSUMER_KEY " + " FROM"
                                         + " IDN_OAUTH_CONSUMER_APPS " + " WHERE"
-                                        + " APP_NAME = ?";
+                                        + " APP_NAME = ? AND TENANT_ID = ?";
 
 		try {
 			connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(getAppConsumerKeyQuery);
 			prepStmt.setString(1, webApp.getId().getApiName());
+			prepStmt.setInt(2, tenantId);
 
 			rs = prepStmt.executeQuery();
             String appConsumerKey = null;
@@ -6205,11 +6223,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             prepStmt.close();
 
             prepStmt = connection.prepareStatement(query);
-			prepStmt.setString(1, appConsumerKey);
-			prepStmt.setString(2, webApp.getTokenEndpoint());
-			prepStmt.setString(3, webApp.getApiConsumerKey());
-			prepStmt.setString(4, webApp.getApiConsumerSecret());
-			prepStmt.setString(5, webApp.getApiName());
+            prepStmt.setString(1, webApp.getSaml2SsoIssuer());
+			prepStmt.setString(2, appConsumerKey);
+			prepStmt.setString(3, webApp.getTokenEndpoint());
+			prepStmt.setString(4, webApp.getApiConsumerKey());
+			prepStmt.setString(5, webApp.getApiConsumerSecret());
+			prepStmt.setString(6, webApp.getApiName());
 
 			prepStmt.execute();
 
@@ -6221,25 +6240,25 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		}
     }
 
-    public void updateOAuthAPIAccessInfo(WebApp webApp) throws AppManagementException {
+    public void updateOAuthAPIAccessInfo(WebApp webApp,  int tenantId) throws AppManagementException {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
 
-
         String getAppConsumerKeyQuery = "SELECT" + " CONSUMER_KEY " + " FROM"
                 + " IDN_OAUTH_CONSUMER_APPS " + " WHERE"
-                + " APP_NAME = ?";
+                + " APP_NAME = ? AND TENANT_ID = ?";
 
 
         // Remove entry from APM_SUBSCRIPTION table
-        String query = "DELETE FROM APM_API_CONSUMER_APPS  WHERE APP_CONSUMER_KEY = ?";
+        String query = "DELETE FROM APM_API_CONSUMER_APPS WHERE APP_CONSUMER_KEY = ?";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             prepStmt = connection.prepareStatement(getAppConsumerKeyQuery);
             prepStmt.setString(1, webApp.getId().getApiName());
-
+            prepStmt.setInt(2, tenantId);
+            
             rs = prepStmt.executeQuery();
             String appConsumerKey = null;
             while (rs.next()) {
@@ -6297,6 +6316,37 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		}
 
         return registeredAPIs;
+    }
+
+    public static String getSAML2SSOIssuerByAppConsumerKey(String webAppConsumerKey)
+            throws AppManagementException {
+
+        Connection con = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+
+        String query = "SELECT SAML2_SSO_ISSUER " +
+                       "FROM APM_API_CONSUMER_APPS " +
+                       "WHERE APP_CONSUMER_KEY=?";
+
+        String saml2SsoIssuer = null;
+
+        try {
+            con = APIMgtDBUtil.getConnection();
+            prepStmt = con.prepareStatement(query);
+            prepStmt.setString(1, webAppConsumerKey);
+            rs = prepStmt.executeQuery();
+
+            while(rs.next()) {
+                saml2SsoIssuer = rs.getString("SAML2_SSO_ISSUER");
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting SAML2_SSO_ISSUER for webAppConsumerKey = " + webAppConsumerKey, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, con, rs);
+        }
+
+        return saml2SsoIssuer;
     }
 
     public static boolean webAppKeyPairExist(String consumerKey, String consumerSecret) throws
@@ -7283,4 +7333,31 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+	/**
+	 * Retrieves TRACKING_CODE sequences from APM_APP Table
+	 *@param uuid : Application UUID
+	 *@return TRACKING_CODE
+	 *@throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public  String getTrackingID(String uuid) throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT TRACKING_CODE  FROM APM_APP WHERE UUID= ?";
+		String value =  null;
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, uuid);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				value=rs.getString("TRACKING_CODE");
+			}
+		} catch (SQLException e) {
+			handleException("Sorry wrong UUID " +uuid, e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return value;
+	}
 }

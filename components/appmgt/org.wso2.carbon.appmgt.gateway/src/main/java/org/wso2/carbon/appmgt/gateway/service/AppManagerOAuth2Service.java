@@ -14,6 +14,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.gateway.dto.Token;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.identity.oauth.common.OAuth2ErrorCodes;
 import org.wso2.carbon.identity.oauth2.dto.*;
@@ -28,6 +29,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -56,10 +58,13 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
         try {
             String webAppConsumerKey = tokenReqDTO.getClientId();
             String webAppConsumerSecret = tokenReqDTO.getClientSecret();
+            String saml2SsoIssuer = null;
 
             if (!AppMDAO.webAppKeyPairExist(webAppConsumerKey, webAppConsumerSecret)) {
                 throw new Exception("Invalid Credentials");
             }
+
+            saml2SsoIssuer = AppMDAO.getSAML2SSOIssuerByAppConsumerKey(webAppConsumerKey);
 
             //scope received as samlssoTokenId,apiAlias
             String[] scopes = tokenReqDTO.getScope();
@@ -76,9 +81,10 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
 
             Map<String, String> registeredAPIs = getRegisteredAPIs(webAppConsumerKey);
             if (isAuthorizedAPI(registeredAPIs, apiAlias)) {
-                String encodedSAMLResponse = (String) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
+                Map<String, SAMLTokenInfoDTO> encodedSAMLResponseMap = (HashMap<String, SAMLTokenInfoDTO>) Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
                         .getCache(AppMConstants.SAML2_CONFIG_CACHE).get(samlssoTokenId);
-                String decodedSAMLResponse = getSamlAssetionString(new String(Base64.decode(encodedSAMLResponse)));
+                String samlResponseOfApp = encodedSAMLResponseMap.get(saml2SsoIssuer).getEncodedSamlToken();
+                String decodedSAMLResponse = getSamlAssetionString(new String(Base64.decode(samlResponseOfApp)));
                 String encodedSamlAssertion = URLEncoder.encode(Base64.encodeBytes(getSamlAssetionString(decodedSAMLResponse).getBytes()), "UTF-8");
               
                 //consumerKey,consumerSecret,tokenEndpoint
@@ -105,26 +111,6 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
         }
     }
 
-//    public void getAccessToken1(String consumerKey, String consumerSecret, String encodedSamlToken, String tokenEndPoint) {
-//        try {
-//            String applicationToken = consumerKey + ":" + consumerSecret;
-//            BASE64Encoder base64Encoder = new BASE64Encoder();
-//            applicationToken = "Basic " + base64Encoder.encode(applicationToken.getBytes()).trim();
-//
-//            String payload = "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=" + encodedSamlToken;
-//            // String payload = "grant_type=password&username=" + "admin" + "&password=admin";
-//            doPost(tokenEndPoint, applicationToken, payload,
-//                                               "application/x-www-form-urlencoded");
-//
-//
-//
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            //return null;
-//        }
-//    }
-
     public Token getAccessToken(String consumerKey, String consumerSecret, String encodedSamlAssertion, String tokenEndPoint) {
         try {
             String applicationToken = consumerKey + ":" + consumerSecret;
@@ -133,17 +119,6 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
 
             String payload = "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=" + encodedSamlAssertion;
             // String payload = "grant_type=password&username=" + "admin" + "&password=admin";
-            doPost(tokenEndPoint, applicationToken, payload,
-                                               "application/x-www-form-urlencoded");
-
-
-
-//            HttpResponse httpResponse = doPost(tokenEndPoint, applicationToken, payload,
-//                                               "application/x-www-form-urlencoded");
-//            if (httpResponse.getStatusLine().getStatusCode() != 200) {
-//                return null;
-//            }
-//            String response = getResponsePayload(httpResponse);
 
             String response = doPost(tokenEndPoint, applicationToken, payload, "application/x-www-form-urlencoded");
 
@@ -259,36 +234,6 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
         }
         return response;
     }
-
-
-//    public HttpResponse doPost(String url, String token, final String payload, String contentType)
-//            throws IOException {
-//        DefaultHttpClient httpClient = new DefaultHttpClient();
-//        HttpEntityEnclosingRequest entityEncReq = null;
-//        try {
-//            HttpUriRequest request = new HttpPost(url);
-//            addSecurityHeaders(request, token);
-//            request.getParams().setParameter("http.protocol.content-charset", "UTF-8");
-//            entityEncReq = (HttpEntityEnclosingRequest) request;
-//            //StringEntity stringentity = new StringEntity(payload,"UTF-8");
-//
-//            EntityTemplate ent = new EntityTemplate(new ContentProducer() {
-//                public void writeTo(OutputStream outputStream) throws IOException {
-//                    outputStream.write(payload.getBytes("UTF-8"));
-//                    outputStream.flush();
-//                }
-//            });
-//            ent.setContentType(contentType);
-//            entityEncReq.setEntity(ent);
-//
-//            return httpClient.execute(request);
-//        } finally {
-//            if (entityEncReq != null) {
-//                InputStream is = entityEncReq.getEntity().getContent();
-//                is.close();
-//            }
-//        }
-//    }
 
     private void addSecurityHeaders(HttpRequest request, String token) {
         if (token != null) {

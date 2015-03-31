@@ -7,6 +7,7 @@
 .project
 .metadata
 bin/
+target/
 tmp/
 *.tmp
 *.bak
@@ -225,5 +226,14 @@ pip-log.txt
 *.iml
 
 
+<<<<<<< HEAD
 #Ignore Targets
 target/
+=======
+#############
+## Appmgt
+#############
+features/appmgt/org.wso2.carbon.appmgt.services.api.feature/src/main/resources/api.war
+features/appmgt/org.wso2.carbon.appmgt.core.feature/src/main/resources/appmoauth2.war
+features/appmgt/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.h2.db
+>>>>>>> 736dcefd64494a87df5f09071d4ec02ade20eabf
