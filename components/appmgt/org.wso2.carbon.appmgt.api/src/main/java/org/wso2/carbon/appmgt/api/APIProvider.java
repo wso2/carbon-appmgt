@@ -474,7 +474,9 @@ public interface APIProvider extends APIManager {
      * @return subscription count of apps
      * @throws AppManagementException
      */
+
     public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
+
             throws AppManagementException;
 
 
