@@ -56,12 +56,12 @@ import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-
 import javax.net.ssl.SSLHandshakeException;
-
+import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -2521,6 +2521,64 @@ public class APIProviderHostObject extends ScriptableObject {
                 row.put("userId", row, usage.getUserID());
                 row.put("time", row, usage.getRequestDate());
 
+
+                myn.put(i, myn, row);
+                i++;
+            }
+        }
+        return myn;
+    }
+
+    //cache hit
+
+    public static NativeArray jsFunction_getcashHitMiss(Context cx, Scriptable thisObj,
+                                                           Object[] args, Function funObj)
+            throws AppManagementException {
+        List<APPMCacheCountDTO> list = null;
+        NativeArray myn = new NativeArray(0);
+        if(!HostObjectUtils.checkDataPublishingEnabled()){
+            return myn;
+        }
+        if (args.length == 0) {
+            handleException("Invalid number of parameters.");
+        }
+        if (!HostObjectUtils.checkDataPublishingEnabled()) {
+            return myn;
+        }
+        String providerName = (String) args[0];
+        String fromDate = (String) args[1];
+        String toDate = (String) args[2];
+
+        try {
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
+            //APIUsageStatisticsClient client = new APIUsageStatisticsClient("admin");
+            list = client.getCacheHitCount(providerName,fromDate,toDate);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+        } catch (SQLException e) {
+            log.error("Error while executing the SQL", e);
+        } catch (XMLStreamException e) {
+            log.error("Error while reading the xml-stream", e);
+        }
+
+        Iterator it = null;
+        if (list != null) {
+            it = list.iterator();
+        }
+        int i = 0;
+        if (it != null) {
+            while (it.hasNext()) {
+                NativeObject row = new NativeObject();
+                Object usageObject = it.next();
+                APPMCacheCountDTO usage = (APPMCacheCountDTO) usageObject;
+                String userName[]=usage.getApiName().split("--");
+                String name[]=userName[1].split(":");
+                row.put("apiName", row,  name[0]);
+                row.put("version", row, usage.getVersion());
+                row.put("fullRequestPath", row, usage.getFullRequestPath());
+                row.put("cachetHit",row,usage.getCacheHit());
+                row.put("totalRequestCount", row, usage.getTotalRequestCount());
+                row.put("time", row, usage.getRequestDate());
 
                 myn.put(i, myn, row);
                 i++;
