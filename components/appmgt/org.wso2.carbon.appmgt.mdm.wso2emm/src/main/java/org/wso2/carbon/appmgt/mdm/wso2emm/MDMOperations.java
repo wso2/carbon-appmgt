@@ -170,6 +170,7 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
                 if(statusCode == Response.Status.OK.getStatusCode()){
                    String response = getMethod.getResponseBodyAsString();
                    JSONArray devicesArray = (JSONArray) new JSONValue().parse(response);
+                   log.debug("Devices Received" + devicesArray.toJSONString());
                    Iterator<JSONObject> iterator = devicesArray.iterator();
                    while (iterator.hasNext()){
                        JSONObject deviceObj = iterator.next();
@@ -178,9 +179,9 @@ public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOpera
                        JSONObject properties = (JSONObject) new JSONValue().parse(deviceObj.get("properties").toString());
                        device.setName(properties.get("device").toString());
                        device.setModel(properties.get("model").toString());
-                       if("1".equals(deviceObj.get("id").toString())){
+                       if("1".equals(deviceObj.get("platform_id").toString())){
                            device.setPlatform("android");
-                       }else if("2".equals(deviceObj.get("id").toString())){
+                       }else if("2".equals(deviceObj.get("platform_id").toString())){
                            device.setPlatform("ios");
                        }
                        device.setImage("");
