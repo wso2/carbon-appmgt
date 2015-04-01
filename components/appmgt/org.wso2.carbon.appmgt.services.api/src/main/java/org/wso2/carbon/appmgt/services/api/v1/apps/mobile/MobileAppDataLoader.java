@@ -32,7 +32,7 @@ public class MobileAppDataLoader {
             }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                 mobileApp.setPackageName(artifact.getAttribute("overview_packagename"));
                 mobileApp.setAppIdentifier(artifact.getAttribute("overview_appid"));
-                mobileApp.setIdentifier(artifact.getAttribute("overview_appid"));
+                mobileApp.setIdentifier(artifact.getAttribute("overview_packagename"));
                 mobileApp.setBundleVersion(artifact.getAttribute("overview_bundleversion"));
             }
         } catch (GovernanceException e) {
