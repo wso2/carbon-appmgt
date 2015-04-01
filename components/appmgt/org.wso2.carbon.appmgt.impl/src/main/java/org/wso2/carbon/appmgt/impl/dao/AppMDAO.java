@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.appmgt.impl.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -49,7 +51,10 @@ import java.util.regex.Pattern;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import javax.xml.stream.XMLStreamException;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,8 +65,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.*;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.EntitlementService;
@@ -5440,11 +5443,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 EntitlementPolicyPartial policyPartial = new EntitlementPolicyPartial();
                 policyPartial.setPolicyPartialId(rs.getInt("ENTITLEMENT_POLICY_PARTIAL_ID"));
                 policyPartial.setPolicyPartialName(rs.getString("NAME"));
-                policyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
+
+                // If the content cannot be parsed skip that policy partial.
+                String ruleCondition = exctractConditionFromPolicyPartialContent(rs.getString("CONTENT"));
+                if(ruleCondition == null){
+                	log.error(String.format("Can't read content for the policy partial '%s'.", policyPartial.getPolicyPartialName()));
+                	continue;
+                }else{
+                	policyPartial.setPolicyPartialContent(ruleCondition);
+                }
+                
                 policyPartial.setShared(rs.getBoolean("SHARED"));
                 policyPartial.setAuthor(rs.getString("AUTHOR"));
 				policyPartial.setDescription(rs.getString("DESCRIPTION"));
                 entitlementPolicyPartialList.add(policyPartial);
+                
 
             }
 
@@ -5547,6 +5560,20 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         }
     }
 
+    private String exctractConditionFromPolicyPartialContent(String policyPartialContent){
+    	
+    	try {
+			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
+			OMElement conditionNode = (OMElement) builder.getDocumentElement().getChildrenWithLocalName("Condition").next();
+			
+			return conditionNode.toString();
+			
+		} catch (XMLStreamException e) {
+			log.error("Can't extract the 'Condition' node from the 'Rule' node.", e);
+			return null;
+		}
+    }
+    
 	/**
 	 * Remove existing updated entitlement policies from IDP
 	 *
