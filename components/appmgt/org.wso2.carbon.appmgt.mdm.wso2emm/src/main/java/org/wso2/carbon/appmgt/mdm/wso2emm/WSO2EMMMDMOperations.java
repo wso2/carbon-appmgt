@@ -32,6 +32,7 @@ import org.apache.commons.ssl.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
@@ -49,9 +50,9 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOperations {
+public class WSO2EMMMDMOperations implements MDMOperations {
 
-    private static final Log log = LogFactory.getLog(MDMOperations.class);
+    private static final Log log = LogFactory.getLog(WSO2EMMMDMOperations.class);
 
     /**
      * @param action action of the operation. Eg. install, uninstall, update

@@ -35,9 +35,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
-import org.wso2.carbon.appmgt.mobile.mdm.Device;
-import org.wso2.carbon.appmgt.mobile.mdm.Property;
+import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
+import org.wso2.carbon.appmgt.mobile.mdm.Property;
+import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import javax.ws.rs.core.Response;
@@ -50,9 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class MDMOperations implements org.wso2.carbon.appmgt.mobile.mdm.MDMOperations {
+public class WSO2MDMOperations implements MDMOperations {
 
-    private static final Log log = LogFactory.getLog(MDMOperations.class);
+    private static final Log log = LogFactory.getLog(WSO2MDMOperations.class);
 
     /**
      * @param action action of the operation. Eg. install, uninstall, update

@@ -1,5 +1,7 @@
-package org.wso2.carbon.appmgt.mobile.mdm;
+package org.wso2.carbon.appmgt.mobile.interfaces;
 
+import org.wso2.carbon.appmgt.mobile.mdm.App;
+import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import java.util.HashMap;

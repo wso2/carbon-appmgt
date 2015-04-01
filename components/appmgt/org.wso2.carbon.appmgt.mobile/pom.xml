@@ -73,11 +73,37 @@
                         <Bundle-Version>1.0.0</Bundle-Version>
                         <Private-Package>org.wso2.carbon.appmgt.mobile.internal</Private-Package>
                         <Import-Package>
-                            *
+                            org.xml.sax.*,
+                            org.wso2.carbon.utils.*,
+                            org.wso2.carbon.user.api.*,
+                            org.wso2.carbon.registry.core.session.*,
+                            org.wso2.carbon.registry.core.exceptions.*,
+                            org.wso2.carbon.registry.core.*,
+                            org.wso2.carbon.registry.api.*,
+                            org.wso2.carbon.governance.api.util.*,
+                            org.wso2.carbon.governance.api.generic.dataobjects.*,
+                            org.wso2.carbon.governance.api.generic.*,
+                            org.wso2.carbon.governance.api.exception.*,
+                            org.wso2.carbon.context.*,
+                            org.w3c.dom.*,
+                            org.osgi.service.component.*,
+                            org.json.simple.*,
+                            org.apache.commons.logging.*,
+                            org.apache.commons.io.*,
+                            org.apache.axis2.context.*,
+                            org.apache.axiom.om.impl.builder.*,
+                            org.apache.axiom.om.*,
+                            javax.xml.stream.*,
+                            javax.xml.parsers.*,
+                            javax.xml.namespace.*,
+                            com.dd.plist.*
                         </Import-Package>
                         <Export-Package>
-                            org.wso2.mobile.utils.*,
-                            org.wso2.carbon.appmgt.mobile.*,
+                            org.wso2.mobile.utils.utilities.*,
+                            org.wso2.carbon.appmgt.mobile.mdm.*,
+                            org.wso2.carbon.appmgt.mobile.store.*,
+                            org.wso2.carbon.appmgt.mobile.utils.*,
+                            org.wso2.carbon.appmgt.mobile.interfaces.*
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -125,11 +151,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple.wso2</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.wso2v1</version>
         </dependency>
     </dependencies>
 

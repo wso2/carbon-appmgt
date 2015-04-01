@@ -12,7 +12,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.appmgt.mdm.wso2mdm</artifactId>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - App Manager WSO2 Mobile Component</name>
+    <name>WSO2 Carbon - App Manager WSO2 MDM Component</name>
     <url>http://maven.apache.org</url>
     <properties>
         <maven-scr-plugin.version>1.7.2</maven-scr-plugin.version>
@@ -73,7 +73,7 @@
                         <Bundle-Version>1.0.0</Bundle-Version>
                         <Private-Package>org.wso2.carbon.appmgt.mdm.wso2mdm.internal</Private-Package>
                         <Import-Package>
-                            *
+                           *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             org.wso2.carbon.appmgt.mdm.wso2mdm.*,
@@ -125,11 +125,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple.wso2</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.wso2v1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>

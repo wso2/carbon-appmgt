@@ -1,5 +1,7 @@
 package org.wso2.carbon.appmgt.mobile.mdm;
 
+import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
+
 /**
  * Created by dilan on 3/20/15.
  */

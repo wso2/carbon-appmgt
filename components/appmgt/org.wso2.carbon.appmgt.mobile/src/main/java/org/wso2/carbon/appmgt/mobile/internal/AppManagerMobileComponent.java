@@ -3,14 +3,14 @@ package org.wso2.carbon.appmgt.mobile.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mobile.mdm.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.mobile" immediate="false"
+ * @scr.component name="org.wso2.carbon.appmgt.mobile" immediate="true"
  * @scr.reference name="mdm.service"
- * interface="org.wso2.carbon.appmgt.mobile.mdm.MDMOperations" cardinality="1..n"
+ * interface="org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations" cardinality="1..n"
  * policy="dynamic" bind="setMDMService" unbind="unsetMDMService"
  */
 public class AppManagerMobileComponent {
