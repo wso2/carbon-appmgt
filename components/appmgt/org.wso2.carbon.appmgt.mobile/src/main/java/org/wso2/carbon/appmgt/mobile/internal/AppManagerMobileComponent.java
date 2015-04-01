@@ -16,14 +16,14 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 public class AppManagerMobileComponent {
 
     private static final Log log = LogFactory.getLog(AppManagerMobileComponent.class);
-    private static final String MDM_OPERATIONS_CLASS = "MDMOperations";
+    private static final String MDM_OPERATIONS_CLASS = "MDMOperationsImpl";
 
     protected void activate(ComponentContext context) {
-        log.debug("App Manger mobile component activated");
+        log.info("App Manger Mobile Component activated");
     }
 
     protected void deactivate(ComponentContext context) {
-        log.debug("App Manger mobile components deactivated");
+        log.info("App Manger Mobile Component deactivated");
     }
 
     protected void setMDMService(MDMOperations operations) {
@@ -35,7 +35,7 @@ public class AppManagerMobileComponent {
     }
 
     protected void unsetMDMService(MDMOperations operations) {
-        log.debug("App Manger MDM service is unbound");
+        log.info("App Manger MDM is unbound");
     }
 
 }
