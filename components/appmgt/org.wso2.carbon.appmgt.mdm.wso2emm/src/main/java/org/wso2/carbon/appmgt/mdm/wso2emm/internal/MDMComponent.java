@@ -5,22 +5,22 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mdm.wso2emm.WSO2EMMMDMOperations;
+import org.wso2.carbon.appmgt.mdm.wso2emm.MDMOperationsImpl;
 import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 
 /**
  * @scr.component name="org.wso2.carbon.appmgt.mdm.wso2emm.WSO2EMMMDMComponent" immediate="true"
  */
 
-public class MDMComponentEMM {
+public class MDMComponent {
 
-    private static final Log log = LogFactory.getLog(MDMComponentEMM.class);
+    private static final Log log = LogFactory.getLog(MDMComponent.class);
 
     private ServiceRegistration mdmServiceRegistration;
 
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
-        mdmServiceRegistration = bundleContext.registerService(MDMOperations.class.getName(), new WSO2EMMMDMOperations(), null);
+        mdmServiceRegistration = bundleContext.registerService(MDMOperations.class.getName(), new MDMOperationsImpl(), null);
         log.debug("WSO2 EMM Service Registration activated");
     }
 

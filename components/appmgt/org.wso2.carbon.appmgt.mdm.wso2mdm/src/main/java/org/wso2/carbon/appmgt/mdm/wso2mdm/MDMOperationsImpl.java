@@ -51,9 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class WSO2MDMOperations implements MDMOperations {
+public class MDMOperationsImpl implements MDMOperations {
 
-    private static final Log log = LogFactory.getLog(WSO2MDMOperations.class);
+    private static final Log log = LogFactory.getLog(MDMOperationsImpl.class);
 
     /**
      * @param action action of the operation. Eg. install, uninstall, update

@@ -50,9 +50,9 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class WSO2EMMMDMOperations implements MDMOperations {
+public class MDMOperationsImpl implements MDMOperations {
 
-    private static final Log log = LogFactory.getLog(WSO2EMMMDMOperations.class);
+    private static final Log log = LogFactory.getLog(MDMOperationsImpl.class);
 
     /**
      * @param action action of the operation. Eg. install, uninstall, update
