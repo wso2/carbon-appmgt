@@ -26,6 +26,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.PublishApplicationWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -65,10 +66,12 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             WebApp api = provider.getAPI(apiId);
             APIStatus newStatus = null;
             if (api != null) {
-                newStatus = getApiStatus(((PublishApplicationWorkflowDTO) workflowDTO).getNewState());
+                newStatus = getApiStatus(publishAPPDTO.getNewState());
                 provider.changeAPIStatus(api, newStatus, fullName, true);
             }
-            super.execute(workflowDTO);
+            if(publishAPPDTO.getLcState().equalsIgnoreCase(AppMConstants.ApplicationStatus.APPLICATION_CREATED)) {
+                super.execute(workflowDTO);
+            }
         }catch (AppManagementException e){
             log.error("Could not update APP lifecycle state to IN-REVIEW", e);
             throw new WorkflowException("Could not update APP lifecycle state to IN-REVIEW", e);
@@ -77,6 +80,7 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
 
     @Override
     public void complete(WorkflowDTO workflowDTO) throws WorkflowException{
+        workflowDTO.setUpdatedTime(System.currentTimeMillis());
         super.complete(workflowDTO);
         try {
             String reference = workflowDTO.getWorkflowReference();
