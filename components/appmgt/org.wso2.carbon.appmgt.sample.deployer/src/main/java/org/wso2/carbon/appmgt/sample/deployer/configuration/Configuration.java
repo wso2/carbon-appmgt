@@ -1,3 +1,12 @@
+package org.wso2.carbon.appmgt.sample.deployer.configuration;
+
+import org.apache.axis2.context.ConfigurationContext;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.sample.deployer.internal.ServiceReferenceHolder;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.ConfigurationContextService;
+
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -15,16 +24,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
-package org.wso2.carbon.appmgt.sample.deployer.configuration;
-
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.sample.deployer.internal.ServiceReferenceHolder;
-import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ConfigurationContextService;
-
 public class Configuration {
     private static AppManagerConfiguration config;
     private static ConfigurationContextService configContextService = null;

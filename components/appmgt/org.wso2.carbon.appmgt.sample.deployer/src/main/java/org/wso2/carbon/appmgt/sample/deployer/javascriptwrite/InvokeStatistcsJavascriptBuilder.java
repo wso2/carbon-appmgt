@@ -1,3 +1,10 @@
+package org.wso2.carbon.appmgt.sample.deployer.javascriptwrite;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -15,14 +22,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
-package org.wso2.carbon.appmgt.sample.deployer.javascriptwrite;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class InvokeStatistcsJavascriptBuilder {
     private String jsFunction;
 

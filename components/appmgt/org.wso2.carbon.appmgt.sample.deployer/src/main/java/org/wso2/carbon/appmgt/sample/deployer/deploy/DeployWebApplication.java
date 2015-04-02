@@ -1,3 +1,12 @@
+package org.wso2.carbon.appmgt.sample.deployer.deploy;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.io.File;
+import java.io.IOException;
+
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -15,15 +24,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
-package org.wso2.carbon.appmgt.sample.deployer.deploy;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.io.File;
-import java.io.IOException;
 
 public class DeployWebApplication {
 

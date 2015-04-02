@@ -1,3 +1,16 @@
+package org.wso2.carbon.appmgt.sample.deployer.configuration;
+
+import org.apache.log4j.Logger;
+import org.wso2.carbon.appmgt.sample.deployer.appm.ClaimManagementServiceClient;
+import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
+import org.wso2.carbon.appmgt.sample.deployer.appm.RemoteUserStoreManagerServiceClient;
+import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
+import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.rmi.RemoteException;
+
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -15,20 +28,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
-package org.wso2.carbon.appmgt.sample.deployer.configuration;
-
-import org.apache.log4j.Logger;
-import org.wso2.carbon.appmgt.sample.deployer.appm.ClaimManagementServiceClient;
-import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
-import org.wso2.carbon.appmgt.sample.deployer.appm.RemoteUserStoreManagerServiceClient;
-import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
-import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.rmi.RemoteException;
-
 public class ManageClaim {
 
     final static Logger log = Logger.getLogger(ManageClaim.class.getName());
