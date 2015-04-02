@@ -1,14 +1,3 @@
-package org.wso2.carbon.appmgt.sample.deployer.appm;
-
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
-
-import java.rmi.RemoteException;
-
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -26,6 +15,17 @@ import java.rmi.RemoteException;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.appmgt.sample.deployer.appm;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
+import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
+import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
+
+import java.rmi.RemoteException;
 
 public class RemoteUserStoreManagerServiceClient {
     private RemoteUserStoreManagerServiceStub userStoreManagerStub;

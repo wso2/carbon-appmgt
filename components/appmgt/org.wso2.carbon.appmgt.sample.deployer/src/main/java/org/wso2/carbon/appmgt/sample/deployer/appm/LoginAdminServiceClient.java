@@ -1,13 +1,3 @@
-package org.wso2.carbon.appmgt.sample.deployer.appm;
-
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.transport.http.HTTPConstants;
-import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
-import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
-
-import java.rmi.RemoteException;
-
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -25,6 +15,16 @@ import java.rmi.RemoteException;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.appmgt.sample.deployer.appm;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
+import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+
+import java.rmi.RemoteException;
 
 public class LoginAdminServiceClient {
 

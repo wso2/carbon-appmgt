@@ -1,21 +1,3 @@
-package org.wso2.carbon.appmgt.sample.deployer.configuration;
-
-
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
-import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
-import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.user.mgt.stub.UserAdminStub;
-import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
-import org.wso2.carbon.user.mgt.stub.types.carbon.ClaimValue;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.io.File;
-import java.rmi.RemoteException;
-
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -33,6 +15,24 @@ import java.rmi.RemoteException;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.appmgt.sample.deployer.configuration;
+
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
+import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.user.mgt.stub.UserAdminStub;
+import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
+import org.wso2.carbon.user.mgt.stub.types.carbon.ClaimValue;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.io.File;
+import java.rmi.RemoteException;
+
 public class ManageUser {
 
     private static final String appmHome = CarbonUtils.getCarbonHome();

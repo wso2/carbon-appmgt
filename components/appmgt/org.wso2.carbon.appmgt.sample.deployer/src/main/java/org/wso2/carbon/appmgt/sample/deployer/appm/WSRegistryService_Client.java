@@ -1,19 +1,3 @@
-package org.wso2.carbon.appmgt.sample.deployer.appm;
-
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
-import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.registry.core.Registry;
-import org.wso2.carbon.registry.core.Resource;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.ws.client.registry.WSRegistryServiceClient;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.io.File;
-
 /*
 *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
@@ -31,6 +15,22 @@ import java.io.File;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.appmgt.sample.deployer.appm;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
+import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.ws.client.registry.WSRegistryServiceClient;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.io.File;
 
 public class WSRegistryService_Client {
     final static Logger log = Logger.getLogger(WSRegistryService_Client.class.getName());
