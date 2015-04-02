@@ -21,12 +21,14 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.PublishApplicationWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -56,9 +58,9 @@ Description:The executor parses the parameter map defined in the
 Filename: GenericExecutor.java
 Created Date: 26/8/2013
  */
-public class ApprovalActionEventExecutor implements Execution
+public class ApproveEventExecutor implements Execution
 {
-    private static final Log log=LogFactory.getLog(ApprovalActionEventExecutor.class);
+    private static final Log log=LogFactory.getLog(ApproveEventExecutor.class);
 
     private UserRealm userRealm;
     private int tenantId;
@@ -120,7 +122,7 @@ public class ApprovalActionEventExecutor implements Execution
 
                 try{
                     WorkflowDTO workflowDTO = dao.retrieveLatestWorkflowByReference(searchString);
-
+                    workflowDTO.setStatus(WorkflowStatus.APPROVED);
                     try {
                         if(workflowDTO!=null){
                             appPublishWFExecutor.complete(workflowDTO);

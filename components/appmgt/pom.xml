@@ -40,6 +40,7 @@
         <module>org.wso2.carbon.appmgt.mdm.wso2mdm</module>
         <module>org.wso2.carbon.appmgt.mdm.wso2emm</module>
 	<module>org.wso2.carbon.appmgt.services.api</module>
+	<module>org.wso2.carbon.appmgt.sample.deployer</module>
   </modules>
     <build>
         <plugins>

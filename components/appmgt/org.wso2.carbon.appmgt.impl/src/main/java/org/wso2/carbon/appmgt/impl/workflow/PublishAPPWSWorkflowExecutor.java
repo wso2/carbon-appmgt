@@ -103,57 +103,60 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
         }
 
         try {
-            ServiceClient client = new ServiceClient(ServiceReferenceHolder.getInstance()
-                    .getContextService().getClientConfigContext(), null);
-            Options options = new Options();
-            options.setAction("http://workflow.publishapplication.apimgt.carbon.wso2.org/initiate");
-            options.setTo(new EndpointReference(serviceEndpoint));
-            if(contentType != null){
-                options.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
-            }
+            if(publishAPPDTO.getLcState().equalsIgnoreCase(AppMConstants.ApplicationStatus.APPLICATION_CREATED)) {
 
-            HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
-
-            //Consider this as a secured service if username and password are not null. Unsecured if not.
-            if(username != null && password != null){
-                auth.setUsername(username);
-                auth.setPassword(password);
-                auth.setPreemptiveAuthentication(true);
-                List<String> authSchemes = new ArrayList<String>();
-                authSchemes.add(HttpTransportProperties.Authenticator.BASIC);
-                auth.setAuthSchemes(authSchemes);
-
-                if(contentType == null){
-                    options.setProperty(Constants.Configuration.MESSAGE_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
+                ServiceClient client = new ServiceClient(ServiceReferenceHolder.getInstance()
+                                                                 .getContextService().getClientConfigContext(), null);
+                Options options = new Options();
+                options.setAction("http://workflow.publishapplication.apimgt.carbon.wso2.org/initiate");
+                options.setTo(new EndpointReference(serviceEndpoint));
+                if (contentType != null) {
+                    options.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
                 }
-                options.setProperty(HTTPConstants.AUTHENTICATE, auth);
-                options.setManageSession(true);
+
+                HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
+
+                //Consider this as a secured service if username and password are not null. Unsecured if not.
+                if (username != null && password != null) {
+                    auth.setUsername(username);
+                    auth.setPassword(password);
+                    auth.setPreemptiveAuthentication(true);
+                    List<String> authSchemes = new ArrayList<String>();
+                    authSchemes.add(HttpTransportProperties.Authenticator.BASIC);
+                    auth.setAuthSchemes(authSchemes);
+
+                    if (contentType == null) {
+                        options.setProperty(Constants.Configuration.MESSAGE_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
+                    }
+                    options.setProperty(HTTPConstants.AUTHENTICATE, auth);
+                    options.setManageSession(true);
+                }
+
+                client.setOptions(options);
+
+                String payload = "<wor:PublishAppApprovalWorkFlowProcessRequest xmlns:wor=\"http://workflow.publishapplication.apimgt.carbon.wso2.org\">\n" +
+                                 "         <wor:appName>$1</wor:appName>\n" +
+                                 "         <wor:appVersion>$2</wor:appVersion>\n" +
+                                 "         <wor:appProvider>$3</wor:appProvider>\n" +
+                                 "         <wor:lcState>$4</wor:lcState>\n" +
+                                 "         <wor:workflowExternalRef>$5</wor:workflowExternalRef>\n" +
+                                 "         <wor:callBackURL>$6</wor:callBackURL>\n" +
+                                 "      </wor:PublishAppApprovalWorkFlowProcessRequest>";
+
+                PublishApplicationWorkflowDTO publishApplicationWorkflowDTO = (PublishApplicationWorkflowDTO) workflowDTO;
+                String callBackURL = publishApplicationWorkflowDTO.getCallbackUrl();
+
+                payload = payload.replace("$1", publishApplicationWorkflowDTO.getAppName());
+                payload = payload.replace("$2", publishApplicationWorkflowDTO.getAppVersion());
+                payload = payload.replace("$3", publishApplicationWorkflowDTO.getAppProvider());
+                payload = payload.replace("$4", publishApplicationWorkflowDTO.getLcState());
+                payload = payload.replace("$5", publishApplicationWorkflowDTO.getExternalWorkflowReference());
+                payload = payload.replace("$6", callBackURL != null ? callBackURL : "?");
+
+                client.fireAndForget(AXIOMUtil.stringToOM(payload));
+
+                super.execute(workflowDTO);
             }
-
-            client.setOptions(options);
-
-            String payload = "<wor:PublishAppApprovalWorkFlowProcessRequest xmlns:wor=\"http://workflow.publishapplication.apimgt.carbon.wso2.org\">\n" +
-                    "         <wor:appName>$1</wor:appName>\n" +
-                    "         <wor:appVersion>$2</wor:appVersion>\n" +
-                    "         <wor:appProvider>$3</wor:appProvider>\n" +
-                    "         <wor:lcState>$4</wor:lcState>\n" +
-                    "         <wor:workflowExternalRef>$5</wor:workflowExternalRef>\n" +
-                    "         <wor:callBackURL>$6</wor:callBackURL>\n" +
-                    "      </wor:PublishAppApprovalWorkFlowProcessRequest>";
-
-            PublishApplicationWorkflowDTO publishApplicationWorkflowDTO = (PublishApplicationWorkflowDTO)workflowDTO;
-            String callBackURL = publishApplicationWorkflowDTO.getCallbackUrl();
-
-            payload = payload.replace("$1", publishApplicationWorkflowDTO.getAppName()) ;
-            payload = payload.replace("$2", publishApplicationWorkflowDTO.getAppVersion());
-            payload = payload.replace("$3", publishApplicationWorkflowDTO.getAppProvider());
-            payload = payload.replace("$4", publishApplicationWorkflowDTO.getLcState());
-            payload = payload.replace("$5", publishApplicationWorkflowDTO.getExternalWorkflowReference());
-            payload = payload.replace("$6", callBackURL != null ? callBackURL : "?");
-
-            client.fireAndForget(AXIOMUtil.stringToOM(payload));
-
-            super.execute(workflowDTO);
         } catch (AxisFault axisFault) {
             log.error("Error sending out message", axisFault);
             throw new WorkflowException("Error sending out message", axisFault);
