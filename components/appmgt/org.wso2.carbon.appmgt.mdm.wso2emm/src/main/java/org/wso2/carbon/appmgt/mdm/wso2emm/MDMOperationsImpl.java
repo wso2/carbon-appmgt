@@ -185,8 +185,8 @@ public class MDMOperationsImpl implements MDMOperations {
                        }else if("2".equals(deviceObj.get("platform_id").toString())){
                            device.setPlatform("ios");
                        }
-                       device.setImage("");
-                       device.setType("");
+                       device.setImage(String.format(configProperties.get("ImageURL"), properties.get("model").toString()));
+                       device.setType("mobileDevice");
                        device.setPlatformVersion("0");
                        devices.add(device);
 
