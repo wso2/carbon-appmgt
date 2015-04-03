@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.appmgt.impl.entitlement;
 
+import java.io.File;
+import java.io.StringWriter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.Template;
@@ -23,10 +26,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
-
-import java.io.File;
-import java.io.StringWriter;
-import java.util.UUID;
 
 /**
  * This class is responsible for building XACML policies using templates and partials.
@@ -36,7 +35,6 @@ public class XACMLTemplateBuilder {
     private static final Log log = LogFactory.getLog(XACMLTemplateBuilder.class);
     private static final String TEMPLATE_NAME = "xacml_policy_template";
     private static final String MOCK_TEMPLATE_NAME = "mock_xacml_policy_template";
-    private static final String POLICY_ID_PREFIX = "eam_";
 
     private VelocityEngine velocityEngine;
 
@@ -55,12 +53,6 @@ public class XACMLTemplateBuilder {
      * @return Entitlement policy
      */
     public EntitlementPolicy generatePolicy(XACMLPolicyTemplateContext xacmlPolicyTemplateContext){
-
-        // Generate policy ID for new policies.
-        if(xacmlPolicyTemplateContext.getPolicyId() == null){
-            String generatedPolicyId = generatePolicyId();
-            xacmlPolicyTemplateContext.setPolicyId(generatedPolicyId);
-        }
 
         EntitlementPolicy entitlementPolicy = null;
         try {
@@ -81,10 +73,6 @@ public class XACMLTemplateBuilder {
             log.error("Error while generating XACML policy for XacmlPolicyTemplateContext", e);
             return null;
         }
-    }
-
-    private String generatePolicyId() {
-        return POLICY_ID_PREFIX + UUID.randomUUID().toString();
     }
 
     /**
@@ -125,10 +113,9 @@ public class XACMLTemplateBuilder {
 
         VelocityContext velocityContext = new VelocityContext();
 
-        velocityContext.put("resource", policyTemplateContext.getResource());
-        velocityContext.put("action", policyTemplateContext.getAction());
-        velocityContext.put("effect", policyTemplateContext.getEffect());
-        velocityContext.put("condition", policyTemplateContext.getPolicyPartialContent());
+        velocityContext.put("appUuid", policyTemplateContext.getAppUuid());
+        velocityContext.put("ruleId", policyTemplateContext.getRuleId());
+        velocityContext.put("ruleContent", policyTemplateContext.getRuleContent());
         velocityContext.put("policyId", policyTemplateContext.getPolicyId());
 
         return velocityContext;
