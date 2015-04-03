@@ -82,9 +82,9 @@ public class Utils {
         try {
             RelayUtils.buildMessage(((Axis2MessageContext) messageContext).getAxis2MessageContext());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while building response.", e);
         } catch (XMLStreamException e) {
-            e.printStackTrace();
+            log.error("Error while building response.", e);
         }
         Axis2Sender.sendBack(messageContext);
     }
