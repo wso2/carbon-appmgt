@@ -135,6 +135,8 @@ public interface APIProvider extends APIManager {
     public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate)
             throws AppManagementException;
 
+    public List<WebApp> getAppsWithEndpoint() throws AppManagementException;
+
     public void addTier(Tier tier) throws AppManagementException;
 
     public void updateTier(Tier tier) throws AppManagementException;

@@ -528,8 +528,9 @@ public final class AppMConstants {
        public static final String APPLICATION_CREATED = "CREATED";
        public static final String APPLICATION_APPROVED = "APPROVED"; 
        public static final String APPLICATION_REJECTED = "REJECTED"; 
-       public static final String APPLICATION_ONHOLD = "ON_HOLD"; 
-          
+       public static final String APPLICATION_ONHOLD = "ON_HOLD";
+        public static final String APPLICATION_RETIRED = "RETIRED";
+
     }
 
     // constants related to Statistics
