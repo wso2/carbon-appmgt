@@ -18,13 +18,12 @@
 
 package org.wso2.carbon.appmgt.api;
 
+import java.util.List;
+
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
-
-import java.rmi.RemoteException;
-import java.util.List;
 
 /**
  * This is the service contract for entitlement service implementations.

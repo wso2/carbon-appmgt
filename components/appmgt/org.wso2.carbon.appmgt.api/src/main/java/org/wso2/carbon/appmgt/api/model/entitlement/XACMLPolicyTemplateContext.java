@@ -21,144 +21,70 @@ package org.wso2.carbon.appmgt.api.model.entitlement;
  */
 public class XACMLPolicyTemplateContext {
 
-    private int urlTemplateId;
-    private int policyPartialId;
-    private String resource;
-    private String action;
-    private String effect;
-    private String policyPartialContent;
-    private String policyId;
-    private int policyGroupId; //Policy Group Id
+    private static final String POLICY_ID_PREFIX = "wso2appm";
+	
+	private int appId;
+	private String appUuid;
+	private int policyGroupId;
+	private int ruleId;
+	private String ruleContent;
+	private String policyId;
 
-    /**
-     * Get urlTemplate id
-     * @return urlTemplate id
-     */
-    public int getUrlTemplateId() {
-        return urlTemplateId;
-    }
+	public int getAppId() {
+		return appId;
+	}
 
-    /**
-     * Set urlTemplate id
-     * @param urlTemplateId urlTemplate id
-     */
-    public void setUrlTemplateId(int urlTemplateId) {
-        this.urlTemplateId = urlTemplateId;
-    }
+	public void setAppId(int appId) {
+		this.appId = appId;
+	}
 
-    /**
-     * Get entitlement policy partial id
-     * @return entitlement policy partial id
-     */
-    public int getPolicyPartialId() {
-        return policyPartialId;
-    }
+	public String getAppUuid() {
+		return appUuid;
+	}
 
-    /**
-     * Set entitlement policy partial id
-     * @param policyPartialId entitlement policy partial id
-     */
-    public void setPolicyPartialId(int policyPartialId) {
-        this.policyPartialId = policyPartialId;
-    }
+	public void setAppUuid(String appUuid) {
+		this.appUuid = appUuid;
+	}
 
-    /**
-     * Get Resource value of policy template
-     * @return resource value
-     */
-    public String getResource() {
-        return resource;
-    }
+	public int getPolicyGroupId() {
+		return policyGroupId;
+	}
 
-    /**
-     * Set 'Resource' value of policy template
-     * @param resource resource value
-     */
-    public void setResource(String resource) {
-        this.resource = resource;
-    }
+	public void setPolicyGroupId(int policyGroupId) {
+		this.policyGroupId = policyGroupId;
+	}
 
-    /**
-     * Get 'Action' value of policy template
-     * @return action value
-     */
-    public String getAction() {
-        return action;
-    }
+	public int getRuleId() {
+		return ruleId;
+	}
 
-    /**
-     * Set 'Action' value of policy template
-     * @param action action value
-     */
-    public void setAction(String action) {
-        this.action = action;
-    }
+	public void setRuleId(int ruleId) {
+		this.ruleId = ruleId;
+	}
 
-    /**
-     * Get 'Effect' value of policy template
-     * @return effect value
-     */
-    public String getEffect() {
-        return effect;
-    }
+	public String getRuleContent() {
+		return ruleContent;
+	}
 
-    /**
-     * Set 'Effect' value of policy template
-     * @param effect effect value
-     */
-    public void setEffect(String effect) {
-        this.effect = effect;
-    }
+	public void setRuleContent(String ruleContent) {
+		this.ruleContent = ruleContent;
+	}
 
-    /**
-     * Get policy partial condition value of the policy template
-     * @return partial condition value
-     */
-    public String getPolicyPartialContent() {
-        return policyPartialContent;
-    }
+	public String getPolicyId() {
+		
+		if(policyId == null){
+			policyId = generatePolicyId();
+		}
 
-    /**
-     * Set policy partial condition value of the policy template
-     * @param policyPartialContent partial condition value
-     */
-    public void setPolicyPartialContent(String policyPartialContent) {
-        this.policyPartialContent = policyPartialContent;
-    }
+		return policyId;
+	}
 
-    /**
-     * Get entitlement policy id
-     *
-     * @return entitlement policy id
-     */
-    public String getPolicyId() {
-        return policyId;
-    }
-
-    /**
-     * Set entitlement policy id
-     *
-     * @param policyId entitlement policy id
-     */
-    public void setPolicyId(String policyId) {
-        this.policyId = policyId;
-    }
-
-    /**
-     * Set Policy Group Id
-     *
-     * @param policyGroupId : Policy Group Id
-     */
-    public void setPolicyGroupId(int policyGroupId) {
-        this.policyGroupId = policyGroupId;
-    }
-
-    /**
-     * Get Policy Group Id
-     *
-     * @return Policy Group Id
-     */
-    public int getPolicyGroupId() {
-        return policyGroupId;
-    }
+	public void setPolicyId(String policyId) {
+		this.policyId = policyId;
+	}
+	
+	public String generatePolicyId(){
+		return String.format("%s:%s:%d", POLICY_ID_PREFIX, appUuid, ruleId);
+	}
+	
 }
