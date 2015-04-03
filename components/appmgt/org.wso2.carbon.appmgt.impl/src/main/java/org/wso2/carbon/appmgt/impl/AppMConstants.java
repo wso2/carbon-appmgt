@@ -443,6 +443,8 @@ public final class AppMConstants {
     public static final int API_CONTEXT_CACHE_EXPIRY_TIME_IN_DAYS = 3650 ;
     public static final String SAML2_CONFIG_CACHE = "saml2ConfigCache";
     public static final String SAML2_CONFIG_CACHE_MANAGER = "SAML2_CONFIG_CACHE_MANAGER";
+    public static final String USAGE_CONFIG_CACHE = "usageConfigCache";
+    public static final String USAGE_CONFIG_CACHE_MANAGER = "USAGE_CONFIG_CACHE_MANAGER";
     public static final String USER_ROLES_CACHE_MANAGER = "USER_ROLES_CACHE_MANAGER";
     public static final String USER_ROLES_CONFIG_CACHE = "userRolesConfigCache";
     public static final String USER_ROLES_CACHE_KEY = "userRolesCacheKey";
