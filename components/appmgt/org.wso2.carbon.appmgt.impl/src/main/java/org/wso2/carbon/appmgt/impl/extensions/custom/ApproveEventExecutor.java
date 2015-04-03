@@ -122,10 +122,24 @@ public class ApproveEventExecutor implements Execution
 
                 try{
                     WorkflowDTO workflowDTO = dao.retrieveLatestWorkflowByReference(searchString);
-                    workflowDTO.setStatus(WorkflowStatus.APPROVED);
                     try {
                         if(workflowDTO!=null){
-                            appPublishWFExecutor.complete(workflowDTO);
+                            PublishApplicationWorkflowDTO publishhAppDTO = new PublishApplicationWorkflowDTO();
+
+                            publishhAppDTO.setStatus(WorkflowStatus.APPROVED);
+                            publishhAppDTO.setExternalWorkflowReference(workflowDTO.getExternalWorkflowReference());
+                            publishhAppDTO.setWorkflowReference(workflowDTO.getWorkflowReference());
+                            publishhAppDTO.setWorkflowType(workflowDTO.getWorkflowType());
+                            publishhAppDTO.setCallbackUrl(workflowDTO.getCallbackUrl());
+                            publishhAppDTO.setAppName(appName);
+                            publishhAppDTO.setLcState(s);
+                            publishhAppDTO.setNewState(s2);
+                            publishhAppDTO.setAppVersion(appVersion);
+                            publishhAppDTO.setAppProvider(appProvider);
+                            publishhAppDTO.setTenantId(tenantId);
+                            publishhAppDTO.setTenantDomain(tenantDomain);
+
+                            appPublishWFExecutor.complete(publishhAppDTO);
                         }else{
                             throw new WorkflowException("Workflow Reference not found");
                         }

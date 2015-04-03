@@ -183,8 +183,11 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 APIIdentifier apiIdentifier = new APIIdentifier(arr[2], arr[0], arr[1]);
                 APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
                 WebApp app = provider.getAPI(apiIdentifier);
+
+                PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
+
                 if (app != null) {
-                    APIStatus newStatus = getApiStatus("published");
+                    APIStatus newStatus = getApiStatus(publishAPPDTO.getNewState());
                     provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
                 }
 
@@ -224,6 +227,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                 APIIdentifier apiIdentifier = new APIIdentifier(arr[2], arr[0], arr[1]);
                 APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
                 WebApp app = provider.getAPI(apiIdentifier);
+
                 if (app != null) {
                     APIStatus newStatus = getApiStatus("rejected");
                     provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
