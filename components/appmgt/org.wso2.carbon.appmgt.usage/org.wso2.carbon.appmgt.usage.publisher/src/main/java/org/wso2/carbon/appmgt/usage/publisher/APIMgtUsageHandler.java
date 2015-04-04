@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.net.URL;
 
+import javax.cache.Cache;
 import javax.cache.Caching;
 
 import org.apache.axis2.Constants;
@@ -43,6 +44,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.usage.publisher.dto.RequestPublisherDTO;
@@ -105,6 +107,30 @@ public class APIMgtUsageHandler extends AbstractHandler {
             if (context.contains("/t/")) {
             	tenantDomain = contextAndVersion[2];
             }
+
+            WebApp webApp = getWebApp(context, version);
+            String api = webApp.getId().getApiName();
+            String api_version = api + ":" + version;
+
+            String hashcode = webApp.getTrackingCode();
+
+            APIIdentifier webAppIdentifier = webApp.getId();
+            String cacheKey = webAppIdentifier.getProviderName() + ":" + webAppIdentifier.getApiName() +
+                              ":" + webAppIdentifier.getVersion() + ":" + context;
+
+            boolean usagePublishingEnabledForApp;
+
+            if (getUsageConfigCache().get(cacheKey) != null) {
+                usagePublishingEnabledForApp = (Boolean) getUsageConfigCache().get(cacheKey);
+            } else {
+                usagePublishingEnabledForApp = AppMDAO.isUsagePublishingEnabledForApp(webApp);
+                getUsageConfigCache().put(cacheKey, usagePublishingEnabledForApp);
+            }
+
+            /* Do not publish stats if API level usage tracking is disabled */
+            if (!usagePublishingEnabledForApp) {
+                return true;
+            }
             
             String cookieString = headers.get(HTTPConstants.COOKIE_STRING);
             String saml2CookieValue = getCookieValue(cookieString, AppMConstants.APPM_SAML2_COOKIE);
@@ -130,18 +156,12 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String username = "";
             String applicationName = "DefaultApplication";
             String applicationId = "1";
-
             username = loggedUser;
+            String hostName = DataPublisherUtil.getHostAddress();
+            if (username == null) {
+                username = APIMgtUsagePublisherConstants.ANONYMOUS_USER;
+            }
 
-            String hostName = DataPublisherUtil.getHostAddress();       
-
-            
-            WebApp webApp = getWebApp(context,version);
-            String api = webApp.getId().getApiName();
-            String api_version =   api + ":" + version;
-
-            String hashcode = webApp.getTrackingCode();
-            
             boolean trackingCodeExist = false;
             String tracking_code = headers.get("trackingCode");    
             if (tracking_code != null) {
@@ -155,8 +175,6 @@ public class APIMgtUsageHandler extends AbstractHandler {
             
             int tenantId = UsageComponent.getRealmService().getTenantManager().
                     getTenantId(tenantDomain);
-
-
 
             List<Long[]> timeList = UsageComponent.getResponseTime(page);
 
@@ -272,7 +290,7 @@ public class APIMgtUsageHandler extends AbstractHandler {
 
     public String[] getContextWithVersion(String refer) {
         String webapp[]= new String[3];
-        if (refer.length() > 0) {
+        if (refer != null && refer.length() > 0) {
            
         	if (refer.contains("/t/")) {
         		// e.g URL pattern : "http://localhost:8281/t/lakmali.com/united-airline/1.0.0/";
@@ -336,6 +354,9 @@ public class APIMgtUsageHandler extends AbstractHandler {
           return webApp;
     }
 
-
+    private Cache getUsageConfigCache() {
+            return Caching.getCacheManager(AppMConstants.USAGE_CONFIG_CACHE_MANAGER)
+                    .getCache(AppMConstants.USAGE_CONFIG_CACHE);
+    }
 
    }

@@ -7359,6 +7359,60 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+    public static boolean isUsagePublishingEnabledForApp(WebApp webApp) throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        boolean isUsagePublishingEnabledForApp = false;
+
+        String getStatisticsPolicyIdQuery = "SELECT JAVA_POLICY_ID " +
+                                  "FROM APM_APP_JAVA_POLICY " +
+                                  "WHERE FULL_QUALIFI_NAME = 'org.wso2.carbon.appmgt.usage.publisher.APPMgtUsageHandler' ";
+
+        String getPoliciesOfAppQuery = "SELECT JAVA_POLICY_ID " +
+                                    "FROM APM_APP_JAVA_POLICY_MAPPING " +
+                                    "WHERE APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? " +
+                                    "AND APP_NAME = ? AND APP_VERSION = ? AND CONTEXT = ?)";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            prepStmt = conn.prepareStatement(getStatisticsPolicyIdQuery);
+            rs = prepStmt.executeQuery();
+
+            int statisticsPolicyId = 0;
+
+            while (rs.next()) {
+                statisticsPolicyId = rs.getInt("JAVA_POLICY_ID");
+            }
+            prepStmt.close();
+
+            APIIdentifier webAppIdentifier = webApp.getId();
+            prepStmt = conn.prepareStatement(getPoliciesOfAppQuery);
+            prepStmt.setString(1, webAppIdentifier.getProviderName());
+            prepStmt.setString(2, webAppIdentifier.getApiName());
+            prepStmt.setString(3, webAppIdentifier.getVersion());
+            prepStmt.setString(4, webApp.getContext());
+
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                if (statisticsPolicyId == rs.getInt("JAVA_POLICY_ID")) {
+                    isUsagePublishingEnabledForApp = true;
+                    break;
+                }
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while retrieving java policies for web app :" +
+                            " Provider : " + webApp.getId().getProviderName() +
+                            " App : " + webApp.getId().getApiName() +
+                            " Version : " +  webApp.getId().getVersion() , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, conn, rs);
+        }
+
+        return isUsagePublishingEnabledForApp;
+    }
+
 	/**
 	 * Retrieves TRACKING_CODE sequences from APM_APP Table
 	 *@param uuid : Application UUID

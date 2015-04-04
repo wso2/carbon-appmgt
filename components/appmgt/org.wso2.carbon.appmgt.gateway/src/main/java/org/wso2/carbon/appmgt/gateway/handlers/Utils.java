@@ -30,13 +30,10 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 import java.util.*;
 
 public class Utils {
@@ -77,14 +74,6 @@ public class Utils {
             }
 
             headers.remove(HttpHeaders.HOST);
-        }
-
-        try {
-            RelayUtils.buildMessage(((Axis2MessageContext) messageContext).getAxis2MessageContext());
-        } catch (IOException e) {
-            log.error("Error while building response.", e);
-        } catch (XMLStreamException e) {
-            log.error("Error while building response.", e);
         }
         Axis2Sender.sendBack(messageContext);
     }
