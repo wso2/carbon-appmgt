@@ -18,18 +18,26 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.entitlement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.axis2.Constants;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 
 /**
@@ -37,6 +45,8 @@ import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
  */
 public class EntitlementHandler extends AbstractHandler implements ManagedLifecycle {
 
+	private static final Log log = LogFactory.getLog(EntitlementHandler.class);
+	
     private AppManagerConfiguration configuration;
 
     public void init(SynapseEnvironment synapseEnvironment) {
@@ -52,7 +62,14 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
             // this Entitlement handler.
             return true;
         } else {
-            return isResourcePermitted(messageContext);
+            try {
+				boolean isPermitted = isResourcePermitted(messageContext);
+				return isPermitted;
+			} catch (AppManagementException e) {
+				String message = "Error while evaluating entitlement policies";
+				log.error(message, e);
+				throw new SynapseException(message, e);
+			}
         }
     }
     public boolean handleResponse(MessageContext messageContext) {
@@ -67,39 +84,62 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      * Extracts info related to the resource requests and checked whether the request is permitted.
      * @param messageContext Synapse message context.
      * @return true if the resource is permitted, false otherwise.
+     * @throws AppManagementException 
      */
-    private boolean isResourcePermitted(MessageContext messageContext){
-        EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext);
+    private boolean isResourcePermitted(MessageContext messageContext) throws AppManagementException{
+    	
+    	
+    	// Get the XACML policy ids to be evaluated.
+    	List<String> applicablePolicyIds = getApplicableEntitlementPolicyIds(messageContext);
+    	
+    	// If there are not associated entitlement policies the resource is permitted anyway.
+    	if(applicablePolicyIds.isEmpty()){
+    		return true;
+    	}
+    	
+    	// We only support only one XACML policy as of now.
+    	String applicablePolicyId = applicablePolicyIds.get(0);
+    	
+        EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
         return isResourcePermitted(entitlementDecisionRequest);
     }
 
-    private boolean isResourcePermitted(EntitlementDecisionRequest request){
+    private List<String> getApplicableEntitlementPolicyIds(MessageContext messageContext) throws AppManagementException {
+		
+    	Integer appId = (Integer) messageContext.getProperty("appm.appId");
+    	
+    	if(appId == null){
+    		return new ArrayList<String>();
+    	}
+    	
+    	String matchedUrlPattern = (String) messageContext.getProperty("appm.matchedUrlPattern");
+    	String httpVerb = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(Constants.Configuration.HTTP_METHOD);
+    	
+    	AppMDAO appMDAO = new AppMDAO();
+    	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedUrlPattern, httpVerb);
+	}
+
+	private boolean isResourcePermitted(EntitlementDecisionRequest request){
         EntitlementService entitlementService = getEntitlementService();
         return entitlementService.isPermitted(request);
     }
 
-    /**
+	 /**
      * Creates and returns the entitlement decision request, from the message context.
      * @param messageContext Synapse message context.
      * @return entitlement decision request.
      */
-    private EntitlementDecisionRequest getEntitlementDecisionRequest(MessageContext messageContext) {
+    private EntitlementDecisionRequest getEntitlementDecisionRequest(MessageContext messageContext, String applicablePolicyId) {
 
         String subject = (String) messageContext.getProperty(APISecurityConstants.SUBJECT);
 
-        String resourcePath = getAxis2MessageContext(messageContext).getProperty(Constants.Configuration.TRANSPORT_IN_URL).toString();
-
-        // Consider HTTP verb as the action of the request.
-        String httpVerb = (String) getAxis2MessageContext(messageContext).getProperty(Constants.Configuration.HTTP_METHOD);
-
         EntitlementDecisionRequest entitlementDecisionRequest = new EntitlementDecisionRequest();
+        entitlementDecisionRequest.setPolicyId(applicablePolicyId);
         entitlementDecisionRequest.setSubject(subject);
-        entitlementDecisionRequest.setResource(resourcePath);
-        entitlementDecisionRequest.setAction(httpVerb);
 
         return entitlementDecisionRequest;
     }
-
+	
     /**
      * Returns the Axis2 message context from the Synapse message context.
      * @param messageContext

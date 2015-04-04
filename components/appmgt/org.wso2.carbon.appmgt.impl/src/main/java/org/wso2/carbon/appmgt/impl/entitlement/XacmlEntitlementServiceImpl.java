@@ -36,8 +36,10 @@ import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.identity.entitlement.EntitlementUtil;
+import org.wso2.carbon.identity.entitlement.proxy.Attribute;
 import org.wso2.carbon.identity.entitlement.proxy.PEPProxy;
 import org.wso2.carbon.identity.entitlement.proxy.PEPProxyConfig;
+import org.wso2.carbon.identity.entitlement.proxy.ProxyConstants;
 import org.wso2.carbon.identity.entitlement.proxy.exception.EntitlementProxyException;
 import org.wso2.carbon.identity.entitlement.stub.EntitlementPolicyAdminServiceEntitlementException;
 import org.wso2.carbon.identity.entitlement.stub.EntitlementPolicyAdminServiceStub;
@@ -45,6 +47,7 @@ import org.wso2.carbon.identity.entitlement.stub.dto.PolicyDTO;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -57,12 +60,19 @@ import java.util.Map;
  */
 public class XacmlEntitlementServiceImpl implements EntitlementService {
 
-    private static final Log log = LogFactory.getLog(XacmlEntitlementServiceImpl.class);
+    private static final String XACML_ATTRIBUTE_ID_SUBJECT_ID = "urn:oasis:names:tc:xacml:1.0:subject:subject-id";
+
+	private static final String XACML_ATTRIBUTE_CATEGORY_SUBJECT = "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject";
+
+	private static final Log log = LogFactory.getLog(XacmlEntitlementServiceImpl.class);
 
     private static final String DECISION_DENY = "DENY";
     private static final String XML_ELEMENT_RESULT = "Result";
     private static final String XML_ELEMENT_DECISION = "Decision";
     private static final String XML_NS_XACML_RESULT = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17";
+    
+    private static final String XACML_ATTRIBUTE_CATEGORY_CUSTOM = "urn:wso2:appm:xacml:attribute-category:custom";
+    private static final String XACML_ATTRIBUTE_ID_POLICY_ID = "urn:wso2:appm:xacml:custom:policy-id";
 
     private String serverUrl;
     private String username;
@@ -175,13 +185,6 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
             generateAndSaveEntitlementPolicy(context, xacmlTemplateBuilder);
         }
     }
-    private void generateAndSaveEntitlementPolicy(XACMLPolicyTemplateContext xacmlPolicyTemplateContext,
-                                                  XACMLTemplateBuilder templateBuilder){
-
-        // Generate the policy
-        EntitlementPolicy entitlementPolicy = templateBuilder.generatePolicy(xacmlPolicyTemplateContext);
-        savePolicy(entitlementPolicy);
-    }
 
     @Override
     public boolean isPermitted(EntitlementDecisionRequest request) {
@@ -195,7 +198,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         String decisionResult = null;
         try {
 
-            decisionResult = pepProxy.getDecision(request.getSubject(), request.getResource(), request.getAction(), request.getEnvironment());
+            decisionResult = pepProxy.getDecision(getEntitlementAttributes(request));
 
             OMElement decisionElement = AXIOMUtil.stringToOM(decisionResult);
             String decision = decisionElement.getFirstChildWithName(new QName(XML_NS_XACML_RESULT, XML_ELEMENT_RESULT)).
@@ -208,7 +211,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
             }
 
         } catch (Exception e) {
-            String errorMessage = String.format("Error while evaluating entitlement for the resource '%s'.", request.getResource());
+            String errorMessage = String.format("Error while evaluating entitlement for the policy id '%s'.", request.getPolicyId());
             log.error(errorMessage, e);
             throw new SynapseException(errorMessage, e);
         }
@@ -243,6 +246,14 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         }
     }
 
+    private void generateAndSaveEntitlementPolicy(XACMLPolicyTemplateContext xacmlPolicyTemplateContext,
+            XACMLTemplateBuilder templateBuilder){
+
+		// Generate the policy
+		EntitlementPolicy entitlementPolicy = templateBuilder.generatePolicy(xacmlPolicyTemplateContext);
+		savePolicy(entitlementPolicy);
+	}
+    
     private PolicyDTO getExistingPolicy(String policyId) throws RemoteException, EntitlementPolicyAdminServiceEntitlementException {
         return entitlementPolicyAdminServiceStub.getLightPolicy(policyId);
     }
@@ -360,6 +371,12 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
             throw new AxisFault("Error while authenticating against the entitlement service", e);
         }
     }
-
-
+    
+    private Attribute[] getEntitlementAttributes(EntitlementDecisionRequest request){
+    
+    	Attribute policyIdAttribute = new Attribute(XACML_ATTRIBUTE_CATEGORY_CUSTOM, XACML_ATTRIBUTE_ID_POLICY_ID, ProxyConstants.DEFAULT_DATA_TYPE, request.getPolicyId());
+    	Attribute subjectIdAttribute = new Attribute(XACML_ATTRIBUTE_CATEGORY_SUBJECT, XACML_ATTRIBUTE_ID_SUBJECT_ID, ProxyConstants.DEFAULT_DATA_TYPE, request.getSubject());
+    	
+    	return new Attribute[]{policyIdAttribute, subjectIdAttribute};
+    }
 }

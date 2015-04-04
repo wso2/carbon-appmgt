@@ -4389,7 +4389,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 
 		String query = "SELECT DISTINCT "
-				 		+ "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, "
+				 		+ "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, POLICY_GROUP.POLICY_GRP_ID AS POLICY_GRP_ID,"
 						+ "RULE.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, RULE.CONTENT AS RULE_CONTENT "
 						+ "FROM "
 						+ "APM_APP AS APP, "
@@ -4426,6 +4426,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				context = new XACMLPolicyTemplateContext();
 				context.setAppId(resultSet.getInt("APP_ID"));
 				context.setAppUuid(resultSet.getString("APP_UUID"));
+				context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
 				context.setRuleId(resultSet.getInt("RULE_ID"));
 				context.setRuleContent(resultSet.getString("RULE_CONTENT"));
 				contexts.add(context);
@@ -7384,5 +7385,52 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
 		return value;
+	}
+
+	public List<String> getApplicableEntitlementPolicyIds(int appId,
+			String matchedUrlPattern, String httpVerb) throws AppManagementException {
+		
+		List<String> applicableEntitlementPolicies = new ArrayList<String>();
+		
+		Connection con = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+
+        String query = "SELECT "
+		        		+ "POLICY_XACML.POLICY_ID AS POLICY_ID "
+		        		+ "FROM "
+		        		+ "APM_APP_URL_MAPPING AS APP_URL, "
+		        		+ "APM_POLICY_GRP_PARTIAL_MAPPING AS POLICY_XACML "
+		        		+ "WHERE "
+		        		+ "APP_URL.POLICY_GRP_ID = POLICY_XACML.POLICY_GRP_ID "
+		        		+ "AND APP_URL.APP_ID = ? "
+		        		+ "AND URL_PATTERN = ? "
+		        		+ "AND HTTP_METHOD = ?";
+
+        try {
+            con = APIMgtDBUtil.getConnection();
+            prepStmt = con.prepareStatement(query);
+            
+            prepStmt.setInt(1, appId);
+            prepStmt.setString(2, matchedUrlPattern);
+            prepStmt.setString(3, httpVerb);
+            
+            rs = prepStmt.executeQuery();
+
+            while(rs.next()) {
+                applicableEntitlementPolicies.add(rs.getString("POLICY_ID"));
+            }
+            
+            
+        } catch (SQLException e) {
+            handleException(
+            		String.format("Error while getting applicable entitlement policies for "
+            				+ "AppId : %d, URL pattern : %s, HTTP verb : %s", appId, matchedUrlPattern, httpVerb), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, con, rs);
+        }
+		
+        return applicableEntitlementPolicies;
+		
 	}
 }
