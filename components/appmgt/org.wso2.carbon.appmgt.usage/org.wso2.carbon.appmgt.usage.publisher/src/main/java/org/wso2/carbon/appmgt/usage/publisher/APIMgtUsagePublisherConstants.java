@@ -52,7 +52,8 @@ public final class APIMgtUsagePublisherConstants {
     public static final String API_PUBLISHER = "api.ut.apiPublisher";
     public static final String APPLICATION_NAME = "api.ut.application.name";
     public static final String APPLICATION_ID = "api.ut.application.id";
-    
+    public static final String ANONYMOUS_USER = "anonymous.user";
+
 	public static final String API_MANAGER_STREAM_NAME_DEFINITION = "APIStreamNameDefinition.";
 	public static final String API_MANAGER_REQUEST_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
 			+ "ApiManagerRequestStreamName";
