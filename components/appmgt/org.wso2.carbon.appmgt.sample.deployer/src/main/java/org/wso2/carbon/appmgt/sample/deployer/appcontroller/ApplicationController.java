@@ -517,8 +517,9 @@ public class ApplicationController {
      * @param ipAddress
      *            - IP address of the user mashine
      *
-     * @throws IOException
+     * @throws AppManagementException
      *             - Throws this when failed to accses web application
+     *             - Throws this when thread failed to sleep
      */
     public void accsesWebPages(String webContext, String trackingCode, int hitCount, String ipAddress) throws AppManagementException {
         String loginHtmlPage = null;
@@ -566,7 +567,8 @@ public class ApplicationController {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    log.error(e.getMessage());
+                    log.error("Error while accessing a web page", e);
+                    throw  new AppManagementException("Error while accessing a web page", e);
                 }
             }
         } catch (IOException e) {
