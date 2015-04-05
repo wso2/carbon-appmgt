@@ -41,20 +41,15 @@ public class APIHandlerServiceComponent {
     
     private static final Log log = LogFactory.getLog(APIHandlerServiceComponent.class);
 
-    private APIKeyValidatorClientPool clientPool;
-    private ThriftKeyValidatorClientPool thriftClientPool;
     private static BundleContext bundleContext;
     private static AppManagerConfigurationService amConfigService;
 
     protected void activate(ComponentContext context) {
-        clientPool = APIKeyValidatorClientPool.getInstance();
-        thriftClientPool = ThriftKeyValidatorClientPool.getInstance();
-
         //Registering AppManagerOAuth2Service as a OSGIService
         bundleContext = context.getBundleContext();
         bundleContext.registerService(AppManagerOAuth2Service.class.getName(), new AppManagerOAuth2Service(), null);
         if (log.isDebugEnabled()) {
-            log.debug("WebApp handlers component activated");
+            log.debug("App Manager sampl deployer component activated");
         }
         String filePath = null;
         try {
@@ -75,8 +70,7 @@ public class APIHandlerServiceComponent {
         if (log.isDebugEnabled()) {
             log.debug("WebApp handlers component deactivated");
         }
-        clientPool.cleanup();
-        thriftClientPool.cleanup();
+
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
