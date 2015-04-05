@@ -1,16 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.appm;
-
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
-import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
-import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
-
-import java.rmi.RemoteException;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -27,9 +16,35 @@ import java.rmi.RemoteException;
 * under the License.
 */
 
+package org.wso2.carbon.appmgt.sample.deployer.appm;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
+import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
+import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
+
+import java.rmi.RemoteException;
+
+/**
+ * This class is use as a client for Remote UserStore Manager Service
+ * */
 public class RemoteUserStoreManagerServiceClient {
     private RemoteUserStoreManagerServiceStub userStoreManagerStub;
 
+    /**
+     * Creates a new RemoteUserStoreManagerServiceClient object and initialising the RemoteUserStoreManagerServiceStub
+     *
+     * @param cookie
+     *            - cookie to get authentication for RemoteUserStoreManagerService
+     *
+     * @param url
+     *            - https server url
+     *
+     * @throws AxisFault
+     *             - Throws this when RemoteUserStoreManagerServiceStub failed initialise
+     */
     public RemoteUserStoreManagerServiceClient(String cookie, String url) throws AxisFault {
         String serviceURL = url + "/services/RemoteUserStoreManagerService";
         userStoreManagerStub = new RemoteUserStoreManagerServiceStub(serviceURL);
@@ -40,6 +55,19 @@ public class RemoteUserStoreManagerServiceClient {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
     }
 
+    /**
+     * This method is use to set a value for given claim
+     *
+     *@param claimURI
+     *          -URI of the claim
+     *
+     *@param data
+     *          -value
+     *
+     * @throws RemoteException
+     *             - Throws this when failed to update a claim value
+     *
+     * */
     public void updateClaims(String claimURI, String data) throws RemoteException,
             RemoteUserStoreManagerServiceUserStoreExceptionException {
         userStoreManagerStub.setUserClaimValue(Configuration.getUserName(), claimURI, data, "default");
