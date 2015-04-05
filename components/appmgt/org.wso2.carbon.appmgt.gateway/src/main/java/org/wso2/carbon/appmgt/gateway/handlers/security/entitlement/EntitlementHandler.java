@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security.entitlement;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.axis2.Constants;
 import org.apache.commons.logging.Log;
@@ -29,6 +29,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.Axis2Sender;
 import org.apache.synapse.rest.AbstractHandler;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
@@ -54,25 +55,27 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     }
 
     public boolean handleRequest(MessageContext messageContext) {
-        if ((Boolean) messageContext.getProperty(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS) ||
-                (Boolean) messageContext.getProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS)) {
-            // If anonymous access is allowed to whole app
-            // or
-            // If anonymous access is allowed to particular URL pattern, skip
-            // this Entitlement handler.
-            return true;
-        } else {
-            try {
-				boolean isPermitted = isResourcePermitted(messageContext);
-				return isPermitted;
+
+    	// If anonymous access is allowed to whole app or a particular URL pattern, skip this handler.
+    	if (isHandlerApplicable(messageContext)) {
+    		try {
+				if(!isResourcePermitted(messageContext)){
+					notifyUser(messageContext);
+					return false;
+				}else{
+					return true;
+				}
 			} catch (AppManagementException e) {
 				String message = "Error while evaluating entitlement policies";
 				log.error(message, e);
 				throw new SynapseException(message, e);
 			}
+        } else {
+        	return true;
         }
     }
-    public boolean handleResponse(MessageContext messageContext) {
+
+	public boolean handleResponse(MessageContext messageContext) {
         return true;
     }
 
@@ -80,8 +83,21 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 
     }
 
+    private boolean isHandlerApplicable(MessageContext messageContext) {
+		return doesInUrlHasMatchingResourcePattern(messageContext) && !isAnnoymousAccessAllowed(messageContext);  
+	}
+
+	private boolean isAnnoymousAccessAllowed(MessageContext messageContext) {
+		return (Boolean) messageContext.getProperty(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS) ||
+                (Boolean) messageContext.getProperty(AppMConstants.API_URI_ALLOW_ANONYMOUS);
+	}
+    
+	private boolean doesInUrlHasMatchingResourcePattern(MessageContext messageContext) {
+		return messageContext.getProperty(AppMConstants.MATCHED_URL_PATTERN_PROERTY_NAME) != null;
+	}
+    
     /**
-     * Extracts info related to the resource requests and checked whether the request is permitted.
+     * Extracts info related to the resource requests and checkes whether the request is permitted.
      * @param messageContext Synapse message context.
      * @return true if the resource is permitted, false otherwise.
      * @throws AppManagementException 
@@ -95,24 +111,20 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     	// If there are not associated entitlement policies the resource is permitted anyway.
     	if(applicablePolicyIds.isEmpty()){
     		return true;
+    	}else{
+    		
+    		// We only support only one XACML policy as of now.
+    		String applicablePolicyId = applicablePolicyIds.get(0);
+    		
+    		EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
+    		return isResourcePermitted(entitlementDecisionRequest);
     	}
-    	
-    	// We only support only one XACML policy as of now.
-    	String applicablePolicyId = applicablePolicyIds.get(0);
-    	
-        EntitlementDecisionRequest entitlementDecisionRequest = getEntitlementDecisionRequest(messageContext, applicablePolicyId);
-        return isResourcePermitted(entitlementDecisionRequest);
     }
 
     private List<String> getApplicableEntitlementPolicyIds(MessageContext messageContext) throws AppManagementException {
 		
-    	Integer appId = (Integer) messageContext.getProperty("appm.appId");
-    	
-    	if(appId == null){
-    		return new ArrayList<String>();
-    	}
-    	
-    	String matchedUrlPattern = (String) messageContext.getProperty("appm.matchedUrlPattern");
+    	Integer appId = (Integer) messageContext.getProperty(AppMConstants.MATCHED_APP_ID_PROERTY_NAME);
+    	String matchedUrlPattern = (String) messageContext.getProperty(AppMConstants.MATCHED_URL_PATTERN_PROERTY_NAME);
     	String httpVerb = (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(Constants.Configuration.HTTP_METHOD);
     	
     	AppMDAO appMDAO = new AppMDAO();
@@ -139,19 +151,44 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
 
         return entitlementDecisionRequest;
     }
+    
+	/**
+	 * Sends "401 Unauthorized" response to the user.
+	 * 
+	 * @param messageContext
+	 */
+	private void notifyUser(MessageContext messageContext) {
+
+		org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+		Object headers = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+		
+		if (headers != null && headers instanceof Map) {
+            
+			@SuppressWarnings("unchecked")
+			Map<String, Object> headersMap = (Map<String, Object>) headers;
+            
+			headersMap.clear();
+            axis2MessageContext.setProperty("HTTP_SC", "401");
+            axis2MessageContext.setProperty("NO_ENTITY_BODY", new Boolean("true"));
+            messageContext.setProperty("RESPONSE", "true");
+            messageContext.setTo(null);
+            Axis2Sender.sendBack(messageContext);
+        }
+	}
 	
     /**
      * Returns the Axis2 message context from the Synapse message context.
      * @param messageContext
      * @return Axis2 message context.
      */
-    private org.apache.axis2.context.MessageContext getAxis2MessageContext(MessageContext messageContext){
+    @SuppressWarnings("unused")
+	private org.apache.axis2.context.MessageContext getAxis2MessageContext(MessageContext messageContext){
         return ((Axis2MessageContext) messageContext).getAxis2MessageContext();
     }
 
     /**
      * TODO : Remove this hack.
-     * This hack is here to since, handler init fails when it tries to get IS entitlement service stub, in embedded IS setup.
+     * This hack is here since, handler init fails when it tries to get IS entitlement service stub, in embedded IS setup.
      * Service endpoint is not available when init is called.
      * @return
      */

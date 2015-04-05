@@ -718,8 +718,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             String matched = getMatchedURLPattern(mapperList,inUrl);
                 if(matched!=null){
                     String urlMapping = matched.substring((webAppContext+"/"+webAppVersion).length(),matched.length());
-                    synapseMessageContext.setProperty("appm.matchedUrlPattern", urlMapping);
-                    synapseMessageContext.setProperty("appm.appId", appID);
+                    
+                    // Set the relevant synapse properties to let the entitlement handler do its job properly.
+                    synapseMessageContext.setProperty(AppMConstants.MATCHED_URL_PATTERN_PROERTY_NAME, urlMapping);
+                    synapseMessageContext.setProperty(AppMConstants.MATCHED_APP_ID_PROERTY_NAME, appID);
+                    
                     if (checkResourseAccessibleByRole(urlMapping, roles, appID, httpVerb)){
                         return true;
                     }
