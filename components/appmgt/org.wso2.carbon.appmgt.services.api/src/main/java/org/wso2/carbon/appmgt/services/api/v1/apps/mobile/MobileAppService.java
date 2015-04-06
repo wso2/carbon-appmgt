@@ -61,7 +61,9 @@ public class MobileAppService {
 
         @GET
         @Path("list/tenant/{tenantDomain}")
-        public AppListResponse getApplicationList(@Context final HttpServletResponse servletResponse, @Context HttpHeaders headers, @PathParam("tenantDomain") String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
+        public AppListResponse getApplicationList(@Context final HttpServletResponse servletResponse,
+                                                  @Context HttpHeaders headers, @PathParam("tenantDomain")
+                            String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
 
             boolean noLimit = false;
 
@@ -88,9 +90,12 @@ public class MobileAppService {
                         throw new UnauthorizedUserException();
                     }
 
-                    RealmService realmService = (RealmService)PrivilegedCarbonContext.getThreadLocalCarbonContext().getOSGiService(RealmService.class);
-                    RegistryService registryService  = (RegistryService) PrivilegedCarbonContext.getThreadLocalCarbonContext().getOSGiService(RegistryService.class);
-                    UserStoreManager userStoreManager = (UserStoreManager) realmService.getTenantUserRealm(SUPER_USER_TENANT_ID).getUserStoreManager();
+                    RealmService realmService = (RealmService)PrivilegedCarbonContext
+                            .getThreadLocalCarbonContext().getOSGiService(RealmService.class);
+                    RegistryService registryService  = (RegistryService) PrivilegedCarbonContext
+                            .getThreadLocalCarbonContext().getOSGiService(RegistryService.class);
+                    UserStoreManager userStoreManager = (UserStoreManager) realmService
+                            .getTenantUserRealm(SUPER_USER_TENANT_ID).getUserStoreManager();
 
 
                     String[] userList = userStoreManager.getRoleListOfUser(credentials[0]);
@@ -99,7 +104,8 @@ public class MobileAppService {
                         throw new UnauthorizedUserException();
                     }
 
-                    boolean isAuthenticated = userStoreManager.authenticate( MultitenantUtils.getTenantAwareUsername(credentials[0]), credentials[1]);
+                    boolean isAuthenticated = userStoreManager
+                            .authenticate( MultitenantUtils.getTenantAwareUsername(credentials[0]), credentials[1]);
 
                     if(!isAuthenticated){
                         throw new UnauthorizedUserException();
@@ -111,14 +117,17 @@ public class MobileAppService {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
+                PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                        .setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                                .getUserRealm().getRealmConfiguration().getAdminUserName());
 
 
                 Registry registry = CarbonContext.getThreadLocalCarbonContext().getRegistry(RegistryType.USER_GOVERNANCE);
 
                 GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
                 GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
-                GenericArtifact[] artifacts = artifactManager.getAllGenericArtifactsByLifecycleStatus("MobileAppLifeCycle", "Published");
+                GenericArtifact[] artifacts = artifactManager
+                        .getAllGenericArtifactsByLifecycleStatus("MobileAppLifeCycle", "Published");
 
                 response.setApps(new ArrayList<App>());
 
