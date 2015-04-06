@@ -54,9 +54,9 @@ Description:The executor parses the parameter map defined in the
 Filename: GenericExecutor.java
 Created Date: 26/8/2013
  */
-public class PublishActionEventExecutor implements Execution
+public class PublishEventExecutor implements Execution
 {
-    private static final Log log=LogFactory.getLog(PublishActionEventExecutor.class);
+    private static final Log log=LogFactory.getLog(PublishEventExecutor.class);
 
     private UserRealm userRealm;
     private int tenantId;
@@ -131,6 +131,7 @@ public class PublishActionEventExecutor implements Execution
         }
 
         PublishApplicationWorkflowDTO workflowDTO = new PublishApplicationWorkflowDTO();
+        //This is the status of the workflow, and not the APP
         workflowDTO.setStatus(WorkflowStatus.CREATED);
         workflowDTO.setCreatedTime(System.currentTimeMillis());
         workflowDTO.setExternalWorkflowReference(appPublishWFExecutor.generateUUID());
@@ -143,6 +144,7 @@ public class PublishActionEventExecutor implements Execution
         workflowDTO.setAppVersion(appVersion);
         workflowDTO.setAppProvider(appProvider);
         workflowDTO.setTenantId(tenantId);
+        workflowDTO.setTenantDomain(tenantDomain);
 
         try {
             appPublishWFExecutor.execute(workflowDTO);
@@ -153,17 +155,17 @@ public class PublishActionEventExecutor implements Execution
         }
 
 
-        appMDAO = new AppMDAO();
-        apiIdentifier = new APIIdentifier(appProvider,appName,appVersion);
+        if(s2.equalsIgnoreCase(AppMConstants.ApplicationStatus.APPLICATION_RETIRED)) {
+            appMDAO = new AppMDAO();
+            apiIdentifier = new APIIdentifier(appProvider, appName, appVersion);
 
-
-//        try {
-//            appMDAO.removeAPISubscription(apiIdentifier);
-//        } catch (AppManagementException e) {
-//            log.error("Could not remove subscription when Unpublishing", e);
-//            return false;
-//        }
-
+            try {
+                appMDAO.removeAPISubscription(apiIdentifier);
+            } catch (AppManagementException e) {
+                log.error("Could not remove subscription when Unpublishing", e);
+                return false;
+            }
+        }
 
         JaggeryThreadContext jaggeryThreadContext=new JaggeryThreadContext();
 

@@ -2743,6 +2743,32 @@ public final class AppManagerUtil {
     	
     }
 
+    /**
+     * Helper method to get tenantId from userName
+     *
+     * @param userName
+     * @return tenantId
+     */
+    public static int getTenantId(String userName) {
+        //get tenant domain from user name
+        String tenantDomain = MultitenantUtils.getTenantDomain(userName);
+        RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+
+        if (realmService == null) {
+            return MultitenantConstants.SUPER_TENANT_ID;
+        }
+
+        try {
+            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+            return tenantId;
+        } catch (UserStoreException e) {
+
+            log.error(e);
+        }
+
+        return -1;
+    }
+
 
 
 }

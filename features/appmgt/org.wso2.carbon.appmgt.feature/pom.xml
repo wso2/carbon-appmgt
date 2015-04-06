@@ -94,6 +94,7 @@
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.startup.publisher.feature:1.0.0</includedFeatureDef> -->
                             </includedFeatures>
 			    <importBundles>
+				<importBundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:1.0.0-SNAPSHOT</importBundleDef>
                                 <importBundleDef>org.wso2.store:jaggery-scxml-executors:1.0.0</importBundleDef>
                             </importBundles>
                         </configuration>
