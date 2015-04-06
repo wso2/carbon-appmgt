@@ -163,19 +163,23 @@ public class APPMgtGoogleAnalayticsHandler extends AbstractHandler {
     }
 
     private String findCookie(String cookieString, String cookieName) {
-        String rawCookies[] = cookieString.split(";");
-        List<HttpCookie> cookies = new ArrayList<HttpCookie>();
-        for(String cookie: rawCookies) {
-            String[] split = cookie.split("=");
-            if(split.length >= 2) {
-                HttpCookie c = new HttpCookie(split[0].trim(), split[1].trim());
-                cookies.add(c);
-            }
-        }
+        String[] rawCookies = null;
+        if (cookieString != null) {
+            rawCookies = cookieString.split(";");
 
-        for(HttpCookie cookie: cookies) {
-            if(cookie.getName().equals(cookieName)) {
-                return cookie.getValue();
+            List<HttpCookie> cookies = new ArrayList<HttpCookie>();
+            for (String cookie : rawCookies) {
+                String[] split = cookie.split("=");
+                if (split.length >= 2) {
+                    HttpCookie c = new HttpCookie(split[0].trim(), split[1].trim());
+                    cookies.add(c);
+                }
+            }
+
+            for (HttpCookie cookie : cookies) {
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
+                }
             }
         }
 

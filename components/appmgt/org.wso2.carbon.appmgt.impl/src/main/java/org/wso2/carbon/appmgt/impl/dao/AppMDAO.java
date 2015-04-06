@@ -4388,13 +4388,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		List<XACMLPolicyTemplateContext> contexts = new ArrayList<XACMLPolicyTemplateContext>();
 
 
-		String query = "SELECT  URL.APP_ID AS APP_ID,URL.URL_MAPPING_ID AS URL_MAPPING_ID,ENT.POLICY_ID AS POLICY_ID " +
-				",ENT.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,URL.URL_PATTERN AS URL_PATTERN,URL.HTTP_METHOD AS HTTP_METHOD  " +
-				",ENT.EFFECT AS EFFECT,POL.CONTENT AS POLICY_PARTIAL_CONTENT, URL.POLICY_GRP_ID AS POLICY_GRP_ID  " +
-				"FROM APM_APP_URL_MAPPING URL " +
-				"INNER JOIN APM_POLICY_GRP_PARTIAL_MAPPING ENT ON ENT.POLICY_GRP_ID =URL.POLICY_GRP_ID " +
-				"LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL   POL ON POL.ENTITLEMENT_POLICY_PARTIAL_ID =ENT.POLICY_PARTIAL_ID  " +
-				"WHERE URL.APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) ";
+		String query = "SELECT DISTINCT "
+				 		+ "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, POLICY_GROUP.POLICY_GRP_ID AS POLICY_GRP_ID,"
+						+ "RULE.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, RULE.CONTENT AS RULE_CONTENT "
+						+ "FROM "
+						+ "APM_APP AS APP, "
+						+ "APM_POLICY_GROUP AS POLICY_GROUP, "
+						+ "APM_POLICY_GROUP_MAPPING AS APP_GROUP, "
+						+ "APM_ENTITLEMENT_POLICY_PARTIAL AS RULE, "
+						+ "APM_POLICY_GRP_PARTIAL_MAPPING AS GROUP_RULE "
+						+ "WHERE "
+						+ "APP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) "
+						+ "AND APP_GROUP.APP_ID = APP.APP_ID "
+						+ "AND APP_GROUP.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
+						+ "AND GROUP_RULE.POLICY_GRP_ID = POLICY_GROUP.POLICY_GRP_ID "
+						+ "AND GROUP_RULE.POLICY_PARTIAL_ID = RULE.ENTITLEMENT_POLICY_PARTIAL_ID";
 
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
@@ -4415,18 +4423,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			XACMLPolicyTemplateContext context;
 			while (resultSet.next()) {
-
 				context = new XACMLPolicyTemplateContext();
-				context.setUrlTemplateId(resultSet.getInt("URL_MAPPING_ID"));
-				context.setPolicyPartialId(resultSet.getInt("POLICY_PARTIAL_ID"));
-				context.setPolicyId(resultSet.getString("POLICY_ID"));
-				context.setResource(resultSet.getString("URL_PATTERN"));
-				context.setAction(resultSet.getString("HTTP_METHOD"));
-				context.setEffect(resultSet.getString("EFFECT"));
-				context.setPolicyPartialContent(resultSet.getString("POLICY_PARTIAL_CONTENT"));
+				context.setAppId(resultSet.getInt("APP_ID"));
+				context.setAppUuid(resultSet.getString("APP_UUID"));
 				context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
+				context.setRuleId(resultSet.getInt("RULE_ID"));
+				context.setRuleContent(resultSet.getString("RULE_CONTENT"));
 				contexts.add(context);
-
 			}
 
 		} catch (SQLException e) {
@@ -5716,7 +5719,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             for (XACMLPolicyTemplateContext context : xacmlPolicyTemplateContexts) {
                 preparedStatement.setString(1, context.getPolicyId());
                 preparedStatement.setInt(2, context.getPolicyGroupId());
-                preparedStatement.setInt(3, context.getPolicyPartialId());
+                preparedStatement.setInt(3, context.getRuleId());
                 preparedStatement.addBatch();
             }
 
@@ -6995,20 +6998,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 												 Object[] objPartialMappings, Connection conn)
 			throws SQLException {
 		String query =
-				" INSERT INTO APM_POLICY_GRP_PARTIAL_MAPPING (POLICY_GRP_ID,EFFECT,POLICY_PARTIAL_ID ) "
-						+ " VALUES(?,?,?) ";
+				" INSERT INTO APM_POLICY_GRP_PARTIAL_MAPPING (POLICY_GRP_ID,POLICY_PARTIAL_ID ) "
+						+ " VALUES(?,?) ";
 		PreparedStatement preparedStatement = null;
 
 		try {
 			preparedStatement = conn.prepareStatement(query);
 
 			for (int i = 0; i < objPartialMappings.length; i++) {
-				NativeObject objPartial = (NativeObject) objPartialMappings[i];
 				preparedStatement.setInt(1, policyGroupId);
-				preparedStatement.setString(2, objPartial.get("effect", objPartial).toString());
-				preparedStatement.setInt(3,
-						Integer.parseInt(objPartial.get("entitlementPolicyPartialId",
-								objPartial).toString()));
+				preparedStatement.setInt(2, ((Double)(objPartialMappings[i])).intValue());
 				preparedStatement.addBatch();
 			}
 			preparedStatement.executeBatch();
@@ -7360,6 +7359,60 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+    public static boolean isUsagePublishingEnabledForApp(WebApp webApp) throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        boolean isUsagePublishingEnabledForApp = false;
+
+        String getStatisticsPolicyIdQuery = "SELECT JAVA_POLICY_ID " +
+                                  "FROM APM_APP_JAVA_POLICY " +
+                                  "WHERE FULL_QUALIFI_NAME = 'org.wso2.carbon.appmgt.usage.publisher.APPMgtUsageHandler' ";
+
+        String getPoliciesOfAppQuery = "SELECT JAVA_POLICY_ID " +
+                                    "FROM APM_APP_JAVA_POLICY_MAPPING " +
+                                    "WHERE APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? " +
+                                    "AND APP_NAME = ? AND APP_VERSION = ? AND CONTEXT = ?)";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            prepStmt = conn.prepareStatement(getStatisticsPolicyIdQuery);
+            rs = prepStmt.executeQuery();
+
+            int statisticsPolicyId = 0;
+
+            while (rs.next()) {
+                statisticsPolicyId = rs.getInt("JAVA_POLICY_ID");
+            }
+            prepStmt.close();
+
+            APIIdentifier webAppIdentifier = webApp.getId();
+            prepStmt = conn.prepareStatement(getPoliciesOfAppQuery);
+            prepStmt.setString(1, webAppIdentifier.getProviderName());
+            prepStmt.setString(2, webAppIdentifier.getApiName());
+            prepStmt.setString(3, webAppIdentifier.getVersion());
+            prepStmt.setString(4, webApp.getContext());
+
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                if (statisticsPolicyId == rs.getInt("JAVA_POLICY_ID")) {
+                    isUsagePublishingEnabledForApp = true;
+                    break;
+                }
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while retrieving java policies for web app :" +
+                            " Provider : " + webApp.getId().getProviderName() +
+                            " App : " + webApp.getId().getApiName() +
+                            " Version : " +  webApp.getId().getVersion() , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, conn, rs);
+        }
+
+        return isUsagePublishingEnabledForApp;
+    }
+
 	/**
 	 * Retrieves TRACKING_CODE sequences from APM_APP Table
 	 *@param uuid : Application UUID
@@ -7386,5 +7439,52 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
 		return value;
+	}
+
+	public List<String> getApplicableEntitlementPolicyIds(int appId,
+			String matchedUrlPattern, String httpVerb) throws AppManagementException {
+		
+		List<String> applicableEntitlementPolicies = new ArrayList<String>();
+		
+		Connection con = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+
+        String query = "SELECT "
+		        		+ "POLICY_XACML.POLICY_ID AS POLICY_ID "
+		        		+ "FROM "
+		        		+ "APM_APP_URL_MAPPING AS APP_URL, "
+		        		+ "APM_POLICY_GRP_PARTIAL_MAPPING AS POLICY_XACML "
+		        		+ "WHERE "
+		        		+ "APP_URL.POLICY_GRP_ID = POLICY_XACML.POLICY_GRP_ID "
+		        		+ "AND APP_URL.APP_ID = ? "
+		        		+ "AND URL_PATTERN = ? "
+		        		+ "AND HTTP_METHOD = ?";
+
+        try {
+            con = APIMgtDBUtil.getConnection();
+            prepStmt = con.prepareStatement(query);
+            
+            prepStmt.setInt(1, appId);
+            prepStmt.setString(2, matchedUrlPattern);
+            prepStmt.setString(3, httpVerb);
+            
+            rs = prepStmt.executeQuery();
+
+            while(rs.next()) {
+                applicableEntitlementPolicies.add(rs.getString("POLICY_ID"));
+            }
+            
+            
+        } catch (SQLException e) {
+            handleException(
+            		String.format("Error while getting applicable entitlement policies for "
+            				+ "AppId : %d, URL pattern : %s, HTTP verb : %s", appId, matchedUrlPattern, httpVerb), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, con, rs);
+        }
+		
+        return applicableEntitlementPolicies;
+		
 	}
 }

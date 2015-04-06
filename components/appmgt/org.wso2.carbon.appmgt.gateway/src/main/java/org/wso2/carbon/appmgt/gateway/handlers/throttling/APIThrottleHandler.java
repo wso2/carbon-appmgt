@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.throttling;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,6 +43,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.AuthenticationContext;
@@ -59,6 +61,8 @@ import org.wso2.carbon.throttle.core.ThrottleConstants;
 import org.wso2.carbon.throttle.core.ThrottleContext;
 import org.wso2.carbon.throttle.core.ThrottleException;
 import org.wso2.carbon.throttle.core.ThrottleFactory;
+
+import javax.xml.stream.XMLStreamException;
 
 /**
  * This WebApp handler is responsible for evaluating authenticated user requests
@@ -227,15 +231,24 @@ public class APIThrottleHandler extends AbstractHandler {
 			return;
 		}
 
-		// By default we send a 503 response back
+        org.apache.axis2.context.MessageContext axis2MC =
+                ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+
+        try {
+            RelayUtils.buildMessage(axis2MC);
+        } catch (IOException e) {
+            log.error("Error While building message.",e);
+        } catch (XMLStreamException e) {
+            log.error("Error While building message.",e);
+        }
+
+        // By default we send a 503 response back
 		if (messageContext.isDoingPOX() || messageContext.isDoingGET()) {
 			Utils.setFaultPayload(messageContext, getFaultPayload());
 		} else {
 			Utils.setSOAPFault(messageContext, "Server", "Message Throttled Out",
 			                   "You have exceeded your quota");
 		}
-		org.apache.axis2.context.MessageContext axis2MC =
-		                                                  ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
 		if (Utils.isCORSEnabled()) {
 			/* For CORS support adding required headers to the fault response */

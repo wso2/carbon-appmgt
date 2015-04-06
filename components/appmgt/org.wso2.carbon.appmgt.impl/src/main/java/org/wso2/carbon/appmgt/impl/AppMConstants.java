@@ -354,6 +354,7 @@ public final class AppMConstants {
 
     public static final String API_CONSUMER_AUTHENTICATION = "APIConsumerAuthentication.";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = API_CONSUMER_AUTHENTICATION + "AddSAMLResponseHeaderToOutMessage";
+    public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = API_CONSUMER_AUTHENTICATION + "AddClaimsSelectively";
     
     
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
@@ -443,6 +444,8 @@ public final class AppMConstants {
     public static final int API_CONTEXT_CACHE_EXPIRY_TIME_IN_DAYS = 3650 ;
     public static final String SAML2_CONFIG_CACHE = "saml2ConfigCache";
     public static final String SAML2_CONFIG_CACHE_MANAGER = "SAML2_CONFIG_CACHE_MANAGER";
+    public static final String USAGE_CONFIG_CACHE = "usageConfigCache";
+    public static final String USAGE_CONFIG_CACHE_MANAGER = "USAGE_CONFIG_CACHE_MANAGER";
     public static final String USER_ROLES_CACHE_MANAGER = "USER_ROLES_CACHE_MANAGER";
     public static final String USER_ROLES_CONFIG_CACHE = "userRolesConfigCache";
     public static final String USER_ROLES_CACHE_KEY = "userRolesCacheKey";
@@ -547,4 +550,8 @@ public final class AppMConstants {
     
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
     public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
+    
+    // These two synapse properties are used to in the entitlement handler.
+    public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
+    public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
 }

@@ -14,15 +14,12 @@
  *  limitations under the License.
  */
 
-package org.wso2.carbon.appmgt.gateway.internal;
+package org.wso2.carbon.appmgt.sample.deployer.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.gateway.handlers.security.keys.APIKeyValidatorClientPool;
-import org.wso2.carbon.appmgt.gateway.handlers.security.thrift.ThriftKeyValidatorClientPool;
-import org.wso2.carbon.appmgt.gateway.service.AppManagerOAuth2Service;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
@@ -32,22 +29,20 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 import java.io.File;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.handlers" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.sample.deployer" immediate="true"
  * @scr.reference name="configuration.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
  * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  */
-public class APIHandlerServiceComponent {
-    
-    private static final Log log = LogFactory.getLog(APIHandlerServiceComponent.class);
+public class AppManagerSampleDeployerComponent {
+
+    private static final Log log = LogFactory.getLog(AppManagerSampleDeployerComponent.class);
 
     private static BundleContext bundleContext;
     private static AppManagerConfigurationService amConfigService;
 
     protected void activate(ComponentContext context) {
-        //Registering AppManagerOAuth2Service as a OSGIService
         bundleContext = context.getBundleContext();
-        bundleContext.registerService(AppManagerOAuth2Service.class.getName(), new AppManagerOAuth2Service(), null);
         if (log.isDebugEnabled()) {
             log.debug("App Manager sampl deployer component activated");
         }
@@ -88,3 +83,4 @@ public class APIHandlerServiceComponent {
     }
 
 }
+

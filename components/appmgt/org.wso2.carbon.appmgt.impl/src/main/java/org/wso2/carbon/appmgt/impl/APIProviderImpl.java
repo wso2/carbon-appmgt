@@ -1681,5 +1681,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return subscriptions;
     }
 
+    public List<WebApp> getAppsWithEndpoint() throws AppManagementException {
+        List<WebApp> appSortedList = appMDAO.getAllWebApps();
+        Collections.sort(appSortedList, new APINameComparator());
+        return appSortedList;
+    }
 
 }

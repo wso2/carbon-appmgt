@@ -103,8 +103,10 @@ public class PublishAPPSimpleWorkflowExecutor extends WorkflowExecutor {
             apiIdentifier = new APIIdentifier(uId, apiName, version);
             APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(fullName);
             WebApp app = provider.getAPI(apiIdentifier);
+            PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
+
             if (app != null) {
-                APIStatus newStatus = getApiStatus("published");
+                APIStatus newStatus = getApiStatus(publishAPPDTO.getNewState());
                 provider.changeAPIStatus(app, newStatus, fullName, true);
             }
         } catch (AppManagementException e) {

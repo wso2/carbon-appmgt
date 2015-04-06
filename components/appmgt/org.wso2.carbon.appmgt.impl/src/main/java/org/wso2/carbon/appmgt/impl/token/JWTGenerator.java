@@ -27,6 +27,7 @@ import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.util.KeyStoreManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -50,16 +51,6 @@ public class JWTGenerator {
 
     private static final Log log = LogFactory.getLog(JWTGenerator.class);
 
-    private static final String JWT_HEADER = "{\"typ\":\"JWT\", \"alg\":\"[2]\", \"x5t\":\"[1]\"}";
-
-    private static final String JWT_INITIAL_BODY = "{\"iss\":\"[1]\", \"exp\":[2]" +
-            ", \"[0]/subscriber\":\"[3]\"" +
-            ", \"[0]/applicationname\":\"[4]\"" +
-            ", \"[0]/apicontext\":\"[5]\"" +
-            ", \"[0]/version\":\"[6]\"" +
-            ", \"[0]/tier\":\"[7]\"" +
-            ", \"[0]/enduser\":\"[8]\"";
-
     private static final String API_GATEWAY_ID = "wso2.org/products/am";
 
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
@@ -82,6 +73,8 @@ public class JWTGenerator {
 
     private boolean saml2Enabled = true;
 
+    private boolean addClaimsSelectively = false;
+
     private static ConcurrentHashMap<Integer, Key> privateKeys = new ConcurrentHashMap<Integer, Key>();
     private static ConcurrentHashMap<Integer, Certificate> publicCerts = new ConcurrentHashMap<Integer, Certificate>();
 
@@ -98,38 +91,39 @@ public class JWTGenerator {
      *
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public JWTGenerator(){
-        if (saml2Enabled ) {
+    public JWTGenerator() {
 
-        } else if (includeClaims && enableSigning) {
-            String claimsRetrieverImplClass =
-                    ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                            getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CLAIMS_RETRIEVER_IMPL_CLASS);
-            dialectURI = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                            getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CONSUMER_DIALECT_URI);
-            if(dialectURI == null){
-                dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
-            }
-            if(claimsRetrieverImplClass != null){
-                try{
-                    claimsRetriever = (ClaimsRetriever)Class.forName(claimsRetrieverImplClass).newInstance();
-                    claimsRetriever.init();
-                }catch (ClassNotFoundException e){
-                    log.error("Cannot find class: " + claimsRetrieverImplClass,e);
-                } catch (InstantiationException e) {
-                    log.error("Error instantiating " + claimsRetrieverImplClass);
-                } catch (IllegalAccessException e) {
-                    log.error("Illegal access to " + claimsRetrieverImplClass);
-                } catch (AppManagementException e){
-                    log.error("Error while initializing " + claimsRetrieverImplClass);
-                }
+        String claimsRetrieverImplClass =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                        getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CLAIMS_RETRIEVER_IMPL_CLASS);
+        dialectURI = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CONSUMER_DIALECT_URI);
+        if (dialectURI == null) {
+            dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
+        }
+        if (claimsRetrieverImplClass != null) {
+            try {
+                claimsRetriever = (ClaimsRetriever) Class.forName(claimsRetrieverImplClass).newInstance();
+                claimsRetriever.init();
+            } catch (ClassNotFoundException e) {
+                log.error("Cannot find class: " + claimsRetrieverImplClass, e);
+            } catch (InstantiationException e) {
+                log.error("Error instantiating " + claimsRetrieverImplClass);
+            } catch (IllegalAccessException e) {
+                log.error("Illegal access to " + claimsRetrieverImplClass);
+            } catch (AppManagementException e) {
+                log.error("Error while initializing " + claimsRetrieverImplClass);
             }
         }
+
         signatureAlgorithm = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
                 getAPIManagerConfiguration().getFirstProperty(SIGNATURE_ALGORITHM);
         if (signatureAlgorithm == null || !(signatureAlgorithm.equals(NONE) || signatureAlgorithm.equals(SHA256_WITH_RSA))) {
             signatureAlgorithm = SHA256_WITH_RSA;
         }
+
+        addClaimsSelectively = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY));
     }
 
   /**
@@ -158,7 +152,7 @@ public class JWTGenerator {
             //jwtBody = JWT_INITIAL_BODY.replaceAll("\\[0\\]", dialectURI);
             dialect = dialectURI;
         }
-        
+
         String subscriber = keyValidationInfoDTO.getSubscriber();
         String applicationName = keyValidationInfoDTO.getApplicationName();
         String applicationId = keyValidationInfoDTO.getApplicationId();
@@ -168,15 +162,6 @@ public class JWTGenerator {
         String userType = keyValidationInfoDTO.getUserType();
         String applicationTier = keyValidationInfoDTO.getApplicationTier();
         String enduserTenantId = includeEndUserName ? String.valueOf(getTenantId(endUserName)) : null;
-        
-//        jwtBody = jwtBody.replaceAll("\\[1\\]", API_GATEWAY_ID);
-//        jwtBody = jwtBody.replaceAll("\\[2\\]", String.valueOf(expireIn));
-//        jwtBody = jwtBody.replaceAll("\\[3\\]", subscriber);
-//        jwtBody = jwtBody.replaceAll("\\[4\\]", applicationName);
-//        jwtBody = jwtBody.replaceAll("\\[5\\]", apiContext);
-//        jwtBody = jwtBody.replaceAll("\\[6\\]", version);
-//        jwtBody = jwtBody.replaceAll("\\[7\\]", tier);
-//        jwtBody = jwtBody.replaceAll("\\[8\\]", endUserName);
 
 
         //Sample JWT body
@@ -335,23 +320,32 @@ public class JWTGenerator {
         jwtBuilder.append("\"exp\":");
         jwtBuilder.append(String.valueOf(expireIn));
 
-//        jwtBuilder.append("/apicontext\":\"");
-//        jwtBuilder.append(apiContext);
-//        jwtBuilder.append("\",");
-//
-//        jwtBuilder.append("/version\":\"");
-//        jwtBuilder.append(version);
-//        jwtBuilder.append("\",");
-
-        if(saml2Assertions != null){
-            Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
-            while(it.hasNext()){
-                String assertionAttribute = it.next();
-                jwtBuilder.append(",\"");
-                jwtBuilder.append(assertionAttribute);
-                jwtBuilder.append("\":\"");
-                jwtBuilder.append(saml2Assertions.get(assertionAttribute));
-                jwtBuilder.append("\"");
+        /* Populate claims from SAML Assertion if "AddClaimsSelectively" property is set to true,
+         else add all claims values available in user profile */
+        if (addClaimsSelectively) {
+            if (saml2Assertions != null) {
+                Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
+                while (it.hasNext()) {
+                    String assertionAttribute = it.next();
+                    jwtBuilder.append(",\"");
+                    jwtBuilder.append(assertionAttribute);
+                    jwtBuilder.append("\":\"");
+                    jwtBuilder.append(saml2Assertions.get(assertionAttribute));
+                    jwtBuilder.append("\"");
+                }
+            }
+        } else {
+            Map<String, String> customClaims = populateCustomClaims(saml2Assertions);
+            if (customClaims != null) {
+                Iterator<String> it = new TreeSet(customClaims.keySet()).iterator();
+                while (it.hasNext()) {
+                    String claimAttribute = it.next();
+                    jwtBuilder.append(",\"");
+                    jwtBuilder.append(claimAttribute);
+                    jwtBuilder.append("\":\"");
+                    jwtBuilder.append(customClaims.get(claimAttribute));
+                    jwtBuilder.append("\"");
+                }
             }
         }
 
@@ -388,10 +382,43 @@ public class JWTGenerator {
             return base64EncodedHeader + "." + base64EncodedBody + ".";
         }
     }
+
+
+    public Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
+            throws AppManagementException {
+
+        Map<String, String> claims = new HashMap<String, String> ();
+        ClaimsRetriever claimsRetriever = getClaimsRetriever();
+        if (claimsRetriever != null) {
+            String userName = (String) saml2Assertions.get("Subject");
+            String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            String tenantAwareUserName = userName;
+
+            try {
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService()
+                        .getTenantManager().getTenantId(tenantDomain);
+
+                if (MultitenantConstants.SUPER_TENANT_ID == tenantId) {
+                    tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
+                }
+
+                claims.put("Subject", userName);
+                claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+
+                return claims;
+            } catch (UserStoreException e) {
+                log.error("Error while getting tenant id to populate claims ", e);
+                throw new AppManagementException("Error while getting tenant id to populate claims ", e);
+            }
+        }
+
+        return null;
+    }
     
 
-
-
+    public ClaimsRetriever getClaimsRetriever() {
+        return claimsRetriever;
+    }
 
   /**
      * Helper method to sign the JWT

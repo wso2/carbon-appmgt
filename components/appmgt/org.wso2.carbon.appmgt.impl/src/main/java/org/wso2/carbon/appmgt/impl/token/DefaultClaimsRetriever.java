@@ -20,6 +20,7 @@ package org.wso2.carbon.appmgt.impl.token;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.ClaimCacheKey;
 import org.wso2.carbon.appmgt.impl.utils.UserClaims;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -68,7 +69,7 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
     public SortedMap<String, String> getClaims(String endUserName) throws AppManagementException {
         SortedMap<String, String> claimValues;
         try {
-            int tenantId = JWTGenerator.getTenantId(endUserName);
+            int tenantId = AppManagerUtil.getTenantId(endUserName);
             //check in local cache
             String key = endUserName + ":" + tenantId;
             ClaimCacheKey cacheKey = new ClaimCacheKey(key);
