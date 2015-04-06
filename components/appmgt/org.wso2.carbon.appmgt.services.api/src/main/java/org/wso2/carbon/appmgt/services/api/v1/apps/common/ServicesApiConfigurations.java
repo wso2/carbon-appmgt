@@ -38,9 +38,9 @@ import java.io.FileNotFoundException;
 
 public class ServicesApiConfigurations {
 
-    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "conf" + File.separator + "app-manager.xml";
+    private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonHome() + File.separator + "repository"
+                                                    + File.separator + "conf" + File.separator + "app-manager.xml";
     private static ServicesApiConfigurations mobileConfigurations;
-
     private String mdmServerURL;
 
     private OMElement documentElement;
@@ -73,7 +73,8 @@ public class ServicesApiConfigurations {
 
 
     public String getAuthorizedRole() {
-        return documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("AuthorizedRole")).getText();
+        return documentElement.getFirstChildWithName(mobileConfElement)
+                .getFirstChildWithName(new QName("AuthorizedRole")).getText();
     }
 
 }
