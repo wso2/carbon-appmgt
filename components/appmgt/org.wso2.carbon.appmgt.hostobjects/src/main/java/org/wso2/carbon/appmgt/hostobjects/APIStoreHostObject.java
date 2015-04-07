@@ -87,6 +87,7 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceStub;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserDTO;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
+import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
@@ -1615,6 +1616,47 @@ public class APIStoreHostObject extends ScriptableObject {
             return false;
 		}
 	}
+
+    /**
+     * This method takes care of updating the visibiltiy of an app to given user role.
+     * It will be invoked when subscribing / un-subscribing to an app in the store.
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     */
+    public static boolean jsFunction_updateAPPVisibility(Context cx,
+                                                        Scriptable thisObj, Object[] args, Function funObj) {
+        if(!isStringArray(args)) {
+            return false;
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = args[3].toString();
+        String optype = args[4].toString();
+        String userRole = "Internal/private_"+userName;
+
+        APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+        String apiPath = "/_system/governance"+AppManagerUtil.getAPIPath(apiIdentifier);
+        try {
+            if(optype.equalsIgnoreCase("ALLOW")) {
+                org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().authorizeRole(userRole, apiPath, ActionConstants.GET);
+                return true;
+            }else if(optype.equalsIgnoreCase("DENY")){
+                org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().denyRole(userRole, apiPath, ActionConstants.GET);
+                return true;
+            }
+            return false;
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            log.error("Error while updating visibility of Web App : " + apiName +" at "+apiPath, e);
+            return false;
+        }
+    }
 
     public static boolean jsFunction_removeSubscriber(Context cx,
                                                       Scriptable thisObj, Object[] args, Function funObj)

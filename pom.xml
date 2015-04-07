@@ -131,6 +131,7 @@
             <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
-
+    <properties>
+	<axiom.wso2.version>1.2.11.wso2v5</axiom.wso2.version>
+    </properties>
 </project>
