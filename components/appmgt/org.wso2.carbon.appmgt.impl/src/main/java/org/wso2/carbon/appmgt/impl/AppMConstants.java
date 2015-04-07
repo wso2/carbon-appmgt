@@ -354,6 +354,7 @@ public final class AppMConstants {
 
     public static final String API_CONSUMER_AUTHENTICATION = "APIConsumerAuthentication.";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = API_CONSUMER_AUTHENTICATION + "AddSAMLResponseHeaderToOutMessage";
+    public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = API_CONSUMER_AUTHENTICATION + "AddClaimsSelectively";
     
     
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";

@@ -30,33 +30,32 @@ import org.apache.woden.WSDLReader;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.mozilla.javascript.*;
-import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
 import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
 import javax.net.ssl.SSLHandshakeException;
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
@@ -3492,9 +3491,8 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         try {
-            /**
-             * http and https endpoint resolving by reading AppManagerConfiguration
-             */
+
+            //http and https endpoint resolving by reading AppManagerConfiguration
             AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
             List<Environment> environments = config.getApiGatewayEnvironments();
             String envDetails = "";
@@ -3520,10 +3518,10 @@ public class APIProviderHostObject extends ScriptableObject {
                     WebApp app = (WebApp) appObject;
                     APIIdentifier apiIdentifier = app.getId();
                     row.put("name", row, apiIdentifier.getApiName());
-                    /**
-                     * this WebApp is for read the registry values
-                     */
+
+                    //this WebApp is for read the registry values
                     WebApp tempApp = apiProvider.getAPI(apiIdentifier);
+                    row.put("version", row, apiIdentifier.getVersion());
                     row.put("endpoint", row, (tempApp.getTransports().equals("http") ? httpEndpoint : httpsEndpoint) +
                                              (app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext())
                                              + "/" + apiIdentifier.getVersion() + "/");
