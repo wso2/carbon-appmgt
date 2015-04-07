@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.soap.SOAPBody;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -81,6 +82,7 @@ import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.xml.namespace.QName;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -101,6 +103,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_ASSERTION = "Assertion";
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_ASSERTION_NOT_ON_OR_AFTER = "NotOnOrAfter";
 
+    // The element name which IDP uses when it issues an SLO request to the SP.
+    private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST = "SAMLRequest";
+    
     private volatile Authenticator authenticator;
     private SAML2Authenticator saml2Authenticator;
     private String issuer;
@@ -159,6 +164,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 webAppInfoDTO = getSSOInfoForApp(webAppContext, webAppVersion);
             }
 
+            // If this is an SLO request we need to respond to the client (IDP) without continuing the flow. 
+            if(isSLORequestFromIDP(messageContext)){
+            	handleSLORequest();
+            	sendSLOResponse(messageContext);
+            	return false;
+            }
+            
 
             // check if anonymous mode allowed for the entire app
             boolean isAllowAnonymousApp = isAllowAnonymousApplication();
@@ -250,7 +262,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
-    /**
+	/**
      * Check if the Anonymous Access is allowed for the overall app
      *
      * @return result : boolean result relevant to registry value
@@ -313,6 +325,66 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         return true;
     }
 
+    public void destroy() {
+        if (log.isDebugEnabled()) {
+            log.debug("Destroying WebApp authentication handler instance");
+        }
+    }
+
+    private void sendSLOResponse(MessageContext messageContext) {
+
+    	org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+		Object headers = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+		
+		if (headers != null && headers instanceof Map) {
+            
+			@SuppressWarnings("unchecked")
+			Map<String, Object> headersMap = (Map<String, Object>) headers;
+            
+			headersMap.clear();
+			axis2MessageContext.setProperty("HTTP_SC", "200");
+            axis2MessageContext.setProperty("NO_ENTITY_BODY", new Boolean("true"));
+            messageContext.setProperty("RESPONSE", "true");
+            messageContext.setTo(null);
+            Axis2Sender.sendBack(messageContext);
+        }
+	}
+
+	private void handleSLORequest() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private boolean isSLORequestFromIDP(MessageContext messageContext) {
+		
+    	org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) messageContext).
+                getAxis2MessageContext();
+
+        try {
+            RelayUtils.buildMessage(axis2MessageContext);
+        } catch (Exception e) {
+        	String errorMessage = "Error while building the message.";
+            log.error(errorMessage,e);
+            throw new SynapseException(errorMessage, e);
+        }
+
+        SOAPBody soapBody = messageContext.getEnvelope().getBody();
+
+        if(soapBody != null) {
+            
+            // Try to get the SAML request in the SOAP body.
+        	// The expected structure is <body><mediate><SamlRequest></SamlRequest></mediate></body>
+        	
+        	if(soapBody.getChildren().hasNext()){
+        		// Check whether there is a SAML request in the SOAP body.
+        		Iterator possibleSAMLRequestElements = ((OMElement)(soapBody.getChildren().next())).getChildrenWithName(new QName(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST));
+        		return possibleSAMLRequestElements.hasNext();
+        	}
+        }
+    	
+		return false;
+	}
+
     /**
      * Checks whether the request should be authenticated using the cookie.
      *
@@ -332,13 +404,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
     }
-
-    public void destroy() {
-        if (log.isDebugEnabled()) {
-            log.debug("Destroying WebApp authentication handler instance");
-        }
-    }
-
+	
     /**
      * Checks whether the request should be authenticated using the SAML response from the IDP.
      * @param messageContext
