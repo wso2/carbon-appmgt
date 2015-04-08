@@ -20,24 +20,22 @@
 
 package org.wso2.carbon.appmgt.mobile.store;
 
+import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MDMConfig {
 
-    public boolean isMDMEnabled(){
-        return MobileConfigurations.getInstance().isMDMEnabled();
-    }
+    public String getConfigs(){
+        HashMap<String, String> configs = MobileConfigurations.getInstance().getMDMConfigs();
+        JSONObject jsonConf = new JSONObject();
+        for (Map.Entry<String, String> config : configs.entrySet()) {
+            jsonConf.put(config.getKey(), config.getValue());
+        }
 
-    public boolean isSampleDevicesEnabled(){
-        return MobileConfigurations.getInstance().isSampleDevicesEnabled();
-    }
-
-    public boolean isEnterpriseOperationsEnabled(){
-        return MobileConfigurations.getInstance().isEnterpriseOperationsEnabled();
-    }
-
-    public String getEnterpriseAuthorizedRole(){
-        return MobileConfigurations.getInstance().getEnterpriseAuthorizedRole();
+        return jsonConf.toJSONString();
     }
 
 }

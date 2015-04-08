@@ -49,7 +49,7 @@ public class AppManagerMobileComponent {
     protected void setMDMService(MDMOperations operations) {
         if((MobileConfigurations.getInstance().getActiveMDMBundle() + "." + MDM_OPERATIONS_CLASS).equals(operations.getClass().getName())){
             MDMServiceReferenceHolder.getInstance().setMDMOperation(operations);
-            log.info(MobileConfigurations.getInstance().getActiveMDM() + " MDM is bound to App Manager");
+            log.info(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.ACTIVE_MDM) + " MDM is bound to App Manager");
         }
 
     }
