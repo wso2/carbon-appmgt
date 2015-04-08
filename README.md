@@ -8,7 +8,7 @@ to solve a wide range of enterprise challenges associated with managing many num
 applications (Mobile and Web).
 
 The Carbon components in this project are the building blocks of the AppM. The product which is
-built with carbon components can be found at [product-app-manager](../product-app-manager).
+built with carbon components can be found at [product-app-manager](https://github.com/wso2/product-app-manager).
 
 
 Documentation
