@@ -27,7 +27,7 @@
 	<artifactId>org.wso2.carbon.appmgt.services.api.feature</artifactId>
 	<packaging>pom</packaging>
         <version>1.0.0-SNAPSHOT</version>
-	<name>WSO2 Carbon - APPMGT Services API Feature</name>
+	<name>WSO2 Carbon - App Manager Services API Feature</name>
 	<url>http://wso2.org</url>
 	<build>
         <plugins>
