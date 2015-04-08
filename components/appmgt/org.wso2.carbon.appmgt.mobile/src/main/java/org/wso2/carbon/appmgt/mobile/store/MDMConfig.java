@@ -32,7 +32,12 @@ public class MDMConfig {
         HashMap<String, String> configs = MobileConfigurations.getInstance().getMDMConfigs();
         JSONObject jsonConf = new JSONObject();
         for (Map.Entry<String, String> config : configs.entrySet()) {
-            jsonConf.put(config.getKey(), config.getValue());
+            String value = config.getValue();
+            if ("true".equals(value) || "false".equals(value)) {
+                jsonConf.put(config.getKey(), Boolean.valueOf(value));
+            } else {
+                jsonConf.put(config.getKey(), value);
+            }
         }
 
         return jsonConf.toJSONString();
