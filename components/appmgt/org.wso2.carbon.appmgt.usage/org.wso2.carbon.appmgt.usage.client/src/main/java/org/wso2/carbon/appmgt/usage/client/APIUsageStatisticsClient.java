@@ -21,6 +21,7 @@ package org.wso2.carbon.appmgt.usage.client;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -48,6 +49,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -1166,6 +1168,9 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
+                    if(columnName.equals("REFERER")){
+                        columnValue = StringEscapeUtils.escapeXml(columnValue);
+                    }
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
                             "</" + columnName.toLowerCase() + ">");
                 }

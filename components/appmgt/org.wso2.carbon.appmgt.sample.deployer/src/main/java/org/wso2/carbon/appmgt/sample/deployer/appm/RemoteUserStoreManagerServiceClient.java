@@ -21,7 +21,6 @@ package org.wso2.carbon.appmgt.sample.deployer.appm;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
-import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
 import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceStub;
 import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
 
@@ -58,18 +57,21 @@ public class RemoteUserStoreManagerServiceClient {
     /**
      * This method is use to set a value for given claim
      *
+     *@param userName
+     *           - currently logged user
+     *
      *@param claimURI
      *          -URI of the claim
      *
      *@param data
      *          -value
      *
-     * @throws RemoteException
+     *@throws RemoteException
      *             - Throws this when failed to update a claim value
      *
      * */
-    public void updateClaims(String claimURI, String data) throws RemoteException,
+    public void updateClaims(String userName,String claimURI, String data) throws RemoteException,
             RemoteUserStoreManagerServiceUserStoreExceptionException {
-        userStoreManagerStub.setUserClaimValue(Configuration.getUserName(), claimURI, data, "default");
+        userStoreManagerStub.setUserClaimValue(userName, claimURI, data, "default");
     }
 }
