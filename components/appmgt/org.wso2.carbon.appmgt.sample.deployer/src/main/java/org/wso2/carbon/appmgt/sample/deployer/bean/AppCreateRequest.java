@@ -1,7 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.bean;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +16,12 @@ package org.wso2.carbon.appmgt.sample.deployer.bean;
 * under the License.
 */
 
+package org.wso2.carbon.appmgt.sample.deployer.bean;
+
+/**
+ * This class is use as a bean class for web applications
+ *
+ * */
 public class AppCreateRequest extends AbstractRequest {
     private String overview_provider = "admin";
     private String overview_name = "test";
@@ -81,6 +85,10 @@ public class AppCreateRequest extends AbstractRequest {
     private String oauthapis_apiName3 = "";
     private String webapp = "webapp";
 
+    /**
+     * Add all the attributes in to hasmap with there values
+     *
+     * */
     @Override
     public void init() {
         addParameter("overview_provider", getOverview_provider());
@@ -145,11 +153,6 @@ public class AppCreateRequest extends AbstractRequest {
         addParameter("webapp", getWebapp());
         addParameter("uritemplate_javaPolicyIds", getUritemplate_javaPolicyIds());
         //addParameter("uritemplate_javaPolicyIds", getUritemplate_javaPolicyIds());
-    }
-
-    @Override
-    public void setAction() {
-        // TODO Auto-generated method stub
     }
 
     public String getOverview_provider() {
