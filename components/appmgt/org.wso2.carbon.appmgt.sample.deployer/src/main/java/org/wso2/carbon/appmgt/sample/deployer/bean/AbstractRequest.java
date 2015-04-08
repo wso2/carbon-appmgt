@@ -1,12 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.bean;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -23,12 +16,27 @@ import java.util.Random;
 * under the License.
 */
 
+package org.wso2.carbon.appmgt.sample.deployer.bean;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+
+/**
+ * This class is use to build payload and generate tracking id for web application
+ *
+ * */
 public abstract class AbstractRequest {
 
-    private static final String ACTION_PARAMETER_VALUE = "action";
-    public String action;
     private Map<String, String> parameterMap = new HashMap<String, String>();
 
+    /**
+     * This method is use to build payload for web application creating request
+     *
+     *@return  payload for web application
+     *
+     * */
     public String generateRequestParameters() {
         parameterMap.clear();
         init();
@@ -54,6 +62,12 @@ public abstract class AbstractRequest {
         return requestParams;
     }
 
+    /**
+     * This method is use to generate tracking id for web application
+     *
+     *@return  generated tracking id for web application
+     *
+     * */
     public String generateTrackingID() {
         Random rand = new Random();
         StringBuilder randomNumber = new StringBuilder();
@@ -68,11 +82,7 @@ public abstract class AbstractRequest {
         parameterMap.put(key, value);
     }
 
-    public abstract void setAction();
-
     public abstract void init();
 
-    public void setAction(String actionName) {
-        this.action = actionName;
-    }
+
 }

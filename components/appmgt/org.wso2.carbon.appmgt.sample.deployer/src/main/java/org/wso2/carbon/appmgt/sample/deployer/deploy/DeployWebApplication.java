@@ -1,14 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.deploy;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.wso2.carbon.utils.CarbonUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -25,17 +16,43 @@ import java.io.IOException;
 * under the License.
 */
 
+package org.wso2.carbon.appmgt.sample.deployer.deploy;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.io.File;
+import java.io.IOException;
+/**
+ * This class is use to deploy war file in server
+ * */
 public class DeployWebApplication {
 
     final static Logger log = Logger.getLogger(DeployWebApplication.class.getName());
     private static String homePath = CarbonUtils.getCarbonHome();
 
-    public void copyFileUsingFileStreams(String warFileName) throws IOException {
+    /**
+     * This method is use deploy war file according to given name
+     *
+     * @param warFileName
+     *            - Name of the war file that need to be deploy
+     *
+     * @throws AppManagementException
+     *             - Throws this when failed to deploy web application
+     */
+    public void copyFileUsingFileStreams(String warFileName) throws AppManagementException {
         homePath = CarbonUtils.getCarbonHome();
         File souceFile = new File(homePath + "/samples/" + warFileName);
         log.info(souceFile.getAbsolutePath());
         File destinantionFile = new File(homePath + "/repository/deployment/server/webapps/" + warFileName);
-        FileUtils.copyFile(souceFile,
-                destinantionFile);
+        try {
+            FileUtils.copyFile(souceFile,
+                    destinantionFile);
+        } catch (IOException e) {
+            log.error("Error while deploying a "+warFileName, e);
+            throw  new AppManagementException("Error while deploying a "+warFileName, e);
+        }
     }
 }
