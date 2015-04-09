@@ -23,6 +23,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.sample.deployer.appm.WSRegistryServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.bean.AppCreateRequest;
 import org.wso2.carbon.appmgt.sample.deployer.bean.MobileApplicationBean;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -61,16 +63,18 @@ public class ApplicationController {
     private String ipAddress = "localhost";
     private String currentUserName;
     private ManageUser manageUser;
+    private Random random;
+    private String adminPublisherSession;
 
     /**
      * Creates a new ApplicationController object and initialising objects,attributes
      *
      * @param currentUserName
-     *            - Current logged username
+     *            Current logged username
      *
      * @throws AppManagementException
-     *             - Throws this when failed to initialise the ip address
-     *             - Throws this when failed to initialise the WSRegistryServiceClient
+     *            Throws this when failed to initialise the ip address
+     *            Throws this when failed to initialise the WSRegistryServiceClient
      */
     public ApplicationController(String currentUserName) throws AppManagementException {
         this.currentUserName = currentUserName;
@@ -85,6 +89,8 @@ public class ApplicationController {
         httpBackEndUrl = Configuration.getHttpUrl();
         httpHandler = new HttpHandler();
         trackingCodes = new ConcurrentHashMap<String, String>();
+        random = new Random();
+
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);
         } catch (RegistryException e) {
@@ -97,21 +103,35 @@ public class ApplicationController {
     }
 
     /**
-     * This method is use for create,publish and subcribe two sample web application
+     * This method is use for create,publish and subscribe two sample web application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws AppManagementException
-     *             - Throws this when failed to add an user
-     *             - Throws this when store session is failed while requesting
-     *             - Throws this when policy id is failed while requesting
-     *             - Throws this when failed to create,publish or subscribe web application
+     *            Throws this when failed to add an user
+     *            Throws this when store session is failed while requesting
+     *            Throws this when policy id is failed while requesting
+     *            Throws this when failed to create,publish or subscribe web application
      */
     public void manageWebApplication(String publisherSession) throws AppManagementException{
+        if(currentUserName.equals("admin")){
+            adminPublisherSession = publisherSession;
+        }else{
+            try {
+                adminPublisherSession =  httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/authenticate",
+                        "username=" + Configuration.getUserName() + "&password=" + Configuration.getPassword() +
+                                "&action=login", ""
+                        , "application/x-www-form-urlencoded");
+            } catch (IOException e) {
+                log.error("Error while requesting publisher session", e);
+                throw  new AppManagementException("Error while requesting publisher session",e);
+            }
+        }
+
         try {
             manageUser = new ManageUser();
-            manageUser.addUser();
+            manageUser.addUser("subscriber_"+currentUserName);
         } catch (UserAdminUserAdminException e) {
             log.error("Error while registering a User",e);
         } catch (RemoteException e) {
@@ -122,7 +142,7 @@ public class ApplicationController {
         }
         try {
             storeSession = httpHandler.doPostHttp(httpBackEndUrl + "/store/apis/user/login",
-                    "{\"username\":\"subscriber\"" +
+                    "{\"username\":\"subscriber_"+currentUserName+"\"" +
                             ",\"password\":\"subscriber\"}", "header", "application/json");
         } catch (IOException e) {
             log.error("Error while requesting a store session",e);
@@ -154,9 +174,9 @@ public class ApplicationController {
         appCreateRequest.setClaimPropertyCounter("3");
         //publishing plan your trip web application
         log.info("publishing PlanYourTrip");
-        appCreateRequest.setOverview_name("PlanYourTrip");
-        appCreateRequest.setOverview_displayName("PlanYourTrip");
-        appCreateRequest.setOverview_context("/planYourTrip");
+        appCreateRequest.setOverview_name("PlanYourTrip_"+currentUserName);
+        appCreateRequest.setOverview_displayName("Plan Your Trip");
+        appCreateRequest.setOverview_context(generateWebAppContext("/planYourTrip"));
         appCreateRequest.setOverview_version("1.0.0");
         appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
         appCreateRequest.setOverview_transports("http");
@@ -175,7 +195,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
         }
         try {
-            publishApplication("webapp", UUID, publisherSession);
+            publishApplication("webapp", UUID);
         } catch (IOException e) {
             log.error("Error while publishing a web application Plan Your Trip", e);
             throw  new AppManagementException("Error while publishing a web application Plan Your Trip", e);
@@ -190,9 +210,9 @@ public class ApplicationController {
         log.info(appCreateRequest.getOverview_name() + "application subscribed by user ");
         //publishing travel booking application
         log.info("publishing TravelBooking");
-        appCreateRequest.setOverview_name("TravelBooking");
+        appCreateRequest.setOverview_name("TravelBooking_"+currentUserName);
         appCreateRequest.setOverview_displayName("TravelBooking");
-        appCreateRequest.setOverview_context("/travelBooking");
+        appCreateRequest.setOverview_context(generateWebAppContext("/travelBooking"));
         appCreateRequest.setOverview_version("1.0.0");
         appCreateRequest.setOverview_transports("http");
         appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
@@ -216,7 +236,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating a web application TravelBooking", e);
         }
         try {
-            publishApplication("webapp", UUID, publisherSession);
+            publishApplication("webapp", UUID);
         } catch (IOException e) {
             log.error("Error while publishing a web application TravelBooking", e);
             throw  new AppManagementException("Error while publishing a web application TravelBooking", e);
@@ -235,11 +255,11 @@ public class ApplicationController {
      * This method is use for create and publish sample mobile application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws AppManagementException
-     *             - Throws this when apk file is failed while uploading
-     *             - Throws this when failed to create or publish web application
+     *            Throws this when apk file is failed while uploading
+     *            Throws this when failed to create or publish web application
      */
     public void manageMobilebApplication(String publisherSession) throws AppManagementException {
         log.info("publishing CleanCalc mobile application");
@@ -283,7 +303,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating CLeanCalc Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID, publisherSession);
+            publishApplication("mobileapp", UUID);
         } catch (IOException e) {
             log.error("Error while publishing CLeanCalc Mobile Application", e);
             throw  new AppManagementException("Error while publishing CLeanCalc Mobile Application", e);
@@ -321,7 +341,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating WSO2Con Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID, publisherSession);
+            publishApplication("mobileapp", UUID);
         } catch (IOException e) {
             log.error("Error while publishing WSO2Con Mobile Application", e);
             throw  new AppManagementException("Error while publishing WSO2Con Mobile Application", e);
@@ -364,7 +384,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating MyTrack Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID, publisherSession);
+            publishApplication("mobileapp", UUID);
         } catch (IOException e) {
             log.error("Error while publishing MyTrack Mobile Application", e);
             throw  new AppManagementException("Error while publishing MyTrack Mobile Application", e);
@@ -376,21 +396,21 @@ public class ApplicationController {
      * This method is use for create web application
      *
      * @param appCreateRequest
-     *            - bean object of the web application
+     *           bean object of the web application
      * @param publisherSession
-     *            - Current logged publisher session
+     *           Current logged publisher session
      *
      * @throws IOException
-     *             - Throws this when failed to create web application
+     *           Throws this when failed to create web application
      *
      * @throws RegistryException
-     *             - Throws this when UUID failed while requesting
+     *           Throws this when UUID failed while requesting
      *
      * @throws AppManagementException
-     *             - Throws this when gateway port failed while retrieving
+     *           Throws this when gateway port failed while retrieving
      *
      * @throws java.lang.InterruptedException
-     *             - Throws this when thread failed
+     *           Throws this when thread failed
      */
     private String createWebApplication(AppCreateRequest appCreateRequest, String publisherSession)
             throws IOException, RegistryException, AppManagementException, InterruptedException {
@@ -429,10 +449,10 @@ public class ApplicationController {
         trackingCodes.put(appCreateRequest.getOverview_context(), trackingID);
         invokeStatistcsJavascriptBuilder = new InvokeStatistcsJavascriptBuilder
                 (trackingID, ipAddress,Configuration.getGatewayPort());
-        if (appCreateRequest.getOverview_name().equals("PlanYourTrip")) {
+        if (appCreateRequest.getOverview_name().equals("PlanYourTrip_"+currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/plan-your-trip-1.0");
-        } else if (appCreateRequest.getOverview_name().equals("TravelBooking")) {
+        } else if (appCreateRequest.getOverview_name().equals("TravelBooking_"+currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/travel-booking-1.0/js");
         }
@@ -444,36 +464,34 @@ public class ApplicationController {
      * This method is use for publish web application or mobile application
      *
      * @param applicationType
-     *            - type of the application whether mobile application or web application
+     *           type of the application whether mobile application or web application
      * @param UUID
-     *            - UUID of the application
-     * @param publisherSession
-     *            - Current logged publisher session
+     *           UUID of the application
      *
      * @throws IOException
-     *             - Throws this when failed to create web application
+     *           Throws this when failed to create web application
      *
      * @throws RegistryException
-     *             - Throws this when UUID failed while requesting
+     *           Throws this when UUID failed while requesting
      */
-    private void publishApplication(String applicationType, String UUID, String publisherSession) throws IOException {
+    private void publishApplication(String applicationType, String UUID) throws IOException {
         httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Submit%20for%20Review/" + applicationType + "/"
                 + UUID
-                , publisherSession);
+                , adminPublisherSession);
         httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Approve/" + applicationType + "/" + UUID
-                , publisherSession);
+                , adminPublisherSession);
         httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Publish/" + applicationType + "/" + UUID
-                , publisherSession);
+                , adminPublisherSession);
     }
 
     /**
      * This method is use for suscribe web application
      *
      * @param appCreateRequest
-     *            - Bean of the web application
+     *           Bean of the web application
      *
      * @throws IOException
-     *             - Throws this when failed to suscribe web application
+     *           Throws this when failed to suscribe web application
      */
     private void subscribeApplication(AppCreateRequest appCreateRequest) throws IOException {
         httpHandler.doPostHttps(httpsBackEndUrl + "/store/resources/webapp/v1/subscription/app",
@@ -488,13 +506,13 @@ public class ApplicationController {
      * This method is use for suscribe web application
      *
      * @param mobileApplicationBean
-     *            - Bean of the mobile application
+     *            Bean of the mobile application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws IOException
-     *             - Throws this when failed to suscribe web application
+     *            Throws this when failed to suscribe web application
      */
     private String createMobielAppliaction(MobileApplicationBean mobileApplicationBean, String publisherSession
             ) throws IOException, InterruptedException {
@@ -506,20 +524,20 @@ public class ApplicationController {
      * This method is use for accses a web application according to user given hit count
      *
      * @param webContext
-     *            - Context of the web application
+     *            Context of the web application
      *
      * @param trackingCode
-     *            - Tracking code of the web application
+     *            Tracking code of the web application
      *
      * @param hitCount
-     *            - Hit count for web application
+     *            Hit count for web application
      *
      * @param ipAddress
-     *            - IP address of the user mashine
+     *            IP address of the user mashine
      *
      * @throws AppManagementException
-     *             - Throws this when failed to accses web application
-     *             - Throws this when thread failed to sleep
+     *            Throws this when failed to accses web application
+     *            Throws this when thread failed to sleep
      */
     public void accsesWebPages(String webContext, String trackingCode, int hitCount, String ipAddress) throws AppManagementException {
         String loginHtmlPage = null;
@@ -582,13 +600,13 @@ public class ApplicationController {
      * This method is use to build a url
      *
      * @param pageName
-     *            - Page name of the web application
+     *            Page name of the web application
      *
      * @param webAppUrl
-     *            - Current url of web application
+     *            Current url of web application
      *
      * @param isAppendLastOne
-     *            -
+     *
      *
      */
     private String appendPageToUrl(String pageName, String webAppUrl, boolean isAppendLastOne) {
@@ -607,6 +625,26 @@ public class ApplicationController {
         }
         newUrl.append(pageName + "/");
         return newUrl.toString();
+    }
+
+    /**
+     * This method is use to check the availabilty of given context and if it is available generate new context
+     *
+     * @param context
+     *            Page name of the web application
+     *
+     * @return generated or given context
+     *
+     */
+    private String generateWebAppContext(String context){
+        if(!AppMDAO.isContextExist(context)){
+            return context;
+        }else {
+            context += (random.nextInt(10 - 0 + 1));
+            return generateWebAppContext(context);
+        }
+
+
     }
 
 }

@@ -56,10 +56,10 @@ public class ManageClaim {
      *
      *
      * @throws AppManagementException
-     *             - Throws this when LoginAdminServiceClient failed initialise
-     *             - Throws this when authentication failed
-     *             - Throws this when ClaimManagementServiceClient failed initialise
-     *             - Throws this when RemoteUserStoreManagerServiceClient failed initialise
+     *             Throws this when LoginAdminServiceClient failed initialise
+     *             Throws this when authentication failed
+     *             Throws this when ClaimManagementServiceClient failed initialise
+     *             Throws this when RemoteUserStoreManagerServiceClient failed initialise
      */
     public ManageClaim() throws AppManagementException {
         try {
@@ -116,24 +116,29 @@ public class ManageClaim {
     /**
      * This method is use to update claim values
      *
+     * @param userName
+     *           currently logged user
+     *
      * @throws AppManagementException
-     *             - Throws this when failed to update claim value
+     *           Throws this when failed to update claim value
      *
      * */
-    public void setClaimValues() throws AppManagementException {
+    public void setClaimValues(String userName) throws AppManagementException {
         try {
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/ffid", "12345151");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/streetaddress", "21/5");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/zipcode", "GL");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/card_number"
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/ffid", "12345151");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/streetaddress", "21/5");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/zipcode", "GL");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/card_number"
                     , "001012676878");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/card_holder", "Admin");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/telephone", "091222222");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/givenname", "Sachith");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/lastname", "Ushan");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/emailaddress", "wso2@wso2.com");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/country", "SriLanka");
-            remoteUserStoreManagerServiceClient.updateClaims("http://wso2.org/claims/expiration_date"
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/card_holder", "Admin");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/telephone", "091222222");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/givenname", "Sachith");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/lastname", "Ushan");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/emailaddress"
+                    ,"wso2@wso2.com");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,
+                    "http://wso2.org/claims/country", "SriLanka");
+            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/expiration_date"
                     , "31/12/2015");
         } catch (RemoteException e) {
             log.error("Error while updating a claim vaue", e);

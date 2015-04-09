@@ -95,11 +95,9 @@ public class MDMOperationsImpl implements MDMOperations {
                         requestApp.put(method.getAnnotation(Property.class).name(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    log.error("Illegal Action");
-                    log.debug("Error: " + e);
+                    log.error("Illegal Action", e);
                 } catch (InvocationTargetException e) {
-                    log.error("Target invocation failed");
-                    log.debug("Error: " + e);
+                    log.error("Target invocation failed", e);
                 }
             }
 
@@ -131,8 +129,7 @@ public class MDMOperationsImpl implements MDMOperations {
             }
 
         } catch (IOException e) {
-            log.error("Cannot connect to WSO2 MDM to perform operation");
-            log.debug("Error: " + e);
+            log.error("Cannot connect to WSO2 MDM to perform operation", e);
         }
 
     }
@@ -183,7 +180,7 @@ public class MDMOperationsImpl implements MDMOperations {
                         log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                     }
                 } catch (IOException e) {
-                    log.error("Invalid response from the devices API");
+                    log.error("Invalid response from the devices API", e);
                 }
             }else{
                 log.error("MDM Devices API failed");
@@ -218,8 +215,7 @@ public class MDMOperationsImpl implements MDMOperations {
             log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
-            log.error("Cannot connect to Token API Endpoint");
-            log.debug("Error: " + e);
+            log.error("Cannot connect to Token API Endpoint", e);
             return null;
         }
 
@@ -249,7 +245,7 @@ public class MDMOperationsImpl implements MDMOperations {
                         statusCode = httpClient.executeMethod(httpMethod);
                         if(statusCode == Response.Status.UNAUTHORIZED.getStatusCode()){
                             if(++tries > 3){
-                                log.error("API Call failed for the 3rd time: Unauthorized Access Aborting...");
+                                log.info("API Call failed for the 3rd time: Unauthorized Access Aborting...");
                                 return false;
                             }
                             authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, true);
@@ -257,8 +253,7 @@ public class MDMOperationsImpl implements MDMOperations {
                     }
                     return true;
                 } catch (IOException e) {
-                    log.error("No OK response received form the API");
-                    log.debug("Error:" + e);
+                    log.error("No OK response received form the API", e);
                     return false;
                 }
     }

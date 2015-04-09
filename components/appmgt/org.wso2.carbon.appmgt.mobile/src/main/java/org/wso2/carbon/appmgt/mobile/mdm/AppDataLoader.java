@@ -75,8 +75,7 @@ public class AppDataLoader {
                 app.setIdentifier(artifact.getAttribute("overview_appid"));
             }
         } catch (GovernanceException e) {
-            log.error("Error occurred while retrieving information from governance registry");
-            log.debug("Error: " + e);
+            log.error("Error occurred while retrieving information from governance registry", e);
         }finally {
             return app;
         }

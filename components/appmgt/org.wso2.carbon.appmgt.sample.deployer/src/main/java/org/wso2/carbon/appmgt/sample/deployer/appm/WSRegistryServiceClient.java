@@ -49,13 +49,13 @@ public class WSRegistryServiceClient {
      * the org.wso2.carbon.registry.ws.client.registry.WSRegistryServiceClient
      *
      * @param backEndUrl
-     *            - https server url
+     *            https server url
      *
      * @throws AxisFault
-     *             - Throws this when WSRegistryServiceClient failed initialise
+     *            Throws this when WSRegistryServiceClient failed initialise
      *
      * @throws RegistryException
-     *             - Throws this when WSRegistryServiceClient failed initialise
+     *            Throws this when WSRegistryServiceClient failed initialise
      */
     public WSRegistryServiceClient(String backEndUrl) throws RegistryException, AxisFault {
         ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
@@ -69,12 +69,12 @@ public class WSRegistryServiceClient {
      * This method is use to set a value for given claim
      *
      *@param path
-     *          -registry path for web application
+     *          registry path for web application
      *
      *@return UUID of the web application
      *
      * @throws java.rmi.RemoteException
-     *             - Throws this when failed to update a claim value
+     *          Throws this when failed to update a claim value
      *
      * */
     public String getUUID(String path) throws RegistryException {

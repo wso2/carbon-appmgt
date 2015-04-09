@@ -60,12 +60,12 @@ public class HttpHandler {
      * This method is use get a html file for given url
      *
      * @param url
-     *            -Web page url
+     *          Web page url
      *
      * @return response
      *
      * @throws  java.io.IOException
-     *             - Throws this when failed to retrieve web page
+     *            Throws this when failed to retrieve web page
      */
     public static String getHtml(String url) throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
@@ -87,16 +87,16 @@ public class HttpHandler {
      * This method is used to do a https post request
      *
      * @param url
-     *            - request url
+     *           request url
      *
      * @param payload
-     *            - Content of the post request
+     *            Content of the post request
      *
      * @param sessionId
-     *            - sessionId for authentication
+     *            sessionId for authentication
      *
      * @param contentType
-     *            - content type of the post request
+     *            content type of the post request
      *
      * @return response
      *
@@ -149,16 +149,16 @@ public class HttpHandler {
      * This method is used to do a http post request
      *
      * @param url
-     *            - request url
+     *            request url
      *
      * @param payload
-     *            - Content of the post request
+     *            Content of the post request
      *
      * @param sessionId
-     *            - sessionId for authentication
+     *            sessionId for authentication
      *
      * @param contentType
-     *            - content type of the post request
+     *            content type of the post request
      *
      * @return response
      *
@@ -210,10 +210,10 @@ public class HttpHandler {
      * This method is used to do a http put request
      *
      * @param url
-     *          - request url
+     *          request url
      *
      * @param sessionId
-     *          - sessionId for authentication
+     *          sessionId for authentication
      *
      * @return response
      *
@@ -246,13 +246,13 @@ public class HttpHandler {
      * This method is used to do a http post request in multi data format
      *
      * @param url
-     *          - request url
+     *          request url
      *
      * @param isApkFile
-     *          - if content is an apk file
+     *          if content is an apk file
      *
      * @param mobileApplicationBean
-     *          - bean object of mobile application
+     *          bean object of mobile application
      *
      * @param sessionId
      *          - sessionId for authentication
@@ -318,21 +318,21 @@ public class HttpHandler {
      * This method is used to do a http get request
      *
      * @param url
-     *          - request url
+     *          request url
      *
      * @param trackingCode
-     *          - tracking code of the web application
+     *          tracking code of the web application
      *
      * @param appmSamlSsoTokenId
-     *          - appmSamlSsoTokenId id of the web application
+     *          appmSamlSsoTokenId id of the web application
      *
      * @param refer
-     *          - web page url
+     *          web page url
      *
      * @return response
      *
      * @throws  java.io.IOException
-     *             - Throws this when failed to fulfill a http get request
+     *             Throws this when failed to fulfill a http get request
      */
     public String doGet(String url, String trackingCode, String appmSamlSsoTokenId, String refer) throws IOException {
         URL obj = new URL(url);

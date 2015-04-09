@@ -46,7 +46,7 @@ public class AppManagerSampleDeployerComponent {
      * This method is triggered when component is activated
      *
      * @param context
-     *            - smaple deployer component context
+     *            smaple deployer component context
      *
      */
     protected void activate(ComponentContext context) {
@@ -73,7 +73,7 @@ public class AppManagerSampleDeployerComponent {
      * This method is triggered when component is deactivated
      *
      * @param context
-     *            - smaple deployer component context
+     *            smaple deployer component context
      *
      */
     protected void deactivate(ComponentContext context) {
@@ -87,7 +87,7 @@ public class AppManagerSampleDeployerComponent {
      * Set the given ConfigurationContextService to ServiceReferenceHolder instance
      *
      * @param cfgCtxService
-     *            - smaple deployer component configuration context service
+     *            smaple deployer component configuration context service
      *
      */
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
@@ -101,7 +101,7 @@ public class AppManagerSampleDeployerComponent {
      * Unset the ConfigurationContextService from ServiceReferenceHolder instance
      *
      * @param cfgCtxService
-     *            - smaple deployer component configuration context service
+     *            smaple deployer component configuration context service
      *
      */
     protected void unsetConfigurationContextService(ConfigurationContextService cfgCtxService) {

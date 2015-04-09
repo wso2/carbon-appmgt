@@ -94,11 +94,9 @@ public class MDMOperationsImpl implements MDMOperations {
                         requestApp.put(method.getAnnotation(Property.class).name(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    log.error("Illegal Action");
-                    log.debug("Error: " + e);
+                    log.error("Illegal Action", e);
                 } catch (InvocationTargetException e) {
-                    log.error("Target invocation failed");
-                    log.debug("Error: " + e);
+                    log.error("Target invocation failed", e);
                 }
             }
 
@@ -114,7 +112,7 @@ public class MDMOperationsImpl implements MDMOperations {
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error(e);
+            log.error("JSON encoding not supported", e);
         }
 
         String requestURL = serverURL + String.format(Constants.API_OPERATION, tenantId);
@@ -131,8 +129,7 @@ public class MDMOperationsImpl implements MDMOperations {
             }
 
         } catch (IOException e) {
-            log.error("Cannot connect to WSO2 EMM to perform operation");
-            log.debug("Error: " + e);
+            log.error("Cannot connect to WSO2 EMM to perform operation", e);
         }
 
     }
@@ -193,8 +190,7 @@ public class MDMOperationsImpl implements MDMOperations {
                    }
                 }
             } catch (IOException e) {
-                log.error("Error while getting the device list from WSO2 EMM");
-                log.debug("Error:" + e);
+                log.error("Error while getting the device list from WSO2 EMM", e);
             }
 
             return devices;

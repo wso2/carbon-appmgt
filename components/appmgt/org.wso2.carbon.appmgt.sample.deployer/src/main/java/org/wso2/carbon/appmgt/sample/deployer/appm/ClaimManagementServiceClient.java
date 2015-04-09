@@ -39,13 +39,13 @@ public class ClaimManagementServiceClient {
      * Creates a new ClaimManagementServiceClient object and initialising the ClaimManagementServiceStub
      *
      * @param cookie
-     *            - cookie to get authentication for ClaimManagementService
+     *            cookie to get authentication for ClaimManagementService
      *
      * @param url
-     *            - https server url
+     *            https server url
      *
      * @throws AxisFault
-     *             - Throws this when ClaimManagementServiceStub failed initialise
+     *            Throws this when ClaimManagementServiceStub failed initialise
      */
     public ClaimManagementServiceClient(String cookie, String url) throws AxisFault {
         String serviceURL = url + "/services/ClaimManagementService";
@@ -61,16 +61,16 @@ public class ClaimManagementServiceClient {
      * This method is use for accses a web application according to user given hit count
      *
      * @param description
-     *            - Name of the claim
+     *            Name of the claim
      *
      * @param claimURI
-     *            - URI of the claim
+     *            URI of the claim
      *
      * @param isRequired
-     *            - Whether claim is required or not
+     *            Whether claim is required or not
      *
      * @throws RemoteException
-     *             - Throws this when failed to add a claim mapping
+     *            Throws this when failed to add a claim mapping
      */
     public void addClaim(String description, String claimURI, boolean isRequired) throws RemoteException,
             ClaimManagementServiceException {
