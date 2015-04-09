@@ -19,7 +19,6 @@
 package org.wso2.carbon.appmgt.impl.dao;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -58,19 +57,15 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xalan.lib.sql.ObjectArray;
-import org.apache.xpath.operations.Bool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -6790,8 +6785,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setInt(6, policyGroupId);
 			ps.executeUpdate();
 
-            //delete XACML Policies from Entitlement Server
-            deleteXACMLPoliciesFromEntitlementServer(policyGroupId, conn);
+            //delete XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(policyGroupId, conn);
 
 			//delete partials mapped to group id
 			deletePolicyPartialMappings(policyGroupId, conn);
@@ -6966,8 +6961,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
 
-            //Remove XACML Policies from Entitlement Server
-            deleteXACMLPoliciesFromEntitlementServer(Integer.parseInt(policyGroupId), conn);
+            //Remove XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn);
 
 		 	//delete from master table
 			query = " DELETE FROM APM_POLICY_GROUP WHERE POLICY_GRP_ID=? ";
@@ -7065,13 +7060,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
     /**
-     * Remove XACML Policies from Entitlement Server
+     * Remove XACML Policies from Entitlement Service
      *
      * @param policyGroupId
      * @param conn
      * @throws SQLException
      */
-    public static void deleteXACMLPoliciesFromEntitlementServer(Integer policyGroupId, Connection conn)
+    public static void deleteXACMLPoliciesFromEntitlementService(Integer policyGroupId, Connection conn)
             throws SQLException {
         PreparedStatement ps = null;
         ResultSet rs = null;
