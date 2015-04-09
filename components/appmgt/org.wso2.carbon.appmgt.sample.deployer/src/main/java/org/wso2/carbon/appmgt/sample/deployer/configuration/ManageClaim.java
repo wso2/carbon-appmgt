@@ -56,10 +56,10 @@ public class ManageClaim {
      *
      *
      * @throws AppManagementException
-     *             - Throws this when LoginAdminServiceClient failed initialise
-     *             - Throws this when authentication failed
-     *             - Throws this when ClaimManagementServiceClient failed initialise
-     *             - Throws this when RemoteUserStoreManagerServiceClient failed initialise
+     *             Throws this when LoginAdminServiceClient failed initialise
+     *             Throws this when authentication failed
+     *             Throws this when ClaimManagementServiceClient failed initialise
+     *             Throws this when RemoteUserStoreManagerServiceClient failed initialise
      */
     public ManageClaim() throws AppManagementException {
         try {
@@ -117,10 +117,10 @@ public class ManageClaim {
      * This method is use to update claim values
      *
      * @param userName
-     *           - currently logged user
+     *           currently logged user
      *
      * @throws AppManagementException
-     *             - Throws this when failed to update claim value
+     *           Throws this when failed to update claim value
      *
      * */
     public void setClaimValues(String userName) throws AppManagementException {

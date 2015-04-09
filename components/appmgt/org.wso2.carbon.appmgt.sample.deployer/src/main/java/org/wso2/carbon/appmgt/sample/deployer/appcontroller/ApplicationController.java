@@ -70,11 +70,11 @@ public class ApplicationController {
      * Creates a new ApplicationController object and initialising objects,attributes
      *
      * @param currentUserName
-     *            - Current logged username
+     *            Current logged username
      *
      * @throws AppManagementException
-     *             - Throws this when failed to initialise the ip address
-     *             - Throws this when failed to initialise the WSRegistryServiceClient
+     *            Throws this when failed to initialise the ip address
+     *            Throws this when failed to initialise the WSRegistryServiceClient
      */
     public ApplicationController(String currentUserName) throws AppManagementException {
         this.currentUserName = currentUserName;
@@ -106,13 +106,13 @@ public class ApplicationController {
      * This method is use for create,publish and subscribe two sample web application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws AppManagementException
-     *             - Throws this when failed to add an user
-     *             - Throws this when store session is failed while requesting
-     *             - Throws this when policy id is failed while requesting
-     *             - Throws this when failed to create,publish or subscribe web application
+     *            Throws this when failed to add an user
+     *            Throws this when store session is failed while requesting
+     *            Throws this when policy id is failed while requesting
+     *            Throws this when failed to create,publish or subscribe web application
      */
     public void manageWebApplication(String publisherSession) throws AppManagementException{
         if(currentUserName.equals("admin")){
@@ -255,11 +255,11 @@ public class ApplicationController {
      * This method is use for create and publish sample mobile application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws AppManagementException
-     *             - Throws this when apk file is failed while uploading
-     *             - Throws this when failed to create or publish web application
+     *            Throws this when apk file is failed while uploading
+     *            Throws this when failed to create or publish web application
      */
     public void manageMobilebApplication(String publisherSession) throws AppManagementException {
         log.info("publishing CleanCalc mobile application");
@@ -396,21 +396,21 @@ public class ApplicationController {
      * This method is use for create web application
      *
      * @param appCreateRequest
-     *            - bean object of the web application
+     *           bean object of the web application
      * @param publisherSession
-     *            - Current logged publisher session
+     *           Current logged publisher session
      *
      * @throws IOException
-     *             - Throws this when failed to create web application
+     *           Throws this when failed to create web application
      *
      * @throws RegistryException
-     *             - Throws this when UUID failed while requesting
+     *           Throws this when UUID failed while requesting
      *
      * @throws AppManagementException
-     *             - Throws this when gateway port failed while retrieving
+     *           Throws this when gateway port failed while retrieving
      *
      * @throws java.lang.InterruptedException
-     *             - Throws this when thread failed
+     *           Throws this when thread failed
      */
     private String createWebApplication(AppCreateRequest appCreateRequest, String publisherSession)
             throws IOException, RegistryException, AppManagementException, InterruptedException {
@@ -464,15 +464,15 @@ public class ApplicationController {
      * This method is use for publish web application or mobile application
      *
      * @param applicationType
-     *            - type of the application whether mobile application or web application
+     *           type of the application whether mobile application or web application
      * @param UUID
-     *            - UUID of the application
+     *           UUID of the application
      *
      * @throws IOException
-     *             - Throws this when failed to create web application
+     *           Throws this when failed to create web application
      *
      * @throws RegistryException
-     *             - Throws this when UUID failed while requesting
+     *           Throws this when UUID failed while requesting
      */
     private void publishApplication(String applicationType, String UUID) throws IOException {
         httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Submit%20for%20Review/" + applicationType + "/"
@@ -488,10 +488,10 @@ public class ApplicationController {
      * This method is use for suscribe web application
      *
      * @param appCreateRequest
-     *            - Bean of the web application
+     *           Bean of the web application
      *
      * @throws IOException
-     *             - Throws this when failed to suscribe web application
+     *           Throws this when failed to suscribe web application
      */
     private void subscribeApplication(AppCreateRequest appCreateRequest) throws IOException {
         httpHandler.doPostHttps(httpsBackEndUrl + "/store/resources/webapp/v1/subscription/app",
@@ -506,13 +506,13 @@ public class ApplicationController {
      * This method is use for suscribe web application
      *
      * @param mobileApplicationBean
-     *            - Bean of the mobile application
+     *            Bean of the mobile application
      *
      * @param publisherSession
-     *            - Current logged publisher session
+     *            Current logged publisher session
      *
      * @throws IOException
-     *             - Throws this when failed to suscribe web application
+     *            Throws this when failed to suscribe web application
      */
     private String createMobielAppliaction(MobileApplicationBean mobileApplicationBean, String publisherSession
             ) throws IOException, InterruptedException {
@@ -524,20 +524,20 @@ public class ApplicationController {
      * This method is use for accses a web application according to user given hit count
      *
      * @param webContext
-     *            - Context of the web application
+     *            Context of the web application
      *
      * @param trackingCode
-     *            - Tracking code of the web application
+     *            Tracking code of the web application
      *
      * @param hitCount
-     *            - Hit count for web application
+     *            Hit count for web application
      *
      * @param ipAddress
-     *            - IP address of the user mashine
+     *            IP address of the user mashine
      *
      * @throws AppManagementException
-     *             - Throws this when failed to accses web application
-     *             - Throws this when thread failed to sleep
+     *            Throws this when failed to accses web application
+     *            Throws this when thread failed to sleep
      */
     public void accsesWebPages(String webContext, String trackingCode, int hitCount, String ipAddress) throws AppManagementException {
         String loginHtmlPage = null;
@@ -600,13 +600,13 @@ public class ApplicationController {
      * This method is use to build a url
      *
      * @param pageName
-     *            - Page name of the web application
+     *            Page name of the web application
      *
      * @param webAppUrl
-     *            - Current url of web application
+     *            Current url of web application
      *
      * @param isAppendLastOne
-     *            -
+     *
      *
      */
     private String appendPageToUrl(String pageName, String webAppUrl, boolean isAppendLastOne) {
@@ -631,7 +631,7 @@ public class ApplicationController {
      * This method is use to check the availabilty of given context and if it is available generate new context
      *
      * @param context
-     *            - Page name of the web application
+     *            Page name of the web application
      *
      * @return generated or given context
      *

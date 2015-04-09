@@ -41,10 +41,10 @@ public class LoginAdminServiceClient {
      * Creates a new LoginAdminServiceClient object and initialising the AuthenticationAdminStub
      *
      * @param backEndUrl
-     *            - https server url
+     *            https server url
      *
      * @throws AxisFault
-     *             - Throws this when AuthenticationAdminStub failed to initialise
+     *            Throws this when AuthenticationAdminStub failed to initialise
      */
     public LoginAdminServiceClient(String backEndUrl) throws AxisFault {
         this.endPoint = backEndUrl + "/services/" + serviceName;
@@ -55,13 +55,13 @@ public class LoginAdminServiceClient {
      * This method is use to get authentication for accses admin services
      *
      * @return
-     *        - return a session
+     *         return a session
      *
      * @throws RemoteException
-     *             - Throws this when failed connect with the AuthenticationAdminService
+     *         Throws this when failed connect with the AuthenticationAdminService
      *
      * @throws LoginAuthenticationExceptionException
-     *             - Throws this when failed to authenticate with given username and password
+     *         Throws this when failed to authenticate with given username and password
      * */
     public String authenticate(String userName, String password) throws RemoteException,
             LoginAuthenticationExceptionException {

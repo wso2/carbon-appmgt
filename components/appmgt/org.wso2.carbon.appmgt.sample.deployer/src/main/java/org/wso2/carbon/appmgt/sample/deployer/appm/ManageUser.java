@@ -53,10 +53,10 @@ public class ManageUser {
      * the UserAdminStub
      *
      * @throws RemoteException
-     *             - Throws this when UserAdminStub failed initialise
+     *             Throws this when UserAdminStub failed initialise
      *
      * @throws LoginAuthenticationExceptionException
-     *             - Throws this when authentication failed
+     *             Throws this when authentication failed
      */
     public ManageUser() throws RemoteException, LoginAuthenticationExceptionException {
         String backEndUrl = Configuration.getHttpsUrl();
@@ -78,13 +78,13 @@ public class ManageUser {
      * This method is use to add a user
      *
      * @param userName
-     *          -User name
+     *             User name
      *
      * @throws java.rmi.RemoteException
-     *             - Throws this when user admin service failed to connect
+     *             Throws this when user admin service failed to connect
      *
      * @throws UserAdminUserAdminException
-     *             - Throws this when user failed to register
+     *             Throws this when user failed to register
      *
      * */
     public void addUser(String userName) throws RemoteException, UserAdminUserAdminException {

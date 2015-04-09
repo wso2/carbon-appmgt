@@ -39,10 +39,10 @@ public class DeployWebApplication {
      * This method is use deploy war file according to given name
      *
      * @param warFileName
-     *            - Name of the war file that need to be deploy
+     *            Name of the war file that need to be deploy
      *
      * @throws AppManagementException
-     *             - Throws this when failed to deploy web application
+     *            Throws this when failed to deploy web application
      */
     public void copyFileUsingFileStreams(String warFileName) throws AppManagementException {
         homePath = CarbonUtils.getCarbonHome();
@@ -84,13 +84,13 @@ public class DeployWebApplication {
      * This method is use extract war file in given location
      *
      * @param warFile
-     *            - Name of the war file that need to be deploy
+     *            Name of the war file that need to be deploy
      *
      * @param outdir
-     *            - tomcat server path
+     *            tomcat server path
      *
      * @param outdir
-     *            - name of the war file extracting folder
+     *            name of the war file extracting folder
      */
     private static void extractFile(ZipInputStream warFile, File outdir, String name) throws IOException
     {
@@ -106,10 +106,10 @@ public class DeployWebApplication {
      * This method is use create the path to extract a war file if the given path is not exist
      *
      * @param outdir
-     *            - Name of the war file that need to be deploy
+     *            Name of the war file that need to be deploy
      *
      * @param path
-     *            - tomcat server path
+     *            tomcat server path
      *
      */
     private static void mkdirs(File outdir,String path)
@@ -123,7 +123,7 @@ public class DeployWebApplication {
      * This method is use to get the folder name
      *
      * @param name
-     *          -folder name with file seperator
+     *          folder name with file seperator
      */
     private static String dirpart(String name)
     {

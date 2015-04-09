@@ -38,13 +38,13 @@ public class InvokeStatistcsJavascriptBuilder {
      * Creates a new InvokeStatistcsJavascriptBuilder object and build content for invokeStatistcs.js
      *
      * @param trackingID
-     *            - trackingID of the web application
+     *            trackingID of the web application
      *
      * @param ipAddress
-     *            - ipAddress of the user
+     *            ipAddress of the user
      *
      * @param gatewayPort
-     *            - gateway port of the server
+     *            gateway port of the server
      *
      */
     public InvokeStatistcsJavascriptBuilder(String trackingID, String ipAddress,String gatewayPort) {
@@ -57,13 +57,13 @@ public class InvokeStatistcsJavascriptBuilder {
      * This method is used to write a java script file with tracking id in web application
      *
      * @param filePath
-     *          - file pathe of the web application
+     *           file pathe of the web application
      *
      * @throws IOException
-     *             - Throws this when failed to write java script file
+     *           Throws this when failed to write java script file
      *
      * @throws InterruptedException
-     *             - Throws this when thread failed to sleep
+     *           Throws this when thread failed to sleep
      */
     public void buildInvokeStaticsJavascriptFile(String filePath) throws IOException, InterruptedException {
         File file = new File(filePath + "/invokeStatistcs.js");
@@ -86,10 +86,10 @@ public class InvokeStatistcsJavascriptBuilder {
      * This method is used to update tracking id and url in invokeStatistcs.js
      *
      * @param file
-     *          - invokeStatistcs.js file
+     *          invokeStatistcs.js file
      *
      * @throws IOException
-     *             - Throws this when failed to write java script file
+     *          Throws this when failed to write java script file
      *
      */
      private String[] appendTrackingCode(File file) throws IOException {
