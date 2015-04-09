@@ -20,27 +20,16 @@
 
 package org.wso2.carbon.appmgt.mobile.store;
 
-import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class MDMConfig {
 
     public String getConfigs(){
         HashMap<String, String> configs = MobileConfigurations.getInstance().getMDMConfigs();
-        JSONObject jsonConf = new JSONObject();
-        for (Map.Entry<String, String> config : configs.entrySet()) {
-            String value = config.getValue();
-            if ("true".equals(value) || "false".equals(value)) {
-                jsonConf.put(config.getKey(), Boolean.valueOf(value));
-            } else {
-                jsonConf.put(config.getKey(), value);
-            }
-        }
-
-        return jsonConf.toJSONString();
+        return JSONValue.toJSONString(configs);
     }
 
 }
