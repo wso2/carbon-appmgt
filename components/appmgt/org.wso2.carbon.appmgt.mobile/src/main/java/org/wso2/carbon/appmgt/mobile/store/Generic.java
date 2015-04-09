@@ -18,19 +18,18 @@ public class Generic {
         String userRole = "Internal/private_" + username;
 
         try {
-            if(opType.equalsIgnoreCase("ALLOW")) {
+            if("ALLOW".equalsIgnoreCase(opType)) {
                 org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
                 realm.getAuthorizationManager().authorizeRole(userRole, appPath, ActionConstants.GET);
                 return true;
-            }else if(opType.equalsIgnoreCase("DENY")){
+            }else if("DENY".equalsIgnoreCase(opType)){
                 org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
                 realm.getAuthorizationManager().denyRole(userRole, appPath, ActionConstants.GET);
                 return true;
             }
             return false;
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
-            log.error("Error while updating visibility of mobile app at " + appPath);
-            log.debug("Error : " + e);
+            log.error("Error while updating visibility of mobile app at " + appPath, e);
             return false;
         }
     }
