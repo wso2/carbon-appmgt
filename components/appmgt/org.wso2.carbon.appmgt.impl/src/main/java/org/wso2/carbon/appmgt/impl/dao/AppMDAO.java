@@ -19,7 +19,6 @@
 package org.wso2.carbon.appmgt.impl.dao;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -58,19 +57,15 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xalan.lib.sql.ObjectArray;
-import org.apache.xpath.operations.Bool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -6790,8 +6785,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setInt(6, policyGroupId);
 			ps.executeUpdate();
 
+            //delete XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(policyGroupId, conn);
+
 			//delete partials mapped to group id
 			deletePolicyPartialMappings(policyGroupId, conn);
+
 			//insert new partial mappings
 			if (objPartialMappings.length > 0) {
 				savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
@@ -6962,6 +6961,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
 
+            //Remove XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn);
+
 		 	//delete from master table
 			query = " DELETE FROM APM_POLICY_GROUP WHERE POLICY_GRP_ID=? ";
 			ps = conn.prepareStatement(query);
@@ -7056,6 +7058,50 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			APIMgtDBUtil.closeAllConnections(ps, null, null);
 		}
 	}
+
+    /**
+     * Remove XACML Policies from Entitlement Service
+     *
+     * @param policyGroupId
+     * @param conn
+     * @throws SQLException
+     */
+    public static void deleteXACMLPoliciesFromEntitlementService(Integer policyGroupId, Connection conn)
+            throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String query = " SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID=? ";
+        String policyId = "";
+
+        //Define Entitlement Service
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, policyGroupId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                policyId = rs.getString("POLICY_ID");
+                //If policy id not null, remove the Entitlement policy with reference to policy id
+                if (policyId != null) {
+                    entitlementService.removePolicy(policyId);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("SQL Error while executing the query to get policy id's under policy group : " +
+                    policyGroupId + ". SQL Query : " + query + " Exception : " + e.getMessage(), e);
+            /*
+            In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so  the connection will be disposed by the parent function.
+			*/
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, rs);
+        }
+    }
+
 
 
 	/**

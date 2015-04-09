@@ -271,6 +271,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     }
 
     private void deletePolicy(String policyId) throws RemoteException, EntitlementPolicyAdminServiceEntitlementException{
+        entitlementPolicyAdminServiceStub.dePromotePolicy(policyId);
         entitlementPolicyAdminServiceStub.removePolicy(policyId, false);
     }
 
