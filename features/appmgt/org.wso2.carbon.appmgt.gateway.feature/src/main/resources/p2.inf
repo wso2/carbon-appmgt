@@ -4,4 +4,4 @@ org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../depl
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/synapse-configs/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/synapse-configs/default/);\
 org.eclipse.equinox.p2.touchpoint.natives.mkdir(path:${installFolder}/../../deployment/server/synapse-configs/default/sequences/);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.custom.mediators_${feature.version}/repository/deployment/server/synapse-configs/default/sequences/main.xml/,target:${installFolder}/../../repository/deployment/server/synapse-configs/default/sequences/main.xml,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.gateway_${feature.version}/repository/deployment/server/synapse-configs/default/sequences/main.xml/,target:${installFolder}/../../repository/deployment/server/synapse-configs/default/sequences/main.xml,overwrite:true);\
