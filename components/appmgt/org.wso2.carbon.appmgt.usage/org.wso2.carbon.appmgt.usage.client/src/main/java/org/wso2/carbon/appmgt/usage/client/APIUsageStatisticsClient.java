@@ -1168,7 +1168,7 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    if(columnName.equals("REFERER")){
+                    if(columnName.equalsIgnoreCase("REFERER")){
                         columnValue = StringEscapeUtils.escapeXml(columnValue);
                     }
                     returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
