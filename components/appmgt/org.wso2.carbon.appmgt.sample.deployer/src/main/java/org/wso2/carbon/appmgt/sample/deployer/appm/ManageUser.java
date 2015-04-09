@@ -125,6 +125,6 @@ public class ManageUser {
                 card_number, card_holder, telephone
                 , givenName, lastName, email, country, expire_date};
         userAdminStub.addUser(userName, "subscriber",
-                new String[]{"Internal/subscriber"}, claimValues, "Subscriber");
+                new String[]{"Internal/subscriber"}, claimValues, "default");
     }
 }
