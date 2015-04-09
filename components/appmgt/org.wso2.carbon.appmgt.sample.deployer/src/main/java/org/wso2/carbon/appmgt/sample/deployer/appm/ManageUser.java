@@ -53,10 +53,10 @@ public class ManageUser {
      * the UserAdminStub
      *
      * @throws RemoteException
-     *             - Throws this when UserAdminStub failed initialise
+     *             Throws this when UserAdminStub failed initialise
      *
      * @throws LoginAuthenticationExceptionException
-     *             - Throws this when authentication failed
+     *             Throws this when authentication failed
      */
     public ManageUser() throws RemoteException, LoginAuthenticationExceptionException {
         String backEndUrl = Configuration.getHttpsUrl();
@@ -77,14 +77,17 @@ public class ManageUser {
     /**
      * This method is use to add a user
      *
+     * @param userName
+     *             User name
+     *
      * @throws java.rmi.RemoteException
-     *             - Throws this when user admin service failed to connect
+     *             Throws this when user admin service failed to connect
      *
      * @throws UserAdminUserAdminException
-     *             - Throws this when user failed to register
+     *             Throws this when user failed to register
      *
      * */
-    public void addUser() throws RemoteException, UserAdminUserAdminException {
+    public void addUser(String userName) throws RemoteException, UserAdminUserAdminException {
         ClaimValue ffid = new ClaimValue();
         ffid.setClaimURI("http://wso2.org/ffid");
         ffid.setValue("234455666");
@@ -121,7 +124,7 @@ public class ManageUser {
         ClaimValue claimValues[] = new ClaimValue[]{ffid, streetaddress, zipcode,
                 card_number, card_holder, telephone
                 , givenName, lastName, email, country, expire_date};
-        userAdminStub.addUser("subscriber", "subscriber",
+        userAdminStub.addUser(userName, "subscriber",
                 new String[]{"Internal/subscriber"}, claimValues, "Subscriber");
     }
 }

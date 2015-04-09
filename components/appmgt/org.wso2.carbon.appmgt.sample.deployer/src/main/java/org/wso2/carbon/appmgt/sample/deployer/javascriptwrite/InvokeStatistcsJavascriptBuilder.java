@@ -20,62 +20,91 @@ package org.wso2.carbon.appmgt.sample.deployer.javascriptwrite;
 
 import org.apache.log4j.Logger;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
+/**
+ *
+ * Write tracking id and url in to invokeStatistcs.js
+ * */
 public class InvokeStatistcsJavascriptBuilder {
-    private String jsFunction;
+    private  String trackingID;
+    private  String ipAddress;
+    private  String gatewayPort;
+
+
     final static Logger log = Logger.getLogger(InvokeStatistcsJavascriptBuilder.class.getName());
 
     /**
      * Creates a new InvokeStatistcsJavascriptBuilder object and build content for invokeStatistcs.js
      *
      * @param trackingID
-     *            - trackingID of the web application
+     *            trackingID of the web application
      *
      * @param ipAddress
-     *            - ipAddress of the user
+     *            ipAddress of the user
      *
      * @param gatewayPort
-     *            - gateway port of the server
+     *            gateway port of the server
      *
      */
     public InvokeStatistcsJavascriptBuilder(String trackingID, String ipAddress,String gatewayPort) {
-        jsFunction = "function invokeStatistics(){\n" +
-                "       var tracking_code = \"" + trackingID + "\";\n" +
-                "        var request = $.ajax({\n" +
-                "        url: \"http://" + ipAddress + ":"+gatewayPort+"/statistics/\",\n" +
-                "        type: \"GET\",\n" +
-                "        headers: {\n" +
-                "            \"trackingCode\":tracking_code,\n" +
-                "        }\n" +
-                "     \n" +
-                "    });\n" +
-                "}";
+        this.trackingID = trackingID;
+        this.ipAddress =  ipAddress;
+        this.gatewayPort = gatewayPort;
     }
 
     /**
      * This method is used to write a java script file with tracking id in web application
      *
      * @param filePath
-     *          - file pathe of the web application
+     *           file pathe of the web application
      *
      * @throws IOException
-     *             - Throws this when failed to write java script file
+     *           Throws this when failed to write java script file
      *
      * @throws InterruptedException
-     *             - Throws this when thread failed to sleep
+     *           Throws this when thread failed to sleep
      */
     public void buildInvokeStaticsJavascriptFile(String filePath) throws IOException, InterruptedException {
         File file = new File(filePath + "/invokeStatistcs.js");
-        if (file.exists()) {
-            file.delete();
+        String[] lines = appendTrackingCode(file);
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
+        for(String line : lines) {
+            stringBuilder.append(line);
+            if (i != lines.length-1) {
+               stringBuilder.append("\n");
+            }
+            i++;
         }
-        Thread.sleep(5000);
         BufferedWriter output = new BufferedWriter(new FileWriter(file));
-        output.write(jsFunction);
+        output.write(stringBuilder.toString());
         output.close();
     }
+
+    /**
+     * This method is used to update tracking id and url in invokeStatistcs.js
+     *
+     * @param file
+     *          invokeStatistcs.js file
+     *
+     * @throws IOException
+     *          Throws this when failed to write java script file
+     *
+     */
+     private String[] appendTrackingCode(File file) throws IOException {
+         String content = null;
+         FileReader reader = new FileReader(file);
+         char[] chars = new char[(int) file.length()];
+         reader.read(chars);
+         content = new String(chars);
+         reader.close();
+         String[] lines = content.split("\n");
+         String trackingCodes = lines[1].split("=")[1];
+         String trackingCode = trackingCodes.substring(0, (trackingCodes.length() - 2));
+         trackingCode =  trackingCode.concat(","+this.trackingID+"\";");
+         lines[1] = lines[1].split("=")[0]+"="+trackingCode;
+         lines[3] = lines[3].split(":")[0]+":"+"\"http://"+this.ipAddress+":"+gatewayPort+"/statistics/\"," ;
+         return lines;
+     }
 }

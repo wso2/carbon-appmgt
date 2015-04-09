@@ -52,7 +52,7 @@ public class ServiceReferenceHolder {
     /**
      *
      *@param  cfgCtxService
-     *              - ConfigurationContextService
+     *              ConfigurationContextService
      */
     public void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         this.cfgCtxService = cfgCtxService;
@@ -61,7 +61,7 @@ public class ServiceReferenceHolder {
     /**
      *
      *@return  AppManagerConfiguration
-     *              -  APIManagerConfiguration
+     *              APIManagerConfiguration
      */
     public AppManagerConfiguration getAPIManagerConfiguration() {
         return amConfigService.getAPIManagerConfiguration();
@@ -70,7 +70,7 @@ public class ServiceReferenceHolder {
     /**
      *
      *@param  amConfigService
-     *              - AppManagerConfigurationService
+     *              AppManagerConfigurationService
      */
     public void setAPIManagerConfigurationService(AppManagerConfigurationService amConfigService) {
         this.amConfigService = amConfigService;
