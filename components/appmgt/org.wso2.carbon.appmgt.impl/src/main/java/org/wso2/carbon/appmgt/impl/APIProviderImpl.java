@@ -479,7 +479,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
                                                   String author, boolean isShared,String policyPartialDesc) throws
                                                                                    AppManagementException {
-        return appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
+        appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
+        
+        // Regenerate XACML policies of the apps which are using the updated policy partial.
+        List<APIIdentifier> associatedApps = getAssociatedApps(policyPartialId);
+        
+        for(APIIdentifier associatedApp : associatedApps){
+        	generateEntitlementPolicies(associatedApp);
+        }
+        
+        return true;
     }
 
     @Override
@@ -489,8 +498,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public List<String> getAssociatedAppNames(int policyPartialId) throws AppManagementException {
-        return appMDAO.getAssociatedAppNames(policyPartialId);
+    public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException {
+        return appMDAO.getAssociatedApps(policyPartialId);
     }
 
     @Override

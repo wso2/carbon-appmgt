@@ -5380,20 +5380,19 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Get the names of apps which use the given policy partial
+	 * Get the apps which use the given policy partial
 	 *
 	 * @param policyPartialId Policy Partial Id
 	 * @return apps' name
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
-	public List<String> getAssociatedAppNames(int policyPartialId) throws AppManagementException {
-
+	public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement statementToGetAppsName = null;
-		List<String> appsNameList = new ArrayList<String>();
+		List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
 		ResultSet rs = null;
 
-		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
+		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME, APP.APP_PROVIDER, APP.APP_VERSION" +
 				" FROM APM_POLICY_GRP_PARTIAL_MAPPING ENT " +
 				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
@@ -5405,8 +5404,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			statementToGetAppsName.setInt(1,policyPartialId);
 			rs = statementToGetAppsName.executeQuery();
 
+			APIIdentifier apiIdentifier = null;
 			while (rs.next()) {
-				appsNameList.add(rs.getString("APP_NAME"));
+				String providerName = rs.getString("APP_PROVIDER");
+				String apiName = rs.getString("APP_NAME");
+				String version = rs.getString("APP_VERSION");
+				apiIdentifier = new APIIdentifier(providerName, apiName, version);
+				apiIdentifiers.add(apiIdentifier);
 			}
 
 
@@ -5416,7 +5420,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} finally {
 			APIMgtDBUtil.closeAllConnections(statementToGetAppsName, connection, null);
 		}
-		return appsNameList;
+		return apiIdentifiers;
 
 	}
 
