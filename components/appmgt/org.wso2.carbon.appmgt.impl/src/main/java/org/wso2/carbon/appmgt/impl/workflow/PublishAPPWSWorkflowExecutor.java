@@ -177,19 +177,9 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
             try {
                 WorkflowDTO wfdto = dao.retrieveWorkflow(workflowDTO.getExternalWorkflowReference());
                 String reference = wfdto.getWorkflowReference();
-                String adminUserUsername = CarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName();
 
                 String[] arr = decodeValues(reference);
                 APIIdentifier apiIdentifier = new APIIdentifier(arr[2], arr[0], arr[1]);
-                APIProvider provider = APIManagerFactory.getInstance().getAPIProvider(adminUserUsername);
-                WebApp app = provider.getAPI(apiIdentifier);
-
-                PublishApplicationWorkflowDTO publishAPPDTO = (PublishApplicationWorkflowDTO)workflowDTO;
-
-                if (app != null) {
-                    APIStatus newStatus = getApiStatus(publishAPPDTO.getNewState());
-                    provider.changeAPIStatus(app, newStatus, adminUserUsername, true);
-                }
 
                 String apiPath = AppManagerUtil.getAPIPath(apiIdentifier);
 
@@ -214,8 +204,6 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
 
             } catch (AppManagementException e) {
                 log.error("Error while retrieving relevant workflow reference", e);
-            } catch (UserStoreException e) {
-                log.error("Error while trying to complete workflow. Retrieving admin user, username failed.", e);
             }
         } else if (WorkflowStatus.REJECTED.equals(workflowDTO.getStatus())){              //Web App rejection workflow
             try {
