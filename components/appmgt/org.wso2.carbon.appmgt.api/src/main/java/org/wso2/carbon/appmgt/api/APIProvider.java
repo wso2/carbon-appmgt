@@ -213,13 +213,13 @@ public interface APIProvider extends APIManager {
                                                                           AppManagementException;
 
     /**
-          * Get the name of apps which use the given policy partial
+          * Get the apps which use the given policy partial
           *
           * @param policyPartialId policy partial id
-          * @return list of apps name
+          * @return list of apps
           * @throws AppManagementException
           */
-    public List<String> getAssociatedAppNames(int policyPartialId) throws AppManagementException;
+    public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException;
 
     /**
      * Delete entitlement policy partial

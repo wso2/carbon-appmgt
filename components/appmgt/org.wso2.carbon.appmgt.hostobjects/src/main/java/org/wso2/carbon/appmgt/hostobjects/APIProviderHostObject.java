@@ -891,12 +891,12 @@ public class APIProviderHostObject extends ScriptableObject {
         NativeArray myn = new NativeArray(0);
         int policyPartialId = Integer.parseInt(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
-        List<String> appsNameList = apiProvider.getAssociatedAppNames(policyPartialId);
+        List<APIIdentifier> apiIdentifiers = apiProvider.getAssociatedApps(policyPartialId);
 
         int count = 0;
-        for (String appName : appsNameList) {
+        for (APIIdentifier identifier : apiIdentifiers) {
             NativeObject row = new NativeObject();
-            row.put("appName", row, appName);
+            row.put("appName", row, identifier.getApiName());
             count++;
             myn.put(count, myn, row);
         }
