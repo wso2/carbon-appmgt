@@ -6960,6 +6960,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String query = "";
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
 
             //Remove XACML Policies from Entitlement Service
             deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn);
@@ -6978,6 +6979,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				log.debug("Policy Group deleted successfully. " + strDataContext);
 			}
 		} catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Rollback while deleting the policy group", e);
+                }
+            }
 			String strDataContext =
 					"(applicationId:" + applicationId + ", policyGroupId:" + policyGroupId + ")";
 			handleException("Error while executing the query to delete XACML policies : " + query + " : " +
