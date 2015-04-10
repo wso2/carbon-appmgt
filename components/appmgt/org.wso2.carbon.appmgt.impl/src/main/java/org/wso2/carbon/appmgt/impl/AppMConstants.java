@@ -543,6 +543,7 @@ public final class AppMConstants {
     public static final String HOST = "Host";
     public static final String REFERER = "Referer";
     public static final String HTTP = "http://";
+    public static final String URL_DELIMITER = "://";
 
 
     // constants related to Statistics
