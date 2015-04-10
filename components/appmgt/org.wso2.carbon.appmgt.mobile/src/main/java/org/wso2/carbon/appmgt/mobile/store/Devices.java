@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.mobile.utils.User;
@@ -44,7 +44,7 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -55,7 +55,7 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations =  getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -65,7 +65,7 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null, configurations.isSampleDevicesEnabled(), configurations.getActiveMDMProperties());
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 

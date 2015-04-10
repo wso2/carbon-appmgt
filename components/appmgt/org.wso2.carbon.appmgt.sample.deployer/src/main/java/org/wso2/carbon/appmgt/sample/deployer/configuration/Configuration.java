@@ -1,14 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.configuration;
-
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.sample.deployer.internal.ServiceReferenceHolder;
-import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ConfigurationContextService;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -24,6 +15,20 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 * specific language governing permissions and limitations
 * under the License.
 */
+
+package org.wso2.carbon.appmgt.sample.deployer.configuration;
+
+import org.apache.axis2.context.ConfigurationContext;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.sample.deployer.internal.ServiceReferenceHolder;
+import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.ConfigurationContextService;
+
+/**
+ * This class is use to get SSOConfiguration properties
+ *
+ * */
 public class Configuration {
     private static AppManagerConfiguration config;
     private static ConfigurationContextService configContextService = null;
@@ -37,14 +42,26 @@ public class Configuration {
         }
     }
 
+    /**
+     * @return stored username of the SSOConfiguration
+     *
+     * */
     public static String getUserName() {
         return config.getFirstProperty("SSOConfiguration.Configurators.Configurator.parameters.username");
     }
 
+    /**
+     * @return stored password of the SSOConfiguration
+     *
+     * */
     public static String getPassword() {
         return config.getFirstProperty("SSOConfiguration.Configurators.Configurator.parameters.password");
     }
 
+    /**
+     * @return https url of server
+     *
+     * */
     public static String getHttpsUrl() {
         try {
             return "https://localhost:" + getBackendPort("https");
@@ -54,6 +71,10 @@ public class Configuration {
         return null;
     }
 
+    /**
+     * @return http url of the server
+     *
+     * */
     public static String getHttpUrl() {
         try {
             return "http://localhost:" + getBackendPort("http");
@@ -63,6 +84,10 @@ public class Configuration {
         return null;
     }
 
+    /**
+     * @return ConfigurationContext
+     *
+     * */
     public static ConfigurationContext getConfigContext() throws AppManagementException {
         if (configContextService == null) {
             throw new AppManagementException("ConfigurationContextService is null");
@@ -70,6 +95,12 @@ public class Configuration {
         return configContextService.getServerConfigContext();
     }
 
+    /**
+     *
+     * @return appm gateway port
+     *
+     *
+     * */
     public static String getBackendPort(String transport) throws AppManagementException {
         int port;
         String backendPort;
@@ -81,4 +112,17 @@ public class Configuration {
         backendPort = Integer.toString(port);
         return backendPort;
     }
+
+    /**
+     *
+     * @return port according to given transport method
+     *
+     * @throw
+     *      -Throws this when failed to retrive port
+     * */
+    public static String getGatewayPort() throws AppManagementException {
+        int offset = Integer.parseInt(getBackendPort("https")) - 9443;
+        return  (8280+offset)+"";
+    }
+
 }

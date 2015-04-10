@@ -1,5 +1,22 @@
-package org.wso2.carbon.appmgt.sample.deployer.http;
+/*
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 
+package org.wso2.carbon.appmgt.sample.deployer.http;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,28 +40,11 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-
-/*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
-
+/**
+ * This class is use as a http client
+ *
+ */
 public class HttpHandler {
-
-    private final static String USER_AGENT = "Mozilla/5.0";
 
     static {
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
@@ -56,6 +56,17 @@ public class HttpHandler {
         });
     }
 
+    /**
+     * This method is use get a html file for given url
+     *
+     * @param url
+     *          Web page url
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *            Throws this when failed to retrieve web page
+     */
     public static String getHtml(String url) throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
@@ -72,17 +83,36 @@ public class HttpHandler {
         return responseBuffer.toString();
     }
 
-    public String doPostHttps(String backEnd, String payload, String your_session_id, String contentType)
+    /**
+     * This method is used to do a https post request
+     *
+     * @param url
+     *           request url
+     *
+     * @param payload
+     *            Content of the post request
+     *
+     * @param sessionId
+     *            sessionId for authentication
+     *
+     * @param contentType
+     *            content type of the post request
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *             - Throws this when failed to fulfill a https post request
+     */
+    public String doPostHttps(String url, String payload, String sessionId, String contentType)
             throws IOException {
-        URL obj = new URL(backEnd);
+        URL obj = new URL(url);
 
         HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
         //add reuqest header
         con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        if (!your_session_id.equals("")) {
+        if (!sessionId.equals("")) {
             con.setRequestProperty(
-                    "Cookie", "JSESSIONID=" + your_session_id);
+                    "Cookie", "JSESSIONID=" + sessionId);
         }
         if (!contentType.equals("")) {
             con.setRequestProperty("Content-Type", contentType);
@@ -103,10 +133,10 @@ public class HttpHandler {
                 response.append(inputLine);
             }
             in.close();
-            if (your_session_id.equals("")) {
+            if (sessionId.equals("")) {
                 String session_id = response.substring((response.lastIndexOf(":") + 3), (response.lastIndexOf("}") - 2));
                 return session_id;
-            } else if (your_session_id.equals("header")) {
+            } else if (sessionId.equals("header")) {
                 return con.getHeaderField("Set-Cookie");
             }
 
@@ -115,16 +145,36 @@ public class HttpHandler {
         return null;
     }
 
-    public String doPostHttp(String backEnd, String payload, String your_session_id, String contentType)
+    /**
+     * This method is used to do a http post request
+     *
+     * @param url
+     *            request url
+     *
+     * @param payload
+     *            Content of the post request
+     *
+     * @param sessionId
+     *            sessionId for authentication
+     *
+     * @param contentType
+     *            content type of the post request
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *             - Throws this when failed to fulfill a http post request
+     */
+    public String doPostHttp(String url, String payload, String sessionId, String contentType)
             throws IOException {
-        URL obj = new URL(backEnd);
+        URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         //add reuqest header
         con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", USER_AGENT);
-        if (!your_session_id.equals("") && !your_session_id.equals("none")) {
+        //con.setRequestProperty("User-Agent", USER_AGENT);
+        if (!sessionId.equals("") && !sessionId.equals("none")) {
             con.setRequestProperty(
-                    "Cookie", "JSESSIONID=" + your_session_id);
+                    "Cookie", "JSESSIONID=" + sessionId);
         }
         con.setRequestProperty("Content-Type", contentType);
         con.setDoOutput(true);
@@ -142,12 +192,12 @@ public class HttpHandler {
                 response.append(inputLine);
             }
             in.close();
-            if (your_session_id.equals("")) {
+            if (sessionId.equals("")) {
                 String session_id = response.substring((response.lastIndexOf(":") + 3), (response.lastIndexOf("}") - 2));
                 return session_id;
-            } else if (your_session_id.equals("appmSamlSsoTokenId")) {
+            } else if (sessionId.equals("appmSamlSsoTokenId")) {
                 return con.getHeaderField("Set-Cookie").split(";")[0].split("=")[1];
-            } else if (your_session_id.equals("header")) {
+            } else if (sessionId.equals("header")) {
                 return con.getHeaderField("Set-Cookie").split("=")[1].split(";")[0];
             } else {
                 return response.toString();
@@ -156,13 +206,27 @@ public class HttpHandler {
         return null;
     }
 
-    public String doPut(String url, String cookie) throws IOException {
+    /**
+     * This method is used to do a http put request
+     *
+     * @param url
+     *          request url
+     *
+     * @param sessionId
+     *          sessionId for authentication
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *             - Throws this when failed to fulfill a http put request
+     */
+    public String doPut(String url, String sessionId) throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         StringBuilder result = new StringBuilder();
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
         putRequest.addHeader("Accept-Language", "en-US,en;q=0.5");
-        putRequest.addHeader("Cookie", "JSESSIONID=" + cookie);
+        putRequest.addHeader("Cookie", "JSESSIONID=" + sessionId);
         putRequest.addHeader("Accept-Encoding", "gzip, deflate");
         HttpResponse response = httpClient.execute(putRequest);
         if (response.getStatusLine().getStatusCode() != 200) {
@@ -178,13 +242,33 @@ public class HttpHandler {
         return result.toString();
     }
 
-    public String doPostMultiData(String url, String method, MobileApplicationBean mobileApplicationBean, String cookie)
+    /**
+     * This method is used to do a http post request in multi data format
+     *
+     * @param url
+     *          request url
+     *
+     * @param isApkFile
+     *          if content is an apk file
+     *
+     * @param mobileApplicationBean
+     *          bean object of mobile application
+     *
+     * @param sessionId
+     *          - sessionId for authentication
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *             - Throws this when failed to fulfill a http post request
+     */
+    public String doPostMultiData(String url,boolean isApkFile, MobileApplicationBean mobileApplicationBean, String sessionId)
             throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Cookie", "JSESSIONID=" + cookie);
+        httpPost.addHeader("Cookie", "JSESSIONID=" + sessionId);
         MultipartEntityBuilder reqEntity;
-        if (method.equals("upload")) {
+        if (isApkFile) {
             reqEntity = MultipartEntityBuilder.create();
             FileBody fileBody = new FileBody(new File(mobileApplicationBean.getApkFile()));
             reqEntity.addPart("file", fileBody);
@@ -223,20 +307,39 @@ public class HttpHandler {
         httpPost.setEntity(entity);
         ResponseHandler<String> responseHandler = new BasicResponseHandler();
         String responseBody = httpClient.execute(httpPost, responseHandler);
-        if (!method.equals("upload")) {
+        if (!isApkFile) {
             String id_part = responseBody.split(",")[2].split(":")[1];
             return id_part.substring(2, (id_part.length() - 2));
         }
         return responseBody;
     }
 
-    public String doGet(String url, String trackingCode, String appmSamlSsoTokenId, String webAppURl) throws IOException {
+    /**
+     * This method is used to do a http get request
+     *
+     * @param url
+     *          request url
+     *
+     * @param trackingCode
+     *          tracking code of the web application
+     *
+     * @param appmSamlSsoTokenId
+     *          appmSamlSsoTokenId id of the web application
+     *
+     * @param refer
+     *          web page url
+     *
+     * @return response
+     *
+     * @throws  java.io.IOException
+     *             Throws this when failed to fulfill a http get request
+     */
+    public String doGet(String url, String trackingCode, String appmSamlSsoTokenId, String refer) throws IOException {
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("GET");
         //add request header
         if (trackingCode.equals("")) {
-            con.setRequestProperty("User-Agent", USER_AGENT);
             con.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
             con.setRequestProperty("Accept-Encoding", "gzip, deflate, sdch");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.8");
@@ -244,7 +347,7 @@ public class HttpHandler {
         } else {
             con.setRequestProperty("Cookie", "appmSamlSsoTokenId=" + appmSamlSsoTokenId);
             con.setRequestProperty("trackingCode", trackingCode);
-            con.setRequestProperty("Referer", webAppURl);
+            con.setRequestProperty("Referer", refer);
         }
         int responseCode = con.getResponseCode();
         BufferedReader in = new BufferedReader(

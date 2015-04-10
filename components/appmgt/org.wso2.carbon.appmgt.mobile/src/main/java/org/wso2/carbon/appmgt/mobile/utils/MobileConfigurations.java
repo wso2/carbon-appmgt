@@ -52,14 +52,16 @@ public class MobileConfigurations {
 
     private static String activeMDMBundle;
     private static HashMap<String, String> activeMDMProperties;
-    private static String activeMDM;
-    private static String appDownloadHost;
-    private static String iosPlistPath;
-    private static Boolean sampleDevicesEnabled;
-    private static Boolean mdmEnabled;
+    private static HashMap<String, String> mDMConfigs;
 
-    private static Boolean isEnterpriseOperationsEnabled;
-    private static String  enterpriseAuthorizedRole;
+    public final static String  ENABLED = "Enabled";
+    public final static String  ENABLE_SAMPLE_DEVICES = "EnableSampleDevices";
+    public final static String  APP_DOWNLOAD_URL_HOST = "AppDownloadURLHost";
+    public final static String  ACTIVE_MDM = "ActiveMDM";
+    public final static String  IOS_PLIST_PATH = "IosPlistPath";
+    public final static String  ENTERPRISE_OPERATIONS_ENABLED = "EnterpriseOperations_Enabled";
+    public final static String  ENTERPRISE_OPERATIONS_AUTHORIZED_ROLE = "EnterpriseOperations_AuthorizedRole";
+
 
     private MobileConfigurations(){
         XMLStreamReader parser = null;
@@ -85,85 +87,6 @@ public class MobileConfigurations {
     }
 
 
-    public boolean isMDMEnabled(){
-        if(mdmEnabled == null){
-            return mdmEnabled =  Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("Enabled"))
-                    .getText());
-
-        }
-        return  mdmEnabled;
-    }
-
-    public boolean isSampleDevicesEnabled(){
-        if(sampleDevicesEnabled == null){
-            return sampleDevicesEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("EnableSampleDevices"))
-                    .getText());
-
-        }
-        return  sampleDevicesEnabled;
-    }
-
-    public boolean isEnterpriseOperationsEnabled(){
-        if(isEnterpriseOperationsEnabled == null){
-            return isEnterpriseOperationsEnabled = Boolean.valueOf(documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("EnterpriseOperations"))
-                    .getFirstChildWithName(new QName("Enabled"))
-                    .getText());
-
-        }
-        return  isEnterpriseOperationsEnabled;
-    }
-
-
-    public String getEnterpriseAuthorizedRole(){
-        if(enterpriseAuthorizedRole == null){
-            return enterpriseAuthorizedRole = documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("EnterpriseOperations"))
-                    .getFirstChildWithName(new QName("AuthorizedRole"))
-                    .getText();
-
-        }
-        return enterpriseAuthorizedRole;
-    }
-
-    public String getAppDownloadHost(){
-        if(appDownloadHost == null){
-            return appDownloadHost = documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("AppDownloadURLHost"))
-                    .getText();
-
-        }
-        return appDownloadHost;
-    }
-
-    public String getActiveMDM(){
-        if(activeMDM == null){
-            return activeMDM = documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("ActiveMDM"))
-                    .getText();
-        }
-        return activeMDM;
-    }
-
-
-    public String getIosPlistPath(){
-        if(iosPlistPath == null){
-            return iosPlistPath = documentElement.getFirstChildWithName(mobileConfElement)
-                    .getFirstChildWithName(new QName("MDMSettings"))
-                    .getFirstChildWithName(new QName("IosPlistPath"))
-                    .getText();
-        }
-        return iosPlistPath;
-    }
-
     public HashMap<String, String> getActiveMDMProperties(){
         if(activeMDMProperties == null){
 
@@ -173,7 +96,7 @@ public class MobileConfigurations {
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
             while (iterator.hasNext()){
                 OMElement mdmElement = iterator.next();
-                if(getActiveMDM().equals(mdmElement.getAttributeValue(new QName("name")))){
+                if(getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))){
                     HashMap<String, String> properties = new HashMap<String, String>();
                     Iterator<OMElement> propertiesElement = mdmElement.getChildElements();
                     while(propertiesElement.hasNext()){
@@ -189,6 +112,25 @@ public class MobileConfigurations {
         return activeMDMProperties;
     }
 
+    public HashMap<String, String> getMDMConfigs(){
+        if(mDMConfigs == null){
+
+            OMElement mDMConfigsElement = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMConfig"));
+            HashMap<String, String> configs = new HashMap<String, String>();
+            Iterator<OMElement> iterator = mDMConfigsElement.getChildElements();
+
+            while(iterator.hasNext()){
+                OMElement propertyElement = iterator.next();
+                configs.put(propertyElement.getAttributeValue(new QName("name")), propertyElement.getText());
+            }
+            return mDMConfigs = configs;
+        }
+
+        return mDMConfigs;
+    }
+
+
     public String getActiveMDMBundle(){
         if(activeMDMBundle == null){
 
@@ -197,7 +139,7 @@ public class MobileConfigurations {
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
             while (iterator.hasNext()){
                 OMElement mdmElement = iterator.next();
-                if(getActiveMDM().equals(mdmElement.getAttributeValue(new QName("name")))){
+                if(getMDMConfigs().get(ACTIVE_MDM).equals(mdmElement.getAttributeValue(new QName("name")))){
                     return activeMDMBundle =  mdmElement.getAttributeValue(new QName("bundle"));
                 }
             }
