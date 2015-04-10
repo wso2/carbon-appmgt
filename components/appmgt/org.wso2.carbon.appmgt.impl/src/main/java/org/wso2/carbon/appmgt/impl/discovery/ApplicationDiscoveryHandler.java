@@ -19,6 +19,7 @@
 package org.wso2.carbon.appmgt.impl.discovery;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.Locale;
@@ -36,23 +37,21 @@ public interface ApplicationDiscoveryHandler {
      *
      * @param credentials
      * @param criteria
-     * @return  the bean holding the list of paged list of applications
+     * @return the bean holding the list of paged list of applications
      */
-    DiscoveredApplicationListDTO discoverApplications(DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext)
-            throws AppManagementException;
+    DiscoveredApplicationListDTO discoverApplications(ApplicationDiscoveryContext discoveryContext,
+            DiscoveryCredentials credentials, DiscoverySearchCriteria criteria, Locale locale,
+            PrivilegedCarbonContext carbonContext) throws AppManagementException;
 
     /**
      * Reads the application information necessary to create a new proxy application
      *
-     * @param credentials
-     * @param criteria
-     * @param locale
+     * @param apiIdentifier
      * @param carbonContext
      * @return
      * @throws AppManagementException
      */
-    DiscoveredApplicationDTO readApplicationInfo(DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext)
+    DiscoveredApplicationDTO readApplicationInfo(ApplicationDiscoveryContext discoveryContext,
+            APIIdentifier apiIdentifier, PrivilegedCarbonContext carbonContext)
             throws AppManagementException;
 }

@@ -53,6 +53,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private static final String JAX_WEBAPP_TYPE = "jaxWebapp";
     private static final String DEFAULT_GENERATED_VERSION = "1.0";
     private static final String DEFAULT_VERSION_STRING = "/default";
+    private static final String CONTEXT_DATA_LOGGED_IN_USER = "LOGGED_IN_USER";
+    private static final String CONTEXT_DATA_APP_SERVER_URL = "APP_SERVER_URL";
 
     @Override
     public String getDisplayName() {
@@ -60,7 +62,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     }
 
     @Override
-    public DiscoveredApplicationListDTO discoverApplications(DiscoveryCredentials credentials,
+    public DiscoveredApplicationListDTO discoverApplications(
+            ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
             DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext)
             throws AppManagementException {
 
@@ -70,17 +73,25 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             .getName() + " But found " + credentials);
         }
 
+        discoveryContext.putData(CONTEXT_DATA_LOGGED_IN_USER, credentials.getLoggedInUsername());
+
         ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
                 .getOSGiService(ConfigurationContextService.class);
         ConfigurationContext configurationContext = configurationContextService
                 .getClientConfigContext();
         UserNamePasswordCredentials userNamePasswordCredentials = (UserNamePasswordCredentials) credentials;
-        AppServerWebappAdminClient webappAdminClient;
         try {
-            webappAdminClient = new AppServerWebappAdminClient(
-                    userNamePasswordCredentials.getUserName(),
-                    userNamePasswordCredentials.getPassword(),
-                    userNamePasswordCredentials.getAppServerUrl(), configurationContext, locale);
+            AppServerWebappAdminClient webappAdminClient = getAppServerWebappAdminClient(
+                    discoveryContext, locale, configurationContext, userNamePasswordCredentials);
+
+            WebappsWrapper webappsWrapper = webappAdminClient
+                    .getPagedWebappsSummary(translateApplicationNameSearchString(criteria),
+                            translateStatus(criteria), translateStatus(criteria),
+                            criteria.getPageNumber());
+
+            discoveryContext.putData(AppServerWebappAdminClient.class.getName(), webappAdminClient);
+
+            return translateToDto(webappsWrapper, credentials.getLoggedInUsername());
         } catch (AppManagementException ame) {
             String message = String
                     .format("The application server URL, username or password mismatch URL :%s, UserName : %s",
@@ -88,48 +99,29 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             userNamePasswordCredentials.getUserName());
             throw new AppManagementException(message, ame);
         }
-
-        WebappsWrapper webappsWrapper = webappAdminClient
-                .getPagedWebappsSummary(translateApplicationNameSearchString(criteria),
-                        translateStatus(criteria), translateStatus(criteria),
-                        criteria.getPageNumber());
-
-        return translateToDto(webappsWrapper, credentials.getLoggedInUsername());
     }
 
     @Override
-    public DiscoveredApplicationDTO readApplicationInfo(DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext)
-            throws AppManagementException {
-        if (!(credentials instanceof UserNamePasswordCredentials)) {
-            throw new AppManagementException(
-                    "Application Listing from WSO2 AS needs " + UserNamePasswordCredentials.class
-                            .getName() + " But found " + credentials);
-        }
+    public DiscoveredApplicationDTO readApplicationInfo(
+            ApplicationDiscoveryContext discoveryContext, APIIdentifier apiIdentifier,
+            PrivilegedCarbonContext carbonContext) throws AppManagementException {
 
-        String webappId = criteria.getApplicationName();
-        String loggedInUsername = credentials.getLoggedInUsername();
+        String webappId = apiIdentifier.getApplicationId();
+        String loggedInUsername = (String) discoveryContext.getData(CONTEXT_DATA_LOGGED_IN_USER);
         DiscoveredApplicationDTO result = null;
 
-        ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
-                .getOSGiService(ConfigurationContextService.class);
-        ConfigurationContext configurationContext = configurationContextService
-                .getClientConfigContext();
-        UserNamePasswordCredentials userNamePasswordCredentials = (UserNamePasswordCredentials) credentials;
         APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
-        AppServerWebappAdminClient webappAdminClient;
-        try {
-            webappAdminClient = new AppServerWebappAdminClient(
-                    userNamePasswordCredentials.getUserName(),
-                    userNamePasswordCredentials.getPassword(),
-                    userNamePasswordCredentials.getAppServerUrl(), configurationContext, locale);
 
+        try {
+            AppServerWebappAdminClient webappAdminClient = getAppServerWebappAdminClient(
+                    discoveryContext, null, null, null);
             int pageNo = 0;
             int totalPages = 0;
 
             //Refactor to new session
             while ((pageNo == 0 || pageNo < totalPages) && result == null) {
-                WebappsWrapper webappsWrapper = webappAdminClient.getPagedWebappsSummary("", "all", "all", pageNo);
+                WebappsWrapper webappsWrapper = webappAdminClient
+                        .getPagedWebappsSummary("", "all", "all", pageNo);
                 totalPages = webappsWrapper.getNumberOfPages();
                 VersionedWebappMetadata[] versionedWebappMetadataArray = webappsWrapper
                         .getWebapps();
@@ -153,8 +145,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             result.setRemoteContext(context);
                             result.setProxyContext(generateProxyContext(context, apiProvider));
                             result.setApplicationId(generateWebappId(webappMetadata));
-                            result.setStatus(getStatus(credentials.getLoggedInUsername(),
-                                    result.getApplicationName(), result.getVersion(), apiProvider));
+                            result.setStatus(
+                                    getStatus(loggedInUsername, result.getApplicationName(),
+                                            result.getVersion(), apiProvider));
                             result.setApplicationUrl(
                                     generateAppUrl(webappsWrapper, webappMetadata));
 
@@ -165,13 +158,35 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             }
         } catch (AppManagementException ame) {
             String message = String
-                    .format("The application server URL, username or password mismatch URL :%s, UserName : %s",
-                            userNamePasswordCredentials.getAppServerUrl(),
-                            userNamePasswordCredentials.getUserName());
+                    .format("Could not get the application information from the underlying service from [%s]. Most probably the underlying session has been expired.",
+                            discoveryContext.getData(CONTEXT_DATA_APP_SERVER_URL));
             throw new AppManagementException(message, ame);
         }
 
         return result;
+    }
+
+    /*
+    Returns the application server admin client from the context or create one if not exists.
+     */
+    private AppServerWebappAdminClient getAppServerWebappAdminClient(
+            ApplicationDiscoveryContext discoveryContext, Locale locale,
+            ConfigurationContext configurationContext,
+            UserNamePasswordCredentials userNamePasswordCredentials) throws AppManagementException {
+
+        AppServerWebappAdminClient webappAdminClient = (AppServerWebappAdminClient) discoveryContext
+                .getData(AppServerWebappAdminClient.class.getName());
+        if (webappAdminClient == null) {
+            if (userNamePasswordCredentials == null) {
+                throw new AppManagementException(
+                        "Can not create the AppServerWebappAdminClient as UserNamePasswordCredentials is null. Try log-off and log back in.");
+            }
+            webappAdminClient = new AppServerWebappAdminClient(
+                    userNamePasswordCredentials.getUserName(),
+                    userNamePasswordCredentials.getPassword(),
+                    userNamePasswordCredentials.getAppServerUrl(), configurationContext, locale);
+        }
+        return webappAdminClient;
     }
 
     /**
@@ -203,8 +218,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                 listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
                 String appId = generateWebappId(webappMetadata);
                 listElementDTO.setApplicationId(appId);
-                listElementDTO.setStatus(
-                        getStatus(loggedInUsername, appId, version, apiProvider));
+                listElementDTO.setStatus(getStatus(loggedInUsername, appId, version, apiProvider));
                 listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
                 listElementDTO.setApplicationPreviewUrl(
                         generateAppPreviewUrl(webappsWrapper, webappMetadata));
@@ -216,12 +230,15 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         return result;
     }
 
-
     private String getVersion(WebappMetadata webappMetadata) {
-        if(DEFAULT_VERSION_STRING.equals(webappMetadata.getAppVersion())) {
+        String version = webappMetadata.getAppVersion();
+        if (DEFAULT_VERSION_STRING.equals(version)) {
             return DEFAULT_GENERATED_VERSION;
         }
-        return webappMetadata.getAppVersion();
+        if (version.startsWith("/")) {
+            version = version.substring(1, version.length());
+        }
+        return version;
     }
 
     /*
