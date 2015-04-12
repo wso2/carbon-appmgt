@@ -735,6 +735,7 @@ public final class AppManagerUtil {
 
         // replace '/' with ':'
         String provider = makeSecondaryUSNameRegFriendly(identifier.getProviderName());
+        provider = AppManagerUtil.replaceEmailDomain(provider);
         return AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
                     provider + RegistryConstants.PATH_SEPARATOR +
                     identifier.getApiName() + RegistryConstants.PATH_SEPARATOR +

@@ -3491,23 +3491,6 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         try {
-
-            //http and https endpoint resolving by reading AppManagerConfiguration
-            AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-            List<Environment> environments = config.getApiGatewayEnvironments();
-            String envDetails = "";
-            String httpEndpoint = null, httpsEndpoint = null, endpoint = null;
-            for (int i = 0; i < environments.size(); i++) {
-                Environment environment = environments.get(i);
-                envDetails = environment.getApiGatewayEndpoint();
-                try {
-                    httpEndpoint = envDetails.split(",")[0];
-                    httpsEndpoint = envDetails.split(",")[1];
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    handleException("Error occurred while getting endpoint form AppManagerConfiguration", e);
-                }
-            }
-
             List<WebApp> apiList = apiProvider.getAppsWithEndpoint();
             if (apiList != null) {
                 Iterator it = apiList.iterator();
@@ -3522,9 +3505,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     //this WebApp is for read the registry values
                     WebApp tempApp = apiProvider.getAPI(apiIdentifier);
                     row.put("version", row, apiIdentifier.getVersion());
-                    row.put("endpoint", row, (tempApp.getTransports().equals("http") ? httpEndpoint : httpsEndpoint) +
-                                             (app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext())
-                                             + "/" + apiIdentifier.getVersion() + "/");
+                    row.put("endpoint", row, tempApp.getUrl());
                     myn.put(i, myn, row);
                     i++;
                 }
