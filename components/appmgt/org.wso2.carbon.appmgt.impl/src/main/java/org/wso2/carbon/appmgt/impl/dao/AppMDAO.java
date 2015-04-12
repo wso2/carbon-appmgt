@@ -50,6 +50,7 @@ import java.util.regex.Pattern;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
@@ -5454,6 +5455,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 }else{
                 	policyPartial.setPolicyPartialContent(ruleCondition);
                 }
+
+                String ruleEffect = extractEffectFromPolicyPartialContent(rs.getString("CONTENT"));
+                
+                // No need to handle parsing errors at this point since they are captured in the previous block.
+                if(ruleEffect != null){
+                	policyPartial.setRuleEffect(ruleEffect);
+                }
                 
                 policyPartial.setShared(rs.getBoolean("SHARED"));
                 policyPartial.setAuthor(rs.getString("AUTHOR"));
@@ -5575,6 +5583,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			return null;
 		}
     }
+    
+	private String extractEffectFromPolicyPartialContent(String policyPartialContent) {
+		
+		try {
+			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
+			String effect = builder.getDocumentElement().getAttributeValue(new QName("Effect"));
+			
+			return effect;
+			
+		} catch (XMLStreamException e) {
+			log.error("Can't extract the 'Effect' attribute value from the 'Rule' node.", e);
+			return null;
+		}
+		
+	}
     
 	/**
 	 * Remove existing updated entitlement policies from IDP

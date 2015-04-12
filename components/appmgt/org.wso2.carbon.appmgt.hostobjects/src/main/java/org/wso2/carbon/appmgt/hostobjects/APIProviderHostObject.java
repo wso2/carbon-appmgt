@@ -818,6 +818,7 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("partialId", row, entitlementPolicyPartial.getPolicyPartialId());
             row.put("partialName", row, entitlementPolicyPartial.getPolicyPartialName());
             row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
+            row.put("ruleEffect", row, entitlementPolicyPartial.getRuleEffect());
             row.put("isShared", row, entitlementPolicyPartial.isShared());
             row.put("author", row, entitlementPolicyPartial.getAuthor());
             row.put("description", row, entitlementPolicyPartial.getDescription());
