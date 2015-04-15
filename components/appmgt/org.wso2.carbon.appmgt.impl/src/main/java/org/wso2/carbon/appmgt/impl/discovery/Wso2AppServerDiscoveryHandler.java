@@ -276,7 +276,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     }
 
     private String translateApplicationNameSearchString(DiscoverySearchCriteria criteria) {
-        return "";
+        return criteria.getApplicationName();
     }
 
     private String generateWebappId(WebappMetadata webappMetadata) {
