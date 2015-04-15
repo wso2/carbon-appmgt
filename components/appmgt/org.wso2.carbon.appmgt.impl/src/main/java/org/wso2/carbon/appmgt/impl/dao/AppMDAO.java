@@ -19,7 +19,6 @@
 package org.wso2.carbon.appmgt.impl.dao;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Date;
@@ -51,6 +50,7 @@ import java.util.regex.Pattern;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
@@ -58,19 +58,15 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xalan.lib.sql.ObjectArray;
-import org.apache.xpath.operations.Bool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -5380,20 +5376,19 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Get the names of apps which use the given policy partial
+	 * Get the apps which use the given policy partial
 	 *
 	 * @param policyPartialId Policy Partial Id
 	 * @return apps' name
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
-	public List<String> getAssociatedAppNames(int policyPartialId) throws AppManagementException {
-
+	public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement statementToGetAppsName = null;
-		List<String> appsNameList = new ArrayList<String>();
+		List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
 		ResultSet rs = null;
 
-		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
+		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME, APP.APP_PROVIDER, APP.APP_VERSION" +
 				" FROM APM_POLICY_GRP_PARTIAL_MAPPING ENT " +
 				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
@@ -5405,8 +5400,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			statementToGetAppsName.setInt(1,policyPartialId);
 			rs = statementToGetAppsName.executeQuery();
 
+			APIIdentifier apiIdentifier = null;
 			while (rs.next()) {
-				appsNameList.add(rs.getString("APP_NAME"));
+				String providerName = rs.getString("APP_PROVIDER");
+				String apiName = rs.getString("APP_NAME");
+				String version = rs.getString("APP_VERSION");
+				apiIdentifier = new APIIdentifier(providerName, apiName, version);
+				apiIdentifiers.add(apiIdentifier);
 			}
 
 
@@ -5416,7 +5416,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} finally {
 			APIMgtDBUtil.closeAllConnections(statementToGetAppsName, connection, null);
 		}
-		return appsNameList;
+		return apiIdentifiers;
 
 	}
 
@@ -5454,6 +5454,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 	continue;
                 }else{
                 	policyPartial.setPolicyPartialContent(ruleCondition);
+                }
+
+                String ruleEffect = extractEffectFromPolicyPartialContent(rs.getString("CONTENT"));
+                
+                // No need to handle parsing errors at this point since they are captured in the previous block.
+                if(ruleEffect != null){
+                	policyPartial.setRuleEffect(ruleEffect);
                 }
                 
                 policyPartial.setShared(rs.getBoolean("SHARED"));
@@ -5576,6 +5583,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			return null;
 		}
     }
+    
+	private String extractEffectFromPolicyPartialContent(String policyPartialContent) {
+		
+		try {
+			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
+			String effect = builder.getDocumentElement().getAttributeValue(new QName("Effect"));
+			
+			return effect;
+			
+		} catch (XMLStreamException e) {
+			log.error("Can't extract the 'Effect' attribute value from the 'Rule' node.", e);
+			return null;
+		}
+		
+	}
     
 	/**
 	 * Remove existing updated entitlement policies from IDP
@@ -6790,8 +6812,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setInt(6, policyGroupId);
 			ps.executeUpdate();
 
+            //delete XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(policyGroupId, conn);
+
 			//delete partials mapped to group id
 			deletePolicyPartialMappings(policyGroupId, conn);
+
 			//insert new partial mappings
 			if (objPartialMappings.length > 0) {
 				savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
@@ -6961,6 +6987,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String query = "";
 		try {
 	   		conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            //Remove XACML Policies from Entitlement Service
+            deleteXACMLPoliciesFromEntitlementService(Integer.parseInt(policyGroupId), conn);
 
 		 	//delete from master table
 			query = " DELETE FROM APM_POLICY_GROUP WHERE POLICY_GRP_ID=? ";
@@ -6976,6 +7006,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				log.debug("Policy Group deleted successfully. " + strDataContext);
 			}
 		} catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Rollback while deleting the policy group", e);
+                }
+            }
 			String strDataContext =
 					"(applicationId:" + applicationId + ", policyGroupId:" + policyGroupId + ")";
 			handleException("Error while executing the query to delete XACML policies : " + query + " : " +
@@ -7056,6 +7093,50 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			APIMgtDBUtil.closeAllConnections(ps, null, null);
 		}
 	}
+
+    /**
+     * Remove XACML Policies from Entitlement Service
+     *
+     * @param policyGroupId
+     * @param conn
+     * @throws SQLException
+     */
+    public static void deleteXACMLPoliciesFromEntitlementService(Integer policyGroupId, Connection conn)
+            throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String query = " SELECT POLICY_ID FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID=? ";
+        String policyId = "";
+
+        //Define Entitlement Service
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        EntitlementService entitlementService = EntitlementServiceFactory.getEntitlementService(config);
+
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, policyGroupId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                policyId = rs.getString("POLICY_ID");
+                //If policy id not null, remove the Entitlement policy with reference to policy id
+                if (policyId != null) {
+                    entitlementService.removePolicy(policyId);
+                }
+            }
+        } catch (SQLException e) {
+            log.error("SQL Error while executing the query to get policy id's under policy group : " +
+                    policyGroupId + ". SQL Query : " + query + " Exception : " + e.getMessage(), e);
+            /*
+            In the code im using a single SQL connection passed from the parent function so I'm logging the error here
+			and throwing the SQLException so  the connection will be disposed by the parent function.
+			*/
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, rs);
+        }
+    }
+
 
 
 	/**

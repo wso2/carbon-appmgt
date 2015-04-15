@@ -449,6 +449,9 @@ public final class AppMConstants {
     public static final String USER_ROLES_CACHE_MANAGER = "USER_ROLES_CACHE_MANAGER";
     public static final String USER_ROLES_CONFIG_CACHE = "userRolesConfigCache";
     public static final String USER_ROLES_CACHE_KEY = "userRolesCacheKey";
+    public static final String APP_CONTEXT_VERSION_CACHE_MANAGER = "APP_CONTEXT_VERSION_CACHE_MANAGER";
+    public static final String APP_CONTEXT_VERSION_CONFIG_CACHE = "APP_CONTEXT_VERSION_CONFIG_CACHE";
+    public static final String APP_CONTEXT_VERSION_CACHE_KEY = "APP_CONTEXT_VERSION_CACHE_KEY";
 
     public static final String SAML2_COOKIE = "appmanager_sso";
     public static final String SAML_SSO_TOKENID = "samlssoTokenId";
@@ -535,6 +538,13 @@ public final class AppMConstants {
         public static final String APPLICATION_RETIRED = "RETIRED";
 
     }
+
+    public static final String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
+    public static final String HOST = "Host";
+    public static final String REFERER = "Referer";
+    public static final String HTTP = "http://";
+    public static final String URL_DELIMITER = "://";
+
 
     // constants related to Statistics
     public static class Statistics {

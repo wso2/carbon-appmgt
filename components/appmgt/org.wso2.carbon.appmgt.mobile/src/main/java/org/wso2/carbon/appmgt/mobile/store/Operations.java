@@ -76,14 +76,11 @@ public class Operations {
 
 
         } catch (UserStoreException e) {
-            log.error("error occurred at the user store");
-            log.debug("Error: " + e);
+            log.error("error occurred at the user store", e);
         } catch (GovernanceException e) {
-            log.error("error occurred from governance registry");
-            log.debug("Error: " + e);
+            log.error("error occurred from governance registry", e);
         } catch (RegistryException e) {
-            log.error("error occurred from registry");
-            log.debug("Error: " + e);
+            log.error("error occurred from registry", e);
         }  finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

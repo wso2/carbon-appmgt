@@ -1,18 +1,20 @@
 /*
- *  Copyright WSO2 Inc.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 
 package org.wso2.carbon.appmgt.sample.deployer.internal;
 
@@ -25,7 +27,6 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
-
 import java.io.File;
 
 /**
@@ -41,6 +42,13 @@ public class AppManagerSampleDeployerComponent {
     private static BundleContext bundleContext;
     private static AppManagerConfigurationService amConfigService;
 
+    /**
+     * This method is triggered when component is activated
+     *
+     * @param context
+     *            smaple deployer component context
+     *
+     */
     protected void activate(ComponentContext context) {
         bundleContext = context.getBundleContext();
         if (log.isDebugEnabled()) {
@@ -61,6 +69,13 @@ public class AppManagerSampleDeployerComponent {
         }
     }
 
+    /**
+     * This method is triggered when component is deactivated
+     *
+     * @param context
+     *            smaple deployer component context
+     *
+     */
     protected void deactivate(ComponentContext context) {
         if (log.isDebugEnabled()) {
             log.debug("WebApp handlers component deactivated");
@@ -68,6 +83,13 @@ public class AppManagerSampleDeployerComponent {
 
     }
 
+    /**
+     * Set the given ConfigurationContextService to ServiceReferenceHolder instance
+     *
+     * @param cfgCtxService
+     *            smaple deployer component configuration context service
+     *
+     */
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         if (log.isDebugEnabled()) {
             log.debug("Configuration context service bound to the WebApp handlers");
@@ -75,6 +97,13 @@ public class AppManagerSampleDeployerComponent {
         ServiceReferenceHolder.getInstance().setConfigurationContextService(cfgCtxService);
     }
 
+    /**
+     * Unset the ConfigurationContextService from ServiceReferenceHolder instance
+     *
+     * @param cfgCtxService
+     *            smaple deployer component configuration context service
+     *
+     */
     protected void unsetConfigurationContextService(ConfigurationContextService cfgCtxService) {
         if (log.isDebugEnabled()) {
             log.debug("Configuration context service unbound from the WebApp handlers");

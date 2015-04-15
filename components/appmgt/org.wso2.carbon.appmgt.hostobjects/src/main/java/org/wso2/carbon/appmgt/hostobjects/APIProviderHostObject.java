@@ -818,6 +818,7 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("partialId", row, entitlementPolicyPartial.getPolicyPartialId());
             row.put("partialName", row, entitlementPolicyPartial.getPolicyPartialName());
             row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
+            row.put("ruleEffect", row, entitlementPolicyPartial.getRuleEffect());
             row.put("isShared", row, entitlementPolicyPartial.isShared());
             row.put("author", row, entitlementPolicyPartial.getAuthor());
             row.put("description", row, entitlementPolicyPartial.getDescription());
@@ -891,12 +892,12 @@ public class APIProviderHostObject extends ScriptableObject {
         NativeArray myn = new NativeArray(0);
         int policyPartialId = Integer.parseInt(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
-        List<String> appsNameList = apiProvider.getAssociatedAppNames(policyPartialId);
+        List<APIIdentifier> apiIdentifiers = apiProvider.getAssociatedApps(policyPartialId);
 
         int count = 0;
-        for (String appName : appsNameList) {
+        for (APIIdentifier identifier : apiIdentifiers) {
             NativeObject row = new NativeObject();
-            row.put("appName", row, appName);
+            row.put("appName", row, identifier.getApiName());
             count++;
             myn.put(count, myn, row);
         }
@@ -3491,23 +3492,6 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         try {
-
-            //http and https endpoint resolving by reading AppManagerConfiguration
-            AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-            List<Environment> environments = config.getApiGatewayEnvironments();
-            String envDetails = "";
-            String httpEndpoint = null, httpsEndpoint = null, endpoint = null;
-            for (int i = 0; i < environments.size(); i++) {
-                Environment environment = environments.get(i);
-                envDetails = environment.getApiGatewayEndpoint();
-                try {
-                    httpEndpoint = envDetails.split(",")[0];
-                    httpsEndpoint = envDetails.split(",")[1];
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    handleException("Error occurred while getting endpoint form AppManagerConfiguration", e);
-                }
-            }
-
             List<WebApp> apiList = apiProvider.getAppsWithEndpoint();
             if (apiList != null) {
                 Iterator it = apiList.iterator();
@@ -3522,9 +3506,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     //this WebApp is for read the registry values
                     WebApp tempApp = apiProvider.getAPI(apiIdentifier);
                     row.put("version", row, apiIdentifier.getVersion());
-                    row.put("endpoint", row, (tempApp.getTransports().equals("http") ? httpEndpoint : httpsEndpoint) +
-                                             (app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext())
-                                             + "/" + apiIdentifier.getVersion() + "/");
+                    row.put("endpoint", row, tempApp.getUrl());
                     myn.put(i, myn, row);
                     i++;
                 }

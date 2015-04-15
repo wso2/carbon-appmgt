@@ -50,10 +50,10 @@ public class AppDataLoader {
 
                 if("install".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
-                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + artifact.getAttribute("overview_url"));
+                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
                     }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
                         String fileName = new File(artifact.getAttribute("overview_url")).getName();
-                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getAppDownloadHost()) + "/" + MobileConfigurations.getInstance().getIosPlistPath() + "/" + tenantId + "/"  + fileName);
+                        app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance().getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
                     }
                 }
 
@@ -75,8 +75,7 @@ public class AppDataLoader {
                 app.setIdentifier(artifact.getAttribute("overview_appid"));
             }
         } catch (GovernanceException e) {
-            log.error("Error occurred while retrieving information from governance registry");
-            log.debug("Error: " + e);
+            log.error("Error occurred while retrieving information from governance registry", e);
         }finally {
             return app;
         }

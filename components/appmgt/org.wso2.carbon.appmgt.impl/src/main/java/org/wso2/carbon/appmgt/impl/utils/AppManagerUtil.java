@@ -735,6 +735,7 @@ public final class AppManagerUtil {
 
         // replace '/' with ':'
         String provider = makeSecondaryUSNameRegFriendly(identifier.getProviderName());
+        provider = AppManagerUtil.replaceEmailDomain(provider);
         return AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
                     provider + RegistryConstants.PATH_SEPARATOR +
                     identifier.getApiName() + RegistryConstants.PATH_SEPARATOR +
@@ -1257,6 +1258,25 @@ public final class AppManagerUtil {
 		}
 		return displayName;
 	}
+
+    /**
+     * This is written as a wrapper to for the checkPermission Method
+     * returns a boolean indicating if user is authorized or not
+     * @param username
+     * @param permission
+     * @return
+     */
+    public static boolean checkPermissionWrapper(String username, String permission) {
+        boolean result;
+        try {
+            checkPermission(username, permission);
+            result = true;
+        } catch (AppManagementException e) {
+            //We catch this exception and return a false
+            result = false;
+        }
+        return result;
+    }
 
 	/**
 	 * Checks whether the specified user has the specified permission.

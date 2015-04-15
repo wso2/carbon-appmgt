@@ -1,7 +1,5 @@
-package org.wso2.carbon.appmgt.sample.deployer.bean;
-
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -18,6 +16,12 @@ package org.wso2.carbon.appmgt.sample.deployer.bean;
 * under the License.
 */
 
+package org.wso2.carbon.appmgt.sample.deployer.bean;
+
+/**
+ * Bean class for mobile application
+ *
+ * */
 public class MobileApplicationBean {
 
     private String appmeta;
@@ -35,12 +39,7 @@ public class MobileApplicationBean {
     private String screenShot2File;
     private String screenShot3File;
     private String mobileapp;
-
     private String apkFile;
-
-    public MobileApplicationBean() {
-
-    }
 
     public String getVersion() {
         return version;
