@@ -278,9 +278,9 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.stub:4.2.1</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.user.registration.stub:${carbon.platform.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${carbon.platform.version}</bundleDef>
-				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:${carbon.platform.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.user.registration.stub:${wso2carbon.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${wso2carbon.version}</bundleDef>
+				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:${wso2carbon.version}</bundleDef>
 				<bundleDef>org.wso2.carbon:org.wso2.carbon.identity.entitlement.proxy:4.2.1</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer</bundleDef>
                             </bundles>

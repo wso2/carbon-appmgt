@@ -39,47 +39,38 @@
     	<dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.user.core</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
-            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.ws.client</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-			<version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
-            <version>4.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
-            <version>4.2.4</version>
         </dependency>
       <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.webapp.mgt.stub</artifactId>
-          <version>${wso2carbon.version}</version>
       </dependency>
         <dependency>
             <groupId>com.h2database.wso2</groupId>
             <artifactId>h2-database-engine</artifactId>
-            <version>${orbit.version.h2.engine}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.osgi</groupId>
@@ -94,42 +85,34 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.rest.api.stub</artifactId>
-           <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
              <groupId>org.wso2.carbon</groupId>
              <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
-             <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.um.ws.api</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-           <version>${wso2carbon.version}</version>
         </dependency>
 	<dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
-           <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.registry</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -138,71 +121,54 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-			<version>${wso2carbon.version}</version>
         </dependency>
-		<dependency>
+	<dependency>
            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.sequences.stub</artifactId>
-           <version>4.2.1</version>
         </dependency>
-      <dependency>
-          <groupId>org.wso2.carbon</groupId>
-          <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
-          <version>4.2.1</version>
-      </dependency>
-		<dependency>
-			<groupId>org.wso2.carbon</groupId>
-			<artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
-			<version>${wso2carbon.version}</version>
-		</dependency>
+        <dependency>
+           <groupId>org.wso2.carbon</groupId>
+           <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
+        </dependency>
+	<dependency>
+	   <groupId>org.wso2.carbon</groupId>
+	   <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
+	   <version>${wso2carbon.version}</version>
+	</dependency>
         <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.registry.indexing</artifactId>
-          <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple.wso2</groupId>
             <artifactId>json-simple</artifactId>
-            <version>1.1.wso2v1</version>
         </dependency>
-      <dependency>
+        <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
-          <version>4.2.0</version>
-      </dependency>
-      <dependency>
+        </dependency>
+        <dependency>
           <groupId>org.wso2.store</groupId>
           <artifactId>jaggery-scxml-executors</artifactId>
-          <version>1.0.0</version>
-      </dependency>
-
-      <!-- WSO2IS SAML SSO Configurator -->
-      <dependency>
+        </dependency>
+        <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
-          <version>4.2.2</version>
-      </dependency>
-      <dependency>
+        </dependency>
+        <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
-          <version>4.2.0</version>
-      </dependency>
-      <!-- End WSO2IS SAML SSO Configurator -->
-
-      <!-- Entitlement Dependencies -->
-      <dependency>
+        </dependency>
+        <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
-          <version>4.2.1</version>
-      </dependency>
-
-      <dependency>
+        </dependency>
+        <dependency>
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
-          <version>4.2.1</version>
-      </dependency>
-
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -276,17 +242,17 @@
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.appmgt.impl.internal,
-                            org.wso2.carbon.appmgt.impl.*;version="1.0.0-SNAPSHOT",
+                            org.wso2.carbon.appmgt.impl.*;version="${carbon.appmgt.version}",
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.governance.api.*,
                             org.wso2.carbon.registry.ws.client.*,
                             org.wso2.carbon.appmgt.api.model.*,
                             org.wso2.carbon.appmgt.api.*,
-                            org.wso2.carbon.governance.registry.extensions.aspects.*;version="[4.2.0,4.3.0)",
-                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
-                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
-                            javax.servlet.resources;version="${imp.pkg.version.javax.servlet}",
+                            org.wso2.carbon.governance.registry.extensions.aspects.*;version="${governance.registry.extensions.imp.pkg.version}",
+                            javax.servlet;version="${javax.servlet.imp.pkg.version}",
+                            javax.servlet.http;version="${javax.servlet.imp.pkg.version}",
+                            javax.servlet.resources;version="${javax.servlet.imp.pkg.version}",
                             org.eclipse.equinox.http.helper,
                             *;resolution:=optional
                         </Import-Package>
@@ -297,7 +263,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
-                <version>1.0.10</version>
                 <executions>
                     <execution>
                         <id>generate-scr-scrdescriptor</id>
