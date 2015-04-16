@@ -201,6 +201,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private DiscoveredApplicationListDTO translateToDto(WebappsWrapper webappsWrapper,
             String loggedInUsername) throws AppManagementException {
         VersionedWebappMetadata[] versionedWebappMetadataArray = webappsWrapper.getWebapps();
+        String providerName = loggedInUsername.replace("@", "-AT-");
         APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
         DiscoveredApplicationListDTO result = new DiscoveredApplicationListDTO();
         List<DiscoveredApplicationListElementDTO> appList = new ArrayList<DiscoveredApplicationListElementDTO>();
@@ -219,7 +220,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                 listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
                 String appId = generateWebappId(webappMetadata);
                 listElementDTO.setApplicationId(appId);
-                listElementDTO.setStatus(getStatus(loggedInUsername, appId, version, apiProvider));
+                listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
                 listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
                 listElementDTO.setApplicationPreviewUrl(
                         generateAppPreviewUrl(webappsWrapper, webappMetadata));
