@@ -35,12 +35,10 @@
 			<dependency>
 				<groupId>org.wso2.carbon.appmgt</groupId>
 				<artifactId>org.wso2.carbon.appmgt.mdm.wso2emm</artifactId>
-				<version>${appmgt.mdm.version}</version>
 			</dependency>
 			<dependency>
             			<groupId>com.googlecode.plist</groupId>
             			<artifactId>dd-plist</artifactId>
-            			<version>1.8</version> <!-- corresponds to r108 -->
         		</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -70,9 +68,9 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.mdm.wso2emm:${appmgt.mdm.version}</bundleDef>
+				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</bundleDef>
 				<bundleDef>org.bouncycastle.wso2:bcprov-jdk15on:${bcprov.wso2.version}</bundleDef>
-				<bundleDef>com.googlecode.plist:dd-plist:1.8</bundleDef>
+				<bundleDef>com.googlecode.plist:dd-plist:${googlecode.plist.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                             </importFeatures>
@@ -82,11 +80,6 @@
             </plugin>
         </plugins>
     </build>
-
-	<properties>
-		<appmgt.mdm.version>1.0.0-SNAPSHOT</appmgt.mdm.version>
-		<bcprov.wso2.version>1.49.wso2v1</bcprov.wso2.version>
-	</properties>
 
 </project>
 

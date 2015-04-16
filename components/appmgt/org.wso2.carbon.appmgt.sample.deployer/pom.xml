@@ -99,7 +99,7 @@
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.appmgt.sample.deployer.internal;
-                            org.wso2.carbon.appmgt.sample.deployer.*;version="${carbon.appmgt.imp.pkg.version}",
+                            org.wso2.carbon.appmgt.sample.deployer.*;version="${carbon.appmgt.version}",
                         </Export-Package>
                         <Import-Package>
                             org.apache.httpcomponents.wso2.*,

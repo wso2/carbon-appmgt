@@ -75,34 +75,4 @@
         </repository>
     </repositories>
     
-    <properties>
-        <hostobjects.version>1.0.0</hostobjects.version>
-        <apim.version>1.0.0</apim.version>
-        <identity.version>${wso2carbon.version}</identity.version>
-        <wso2carbon.version.identity>${wso2carbon.version}</wso2carbon.version.identity>
-        <axis2.wso2.version.identity>${axis2.wso2.version}</axis2.wso2.version.identity>
-        <axiom.wso2.version.identity>${axiom.wso2.version}</axiom.wso2.version.identity>
-        <synapse.version.identity>${synapse.version}</synapse.version.identity>
-        <synapse.version.handlers>${synapse.version}</synapse.version.handlers>
-        <throttle.version.handlers>3.3.0</throttle.version.handlers>
-        <gdata-core.wso2.version.identity>${gdata-core.wso2.version}
-        </gdata-core.wso2.version.identity>
-        <junit.version.identity>${junit.version}</junit.version.identity>
-        <smack.version.identity>${smack.wso2.version}</smack.version.identity>
-        <smackx.version.identity>${smackx.wso2.version}</smackx.version.identity>
-        <sun-xacml.wso2.version.identity>${sun-xacml.wso2.version}</sun-xacml.wso2.version.identity>
-        <wss4j.version.wso2.identity>${wss4j.version}</wss4j.version.wso2.identity>
-        <rampart.wso2.version.identity>${rampart.wso2.version}</rampart.wso2.version.identity>
-        <opensaml.wso2.version.identity>${opensaml.wso2.version}</opensaml.wso2.version.identity>
-        <opensaml2.wso2.version.identity>${opensaml2.wso2.version}</opensaml2.wso2.version.identity>
-        <openid4java.wso2.version.identity>${openid4java.wso2.version}
-        </openid4java.wso2.version.identity>
-        <httpcomponents-httpclient.wso2.version.identity>${httpcomponents-httpclient.wso2.version}
-        </httpcomponents-httpclient.wso2.version.identity>
-        <httpcomponents-httpcore.wso2.version.identity>${httpcomponents-httpcore.wso2.version}
-        </httpcomponents-httpcore.wso2.version.identity>
-        <neethi.osgi.version.identity>${neethi.osgi.version}</neethi.osgi.version.identity>
-	    <libthrift.wso2.version>0.7.wso2v1</libthrift.wso2.version>
-        <jackson.version>1.9.0</jackson.version>
-    </properties>
 </project>
