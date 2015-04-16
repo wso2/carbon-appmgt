@@ -192,7 +192,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     /**
      * Translates the WebappsWrapper to its flat list form
      *
-     * TODO: document a sample response
+     * The structure of the response object is:
+     * {WebappsWrapper : {localWebapps(type of VersionedWebappMetadata) : [type of WebappMetadata]}}
+     *
      * @param webappsWrapper
      * @return
      */
@@ -204,7 +206,6 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         List<DiscoveredApplicationListElementDTO> appList = new ArrayList<DiscoveredApplicationListElementDTO>();
         result.setApplicationList(appList);
         result.setPageCount(webappsWrapper.getNumberOfPages());
-        result.setTotalNumberOfResults(webappsWrapper.getNumberOfCorrectWebapps());
         for (VersionedWebappMetadata versionedWebappMetadata : versionedWebappMetadataArray) {
             WebappMetadata[] webappMetadataArray = versionedWebappMetadata.getVersionGroups();
             for (WebappMetadata webappMetadata : webappMetadataArray) {
@@ -227,6 +228,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             }
 
         }
+        result.setTotalNumberOfResults(appList.size());
         return result;
     }
 
