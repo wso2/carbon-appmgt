@@ -22,6 +22,8 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.webapp.mgt.stub.WebappAdminStub;
@@ -46,9 +48,28 @@ public class AppServerWebappAdminClient {
         this.userName = userName;
         serviceURL = backendServerURL + "WebappAdmin";
 
+        try {
+            stub = new WebappAdminStub(configCtx, serviceURL);
+        } catch (AxisFault axisFault) {
+            final String msg = String
+                    .format("Could not initialize Admin Service Stub. Server [%s],Reason: %s",
+                            serviceURL, axisFault.getMessage());
+            throw new AppManagementException(msg, axisFault);
+        }
+
+        ServiceClient client = stub._getServiceClient();
+        Options options = client.getOptions();
+        options.setManageSession(true);
+
         HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
         auth.setUsername(userName);
         auth.setPassword(password);
+        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.AUTHENTICATE, auth);
+    }
+
+    public AppServerWebappAdminClient(String sessionCookie, String backendServerURL,
+            ConfigurationContext configCtx, Locale locale) throws AppManagementException {
+        serviceURL = backendServerURL + "WebappAdmin";
 
         try {
             stub = new WebappAdminStub(configCtx, serviceURL);
@@ -61,15 +82,24 @@ public class AppServerWebappAdminClient {
 
         ServiceClient client = stub._getServiceClient();
         Options options = client.getOptions();
-        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.AUTHENTICATE, auth);
+        options.setManageSession(true);
+
+        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
+                sessionCookie);
 
     }
 
     public WebappsWrapper getPagedWebappsSummary(String webappSearchString, String webappState,
             String webappType, int pageNumber) throws AppManagementException {
         try {
-            return stub.getPagedWebappsSummary(webappSearchString, webappState, webappType,
-                    pageNumber);
+            WebappsWrapper result = stub
+                    .getPagedWebappsSummary(webappSearchString, webappState, webappType,
+                            pageNumber);
+            ServiceContext serviceContext = stub.
+                    _getServiceClient().getLastOperationContext().getServiceContext();
+            String sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
+            System.out.println(sessionCookie);
+            return result;
         } catch (RemoteException e) {
             final String msg = String.format("Failed to get available applications from "
                             + "Application server. Server [%s], User Name [%s] Reason: %s",
