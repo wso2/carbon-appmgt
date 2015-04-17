@@ -23,6 +23,7 @@ package org.wso2.carbon.appmgt.impl.discovery;
  *
  */
 public class UserNamePasswordCredentials implements DiscoveryCredentials {
+
     private String appServerUrl;
     private String userName;
     private String password;
