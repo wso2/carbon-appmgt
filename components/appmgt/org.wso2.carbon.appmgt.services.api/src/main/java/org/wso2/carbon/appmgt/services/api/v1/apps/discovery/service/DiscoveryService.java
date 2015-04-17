@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.impl.discovery.*;
+import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
+import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,9 @@ public class DiscoveryService {
     private static final Log log = LogFactory.getLog(DiscoveryService.class);
 
     private static final String SUPER_TENANT_DOMAIN = "carbon.super";
+    private static final String NAME_WSO2_AS = "WSO2-AS";
+    private static final String CONTEXT_DATA_APP_SERVER_URL = "appServerUrl";
+    private static final String CONTEXT_DATA_APP_SERVER_USER_NAME = "userName";
 
     /**
      * Returns the full application information so that an application can be created with the
@@ -62,32 +67,32 @@ public class DiscoveryService {
     public DiscoveredApplicationDTO getDiscoveredApplication(
             @Context final HttpServletRequest servletRequest,
             @Context final HttpServletResponse servletResponse, @Context HttpHeaders headers,
-            @PathParam("tenantDomain") String tenantDomain, DiscoveryInfoRequest discoverInfoRequest) {
+            @PathParam("tenantDomain") String tenantDomain,
+            DiscoveryInfoRequest discoverInfoRequest) {
 
-        if (tenantDomain == null)
-            tenantDomain = SUPER_TENANT_DOMAIN;
         DiscoveredApplicationDTO result = null;
 
         ApplicationDiscoveryServiceFactory applicationDiscoveryServiceFactory = (ApplicationDiscoveryServiceFactory) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(ApplicationDiscoveryServiceFactory.class);
         ApplicationDiscoveryHandler handler = applicationDiscoveryServiceFactory
-                .getHandler("WSO2-AS");
+                .getHandler(NAME_WSO2_AS);
 
         APIIdentifier apiIdentifier = new APIIdentifier(null, null, null);
         apiIdentifier.setApplicationId(discoverInfoRequest.getApplicationId());
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
                 .getThreadLocalCarbonContext();
-        ApplicationDiscoveryContext applicationDiscoveryContext = (ApplicationDiscoveryContext) servletRequest.getSession().getAttribute(ApplicationDiscoveryContext.class.getName());
-        if(applicationDiscoveryContext == null) {
+        ApplicationDiscoveryContext applicationDiscoveryContext = (ApplicationDiscoveryContext) servletRequest
+                .getSession().getAttribute(ApplicationDiscoveryContext.class.getName());
+        if (applicationDiscoveryContext == null) {
             applicationDiscoveryContext = new ApplicationDiscoveryContext();
-            servletRequest.getSession().setAttribute(ApplicationDiscoveryContext.class.getName(), applicationDiscoveryContext);
+            servletRequest.getSession().setAttribute(ApplicationDiscoveryContext.class.getName(),
+                    applicationDiscoveryContext);
         }
         try {
             result = handler
-                    .readApplicationInfo(applicationDiscoveryContext, apiIdentifier,
-                             carbonContext);
+                    .readApplicationInfo(applicationDiscoveryContext, apiIdentifier, carbonContext);
         } catch (AppManagementException e) {
             String message = "Error while discovering the application from the backend server Server[%s], User[%s], Reason: ";
             log.error(message);
@@ -119,14 +124,12 @@ public class DiscoveryService {
             @Context final HttpServletRequest request,
             @Context final HttpServletResponse servletResponse, @Context HttpHeaders headers,
             @PathParam("tenantDomain") String tenantDomain, DiscoverRequest discoverRequest) {
-        if (tenantDomain == null)
-            tenantDomain = SUPER_TENANT_DOMAIN;
 
         ApplicationDiscoveryServiceFactory applicationDiscoveryServiceFactory = (ApplicationDiscoveryServiceFactory) PrivilegedCarbonContext
                 .getThreadLocalCarbonContext()
                 .getOSGiService(ApplicationDiscoveryServiceFactory.class);
         ApplicationDiscoveryHandler handler = applicationDiscoveryServiceFactory
-                .getHandler("WSO2-AS");
+                .getHandler(NAME_WSO2_AS);
 
         UserNamePasswordCredentials userNamePasswordCredentials = discoverRequest.getCredentials();
         if (userNamePasswordCredentials == null) {
@@ -140,15 +143,22 @@ public class DiscoveryService {
             discoverySearchCriteria = new DiscoverySearchCriteria();
         }
 
-        ApplicationDiscoveryContext applicationDiscoveryContext = (ApplicationDiscoveryContext) servletRequest.getSession().getAttribute(ApplicationDiscoveryContext.class.getName());
-        if(applicationDiscoveryContext == null ||
-                ! (userNamePasswordCredentials.getAppServerUrl().equals(applicationDiscoveryContext.getData("appServerUrl")) ) ||
-                ! (userNamePasswordCredentials.getUserName().equals(applicationDiscoveryContext.getData("userName"))) ){
+        ApplicationDiscoveryContext applicationDiscoveryContext = (ApplicationDiscoveryContext) servletRequest
+                .getSession().getAttribute(ApplicationDiscoveryContext.class.getName());
+        if (applicationDiscoveryContext == null ||
+                !(userNamePasswordCredentials.getAppServerUrl()
+                        .equals(applicationDiscoveryContext.getData(CONTEXT_DATA_APP_SERVER_URL)))
+                ||
+                !(userNamePasswordCredentials.getUserName().equals(applicationDiscoveryContext
+                        .getData(CONTEXT_DATA_APP_SERVER_USER_NAME)))) {
             applicationDiscoveryContext = new ApplicationDiscoveryContext();
-            servletRequest.getSession().setAttribute(ApplicationDiscoveryContext.class.getName(), applicationDiscoveryContext);
+            servletRequest.getSession().setAttribute(ApplicationDiscoveryContext.class.getName(),
+                    applicationDiscoveryContext);
 
-            applicationDiscoveryContext.putData("appServerUrl", userNamePasswordCredentials.getAppServerUrl());
-            applicationDiscoveryContext.putData("userName", userNamePasswordCredentials.getUserName());
+            applicationDiscoveryContext.putData(CONTEXT_DATA_APP_SERVER_URL,
+                    userNamePasswordCredentials.getAppServerUrl());
+            applicationDiscoveryContext.putData(CONTEXT_DATA_APP_SERVER_USER_NAME,
+                    userNamePasswordCredentials.getUserName());
         }
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
@@ -156,8 +166,8 @@ public class DiscoveryService {
 
         try {
             DiscoveredApplicationListDTO result = handler
-                    .discoverApplications(applicationDiscoveryContext, userNamePasswordCredentials, discoverySearchCriteria,
-                            Locale.ENGLISH, carbonContext);
+                    .discoverApplications(applicationDiscoveryContext, userNamePasswordCredentials,
+                            discoverySearchCriteria, Locale.ENGLISH, carbonContext);
             return result;
         } catch (AppManagementException e) {
             String message = "Error while discovering the application from the backend server Server[%s], User[%s], Reason: ";

@@ -16,13 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.discovery;
+package org.wso2.carbon.appmgt.impl.dto;
 
 /**
  * Data Transfer Object which sends discovered application(web or mobile).
  * This will contain all the necessary data to create an application/proxy withing AppM.
  */
 public class DiscoveredApplicationDTO extends DiscoveredApplicationListElementDTO {
-
 
 }

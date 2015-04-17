@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.discovery;
+package org.wso2.carbon.appmgt.impl.dto;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
