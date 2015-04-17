@@ -22,6 +22,7 @@ package org.wso2.carbon.appmgt.impl.discovery;
  * Search criteria for the application discovery.
  */
 public class DiscoverySearchCriteria {
+
     private String applicationName;
     private String status;
     private int pageNumber;
