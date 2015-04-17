@@ -42,10 +42,20 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserStoreException;
 
+/**
+ * Class responsible for perform actions on MDM
+ */
 public class Operations {
 
     private static final Log log = LogFactory.getLog(Operations.class);
 
+    /**
+     * Performs action on MDM
+     * @param currentUser User who perform the action
+     * @param tenantId Tenant Id
+     * @param type Type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     */
     public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params ){
         log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();

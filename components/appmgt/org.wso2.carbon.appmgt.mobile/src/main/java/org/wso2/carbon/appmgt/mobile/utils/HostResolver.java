@@ -27,7 +27,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 
 /**
- * Created by dilan on 3/18/15.
+ * Resolved host information
  */
 public class HostResolver {
 

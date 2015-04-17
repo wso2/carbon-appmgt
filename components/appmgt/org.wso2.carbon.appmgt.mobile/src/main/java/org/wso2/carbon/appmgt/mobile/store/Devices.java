@@ -33,11 +33,23 @@ import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import java.util.List;
 
-
+/**
+ * Provides device information to the store
+ */
 public class Devices {
 
     private static final Log log = LogFactory.getLog(Devices.class);
 
+    /**
+     *
+     * @param currentUser Current user who ask for devices
+     * @param tenantId Tenant Id of the user
+     * @param type type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     * @param platform Platform of the devices
+     * @param platformVersion Platform version of the devices
+     * @return JSON List of devices
+     */
     public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform, String platformVersion){
 
         User user = setUserData(new User(), currentUser);
@@ -48,6 +60,15 @@ public class Devices {
         return convertDevicesToJSON(devices).toJSONString();
     }
 
+    /**
+     *
+     * @param currentUser Current user who ask for devices
+     * @param tenantId Tenant Id of the user
+     * @param type type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     * @param platform Platform of the devices
+     * @return JSON List of devices
+     */
     public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform){
 
         User user = setUserData(new User(), currentUser);
@@ -59,6 +80,14 @@ public class Devices {
         return convertDevicesToJSON(devices).toJSONString();
     }
 
+    /**
+     *
+     * @param currentUser Current user who ask for devices
+     * @param tenantId Tenant Id of the user
+     * @param type type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     * @return JSON List of devices
+     */
     public String getDevicesList(String currentUser, int tenantId, String type, String[] params){
 
         User user = setUserData(new User(), currentUser);

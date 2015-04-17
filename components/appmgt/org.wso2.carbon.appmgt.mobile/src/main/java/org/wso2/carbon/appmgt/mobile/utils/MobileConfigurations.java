@@ -37,7 +37,9 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Iterator;
 
-
+/**
+ * Class which is responsible for reading mobile configuration from app-manager.xml
+ */
 public class MobileConfigurations {
 
     private static final String CONFIG_FILE_PATH = CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "conf" + File.separator + "app-manager.xml";
@@ -86,7 +88,10 @@ public class MobileConfigurations {
         return mobileConfigurations;
     }
 
-
+    /**
+     *
+     * @return list of active MDM properties
+     */
     public HashMap<String, String> getActiveMDMProperties(){
         if(activeMDMProperties == null){
 
@@ -112,6 +117,10 @@ public class MobileConfigurations {
         return activeMDMProperties;
     }
 
+    /**
+     *
+     * @return list of active MDM configurations
+     */
     public HashMap<String, String> getMDMConfigs(){
         if(mDMConfigs == null){
 
@@ -130,7 +139,10 @@ public class MobileConfigurations {
         return mDMConfigs;
     }
 
-
+    /**
+     *
+     * @return the bundle id of the active MDM
+     */
     public String getActiveMDMBundle(){
         if(activeMDMBundle == null){
 

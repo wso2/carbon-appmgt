@@ -6,12 +6,19 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.ActionConstants;
 
 /**
- * Created by dilan on 4/9/15.
+ * Class which has Generic operations for store
  */
 public class Generic {
 
     private static final Log log = LogFactory.getLog(Generic.class);
 
+    /**
+     * Shows application visibility to the user
+     * @param appPath Path of the application
+     * @param username Username of the user
+     * @param opType Op type (ALLOW OR DENY)
+     * @return whether it is success
+     */
     public boolean showAppVisibilityToUser(String appPath, String username, String opType){
 
 
