@@ -1315,6 +1315,8 @@ public final class AppManagerUtil {
 				                                      permission,
 				                                      CarbonConstants.UI_PERMISSION_ACTION);
 			} else {
+                //Get rid of carbon.super in user name
+                username = MultitenantUtils.getTenantAwareUsername(username);
                 //email login
                 username = AppManagerUtil.replaceEmailDomainBack(username);
 				RemoteAuthorizationManager authorizationManager =
