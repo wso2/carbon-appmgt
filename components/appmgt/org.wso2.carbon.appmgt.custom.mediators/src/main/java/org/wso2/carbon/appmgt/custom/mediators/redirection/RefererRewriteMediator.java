@@ -47,9 +47,11 @@ public class RefererRewriteMediator extends AbstractMediator{
                 String host = (String) map.get(AppMConstants.HOST);
         String referer = (String)map.get(AppMConstants.REFERER);
 
+        //Identify http/https
+        String transport = referer.split(AppMConstants.URL_DELIMITER)[0];
         for (String contextVersion : contextVersionList){
             if (referer.contains(contextVersion)){
-                referer = AppMConstants.HTTP + host + contextVersion;
+                referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion;
                 break;
             }
         }

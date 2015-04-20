@@ -36,22 +36,18 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-			<version>${wso2carbon.version}</version>			
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-			<version>${wso2carbon.version}</version>			
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.throttle.core</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
-            <version>2.1.2-wso2v3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.axis2</groupId>
@@ -62,43 +58,31 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-			<version>${wso2carbon.version}</version>			
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>
-			<version>4.2.2</version>			
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>   
-	    <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>     
-			<version>${wso2carbon.version}</version>			
         </dependency>
         <dependency>
-             <groupId>org.wso2.carbon</groupId>
-             <artifactId>org.wso2.carbon.utils</artifactId>       
-			<version>${wso2carbon.version}</version>			 
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>       
          </dependency>
-                 <dependency>
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-nhttp-transport</artifactId>       
-			<version>2.1.2-wso2v3</version>			 
+         <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp-transport</artifactId>       
          </dependency>
 	 <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.sso.saml</artifactId>
-	    <version>4.2.4</version>			
-        </dependency>
-        <!--<dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.identity.sso.agent</artifactId>
-            <version>1.2.0</version>
-        </dependency>-->
+         </dependency>
          
     </dependencies>
 
@@ -120,7 +104,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -138,13 +121,12 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.soap,
-                            javax.xml.stream.*; version="1.0.1",
+                            javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.axis2; version="${axis2.osgi.version.range}",
                             org.apache.axis2.description; version="${axis2.osgi.version.range}",
                             org.apache.axis2.engine; version="${axis2.osgi.version.range}",
-                            org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
                             org.apache.axis2.context; version="${axis2.osgi.version.range}",
                             org.apache.commons.logging,
                             org.apache.synapse,
@@ -156,10 +138,10 @@
                             org.apache.synapse.mediators.base,
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
+                            org.wso2.carbon.registry.core.service; version="${carbon.registry.imp.pkg.version}",
                             org.wso2.carbon.appmgt.impl.*,
                             org.wso2.carbon.identity.sso.saml.*,
-                            javax.xml.soap; version=1.0.0,
+                            javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

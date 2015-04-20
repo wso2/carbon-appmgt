@@ -24,6 +24,9 @@ package org.wso2.carbon.appmgt.mobile.mdm;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class which has sample data
+ */
 public class Sample {
 
     public static List<Device> getSampleDevices(){

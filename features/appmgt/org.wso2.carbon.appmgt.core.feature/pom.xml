@@ -32,13 +32,12 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Core Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the core bundles required for getting light weight API Management functionalities.</description>
+    <description>This feature contains the core bundles required for getting light weight App Management functionalities.</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -51,77 +50,62 @@
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.keymgt</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>
-            <version>4.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.usage.publisher</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.usage.client</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.sample.deployer</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
-            <version>4.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.sequences.stub</artifactId>
-            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>
-            <version>4.2.0</version>
         </dependency>		
-		<dependency>
+	<dependency>
             <groupId>org.wso2.carbon</groupId>
-			<artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
-            <version>4.2.0</version>
+	    <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.oauth.endpoint</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
 	    <type>war</type>
         </dependency>
 
@@ -129,13 +113,11 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
-	    <version>4.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
-            <version>4.2.1</version>
         </dependency>
 
     </dependencies>
@@ -158,7 +140,6 @@
                                 <artifactItem>
                                     <groupId>org.wso2.carbon.appmgt</groupId>
                                     <artifactId>org.wso2.carbon.appmgt.oauth.endpoint</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
@@ -268,32 +249,32 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.keymgt.stub:4.2.2</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt.client</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.publisher</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.stub:4.2.1</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.user.registration.stub:${carbon.platform.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${carbon.platform.version}</bundleDef>
-				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:${carbon.platform.version}</bundleDef>
-				<bundleDef>org.wso2.carbon:org.wso2.carbon.identity.entitlement.proxy:4.2.1</bundleDef>
-				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.keymgt.stub:${apimgt.keymgt.stub.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt.client:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.publisher:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.stub:${carbon.sequences.stub.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.user.registration.stub:${wso2carbon.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${wso2carbon.version}</bundleDef>
+				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:${wso2carbon.version}</bundleDef>
+				<bundleDef>org.wso2.carbon:org.wso2.carbon.identity.entitlement.proxy:${identity.entitlement.version}</bundleDef>
+				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.identity.authentication:4.2.1</importBundleDef>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.identity.thrift.authentication:4.2.1</importBundleDef>
                                 <importBundleDef>libthrift.wso2:libthrift:0.8.0.wso2v1</importBundleDef>
-				<importBundleDef>org.wso2.store:jaggery-scxml-executors:1.0.0</importBundleDef>
+				<importBundleDef>org.wso2.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
                             </importBundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:4.2.4</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:${carbon.platform.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:${identity.oauth.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:${wso2carbon.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

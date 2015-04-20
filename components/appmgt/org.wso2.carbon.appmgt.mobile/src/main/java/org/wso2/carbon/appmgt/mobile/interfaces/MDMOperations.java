@@ -27,11 +27,36 @@ import org.wso2.carbon.appmgt.mobile.utils.User;
 import java.util.HashMap;
 import java.util.List;
 
-
+/**
+ * Interface for MDM Operations which connects with MDM components
+ *
+ */
 public interface MDMOperations {
 
+    /**
+     *
+     * @param currentUser User who perform the action
+     * @param action Name of the action
+     * @param app Instance of the mobile app
+     * @param tenantId Tenant Id
+     * @param type Type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     * @param configParams Configuration belongs to the MDM which is defined in app-manager.xml
+     */
     public void performAction(User currentUser,String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configParams);
 
+    /**
+     *
+     * @param currentUser User who perform the action
+     * @param tenantId Tenant Id
+     * @param type Type of the resource (device, user or role)
+     * @param params Collection of ids of the type
+     * @param platform Platform of the devices
+     * @param platformVersion Platform version of the devices
+     * @param isSampleDevicesEnabled
+     * @param configParams
+     * @return List of devices
+     */
     public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configParams);
 
 }

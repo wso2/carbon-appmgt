@@ -47,7 +47,6 @@
                                 <artifactItem>
                                     <groupId>org.wso2.carbon.appmgt</groupId>
                                     <artifactId>org.wso2.carbon.appmgt.services.api</artifactId>
-                                    <version>1.0.0-SNAPSHOT</version>
                                     <type>war</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
@@ -90,10 +89,6 @@
         </plugins>
     </build>
 
-	<properties>
-		<appmgt.services.api>1.0.0-SNAPSHOT</appmgt.services.api>
-		<bcprov.wso2.version>1.49.wso2v1</bcprov.wso2.version>
-	</properties>
 
 </project>
 

@@ -29,11 +29,21 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
 import java.io.File;
 
-
+/**
+ * This class will loads data to app instance based on the artifact
+ */
 public class AppDataLoader {
 
     private static final Log log = LogFactory.getLog(AppDataLoader.class);
 
+    /**
+     * Load the data to the empty app instance based on the artifact
+     * @param app Instance of the empty app
+     * @param artifact Artifact of the mobile app
+     * @param action Action of the operation
+     * @param tenantId Tenant Id
+     * @return App which is filled by artifact
+     */
     public static App load(App app, GenericArtifact artifact, String action, int tenantId){
 
         try {

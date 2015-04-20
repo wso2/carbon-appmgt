@@ -50,6 +50,7 @@ import java.util.regex.Pattern;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.axiom.om.OMElement;
@@ -5375,20 +5376,19 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	}
 
 	/**
-	 * Get the names of apps which use the given policy partial
+	 * Get the apps which use the given policy partial
 	 *
 	 * @param policyPartialId Policy Partial Id
 	 * @return apps' name
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
-	public List<String> getAssociatedAppNames(int policyPartialId) throws AppManagementException {
-
+	public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement statementToGetAppsName = null;
-		List<String> appsNameList = new ArrayList<String>();
+		List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
 		ResultSet rs = null;
 
-		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME " +
+		String queryToGetAppsName = "SELECT DISTINCT APP.APP_NAME, APP.APP_PROVIDER, APP.APP_VERSION" +
 				" FROM APM_POLICY_GRP_PARTIAL_MAPPING ENT " +
 				" INNER JOIN APM_APP_URL_MAPPING URL ON URL.POLICY_GRP_ID=ENT.POLICY_GRP_ID " +
 				" LEFT JOIN APM_APP APP ON APP.APP_ID=URL.APP_ID " +
@@ -5400,8 +5400,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			statementToGetAppsName.setInt(1,policyPartialId);
 			rs = statementToGetAppsName.executeQuery();
 
+			APIIdentifier apiIdentifier = null;
 			while (rs.next()) {
-				appsNameList.add(rs.getString("APP_NAME"));
+				String providerName = rs.getString("APP_PROVIDER");
+				String apiName = rs.getString("APP_NAME");
+				String version = rs.getString("APP_VERSION");
+				apiIdentifier = new APIIdentifier(providerName, apiName, version);
+				apiIdentifiers.add(apiIdentifier);
 			}
 
 
@@ -5411,7 +5416,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} finally {
 			APIMgtDBUtil.closeAllConnections(statementToGetAppsName, connection, null);
 		}
-		return appsNameList;
+		return apiIdentifiers;
 
 	}
 
@@ -5449,6 +5454,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 	continue;
                 }else{
                 	policyPartial.setPolicyPartialContent(ruleCondition);
+                }
+
+                String ruleEffect = extractEffectFromPolicyPartialContent(rs.getString("CONTENT"));
+                
+                // No need to handle parsing errors at this point since they are captured in the previous block.
+                if(ruleEffect != null){
+                	policyPartial.setRuleEffect(ruleEffect);
                 }
                 
                 policyPartial.setShared(rs.getBoolean("SHARED"));
@@ -5571,6 +5583,21 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			return null;
 		}
     }
+    
+	private String extractEffectFromPolicyPartialContent(String policyPartialContent) {
+		
+		try {
+			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
+			String effect = builder.getDocumentElement().getAttributeValue(new QName("Effect"));
+			
+			return effect;
+			
+		} catch (XMLStreamException e) {
+			log.error("Can't extract the 'Effect' attribute value from the 'Rule' node.", e);
+			return null;
+		}
+		
+	}
     
 	/**
 	 * Remove existing updated entitlement policies from IDP
