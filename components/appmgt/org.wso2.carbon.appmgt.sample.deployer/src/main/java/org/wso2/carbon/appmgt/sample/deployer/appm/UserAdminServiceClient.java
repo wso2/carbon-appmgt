@@ -38,7 +38,7 @@ import java.rmi.RemoteException;
  * This class is use as a client of UserAdminService
  *
  * */
-public class ManageUser {
+public class UserAdminServiceClient {
 
     private static final String appmHome = CarbonUtils.getCarbonHome();
 
@@ -49,7 +49,7 @@ public class ManageUser {
     private UserAdminStub userAdminStub;
 
     /**
-     * Creates a new ManageUser object and initialising
+     * Creates a new UserAdminServiceClient object and initialising
      * the UserAdminStub
      *
      * @throws RemoteException
@@ -58,7 +58,7 @@ public class ManageUser {
      * @throws LoginAuthenticationExceptionException
      *             Throws this when authentication failed
      */
-    public ManageUser() throws RemoteException, LoginAuthenticationExceptionException {
+    public UserAdminServiceClient() throws RemoteException, LoginAuthenticationExceptionException {
         String backEndUrl = Configuration.getHttpsUrl();
         ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
                 axis2Repo, axis2Conf);
@@ -88,43 +88,7 @@ public class ManageUser {
      *
      * */
     public void addUser(String userName) throws RemoteException, UserAdminUserAdminException {
-        ClaimValue ffid = new ClaimValue();
-        ffid.setClaimURI("http://wso2.org/ffid");
-        ffid.setValue("234455666");
-        ClaimValue streetaddress = new ClaimValue();
-        streetaddress.setClaimURI("http://wso2.org/claims/streetaddress");
-        streetaddress.setValue("234455666");
-        ClaimValue zipcode = new ClaimValue();
-        zipcode.setClaimURI("http://wso2.org/claims/zipcode");
-        zipcode.setValue("GL");
-        ClaimValue card_number = new ClaimValue();
-        card_number.setClaimURI("http://wso2.org/claims/card_number");
-        card_number.setValue("001012676878");
-        ClaimValue card_holder = new ClaimValue();
-        card_holder.setClaimURI("http://wso2.org/claims/card_holder");
-        card_holder.setValue("subscriber");
-        ClaimValue telephone = new ClaimValue();
-        telephone.setClaimURI("http://wso2.org/claims/telephone");
-        telephone.setValue("0918886565");
-        ClaimValue givenName = new ClaimValue();
-        givenName.setClaimURI("http://wso2.org/claims/givenname");
-        givenName.setValue("Subscriber");
-        ClaimValue lastName = new ClaimValue();
-        lastName.setClaimURI("http://wso2.org/claims/lastname");
-        lastName.setValue("Subscriber");
-        ClaimValue email = new ClaimValue();
-        email.setClaimURI("http://wso2.org/claims/emailaddress");
-        email.setValue("wso2@wso2.com");
-        ClaimValue country = new ClaimValue();
-        country.setClaimURI("http://wso2.org/claims/country");
-        country.setValue("SriLanka");
-        ClaimValue expire_date = new ClaimValue();
-        expire_date.setClaimURI("http://wso2.org/claims/expiration_date");
-        expire_date.setValue("31/12/2015");
-        ClaimValue claimValues[] = new ClaimValue[]{ffid, streetaddress, zipcode,
-                card_number, card_holder, telephone
-                , givenName, lastName, email, country, expire_date};
         userAdminStub.addUser(userName, "subscriber",
-                new String[]{"Internal/subscriber"}, claimValues, "default");
+                new String[]{"Internal/subscriber"}, new ClaimValue[]{}, "default");
     }
 }

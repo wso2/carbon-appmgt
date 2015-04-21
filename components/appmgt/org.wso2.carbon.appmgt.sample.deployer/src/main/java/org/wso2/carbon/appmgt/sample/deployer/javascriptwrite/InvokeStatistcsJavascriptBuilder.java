@@ -66,7 +66,7 @@ public class InvokeStatistcsJavascriptBuilder {
      *           Throws this when thread failed to sleep
      */
     public void buildInvokeStaticsJavascriptFile(String filePath) throws IOException, InterruptedException {
-        File file = new File(filePath + "/invokeStatistcs.js");
+        File file = new File(filePath + "/invokeStatistcs.js");// implement a is exists function
         String[] lines = appendTrackingCode(file);
         StringBuilder stringBuilder = new StringBuilder();
         int i = 0;
