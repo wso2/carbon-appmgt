@@ -94,7 +94,11 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
             discoveryContext.putData(AppServerWebappAdminClient.class.getName(), webappAdminClient);
 
-            return translateToDto(webappsWrapper, credentials.getLoggedInUsername());
+            List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
+            List<WebappMetadata> filteredMetadataList = filter(webappMetadataList, discoveryContext,
+                    credentials, criteria, locale, carbonContext);
+            return translateToDto(webappsWrapper, filteredMetadataList,
+                    credentials.getLoggedInUsername());
         } catch (AppManagementException ame) {
             String message = String
                     .format("The application server URL, username or password mismatch URL :%s, UserName : %s",
@@ -192,6 +196,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         return webappAdminClient;
     }
 
+
     /**
      * Translates the WebappsWrapper to its flat list form
      *
@@ -202,37 +207,79 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      * @return
      */
     private DiscoveredApplicationListDTO translateToDto(WebappsWrapper webappsWrapper,
-            String loggedInUsername) throws AppManagementException {
-        VersionedWebappMetadata[] versionedWebappMetadataArray = webappsWrapper.getWebapps();
+            List<WebappMetadata> webappMetadataList, String loggedInUsername)
+            throws AppManagementException {
         String providerName = loggedInUsername.replace("@", "-AT-");
         APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
         DiscoveredApplicationListDTO result = new DiscoveredApplicationListDTO();
         List<DiscoveredApplicationListElementDTO> appList = new ArrayList<DiscoveredApplicationListElementDTO>();
         result.setApplicationList(appList);
         result.setPageCount(webappsWrapper.getNumberOfPages());
+
+        for (WebappMetadata webappMetadata : webappMetadataList) {
+            DiscoveredApplicationListElementDTO listElementDTO = new DiscoveredApplicationListElementDTO();
+            String version = getVersion(webappMetadata);
+            String context = webappMetadata.getContextPath();
+            listElementDTO.setDisplayName(webappMetadata.getDisplayName());
+            listElementDTO.setVersion(version);
+            listElementDTO.setApplicationType(webappMetadata.getWebappType());
+            listElementDTO.setRemoteContext(context);
+            listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
+            String appId = generateWebappId(webappMetadata);
+            listElementDTO.setApplicationId(appId);
+            listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
+            listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
+            listElementDTO.setApplicationPreviewUrl(
+                    generateAppPreviewUrl(webappsWrapper, webappMetadata));
+
+            appList.add(listElementDTO);
+        }
+
+        result.setTotalNumberOfResults(appList.size());
+        return result;
+    }
+
+    /**
+     * Flatten and return a list of DiscoveredApplicationListElementDTO related to nested  VersionedWebappMetadata
+     *
+     * @param versionedWebappMetadataArray
+     * @return
+     */
+    private List<WebappMetadata> flatten(VersionedWebappMetadata[] versionedWebappMetadataArray) {
+        List<WebappMetadata> result = new ArrayList<WebappMetadata>();
+
         for (VersionedWebappMetadata versionedWebappMetadata : versionedWebappMetadataArray) {
             WebappMetadata[] webappMetadataArray = versionedWebappMetadata.getVersionGroups();
             for (WebappMetadata webappMetadata : webappMetadataArray) {
-                DiscoveredApplicationListElementDTO listElementDTO = new DiscoveredApplicationListElementDTO();
-                String version = getVersion(webappMetadata);
-                String context = webappMetadata.getContextPath();
-                listElementDTO.setDisplayName(webappMetadata.getDisplayName());
-                listElementDTO.setVersion(version);
-                listElementDTO.setApplicationType(webappMetadata.getWebappType());
-                listElementDTO.setRemoteContext(context);
-                listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
-                String appId = generateWebappId(webappMetadata);
-                listElementDTO.setApplicationId(appId);
-                listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
-                listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
-                listElementDTO.setApplicationPreviewUrl(
-                        generateAppPreviewUrl(webappsWrapper, webappMetadata));
-
-                appList.add(listElementDTO);
+                result.add(webappMetadata);
             }
-
         }
-        result.setTotalNumberOfResults(appList.size());
+
+        return result;
+    }
+
+    /**
+     * Returns the filtered list of list elements
+     *
+     * @param applicationListElementList
+     * @param discoveryContext
+     * @param credentials
+     * @param criteria
+     * @param locale
+     * @param carbonContext
+     * @return
+     */
+    private List<WebappMetadata> filter(List<WebappMetadata> applicationListElementList,
+            ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
+            DiscoverySearchCriteria criteria, Locale locale,
+            PrivilegedCarbonContext carbonContext) {
+
+        if (APP_STATUS.ANY == parseAppStatus(criteria.getStatus())) {
+            return applicationListElementList;
+        }
+
+        List<WebappMetadata> result = new ArrayList<WebappMetadata>();
+
         return result;
     }
 
@@ -339,5 +386,33 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             APIProvider apiProvider) throws AppManagementException {
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, appName, version);
         return apiProvider.isAPIAvailable(apiIdentifier);
+    }
+
+    private DiscoveredApplicationListDTO discoverApplicationsWithLocalPaging(
+            ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
+            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext,
+            AppServerWebappAdminClient webappAdminClient) throws AppManagementException {
+
+        String searchString = translateApplicationNameSearchString(criteria);
+        int pageNumber = 0;
+
+        WebappsWrapper webappsWrapper = webappAdminClient
+                .getPagedWebappsSummary(searchString, translateStatus(criteria),
+                        translateStatus(criteria), criteria.getPageNumber());
+
+        return null;
+    }
+
+    protected APP_STATUS parseAppStatus(String statusString) {
+        APP_STATUS result = APP_STATUS.ANY;
+        if (statusString == null || statusString.isEmpty()) {
+            result = APP_STATUS.ANY;
+        } else if ("CREATED".equalsIgnoreCase(statusString)) {
+            result = APP_STATUS.CREATED;
+        } else if ("NEW".equalsIgnoreCase(statusString)) {
+            result = APP_STATUS.NEW;
+        }
+
+        return result;
     }
 }

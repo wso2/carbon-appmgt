@@ -1,0 +1,8 @@
+<APPManager>
+    <DiscoveryConfiguration>
+        <DiscoveryHandlers>
+            <Handler name="name1" class="class1" />
+            <Handler name="name2" class="class2" />
+        </DiscoveryHandlers>
+    </DiscoveryConfiguration>
+</APPManager>
