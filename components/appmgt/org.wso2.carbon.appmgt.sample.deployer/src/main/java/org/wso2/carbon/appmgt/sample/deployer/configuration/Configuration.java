@@ -120,9 +120,9 @@ public class Configuration {
      * @throw
      *      -Throws this when failed to retrive port
      * */
-    public static String getGatewayPort() throws AppManagementException {
+     public static String getGatewayPort() throws AppManagementException {
         int offset = Integer.parseInt(getBackendPort("https")) - 9443;
         return  (8280+offset)+"";
-    }
+     }
 
 }

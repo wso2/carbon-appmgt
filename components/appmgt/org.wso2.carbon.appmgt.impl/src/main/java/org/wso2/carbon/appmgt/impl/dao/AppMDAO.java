@@ -7568,4 +7568,67 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         return applicableEntitlementPolicies;
 		
 	}
+
+	/**
+	 * Check availability of the web application according to given version and web app name
+	 *
+	 *@param webAppName
+	 * 				name of the web application
+	 *@param version
+	 * 			   version of the web application
+	 *
+	 *@throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public  static  boolean isWebAppAvailable(String webAppName,String version) throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		boolean status = true;
+		ResultSet rs = null;
+		String query = "SELECT * FROM APM_APP WHERE APP_NAME=? AND APP_VERSION =?";
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			ps.setString(1, webAppName);
+			ps.setString(2, version);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				status= true;
+			}else {
+				status= false;
+			}
+		} catch (SQLException e) {
+			handleException("There is error in sql statement", e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return  status;
+	}
+
+	/**
+	 * Get the seq number of the Publish Statistics: policy
+	 *
+	 *@return seq number of the java policy
+	 *
+	 *@throws org.wso2.carbon.appmgt.api.AppManagementException
+	 */
+	public static String getDisplayOrderSeqNo() throws AppManagementException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		String seqNo = null;
+		ResultSet rs = null;
+		String query = "SELECT DISPLAY_ORDER_SEQ_NO FROM APM_APP_JAVA_POLICY WHERE DISPLAY_NAME='Publish Statistics:'";
+		try {
+			conn = APIMgtDBUtil.getConnection();
+			ps = conn.prepareStatement(query);
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				seqNo = rs.getInt(1)+"";
+			}
+		} catch (SQLException e) {
+			handleException("There is error in sql statement", e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
+		return  seqNo;
+	}
 }
