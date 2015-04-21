@@ -59,6 +59,12 @@ public class AppDiscoveryComponent {
 
     }
 
+    /**
+     * Loads the configuration related to application discovery
+     * Configurations are read from system-wide app-manager.xml.
+     *
+     * @return
+     */
     private AppDiscoveryConfiguration loadConfig() {
         String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
                 File.separator + "conf" + File.separator + "app-manager.xml";
@@ -87,7 +93,6 @@ public class AppDiscoveryComponent {
         Map<String, String> handlerMap = configuration.getHandlersMap();
         for (String name : handlerMap.keySet()) {
             String value = handlerMap.get(name);
-
             try {
                 Class clazz = Class.forName(value);
                 Object o = clazz.newInstance();
