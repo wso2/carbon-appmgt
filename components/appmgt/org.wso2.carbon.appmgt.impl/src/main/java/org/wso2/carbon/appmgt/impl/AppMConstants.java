@@ -141,6 +141,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_INSEQUENCE = "overview_inSequence";
     public static final String API_OVERVIEW_OUTSEQUENCE = "overview_outSequence";
     public static final String API_OVERVIEW_ALLOW_ANONYMOUS = "overview_allowAnonymous";
+    public static final String API_OVERVIEW_SKIP_GATEWAY ="overview_skipGateway";
     
     public static final String API_OVERVIEW_RESPONSE_CACHING = "overview_responseCaching";
     public static final String API_OVERVIEW_CACHE_TIMEOUT = "overview_cacheTimeout";
