@@ -94,8 +94,8 @@ public class DiscoveryService {
             result = handler
                     .readApplicationInfo(applicationDiscoveryContext, apiIdentifier, carbonContext);
         } catch (AppManagementException e) {
-            String message = "Error while discovering the application from the backend server Server[%s], User[%s], Reason: ";
-            log.error(message);
+            String message = String.format("Error while reading the application info from the backend server Reason: %s ",
+                    e.getMessage());
             log.debug(message, e);
             safeSendError(servletResponse, Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -170,8 +170,9 @@ public class DiscoveryService {
                             discoverySearchCriteria, Locale.ENGLISH, carbonContext);
             return result;
         } catch (AppManagementException e) {
-            String message = "Error while discovering the application from the backend server Server[%s], User[%s], Reason: ";
-            log.error(message);
+            String message = String.format("Error while discovering the application from the backend server Server[%s], User[%s], Reason: %s",
+                    userNamePasswordCredentials.getAppServerUrl(), userNamePasswordCredentials.getUserName(),
+                    e.getMessage());
             log.debug(message, e);
             safeSendError(servletResponse, Response.Status.INTERNAL_SERVER_ERROR);
         }
