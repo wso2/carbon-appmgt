@@ -94,9 +94,20 @@ public class MDMOperationsImpl implements MDMOperations {
                         requestApp.put(method.getAnnotation(Property.class).name(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    log.error("Illegal Action", e);
+                    String errorMessage = "Illegal Action";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
+
                 } catch (InvocationTargetException e) {
-                    log.error("Target invocation failed", e);
+                    String errorMessage = "Target invocation failed";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
                 }
             }
 
@@ -112,7 +123,12 @@ public class MDMOperationsImpl implements MDMOperations {
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("JSON encoding not supported", e);
+            String errorMessage = "JSON encoding not supported";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
         }
 
         String requestURL = serverURL + String.format(Constants.API_OPERATION, tenantId);
@@ -129,7 +145,12 @@ public class MDMOperationsImpl implements MDMOperations {
             }
 
         } catch (IOException e) {
-            log.error("Cannot connect to WSO2 EMM to perform operation", e);
+            String errorMessage = "Cannot connect to WSO2 EMM to perform operation";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
         }
 
     }
@@ -190,9 +211,13 @@ public class MDMOperationsImpl implements MDMOperations {
                    }
                 }
             } catch (IOException e) {
-                log.error("Error while getting the device list from WSO2 EMM", e);
+                String errorMessage = "Error while getting the device list from WSO2 EMM";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
             }
-
             return devices;
         }
     }

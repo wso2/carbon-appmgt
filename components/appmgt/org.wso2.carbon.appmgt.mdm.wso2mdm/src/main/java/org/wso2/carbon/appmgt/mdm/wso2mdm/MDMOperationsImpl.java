@@ -95,9 +95,19 @@ public class MDMOperationsImpl implements MDMOperations {
                         requestApp.put(method.getAnnotation(Property.class).name(), value);
                     }
                 } catch (IllegalAccessException e) {
-                    log.error("Illegal Action", e);
+                    String errorMessage = "Illegal Action";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
                 } catch (InvocationTargetException e) {
-                    log.error("Target invocation failed", e);
+                    String errorMessage = "Target invocation failed";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
                 }
             }
 
@@ -129,7 +139,12 @@ public class MDMOperationsImpl implements MDMOperations {
             }
 
         } catch (IOException e) {
-            log.error("Cannot connect to WSO2 MDM to perform operation", e);
+            String errorMessage = "Cannot connect to WSO2 EMM to perform operation";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
         }
 
     }
@@ -180,7 +195,12 @@ public class MDMOperationsImpl implements MDMOperations {
                         log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                     }
                 } catch (IOException e) {
-                    log.error("Invalid response from the devices API", e);
+                    String errorMessage = "Invalid response from the devices API";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
                 }
             }else{
                 log.error("MDM Devices API failed");
@@ -215,7 +235,12 @@ public class MDMOperationsImpl implements MDMOperations {
             log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
-            log.error("Cannot connect to Token API Endpoint", e);
+            String errorMessage = "Cannot connect to Token API Endpoint";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
             return null;
         }
 
@@ -223,8 +248,12 @@ public class MDMOperationsImpl implements MDMOperations {
         try {
             response = postMethod.getResponseBodyAsString();
         } catch (IOException e) {
-            log.error("Cannot get response body for auth");
-            log.debug("Error: " + e);
+            String errorMessage = "Cannot get response body for auth";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
             return null;
         }
 
@@ -253,7 +282,12 @@ public class MDMOperationsImpl implements MDMOperations {
                     }
                     return true;
                 } catch (IOException e) {
-                    log.error("No OK response received form the API", e);
+                    String errorMessage = "No OK response received form the API";
+                    if(log.isDebugEnabled()){
+                        log.error(errorMessage, e);
+                    }else{
+                        log.error(errorMessage);
+                    }
                     return false;
                 }
     }

@@ -4451,7 +4451,12 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String[] urlArray = gatewayURLs.split(",");
 		String prodURL = urlArray[0];
 		String logoutURL =  api.getLogoutURL();
-		logoutURL = prodURL.concat(api.getContext()).concat("/"+api.getId().getVersion()).concat(logoutURL);
+        String logoutURLStart = prodURL.concat(api.getContext()).concat("/"+api.getId().getVersion());
+        if(logoutURL.endsWith("/")){
+            logoutURL = logoutURLStart.concat(logoutURL);
+        }else{
+            logoutURL = logoutURLStart.concat("/" + logoutURL);
+        }
 
 		try {
 			connection = APIMgtDBUtil.getConnection();
