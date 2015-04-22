@@ -25,19 +25,19 @@ import org.wso2.carbon.appmgt.sample.deployer.appm.ClaimManagementServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.RemoteUserStoreManagerServiceClient;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
-import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
 import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.rmi.RemoteException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is use to manage claims
  *
  * */
-public class ManageClaim {
+public class ClaimManager {
 
-    final static Logger log = Logger.getLogger(ManageClaim.class.getName());
+    final static Logger log = Logger.getLogger(ClaimManager.class.getName());
     private static String session;
     private static RemoteUserStoreManagerServiceClient remoteUserStoreManagerServiceClient;
     private static String appmPath = CarbonUtils.getCarbonHome();
@@ -52,7 +52,7 @@ public class ManageClaim {
     }
 
     /**
-     * Creates a new ManageClaim object and initialising the ClaimManagementServiceStub
+     * Creates a new ClaimManager object and initialising the ClaimManagementServiceStub
      *
      *
      * @throws AppManagementException
@@ -61,7 +61,7 @@ public class ManageClaim {
      *             Throws this when ClaimManagementServiceClient failed initialise
      *             Throws this when RemoteUserStoreManagerServiceClient failed initialise
      */
-    public ManageClaim() throws AppManagementException {
+    public ClaimManager() throws AppManagementException {
         try {
             loginAdminServiceClient = new LoginAdminServiceClient(backendUrl);
         } catch (AxisFault axisFault) {
@@ -96,50 +96,45 @@ public class ManageClaim {
     /**
      * This method is use to add claim mapping
      *
+     * @param claims
+     *         map that include claim name,value and uri
+     *
      * */
-    public void addClaimMapping() throws AppManagementException {
+    public void addClaimMapping(ConcurrentHashMap<String,String[]> claims) throws AppManagementException {
         try {
-            claimManagementServiceClient.addClaim("FrequentFlyerID", "http://wso2.org/ffid", true);
-            claimManagementServiceClient.addClaim("zipcode", "http://wso2.org/claims/zipcode", true);
-            claimManagementServiceClient.addClaim("Credit card number", "http://wso2.org/claims/card_number", true);
-            claimManagementServiceClient.addClaim("Credit cArd Holder Name", "http://wso2.org/claims/card_holder"
-                    , true);
-            claimManagementServiceClient.addClaim("Credit card expiration date", "http://wso2.org/claims/expiration_date"
-                    , true);
-        } catch (RemoteException e) {
-            log.error("Error while adding a ClaimMapping", e);
-        } catch (ClaimManagementServiceException e) {
-            log.error("Error while adding a ClaimMapping", e);
+            for(String claimName : claims.keySet()){
+                if(claims.get(claimName)[2].equalsIgnoreCase("true")){
+                    claimManagementServiceClient.addClaim(claimName
+                            ,claims.get(claimName)[0], false);
+                }
+            }
+        } catch (Exception e) {
+            if(!e.getMessage().equals("Duplicate claim exist in the system. Please pick a different Claim Uri")){
+                log.error("Error while adding a ClaimMapping", e);
+                throw  new AppManagementException("Error while adding a ClaimMapping",e);
+            }
         }
-
     }
+
     /**
      * This method is use to update claim values
      *
      * @param userName
      *           currently logged user
      *
+     * @param claims
+     *         map that include claim name,value and uri
+     *
      * @throws AppManagementException
      *           Throws this when failed to update claim value
      *
      * */
-    public void setClaimValues(String userName) throws AppManagementException {
+    public void setClaimValues(ConcurrentHashMap<String,String[]> claims,String userName) throws AppManagementException {
         try {
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/ffid", "12345151");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/streetaddress", "21/5");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/zipcode", "GL");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/card_number"
-                    , "001012676878");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/card_holder", "Admin");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/telephone", "091222222");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/givenname", "Sachith");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/lastname", "Ushan");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/emailaddress"
-                    ,"wso2@wso2.com");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,
-                    "http://wso2.org/claims/country", "SriLanka");
-            remoteUserStoreManagerServiceClient.updateClaims(userName,"http://wso2.org/claims/expiration_date"
-                    , "31/12/2015");
+            for(String claimName : claims.keySet()){
+                remoteUserStoreManagerServiceClient.updateClaims(userName,claims.get(claimName)[0]
+                            , claims.get(claimName)[1]);
+            }
         } catch (RemoteException e) {
             log.error("Error while updating a claim vaue", e);
             throw  new AppManagementException("Error while updating a claim vaue", e);
