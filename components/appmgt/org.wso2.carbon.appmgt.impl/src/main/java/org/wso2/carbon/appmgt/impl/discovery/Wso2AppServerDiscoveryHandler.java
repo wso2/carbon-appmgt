@@ -458,9 +458,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         APP_STATUS result = APP_STATUS.ANY;
         if (statusString == null || statusString.isEmpty()) {
             result = APP_STATUS.ANY;
-        } else if ("CREATED".equalsIgnoreCase(statusString)) {
+        } else if (STATUS_CREATED.equalsIgnoreCase(statusString)) {
             result = APP_STATUS.CREATED;
-        } else if ("NEW".equalsIgnoreCase(statusString)) {
+        } else if (STATUS_NEW.equalsIgnoreCase(statusString)) {
             result = APP_STATUS.NEW;
         }
 
