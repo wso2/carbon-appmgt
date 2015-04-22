@@ -35,6 +35,7 @@ import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappsWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Discovery handler implementation which calls the WSO2-AS as backend server and returns the
@@ -55,6 +56,11 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private static final String DEFAULT_VERSION_STRING = "/default";
     private static final String CONTEXT_DATA_LOGGED_IN_USER = "LOGGED_IN_USER";
     private static final String CONTEXT_DATA_APP_SERVER_URL = "APP_SERVER_URL";
+    private static final int MAX_USERNAME_CONTRIBUTION_LENGTH = 8;
+    private static final int MAX_HOSTNAME_CONTRIBUTION_LENGTH = 15;
+    private static final String PROTOCOL_HTTP = "http";
+
+    private Pattern nonAlphaNumericPattern = Pattern.compile("[^\\p{Alnum}]");
 
     @Override
     public String getDisplayName() {
@@ -108,6 +114,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         String webappId = apiIdentifier.getApplicationId();
         String loggedInUsername = (String) discoveryContext.getData(CONTEXT_DATA_LOGGED_IN_USER);
+        String providerName = loggedInUsername.replace("@", "-AT-");
         DiscoveredApplicationDTO result = null;
 
         APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
@@ -133,7 +140,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                     WebappMetadata[] webappMetadataArray = versionedWebappMetadata
                             .getVersionGroups();
                     for (WebappMetadata webappMetadata : webappMetadataArray) {
-                        String currentWebappId = generateWebappId(webappMetadata);
+                        String currentWebappId = generateWebappId(webappMetadata, webappsWrapper,
+                                providerName);
                         String deploymentId = webappMetadata.getWebappFile();
                         if (currentWebappId.equals(webappId)) {
                             result = new DiscoveredApplicationDTO();
@@ -144,7 +152,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             result.setApplicationType(webappMetadata.getWebappType());
                             result.setRemoteContext(context);
                             result.setProxyContext(generateProxyContext(context, apiProvider));
-                            result.setApplicationId(generateWebappId(webappMetadata));
+                            result.setApplicationId(currentWebappId);
                             result.setStatus(
                                     getStatus(loggedInUsername, result.getApplicationName(),
                                             result.getVersion(), apiProvider));
@@ -218,7 +226,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                 listElementDTO.setApplicationType(webappMetadata.getWebappType());
                 listElementDTO.setRemoteContext(context);
                 listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
-                String appId = generateWebappId(webappMetadata);
+                String appId = generateWebappId(webappMetadata, webappsWrapper, providerName);
                 listElementDTO.setApplicationId(appId);
                 listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
                 listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
@@ -282,8 +290,35 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         return criteria.getApplicationName();
     }
 
-    private String generateWebappId(WebappMetadata webappMetadata) {
-        return webappMetadata.getWebappFile().replaceAll("[^\\p{Alnum}]", "_");
+    /**
+     * Generates the webapp Identifier.
+     * this is in the format of
+     * <webapp file name><user name><host name>
+     * All the non Alphanumeric characters are removed and any immediate character is converted to upper case so that the name looks like a CamelCase.
+     * @param webappMetadata
+     * @param webappsWrapper
+     * @param userName
+     * @return
+     */
+    private String generateWebappId(WebappMetadata webappMetadata, WebappsWrapper webappsWrapper,
+            String userName) {
+        String fileName = webappMetadata.getWebappFile();
+        String madeName = fileName + "By_" + userName
+                .substring(0, Math.min(MAX_USERNAME_CONTRIBUTION_LENGTH, userName.length())) + "On_"
+                +
+                webappsWrapper.getHostName().substring(0, Math.min(MAX_HOSTNAME_CONTRIBUTION_LENGTH,
+                        webappsWrapper.getHostName().length()));
+
+        //remove all non "Alphanumeric" characters and capitalize the character next to the removed one
+        StringBuilder sb = new StringBuilder();
+        String[] splits = nonAlphaNumericPattern.split(madeName);
+        for (String s : splits) {
+            if (s.length() > 0) {
+                sb.append(s.substring(0, 1).toUpperCase()).append(s.substring(1, s.length()));
+            }
+        }
+
+        return sb.toString();
     }
 
     /**
