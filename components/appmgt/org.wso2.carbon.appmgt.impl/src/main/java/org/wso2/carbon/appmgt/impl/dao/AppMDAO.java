@@ -1085,6 +1085,7 @@ public class AppMDAO {
             preparedStatement.setInt(4, subscriptionId);
 
             int result = preparedStatement.executeUpdate();
+            connection.commit();
 
             return result == 1;
 
