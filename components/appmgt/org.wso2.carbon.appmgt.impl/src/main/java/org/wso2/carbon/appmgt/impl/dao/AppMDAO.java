@@ -18,41 +18,6 @@
 
 package org.wso2.carbon.appmgt.impl.dao;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.cache.Cache;
-import javax.cache.Caching;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
@@ -62,26 +27,22 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dto.*;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
-import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.APIVersionComparator;
-import org.wso2.carbon.appmgt.impl.utils.LRUCache;
-import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
+import org.wso2.carbon.appmgt.impl.utils.*;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.base.IdentityException;
@@ -92,6 +53,20 @@ import org.wso2.carbon.identity.oauth.OAuthUtil;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import javax.cache.Cache;
+import javax.cache.Caching;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Data Access Layer for App Management
@@ -4659,6 +4634,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		String deleteCommentQuery = "DELETE FROM APM_APP_COMMENTS WHERE APP_ID=? ";
 		String deleteRatingsQuery = "DELETE FROM APM_APP_RATINGS WHERE APP_ID=? ";
 		String deleteSubscriptionQuery = "DELETE FROM APM_SUBSCRIPTION WHERE APP_ID=?";
+		String deleteConsumerQuery = "DELETE FROM APM_API_CONSUMER_APPS WHERE SAML2_SSO_ISSUER=?";
 		String deleteAPIQuery =
 		                        "DELETE FROM APM_APP WHERE APP_PROVIDER=? AND APP_NAME=? AND APP_VERSION=? ";
 
@@ -4683,6 +4659,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 			prepStmt = connection.prepareStatement(deleteLCEventQuery);
 			prepStmt.setInt(1, id);
+			prepStmt.execute();
+
+			prepStmt = connection.prepareStatement(deleteConsumerQuery);
+			prepStmt.setString(1, apiId.getApiName() + "-" + apiId.getVersion());
 			prepStmt.execute();
 
 			prepStmt = connection.prepareStatement(deleteAPIQuery);
