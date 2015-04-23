@@ -56,7 +56,9 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
+        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion,
+                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
+                configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -76,7 +78,9 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations =  getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null,
+                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
+                configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -94,7 +98,9 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null, Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)), configurations.getActiveMDMProperties());
+        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null,
+                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
+                configurations.getActiveMDMProperties());
         return convertDevicesToJSON(devices).toJSONString();
     }
 

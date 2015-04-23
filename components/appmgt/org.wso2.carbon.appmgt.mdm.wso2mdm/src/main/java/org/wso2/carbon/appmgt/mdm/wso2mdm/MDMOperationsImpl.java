@@ -63,7 +63,8 @@ public class MDMOperationsImpl implements MDMOperations {
      * @param params ids of the resources which belong to type
      */
 
-    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configProperties) {
+    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params,
+                              HashMap<String, String> configProperties) {
 
 
 
@@ -160,7 +161,8 @@ public class MDMOperationsImpl implements MDMOperations {
      * @return
      */
 
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
+    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
+                                   String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
 
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
@@ -229,7 +231,8 @@ public class MDMOperationsImpl implements MDMOperations {
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         nameValuePairs.add(new NameValuePair("grant_type", "client_credentials"));
         postMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-        postMethod.addRequestHeader("Authorization" , "Basic " +  new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
+        postMethod.addRequestHeader("Authorization" , "Basic " +
+                new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
         postMethod.addRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
         try {
             log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
@@ -264,7 +267,8 @@ public class MDMOperationsImpl implements MDMOperations {
     }
 
 
-    private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient, HttpMethodBase httpMethod){
+    private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient,
+                                  HttpMethodBase httpMethod){
                 String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
                 try {
                     int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();

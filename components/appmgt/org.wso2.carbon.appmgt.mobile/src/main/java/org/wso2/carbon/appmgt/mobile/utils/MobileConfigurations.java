@@ -146,7 +146,8 @@ public class MobileConfigurations {
     public String getActiveMDMBundle(){
         if(activeMDMBundle == null){
 
-            OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement).getFirstChildWithName(new QName("MDMProperties"));
+            OMElement mdmPropertiesElement = documentElement.getFirstChildWithName(mobileConfElement)
+                    .getFirstChildWithName(new QName("MDMProperties"));
 
             Iterator<OMElement> iterator = mdmPropertiesElement.getChildElements();
             while (iterator.hasNext()){

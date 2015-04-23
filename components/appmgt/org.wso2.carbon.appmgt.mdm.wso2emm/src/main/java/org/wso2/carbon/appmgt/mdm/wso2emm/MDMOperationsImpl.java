@@ -62,7 +62,8 @@ public class MDMOperationsImpl implements MDMOperations {
      * @param params ids of the resources which belong to type
      */
 
-    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configProperties) {
+    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params,
+                              HashMap<String, String> configProperties) {
 
 
 
@@ -135,7 +136,8 @@ public class MDMOperationsImpl implements MDMOperations {
 
         PostMethod postMethod = new PostMethod(requestURL);
         postMethod.setRequestEntity(requestEntity);
-        postMethod.setRequestHeader("Authorization", "Basic " + new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
+        postMethod.setRequestHeader("Authorization", "Basic " +
+                new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
 
         try {
             log.debug("Sending POST request to perform operation on MDM. Request path:  "  + requestURL);
@@ -166,7 +168,9 @@ public class MDMOperationsImpl implements MDMOperations {
      * @return
      */
 
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
+    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
+                                   String platformVersion, boolean isSampleDevicesEnabled,
+                                   HashMap<String, String> configProperties) {
 
         String serverURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
         String authUser = configProperties.get(Constants.PROPERTY_AUTH_USER);
@@ -183,7 +187,8 @@ public class MDMOperationsImpl implements MDMOperations {
 
             HttpClient httpClient = new HttpClient();
             GetMethod getMethod = new GetMethod(serverURL + String.format(Constants.API_DEVICE_LIST, tenantId, params[0]));
-            getMethod.setRequestHeader("Authorization", "Basic " + new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
+            getMethod.setRequestHeader("Authorization", "Basic " +
+                    new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
             try {
                 int statusCode = httpClient.executeMethod(getMethod);
                 if(statusCode == Response.Status.OK.getStatusCode()){

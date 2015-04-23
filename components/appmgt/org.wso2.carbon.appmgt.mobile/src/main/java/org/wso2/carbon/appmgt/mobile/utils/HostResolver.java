@@ -40,14 +40,16 @@ public class HostResolver {
         if("%http%".equals(abbr)){
 
             try {
-                host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
+                host += "http://" + NetworkUtils.getLocalHostname() + ":" +
+                        CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
             } catch (Exception e) {
                log.error("Error occurred while getting host", e);
                log.debug("Error: " + e);
             }
         }else if("%https%".equals(abbr)){
             try {
-                host += "https://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
+                host += "https://" + NetworkUtils.getLocalHostname() + ":" +
+                        CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "https");
             } catch (Exception e) {
                 log.error("Error occurred while getting host", e);
             }
@@ -64,7 +66,8 @@ public class HostResolver {
         String host = "";
 
         try {
-            host += "http://" + NetworkUtils.getLocalHostname() + ":" +  CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
+            host += "http://" + NetworkUtils.getLocalHostname() + ":" +
+                    CarbonUtils.getTransportPort(ConfigurationContextFactory.createDefaultConfigurationContext(), "http");
         } catch (Exception e) {
             log.error("Error occurred while getting host", e);
         }

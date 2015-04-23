@@ -43,7 +43,8 @@ public interface MDMOperations {
      * @param params Collection of ids of the type
      * @param configParams Configuration belongs to the MDM which is defined in app-manager.xml
      */
-    public void performAction(User currentUser,String action, App app, int tenantId, String type, String[] params, HashMap<String, String> configParams);
+    public void performAction(User currentUser,String action, App app, int tenantId, String type, String[] params,
+                              HashMap<String, String> configParams);
 
     /**
      *
@@ -57,6 +58,7 @@ public interface MDMOperations {
      * @param configParams
      * @return List of devices
      */
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform, String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configParams);
+    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
+                                   String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configParams);
 
 }

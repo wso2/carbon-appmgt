@@ -71,7 +71,8 @@ public class Operations {
 
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId, true);
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(PrivilegedCarbonContext
+                    .getThreadLocalCarbonContext().getUserRealm().getRealmConfiguration().getAdminUserName());
 
             CarbonContext cCtx = CarbonContext.getThreadLocalCarbonContext();
             Registry registry = cCtx.getRegistry(RegistryType.USER_GOVERNANCE);
