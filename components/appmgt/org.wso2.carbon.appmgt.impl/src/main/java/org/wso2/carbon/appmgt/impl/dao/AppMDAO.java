@@ -653,7 +653,7 @@ public class AppMDAO {
 		String saml2SsoIssuer;
 
 		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, " +
-				"COALESCE(app.APP_ALLOW_ANONYMOUS, 'FALSE') APP_ALLOW_ANONYMOUS "
+				" APP_ALLOW_ANONYMOUS "
 				+ " FROM APM_APP app "
 				+ " WHERE app.CONTEXT = ? AND app.APP_VERSION = ? ";
 
@@ -701,7 +701,7 @@ public class AppMDAO {
 		VerbInfoDTO verbInfoDTO = new VerbInfoDTO();
 
 		String query =
-				"SELECT HTTP_METHOD, URL_PATTERN, COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') URL_ALLOW_ANONYMOUS  "
+				"SELECT HTTP_METHOD, URL_PATTERN, URL_ALLOW_ANONYMOUS  "
 						+ " FROM APM_APP_URL_MAPPING MAP "
 						+ " LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID  "
 						+ " WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=? ) ";
@@ -4144,11 +4144,18 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         WorkflowDTO workflowDTO = null;
+        String query;
 
-        String query = "SELECT * FROM APM_WORKFLOWS WHERE WF_REFERENCE=? ORDER BY WF_CREATED_TIME LIMIT 1";
         try {
-
             connection = APIMgtDBUtil.getConnection();
+
+            //oracle specific query
+            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+                query = "SELECT * FROM APM_WORKFLOWS WHERE WF_REFERENCE=? AND ROWNUM <=1 ORDER BY WF_CREATED_TIME";
+            } else {
+                query = "SELECT * FROM APM_WORKFLOWS WHERE WF_REFERENCE=? ORDER BY WF_CREATED_TIME LIMIT 1";
+            }
+
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, workflowReference);
 
@@ -6620,28 +6627,48 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				.append(", startIndex:").append(startIndex)
 				.append(", pageSize:").append(pageSize).append(")");
 
-		// Set 1: Selects all applications in APM_APP_HIT_TOTAL relevant to
-		// the logged user. Set 2: Select all applications in the store
-		// excluding set 1 Then Merge the result and sort descending order by
-		// hit count, API name (If hit count is 0 then it will sort by name Also
-		// APP_NAME is upper cased as some DBMS's consider the case when
-		// ordering data.
-		String query = "SELECT HIT.UUID ,HIT_COUNT,UPPER(APP_NAME)AS APP_NAME "
-				+ " FROM APM_APP_HIT_TOTAL HIT "
-				+ " LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
-				+ " UNION ALL "
-				+ " SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-				+ " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
-				+ " ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ? ";
+
+        String query = "";
 
 		try {
 			// get the connection for the UI Activity Publish data source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, userId);
-			ps.setString(2, userId);
-			ps.setInt(3, startIndex);
-			ps.setInt(4, pageSize);
+
+
+            //oracle specific query
+            if (conn.getMetaData().getDriverName().contains("Oracle")) {
+                // Set 1: Selects all applications in APM_APP_HIT_TOTAL relevant to
+                // the logged user. Set 2: Select all applications in the store
+                // excluding set 1 Then Merge the result and sort descending order by
+                // hit count, API name (If hit count is 0 then it will sort by name Also
+                // APP_NAME is upper cased as some DBMS's consider the case when
+                // ordering data.
+                query = "SELECT * FROM (SELECT HIT.UUID ,HIT_COUNT,UPPER(APP_NAME)AS APP_NAME "
+                        + " FROM APM_APP_HIT_TOTAL HIT "
+                        + " LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
+                        + " UNION ALL "
+                        + " SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
+                        + " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ))  "
+                        + " WHERE ROWNUM >= ? AND ROWNUM <= ? "
+                        + " ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
+
+            } else {
+                query = "SELECT HIT.UUID ,HIT_COUNT,UPPER(APP_NAME)AS APP_NAME "
+                        + " FROM APM_APP_HIT_TOTAL HIT "
+                        + " LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
+                        + " UNION ALL "
+                        + " SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
+                        + " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
+                        + " ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ? ";
+
+            }
+
+
+            ps = conn.prepareStatement(query);
+            ps.setString(1, userId);
+            ps.setString(2, userId);
+            ps.setInt(3, startIndex);
+            ps.setInt(4, pageSize);
 			rs = ps.executeQuery();
 
 			// creates the output string format
@@ -6887,8 +6914,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 		String query =
 				"SELECT POLICY_GRP_ID ,NAME ,THROTTLING_TIER ,USER_ROLES ,"
-						+ "COALESCE(URL_ALLOW_ANONYMOUS,'FALSE') "
-						+ "AS URL_ALLOW_ANONYMOUS,URL_ALLOW_ANONYMOUS ,DESCRIPTION  FROM APM_POLICY_GROUP "
+						+ " URL_ALLOW_ANONYMOUS ,DESCRIPTION  FROM APM_POLICY_GROUP "
 						+ "WHERE POLICY_GRP_ID IN (SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?) ";
 		try {
 			connection = APIMgtDBUtil.getConnection();
@@ -7140,8 +7166,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		// application
 		String query =
 				"SELECT DISTINCT MAP.POLICY_GRP_ID AS POLICY_GRP_ID, POL.NAME AS POLICY_GRP_NAME, "
-						+ "POL.THROTTLING_TIER AS THROTTLING_TIER, POL.USER_ROLES AS USER_ROLES, "
-						+ "COALESCE(POL.URL_ALLOW_ANONYMOUS,'FALSE') AS URL_ALLOW_ANONYMOUS "
+						+ "POL.THROTTLING_TIER AS THROTTLING_TIER, POL.USER_ROLES AS USER_ROLES, URL_ALLOW_ANONYMOUS "
 						+ "FROM APM_POLICY_GROUP_MAPPING MAP "
 						+ "LEFT JOIN APM_POLICY_GROUP POL ON MAP.POLICY_GRP_ID =POL.POLICY_GRP_ID "
 						+ "WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE UUID = ?) ";
