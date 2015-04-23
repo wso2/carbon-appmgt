@@ -17,29 +17,24 @@
 */
 package org.wso2.carbon.appmgt.sample.deployer.appcontroller;
 
+import net.minidev.json.JSONArray;
 import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.sample.deployer.appm.WSRegistryServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.bean.AppCreateRequest;
 import org.wso2.carbon.appmgt.sample.deployer.bean.MobileApplicationBean;
+import org.wso2.carbon.appmgt.sample.deployer.bean.WebAppDetail;
 import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
-import org.wso2.carbon.appmgt.sample.deployer.appm.ManageUser;
 import org.wso2.carbon.appmgt.sample.deployer.http.HttpHandler;
 import org.wso2.carbon.appmgt.sample.deployer.javascriptwrite.InvokeStatistcsJavascriptBuilder;
-import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 import java.io.IOException;
 import java.net.SocketException;
-import java.net.URLEncoder;
-import java.rmi.RemoteException;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,11 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
 * This also create and publish mobile applications.
 *
 */
-public class ApplicationController {
+public class ProxyApplicationCreator {
 
-    final static Logger log = Logger.getLogger(ApplicationController.class.getName());
+    final static Logger log = Logger.getLogger(ProxyApplicationCreator.class.getName());
     private static String appmHomePath = CarbonUtils.getCarbonHome();
-    private String storeSession;
     private HttpHandler httpHandler;
     private String httpsBackEndUrl;
     private String httpBackEndUrl;
@@ -61,36 +55,33 @@ public class ApplicationController {
     private ConcurrentHashMap<String, String> trackingCodes;
     private InvokeStatistcsJavascriptBuilder invokeStatistcsJavascriptBuilder;
     private String ipAddress = "localhost";
-    private String currentUserName;
-    private ManageUser manageUser;
     private Random random;
     private String adminPublisherSession;
+    private ApplicationPublisher applicationPublisher;
+    private ApplicationSubscriber  applicationSubscriber;
 
     /**
-     * Creates a new ApplicationController object and initialising objects,attributes
-     *
-     * @param currentUserName
-     *            Current logged username
+     * Creates a new ProxyApplicationCreator object and initialising objects,attributes
      *
      * @throws AppManagementException
      *            Throws this when failed to initialise the ip address
      *            Throws this when failed to initialise the WSRegistryServiceClient
      */
-    public ApplicationController(String currentUserName) throws AppManagementException {
-        this.currentUserName = currentUserName;
+    public ProxyApplicationCreator() throws AppManagementException {
+
         try {
             this.ipAddress = NetworkUtils.getLocalHostname();
         } catch (SocketException e) {
             log.error("Error while initialising IP address",e);
             throw  new AppManagementException("Error while initialising IP address",e);
         }
-        log.info("IP Address is : " + ipAddress);
         httpsBackEndUrl = Configuration.getHttpsUrl();
         httpBackEndUrl = Configuration.getHttpUrl();
         httpHandler = new HttpHandler();
         trackingCodes = new ConcurrentHashMap<String, String>();
+        applicationPublisher = new ApplicationPublisher();
+        applicationSubscriber =  new ApplicationSubscriber();
         random = new Random();
-
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);
         } catch (RegistryException e) {
@@ -103,10 +94,10 @@ public class ApplicationController {
     }
 
     /**
-     * This method is use for create,publish and subscribe two sample web application
+     * This method is use for create,publish and subscribe given web application
      *
-     * @param publisherSession
-     *            Current logged publisher session
+     * @param webAppDetail
+     *            Bean object of the web application
      *
      * @throws AppManagementException
      *            Throws this when failed to add an user
@@ -114,9 +105,14 @@ public class ApplicationController {
      *            Throws this when policy id is failed while requesting
      *            Throws this when failed to create,publish or subscribe web application
      */
-    public void manageWebApplication(String publisherSession) throws AppManagementException{
+    public void manageWebApplication(WebAppDetail webAppDetail) throws AppManagementException{
+        String currentUserName = webAppDetail.getUserName();
+        String creatorSession = webAppDetail.getCreatorSession();
+        String storeSession = webAppDetail.getStoreSession();
+        String java_policyId = AppMDAO.getDisplayOrderSeqNo();
+        webAppDetail.setContext(generateWebAppContext(webAppDetail.getContext()));
         if(currentUserName.equals("admin")){
-            adminPublisherSession = publisherSession;
+            adminPublisherSession = webAppDetail.getCreatorSession();
         }else{
             try {
                 adminPublisherSession =  httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/authenticate",
@@ -129,38 +125,17 @@ public class ApplicationController {
             }
         }
 
-        try {
-            manageUser = new ManageUser();
-            manageUser.addUser("subscriber_"+currentUserName);
-        } catch (UserAdminUserAdminException e) {
-            log.error("Error while registering a User",e);
-        } catch (RemoteException e) {
-            log.error("Error while registering a User",e);
-        } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while login", e);
-            throw  new AppManagementException("Error while login",e);
-        }
-        try {
-            storeSession = httpHandler.doPostHttp(httpBackEndUrl + "/store/apis/user/login",
-                    "{\"username\":\"subscriber_"+currentUserName+"\"" +
-                            ",\"password\":\"subscriber\"}", "header", "application/json");
-        } catch (IOException e) {
-            log.error("Error while requesting a store session",e);
-            throw  new AppManagementException("Error while requesting a store session",e);
-        }
-        log.info("Store session id is : " + storeSession);
         String policyIDResponce = null;
         try {
             policyIDResponce = httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/entitlement/policy/partial" +
                             "/policyGroup/save", "anonymousAccessToUrlPattern=false&policyGroupName" +
-                            "=test&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=null&userRoles=",
-                    publisherSession, "application/x-www-form-urlencoded; charset=UTF-8").split(":")[3];
+                            "=samples&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=null&userRoles=",
+                    creatorSession, "application/x-www-form-urlencoded; charset=UTF-8").split(":")[3];
         } catch (IOException e) {
             log.error("Error while requesting a policy id", e);
             throw  new AppManagementException("Error while requesting a policy id",e);
         }
         String policyId = policyIDResponce.substring(1, (policyIDResponce.length() - 2)).trim();
-        //initialise common properties for web applications
         AppCreateRequest appCreateRequest = new AppCreateRequest();
         appCreateRequest.setUritemplate_policyGroupIds("[" + policyId + "]");
         appCreateRequest.setUritemplate_policyGroupId4(policyId);
@@ -169,21 +144,18 @@ public class ApplicationController {
         appCreateRequest.setUritemplate_policyGroupId1(policyId);
         appCreateRequest.setUritemplate_policyGroupId0(policyId);
         appCreateRequest.setOverview_provider(currentUserName);
-        appCreateRequest.setClaimPropertyName0("http://wso2.org/claims/streetaddress,http://wso2.org/ffid" +
-                ",http://wso2.org/claims/telephone");
-        appCreateRequest.setClaimPropertyCounter("3");
-        //publishing plan your trip web application
-        log.info("publishing PlanYourTrip");
-        appCreateRequest.setOverview_name("PlanYourTrip_"+currentUserName);
-        appCreateRequest.setOverview_displayName("Plan Your Trip");
-        appCreateRequest.setOverview_context(generateWebAppContext("/planYourTrip"));
-        appCreateRequest.setOverview_version("1.0.0");
+        appCreateRequest.setUritemplate_javaPolicyIds("["+java_policyId+"]");
+        appCreateRequest.setClaimPropertyCounter(webAppDetail.getClaims().size()+"");
+        appCreateRequest.setOverview_name(webAppDetail.getWebAppName());
+        appCreateRequest.setOverview_displayName(webAppDetail.getDisplayName());
+        appCreateRequest.setOverview_context(webAppDetail.getContext());
+        appCreateRequest.setOverview_version(webAppDetail.getVersion());
         appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
         appCreateRequest.setOverview_transports("http");
-        appCreateRequest.setOverview_webAppUrl(httpBackEndUrl + "/plan-your-trip-1.0/");
+        appCreateRequest.setOverview_webAppUrl(httpBackEndUrl +"/" +webAppDetail.getWarFileName()+"/");
         String UUID = null;
         try {
-            UUID = createWebApplication(appCreateRequest, publisherSession);
+            UUID = createWebApplication(appCreateRequest.generateRequestParameters(),webAppDetail);
         } catch (IOException e) {
             log.error("Error while creating a web application Plan Your Trip", e);
             throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
@@ -195,60 +167,20 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
         }
         try {
-            publishApplication("webapp", UUID);
+           applicationPublisher.publishApplication("webapp", UUID,adminPublisherSession);
         } catch (IOException e) {
             log.error("Error while publishing a web application Plan Your Trip", e);
             throw  new AppManagementException("Error while publishing a web application Plan Your Trip", e);
         }
         log.info(appCreateRequest.getOverview_name() + " published and UUID is " + UUID);
         try {
-            subscribeApplication(appCreateRequest);
+            applicationSubscriber.subscribeApplication(appCreateRequest,storeSession,
+                    currentUserName);
         } catch (IOException e) {
             log.error("Error while subscribing a web application Plan Your Trip", e);
             throw  new AppManagementException("Error while subscribing a web application Plan Your Trip", e);
         }
-        log.info(appCreateRequest.getOverview_name() + "application subscribed by user ");
-        //publishing travel booking application
-        log.info("publishing TravelBooking");
-        appCreateRequest.setOverview_name("TravelBooking_"+currentUserName);
-        appCreateRequest.setOverview_displayName("TravelBooking");
-        appCreateRequest.setOverview_context(generateWebAppContext("/travelBooking"));
-        appCreateRequest.setOverview_version("1.0.0");
-        appCreateRequest.setOverview_transports("http");
-        appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
-        appCreateRequest.setClaimPropertyName0("http://wso2.org/claims/givenname,http://wso2.org/claims/lastname" +
-                ",http://wso2.org/claims/emailaddress,http://wso2.org/claims/streetaddress" +
-                ",http://wso2.org/claims/zipcode,http://wso2.org/claims/country" +
-                ",http://wso2.org/claims/card_number,http://wso2.org/claims/card_holder" +
-                ",http://wso2.org/claims/expiration_date");
-        appCreateRequest.setClaimPropertyCounter("9");
-        appCreateRequest.setOverview_webAppUrl(httpBackEndUrl + "/travel-booking-1.0/");
-        try {
-            UUID = createWebApplication(appCreateRequest, publisherSession);
-        } catch (IOException e) {
-            log.error("Error while creating a web application TravelBooking", e);
-            throw  new AppManagementException("Error while creating a web application TravelBooking", e);
-        } catch (RegistryException e) {
-            log.error("Error while creating a web application TravelBooking", e);
-            throw  new AppManagementException("Error while creating a web application TravelBooking", e);
-        } catch (InterruptedException e) {
-            log.error("Error while creating a web application TravelBooking", e);
-            throw  new AppManagementException("Error while creating a web application TravelBooking", e);
-        }
-        try {
-            publishApplication("webapp", UUID);
-        } catch (IOException e) {
-            log.error("Error while publishing a web application TravelBooking", e);
-            throw  new AppManagementException("Error while publishing a web application TravelBooking", e);
-        }
-        log.info(appCreateRequest.getOverview_name() + " published and UUID is " + UUID);
-        try {
-            subscribeApplication(appCreateRequest);
-        } catch (IOException e) {
-            log.error("Error while subscribing a web application TravelBooking", e);
-            throw  new AppManagementException("Error while subscribing a web application TravelBooking", e);
-        }
-        log.info(appCreateRequest.getOverview_name() + "application subscribed by user ");
+        log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_"+currentUserName);
     }
 
     /**
@@ -265,7 +197,7 @@ public class ApplicationController {
         log.info("publishing CleanCalc mobile application");
         MobileApplicationBean mobileApplicationBean = new MobileApplicationBean();
         mobileApplicationBean.setApkFile(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/CleanCalc.apk");
+                "/Resources/CleanCalc.apk");//to do use a constant
         String appMeta = null;
         try {
             appMeta = httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/mobileapp/upload",
@@ -303,7 +235,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating CLeanCalc Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID);
+            applicationPublisher.publishApplication("webapp", UUID, adminPublisherSession);
         } catch (IOException e) {
             log.error("Error while publishing CLeanCalc Mobile Application", e);
             throw  new AppManagementException("Error while publishing CLeanCalc Mobile Application", e);
@@ -321,7 +253,7 @@ public class ApplicationController {
                 "feedback on the sessions, and get more information on the venue and sponsors. Join us at " +
                 "WSO2Con, where we will place emerging technology, best practices, and WSO2 product features " +
                 "in the perspective of accelerating development and building a connected business. We hope you " +
-                "enjoy WSO2Con!");
+                "enjoy WSO2Con!");//to do read from properties file
         mobileApplicationBean.setBannerFilePath(appmHomePath + "/repository/resources/mobileapps/WSO2Con" +
                 "/Resources/banner.png");
         mobileApplicationBean.setIconFile(appmHomePath + "/repository/resources/mobileapps/WSO2Con" +
@@ -341,7 +273,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating WSO2Con Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID);
+            applicationPublisher.publishApplication("mobileapp", UUID, adminPublisherSession);
         } catch (IOException e) {
             log.error("Error while publishing WSO2Con Mobile Application", e);
             throw  new AppManagementException("Error while publishing WSO2Con Mobile Application", e);
@@ -384,7 +316,7 @@ public class ApplicationController {
             throw  new AppManagementException("Error while creating MyTrack Mobile Application", e);
         }
         try {
-            publishApplication("mobileapp", UUID);
+            applicationPublisher.publishApplication("mobileapp", UUID, adminPublisherSession);
         } catch (IOException e) {
             log.error("Error while publishing MyTrack Mobile Application", e);
             throw  new AppManagementException("Error while publishing MyTrack Mobile Application", e);
@@ -395,10 +327,11 @@ public class ApplicationController {
     /**
      * This method is use for create web application
      *
-     * @param appCreateRequest
+     * @param payload
+     *          request payload for web app create api
+     *
+     * @param webAppDetail
      *           bean object of the web application
-     * @param publisherSession
-     *           Current logged publisher session
      *
      * @throws IOException
      *           Throws this when failed to create web application
@@ -412,95 +345,55 @@ public class ApplicationController {
      * @throws java.lang.InterruptedException
      *           Throws this when thread failed
      */
-    private String createWebApplication(AppCreateRequest appCreateRequest, String publisherSession)
+    private String createWebApplication(String payload,WebAppDetail webAppDetail)
             throws IOException, RegistryException, AppManagementException, InterruptedException {
-        String payload = appCreateRequest.generateRequestParameters();
+        String currentUserName = webAppDetail.getUserName();
+        String creatorSession = webAppDetail.getCreatorSession();
         httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/asset/webapp", payload
-                , publisherSession, "application/x-www-form-urlencoded");
-        String claims_ary = "[\"http://wso2.org/claims/givenname\"]";
+                , creatorSession, "application/x-www-form-urlencoded");
 
-        if (appCreateRequest.getClaimPropertyName0().contains(",")) {
-            claims_ary = "[";
-            String[] claims = appCreateRequest.getClaimPropertyName0().split(",");
-            for (int i = 0; i < claims.length; i++) {
-                claims_ary += "\"" + claims[i] + "\"";
-                if (claims.length - 1 != i) {
-                    claims_ary += ",";
-                }
-            }
-            claims_ary += "]";
+        JSONArray claimsAry = new JSONArray();
+        ConcurrentHashMap<String,String[]> claimMap =  webAppDetail.getClaims();
+        for (String claimName : claimMap.keySet()) {
+            claimsAry.add(claimMap.get(claimName)[0]);
         }
-        String jsonPayload = "{\"provider\":\"wso2is-5.0.0\",\"logout_url\":\"\",\"claims\":" + claims_ary + "" +
-                ",\"app_name\":\"" + appCreateRequest.getOverview_name() + "\",\"app_verison\":\""
-                + appCreateRequest.getOverview_version() + "\",\"app_transport\":\"http\",\"app_context\":\""
-                + appCreateRequest.getOverview_context() + "\",\"app_provider\":\"" + currentUserName
-                + "\",\"app_allowAnonymous\":\"f" +
-                "alse\"}";
-        httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/sso/addConfig", jsonPayload, publisherSession
+        JSONObject configJson = new JSONObject();
+        configJson.put("provider", "wso2is-5.0.0");
+        configJson.put("logout_url", "");
+        configJson.put("claims", claimsAry);
+        configJson.put("app_name", webAppDetail.getWebAppName());
+        configJson.put("app_verison", webAppDetail.getVersion());
+        configJson.put("app_transport", "http");
+        configJson.put("app_context", webAppDetail.getContext());
+        configJson.put("app_provider", webAppDetail.getUserName());
+        configJson.put("app_allowAnonymous", "false");
+        httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/sso/addConfig", configJson.toJSONString(), creatorSession
                 , "application/json; charset=UTF-8");
         String appPath = "/_system/governance/appmgt/applicationdata/provider/"
                 + currentUserName + "/" +
-                appCreateRequest.getOverview_name() + "/1.0.0/webapp";
+                webAppDetail.getWebAppName()+ "/1.0.0/webapp";
         String UUID = wsRegistryServiceClient.getUUID(appPath);
         String trackingIDResponse = httpHandler.doGet(httpsBackEndUrl + "/publisher/api/asset/webapp/trackingid/" + UUID
-                , "", publisherSession, "").split(":")[1].trim();
+                , "", creatorSession, "").split(":")[1].trim();
         String trackingID = trackingIDResponse.substring(1, (trackingIDResponse.length() - 2));
 
-        trackingCodes.put(appCreateRequest.getOverview_context(), trackingID);
+        trackingCodes.put(webAppDetail.getContext(), trackingID);
         invokeStatistcsJavascriptBuilder = new InvokeStatistcsJavascriptBuilder
                 (trackingID, ipAddress,Configuration.getGatewayPort());
-        if (appCreateRequest.getOverview_name().equals("PlanYourTrip_"+currentUserName)) {
+        if (webAppDetail.getWebAppName().equals("PlanYourTrip_"+currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/plan-your-trip-1.0");
-        } else if (appCreateRequest.getOverview_name().equals("TravelBooking_"+currentUserName)) {
+        } else if (webAppDetail.getWebAppName().equals("TravelBooking_"+currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/travel-booking-1.0/js");
         }
-        log.info(appCreateRequest.getOverview_name() + " created and UUID is : " + UUID);
+        log.info(webAppDetail.getWebAppName() + " created and UUID is : " + UUID);
         return UUID;
     }
 
-    /**
-     * This method is use for publish web application or mobile application
-     *
-     * @param applicationType
-     *           type of the application whether mobile application or web application
-     * @param UUID
-     *           UUID of the application
-     *
-     * @throws IOException
-     *           Throws this when failed to create web application
-     *
-     * @throws RegistryException
-     *           Throws this when UUID failed while requesting
-     */
-    private void publishApplication(String applicationType, String UUID) throws IOException {
-        httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Submit%20for%20Review/" + applicationType + "/"
-                + UUID
-                , adminPublisherSession);
-        httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Approve/" + applicationType + "/" + UUID
-                , adminPublisherSession);
-        httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Publish/" + applicationType + "/" + UUID
-                , adminPublisherSession);
-    }
 
-    /**
-     * This method is use for suscribe web application
-     *
-     * @param appCreateRequest
-     *           Bean of the web application
-     *
-     * @throws IOException
-     *           Throws this when failed to suscribe web application
-     */
-    private void subscribeApplication(AppCreateRequest appCreateRequest) throws IOException {
-        httpHandler.doPostHttps(httpsBackEndUrl + "/store/resources/webapp/v1/subscription/app",
-                "apiName=" + appCreateRequest.getOverview_name() + "" +
-                        "&apiVersion=" + appCreateRequest.getOverview_version() + "&apiTier=" +
-                        appCreateRequest.getOverview_tier()
-                        + "&subscriptionType=INDIVIDUAL&apiProvider=" + currentUserName + "&appName=DefaultApplication"
-                , storeSession, "application/x-www-form-urlencoded; charset=UTF-8");
-    }
+
+
 
     /**
      * This method is use for suscribe web application
@@ -518,113 +411,6 @@ public class ApplicationController {
             ) throws IOException, InterruptedException {
         return httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/asset/mobileapp",false,
                 mobileApplicationBean, publisherSession);
-    }
-
-    /**
-     * This method is use for accses a web application according to user given hit count
-     *
-     * @param webContext
-     *            Context of the web application
-     *
-     * @param trackingCode
-     *            Tracking code of the web application
-     *
-     * @param hitCount
-     *            Hit count for web application
-     *
-     * @param ipAddress
-     *            IP address of the user mashine
-     *
-     * @throws AppManagementException
-     *            Throws this when failed to accses web application
-     *            Throws this when thread failed to sleep
-     */
-    public void accsesWebPages(String webContext, String trackingCode, int hitCount, String ipAddress) throws AppManagementException {
-        String loginHtmlPage = null;
-        StringBuilder webAppUrlBuilder = new StringBuilder();
-        webAppUrlBuilder.append("http://");
-        webAppUrlBuilder.append(ipAddress);
-        webAppUrlBuilder.append(":");
-        webAppUrlBuilder.append(Configuration.getGatewayPort());
-        webAppUrlBuilder.append(webContext);
-        webAppUrlBuilder.append("/1.0.0/");
-        String webAppurl = webAppUrlBuilder.toString();
-        String responceHtml = null;
-        try {
-            loginHtmlPage = httpHandler.getHtml(webAppurl);
-            Document html = Jsoup.parse(loginHtmlPage);
-            Element sessionDataKeyElement = html.select("input[name=sessionDataKey]").first();
-            String sessionDataKey = sessionDataKeyElement.val();
-            responceHtml = httpHandler.doPostHttps(httpsBackEndUrl + "/commonauth"
-                    , "username=subscriber&password=subscriber&sessionDataKey=" + sessionDataKey
-                    , "none"
-                    , "application/x-www-form-urlencoded; charset=UTF-8");
-            Document postHtml = Jsoup.parse(responceHtml);
-            Element postHTMLResponse = postHtml.select("input[name=SAMLResponse]").first();
-            String samlResponse = postHTMLResponse.val();
-            String appmSamlSsoTokenId = httpHandler.doPostHttp(webAppurl,
-                    "SAMLResponse=" + URLEncoder.encode(samlResponse, "UTF-8"), "appmSamlSsoTokenId",
-                    "application/x-www-form-urlencoded; charset=UTF-8");
-            for (int i = 0; i < hitCount; i++) {
-                if (webContext.equals("/notifi")) {
-                    if (i == hitCount / 5) {
-                        webAppurl += "member/";
-                    } else if (i == hitCount / 2) {
-                        webAppurl = appendPageToUrl("admin", webAppurl, false);
-                    }
-                } else if (webContext.equals("/travelBooking")) {
-                    if (i == hitCount / 5) {
-                        webAppurl = appendPageToUrl("booking-step1.jsp", webAppurl, true);
-                    } else if (i == hitCount / 2) {
-                        webAppurl = appendPageToUrl("booking-step2.jsp", webAppurl, false);
-                    }
-                }
-                httpHandler.doGet("http://" + ipAddress + ":"+Configuration.getGatewayPort()+"/statistics/",
-                        trackingCode, appmSamlSsoTokenId, webAppurl);
-                log.info("Web Page : " + webAppurl + " Hit count : " + i);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.error("Error while accessing a web page", e);
-                    throw  new AppManagementException("Error while accessing a web page", e);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Error while accessing a web page", e);
-            throw  new AppManagementException("Error while accessing a web page", e);
-        }
-
-    }
-
-    /**
-     * This method is use to build a url
-     *
-     * @param pageName
-     *            Page name of the web application
-     *
-     * @param webAppUrl
-     *            Current url of web application
-     *
-     * @param isAppendLastOne
-     *
-     *
-     */
-    private String appendPageToUrl(String pageName, String webAppUrl, boolean isAppendLastOne) {
-        String elements[] = webAppUrl.split("/");
-        StringBuilder newUrl = new StringBuilder();
-        for (int i = 0; i < elements.length; i++) {
-            if (!elements[i].equals("")) {
-                if (i == 0) {
-                    newUrl.append(elements[i] + "//");
-                } else if ((i == (elements.length - 1)) && isAppendLastOne) {
-                    newUrl.append(elements[i] + "/");
-                } else if (i != (elements.length - 1)) {
-                    newUrl.append(elements[i] + "/");
-                }
-            }
-        }
-        newUrl.append(pageName + "/");
-        return newUrl.toString();
     }
 
     /**
