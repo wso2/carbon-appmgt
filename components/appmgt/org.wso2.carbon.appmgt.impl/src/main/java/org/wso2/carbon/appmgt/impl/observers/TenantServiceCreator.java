@@ -181,6 +181,11 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
 
             AppManagerUtil.addNewRole(AppMConstants.PUBLISHER_ROLE,publisherPermissions, realm);
 //            AppManagerUtil.applyRolePermissionToCollection(AppMConstants.CREATOR_ROLE, realm);
+
+            //Add the store-admin role
+            Permission[] storeAdminPermissions = new Permission[]
+                    {new Permission(AppMConstants.Permissions.LOGIN, UserMgtConstants.EXECUTE_ACTION)};
+            AppManagerUtil.addNewRole(AppMConstants.STORE_ADMIN_ROLE, storeAdminPermissions , realm);
         } catch(Exception e) {
             log.error("Failed to add permissions of appmgt/application data collection for creator role.");
         }
