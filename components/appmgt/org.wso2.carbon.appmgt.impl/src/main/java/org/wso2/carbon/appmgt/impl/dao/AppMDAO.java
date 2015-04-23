@@ -18,41 +18,6 @@
 
 package org.wso2.carbon.appmgt.impl.dao;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.cache.Cache;
-import javax.cache.Caching;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.util.JavaUtils;
@@ -62,26 +27,22 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dto.*;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
-import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.APIVersionComparator;
-import org.wso2.carbon.appmgt.impl.utils.LRUCache;
-import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
+import org.wso2.carbon.appmgt.impl.utils.*;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.base.IdentityException;
@@ -92,6 +53,20 @@ import org.wso2.carbon.identity.oauth.OAuthUtil;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import javax.cache.Cache;
+import javax.cache.Caching;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.sql.*;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Data Access Layer for App Management
@@ -4388,11 +4363,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				 		+ "APP.APP_ID AS APP_ID, APP.UUID AS APP_UUID, POLICY_GROUP.POLICY_GRP_ID AS POLICY_GRP_ID,"
 						+ "RULE.ENTITLEMENT_POLICY_PARTIAL_ID AS RULE_ID, RULE.CONTENT AS RULE_CONTENT "
 						+ "FROM "
-						+ "APM_APP AS APP, "
-						+ "APM_POLICY_GROUP AS POLICY_GROUP, "
-						+ "APM_POLICY_GROUP_MAPPING AS APP_GROUP, "
-						+ "APM_ENTITLEMENT_POLICY_PARTIAL AS RULE, "
-						+ "APM_POLICY_GRP_PARTIAL_MAPPING AS GROUP_RULE "
+						+ "APM_APP APP, "
+						+ "APM_POLICY_GROUP POLICY_GROUP, "
+						+ "APM_POLICY_GROUP_MAPPING APP_GROUP, "
+						+ "APM_ENTITLEMENT_POLICY_PARTIAL RULE, "
+						+ "APM_POLICY_GRP_PARTIAL_MAPPING GROUP_RULE "
 						+ "WHERE "
 						+ "APP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ) "
 						+ "AND APP_GROUP.APP_ID = APP.APP_ID "
@@ -5433,12 +5408,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         PreparedStatement statementToGetPolicyPartialList = null;
         List<EntitlementPolicyPartial> entitlementPolicyPartialList = new ArrayList<EntitlementPolicyPartial>();
         ResultSet rs = null;
+        boolean isShared = true;
 
-        String queryToGetPolicyPartial = "SELECT * FROM APM_ENTITLEMENT_POLICY_PARTIAL WHERE SHARED = TRUE";
+        String queryToGetPolicyPartial = "SELECT * FROM APM_ENTITLEMENT_POLICY_PARTIAL WHERE SHARED = ? ";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetPolicyPartialList = connection.prepareStatement(queryToGetPolicyPartial);
+            statementToGetPolicyPartialList.setBoolean(1, isShared);
 
             rs = statementToGetPolicyPartialList.executeQuery();
 
@@ -7263,21 +7240,23 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		NativeObject objPolicy;
 		NativeArray arrJavaPolicies = new NativeArray(0);
 		Integer count = 0;
+        Boolean isMandatory = false; //no need to show the mandatory fields as options
 
 		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
 				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
 				"FROM APM_APP_JAVA_POLICY POL " +
 				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
 				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
-				"WHERE IS_MANDATORY=FALSE AND IS_GLOBAL= ? " +
+				"WHERE IS_MANDATORY= ? AND IS_GLOBAL= ? " +
 				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setString(1, applicationUUId);
-			ps.setBoolean(2, isGlobalPolicy);
-			rs = ps.executeQuery();
+			ps.setBoolean(2, isMandatory);
+            ps.setBoolean(3, isGlobalPolicy);
+            rs = ps.executeQuery();
 			while (rs.next()) {
 				objPolicy = new NativeObject();
 				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
@@ -7356,21 +7335,23 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 		List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
 		String strJavaPolicyProperty = "";
+        boolean isMandatory = true;
 
 		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME " +
 				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID ,FULL_QUALIFI_NAME ,POLICY_PROPERTIES " +
 				"FROM APM_APP_JAVA_POLICY POL " +
 				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
 				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
-				"WHERE (IS_MANDATORY=TRUE OR APP.APP_ID IS NOT NULL) AND IS_GLOBAL= ? " +
+				"WHERE (IS_MANDATORY= ? OR APP.APP_ID IS NOT NULL) AND IS_GLOBAL= ? " +
 				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setString(1, applicationUUId);
-			ps.setBoolean(2, isGlobalPolicy);
-			rs = ps.executeQuery();
+			ps.setBoolean(2, isMandatory);
+            ps.setBoolean(3, isGlobalPolicy);
+            rs = ps.executeQuery();
 			JSONParser parser = new JSONParser();
 			while (rs.next()) {
 				JavaPolicy policy = new JavaPolicy();
