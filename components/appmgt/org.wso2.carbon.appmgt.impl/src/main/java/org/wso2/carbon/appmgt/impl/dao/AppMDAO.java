@@ -1015,8 +1015,10 @@ public class AppMDAO {
                 subscription.setSubscriptionStatus(resultSet.getString("SUB_STATUS"));
 
                 String trustedIdpsJson = resultSet.getString("TRUSTED_IDP");
-                Object  decodedJson = JSONValue.parse(trustedIdpsJson);
-
+                Object decodedJson = null;
+                if (trustedIdpsJson != null) {
+                    decodedJson = JSONValue.parse(trustedIdpsJson);
+                }
                 if(decodedJson != null){
 
                     for(Object item : (JSONArray)decodedJson){
