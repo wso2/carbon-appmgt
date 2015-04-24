@@ -92,7 +92,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         discoveryContext.putData(CONTEXT_DATA_LOGGED_IN_USER, credentials.getLoggedInUsername());
 
-        if(isResetPageCache(criteria, discoveryContext)) {
+        if (isResetPageCache(criteria, discoveryContext)) {
             clearCache(discoveryContext);
         }
         ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
@@ -493,8 +493,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             setPageCacheData(criteria, discoveryContext);
         }
         boolean isMoreResultsPossible = true;
-        if(discoveryContext.getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE) != null) {
-            isMoreResultsPossible = isMoreResultsPossible && (Boolean)discoveryContext.getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE);
+        if (discoveryContext.getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE) != null) {
+            isMoreResultsPossible = isMoreResultsPossible && (Boolean) discoveryContext
+                    .getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE);
         }
 
         PagingResult result = cachedMap.get(Integer.valueOf(criteria.getPageNumber()));
@@ -502,26 +503,28 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             result = getNextPage(discoveryContext, credentials, searchString, criteria, locale,
                     carbonContext, webappAdminClient, providerName, loggedInUserName, apiProvider);
 
-            if(result.metadataList.size() >0 ) {
+            if (result.metadataList.size() > 0) {
                 cachedMap.put(criteria.getPageNumber(), result);
             }
             isMoreResultsPossible = isMoreResultsPossible && result.isMoreResultsPossible;
             discoveryContext.putData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE, isMoreResultsPossible);
         }
 
-        DiscoveredApplicationListDTO discoveredApplicationListDTO= translateToDto(result.webappsWrapper, result.metadataList, providerName,
-                loggedInUserName, apiProvider);
+        DiscoveredApplicationListDTO discoveredApplicationListDTO = translateToDto(
+                result.webappsWrapper, result.metadataList, providerName, loggedInUserName,
+                apiProvider);
 
         discoveredApplicationListDTO.setPageCount(cachedMap.size());
         discoveredApplicationListDTO.setMoreResultsPossible(isMoreResultsPossible);
-        discoveredApplicationListDTO.setTotalNumberOfPagesKnown(! isMoreResultsPossible);
+        discoveredApplicationListDTO.setTotalNumberOfPagesKnown(!isMoreResultsPossible);
 
         return discoveredApplicationListDTO;
     }
 
     private void setPageCacheData(DiscoverySearchCriteria criteria,
             ApplicationDiscoveryContext discoveryContext) {
-        discoveryContext.putData(CONTEXT_DATA_SEARCH_APPLICATION_NAME, criteria.getApplicationName());
+        discoveryContext
+                .putData(CONTEXT_DATA_SEARCH_APPLICATION_NAME, criteria.getApplicationName());
         discoveryContext.putData(CONTEXT_DATA_SEARCH_APPLICATION_STATUS, criteria.getStatus());
     }
 
@@ -529,11 +532,11 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             ApplicationDiscoveryContext discoveryContext) {
         //TODO: Use URL and user name to reset too
         String cachedName = (String) discoveryContext.getData(CONTEXT_DATA_SEARCH_APPLICATION_NAME);
-        String cachedStatus = (String) discoveryContext.getData(
-                CONTEXT_DATA_SEARCH_APPLICATION_STATUS);
+        String cachedStatus = (String) discoveryContext
+                .getData(CONTEXT_DATA_SEARCH_APPLICATION_STATUS);
 
-        return ! isEqual(cachedName, criteria.getApplicationName()) ||
-                ! isEqual(cachedStatus, criteria.getStatus());
+        return !isEqual(cachedName, criteria.getApplicationName()) || !isEqual(cachedStatus,
+                criteria.getStatus());
     }
 
     private void clearCache(ApplicationDiscoveryContext discoveryContext) {
@@ -547,7 +550,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     }
 
     private boolean isEqual(String s1, String s2) {
-        if(s1 == null) {
+        if (s1 == null) {
             return s2 == null;
         }
         return s1.equals(s2);
@@ -582,8 +585,10 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         int pageSize = criteria.getPageSize() > 0 ? criteria.getPageSize() : DEFAULT_PAGE_SIZE;
         WebappsWrapper webappsWrapper = null;
-        Integer lastAppServerPage = (Integer) discoveryContext.getData(CONTEXT_DATA_LAST_APPSERVER_PAGE);
-        Integer lastAppServerIndex = (Integer) discoveryContext.getData(CONTEXT_DATA_LAST_APPSERVER_INDEX);
+        Integer lastAppServerPage = (Integer) discoveryContext
+                .getData(CONTEXT_DATA_LAST_APPSERVER_PAGE);
+        Integer lastAppServerIndex = (Integer) discoveryContext
+                .getData(CONTEXT_DATA_LAST_APPSERVER_INDEX);
         webappsWrapper = (WebappsWrapper) discoveryContext.getData(CONTEXT_DATA_LASTWEBAPPSWRAPER);
         if (lastAppServerPage == null) {
             lastAppServerPage = 0;
@@ -597,15 +602,15 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         boolean isLastResultAdded = false;
 
         //Loads the data from the rest of the previously queried page
-        if( webappsWrapper != null) {
+        if (webappsWrapper != null) {
             List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
             List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
                     discoveryContext, credentials, criteria, locale, carbonContext, providerName,
                     loggedInUserName, apiProvider);
             int recordsToAdd = Math
                     .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
-            if(lastAppServerIndex >= recordsToAdd) {
-                lastAppServerPage ++;
+            if (lastAppServerIndex >= recordsToAdd) {
+                lastAppServerPage++;
             } else {
                 accumulatedMetadataList
                         .addAll(filteredMetadataList.subList(lastAppServerIndex, recordsToAdd));
@@ -629,7 +634,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             isEndOfPages = webappsWrapper.getNumberOfPages() <= lastAppServerPage + 1;
             isCurrentPageFull = (accumulatedMetadataList.size() >= pageSize) || isEndOfPages;
             lastAppServerPage++;
-            isLastResultAdded = filteredMetadataList.size() - recordsToAdd <=0;
+            isLastResultAdded = filteredMetadataList.size() - recordsToAdd <= 0;
         } while (!(isEndOfPages || isCurrentPageFull));
 
         discoveryContext.putData(CONTEXT_DATA_LAST_APPSERVER_PAGE, lastAppServerPage);
@@ -638,7 +643,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         PagingResult result = new PagingResult(accumulatedMetadataList, webappsWrapper);
 
-        result.isMoreResultsPossible = ! (isEndOfPages && isLastResultAdded);
+        result.isMoreResultsPossible = !(isEndOfPages && isLastResultAdded);
         return result;
     }
 

@@ -30,14 +30,28 @@ public class ApplicationDiscoveryContext {
 
     private final Map<String, Object> contextData = new HashMap<String, Object>();
 
+    /**
+     * Put a data given key. similar to ServletSession.setAttribute() .
+     * @param key
+     * @param value
+     */
     public void putData(String key, Object value) {
         contextData.put(key, value);
     }
 
+    /**
+     * Retrieves data from the context. similar to ServletSession.getAttribute()
+     * @param key
+     * @return
+     */
     public Object getData(String key) {
         return contextData.get(key);
     }
 
+    /**
+     * Clears the data given the key. This is a convenient method to putData(key, null)
+     * @param key
+     */
     public void clear(String key) {
         contextData.remove(key);
     }
