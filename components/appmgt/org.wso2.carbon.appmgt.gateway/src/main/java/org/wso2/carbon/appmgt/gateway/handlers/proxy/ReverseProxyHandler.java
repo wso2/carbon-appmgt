@@ -1,6 +1,22 @@
-package org.wso2.carbon.appmgt.gateway.handlers.proxy;
+/*
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
 
-import java.util.TreeMap;
+package org.wso2.carbon.appmgt.gateway.handlers.proxy;
 
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.synapse.MessageContext;
@@ -10,6 +26,8 @@ import org.apache.synapse.endpoints.HTTPEndpoint;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+
+import java.util.TreeMap;
 
 public class ReverseProxyHandler extends AbstractHandler {
 
@@ -51,6 +69,19 @@ public class ReverseProxyHandler extends AbstractHandler {
 
 			headers.put(HTTPConstants.HEADER_LOCATION, location);
 
+		}
+
+		// If the user enter gateway endpoint without "/" end of the request, relative path resource will no be loaded.
+		// In this logic it identified such cases and append the "/" to the end of the request and rewrite the response
+		// as a request to the gateway.
+		String appVersion = String.valueOf(messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION));
+		String requestContextPath = String.valueOf(messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH));
+		if (requestContextPath.endsWith(appVersion)) {
+			String endpointUrl = String.valueOf(messageContext.getProperty(RESTConstants.REST_URL_PREFIX)) + requestContextPath;
+			String gatewayContext = endpointUrl +
+							(endpointUrl.endsWith(URL_SEPERATOR) ? EMPTY_STRING : URL_SEPERATOR);
+			headers.put(HTTPConstants.HEADER_LOCATION, gatewayContext);
+			axis2MC.setProperty(NhttpConstants.HTTP_SC, 302);
 		}
 
 		Object cookie = headers.get(HTTPConstants.HEADER_SET_COOKIE);
