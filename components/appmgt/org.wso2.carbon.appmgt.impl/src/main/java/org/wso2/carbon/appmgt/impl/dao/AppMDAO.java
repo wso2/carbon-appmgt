@@ -6054,7 +6054,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
                 // Set trusted IDPs.
                 String trustedIdpsJson = individualSubscriptionResult.getString("TRUSTED_IDPS");
-                Object  decodedJson = JSONValue.parse(trustedIdpsJson);
+                Object decodedJson = null;
+                if (trustedIdpsJson != null) {
+                    decodedJson = JSONValue.parse(trustedIdpsJson);
+                }
+
                 if(decodedJson != null){
                     for(Object item : (JSONArray)decodedJson){
                         subscription.addTrustedIdp(item.toString());
@@ -7547,8 +7551,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         String query = "SELECT "
 		        		+ "POLICY_XACML.POLICY_ID AS POLICY_ID "
 		        		+ "FROM "
-		        		+ "APM_APP_URL_MAPPING AS APP_URL, "
-		        		+ "APM_POLICY_GRP_PARTIAL_MAPPING AS POLICY_XACML "
+		        		+ "APM_APP_URL_MAPPING APP_URL, "
+		        		+ "APM_POLICY_GRP_PARTIAL_MAPPING POLICY_XACML "
 		        		+ "WHERE "
 		        		+ "APP_URL.POLICY_GRP_ID = POLICY_XACML.POLICY_GRP_ID "
 		        		+ "AND APP_URL.APP_ID = ? "
