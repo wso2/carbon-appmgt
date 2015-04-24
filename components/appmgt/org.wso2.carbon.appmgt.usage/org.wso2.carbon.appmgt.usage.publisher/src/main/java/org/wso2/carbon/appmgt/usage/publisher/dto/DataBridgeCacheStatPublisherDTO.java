@@ -47,7 +47,7 @@ public class DataBridgeCacheStatPublisherDTO extends CacheStatPublisherDTO {
 				+ "          {'name':'version','type':'STRING'},"
 				+ "          {'name':'request','type':'INT'},"
 				+ "          {'name':'cacheHit','type':'INT'},"
-				+ "          {'name':'requestTime','type':'STRING'},"
+				+ "          {'name':'requestTime','type':'LONG'},"
 				+ "          {'name':'userId','type':'STRING'},"
 				+ "          {'name':'tenantDomain','type':'STRING'},"
 				+ "          {'name':'hostName','type':'STRING'},"
@@ -67,7 +67,7 @@ public class DataBridgeCacheStatPublisherDTO extends CacheStatPublisherDTO {
 
     public Object createPayload(){
         return new Object[]{getContext(),getApi_version(),getApi(), getFullRequestPath(), 
-                getVersion(),getRequestCount(), getCachHit(), String.valueOf(getRequestTime()), getUsername(),
+                getVersion(),getRequestCount(), getCachHit(), getRequestTime(), getUsername(),
                 getTenantDomain(),getHostName(),getApiPublisher(), getApplicationName(), getApplicationId(),getTrackingCode(),getReferer(), getResponseTime()};
     }
 
