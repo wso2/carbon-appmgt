@@ -32,7 +32,7 @@ import java.util.Locale;
  */
 public interface ApplicationDiscoveryHandler {
 
-    public enum APP_STATUS {ANY, CREATED, NEW};
+    public enum APP_STATUS {ANY, CREATED, NEW}
 
     String getDisplayName();
 

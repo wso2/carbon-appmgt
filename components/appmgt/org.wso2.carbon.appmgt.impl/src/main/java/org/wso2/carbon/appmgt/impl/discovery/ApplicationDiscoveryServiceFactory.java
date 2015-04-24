@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class ApplicationDiscoveryServiceFactory {
 
-    private Map<String, ApplicationDiscoveryHandler> applicationDiscoveryHandlerMap = new HashMap<String, ApplicationDiscoveryHandler>();
+    private final Map<String, ApplicationDiscoveryHandler> applicationDiscoveryHandlerMap = new HashMap<String, ApplicationDiscoveryHandler>();
 
     public void addHandler(String name, ApplicationDiscoveryHandler applicationDiscoveryHandler) {
         applicationDiscoveryHandlerMap.put(name, applicationDiscoveryHandler);

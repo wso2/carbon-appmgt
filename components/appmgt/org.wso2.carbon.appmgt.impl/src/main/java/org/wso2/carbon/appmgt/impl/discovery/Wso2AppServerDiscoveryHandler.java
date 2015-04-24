@@ -35,9 +35,7 @@ import org.wso2.carbon.webapp.mgt.stub.types.carbon.VersionedWebappMetadata;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappMetadata;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappsWrapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -51,6 +49,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
     private static final String HANDLER_NAME = "WSO2-AS";
     private static final int MAX_GENERATED_CONTEXT_SUFFIX = 1000;
+    private static final int DEFAULT_PAGE_SIZE = 16;
     private static final String CONTEXT_NOT_GENERATED = "<could-not-generate>";
     private static final String STATUS_NEW = "NEW";
     private static final String STATUS_CREATED = "CREATED";
@@ -58,7 +57,16 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private static final String DEFAULT_GENERATED_VERSION = "1.0";
     private static final String DEFAULT_VERSION_STRING = "/default";
     private static final String CONTEXT_DATA_LOGGED_IN_USER = "LOGGED_IN_USER";
+
+    private static final String CONTEXT_DATA_PAGE_MAP = "PageMap";
+    private static final String CONTEXT_DATA_SEARCH_APPLICATION_NAME = "SearchApplicationName";
+    private static final String CONTEXT_DATA_SEARCH_APPLICATION_STATUS = "SearchApplicationStatus";
+    private static final String CONTEXT_DATA_LAST_APPSERVER_PAGE = "LastAppServerPage";
+    private static final String CONTEXT_DATA_LAST_APPSERVER_INDEX = "LastAppServerIndex";
+    private static final String CONTEXT_DATA_LASTWEBAPPSWRAPER = "LastWebappsWraper";
+    private static final String CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE = "IsMoreResultsPossible";
     private static final String CONTEXT_DATA_APP_SERVER_URL = "APP_SERVER_URL";
+
     private static final int MAX_USERNAME_CONTRIBUTION_LENGTH = 8;
     private static final int MAX_HOSTNAME_CONTRIBUTION_LENGTH = 15;
     private static final String PROTOCOL_HTTP = "http";
@@ -84,6 +92,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         discoveryContext.putData(CONTEXT_DATA_LOGGED_IN_USER, credentials.getLoggedInUsername());
 
+        if(isResetPageCache(criteria, discoveryContext)) {
+            clearCache(discoveryContext);
+        }
         ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
                 .getOSGiService(ConfigurationContextService.class);
         ConfigurationContext configurationContext = configurationContextService
@@ -99,8 +110,24 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             criteria.getPageNumber());
 
             discoveryContext.putData(AppServerWebappAdminClient.class.getName(), webappAdminClient);
+            String loggedInUsername = (String) discoveryContext
+                    .getData(CONTEXT_DATA_LOGGED_IN_USER);
+            String providerName = loggedInUsername.replace("@", "-AT-");
+            APIProvider apiProvider = APIManagerFactory.getInstance()
+                    .getAPIProvider(loggedInUsername);
 
-            return translateToDto(webappsWrapper, credentials.getLoggedInUsername());
+            if (criteria.getStatus() != null && criteria.getStatus().length() > 0) {
+                return discoverApplicationsWithPaging(discoveryContext, credentials, criteria,
+                        locale, carbonContext, webappAdminClient, providerName, loggedInUsername,
+                        apiProvider);
+            } else {
+                List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
+                List<WebappMetadata> filteredMetadataList = filter(webappsWrapper,
+                        webappMetadataList, discoveryContext, credentials, criteria, locale,
+                        carbonContext, providerName, loggedInUsername, apiProvider);
+                return translateToDto(webappsWrapper, filteredMetadataList, providerName,
+                        loggedInUsername, apiProvider);
+            }
         } catch (AppManagementException ame) {
             String message = String
                     .format("The application server URL, username or password mismatch URL :%s, UserName : %s",
@@ -117,7 +144,6 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
         String webappId = apiIdentifier.getApplicationId();
         String loggedInUsername = (String) discoveryContext.getData(CONTEXT_DATA_LOGGED_IN_USER);
-        String providerName = loggedInUsername.replace("@", "-AT-");
         DiscoveredApplicationDTO result = null;
 
         APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
@@ -143,24 +169,12 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                     WebappMetadata[] webappMetadataArray = versionedWebappMetadata
                             .getVersionGroups();
                     for (WebappMetadata webappMetadata : webappMetadataArray) {
+                        String providerName = loggedInUsername.replace("@", "-AT-");
                         String currentWebappId = generateWebappId(webappMetadata, webappsWrapper,
                                 providerName);
-                        String deploymentId = webappMetadata.getWebappFile();
                         if (currentWebappId.equals(webappId)) {
-                            result = new DiscoveredApplicationDTO();
-                            String version = getVersion(webappMetadata);
-                            String context = webappMetadata.getContextPath();
-                            result.setDisplayName(webappMetadata.getDisplayName());
-                            result.setVersion(version);
-                            result.setApplicationType(webappMetadata.getWebappType());
-                            result.setRemoteContext(context);
-                            result.setProxyContext(generateProxyContext(context, apiProvider));
-                            result.setApplicationId(currentWebappId);
-                            result.setStatus(
-                                    getStatus(loggedInUsername, result.getApplicationName(),
-                                            result.getVersion(), apiProvider));
-                            result.setApplicationUrl(
-                                    generateAppUrl(webappsWrapper, webappMetadata));
+                            result = translateToDiscoveredApplicationDTO(loggedInUsername,
+                                    apiProvider, webappsWrapper, webappMetadata, currentWebappId);
 
                             break searching; //Found the item. stop search loops
                         }
@@ -204,43 +218,130 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      * Translates the WebappsWrapper to its flat list form
      *
      * The structure of the response object is:
-     * {WebappsWrapper : {localWebapps(type of VersionedWebappMetadata) : [type of WebappMetadata]}}
+     * {WebappsWrapper : {localWebapps(type of VersionedWebappMetadata) : [type of WebappMetadata]}}.
      *
      * @param webappsWrapper
      * @return
      */
     private DiscoveredApplicationListDTO translateToDto(WebappsWrapper webappsWrapper,
-            String loggedInUsername) throws AppManagementException {
-        VersionedWebappMetadata[] versionedWebappMetadataArray = webappsWrapper.getWebapps();
-        String providerName = loggedInUsername.replace("@", "-AT-");
-        APIProvider apiProvider = APIManagerFactory.getInstance().getAPIProvider(loggedInUsername);
+            List<WebappMetadata> webappMetadataList, String providerName, String loggedInUsername,
+            APIProvider apiProvider) throws AppManagementException {
+
         DiscoveredApplicationListDTO result = new DiscoveredApplicationListDTO();
         List<DiscoveredApplicationListElementDTO> appList = new ArrayList<DiscoveredApplicationListElementDTO>();
         result.setApplicationList(appList);
         result.setPageCount(webappsWrapper.getNumberOfPages());
+
+        for (WebappMetadata webappMetadata : webappMetadataList) {
+            DiscoveredApplicationListElementDTO listElementDTO = new DiscoveredApplicationListElementDTO();
+            String version = getVersion(webappMetadata);
+            String context = webappMetadata.getContextPath();
+            listElementDTO.setDisplayName(webappMetadata.getDisplayName());
+            listElementDTO.setVersion(version);
+            listElementDTO.setApplicationType(webappMetadata.getWebappType());
+            listElementDTO.setRemoteContext(context);
+            listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
+            String appId = generateWebappId(webappMetadata, webappsWrapper, providerName);
+            listElementDTO.setApplicationId(appId);
+            listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
+            listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
+            listElementDTO.setApplicationPreviewUrl(
+                    generateAppPreviewUrl(webappsWrapper, webappMetadata));
+
+            appList.add(listElementDTO);
+        }
+
+        result.setTotalNumberOfResults(appList.size());
+        return result;
+    }
+
+    /**
+     * Translate to given webapp metadata to the webapp information DTO.
+     *
+     * @param loggedInUsername
+     * @param apiProvider
+     * @param webappsWrapper
+     * @param webappMetadata
+     * @param currentWebappId
+     * @return
+     * @throws AppManagementException
+     */
+    private DiscoveredApplicationDTO translateToDiscoveredApplicationDTO(String loggedInUsername,
+            APIProvider apiProvider, WebappsWrapper webappsWrapper, WebappMetadata webappMetadata,
+            String currentWebappId) throws AppManagementException {
+        DiscoveredApplicationDTO result;
+        result = new DiscoveredApplicationDTO();
+        String version = getVersion(webappMetadata);
+        String context = webappMetadata.getContextPath();
+        result.setDisplayName(webappMetadata.getDisplayName());
+        result.setVersion(version);
+        result.setApplicationType(webappMetadata.getWebappType());
+        result.setRemoteContext(context);
+        result.setProxyContext(generateProxyContext(context, apiProvider));
+        result.setApplicationId(currentWebappId);
+        result.setStatus(
+                getStatus(loggedInUsername, result.getApplicationName(), result.getVersion(),
+                        apiProvider));
+        result.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
+        return result;
+    }
+
+    /**
+     * Flatten and return a list of DiscoveredApplicationListElementDTO related to nested  VersionedWebappMetadata
+     *
+     * @param versionedWebappMetadataArray
+     * @return
+     */
+    private List<WebappMetadata> flatten(VersionedWebappMetadata[] versionedWebappMetadataArray) {
+        List<WebappMetadata> result = new ArrayList<WebappMetadata>();
+
         for (VersionedWebappMetadata versionedWebappMetadata : versionedWebappMetadataArray) {
             WebappMetadata[] webappMetadataArray = versionedWebappMetadata.getVersionGroups();
             for (WebappMetadata webappMetadata : webappMetadataArray) {
-                DiscoveredApplicationListElementDTO listElementDTO = new DiscoveredApplicationListElementDTO();
-                String version = getVersion(webappMetadata);
-                String context = webappMetadata.getContextPath();
-                listElementDTO.setDisplayName(webappMetadata.getDisplayName());
-                listElementDTO.setVersion(version);
-                listElementDTO.setApplicationType(webappMetadata.getWebappType());
-                listElementDTO.setRemoteContext(context);
-                listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
-                String appId = generateWebappId(webappMetadata, webappsWrapper, providerName);
-                listElementDTO.setApplicationId(appId);
-                listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
-                listElementDTO.setApplicationUrl(generateAppUrl(webappsWrapper, webappMetadata));
-                listElementDTO.setApplicationPreviewUrl(
-                        generateAppPreviewUrl(webappsWrapper, webappMetadata));
+                result.add(webappMetadata);
+            }
+        }
 
-                appList.add(listElementDTO);
+        return result;
+    }
+
+    /**
+     * Returns the filtered list of list elements
+     *
+     * @param applicationListElementList
+     * @param discoveryContext
+     * @param credentials
+     * @param criteria
+     * @param locale
+     * @param carbonContext
+     * @return
+     */
+    private List<WebappMetadata> filter(WebappsWrapper webappsWrapper,
+            List<WebappMetadata> applicationListElementList,
+            ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
+            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext,
+            String providerName, String userName, APIProvider apiProvider)
+            throws AppManagementException {
+
+        APP_STATUS status = parseAppStatus(criteria.getStatus());
+        if (status == APP_STATUS.ANY) {
+            return applicationListElementList;
+        }
+
+        List<WebappMetadata> result = new ArrayList<WebappMetadata>();
+        int i = 0;
+        for (WebappMetadata webappMetadata : applicationListElementList) {
+            String webappId = generateWebappId(webappMetadata, webappsWrapper, userName);
+            boolean isCreated = isCreated(providerName, webappId, getVersion(webappMetadata),
+                    apiProvider);
+            if (status == APP_STATUS.NEW && !isCreated) {
+                result.add(webappMetadata);
+            } else if (status == APP_STATUS.CREATED && isCreated) {
+                result.add(webappMetadata);
             }
 
         }
-        result.setTotalNumberOfResults(appList.size());
+
         return result;
     }
 
@@ -259,7 +360,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     Creates the Application URL to reach the backend application
      */
     private String generateAppUrl(WebappsWrapper webappsWrapper, WebappMetadata webappMetadata) {
-        String protocol = "http";
+        String protocol = PROTOCOL_HTTP;
         String host = webappsWrapper.getHostName();
         int port = webappsWrapper.getHttpPort();
         String context = webappMetadata.getContextPath();
@@ -273,7 +374,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      */
     private String generateAppPreviewUrl(WebappsWrapper webappsWrapper,
             WebappMetadata webappMetadata) {
-        String protocol = "http";
+        String protocol = PROTOCOL_HTTP;
         String host = webappsWrapper.getHostName();
         int port = webappsWrapper.getHttpPort();
         String context = webappMetadata.getContextPath();
@@ -362,7 +463,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     }
 
     /**
-     * Returns true if the given application exists
+     * Returns true if the given application exists.
      * @param providerName
      * @param appName
      * @param version
@@ -374,5 +475,195 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             APIProvider apiProvider) throws AppManagementException {
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, appName, version);
         return apiProvider.isAPIAvailable(apiIdentifier);
+    }
+
+    private DiscoveredApplicationListDTO discoverApplicationsWithPaging(
+            ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
+            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext,
+            AppServerWebappAdminClient webappAdminClient, String providerName,
+            String loggedInUserName, APIProvider apiProvider) throws AppManagementException {
+
+        String searchString = translateApplicationNameSearchString(criteria);
+
+        Map<Integer, PagingResult> cachedMap = (Map<Integer, PagingResult>) discoveryContext
+                .getData(CONTEXT_DATA_PAGE_MAP);
+        if (cachedMap == null) {
+            cachedMap = new HashMap<Integer, PagingResult>();
+            discoveryContext.putData(CONTEXT_DATA_PAGE_MAP, cachedMap);
+            setPageCacheData(criteria, discoveryContext);
+        }
+        boolean isMoreResultsPossible = true;
+        if(discoveryContext.getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE) != null) {
+            isMoreResultsPossible = isMoreResultsPossible && (Boolean)discoveryContext.getData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE);
+        }
+
+        PagingResult result = cachedMap.get(Integer.valueOf(criteria.getPageNumber()));
+        if (result == null) {
+            result = getNextPage(discoveryContext, credentials, searchString, criteria, locale,
+                    carbonContext, webappAdminClient, providerName, loggedInUserName, apiProvider);
+
+            if(result.metadataList.size() >0 ) {
+                cachedMap.put(criteria.getPageNumber(), result);
+            }
+            isMoreResultsPossible = isMoreResultsPossible && result.isMoreResultsPossible;
+            discoveryContext.putData(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE, isMoreResultsPossible);
+        }
+
+        DiscoveredApplicationListDTO discoveredApplicationListDTO= translateToDto(result.webappsWrapper, result.metadataList, providerName,
+                loggedInUserName, apiProvider);
+
+        discoveredApplicationListDTO.setPageCount(cachedMap.size());
+        discoveredApplicationListDTO.setMoreResultsPossible(isMoreResultsPossible);
+        discoveredApplicationListDTO.setTotalNumberOfPagesKnown(! isMoreResultsPossible);
+
+        return discoveredApplicationListDTO;
+    }
+
+    private void setPageCacheData(DiscoverySearchCriteria criteria,
+            ApplicationDiscoveryContext discoveryContext) {
+        discoveryContext.putData(CONTEXT_DATA_SEARCH_APPLICATION_NAME, criteria.getApplicationName());
+        discoveryContext.putData(CONTEXT_DATA_SEARCH_APPLICATION_STATUS, criteria.getStatus());
+    }
+
+    private boolean isResetPageCache(DiscoverySearchCriteria criteria,
+            ApplicationDiscoveryContext discoveryContext) {
+        //TODO: Use URL and user name to reset too
+        String cachedName = (String) discoveryContext.getData(CONTEXT_DATA_SEARCH_APPLICATION_NAME);
+        String cachedStatus = (String) discoveryContext.getData(
+                CONTEXT_DATA_SEARCH_APPLICATION_STATUS);
+
+        return ! isEqual(cachedName, criteria.getApplicationName()) ||
+                ! isEqual(cachedStatus, criteria.getStatus());
+    }
+
+    private void clearCache(ApplicationDiscoveryContext discoveryContext) {
+        discoveryContext.clear(CONTEXT_DATA_SEARCH_APPLICATION_NAME);
+        discoveryContext.clear(CONTEXT_DATA_PAGE_MAP);
+        discoveryContext.clear(CONTEXT_DATA_SEARCH_APPLICATION_STATUS);
+        discoveryContext.clear(CONTEXT_DATA_LAST_APPSERVER_PAGE);
+        discoveryContext.clear(CONTEXT_DATA_LAST_APPSERVER_INDEX);
+        discoveryContext.clear(CONTEXT_DATA_LASTWEBAPPSWRAPER);
+        discoveryContext.clear(CONTEXT_DATA_IS_MORE_RESULTS_POSSIBLE);
+    }
+
+    private boolean isEqual(String s1, String s2) {
+        if(s1 == null) {
+            return s2 == null;
+        }
+        return s1.equals(s2);
+    }
+
+    /**
+     * Reads tha data from the server. Handles the pagination with the service session.
+     * Strategy:
+     *  1: Read the first page from the AS  and filter
+     *  2: If the data retrieved can be filled to current page, then return
+     *  3: if data is short of page size, then query next page until end of the page form AS occurs.
+     *  4: cache the queried pages so that we do not query the AS anu more.
+     *
+     * @param discoveryContext  the discovery context: keeps track of sessions
+     * @param credentials  the credentials of the discovery WSO2-AS
+     * @param searchString the search string (name of the applicaiton)
+     * @param criteria search criteria
+     * @param locale
+     * @param carbonContext  The carbon context passed so that services can be loaded
+     * @param webappAdminClient WebappAdmin client for AS
+     * @param providerName  Provider name e.g. user1-AT-tenant.domain
+     * @param loggedInUserName Currently logged in user
+     * @param apiProvider The API Provider service
+     * @return
+     * @throws AppManagementException
+     */
+    private PagingResult getNextPage(ApplicationDiscoveryContext discoveryContext,
+            DiscoveryCredentials credentials, String searchString, DiscoverySearchCriteria criteria,
+            Locale locale, PrivilegedCarbonContext carbonContext,
+            AppServerWebappAdminClient webappAdminClient, String providerName,
+            String loggedInUserName, APIProvider apiProvider) throws AppManagementException {
+
+        int pageSize = criteria.getPageSize() > 0 ? criteria.getPageSize() : DEFAULT_PAGE_SIZE;
+        WebappsWrapper webappsWrapper = null;
+        Integer lastAppServerPage = (Integer) discoveryContext.getData(CONTEXT_DATA_LAST_APPSERVER_PAGE);
+        Integer lastAppServerIndex = (Integer) discoveryContext.getData(CONTEXT_DATA_LAST_APPSERVER_INDEX);
+        webappsWrapper = (WebappsWrapper) discoveryContext.getData(CONTEXT_DATA_LASTWEBAPPSWRAPER);
+        if (lastAppServerPage == null) {
+            lastAppServerPage = 0;
+        }
+        if (lastAppServerIndex == null) {
+            lastAppServerIndex = 0;
+        }
+        List<WebappMetadata> accumulatedMetadataList = new ArrayList<WebappMetadata>();
+        boolean isEndOfPages = false;
+        boolean isCurrentPageFull = false;
+        boolean isLastResultAdded = false;
+
+        //Loads the data from the rest of the previously queried page
+        if( webappsWrapper != null) {
+            List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
+            List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
+                    discoveryContext, credentials, criteria, locale, carbonContext, providerName,
+                    loggedInUserName, apiProvider);
+            int recordsToAdd = Math
+                    .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
+            if(lastAppServerIndex >= recordsToAdd) {
+                lastAppServerPage ++;
+            } else {
+                accumulatedMetadataList
+                        .addAll(filteredMetadataList.subList(lastAppServerIndex, recordsToAdd));
+            }
+        }
+        //Now read data from the next page
+        do {
+            webappsWrapper = webappAdminClient
+                    .getPagedWebappsSummary(searchString, translateStatus(criteria),
+                            translateStatus(criteria), lastAppServerPage);
+            List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
+            List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
+                    discoveryContext, credentials, criteria, locale, carbonContext, providerName,
+                    loggedInUserName, apiProvider);
+            int recordsToAdd = Math
+                    .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
+            List subList = filteredMetadataList.subList(0, recordsToAdd);
+            accumulatedMetadataList.addAll(subList);
+            lastAppServerIndex = subList.size();
+
+            isEndOfPages = webappsWrapper.getNumberOfPages() <= lastAppServerPage + 1;
+            isCurrentPageFull = (accumulatedMetadataList.size() >= pageSize) || isEndOfPages;
+            lastAppServerPage++;
+            isLastResultAdded = filteredMetadataList.size() - recordsToAdd <=0;
+        } while (!(isEndOfPages || isCurrentPageFull));
+
+        discoveryContext.putData(CONTEXT_DATA_LAST_APPSERVER_PAGE, lastAppServerPage);
+        discoveryContext.putData(CONTEXT_DATA_LAST_APPSERVER_INDEX, lastAppServerIndex);
+        discoveryContext.putData(CONTEXT_DATA_LASTWEBAPPSWRAPER, webappsWrapper);
+
+        PagingResult result = new PagingResult(accumulatedMetadataList, webappsWrapper);
+
+        result.isMoreResultsPossible = ! (isEndOfPages && isLastResultAdded);
+        return result;
+    }
+
+    protected APP_STATUS parseAppStatus(String statusString) {
+        APP_STATUS result = APP_STATUS.ANY;
+        if (statusString == null || statusString.isEmpty()) {
+            result = APP_STATUS.ANY;
+        } else if (STATUS_CREATED.equalsIgnoreCase(statusString)) {
+            result = APP_STATUS.CREATED;
+        } else if (STATUS_NEW.equalsIgnoreCase(statusString)) {
+            result = APP_STATUS.NEW;
+        }
+
+        return result;
+    }
+
+    private class PagingResult {
+
+        List<WebappMetadata> metadataList;
+        WebappsWrapper webappsWrapper;
+        boolean isMoreResultsPossible = true;
+
+        public PagingResult(List<WebappMetadata> metadataList, WebappsWrapper webappsWrapper) {
+            this.metadataList = metadataList;
+            this.webappsWrapper = webappsWrapper;
+        }
     }
 }

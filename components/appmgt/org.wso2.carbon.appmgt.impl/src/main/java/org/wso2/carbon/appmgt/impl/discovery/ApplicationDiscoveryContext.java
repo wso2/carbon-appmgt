@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class ApplicationDiscoveryContext {
 
-    private Map<String, Object> contextData = new HashMap<String, Object>();
+    private final Map<String, Object> contextData = new HashMap<String, Object>();
 
     public void putData(String key, Object value) {
         contextData.put(key, value);
@@ -36,5 +36,9 @@ public class ApplicationDiscoveryContext {
 
     public Object getData(String key) {
         return contextData.get(key);
+    }
+
+    public void clear(String key) {
+        contextData.remove(key);
     }
 }

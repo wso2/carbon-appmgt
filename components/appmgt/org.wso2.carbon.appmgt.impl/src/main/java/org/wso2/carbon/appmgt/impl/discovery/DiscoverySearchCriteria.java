@@ -26,6 +26,7 @@ public class DiscoverySearchCriteria {
     private String applicationName;
     private String status;
     private int pageNumber;
+    private int pageSize;
 
     public String getApplicationName() {
         return applicationName;
@@ -49,5 +50,13 @@ public class DiscoverySearchCriteria {
 
     public void setPageNumber(int pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 }
