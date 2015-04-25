@@ -199,6 +199,7 @@ public final class AppManagerUtil {
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
             api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;

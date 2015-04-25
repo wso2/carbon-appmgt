@@ -617,7 +617,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             WebApp apiPublished = getAPI(api.getId());
                             apiPublished.setOldInSequence(oldApi.getInSequence());
                             apiPublished.setOldOutSequence(oldApi.getOutSequence());
-                            publishToGateway(apiPublished);
+
+                            //publish to gateway if skipGateway is disabled only
+                            if (!api.getSkipGateway()) {
+                                publishToGateway(apiPublished);
+                            }
                         }
                     } else {
                         log.debug("Gateway is not existed for the current WebApp Provider");
@@ -806,7 +810,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if (gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE) && updateGatewayConfig) {
                     if (status.equals(APIStatus.PUBLISHED) || status.equals(APIStatus.DEPRECATED) ||
                         status.equals(APIStatus.BLOCKED)) {
-                        publishToGateway(api);
+
+                        //publish to gateway if skipGateway is disabled only
+                        if (!api.getSkipGateway()) {
+                            publishToGateway(api);
+                        }
                     } else {
                         removeFromGateway(api);
                     }
