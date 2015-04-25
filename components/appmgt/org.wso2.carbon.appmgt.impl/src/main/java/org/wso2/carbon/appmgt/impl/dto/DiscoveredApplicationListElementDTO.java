@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.discovery;
+package org.wso2.carbon.appmgt.impl.dto;
 
 import java.util.Map;
 
@@ -28,6 +28,7 @@ import java.util.Map;
  * This will contain all the necessary data to create an application/proxy withing AppM.
  */
 public class DiscoveredApplicationListElementDTO {
+
     private String applicationId;
 
     /* Server Type e.g. WSO2 AS, Tomcat, MDM */

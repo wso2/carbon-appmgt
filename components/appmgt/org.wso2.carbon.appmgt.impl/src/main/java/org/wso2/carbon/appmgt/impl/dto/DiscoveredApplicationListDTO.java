@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.discovery;
+package org.wso2.carbon.appmgt.impl.dto;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
@@ -29,8 +29,9 @@ public class DiscoveredApplicationListDTO {
 
     private int pageCount;
     private int currentPage;
-    private String authCookie;
     private int totalNumberOfResults;
+    private boolean isMoreResultsPossible =false;
+    private boolean isTotalNumberOfPagesKnown = false;
 
     @XmlElement
     private List<DiscoveredApplicationListElementDTO> applicationList;
@@ -51,14 +52,6 @@ public class DiscoveredApplicationListDTO {
         this.currentPage = currentPage;
     }
 
-    public String getAuthCookie() {
-        return authCookie;
-    }
-
-    public void setAuthCookie(String authCookie) {
-        this.authCookie = authCookie;
-    }
-
     public int getTotalNumberOfResults() {
         return totalNumberOfResults;
     }
@@ -73,5 +66,21 @@ public class DiscoveredApplicationListDTO {
 
     public void setApplicationList(List<DiscoveredApplicationListElementDTO> applicationList) {
         this.applicationList = applicationList;
+    }
+
+    public boolean isMoreResultsPossible() {
+        return isMoreResultsPossible;
+    }
+
+    public void setMoreResultsPossible(boolean isMoreResultsPossible) {
+        this.isMoreResultsPossible = isMoreResultsPossible;
+    }
+
+    public boolean isTotalNumberOfPagesKnown() {
+        return isTotalNumberOfPagesKnown;
+    }
+
+    public void setTotalNumberOfPagesKnown(boolean isTotalNumberOfPagesKnown) {
+        this.isTotalNumberOfPagesKnown = isTotalNumberOfPagesKnown;
     }
 }

@@ -18,43 +18,17 @@
 
 package org.wso2.carbon.appmgt.impl.internal;
 
-import org.apache.axis2.engine.ListenerManager;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.*;
+import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryHandler;
 import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryServiceFactory;
-import org.wso2.carbon.appmgt.impl.discovery.Wso2AppServerDiscoveryHandler;
-import org.wso2.carbon.base.MultitenantConstants;
-import org.wso2.carbon.governance.api.util.GovernanceConstants;
-import org.wso2.carbon.identity.application.mgt.ApplicationManagementService;
-import org.wso2.carbon.registry.core.ActionConstants;
-import org.wso2.carbon.registry.core.RegistryConstants;
-import org.wso2.carbon.registry.core.Resource;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
-import org.wso2.carbon.registry.core.session.UserRegistry;
-import org.wso2.carbon.registry.indexing.service.TenantIndexingLoader;
-import org.wso2.carbon.user.api.AuthorizationManager;
-import org.wso2.carbon.user.api.Permission;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
-import org.wso2.carbon.user.core.UserRealm;
-import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.user.mgt.UserMgtConstants;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.utils.FileUtil;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Application discovery service component. This will allow discover api to be exposed via factory
@@ -68,33 +42,76 @@ public class AppDiscoveryComponent {
 
     private ServiceRegistration registration;
 
-
-
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("WebApp Discovery component activated");
+            log.debug("WebApp Discovery component is being activated");
         }
 
-        ApplicationDiscoveryServiceFactory applicationDiscoveryServiceFactory =
-                new ApplicationDiscoveryServiceFactory();
+        AppDiscoveryConfiguration configuration = loadConfig();
+        ApplicationDiscoveryServiceFactory applicationDiscoveryServiceFactory = createFactory(
+                configuration);
 
-        Wso2AppServerDiscoveryHandler wso2AppServerDiscoveryHandler = new Wso2AppServerDiscoveryHandler();
-        applicationDiscoveryServiceFactory.addHandler(wso2AppServerDiscoveryHandler.getDisplayName(),
-                wso2AppServerDiscoveryHandler);
-
-        registration = componentContext.getBundleContext().registerService(
-                ApplicationDiscoveryServiceFactory.class,
-                applicationDiscoveryServiceFactory, null);
-
+        registration = componentContext.getBundleContext()
+                .registerService(ApplicationDiscoveryServiceFactory.class,
+                        applicationDiscoveryServiceFactory, null);
 
         log.info("WebApp Discovery component activated");
 
+    }
+
+    /**
+     * Loads the configuration related to application discovery
+     * Configurations are read from system-wide app-manager.xml.
+     *
+     * @return
+     */
+    private AppDiscoveryConfiguration loadConfig() {
+        String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
+                File.separator + "conf" + File.separator + "app-manager.xml";
+        AppDiscoveryConfiguration discoveryConfiguration = new AppDiscoveryConfiguration();
+        try {
+            discoveryConfiguration.load(filePath);
+        } catch (AppManagementException e) {
+            log.error("Error occurred while initializing App Manager Discovery"
+                    + " configuration Service Component from file path : " +
+                    filePath, e);
+        }
+
+        return discoveryConfiguration;
+    }
+
+    /**
+     * Creates the application discovery factory given the discovery configuration
+     *
+     * @param configuration
+     * @return
+     */
+    private ApplicationDiscoveryServiceFactory createFactory(
+            AppDiscoveryConfiguration configuration) {
+        ApplicationDiscoveryServiceFactory applicationDiscoveryServiceFactory = new ApplicationDiscoveryServiceFactory();
+
+        Map<String, String> handlerMap = configuration.getHandlersMap();
+        for (String name : handlerMap.keySet()) {
+            String value = handlerMap.get(name);
+            try {
+                Class clazz = Class.forName(value);
+                Object o = clazz.newInstance();
+                ApplicationDiscoveryHandler handler = (ApplicationDiscoveryHandler) o;
+                applicationDiscoveryServiceFactory.addHandler(name, handler);
+            } catch (Exception e) {
+                log.error("Could not load create the handler for the handler class: " + value, e);
+            }
+        }
+
+        return applicationDiscoveryServiceFactory;
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("Deactivating WebApp manager component");
         }
-
+        if (registration != null) {
+            registration.unregister();
+        }
     }
 }
