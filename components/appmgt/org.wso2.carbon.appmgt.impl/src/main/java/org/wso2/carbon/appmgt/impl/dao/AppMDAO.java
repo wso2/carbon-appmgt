@@ -52,6 +52,7 @@ import org.wso2.carbon.identity.oauth.IdentityOAuthAdminException;
 import org.wso2.carbon.identity.oauth.OAuthUtil;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.cache.Cache;
@@ -3994,9 +3995,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 
 		String query =
-				"INSERT INTO APM_APP(APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, SAML2_SSO_ISSUER, " +
+				"INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, SAML2_SSO_ISSUER, " +
                 "LOG_OUT_URL,APP_ALLOW_ANONYMOUS) " +
-                "VALUES (?,?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
 		try {
 
@@ -4009,18 +4010,28 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				logoutURL = prodURL.concat(app.getContext()).concat("/" + app.getId().getVersion()).concat(logoutURL);
 			}
 
+            int tenantId;
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()));
+            try {
+                tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomain);
+            } catch (UserStoreException e) {
+                throw new AppManagementException("Error in retrieving Tenant Information while adding app :"
+                        + app.getId().getApiName(), e);
+            }
+
 			connection = APIMgtDBUtil.getConnection();
 			connection.setAutoCommit(false);
 			prepStmt = connection.prepareStatement(query, new String[]{"APP_ID"});
 			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()));
-			prepStmt.setString(2, app.getId().getApiName());
-			prepStmt.setString(3, app.getId().getVersion());
-			prepStmt.setString(4, app.getContext());
-			prepStmt.setString(5, app.getTrackingCode());
-			prepStmt.setString(6, app.getUUID());
-            prepStmt.setString(7, app.getSaml2SsoIssuer());
-			prepStmt.setString(8, logoutURL);
-			prepStmt.setBoolean(9, app.getAllowAnonymous());
+            prepStmt.setInt(2, tenantId);
+			prepStmt.setString(3, app.getId().getApiName());
+			prepStmt.setString(4, app.getId().getVersion());
+			prepStmt.setString(5, app.getContext());
+			prepStmt.setString(6, app.getTrackingCode());
+			prepStmt.setString(7, app.getUUID());
+            prepStmt.setString(8, app.getSaml2SsoIssuer());
+			prepStmt.setString(9, logoutURL);
+			prepStmt.setBoolean(10, app.getAllowAnonymous());
 
 			prepStmt.execute();
 
@@ -6220,7 +6231,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 "APP.APP_VERSION AS APP_VERSION, " +
                 "APP.CONTEXT AS CONTEXT " +
                 "FROM " +
-                "APM_APP APP ";
+                "APM_APP APP";
 
         try {
             connection = APIMgtDBUtil.getConnection();
@@ -6248,6 +6259,58 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
     }
 
 
+    /**
+     * Get the all web apps with provider, name ,context and version
+     *
+     * @return web apps
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     *
+     */
+    public List<WebApp> getAllWebApps(String tenantDomain) throws AppManagementException {
+        WebApp webApp = null;
+        Connection connection = null;
+        PreparedStatement statementToGetAppInfo = null;
+        ResultSet appInfoResult = null;
+        List<WebApp> webApps = new ArrayList<WebApp>();
+        String queryToGetAppInfo = "SELECT " +
+                                   "APP.APP_PROVIDER AS APP_PROVIDER, " +
+                                   "APP.APP_NAME AS APP_NAME, " +
+                                   "APP.APP_VERSION AS APP_VERSION, " +
+                                   "APP.CONTEXT AS CONTEXT " +
+                                   "FROM " +
+                                   "APM_APP APP " +
+                                   "WHERE TENANT_ID = ?";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            statementToGetAppInfo = connection.prepareStatement(queryToGetAppInfo);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantManager().getTenantId(tenantDomain);
+            statementToGetAppInfo.setInt(1, tenantId);
+            appInfoResult = statementToGetAppInfo.executeQuery();
+
+            APIIdentifier identifier = null;
+            while (appInfoResult.next()) {
+                identifier = new APIIdentifier(
+                        appInfoResult.getString("APP_PROVIDER"),
+                        appInfoResult.getString("APP_NAME"),
+                        appInfoResult.getString("APP_VERSION"));
+                webApp = new WebApp(identifier);
+                webApp.setContext(appInfoResult.getString("CONTEXT"));
+                webApps.add(webApp);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while getting all webapps from tenant " + tenantDomain, e);
+        } catch (UserStoreException e) {
+            handleException("Could not load tenant registry. Error while getting tenant id from tenant domain " +
+                            tenantDomain, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToGetAppInfo, connection, appInfoResult);
+        }
+
+        return webApps;
+    }
 
     public void addOAuthAPIAccessInfo(WebApp webApp, int tenantId) throws AppManagementException {
         Connection connection = null;

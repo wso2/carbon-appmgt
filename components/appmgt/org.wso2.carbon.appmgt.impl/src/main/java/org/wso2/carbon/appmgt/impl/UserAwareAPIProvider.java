@@ -43,9 +43,9 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public void addWebApp(WebApp api) throws AppManagementException {
+    public void addWebApp(WebApp app) throws AppManagementException {
         checkCreatePermission();
-        super.addWebApp(api);
+        super.addWebApp(app);
     }
 
     @Override

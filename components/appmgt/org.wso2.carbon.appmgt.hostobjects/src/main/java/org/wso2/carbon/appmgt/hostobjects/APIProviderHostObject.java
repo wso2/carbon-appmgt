@@ -3492,7 +3492,8 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
 
         try {
-            List<WebApp> apiList = apiProvider.getAppsWithEndpoint();
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+            List<WebApp> apiList = apiProvider.getAppsWithEndpoint(tenantDomain);
             if (apiList != null) {
                 Iterator it = apiList.iterator();
                 int i = 0;

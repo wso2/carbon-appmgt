@@ -378,26 +378,26 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Adds a new WebApp to the Store
      *
-     * @param api WebApp
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @param app WebApp
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
      *          if failed to add WebApp
      */
-    public void addWebApp(WebApp api) throws AppManagementException {
+    public void addWebApp(WebApp app) throws AppManagementException {
         try {           
-            createAPI(api);
-            appMDAO.addWebApp(api);
+            createAPI(app);
+            appMDAO.addWebApp(app);
             if (AppManagerUtil.isAPIManagementEnabled()) {
             	Cache contextCache = AppManagerUtil.getAPIContextCache();
             	Boolean apiContext = null;
-            	if (contextCache.get(api.getContext()) != null) {
-            		apiContext = Boolean.parseBoolean(contextCache.get(api.getContext()).toString());
+            	if (contextCache.get(app.getContext()) != null) {
+            		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
             	} 
             	if (apiContext == null) {
-                    contextCache.put(api.getContext(), true);
+                    contextCache.put(app.getContext(), true);
                 }
             }
         } catch (AppManagementException e) {
-            throw new AppManagementException("Error in adding WebApp :"+api.getId().getApiName(),e);
+            throw new AppManagementException("Error in adding WebApp :"+app.getId().getApiName(),e);
         }
     }
 
@@ -1686,6 +1686,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
+    public List<WebApp> getAllWebApps(String tenantDomain) throws AppManagementException {
+        return appMDAO.getAllWebApps(tenantDomain);
+    }
+
+    @Override
     public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
             throws AppManagementException {
         Map<String,Long> subscriptions = null;
@@ -1698,8 +1703,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return subscriptions;
     }
 
-    public List<WebApp> getAppsWithEndpoint() throws AppManagementException {
-        List<WebApp> appSortedList = appMDAO.getAllWebApps();
+    public List<WebApp> getAppsWithEndpoint(String tenantDomain) throws AppManagementException {
+        List<WebApp> appSortedList = appMDAO.getAllWebApps(tenantDomain);
         Collections.sort(appSortedList, new APINameComparator());
         return appSortedList;
     }

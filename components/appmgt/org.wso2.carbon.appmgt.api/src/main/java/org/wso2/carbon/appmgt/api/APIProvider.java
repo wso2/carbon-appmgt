@@ -135,7 +135,7 @@ public interface APIProvider extends APIManager {
     public Map<String, List> getSubscribedAPPsByUsers(String fromDate, String toDate)
             throws AppManagementException;
 
-    public List<WebApp> getAppsWithEndpoint() throws AppManagementException;
+    public List<WebApp> getAppsWithEndpoint(String tenantDomain) throws AppManagementException;
 
     public void addTier(Tier tier) throws AppManagementException;
 
@@ -459,6 +459,15 @@ public interface APIProvider extends APIManager {
      *
      */
     public boolean isSynapseGateway() throws AppManagementException;
+
+    /**
+     * Get the all web apps of tenant
+     *
+     * @return web apps
+     * @throws AppManagementException
+     */
+    public List<WebApp> getAllWebApps(String tenantDomain) throws AppManagementException;
+
 
     /**
      * Get the all web apps

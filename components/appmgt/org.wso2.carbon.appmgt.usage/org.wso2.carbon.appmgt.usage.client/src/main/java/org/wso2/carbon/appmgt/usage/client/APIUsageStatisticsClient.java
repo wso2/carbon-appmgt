@@ -36,6 +36,7 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.usage.client.internal.AppMUsageClientServiceComponent;
 import org.wso2.carbon.bam.presentation.stub.QueryServiceStub;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.naming.Context;
@@ -156,7 +157,7 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDays(
                 APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, fromDate, toDate, null, tenantDomainName);
         Collection<APIUsage> usageData = getUsageData(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         Map<String, APIUsageDTO> usageByAPIs = new TreeMap<String, APIUsageDTO>();
         for (APIUsage usage : usageData) {
             for (WebApp providerAPI : providerAPIs) {
@@ -201,7 +202,8 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDaysForAPIUsageByVersion(
                 APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, null, null, compositeIndex);
         Collection<APIUsage> usageData = getUsageData(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         Map<String, APIVersionUsageDTO> usageByVersions = new TreeMap<String, APIVersionUsageDTO>();
 
         for (APIUsage usage : usageData) {
@@ -245,7 +247,8 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDaysForAPIUsageByVersion(
                 APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, fromDate, toDate, compositeIndex);
         Collection<APIUsage> usageData = getUsageData(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         Map<String, APIVersionUsageDTO> usageByVersions = new TreeMap<String, APIVersionUsageDTO>();
 
         for (APIUsage usage : usageData) {
@@ -281,7 +284,8 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryToGetAPIUsageByResourcePath(
                 APIUsageStatisticsClientConstants.API_Resource_Path_USAGE_SUMMARY, fromDate, toDate, null);
         Collection<APIUsageByResourcePath> usageData = getUsageDataByResourcePath(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         List<APIResourcePathUsageDTO> usageByResourcePath = new ArrayList<APIResourcePathUsageDTO>();
 
         for (APIUsageByResourcePath usage : usageData) {
@@ -310,7 +314,7 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryToGetAPIUsageByPage(
                 APIUsageStatisticsClientConstants.API_PAGE_USAGE_SUMMARY, fromDate, toDate, null, tenantDomainName);
         Collection<APIUsageByPage> usageData = getUsageDataByPage(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         List<APIPageUsageDTO> usageByResourcePath = new ArrayList<APIPageUsageDTO>();
 
         for (APIUsageByPage usage : usageData) {
@@ -355,7 +359,7 @@ public class APIUsageStatisticsClient {
 
         OMElement omElement = this.queryBetweenTwoDaysForAPIUsageByUser(fromDate, toDate, null, tenantDomainName);
         Collection<APIUsageByUserName> usageData = getUsageDataByAPIName(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         List<APIUsageByUserDTO> usageByName = new ArrayList<APIUsageByUserDTO>();
 
         for (APIUsageByUserName usage : usageData) {
@@ -384,7 +388,8 @@ public class APIUsageStatisticsClient {
 
         OMElement omElement = this.queryForCacheHitCount(fromDate, toDate, null);
         Collection<APPMCacheHitCount> usageData = getCacheHitCount(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         List<APPMCacheCountDTO> cacheHit = new ArrayList<APPMCacheCountDTO>();
 
         for (APPMCacheHitCount usage : usageData) {
@@ -417,7 +422,7 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDays(
                 APIUsageStatisticsClientConstants.API_VERSION_SERVICE_TIME_SUMMARY, fromDate, toDate, null, tenantDomain);
         Collection<APIResponseTime> responseTimes = getResponseTimeData(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
 
         List<APIResponseTimeDTO> list = new ArrayList<APIResponseTimeDTO>();
         int x = 0;
@@ -464,7 +469,7 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDays(
                 APIUsageStatisticsClientConstants.API_VERSION_KEY_LAST_ACCESS_SUMMARY,fromDate,toDate, null, tenantDomainName);
         Collection<APIAccessTime> accessTimes = getAccessTimeData(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         Map<String, APIAccessTime> lastAccessTimes = new TreeMap<String, APIAccessTime>();
         for (APIAccessTime accessTime : accessTimes) {
             for (WebApp providerAPI : providerAPIs) {
@@ -514,9 +519,10 @@ public class APIUsageStatisticsClient {
 
         OMElement omElement = this.queryDatabase(
                 APIUsageStatisticsClientConstants.KEY_USAGE_SUMMARY, null);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
         Collection<APIUsageByUser> usageData = getUsageBySubscriber(omElement);
         Map<String, PerUserAPIUsageDTO> usageByUsername = new TreeMap<String, PerUserAPIUsageDTO>();
-        List<WebApp> apiList = getAPIsByProvider(providerName);
+        List<WebApp> apiList = getAPIsByProvider(providerName, tenantDomain);
         for (APIUsageByUser usageEntry : usageData) {
             for (WebApp api : apiList) {
                 if (api.getContext().equals(usageEntry.context) &&
@@ -544,7 +550,8 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryBetweenTwoDaysForFaulty(
                 APIUsageStatisticsClientConstants.API_FAULT_SUMMARY,fromDate,toDate, null);
         Collection<APIResponseFaultCount> faultyData = getAPIResponseFaultCount(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         List<APIResponseFaultCountDTO> faultyCount = new ArrayList<APIResponseFaultCountDTO>();
         List<APIVersionUsageDTO> apiVersionUsageList;
         APIVersionUsageDTO apiVersionUsageDTO;
@@ -587,7 +594,8 @@ public class APIUsageStatisticsClient {
         OMElement omElement = this.queryDatabase(
                 APIUsageStatisticsClientConstants.API_REQUEST_TIME_FAULT_SUMMARY, null);
         Collection<APIResponseFaultCount> faultyData = getAPIResponseFaultCount(omElement);
-        List<WebApp> providerAPIs = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
         List<APIResponseFaultCountDTO> faultyInvocations = new ArrayList<APIResponseFaultCountDTO>();
 
         for (APIResponseFaultCount fault : faultyData) {
@@ -616,7 +624,8 @@ public class APIUsageStatisticsClient {
 
         Collection<APIUsageByUser> usageData = getUsageBySubscriber(omElement);
         Map<String, PerUserAPIUsageDTO> usageByUsername = new TreeMap<String, PerUserAPIUsageDTO>();
-        List<WebApp> apiList = getAPIsByProvider(providerName);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        List<WebApp> apiList = getAPIsByProvider(providerName, tenantDomain);
         for (APIUsageByUser usageEntry : usageData) {
             for (WebApp api : apiList) {
                 if (api.getContext().equals(usageEntry.context) &&
@@ -1467,10 +1476,10 @@ public class APIUsageStatisticsClient {
         return false;
     }
 
-    private List<WebApp> getAPIsByProvider(String providerId) throws APIMgtUsageQueryServiceClientException {
+    private List<WebApp> getAPIsByProvider(String providerId, String tenantDomain) throws APIMgtUsageQueryServiceClientException {
         try {
             if (APIUsageStatisticsClientConstants.ALL_PROVIDERS.equals(providerId)) {
-                return apiProviderImpl.getAllWebApps();
+                return apiProviderImpl.getAllWebApps(tenantDomain);
             } else {
                 return apiProviderImpl.getAPIsByProvider(providerId);
             }
