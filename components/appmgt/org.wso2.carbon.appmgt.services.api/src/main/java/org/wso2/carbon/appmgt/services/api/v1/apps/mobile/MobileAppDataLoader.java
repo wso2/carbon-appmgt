@@ -1,12 +1,13 @@
 package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
-import org.wso2.carbon.appmgt.services.api.v1.utils.HostResolver;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
+import java.io.File;
+
 public class MobileAppDataLoader {
 
-    public static MobileApp load(MobileApp mobileApp, GenericArtifact artifact){
+    public static MobileApp load(MobileApp mobileApp, GenericArtifact artifact, int tenantId, boolean showLocationInfo){
 
 
         try {
@@ -19,12 +20,28 @@ public class MobileAppDataLoader {
 
             if("Enterprise".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("enterprise");
+                if(showLocationInfo){
+                    if("android".equals(artifact.getAttribute("overview_platform"))){
+                        mobileApp.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));
+                    }else  if("ios".equals(artifact.getAttribute("overview_platform"))){
+                        String fileName = new File(artifact.getAttribute("overview_url")).getName();
+                        mobileApp.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
+                                .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + "/" + MobileConfigurations.getInstance().getInstance()
+                                .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
+                    }
+                }
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("public");
             }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("webapp");
                 mobileApp.setIdentifier(artifact.getAttribute("overview_url"));
+                if(showLocationInfo){
+                    mobileApp.setLocation(artifact.getAttribute("overview_url"));
+                }
             }
+
+
 
             if("android".equals(artifact.getAttribute("overview_platform"))){
                 mobileApp.setPackageName(artifact.getAttribute("overview_packagename"));

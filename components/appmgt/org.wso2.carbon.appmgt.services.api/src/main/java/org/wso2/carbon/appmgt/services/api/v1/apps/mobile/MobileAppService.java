@@ -33,6 +33,8 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryService;
+import org.wso2.carbon.registry.api.Resource;
+import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -80,49 +82,8 @@ public class MobileAppService {
 
             try {
 
-                List<String> authorization = headers.getRequestHeader("Authorization");
-                if(authorization != null && authorization.size() != 0){
-                   String basicHeader = authorization.get(0);
-                    String base64Credentials = basicHeader.substring("Basic".length()).trim();
-                    String credentialsString = new String(Base64.decodeBase64(base64Credentials.getBytes()));
-                    final String[] credentials = credentialsString.split(":",2);
-                    if(credentials.length < 2){
-                        throw new UnauthorizedUserException();
-                    }
-
-                    RealmService realmService = (RealmService)PrivilegedCarbonContext
-                            .getThreadLocalCarbonContext().getOSGiService(RealmService.class);
-                    RegistryService registryService  = (RegistryService) PrivilegedCarbonContext
-                            .getThreadLocalCarbonContext().getOSGiService(RegistryService.class);
-                    UserStoreManager userStoreManager = (UserStoreManager) realmService
-                            .getTenantUserRealm(SUPER_USER_TENANT_ID).getUserStoreManager();
-
-
-                    String[] userList = userStoreManager.getRoleListOfUser(credentials[0]);
-                    String authorizedRole = ServicesApiConfigurations.getInstance().getAuthorizedRole();
-                    if(!Arrays.asList(userList).contains(authorizedRole)){
-                        throw new UnauthorizedUserException();
-                    }
-
-                    boolean isAuthenticated = userStoreManager
-                            .authenticate( MultitenantUtils.getTenantAwareUsername(credentials[0]), credentials[1]);
-
-                    if(!isAuthenticated){
-                        throw new UnauthorizedUserException();
-                    }
-                }else{
-                        throw new UnauthorizedUserException();
-                }
-
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
-                PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                        .setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                                .getUserRealm().getRealmConfiguration().getAdminUserName());
-
-
-                Registry registry = CarbonContext.getThreadLocalCarbonContext().getRegistry(RegistryType.USER_GOVERNANCE);
+                Registry registry = doAuthorizeAndGetRegistry(tenantDomain, headers);
+                int tenantId = ((UserRegistry)registry).getTenantId();
 
                 GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
                 GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
@@ -144,7 +105,7 @@ public class MobileAppService {
                     }
                     found = ++pageIndex;
 
-                    response.getApps().add(MobileAppDataLoader.load(new MobileApp(), artifact));
+                    response.getApps().add(MobileAppDataLoader.load(new MobileApp(), artifact, tenantId , false));
                 }
 
                 AppListQuery appListQuery = new AppListQuery();
@@ -155,19 +116,41 @@ public class MobileAppService {
                 response.setQuery(appListQuery);
 
             } catch (GovernanceException e) {
-                log.error("GovernanceException occurred");
-                log.debug("Error: " + e);
+                String errorMessage = "GovernanceException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
             } catch (UnauthorizedUserException e) {
-                log.error("User is not authorized to access the API");
-                log.debug("Error: " + e);
+                String errorMessage = "User is not authorized to access the API";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
                 servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
             } catch (UserStoreException e) {
-                log.error("UserStoreException occurred");
-                log.debug("Error: " + e);
+                String errorMessage = "UserStoreException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
             } catch (RegistryException e) {
-                log.error("RegistryException occurred");
-                log.debug("Error: " + e);
+                String errorMessage = "RegistryException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
             }catch (Exception e) {
+                String errorMessage = "Exception occurred while getting the app list";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
                 servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
             }finally{
                 PrivilegedCarbonContext.endTenantFlow();
@@ -175,6 +158,257 @@ public class MobileAppService {
             }
 
         }
+
+
+
+        @POST
+        @Consumes("application/x-www-form-urlencoded")
+        @Path("subscribe/tenant/{tenantDomain}/{type}/{typeId}")
+        public MobileApp subscribeResource(@Context final HttpServletResponse servletResponse, @PathParam("type")
+        String type,  @PathParam("typeId") String typeId, @PathParam("tenantDomain") String tenantDomain, @Context HttpHeaders headers,
+            @FormParam("appId") String appId){
+
+            MobileApp mobileApp = null;
+            try {
+
+                Registry registry = doAuthorizeAndGetRegistry(tenantDomain, headers);
+                int tenantId = ((UserRegistry)registry).getTenantId();
+
+                GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
+                GenericArtifact artifact  = artifactManager.getGenericArtifact(appId);
+                mobileApp = MobileAppDataLoader.load(new MobileApp(), artifact, tenantId, true);
+
+                if(mobileApp != null){
+
+                    if("role".equals(type)){
+                        UserStoreManager userStoreManager = ((UserRegistry) registry).getUserRealm().getUserStoreManager();
+                        String[] users = userStoreManager.getUserListOfRole(typeId);
+                        for(String userId : users){
+                            subscribeApp(registry, userId, appId);
+                            showAppVisibilityToUser(artifact.getPath(),userId,"ALLOW");
+                        }
+                    }else if("user".equals(type)){
+                        subscribeApp(registry, typeId, appId);
+                        showAppVisibilityToUser(artifact.getPath(),typeId,"ALLOW");
+                    }
+
+                }
+
+            } catch (GovernanceException e) {
+                String errorMessage = "GovernanceException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (UnauthorizedUserException e) {
+                String errorMessage = "User is not authorized to access the API";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            } catch (UserStoreException e) {
+                String errorMessage = "UserStoreException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (RegistryException e) {
+                String errorMessage = "RegistryException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            }catch (Exception e) {
+                String errorMessage = String.format("Exception occurred while subscribe %s %s to app %", type, typeId, appId );
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            }finally{
+                PrivilegedCarbonContext.endTenantFlow();
+                return mobileApp;
+            }
+
+        }
+
+
+        @POST
+        @Consumes("application/x-www-form-urlencoded")
+        @Path("unsubscribe/tenant/{tenantDomain}/{type}/{typeId}")
+        public MobileApp unsubscribeResource(@Context final HttpServletResponse servletResponse,  @PathParam("type")
+        String type,  @PathParam("typeId") String typeId, @PathParam("tenantDomain") String tenantDomain, @Context HttpHeaders headers,
+                                       @FormParam("appId") String appId){
+            MobileApp mobileApp = null;
+            try {
+
+                Registry registry = doAuthorizeAndGetRegistry(tenantDomain, headers);
+                int tenantId = ((UserRegistry)registry).getTenantId();
+
+                GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
+                GenericArtifact artifact  = artifactManager.getGenericArtifact(appId);
+                mobileApp = MobileAppDataLoader.load(new MobileApp(), artifact, tenantId, false);
+
+                if(mobileApp != null){
+                    if("role".equals(type)){
+                        UserStoreManager userStoreManager = ((UserRegistry) registry).getUserRealm().getUserStoreManager();
+                        String[] users = userStoreManager.getUserListOfRole(typeId);
+                        for(String userId : users){
+                            unsubscribeApp(registry, userId, appId);
+                            showAppVisibilityToUser(artifact.getPath(),userId,"DENY");
+                        }
+                    }else if("user".equals(type)){
+                        unsubscribeApp(registry, typeId, appId);
+                        showAppVisibilityToUser(artifact.getPath(),typeId,"DENY");
+                    }
+                }
+
+            } catch (GovernanceException e) {
+                String errorMessage = "GovernanceException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (UnauthorizedUserException e) {
+                String errorMessage = "User is not authorized to access the API";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            } catch (UserStoreException e) {
+                String errorMessage = "UserStoreException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (RegistryException e) {
+                String errorMessage = "RegistryException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            }catch (Exception e) {
+                String errorMessage = String.format("Exception occurred while unsubscribe %s %s to app %", type, typeId, appId );
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            }finally{
+                PrivilegedCarbonContext.endTenantFlow();
+                return mobileApp;
+            }
+
+        }
+
+
+        private void subscribeApp(Registry registry, String userId, String appId) throws org.wso2.carbon.registry.api.RegistryException {
+            String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+            Resource resource = null;
+            try {
+                resource = registry.get(path);
+            } catch (org.wso2.carbon.registry.api.RegistryException e) {
+                log.error("RegistryException occurred");
+                log.debug("Error: " + e);
+            }
+            if(resource == null){
+                resource = registry.newResource();
+                resource.setContent("");
+                registry.put(path, resource);
+            }
+        }
+
+
+        private void unsubscribeApp(Registry registry, String userId, String appId) throws org.wso2.carbon.registry.api.RegistryException {
+            String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+            registry.delete(path);
+        }
+
+
+        private Registry doAuthorizeAndGetRegistry(String tenantDomain, HttpHeaders headers) throws UnauthorizedUserException, UserStoreException {
+            List<String> authorization = headers.getRequestHeader("Authorization");
+            if(authorization != null && authorization.size() != 0){
+                String basicHeader = authorization.get(0);
+                String base64Credentials = basicHeader.substring("Basic".length()).trim();
+                String credentialsString = new String(Base64.decodeBase64(base64Credentials.getBytes()));
+                final String[] credentials = credentialsString.split(":",2);
+                if(credentials.length < 2){
+                    throw new UnauthorizedUserException();
+                }
+
+                RealmService realmService = (RealmService)PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(RealmService.class);
+                RegistryService registryService  = (RegistryService) PrivilegedCarbonContext
+                        .getThreadLocalCarbonContext().getOSGiService(RegistryService.class);
+                UserStoreManager userStoreManager = (UserStoreManager) realmService
+                        .getTenantUserRealm(SUPER_USER_TENANT_ID).getUserStoreManager();
+
+
+                String[] userList = userStoreManager.getRoleListOfUser(credentials[0]);
+                String authorizedRole = ServicesApiConfigurations.getInstance().getAuthorizedRole();
+                if(!Arrays.asList(userList).contains(authorizedRole)){
+                    throw new UnauthorizedUserException();
+                }
+
+                boolean isAuthenticated = userStoreManager
+                        .authenticate( MultitenantUtils.getTenantAwareUsername(credentials[0]), credentials[1]);
+
+                if(!isAuthenticated){
+                    throw new UnauthorizedUserException();
+                }
+            }else{
+                throw new UnauthorizedUserException();
+            }
+
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                    .setUsername(PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                            .getUserRealm().getRealmConfiguration().getAdminUserName());
+
+
+
+            return CarbonContext.getThreadLocalCarbonContext().getRegistry(RegistryType.USER_GOVERNANCE);
+        }
+
+
+
+    private boolean showAppVisibilityToUser(String appPath, String username, String opType){
+
+
+        String userRole = "Internal/private_" + username;
+
+        try {
+            if("ALLOW".equalsIgnoreCase(opType)) {
+                org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().authorizeRole(userRole, appPath, ActionConstants.GET);
+                return true;
+            }else if("DENY".equalsIgnoreCase(opType)){
+                org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().denyRole(userRole, appPath, ActionConstants.GET);
+                return true;
+            }
+            return false;
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            log.error("Error while updating visibility of mobile app at " + appPath, e);
+            return false;
+        }
+    }
 
 
 }

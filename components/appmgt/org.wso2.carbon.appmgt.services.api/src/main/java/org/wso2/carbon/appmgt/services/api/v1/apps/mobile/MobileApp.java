@@ -143,6 +143,8 @@ public class MobileApp extends App {
         this.appIdentifier = appIdentifier;
     }
 
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
     public String getLocation() {
         return location;
     }
