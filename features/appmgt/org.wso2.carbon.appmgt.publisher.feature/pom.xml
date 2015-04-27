@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - APP Publisher Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the core bundles required for API management back end
+    <description>This feature contains the core bundles required for APP management back end
     </description>
 
     <dependencies>

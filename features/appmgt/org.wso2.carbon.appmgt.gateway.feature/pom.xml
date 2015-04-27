@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Gateway Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the core bundles required for API management Gateway
+    <description>This feature contains the core bundles required for APP management Gateway
     </description>
 
     <dependencies>

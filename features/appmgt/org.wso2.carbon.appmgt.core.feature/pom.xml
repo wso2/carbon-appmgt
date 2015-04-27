@@ -168,7 +168,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>create-API-manager-database</id>
+                        <id>create-APP-manager-database</id>
                         <phase>package</phase>
                         <goals>
                             <goal>run</goal>
@@ -179,7 +179,7 @@
                                     <path refid="maven.compile.classpath"/>
                                 </path>
                                 <echo
-                                        message="########### Creating API Manager Database ##############"/>
+                                        message="########### Creating APP Manager Database ##############"/>
                                 <sql
                                         driver="org.h2.Driver"
                                         url="jdbc:h2:${basedir}/src/main/resources/repository/database/WSO2AM_DB;create=true"
