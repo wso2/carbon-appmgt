@@ -65,7 +65,7 @@ public class Deployer {
             throw  new AppManagementException("Error while registering a User subscriber_" + username,e);
         } catch (LoginAuthenticationExceptionException e) {
             log.error("Error while login in to UserAdminStub", e);
-            throw  new AppManagementException("Error while login in to UserAdminStub",e);
+            throw  new AppManagementException("Error while login to UserAdminStub",e);
         }
 
         try {
