@@ -7683,7 +7683,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				status= false;
 			}
 		} catch (SQLException e) {
-			handleException("There is error in sql statement", e);
+			handleException("Error while retrieving web application details", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -7711,7 +7711,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				seqNo = rs.getInt(1)+"";
 			}
 		} catch (SQLException e) {
-			handleException("There is error in sql statement", e);
+			handleException("Error while retrieving display order seq number", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
