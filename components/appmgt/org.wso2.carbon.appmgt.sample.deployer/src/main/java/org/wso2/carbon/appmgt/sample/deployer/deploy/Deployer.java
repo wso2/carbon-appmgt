@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 public class Deployer {
     final static Logger log = Logger.getLogger(Deployer.class.getName());
 
-    public String deploySample(NativeObject request) throws AppManagementException {
+    public boolean deploySample(NativeObject request) throws AppManagementException {
 
         ProxyApplicationCreator proxyApplicationCreator = new ProxyApplicationCreator();
         WebAppDetail webAppDetail =  new WebAppDetail();
@@ -41,7 +41,7 @@ public class Deployer {
         String storeSession;
         String username =  (String) NativeObject.getProperty(request, "username");
         username = username.replace("\"", "").trim();
-        String response = username+" is already created sample web application";
+        boolean response = false;
         log.debug("Username is : " + username);
         String creatorSession = (String) NativeObject.getProperty(request,"creatorSession");
         log.debug("Creator Session is : " + creatorSession);
@@ -61,11 +61,11 @@ public class Deployer {
         } catch (UserAdminUserAdminException e) {
 
         } catch (RemoteException e) {
-            log.error("Error while registering a User",e);
-            throw  new AppManagementException("Error while login",e);
+            log.error("Error while registering a User subscriber_" + username,e);
+            throw  new AppManagementException("Error while registering a User subscriber_" + username,e);
         } catch (LoginAuthenticationExceptionException e) {
-            log.error("Error while login", e);
-            throw  new AppManagementException("Error while login",e);
+            log.error("Error while login in to UserAdminStub", e);
+            throw  new AppManagementException("Error while login in to UserAdminStub",e);
         }
 
         try {
@@ -101,12 +101,9 @@ public class Deployer {
                 claimManager.addClaimMapping(claimsMap);
                 claimManager.setClaimValues(claimsMap, "subscriber_" + username);
                 proxyApplicationCreator.manageWebApplication(webAppDetail);
-                response = "web application created by "+username+" and subscribed by subscriber_"+username+"password " +
-                        "for subsciber_"+username+" is subscriber";
+                response = true;
             }
         }
         return response;
     }
-
-
 }
