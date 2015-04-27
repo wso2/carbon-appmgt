@@ -32,7 +32,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles required for API management</description>
+    <description>This feature contains the bundles required for APP management</description>
 
     <dependencies>
         <dependency>
