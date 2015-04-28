@@ -47,10 +47,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import java.util.*;
 
 
 @Produces({ "application/json"})
@@ -413,6 +410,12 @@ public class MobileAppService {
                 servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
             }finally{
                 PrivilegedCarbonContext.endTenantFlow();
+
+                //remove duplicate and return
+                Set<MobileApp> hs = new HashSet<MobileApp>();
+                hs.addAll(mobileApps);
+                mobileApps.clear();
+                mobileApps.addAll(hs);
                 return mobileApps;
             }
 
