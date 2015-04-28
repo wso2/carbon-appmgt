@@ -212,7 +212,7 @@ public class AppManagerComponent {
                             new UserAddListener(), null);
                 }
             }
-            //Load initially available api contexts at the server startup. This Cache is only use by the products other than the api-manager
+            //Load initially available api contexts at the server startup. This Cache is only use by the products other than the app-manager
             /* TODO: Load Config values from apimgt.core*/
             boolean apiManagementEnabled = AppManagerUtil.isAPIManagementEnabled();
             boolean loadAPIContextsAtStartup = AppManagerUtil.isLoadAPIContextsAtStartup();

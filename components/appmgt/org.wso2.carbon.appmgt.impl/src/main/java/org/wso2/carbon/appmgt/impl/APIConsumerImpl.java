@@ -1394,7 +1394,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
             log.warn("The configurations related to show deprecated APIs in APIStore " +
-                    "are missing in api-manager.xml.");
+                    "are missing in app-manager.xml.");
             return false;
         }
         return Boolean.parseBoolean(displayAllAPIs);
@@ -1407,7 +1407,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         String displayMultiVersions = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_MULTIPLE_VERSIONS);
         if (displayMultiVersions == null) {
             log.warn("The configurations related to show multiple versions of WebApp in APIStore " +
-                    "are missing in api-manager.xml.");
+                    "are missing in app-manager.xml.");
             return false;
         }
         return Boolean.parseBoolean(displayMultiVersions);
@@ -1582,7 +1582,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         String displayAllAPIs = config.getFirstProperty(AppMConstants.API_STORE_DISPLAY_ALL_APIS);
         if (displayAllAPIs == null) {
             log.warn("The configurations related to show deprecated APIs in APIStore " +
-                    "are missing in api-manager.xml.");
+                    "are missing in app-manager.xml.");
             return false;
         }
         return Boolean.parseBoolean(displayAllAPIs);
