@@ -68,13 +68,7 @@ public class ProxyApplicationCreator {
      *            Throws this when failed to initialise the WSRegistryServiceClient
      */
     public ProxyApplicationCreator() throws AppManagementException {
-
-        try {
-            this.ipAddress = NetworkUtils.getLocalHostname();
-        } catch (SocketException e) {
-            log.error("Error while initialising IP address",e);
-            throw  new AppManagementException("Error while initialising IP address",e);
-        }
+        this.ipAddress = Configuration.getIPAddress();
         httpsBackEndUrl = Configuration.getHttpsUrl();
         httpBackEndUrl = Configuration.getHttpUrl();
         httpHandler = new HttpHandler();
@@ -376,10 +370,9 @@ public class ProxyApplicationCreator {
         String trackingIDResponse = httpHandler.doGet(httpsBackEndUrl + "/publisher/api/asset/webapp/trackingid/" + UUID
                 , "", creatorSession, "").split(":")[1].trim();
         String trackingID = trackingIDResponse.substring(1, (trackingIDResponse.length() - 2));
-
-        trackingCodes.put(webAppDetail.getContext(), trackingID);
+        webAppDetail.setTrackingCode(trackingID);
         invokeStatistcsJavascriptBuilder = new InvokeStatistcsJavascriptBuilder
-                (trackingID, ipAddress,Configuration.getGatewayPort());
+                (trackingID, ipAddress,Configuration.getGatewayPort("http"));
         if (webAppDetail.getWebAppName().equals("PlanYourTrip_"+currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/plan-your-trip-1.0");
