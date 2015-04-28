@@ -5099,18 +5099,19 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		return contexts;
 	}
 
-	/**
-	 * Save the entitlement policy partial
-	 *
-	 * @param policyPartialName policy partial name
-	 * @param policyPartial     policy partial content
-	 * @param isSharedPartial   is policy partial shared
-	 * @param policyAuthor      suthor of the policy partial
-	 * @return policy partial id
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 */
-	public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-											String policyAuthor,String policyPartialDesc) throws AppManagementException {
+    /**
+     * Save the entitlement policy partial
+     *
+     * @param policyPartialName policy partial name
+     * @param policyPartial     policy partial content
+     * @param isSharedPartial   is policy partial shared
+     * @param policyAuthor      author of the policy partial
+     * @param tenantId          logged users tenant Id
+     * @return policy partial id
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
+											String policyAuthor,String policyPartialDesc,int tenantId) throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement statementToInsertRecord = null;
@@ -5125,8 +5126,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 			connection = APIMgtDBUtil.getConnection();
 			String queryToInsertRecord = "INSERT INTO "
-					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION)"
-					+ " VALUES (?,?,?,?,?)";
+					+ "APM_ENTITLEMENT_POLICY_PARTIAL(NAME,CONTENT,SHARED,AUTHOR,DESCRIPTION,TENANT_ID)"
+					+ " VALUES (?,?,?,?,?,?)";
 
 			statementToInsertRecord = connection.prepareStatement(queryToInsertRecord, new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
 			statementToInsertRecord.setString(1, policyPartialName);
@@ -5134,6 +5135,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			statementToInsertRecord.setBoolean(3, isSharedPartial);
 			statementToInsertRecord.setString(4, policyAuthor);
 			statementToInsertRecord.setString(5, policyPartialDesc);
+            statementToInsertRecord.setInt(6, tenantId);
 
 			statementToInsertRecord.executeUpdate();
 
@@ -5429,10 +5431,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
     /**
      * Get the list of entitlement policy partial which are shared
      *
+     * @param tenantId logged users tenant Id
      * @return list of policy partial
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public List<EntitlementPolicyPartial> getSharedEntitlementPolicyPartialsList() throws
+    public List<EntitlementPolicyPartial> getSharedEntitlementPolicyPartialsList(int tenantId) throws
                                                                                    AppManagementException {
 
         Connection connection = null;
@@ -5441,12 +5444,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         ResultSet rs = null;
         boolean isShared = true;
 
-        String queryToGetPolicyPartial = "SELECT * FROM APM_ENTITLEMENT_POLICY_PARTIAL WHERE SHARED = ? ";
+        String queryToGetPolicyPartial = "SELECT * FROM APM_ENTITLEMENT_POLICY_PARTIAL WHERE SHARED = ? " +
+                " AND TENANT_ID=? ";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetPolicyPartialList = connection.prepareStatement(queryToGetPolicyPartial);
             statementToGetPolicyPartialList.setBoolean(1, isShared);
+            statementToGetPolicyPartialList.setInt(2, tenantId);
 
             rs = statementToGetPolicyPartialList.executeQuery();
 

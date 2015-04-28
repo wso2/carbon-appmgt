@@ -472,7 +472,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
                                             String policyAuthor,String policyPartialDesc) throws AppManagementException {
-        return appMDAO.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,policyPartialDesc);
+        return appMDAO.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
+                policyPartialDesc, tenantId);
     }
 
     @Override
@@ -517,7 +518,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public List<EntitlementPolicyPartial> getSharedPolicyPartialsList() throws
                                                                         AppManagementException {
-        return appMDAO.getSharedEntitlementPolicyPartialsList();
+        return appMDAO.getSharedEntitlementPolicyPartialsList(tenantId);
     }
 
 
