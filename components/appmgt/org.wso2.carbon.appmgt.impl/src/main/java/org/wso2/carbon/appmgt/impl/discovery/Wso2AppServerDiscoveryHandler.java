@@ -457,11 +457,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
     private boolean isContextExist(String context, String version, APIProvider apiProvider)
             throws AppManagementException {
-        if (AppMDAO.isContextExist(context)) {
-            return true;
-        }
 
-        return false;
+        return AppMDAO.isContextExist(context);
     }
 
     private String getStatus(String providerName, String appName, String version,
