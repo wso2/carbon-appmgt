@@ -70,6 +70,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private static final int MAX_USERNAME_CONTRIBUTION_LENGTH = 8;
     private static final int MAX_HOSTNAME_CONTRIBUTION_LENGTH = 15;
     private static final String PROTOCOL_HTTP = "http";
+    private static final String TENANT_CONTEXT_PATH_START_WITH_T = "/t/";
+    private static final String TENANT_CONTEXT_PATH_REPLACE_WITH_U = "u";
 
     private Pattern nonAlphaNumericPattern = Pattern.compile("[^\\p{Alnum}]");
 
@@ -437,7 +439,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      */
     protected String generateProxyContext(String context, APIProvider apiProvider)
             throws AppManagementException {
-        String result = context;
+
+        String result = getContextFromTenant(context);
         int i = 0;
         while (apiProvider.isContextExist(result)) {
             //Generate a next available context
@@ -450,6 +453,29 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                         + " are already taken. Aborting the creation");
                 return CONTEXT_NOT_GENERATED;
             }
+        }
+        return result;
+    }
+
+    /**
+     * Returns the application context name form the tenant url of the AS
+     * e.g. /t/tenant_domain/webapps/Context/version and we need only the "Context"
+     * @param context
+     * @return
+     */
+    private String getContextFromTenant(String context) {
+        String result = context;
+        if (result.startsWith(TENANT_CONTEXT_PATH_START_WITH_T)) {
+            String[] splits = result.split("/");
+            String s = TENANT_CONTEXT_PATH_REPLACE_WITH_U;
+            if (splits.length > 4) {
+                s = splits[4];
+            } else if (splits.length > 3) {
+                s = splits[3];
+            } else if (splits.length > 2) {
+                s = splits[2];
+            }
+            result = "/" + nonAlphaNumericPattern.matcher(s).replaceAll("");
         }
         return result;
     }
