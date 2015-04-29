@@ -13,10 +13,11 @@ public class WebAppDetail {
     private ConcurrentHashMap<String,String[]> claims;
     private String context;
     private String webAppName;
-    private String[] webPagesurl;
+    private Object[][] webPagesurl;
     private String version;
     private String displayName;
     private String warFileName;
+    private String trackingCode;
 
     public String getUserName() {
         return userName;
@@ -58,11 +59,11 @@ public class WebAppDetail {
         this.webAppName = webAppName;
     }
 
-    public String[] getWebPagesurl() {
+    public Object[][] getWebPagesurl() {
         return webPagesurl;
     }
 
-    public void setWebPagesurl(String[] webPagesurl) {
+    public void setWebPagesurl(Object[][] webPagesurl) {
         this.webPagesurl = webPagesurl;
     }
 
@@ -96,5 +97,14 @@ public class WebAppDetail {
 
     public void setWarFileName(String warFileName) {
         this.warFileName = warFileName;
+    }
+
+
+    public String getTrackingCode() {
+        return trackingCode;
+    }
+
+    public void setTrackingCode(String trackingCode) {
+        this.trackingCode = trackingCode;
     }
 }

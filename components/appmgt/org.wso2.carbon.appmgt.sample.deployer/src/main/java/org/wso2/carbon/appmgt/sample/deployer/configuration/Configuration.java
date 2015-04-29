@@ -115,14 +115,29 @@ public class Configuration {
 
     /**
      *
-     * @return port according to given transport method
+     * @return nio port according to given transport method
      *
-     * @throw
-     *      -Throws this when failed to retrive port
      * */
-     public static String getGatewayPort() throws AppManagementException {
-        int offset = Integer.parseInt(getBackendPort("https")) - 9443;
-        return  (8280+offset)+"";
+     public static String getGatewayPort(String transport){
+         return  System.getProperty(transport+".nio.port");
      }
 
+
+    /**
+     *
+     * @return local ip address
+     *
+     * */
+    public static String getIPAddress(){
+        return  System.getProperty("carbon.local.ip");
+    }
+
+    /**
+     *
+     * @return value of the APIUsageTracking.Enabled property
+     *
+     * */
+    public static  String isStactsEnabled(){
+        return config.getFirstProperty("APIUsageTracking.Enabled");
+    }
 }
