@@ -181,7 +181,7 @@ public class AppManagerConfiguration {
                     String name=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_API_STORE_ID));
                     if(name==null){
                         try {
-                            throw new AppManagementException("The ExternalAPIStore name attribute is not defined in api-manager.xml.");
+                            throw new AppManagementException("The ExternalAPIStore name attribute is not defined in app-manager.xml.");
                         } catch (AppManagementException e) {
                             //ignore
                         }
@@ -214,7 +214,7 @@ public class AppManagerConfiguration {
                                     AppMConstants.EXTERNAL_API_STORE_USERNAME)).getText())); //Set store login username [optional]
                     }else{
                         try {
-                            throw new AppManagementException("The user-credentials of WebApp Publisher is not defined in the <ExternalAPIStore> config of api-manager.xml.");
+                            throw new AppManagementException("The user-credentials of WebApp Publisher is not defined in the <ExternalAPIStore> config of app-manager.xml.");
                         } catch (AppManagementException e) {
                             //ignore
                         }
