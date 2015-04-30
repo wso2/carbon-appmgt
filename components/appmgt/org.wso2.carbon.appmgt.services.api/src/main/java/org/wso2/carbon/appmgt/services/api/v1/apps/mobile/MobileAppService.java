@@ -47,10 +47,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import java.util.*;
 
 
 @Produces({ "application/json"})
@@ -311,6 +308,115 @@ public class MobileAppService {
             }finally{
                 PrivilegedCarbonContext.endTenantFlow();
                 return mobileApp;
+            }
+
+        }
+
+        @GET
+        @Consumes("application/x-www-form-urlencoded")
+        @Path("subscriptions/tenant/{tenantDomain}/{type}/{typeId}")
+        public List<MobileApp> getSubscribedApps(@Context final HttpServletResponse servletResponse,  @PathParam("type")
+            String type,  @PathParam("typeId") String typeId, @PathParam("tenantDomain") String tenantDomain, @Context HttpHeaders headers){
+
+            List<MobileApp> mobileApps = new ArrayList<MobileApp>();
+
+
+            try {
+                
+                Registry registry = doAuthorizeAndGetRegistry(tenantDomain, headers);
+                
+                int tenantId = ((UserRegistry)registry).getTenantId();
+
+                GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
+
+                    if("role".equals(type)){
+
+                        UserStoreManager userStoreManager = ((UserRegistry) registry).getUserRealm().getUserStoreManager();
+                        String[] users = userStoreManager.getUserListOfRole(typeId);
+                        for(String userId : users){
+                            String path = "users/" + userId + "/subscriptions/mobileapp/";
+                            String[] subscriptions = (String[])registry.get(path).getContent();
+                            for(String subscription : subscriptions){
+                                String appId = subscription.substring(subscription.lastIndexOf('/') + 1);
+                                if(!"".equals(appId)){
+                                    try {
+                                        GenericArtifact artifact  = artifactManager.getGenericArtifact(appId);
+                                        if(artifact != null){
+                                            mobileApps.add(MobileAppDataLoader.load(new MobileApp(), artifact, tenantId, true));
+                                        }
+                                    }catch (GovernanceException e){
+                                        log.debug("Invalid artifact : " + appId);
+                                    }
+                                }
+                            }
+                        }
+                    
+                    }else if("user".equals(type)){
+                        String path = "users/" + typeId + "/subscriptions/mobileapp/";
+                        String[] subscriptions = (String[])registry.get(path).getContent();
+                        for(String subscription : subscriptions){
+                            String appId = subscription.substring(subscription.lastIndexOf('/') + 1);
+                            if(!"".equals(appId)){
+                                try {
+                                    GenericArtifact artifact  = artifactManager.getGenericArtifact(appId);
+                                    if(artifact != null){
+                                        mobileApps.add(MobileAppDataLoader.load(new MobileApp(), artifact, tenantId, true));
+                                    }
+                                }catch (GovernanceException e){
+                                    log.debug("Invalid artifact : " + appId);
+                                }
+                            }
+                        }
+                    }
+
+
+            } catch (GovernanceException e) {
+                String errorMessage = "GovernanceException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (UnauthorizedUserException e) {
+                String errorMessage = "User is not authorized to access the API";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            } catch (UserStoreException e) {
+                String errorMessage = "UserStoreException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            } catch (RegistryException e) {
+                String errorMessage = "RegistryException occurred";
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+            }catch (Exception e) {
+                String errorMessage = String.format("Exception occurred while getting subscribe applist from %s %s", type, typeId);
+                if(log.isDebugEnabled()){
+                    log.error(errorMessage, e);
+                }else{
+                    log.error(errorMessage);
+                }
+                servletResponse.sendError(Response.Status.UNAUTHORIZED.getStatusCode());
+            }finally{
+                PrivilegedCarbonContext.endTenantFlow();
+
+                //remove duplicate and return
+                Set<MobileApp> hs = new HashSet<MobileApp>();
+                hs.addAll(mobileApps);
+                mobileApps.clear();
+                mobileApps.addAll(hs);
+                return mobileApps;
             }
 
         }
