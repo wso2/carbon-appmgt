@@ -95,10 +95,6 @@ public class AppServerWebappAdminClient {
             WebappsWrapper result = stub
                     .getPagedWebappsSummary(webappSearchString, webappState, webappType,
                             pageNumber);
-            ServiceContext serviceContext = stub.
-                    _getServiceClient().getLastOperationContext().getServiceContext();
-            String sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
-            System.out.println(sessionCookie);
             return result;
         } catch (RemoteException e) {
             final String msg = String.format("Failed to get available applications from "
