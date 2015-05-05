@@ -4405,10 +4405,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		}
 
 		try {
-			connection = APIMgtDBUtil.getConnection();
-			preparedStatement = connection.prepareStatement(query);
-			preparedStatement.setString(1, appIdentifier.getProviderName());
-			preparedStatement.setString(2, appIdentifier.getApiName());
+            connection = APIMgtDBUtil.getConnection();
+            String providerName = AppManagerUtil.replaceEmailDomainBack(appIdentifier.getProviderName());
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, providerName);
+            preparedStatement.setString(2, appIdentifier.getApiName());
 			preparedStatement.setString(3, appIdentifier.getVersion());
 
 			resultSet = preparedStatement.executeQuery();
