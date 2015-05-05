@@ -62,7 +62,8 @@ public class MobileAppService {
         @Path("list/tenant/{tenantDomain}")
         public AppListResponse getApplicationList(@Context final HttpServletResponse servletResponse,
                                                   @Context HttpHeaders headers, @PathParam("tenantDomain")
-                            String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset){
+                            String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset,
+                                                  @QueryParam("platform") String platform){
 
             boolean noLimit = false;
 
@@ -84,8 +85,13 @@ public class MobileAppService {
 
                 GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);
                 GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
-                GenericArtifact[] artifacts = artifactManager
-                        .getAllGenericArtifactsByLifecycleStatus("MobileAppLifeCycle", "Published");
+
+                Map map = new HashMap();
+                if(platform != null){
+                    map.put("overview_platform", Arrays.asList(platform));
+                }
+                map.put("lcState", Arrays.asList("Published"));
+                GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(map);
 
                 response.setApps(new ArrayList<App>());
 
