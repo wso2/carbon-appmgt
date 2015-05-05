@@ -26,6 +26,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.clients.AppServerWebappAdminClient;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListElementDTO;
@@ -240,7 +241,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             listElementDTO.setVersion(version);
             listElementDTO.setApplicationType(webappMetadata.getWebappType());
             listElementDTO.setRemoteContext(context);
-            listElementDTO.setProxyContext(generateProxyContext(context, apiProvider));
+            listElementDTO.setProxyContext(generateProxyContext(context, version, apiProvider));
             String appId = generateWebappId(webappMetadata, webappsWrapper, providerName);
             listElementDTO.setApplicationId(appId);
             listElementDTO.setStatus(getStatus(providerName, appId, version, apiProvider));
@@ -277,7 +278,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         result.setVersion(version);
         result.setApplicationType(webappMetadata.getWebappType());
         result.setRemoteContext(context);
-        result.setProxyContext(generateProxyContext(context, apiProvider));
+        result.setProxyContext(generateProxyContext(context, version, apiProvider));
         result.setApplicationId(currentWebappId);
         result.setStatus(
                 getStatus(loggedInUsername, result.getApplicationName(), result.getVersion(),
@@ -435,11 +436,11 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      * @return
      * @throws AppManagementException
      */
-    protected String generateProxyContext(String context, APIProvider apiProvider)
+    protected String generateProxyContext(String context, String version, APIProvider apiProvider)
             throws AppManagementException {
         String result = context;
         int i = 0;
-        while (apiProvider.isContextExist(result)) {
+        while (isContextExist(result, version, apiProvider)) {
             //Generate a next available context
             result = context + "_" + i;
             i++;
@@ -452,6 +453,12 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             }
         }
         return result;
+    }
+
+    private boolean isContextExist(String context, String version, APIProvider apiProvider)
+            throws AppManagementException {
+
+        return AppMDAO.isContextExist(context);
     }
 
     private String getStatus(String providerName, String appName, String version,
