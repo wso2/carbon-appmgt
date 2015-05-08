@@ -1109,8 +1109,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String contentPath = AppManagerUtil.getAPIDocPath(identifier) + AppMConstants.INLINE_DOCUMENT_CONTENT_DIR +
                              RegistryConstants.PATH_SEPARATOR + documentationName;
         try {
-            Resource docContent = registry.newResource();
-            docContent.setContent(text);
+            Resource docContent;
+            if (!registry.resourceExists(contentPath)) {
+            	docContent = registry.newResource();
+            } else {
+            	docContent = registry.get(contentPath);
+            }
+
+            /* This is a temporary fix for doc content replace issue. We need to add
+             * separate methods to add inline content resource in document update */
+            if (!AppMConstants.NO_CONTENT_UPDATE.equals(text)) {
+            	docContent.setContent(text);
+            }
+
+            docContent.setMediaType(AppMConstants.DOCUMENTATION_INLINE_CONTENT_TYPE);
             registry.put(contentPath, docContent);
             registry.addAssociation(documentationPath, contentPath,
                                     AppMConstants.DOCUMENTATION_CONTENT_ASSOCIATION);
@@ -1168,7 +1180,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *
      * @param apiId         APIIdentifier
      * @param documentation Documentation
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
      *          if failed to update docs
      */
     public void updateDocumentation(APIIdentifier apiId, Documentation documentation)
@@ -1194,6 +1206,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (visibleRolesList != null) {
                 visibleRoles = visibleRolesList.split(",");
             }
+
             AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(),visibleRoles,artifact.getPath());
             
             String docFilePath = artifact.getAttribute(AppMConstants.DOC_FILE_PATH);

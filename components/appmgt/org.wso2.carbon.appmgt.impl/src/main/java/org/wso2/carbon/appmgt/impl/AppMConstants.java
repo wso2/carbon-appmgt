@@ -211,6 +211,7 @@ public final class AppMConstants {
     public static final String DOC_TYPE = "overview_type";
     public static final String DOC_DIR = "documentation";
     public static final String INLINE_DOCUMENT_CONTENT_DIR = "contents";
+    public static final String NO_CONTENT_UPDATE = "no_content_update";
     public static final String DOCUMENT_FILE_DIR = "files";
     public static final String DOC_API_BASE_PATH="overview_apiBasePath";
     public static final String DOC_SOURCE_URL = "overview_sourceURL";
@@ -220,6 +221,7 @@ public final class AppMConstants {
     public static final String PUBLISHED = "PUBLISHED";
     public static final String CREATED = "CREATED";
     public static final String DEPRECATED = "DEPRECATED";
+    public static final String DOCUMENTATION_INLINE_CONTENT_TYPE = "text/plain";
 
 
     public static class TokenStatus {
