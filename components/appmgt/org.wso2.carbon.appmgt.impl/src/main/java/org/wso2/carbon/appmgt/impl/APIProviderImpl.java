@@ -879,9 +879,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     private void removeFromGateway(WebApp api) throws AppManagementException {
         String tenantDomain = null;
-        if (api.getId().getProviderName().contains("AT")) {
-            String provider = api.getId().getProviderName().replace("-AT-", "@");
-            tenantDomain = MultitenantUtils.getTenantDomain( provider);
+        if (api.getId().getProviderName().contains("@")) {
+            tenantDomain = MultitenantUtils.getTenantDomain( api.getId().getProviderName());
         }
 
         APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
