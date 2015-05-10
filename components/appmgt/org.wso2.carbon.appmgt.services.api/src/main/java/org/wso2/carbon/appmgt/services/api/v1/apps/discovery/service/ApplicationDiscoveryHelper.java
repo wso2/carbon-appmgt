@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.services.api.v1.apps.discovery.service;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -26,6 +27,7 @@ import org.wso2.carbon.appmgt.impl.discovery.*;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +42,6 @@ public class ApplicationDiscoveryHelper {
 
     private static final Log log = LogFactory.getLog(ApplicationDiscoveryHelper.class);
 
-    private static final String SUPER_TENANT_DOMAIN = "carbon.super";
     private static final String NAME_WSO2_AS = "WSO2-AS";
     private static final String CONTEXT_DATA_APP_SERVER_URL = "appServerUrl";
     private static final String CONTEXT_DATA_APP_SERVER_USER_NAME = "userName";
@@ -66,8 +67,6 @@ public class ApplicationDiscoveryHelper {
         APIIdentifier apiIdentifier = new APIIdentifier(null, null, null);
         apiIdentifier.setApplicationId(discoverInfoRequest.getApplicationId());
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
-                .getThreadLocalCarbonContext();
         ApplicationDiscoveryContext applicationDiscoveryContext = (ApplicationDiscoveryContext) servletRequest
                 .getSession().getAttribute(ApplicationDiscoveryContext.class.getName());
         if (applicationDiscoveryContext == null) {
@@ -75,10 +74,13 @@ public class ApplicationDiscoveryHelper {
             servletRequest.getSession().setAttribute(ApplicationDiscoveryContext.class.getName(),
                     applicationDiscoveryContext);
         }
+
+        ConfigurationContext configurationContext = getClientConfigurationContext();
+
         try {
 
             result.setData(handler.readApplicationInfo(applicationDiscoveryContext, apiIdentifier,
-                    carbonContext));
+                    configurationContext));
             result.setStatus(Response.Status.OK.getStatusCode());
         } catch (AppManagementException e) {
             String message = String
@@ -146,13 +148,12 @@ public class ApplicationDiscoveryHelper {
                     userNamePasswordCredentials.getUserName());
         }
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
-                .getThreadLocalCarbonContext();
+        ConfigurationContext configurationContext = getClientConfigurationContext();
 
         try {
             DiscoveredApplicationListDTO applicationListDTO = handler
                     .discoverApplications(applicationDiscoveryContext, userNamePasswordCredentials,
-                            discoverySearchCriteria, Locale.ENGLISH, carbonContext);
+                            discoverySearchCriteria, Locale.ENGLISH, configurationContext);
             result.setStatus(Response.Status.OK.getStatusCode());
             result.setData(applicationListDTO);
         } catch (AppManagementException e) {
@@ -183,5 +184,17 @@ public class ApplicationDiscoveryHelper {
                 .getOSGiService(ApplicationDiscoveryServiceFactory.class);
 
         return applicationDiscoveryServiceFactory.getAvailableHandlerNames();
+    }
+
+    /**
+     * Returns the client configuration context
+     * @return
+     */
+    private ConfigurationContext getClientConfigurationContext() {
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
+                .getThreadLocalCarbonContext();
+        ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
+                .getOSGiService(ConfigurationContextService.class);
+        return configurationContextService.getClientConfigContext();
     }
 }
