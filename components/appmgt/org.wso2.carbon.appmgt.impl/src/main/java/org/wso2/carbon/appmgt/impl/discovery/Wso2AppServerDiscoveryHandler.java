@@ -84,7 +84,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     @Override
     public DiscoveredApplicationListDTO discoverApplications(
             ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext)
+            DiscoverySearchCriteria criteria, Locale locale, ConfigurationContext configurationContext)
             throws AppManagementException {
 
         if (!(credentials instanceof UserNamePasswordCredentials)) {
@@ -98,10 +98,6 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         if (isResetPageCache(criteria, discoveryContext)) {
             clearCache(discoveryContext);
         }
-        ConfigurationContextService configurationContextService = (ConfigurationContextService) carbonContext
-                .getOSGiService(ConfigurationContextService.class);
-        ConfigurationContext configurationContext = configurationContextService
-                .getClientConfigContext();
         UserNamePasswordCredentials userNamePasswordCredentials = (UserNamePasswordCredentials) credentials;
         try {
             AppServerWebappAdminClient webappAdminClient = getAppServerWebappAdminClient(
@@ -121,13 +117,13 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
             if (criteria.getStatus() != null && criteria.getStatus().length() > 0) {
                 return discoverApplicationsWithPaging(discoveryContext, credentials, criteria,
-                        locale, carbonContext, webappAdminClient, providerName, loggedInUsername,
+                        locale, webappAdminClient, providerName, loggedInUsername,
                         apiProvider);
             } else {
                 List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
                 List<WebappMetadata> filteredMetadataList = filter(webappsWrapper,
                         webappMetadataList, discoveryContext, credentials, criteria, locale,
-                        carbonContext, providerName, loggedInUsername, apiProvider);
+                        providerName, loggedInUsername, apiProvider);
                 return translateToDto(webappsWrapper, filteredMetadataList, providerName,
                         loggedInUsername, apiProvider);
             }
@@ -143,7 +139,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     @Override
     public DiscoveredApplicationDTO readApplicationInfo(
             ApplicationDiscoveryContext discoveryContext, APIIdentifier apiIdentifier,
-            PrivilegedCarbonContext carbonContext) throws AppManagementException {
+            ConfigurationContext configurationContext) throws AppManagementException {
 
         String webappId = apiIdentifier.getApplicationId();
         String loggedInUsername = (String) discoveryContext.getData(CONTEXT_DATA_LOGGED_IN_USER);
@@ -316,13 +312,12 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      * @param credentials
      * @param criteria
      * @param locale
-     * @param carbonContext
      * @return
      */
     private List<WebappMetadata> filter(WebappsWrapper webappsWrapper,
             List<WebappMetadata> applicationListElementList,
             ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext,
+            DiscoverySearchCriteria criteria, Locale locale,
             String providerName, String userName, APIProvider apiProvider)
             throws AppManagementException {
 
@@ -460,7 +455,6 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
     private boolean isContextExist(String context, String version, APIProvider apiProvider)
             throws AppManagementException {
-
         return AppMDAO.isContextExist(context);
     }
 
@@ -512,7 +506,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
     private DiscoveredApplicationListDTO discoverApplicationsWithPaging(
             ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, PrivilegedCarbonContext carbonContext,
+            DiscoverySearchCriteria criteria, Locale locale,
             AppServerWebappAdminClient webappAdminClient, String providerName,
             String loggedInUserName, APIProvider apiProvider) throws AppManagementException {
 
@@ -534,7 +528,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         PagingResult result = cachedMap.get(Integer.valueOf(criteria.getPageNumber()));
         if (result == null) {
             result = getNextPage(discoveryContext, credentials, searchString, criteria, locale,
-                    carbonContext, webappAdminClient, providerName, loggedInUserName, apiProvider);
+                    webappAdminClient, providerName, loggedInUserName, apiProvider);
 
             if (result.metadataList.size() > 0) {
                 cachedMap.put(criteria.getPageNumber(), result);
@@ -602,7 +596,6 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      * @param searchString the search string (name of the applicaiton)
      * @param criteria search criteria
      * @param locale
-     * @param carbonContext  The carbon context passed so that services can be loaded
      * @param webappAdminClient WebappAdmin client for AS
      * @param providerName  Provider name e.g. user1-AT-tenant.domain
      * @param loggedInUserName Currently logged in user
@@ -612,7 +605,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      */
     private PagingResult getNextPage(ApplicationDiscoveryContext discoveryContext,
             DiscoveryCredentials credentials, String searchString, DiscoverySearchCriteria criteria,
-            Locale locale, PrivilegedCarbonContext carbonContext,
+            Locale locale,
             AppServerWebappAdminClient webappAdminClient, String providerName,
             String loggedInUserName, APIProvider apiProvider) throws AppManagementException {
 
@@ -638,7 +631,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         if (webappsWrapper != null) {
             List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
             List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
-                    discoveryContext, credentials, criteria, locale, carbonContext, providerName,
+                    discoveryContext, credentials, criteria, locale, providerName,
                     loggedInUserName, apiProvider);
             int recordsToAdd = Math
                     .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
@@ -656,7 +649,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             translateStatus(criteria), lastAppServerPage);
             List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
             List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
-                    discoveryContext, credentials, criteria, locale, carbonContext, providerName,
+                    discoveryContext, credentials, criteria, locale, providerName,
                     loggedInUserName, apiProvider);
             int recordsToAdd = Math
                     .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.impl.discovery;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
@@ -39,23 +40,27 @@ public interface ApplicationDiscoveryHandler {
     /**
      * Discover applications given the credentials and the search criteria
      *
+     * @param discoveryContext
      * @param credentials
      * @param criteria
+     * @param locale
+     * @param configurationContext the Axis2 client configuration context
      * @return the bean holding the list of paged list of applications
      */
     DiscoveredApplicationListDTO discoverApplications(ApplicationDiscoveryContext discoveryContext,
             DiscoveryCredentials credentials, DiscoverySearchCriteria criteria, Locale locale,
-            PrivilegedCarbonContext carbonContext) throws AppManagementException;
+            ConfigurationContext configurationContext) throws AppManagementException;
 
     /**
      * Reads the application information necessary to create a new proxy application
      *
+     * @param discoveryContext
      * @param apiIdentifier
-     * @param carbonContext
+     * @param configurationContext the Axis2 client configuration context
      * @return
      * @throws AppManagementException
      */
     DiscoveredApplicationDTO readApplicationInfo(ApplicationDiscoveryContext discoveryContext,
-            APIIdentifier apiIdentifier, PrivilegedCarbonContext carbonContext)
+            APIIdentifier apiIdentifier, ConfigurationContext configurationContext)
             throws AppManagementException;
 }
