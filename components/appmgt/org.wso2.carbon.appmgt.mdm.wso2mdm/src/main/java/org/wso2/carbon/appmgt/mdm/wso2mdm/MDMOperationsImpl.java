@@ -34,11 +34,11 @@ import org.apache.commons.ssl.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
-import org.wso2.carbon.appmgt.mobile.mdm.Sample;
-import org.wso2.carbon.appmgt.mobile.mdm.Property;
+import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
+import org.wso2.carbon.appmgt.mobile.mdm.Property;
+import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import javax.ws.rs.core.Response;
@@ -48,6 +48,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -72,16 +73,33 @@ public class MDMOperationsImpl implements MDMOperations {
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
         String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
 
-        JSONArray resources = new JSONArray();
-        for(String param : params){
-            resources.add(param);
-        }
+
 
         JSONObject requestObj = new JSONObject();
-        requestObj.put("action", action);
-        requestObj.put("to", type);
-        requestObj.put("resources", resources);
-        requestObj.put("tenantId", tenantId);
+
+        if("user".equals(type)){
+            JSONArray resources = new JSONArray();
+            for(String param : params){
+                resources.add(param);
+            }
+            requestObj.put("userList", resources);
+        }else if("role".equals(type)){
+            JSONArray resources = new JSONArray();
+            for(String param : params){
+                resources.add(param);
+            }
+            requestObj.put("userList", resources);
+        }else{
+            JSONArray resources = new JSONArray();
+            for(String param : params){
+                JSONObject obj =  new JSONObject();
+                obj.put("id", param);
+                obj.put("type", app.getType());
+                resources.add(obj);
+            }
+            requestObj.put("deviceIdentifiers", resources);
+        }
+
 
         JSONObject requestApp = new JSONObject();
 
@@ -114,7 +132,7 @@ public class MDMOperationsImpl implements MDMOperations {
 
         }
 
-        requestObj.put("app", requestApp);
+        requestObj.put("application", requestApp);
 
         HttpClient httpClient = new HttpClient();
         StringRequestEntity requestEntity = null;
@@ -129,7 +147,7 @@ public class MDMOperationsImpl implements MDMOperations {
 
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
 
-        PostMethod postMethod = new PostMethod(requestURL);
+        PostMethod postMethod = new PostMethod(requestURL + Constants.API_INSTALL_APP);
         postMethod.setRequestEntity(requestEntity);
 
         try {
@@ -137,6 +155,8 @@ public class MDMOperationsImpl implements MDMOperations {
             int statusCode = httpClient.executeMethod(postMethod);
             if (statusCode == HttpStatus.SC_OK) {
                 log.debug(action + " operation performed successfully");
+            }else{
+                log.debug(action + " operation unsuccessful. Status code : " + statusCode);
             }
 
         } catch (IOException e) {
@@ -188,7 +208,7 @@ public class MDMOperationsImpl implements MDMOperations {
             if(platformVersion != null) nameValuePairs.add(new NameValuePair("platformVersion", platform));
 
             getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-
+            getMethod.setRequestHeader("Accept", "application/json");
 
             if(executeMethod(tokenApiURL, clientKey, clientSecret, httpClient, getMethod)){
                 try {
@@ -213,7 +233,25 @@ public class MDMOperationsImpl implements MDMOperations {
             jsonArray = (JSONArray) new JSONValue().parse("[]");
         }
 
-        return null;
+        List<Device> devices = new ArrayList<Device>();
+
+        Iterator<JSONObject> iterator = jsonArray.iterator();
+        while (iterator.hasNext()){
+            JSONObject deviceObj = iterator.next();
+
+
+            Device device = new Device();
+            device.setId(deviceObj.get("id").toString());
+            device.setName(deviceObj.get("name").toString());
+            device.setModel(deviceObj.get("name").toString());
+            device.setType("mobileDevice");
+            device.setImage("/store/extensions/assets/mobileapp/resources/models/none.png");
+            device.setPlatform(deviceObj.get("type").toString());
+            devices.add(device);
+
+        }
+
+        return devices;
     }
 
 
@@ -269,7 +307,8 @@ public class MDMOperationsImpl implements MDMOperations {
 
     private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient,
                                   HttpMethodBase httpMethod){
-                String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                //String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                String authKey = "12345";
                 try {
                     int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
                     int tries = 0;
