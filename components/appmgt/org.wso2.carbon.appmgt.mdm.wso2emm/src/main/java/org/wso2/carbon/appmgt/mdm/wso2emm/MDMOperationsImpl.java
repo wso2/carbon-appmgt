@@ -39,7 +39,6 @@ import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -191,7 +190,7 @@ public class MDMOperationsImpl implements MDMOperations {
                     new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
             try {
                 int statusCode = httpClient.executeMethod(getMethod);
-                if(statusCode == Response.Status.OK.getStatusCode()){
+                if(statusCode == 200){
                    String response = getMethod.getResponseBodyAsString();
                    JSONArray devicesArray = (JSONArray) new JSONValue().parse(response);
                    log.debug("Devices Received" + devicesArray.toJSONString());

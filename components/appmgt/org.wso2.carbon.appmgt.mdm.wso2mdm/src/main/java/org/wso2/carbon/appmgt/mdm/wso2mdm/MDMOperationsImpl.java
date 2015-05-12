@@ -41,7 +41,6 @@ import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
@@ -310,12 +309,12 @@ public class MDMOperationsImpl implements MDMOperations {
                 //String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
                 String authKey = "12345";
                 try {
-                    int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+                    int statusCode = 401;
                     int tries = 0;
-                    while(statusCode != Response.Status.OK.getStatusCode()){
+                    while(statusCode != 200){
                         httpMethod.setRequestHeader("Authorization", "Bearer " + authKey);
                         statusCode = httpClient.executeMethod(httpMethod);
-                        if(statusCode == Response.Status.UNAUTHORIZED.getStatusCode()){
+                        if(statusCode == 401){
                             if(++tries > 3){
                                 log.info("API Call failed for the 3rd time: Unauthorized Access Aborting...");
                                 return false;

@@ -80,18 +80,7 @@
                             org.wso2.carbon.governance.api.generic.*,
                             org.wso2.carbon.governance.api.exception.*,
                             org.wso2.carbon.context.*,
-                            org.w3c.dom.*,
-                            org.osgi.service.component.*,
-                            org.json.simple.*,
-                            org.apache.commons.logging.*,
-                            org.apache.commons.io.*,
-                            org.apache.axis2.context.*,
-                            org.apache.axiom.om.impl.builder.*,
-                            org.apache.axiom.om.*,
-                            javax.xml.stream.*,
-                            javax.xml.parsers.*,
-                            javax.xml.namespace.*,
-                            com.dd.plist.*
+                            *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             org.wso2.mobile.utils.utilities.*,
