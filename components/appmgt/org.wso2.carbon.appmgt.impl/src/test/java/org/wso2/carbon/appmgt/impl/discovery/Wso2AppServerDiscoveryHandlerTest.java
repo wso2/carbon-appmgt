@@ -61,7 +61,7 @@ public class Wso2AppServerDiscoveryHandlerTest {
         assertEquals("WSO2-AS", handler.getDisplayName());
     }
 
-    @Test
+    @Test(enabled = false)
     public void testDiscoverApplications() throws Exception {
         UserNamePasswordCredentials credentials = new UserNamePasswordCredentials();
         credentials.setAppServerUrl("http://localhost:9763/services/");
