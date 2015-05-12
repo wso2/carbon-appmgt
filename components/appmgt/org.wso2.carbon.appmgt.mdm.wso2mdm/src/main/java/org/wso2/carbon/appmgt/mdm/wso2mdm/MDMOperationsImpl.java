@@ -146,7 +146,14 @@ public class MDMOperationsImpl implements MDMOperations {
 
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
 
-        PostMethod postMethod = new PostMethod(requestURL + Constants.API_INSTALL_APP);
+        String actionURL = null;
+        if("install".equals("action")){
+            actionURL = Constants.API_INSTALL_APP;
+        }else{
+            actionURL = Constants.API_UNINSTALL_APP;
+        }
+
+        PostMethod postMethod = new PostMethod(requestURL + actionURL);
         postMethod.setRequestEntity(requestEntity);
 
         try {
@@ -306,8 +313,8 @@ public class MDMOperationsImpl implements MDMOperations {
 
     private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient,
                                   HttpMethodBase httpMethod){
-                //String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
-                String authKey = "12345";
+                String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                //String authKey = "12345";
                 try {
                     int statusCode = 401;
                     int tries = 0;
