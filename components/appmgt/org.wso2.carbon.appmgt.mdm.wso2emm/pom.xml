@@ -67,7 +67,16 @@
                         <Bundle-Version>1.0.0</Bundle-Version>
                         <Private-Package>org.wso2.carbon.appmgt.mdm.wso2emm.internal</Private-Package>
                         <Import-Package>
-                            *;resolution:=optional
+                            org.wso2.carbon.appmgt.mobile.utils.*,
+                            org.wso2.carbon.appmgt.mobile.mdm.*,
+                            org.wso2.carbon.appmgt.mobile.interfaces.*,
+                            org.osgi.service.component.*,
+                            org.osgi.framework.*,
+                            org.json.simple.*,
+                            org.apache.commons.ssl.*,
+                            org.apache.commons.logging.*,
+                            org.apache.commons.httpclient.methods.*,
+                            org.apache.commons.httpclient.*
                         </Import-Package>
                         <Export-Package>
                             org.wso2.carbon.appmgt.mdm.wso2emm.*,
