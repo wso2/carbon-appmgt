@@ -392,7 +392,7 @@ public class JWTGenerator {
         if (claimsRetriever != null) {
             String userName = (String) saml2Assertions.get("Subject");
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String tenantAwareUserName = userName;
+            String tenantAwareUserName = userName + "@" + tenantDomain;
 
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService()
