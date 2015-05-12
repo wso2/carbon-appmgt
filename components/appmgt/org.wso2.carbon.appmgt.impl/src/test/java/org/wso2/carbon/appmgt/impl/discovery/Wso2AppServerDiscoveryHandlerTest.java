@@ -18,9 +18,19 @@
 
 package org.wso2.carbon.appmgt.impl.discovery;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
+import org.wso2.carbon.appmgt.impl.dao.test.TestRealmService;
+import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryContext;
+import org.wso2.carbon.appmgt.impl.discovery.DiscoverySearchCriteria;
+import org.wso2.carbon.appmgt.impl.discovery.UserNamePasswordCredentials;
+import org.wso2.carbon.appmgt.impl.discovery.Wso2AppServerDiscoveryHandler;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
+import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.Locale;
@@ -37,6 +47,13 @@ public class Wso2AppServerDiscoveryHandlerTest {
     @BeforeClass
     public void setup() {
         handler = new Wso2AppServerDiscoveryHandler();
+        AppManagerConfiguration appManagerConfiguration = new AppManagerConfiguration();
+        AppManagerConfigurationServiceImpl appManagerConfigurationService = new AppManagerConfigurationServiceImpl(appManagerConfiguration);
+        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(appManagerConfigurationService);
+        TestRealmService testRealmService = new org.wso2.carbon.appmgt.impl.dao.test.TestRealmService();
+
+        ServiceReferenceHolder.getInstance().setRealmService(testRealmService);
+        System.setProperty("carbon.home", "/usr/local/wso2appm/wso2appm");
     }
 
     @Test
@@ -44,18 +61,21 @@ public class Wso2AppServerDiscoveryHandlerTest {
         assertEquals("WSO2-AS", handler.getDisplayName());
     }
 
+    @Test(enabled = false)
     public void testDiscoverApplications() throws Exception {
         UserNamePasswordCredentials credentials = new UserNamePasswordCredentials();
-        credentials.setAppServerUrl("https://localhost:9445/services/");
+        credentials.setAppServerUrl("http://localhost:9763/services/");
+        credentials.setAppServerUrl("http://localhost:8080/MockWebappAdmin/services/");
         credentials.setUserName("reader");
         credentials.setPassword("reader");
         credentials.setLoggedInUsername("admin");
 
-        PrivilegedCarbonContext privilegedCarbonContext = null;
+        ConfigurationContext configurationContext =  ConfigurationContextFactory
+                .createConfigurationContextFromFileSystem((String) null, (String) null);
         DiscoverySearchCriteria criteria = new DiscoverySearchCriteria();
         ApplicationDiscoveryContext discoveryContext = new ApplicationDiscoveryContext();
         DiscoveredApplicationListDTO applicationListDTO = handler.discoverApplications(
-                discoveryContext, credentials, criteria, Locale.ENGLISH, null);
+                discoveryContext, credentials, criteria, Locale.ENGLISH, configurationContext);
 
         assertNotNull(applicationListDTO);
 
@@ -67,4 +87,5 @@ public class Wso2AppServerDiscoveryHandlerTest {
     public void testGenerateProxyContext() throws Exception {
 
     }
+
 }

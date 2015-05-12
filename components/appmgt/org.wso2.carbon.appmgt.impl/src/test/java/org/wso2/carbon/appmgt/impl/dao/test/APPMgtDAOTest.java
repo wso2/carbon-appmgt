@@ -36,7 +36,7 @@ import org.wso2.carbon.identity.core.util.IdentityTenantUtil;
 import java.util.Date;
 import java.util.Set;
 
-public class APIMgtDAOTest extends TestCase {
+public class APPMgtDAOTest extends TestCase {
 
 	AppMDAO appMDAO;
 
