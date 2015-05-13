@@ -22,7 +22,7 @@ public class MobileAppDataLoader {
             mobileApp.setType(artifact.getAttribute("overview_type"));
             mobileApp.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
-            if("Enterprise".equals(artifact.getAttribute("overview_type"))){
+            if("enterprise".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("enterprise");
                 if(showLocationInfo){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
