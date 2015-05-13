@@ -30,8 +30,6 @@ import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListElementDTO;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.VersionedWebappMetadata;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappMetadata;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappsWrapper;
@@ -84,8 +82,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     @Override
     public DiscoveredApplicationListDTO discoverApplications(
             ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale, ConfigurationContext configurationContext)
-            throws AppManagementException {
+            DiscoverySearchCriteria criteria, Locale locale,
+            ConfigurationContext configurationContext) throws AppManagementException {
 
         if (!(credentials instanceof UserNamePasswordCredentials)) {
             throw new AppManagementException(
@@ -205,12 +203,25 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                 throw new AppManagementException(
                         "Can not create the AppServerWebappAdminClient as UserNamePasswordCredentials is null. Try log-off and log back in.");
             }
+            String appServerUrl = getAppServerUrl(userNamePasswordCredentials.getAppServerUrl());
             webappAdminClient = new AppServerWebappAdminClient(
                     userNamePasswordCredentials.getUserName(),
                     userNamePasswordCredentials.getPassword(),
                     userNamePasswordCredentials.getAppServerUrl(), configurationContext, locale);
         }
         return webappAdminClient;
+    }
+
+    /**
+     * Returns the application server url. try to fix any mismatches. e.g. missing slash
+     * @param appServerUrl
+     * @return
+     */
+    private String getAppServerUrl(String appServerUrl) {
+        if (!appServerUrl.endsWith("/")) {
+            appServerUrl = appServerUrl + '/';
+        }
+        return appServerUrl;
     }
 
     /**
