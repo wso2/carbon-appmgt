@@ -33,7 +33,7 @@ public class MobileAppDataLoader {
                 }
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("public");
-            }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
+            }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("webapp");
                 mobileApp.setIdentifier(artifact.getAttribute("overview_url"));
                 if(showLocationInfo){

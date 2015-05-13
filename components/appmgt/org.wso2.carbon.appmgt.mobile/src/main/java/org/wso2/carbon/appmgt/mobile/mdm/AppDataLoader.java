@@ -72,7 +72,7 @@ public class AppDataLoader {
 
             }else if ("Market".equals(artifact.getAttribute("overview_type"))){
                 app.setType("public");
-            }else if ("Web App".equals(artifact.getAttribute("overview_type"))){
+            }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
                 app.setType("webapp");
                 app.setLocation(artifact.getAttribute("overview_url"));
                 app.setIdentifier(artifact.getAttribute("overview_url"));

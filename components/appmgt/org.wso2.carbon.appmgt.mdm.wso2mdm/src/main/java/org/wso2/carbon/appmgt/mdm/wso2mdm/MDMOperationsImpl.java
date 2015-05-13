@@ -92,8 +92,9 @@ public class MDMOperationsImpl implements MDMOperations {
             JSONArray resources = new JSONArray();
             for(String param : params){
                 JSONObject obj =  new JSONObject();
-                obj.put("id", param);
-                obj.put("type", app.getType());
+                String []paramDevices = param.split("---");
+                obj.put("id", paramDevices[0]);
+                obj.put("type", paramDevices[1]);
                 resources.add(obj);
             }
             requestObj.put("deviceIdentifiers", resources);
@@ -147,7 +148,7 @@ public class MDMOperationsImpl implements MDMOperations {
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
 
         String actionURL = null;
-        if("install".equals("action")){
+        if("install".equals("install")){
             actionURL = Constants.API_INSTALL_APP;
         }else{
             actionURL = Constants.API_UNINSTALL_APP;
@@ -157,7 +158,7 @@ public class MDMOperationsImpl implements MDMOperations {
         postMethod.setRequestEntity(requestEntity);
 
         try {
-            log.debug("Sending POST request to perform operation on MDM. Request path:  "  +requestURL);
+            log.debug("Sending POST request to perform operation on MDM. Request path:  "  +requestURL + actionURL);
             int statusCode = httpClient.executeMethod(postMethod);
             if (statusCode == HttpStatus.SC_OK) {
                 log.debug(action + " operation performed successfully");
@@ -247,7 +248,7 @@ public class MDMOperationsImpl implements MDMOperations {
 
 
             Device device = new Device();
-            device.setId(deviceObj.get("id").toString());
+            device.setId(deviceObj.get("deviceIdentifier").toString()+ "---" + deviceObj.get("type").toString());
             device.setName(deviceObj.get("name").toString());
             device.setModel(deviceObj.get("name").toString());
             device.setType("mobileDevice");
