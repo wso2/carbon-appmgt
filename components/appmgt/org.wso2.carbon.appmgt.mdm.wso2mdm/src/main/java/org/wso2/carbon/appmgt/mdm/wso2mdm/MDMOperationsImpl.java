@@ -38,7 +38,6 @@ import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
-import org.wso2.carbon.appmgt.mobile.mdm.Sample;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
 import java.io.IOException;
