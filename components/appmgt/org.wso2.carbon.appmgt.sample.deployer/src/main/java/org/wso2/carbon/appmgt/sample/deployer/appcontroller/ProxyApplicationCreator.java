@@ -239,7 +239,7 @@ public class ProxyApplicationCreator {
         mobileApplicationBean.setAppmeta("{\"package\":\"com.wso2.wso2con.mobile\",\"version\":\"1.0.0\"}");
         mobileApplicationBean.setVersion("1.0.0");
         mobileApplicationBean.setProvider("1WSO2Mobile");
-        mobileApplicationBean.setMarkettype("Market");
+        mobileApplicationBean.setMarkettype("public");
         mobileApplicationBean.setPlatform("android");
         mobileApplicationBean.setName("Wso2Con");
         mobileApplicationBean.setDescription("WSO2Con mobile app provides the agenda and meeting tool for " +
@@ -278,7 +278,7 @@ public class ProxyApplicationCreator {
                 ".0\"}");
         mobileApplicationBean.setVersion("1.0.0");
         mobileApplicationBean.setProvider("1WSO2Mobile");
-        mobileApplicationBean.setMarkettype("Market");
+        mobileApplicationBean.setMarkettype("public");
         mobileApplicationBean.setPlatform("android");
         mobileApplicationBean.setName("MyTracks");
         mobileApplicationBean.setDescription("My Tracks records your path, speed, distance, and elevation while " +
