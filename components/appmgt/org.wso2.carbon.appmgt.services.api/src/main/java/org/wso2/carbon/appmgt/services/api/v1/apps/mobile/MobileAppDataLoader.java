@@ -35,8 +35,8 @@ public class MobileAppDataLoader {
                                 .getMDMConfigs().get(MobileConfigurations.IOS_PLIST_PATH) + "/" + tenantId + "/"  + fileName);
                     }
                 }
-            }else if ("market".equals(artifact.getAttribute("overview_type"))){
-                mobileApp.setType("market");
+            }else if ("public".equals(artifact.getAttribute("overview_type"))){
+                mobileApp.setType("public");
             }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType("webapp");
                 mobileApp.setIdentifier(artifact.getAttribute("overview_url"));
