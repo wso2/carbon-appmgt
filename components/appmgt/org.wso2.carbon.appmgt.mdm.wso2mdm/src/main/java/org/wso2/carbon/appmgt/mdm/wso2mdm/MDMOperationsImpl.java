@@ -132,6 +132,14 @@ public class MDMOperationsImpl implements MDMOperations {
 
         }
 
+        if("enterprise".equals(requestApp.get("type"))){
+            requestApp.put("type", "ENTERPRISE");
+        }else if("public".equals(requestApp.get("type"))){
+            requestApp.put("type", "PUBLIC");
+        }if("webapp".equals(requestApp.get("type"))){
+            requestApp.put("type", "WEBAPP");
+        }
+
         requestObj.put("application", requestApp);
 
         HttpClient httpClient = new HttpClient();
