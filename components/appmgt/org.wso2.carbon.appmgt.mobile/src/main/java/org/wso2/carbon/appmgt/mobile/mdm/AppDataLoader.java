@@ -70,8 +70,8 @@ public class AppDataLoader {
                     }
                 }
 
-            }else if ("public".equals(artifact.getAttribute("overview_type"))){
-                app.setType("public");
+            }else if ("market".equals(artifact.getAttribute("overview_type"))){
+                app.setType("market");
             }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
                 app.setType("webapp");
                 app.setLocation(artifact.getAttribute("overview_url"));
