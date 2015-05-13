@@ -232,7 +232,7 @@ public class MDMOperationsImpl implements MDMOperations {
                     }
                 }
             }else{
-                log.error("MDM Devices API failed");
+                log.error("Getting devices from MDM API failed");
             }
         }
 

@@ -1,11 +1,15 @@
 package org.wso2.carbon.appmgt.services.api.v1.apps.mobile;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 
 import java.io.File;
 
 public class MobileAppDataLoader {
+
+    private static final Log log = LogFactory.getLog(MobileAppDataLoader.class);
 
     public static MobileApp load(MobileApp mobileApp, GenericArtifact artifact, int tenantId, boolean showLocationInfo){
 
@@ -53,7 +57,12 @@ public class MobileAppDataLoader {
                 mobileApp.setBundleVersion(artifact.getAttribute("overview_bundleversion"));
             }
         } catch (GovernanceException e) {
-            e.printStackTrace();
+            String errorMessage = "GovernanceException occurred";
+            if(log.isDebugEnabled()){
+                log.error(errorMessage, e);
+            }else{
+                log.error(errorMessage);
+            }
         }finally {
             return mobileApp;
         }
