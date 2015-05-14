@@ -100,7 +100,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     // The element name which IDP uses when it issues an SLO request to the SP.
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST = "SAMLRequest";
-    
+
+    // Names of the attributes which IDP sends back containing the relay state
+    private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
+
     private volatile Authenticator authenticator;
     private SAML2Authenticator saml2Authenticator;
     private String issuer;
@@ -170,7 +173,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      */
     public boolean handleRequest(MessageContext messageContext) {
 
-        // application context
+         // application context
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         // application version
         String webAppVersion =
@@ -242,8 +245,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if (log.isDebugEnabled()) {
                     log.debug("Processing SAML response");
                 }
+
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
                 isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
+
+                //if a relay state is available, redirect to the relay state path
+                if (!redirectToRelayState(messageContext)) {
+                    return false;
+                }
 
                 if (isAuthorized) {
                     //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
@@ -285,6 +294,86 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             log.error(e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * redirect the page to relay state location
+     *
+     * @param messageContext
+     * @return if yes : true else false
+     */
+    private boolean redirectToRelayState(MessageContext messageContext) {
+        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
+                getAxis2MessageContext();
+
+        String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
+        Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+        String cookieString = (String) headers.get(HTTPConstants.HEADER_SET_COOKIE);
+
+        if (cookieString == null) {
+            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
+        } else {
+            cookieString = cookieString + " ;" + "\nSet-Cookie:" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+        }
+        headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
+        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+
+
+        SOAPBody soapBody = messageContext.getEnvelope().getBody();
+        boolean hasRelayState = false; //check if a relay state is available
+        String relayStateLocation = ""; //contains replay state location where it should be redirected to
+        if (soapBody != null) {
+            if (soapBody.getChildren().hasNext()) {
+                // Check whether there is a SAML request in the SOAP body.
+                relayStateLocation = ((OMElement) ((OMElement) (soapBody.getChildren().next())).
+                        getChildrenWithName(new QName(IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE)).next()).getText();
+
+                if (!"null".equals(relayStateLocation)) {
+                    hasRelayState = true;
+                }
+            }
+        }
+
+        // if relay state is available, redirect the request
+        if (hasRelayState) {
+            axis2MC.setProperty(NhttpConstants.HTTP_SC, "302");
+            messageContext.setResponse(true);
+            messageContext.setProperty("RESPONSE", "true");
+            messageContext.setTo(null);
+            axis2MC.removeProperty("NO_ENTITY_BODY");
+            String method = (String) axis2MC.getProperty(Constants.Configuration.HTTP_METHOD);
+
+            if (method.matches("^(?!.*(POST|PUT)).*$")) {
+            /* If the request was not an entity enclosing request, send a XML response back */
+                axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/xml");
+            }
+
+            /* Always remove the ContentType - Let the formatter do its thing */
+            axis2MC.removeProperty(Constants.Configuration.CONTENT_TYPE);
+            Map headerMap = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+
+            //read value from cache and set location
+            headerMap.put("Location", getSAML2RelayStateCache().get(relayStateLocation));
+
+            if (messageContext.getProperty("error_message_type") != null &&
+                    messageContext.getProperty("error_message_type").toString().equalsIgnoreCase("application/json")) {
+                axis2MC.setProperty(Constants.Configuration.MESSAGE_TYPE, "application/json");
+            }
+
+            headerMap.remove(HttpHeaders.HOST);
+            SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
+            env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
+            try {
+                axis2MC.setEnvelope(env);
+            } catch (AxisFault axisFault) {
+                axisFault.printStackTrace();
+            }
+
+            Axis2Sender.sendBack(messageContext);
+            return false;
+        }
+        return true;
     }
 
 	/**
@@ -1264,6 +1353,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 .getCache(AppMConstants.USER_ROLES_CONFIG_CACHE);
     }
 
+    private Cache getSAML2RelayStateCache() {
+        return Caching.getCacheManager(AppMConstants.SAML2_RELAY_STATE_CACHE_MANAGER)
+                .getCache(AppMConstants.SAML2_RELAY_STATE_CACHE);
+    }
+
     private void redirectToIDPLogin(MessageContext messageContext) {
         RequestAbstractType authnRequest = buildAuthnRequestObject(messageContext);
         String encodedSamlRequest = encodeRequestMessage(authnRequest);
@@ -1318,6 +1412,34 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         return authRequest;
     }
 
+    /**
+     * get Relay State if available
+     *
+     * @param messageContext
+     * @return relay state path
+     */
+    private String getRelayState(MessageContext messageContext) {
+        String replayState = "";
+        String fullRequest = (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
+        String context = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
+        String version = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+
+        if (!context.endsWith("/")) {
+            context += "/";
+        }
+
+        if (!version.endsWith("/")) {
+            version += "/";
+        }
+
+        getSAML2RelayStateCache().put(AppMConstants.SAML2_RELAY_STATE_CACHE_KEY,fullRequest);
+
+        if (!(context + version).equals(fullRequest)) {
+            replayState = "&" + IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE + "=" + AppMConstants.SAML2_RELAY_STATE_CACHE_KEY;
+        }
+        return replayState;
+    }
+
     private void sendSAMLRequestToIdP(MessageContext messageContext, String request) {
 
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext). getAxis2MessageContext();
@@ -1337,7 +1459,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         /* Always remove the ContentType - Let the formatter do its thing */
         axis2MC.removeProperty(Constants.Configuration.CONTENT_TYPE);
         Map headerMap = (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        headerMap.put("Location", getIDPUrl() + "?SAMLRequest=" + request);
+
+
+        headerMap.put("Location", getIDPUrl() + "?SAMLRequest=" + request + getRelayState(messageContext));
 
         if (messageContext.getProperty("error_message_type") != null &&
             messageContext.getProperty("error_message_type").toString().equalsIgnoreCase("application/json")) {
