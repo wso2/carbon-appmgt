@@ -23,7 +23,6 @@ package org.wso2.carbon.appmgt.mdm.wso2mdm;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -161,23 +160,10 @@ public class MDMOperationsImpl implements MDMOperations {
         PostMethod postMethod = new PostMethod(requestURL + actionURL);
         postMethod.setRequestEntity(requestEntity);
 
-        try {
-            if(log.isDebugEnabled()) log.debug("Sending POST request to perform operation on MDM. Request path:  "  +
-                    requestURL + actionURL);
-            int statusCode = httpClient.executeMethod(postMethod);
-            if (statusCode == HttpStatus.SC_OK) {
-                if(log.isDebugEnabled()) log.debug(action + " operation performed successfully");
-            }else{
-                if(log.isDebugEnabled()) log.debug(action + " operation unsuccessful. Status code : " + statusCode);
-            }
-
-        } catch (IOException e) {
-            String errorMessage = "Cannot connect to WSO2 MDM to perform operation";
-            if(log.isDebugEnabled()){
-                log.error(errorMessage, e);
-            }else{
-                log.error(errorMessage);
-            }
+        if(executeMethod(tokenApiURL, clientKey, clientSecret, httpClient, postMethod)){
+            if(log.isDebugEnabled()) log.debug(action + " operation performed successfully on " + type + " " + params.toString());
+        }else{
+            if(log.isDebugEnabled()) log.debug(action + " operation unsuccessful");
         }
 
     }
@@ -327,14 +313,19 @@ public class MDMOperationsImpl implements MDMOperations {
                     int statusCode = 401;
                     int tries = 0;
                     while(statusCode != 200){
+                        if(log.isDebugEnabled()) log.debug("Trying to call API : trying for " + (tries + 1) +  " time(s)");
                         httpMethod.setRequestHeader("Authorization", "Bearer " + authKey);
+                        if(log.isDebugEnabled()) log.debug("Sending " + httpMethod.getName() + " request to " + httpMethod.getURI());
                         statusCode = httpClient.executeMethod(httpMethod);
+                        if(log.isDebugEnabled()) log.debug("Status code received : " + statusCode);
                         if(statusCode == 401){
                             if(++tries > 3){
                                 log.info("API Call failed for the 3rd time: Unauthorized Access Aborting...");
                                 return false;
                             }
                             authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, true);
+                            if(log.isDebugEnabled()) log.debug("Access token getting again, Access token received :  "
+                                    + authKey + " in  try " + tries );
                         }
                     }
                     return true;
