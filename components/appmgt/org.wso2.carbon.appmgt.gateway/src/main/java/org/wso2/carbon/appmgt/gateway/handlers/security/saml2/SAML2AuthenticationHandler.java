@@ -108,7 +108,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private SAML2Authenticator saml2Authenticator;
 
     private WebAppInfoDTO webAppInfoDTO = null;
-    private boolean isResourceAccessible=true;
     private VerbInfoDTO verbInfoDTO=null;
 
     public void init(SynapseEnvironment synapseEnvironment) {
@@ -233,21 +232,22 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
 
             boolean isAuthorized = false;
-            org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
-                        getAxis2MessageContext();
+            boolean isResourceAccessible = false;
 
             if (shouldAuthenticateWithCookie(messageContext)) {
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
                 isAuthorized = handleSecurityUsingCookie(messageContext);
-
+            	isResourceAccessible = checkResourceAccessible(messageContext,true);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Processing SAML response");
                 }
 
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
-                isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
-
+                
+            	isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
+                isResourceAccessible = checkResourceAccessible(messageContext,false);
+                
                 //if a relay state is available, redirect to the relay state path
                 if (!redirectToRelayState(messageContext)) {
                     return false;
@@ -259,11 +259,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     //This is the first request goes to access the web-app which need to go as a GET request
                     //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
                     //segment is to set the HTTP_METHOD as GET and set empty body in request.
-                    axis2MC.setProperty("HTTP_METHOD", "GET");
+                    getAxis2MessageContext(messageContext).setProperty("HTTP_METHOD", "GET");
                     try {
                         SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
                         env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
-                        axis2MC.setEnvelope(env);
+                        getAxis2MessageContext(messageContext).setEnvelope(env);
                     } catch (AxisFault axisFault) {
                         String msg = "Error occurred while constructing SOAPEnvelope for " +
                                      messageContext.getProperty("REST_API_CONTEXT") + "/" +
@@ -275,17 +275,20 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
 
             if (isAuthorized) {
-                if (messageContext.getProperty("isLogoutRequest") == null) {
-                    //Include appmSamlSsoCookie to "Cookie" header before request send to backend
+            	if (!isLogoutRequest(messageContext)) {
+
+                	if (!isResourceAccessible) {
+                		handleAuthFailure(messageContext,
+                				new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
+                		return false;
+                	}
+                    
+                	//Include appmSamlSsoCookie to "Cookie" header before request send to backend
                     setAppmSamlSsoCookie(messageContext);
                 }
+                
                 return true;
-            } else if (!isResourceAccessible) {
-                isResourceAccessible = true;
-                handleAuthFailure(messageContext,
-                        new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
-                return false;
-            }    else {
+            } else {
                 redirectToIDPLogin(messageContext);
                 return false;
             }
@@ -668,7 +671,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         String logoutUrl = webAppInfoDTO.getLogoutUrl();
         if (logoutUrl != null && logoutUrl.endsWith(inURL)) {
-            log.info("Logout URL Encountered");
+            if(log.isDebugEnabled()){
+            	log.debug("Logout URL Encountered");
+            }
             return true;
         } else {
             return false;
@@ -818,7 +823,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if (isLogoutRequest(messageContext)) {
                     handleLogoutRequest(messageContext);
                     return true;
-                } else if (isSubscribed(messageContext) && checkResourceAccessible(messageContext,true)) { // Has subscribed
+                } else if (isSubscribed(messageContext)) { // Has subscribed
                     //TODO: check the expiration time
 
                     //TODO: Handle if JWT Cache expires while saml2Cookie active
@@ -852,7 +857,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * Role claim should be passed by default
      */
 
-    private boolean checkResourceAccessible(MessageContext synapseMessageContext,boolean isCachedRequest){
+    private boolean checkResourceAccessible(MessageContext synapseMessageContext, boolean isCachedRequest){
 
         Map<String, String> idpResponseAttributes = null;
         Map<String, Object> samlAttributes =null;
@@ -906,7 +911,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                         return true;
                     }
                     else{
-                        isResourceAccessible=false;
                         return false;
                     }
                 }
@@ -1067,7 +1071,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if(isLogoutRequest(messageContext)){
                     handleLogoutRequest(messageContext);
                     return true;
-                } else if (isSubscribed(messageContext) && checkResourceAccessible(messageContext,false)) {  //check for subscription
+                } else if (isSubscribed(messageContext)) {  //check for subscription
                     if (isJWTEnabled()) {
                         generateJWTAndAddToTransportHeaders(messageContext, samlAttributes);
 
