@@ -38,6 +38,7 @@ import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
 import org.wso2.carbon.appmgt.mobile.utils.User;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -173,12 +174,18 @@ public class MDMOperationsImpl implements MDMOperations {
 
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
 
+
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+
         String actionURL = null;
         if("install".equals("install")){
-            actionURL = Constants.API_INSTALL_APP;
+            actionURL = String.format(Constants.API_INSTALL_APP, tenantDomain);
         }else{
-            actionURL = Constants.API_UNINSTALL_APP;
+            actionURL = String.format(Constants.API_UNINSTALL_APP, tenantDomain);
         }
+
+
 
         PostMethod postMethod = new PostMethod(requestURL + actionURL);
         postMethod.setRequestEntity(requestEntity);
@@ -218,12 +225,15 @@ public class MDMOperationsImpl implements MDMOperations {
 
             HttpClient httpClient = new HttpClient();
 
-            String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+
+            String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0], tenantDomain);
             String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
             GetMethod getMethod = new GetMethod(requestURL);
 
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
+            //nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
 
             if(platform != null) nameValuePairs.add(new NameValuePair("platform", platform));
 
