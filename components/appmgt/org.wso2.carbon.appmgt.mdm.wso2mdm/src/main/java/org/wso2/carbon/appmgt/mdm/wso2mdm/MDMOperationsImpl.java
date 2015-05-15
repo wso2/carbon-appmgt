@@ -131,13 +131,10 @@ public class MDMOperationsImpl implements MDMOperations {
 
         }
 
-        if("enterprise".equals(requestApp.get("type"))){
-            requestApp.put("type", "ENTERPRISE");
-        }else if("public".equals(requestApp.get("type"))){
-            requestApp.put("type", "PUBLIC");
-        }if("webapp".equals(requestApp.get("type"))){
-            requestApp.put("type", "WEBAPP");
-        }
+
+        requestApp.put("type",requestApp.get("type").toString().toUpperCase());
+
+
 
         requestObj.put("application", requestApp);
 

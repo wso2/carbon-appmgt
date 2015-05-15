@@ -55,9 +55,7 @@ public class AppDataLoader {
             app.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
-                app.setType("enterprise");
-
-
+                app.setType(artifact.getAttribute("overview_type"));
                 if("install".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
@@ -71,9 +69,9 @@ public class AppDataLoader {
                 }
 
             }else if ("public".equals(artifact.getAttribute("overview_type"))){
-                app.setType("public");
+                app.setType(artifact.getAttribute("overview_type"));
             }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
-                app.setType("webapp");
+                app.setType(artifact.getAttribute("overview_type"));
                 app.setLocation(artifact.getAttribute("overview_url"));
                 app.setIdentifier(artifact.getAttribute("overview_url"));
             }

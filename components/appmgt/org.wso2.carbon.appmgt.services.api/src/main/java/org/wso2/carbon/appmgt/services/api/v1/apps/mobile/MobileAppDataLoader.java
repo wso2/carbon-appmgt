@@ -23,7 +23,7 @@ public class MobileAppDataLoader {
             mobileApp.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
-                mobileApp.setType("enterprise");
+                mobileApp.setType(artifact.getAttribute("overview_type"));
                 if(showLocationInfo){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         mobileApp.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
@@ -36,9 +36,9 @@ public class MobileAppDataLoader {
                     }
                 }
             }else if ("public".equals(artifact.getAttribute("overview_type"))){
-                mobileApp.setType("public");
+                mobileApp.setType(artifact.getAttribute("overview_type"));
             }else if ("webapp".equals(artifact.getAttribute("overview_type"))){
-                mobileApp.setType("webapp");
+                mobileApp.setType(artifact.getAttribute("overview_type"));
                 mobileApp.setIdentifier(artifact.getAttribute("overview_url"));
                 if(showLocationInfo){
                     mobileApp.setLocation(artifact.getAttribute("overview_url"));
