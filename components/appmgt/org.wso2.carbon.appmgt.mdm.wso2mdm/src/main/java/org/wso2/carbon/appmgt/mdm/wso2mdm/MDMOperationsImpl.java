@@ -131,9 +131,32 @@ public class MDMOperationsImpl implements MDMOperations {
         }
 
 
+        if("ios".equals(requestApp.get("platform"))){
+
+            JSONObject iosProperties = new JSONObject();
+            if("enterprise".equals(requestApp.get("type"))){
+                iosProperties.put("isRemoveApp", true);
+                iosProperties.put("isPreventBackup", true);
+            }else if("public".equals(requestApp.get("type"))){
+                iosProperties.put("iTunesId", Integer.parseInt(requestApp.get("identifier").toString()));
+                iosProperties.put("isRemoveApp", true);
+                iosProperties.put("isPreventBackup", true);
+            }else if("webapp".equals(requestApp.get("type"))){
+                iosProperties.put("label", requestApp.get("name"));
+                iosProperties.put("isRemoveApp", true);
+            }
+            requestApp.put("properties",  iosProperties);
+
+        }else if("webapp".equals(requestApp.get("platform"))){
+
+            JSONObject webappProperties = new JSONObject();
+            webappProperties.put("label", requestApp.get("name"));
+            webappProperties.put("isRemoveApp", true);
+            requestApp.put("properties",  webappProperties);
+        }
+
+        //make type to uppercase
         requestApp.put("type",requestApp.get("type").toString().toUpperCase());
-
-
 
         requestObj.put("application", requestApp);
 
@@ -318,15 +341,17 @@ public class MDMOperationsImpl implements MDMOperations {
                         if(log.isDebugEnabled()) log.debug("Sending " + httpMethod.getName() + " request to " + httpMethod.getURI());
                         statusCode = httpClient.executeMethod(httpMethod);
                         if(log.isDebugEnabled()) log.debug("Status code received : " + statusCode);
+
+                        if(++tries >= 3){
+                            log.info("API Call failed for the 3rd time: No or Unauthorized Access Aborting...");
+                            return false;
+                        }
                         if(statusCode == 401){
-                            if(++tries > 3){
-                                log.info("API Call failed for the 3rd time: Unauthorized Access Aborting...");
-                                return false;
-                            }
                             authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, true);
                             if(log.isDebugEnabled()) log.debug("Access token getting again, Access token received :  "
                                     + authKey + " in  try " + tries );
                         }
+
                     }
                     return true;
                 } catch (IOException e) {
