@@ -105,9 +105,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
 
     private volatile Authenticator authenticator;
-    private SAML2Authenticator saml2Authenticator;
-
-    private WebAppInfoDTO webAppInfoDTO = null;
+    private volatile SAML2Authenticator saml2Authenticator;
+    private volatile WebAppInfoDTO webAppInfoDTO;
 
     public void init(SynapseEnvironment synapseEnvironment) {
         if (log.isDebugEnabled()) {
