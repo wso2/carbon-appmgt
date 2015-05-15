@@ -106,7 +106,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
     private volatile Authenticator authenticator;
     private SAML2Authenticator saml2Authenticator;
-    private String issuer;
 
     private WebAppInfoDTO webAppInfoDTO = null;
     private boolean isResourceAccessible=true;
@@ -189,7 +188,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         try {
             // Get App Info related to SSO handling.
             if (webAppInfoDTO == null) {
-                webAppInfoDTO = getSSOInfoForApp(webAppContext, webAppVersion);
+                WebAppInfoDTO webAppInfoDTO = getSSOInfoForApp(webAppContext, webAppVersion);
+                constructAndSetFullyQualifiedSamlIssuerId(messageContext, webAppInfoDTO);
+                this.webAppInfoDTO = webAppInfoDTO;
             }
 
             // If this is an SLO request we need to respond to the client (IDP) without continuing the flow. 
@@ -231,8 +232,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return true;
             }
 
-            //Construct issue name for saml request. format: AppName-tenantDomain-version
-            issuer = constructIssuerId(messageContext);
             boolean isAuthorized = false;
             org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                         getAxis2MessageContext();
@@ -577,7 +576,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if(response != null){
             Map<String, SAMLTokenInfoDTO> samlResponsesMap = (HashMap<String, SAMLTokenInfoDTO>) response;
             String samlResponseOfWebApp = null;
-            SAMLTokenInfoDTO samlTokenInfoDTO = samlResponsesMap.get(issuer);
+            SAMLTokenInfoDTO samlTokenInfoDTO = samlResponsesMap.get(webAppInfoDTO.getSaml2SsoIssuer());
 
             if (samlTokenInfoDTO != null) {
                 samlResponseOfWebApp = samlTokenInfoDTO.getEncodedSamlToken();
@@ -600,11 +599,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         Object response = getSAML2ConfigCache().get(cacheKey);
         if (response != null) {
             Map<String, SAMLTokenInfoDTO> samlResponsesMap = (HashMap<String, SAMLTokenInfoDTO>) response;
-            DateTime samlTokenValidity = samlResponsesMap.get(issuer).getNotOnOrAfter();
+            DateTime samlTokenValidity = samlResponsesMap.get(webAppInfoDTO.getSaml2SsoIssuer()).getNotOnOrAfter();
 
             if (samlTokenValidity != null && samlTokenValidity.compareTo(new DateTime()) < 1) {
                 // notOnOrAfter is an expired timestamp
-                log.debug("NotOnOrAfter is having an expired timestamp in the cache for web-app = " + issuer);
+                log.debug("NotOnOrAfter is having an expired timestamp in the cache for the SAML issuer = " + webAppInfoDTO.getSaml2SsoIssuer());
                 return true;
             }
         }
@@ -1029,7 +1028,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 //SAML responses for each app. Map is required to store SAML responses of apps being invoked. Then set the cache
                 //key as value of 'appmSamlSsoTokenId' cookie and this Map has the value and put it to cache.
                 Map<String, SAMLTokenInfoDTO> samlResponsesMap = new HashMap<String, SAMLTokenInfoDTO>();
-                samlResponsesMap.put(constructIssuerId(messageContext), samlTokenInfoDTO);
+                samlResponsesMap.put(webAppInfoDTO.getSaml2SsoIssuer(), samlTokenInfoDTO);
                 getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
             } else {
                 if (log.isDebugEnabled()) {
@@ -1037,12 +1036,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 }
                 //This logic get executed when accessing an app that haven't accessed previously in the same browser
                 Map<String, SAMLTokenInfoDTO> samlResponsesMap = (HashMap<String, SAMLTokenInfoDTO>) getSAML2ConfigCache().get(samlCookieValue);
-                if (samlResponsesMap != null && !samlResponsesMap.containsKey(issuer)) {
-                    samlResponsesMap.put(issuer, samlTokenInfoDTO);
+                String samlIssuer = webAppInfoDTO.getSaml2SsoIssuer();
+                
+                if (samlResponsesMap != null && !samlResponsesMap.containsKey(samlIssuer)) {
+                    samlResponsesMap.put(samlIssuer, samlTokenInfoDTO);
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
                 } else { //when accessing though my-subscriptions page
                     samlResponsesMap = new HashMap<String, SAMLTokenInfoDTO>();
-                    samlResponsesMap.put(constructIssuerId(messageContext), samlTokenInfoDTO);
+                    samlResponsesMap.put(samlIssuer, samlTokenInfoDTO);
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
                 }
                 messageContext.setProperty(AppMConstants.APPM_SAML2_COOKIE, samlCookieValue);
@@ -1182,7 +1183,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     AuthnStatement authnStatement = assertion.getAuthnStatements().get(0);
                     String sessionIndex = authnStatement.getSessionIndex();
 
-                    LogoutRequest logoutReq = buildLogoutRequest(subject,sessionIndex, constructIssuerId(messageContext));
+                    LogoutRequest logoutReq = buildLogoutRequest(subject,sessionIndex, webAppInfoDTO.getSaml2SsoIssuer());
 
                     String encodedSamlLogOutRequest =  encodeRequestMessage(logoutReq);
 
@@ -1369,7 +1370,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         /* Building Issuer object */
         IssuerBuilder issuerBuilder = new IssuerBuilder();
         Issuer issuerOb = issuerBuilder.buildObject("urn:oasis:names:tc:SAML:2.0:assertion", "Issuer", "samlp");
-        issuerOb.setValue(issuer);
+        issuerOb.setValue(webAppInfoDTO.getSaml2SsoIssuer());
 
         /* NameIDPolicy */
         NameIDPolicyBuilder nameIdPolicyBuilder = new NameIDPolicyBuilder();
@@ -1684,20 +1685,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         return tenantDomain;
     }
 
-    private String constructIssuerId(MessageContext messageContext) {
+    private void constructAndSetFullyQualifiedSamlIssuerId(MessageContext messageContext, WebAppInfoDTO webAppInfoDTO) {
         String assertionConsumerUrl = constructAssertionConsumerUrl(messageContext);
         String tenantDomain = getTenantDomainFromGatewayUrl(assertionConsumerUrl);
-        String issuer = webAppInfoDTO.getSaml2SsoIssuer();
         String version = (String)messageContext.getProperty("SYNAPSE_REST_API_VERSION");
-
+        
+        String fullyQualifiedIssuer = webAppInfoDTO.getSaml2SsoIssuer();
+        
         if (!tenantDomain.equals("")) {
-            issuer = issuer + "-" + tenantDomain;
+            fullyQualifiedIssuer = fullyQualifiedIssuer + "-" + tenantDomain;
         }
 
         //Append version to SP name
-        issuer = issuer + "-" + version;
-
-        return issuer;
+        fullyQualifiedIssuer = fullyQualifiedIssuer + "-" + version;
+        
+        webAppInfoDTO.setSaml2SsoIssuer(fullyQualifiedIssuer);
     }
 
     private String constructAssertionConsumerUrl(MessageContext messageContext) {
