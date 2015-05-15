@@ -108,7 +108,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private SAML2Authenticator saml2Authenticator;
 
     private WebAppInfoDTO webAppInfoDTO = null;
-    private VerbInfoDTO verbInfoDTO=null;
 
     public void init(SynapseEnvironment synapseEnvironment) {
         if (log.isDebugEnabled()) {
@@ -210,12 +209,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return true;
             }
 
-            // Get App URL Pattern Info
-            if (verbInfoDTO == null) {
-                verbInfoDTO = getVerbInfoForApp(webAppContext, webAppVersion);
-            }
-
-
             // check if anonymous mode allowed for particular URL pattern
             boolean isAllowAnonymousUrl = isAllowAnonymousUrlPattern(httpVerb, fullReqPath);
             // write to messageContext so then the same value can be accessed as a
@@ -293,8 +286,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 return false;
             }
         } catch (AppManagementException e) {
-            log.error(e.getMessage());
-            return false;
+        	String errorMessage = "Error while handling authentication.";
+            log.error(errorMessage);
+            throw new SynapseException(errorMessage, e);
         }
     }
 
@@ -391,9 +385,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * Check if the Anonymous Access is allowed for the particular URL pattern
      *
      * @return boolean result either anonymous access allowed or not
+     * @throws AppManagementException 
      */
-    public boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) {
-        //Make request path and verbInfoDTO.mapAllowAnonymousUrl keys consistence.
+    public boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) throws AppManagementException {
+
+        // Get App URL Pattern Info
+        VerbInfoDTO verbInfoDTO = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
+    	
+    	//Make request path and verbInfoDTO.mapAllowAnonymousUrl keys consistence.
         if (!requestPath.endsWith("/")) {
             requestPath = requestPath + "/";
         }
@@ -405,40 +404,48 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     public boolean handleResponse(MessageContext messageContext) {
-        if (isAllowAnonymousApplication() ||
-            isAllowAnonymousUrlPattern((String) messageContext.getProperty("REST_METHOD"),
-                                       (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
-            return true;
-        }
-        String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
-
-        if (log.isDebugEnabled()) {
-            log.debug("Reading AppMConstants.APPM_SAML2_COOKIE from msg context");
-            log.debug(AppMConstants.APPM_SAML2_COOKIE + " : " + appmSamlSsoCookie);
-        }
-
-        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
-                getAxis2MessageContext();
-        Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        String cookieString = (String) headers.get(HTTPConstants.HEADER_SET_COOKIE);
-
-        if (log.isDebugEnabled()) {
-            log.debug("Exisiting set cookie string in transport headers : " + cookieString);
-        }
-
-        if (cookieString == null) {
-            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
-        } else {
-            cookieString = cookieString + " ;" + "\nSet-Cookie:" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("Updated set cookie string in transport headers : " + cookieString);
-        }
-        headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
-        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
-
-        return true;
+        
+    	try {
+			if (isAllowAnonymousApplication() ||
+			    isAllowAnonymousUrlPattern((String) messageContext.getProperty("REST_METHOD"),
+			                               (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH))) {
+			    return true;
+			}
+        
+	        String appmSamlSsoCookie = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
+	
+	        if (log.isDebugEnabled()) {
+	            log.debug("Reading AppMConstants.APPM_SAML2_COOKIE from msg context");
+	            log.debug(AppMConstants.APPM_SAML2_COOKIE + " : " + appmSamlSsoCookie);
+	        }
+	
+	        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
+	                getAxis2MessageContext();
+	        Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
+	                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+	        String cookieString = (String) headers.get(HTTPConstants.HEADER_SET_COOKIE);
+	
+	        if (log.isDebugEnabled()) {
+	            log.debug("Exisiting set cookie string in transport headers : " + cookieString);
+	        }
+	
+	        if (cookieString == null) {
+	            cookieString = AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + "; " + "path=" + "/";
+	        } else {
+	            cookieString = cookieString + " ;" + "\nSet-Cookie:" + AppMConstants.APPM_SAML2_COOKIE + "=" + appmSamlSsoCookie + ";" + " Path=" + "/";
+	        }
+	        if (log.isDebugEnabled()) {
+	            log.debug("Updated set cookie string in transport headers : " + cookieString);
+	        }
+	        headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
+	        messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+	
+	        return true;
+    	} catch (AppManagementException e) {
+    		String errorMessage = "Error while handling authentication.";
+    		log.error(errorMessage);
+    		throw new SynapseException(errorMessage, e);
+    	}
     }
 
     public void destroy() {
