@@ -41,7 +41,7 @@ public class MDMComponent {
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
         mdmServiceRegistration = bundleContext.registerService(MDMOperations.class.getName(), new MDMOperationsImpl(), null);
-        log.debug("WSO2EMM MDM Component activated");
+        if(log.isDebugEnabled()) log.debug("WSO2EMM MDM Component activated");
     }
 
     protected void deactivate(ComponentContext context) {
@@ -49,7 +49,7 @@ public class MDMComponent {
             mdmServiceRegistration.unregister();
             mdmServiceRegistration = null;
         }
-        log.debug("WSO2EMM MDM Component deactivated");
+        if(log.isDebugEnabled()) log.debug("WSO2EMM MDM Component deactivated");
     }
 }
 

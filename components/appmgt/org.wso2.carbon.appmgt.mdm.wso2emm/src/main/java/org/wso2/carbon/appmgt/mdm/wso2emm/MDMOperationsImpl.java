@@ -118,7 +118,7 @@ public class MDMOperationsImpl implements MDMOperations {
         HttpClient httpClient = new HttpClient();
         StringRequestEntity requestEntity = null;
 
-        log.debug("Request Payload for MDM: " + requestObj.toJSONString());
+        if(log.isDebugEnabled()) log.debug("Request Payload for MDM: " + requestObj.toJSONString());
 
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
@@ -139,10 +139,10 @@ public class MDMOperationsImpl implements MDMOperations {
                 new String(Base64.encodeBase64((authUser + ":" + authPass).getBytes())));
 
         try {
-            log.debug("Sending POST request to perform operation on MDM. Request path:  "  + requestURL);
+            if(log.isDebugEnabled()) log.debug("Sending POST request to perform operation on MDM. Request path:  "  + requestURL);
             int statusCode = httpClient.executeMethod(postMethod);
             if (statusCode == HttpStatus.SC_OK) {
-                log.debug(action + " operation on WSO2 EMM performed successfully");
+                if(log.isDebugEnabled()) log.debug(action + " operation on WSO2 EMM performed successfully");
             }
 
         } catch (IOException e) {
@@ -193,7 +193,7 @@ public class MDMOperationsImpl implements MDMOperations {
                 if(statusCode == 200){
                    String response = getMethod.getResponseBodyAsString();
                    JSONArray devicesArray = (JSONArray) new JSONValue().parse(response);
-                   log.debug("Devices Received" + devicesArray.toJSONString());
+                    if(log.isDebugEnabled()) log.debug("Devices Received" + devicesArray.toJSONString());
                    Iterator<JSONObject> iterator = devicesArray.iterator();
                    while (iterator.hasNext()){
                        JSONObject deviceObj = iterator.next();

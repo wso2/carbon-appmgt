@@ -141,7 +141,7 @@ public class MDMOperationsImpl implements MDMOperations {
         HttpClient httpClient = new HttpClient();
         StringRequestEntity requestEntity = null;
 
-        log.debug("Request Payload for MDM: " + requestObj.toJSONString());
+        if(log.isDebugEnabled()) log.debug("Request Payload for MDM: " + requestObj.toJSONString());
 
         try {
             requestEntity = new StringRequestEntity( requestObj.toJSONString(),"application/json","UTF-8");
@@ -162,16 +162,17 @@ public class MDMOperationsImpl implements MDMOperations {
         postMethod.setRequestEntity(requestEntity);
 
         try {
-            log.debug("Sending POST request to perform operation on MDM. Request path:  "  +requestURL + actionURL);
+            if(log.isDebugEnabled()) log.debug("Sending POST request to perform operation on MDM. Request path:  "  +
+                    requestURL + actionURL);
             int statusCode = httpClient.executeMethod(postMethod);
             if (statusCode == HttpStatus.SC_OK) {
-                log.debug(action + " operation performed successfully");
+                if(log.isDebugEnabled()) log.debug(action + " operation performed successfully");
             }else{
-                log.debug(action + " operation unsuccessful. Status code : " + statusCode);
+                if(log.isDebugEnabled()) log.debug(action + " operation unsuccessful. Status code : " + statusCode);
             }
 
         } catch (IOException e) {
-            String errorMessage = "Cannot connect to WSO2 EMM to perform operation";
+            String errorMessage = "Cannot connect to WSO2 MDM to perform operation";
             if(log.isDebugEnabled()){
                 log.error(errorMessage, e);
             }else{
@@ -193,7 +194,8 @@ public class MDMOperationsImpl implements MDMOperations {
      */
 
     public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
-                                   String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configProperties) {
+                                   String platformVersion, boolean isSampleDevicesEnabled,
+                                   HashMap<String, String> configProperties) {
 
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
@@ -225,7 +227,7 @@ public class MDMOperationsImpl implements MDMOperations {
                 try {
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
                     if(jsonArray != null){
-                        log.debug("Devices received from MDM: " + jsonArray.toJSONString());
+                        if(log.isDebugEnabled()) log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                     }
                 } catch (IOException e) {
                     String errorMessage = "Invalid response from the devices API";
@@ -284,7 +286,7 @@ public class MDMOperationsImpl implements MDMOperations {
                 new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
         postMethod.addRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
         try {
-            log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
+            if(log.isDebugEnabled()) log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
             String errorMessage = "Cannot connect to Token API Endpoint";
@@ -319,6 +321,7 @@ public class MDMOperationsImpl implements MDMOperations {
     private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient,
                                   HttpMethodBase httpMethod){
                 String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                if(log.isDebugEnabled()) log.debug("Access token received : " + authKey);
                 //String authKey = "12345";
                 try {
                     int statusCode = 401;
