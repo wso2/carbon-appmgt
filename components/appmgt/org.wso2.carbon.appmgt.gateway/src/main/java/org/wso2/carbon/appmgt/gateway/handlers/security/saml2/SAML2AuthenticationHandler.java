@@ -55,7 +55,9 @@ import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.util.Base64;
 import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Element;
+import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
@@ -64,6 +66,8 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Authenticator;
 import org.wso2.carbon.appmgt.gateway.handlers.security.oauth.OAuthAuthenticator;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AbstractAPIManager;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
@@ -139,19 +143,20 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * retrieving context+version string list from database.
      * @return context+version list
      */
-    private List<String> getAppContextWithVersion() {
+    private Map<String, String> getAppContextWithVersion() {
         if (log.isDebugEnabled()) {
             log.debug("Calling getAppContextWithVersion");
         }
         try {
             APIMgtDBUtil.initialize();
             AppMDAO dao = new AppMDAO();
-            List<String> contextVersion = new ArrayList();
+            Map<String, String> contextVersion = new HashMap<String, String>();
             Iterator listI = dao.getAllWebApps().listIterator();
+
             while(listI.hasNext()) {
-                WebApp app = (WebApp)listI.next();
-                contextVersion.add((app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext()) +
-                        "/" + app.getId().getVersion());
+                WebApp app = (WebApp) listI.next();
+                contextVersion.put((app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext()) +
+                        "/" + app.getId().getVersion(), app.getUrl());
             }
             return contextVersion;
         } catch (AppManagementException e) {

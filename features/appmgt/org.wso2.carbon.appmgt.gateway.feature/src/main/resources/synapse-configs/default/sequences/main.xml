@@ -62,7 +62,7 @@
             </then>
             <else>
                 <class name="org.wso2.carbon.appmgt.custom.mediators.redirection.RefererRewriteMediator"/>
-                <header name="Location" expression="fn:concat($trp:referer,get-property('REST_FULL_REQUEST_PATH'))" scope="transport"/>
+                <header name="Location" expression="$trp:referer" scope="transport"/>
                 <property name="HTTP_SC" value="303" scope="axis2"/>                
                 <respond/>
                 <!--payloadFactory>
