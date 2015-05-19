@@ -76,14 +76,15 @@ public class ProxyApplicationCreator {
         applicationPublisher = new ApplicationPublisher();
         applicationSubscriber =  new ApplicationSubscriber();
         random = new Random();
+        String errorMessage = "Error while creating a WSRegistryServiceClient";
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);
         } catch (RegistryException e) {
-            log.error("Error while creating a WSRegistryServiceClient",e);
-            throw  new AppManagementException("Error while creating WSRegistryServiceClient",e);
+            log.error(errorMessage,e);
+            throw  new AppManagementException(errorMessage,e);
         } catch (AxisFault axisFault) {
-            log.error("Error while creating a WSRegistryServiceClient", axisFault);
-            throw  new AppManagementException("Error while creating WSRegistryServiceClient",axisFault);
+            log.error(errorMessage, axisFault);
+            throw  new AppManagementException(errorMessage,axisFault);
         }
     }
 
@@ -99,7 +100,8 @@ public class ProxyApplicationCreator {
      *            Throws this when policy id is failed while requesting
      *            Throws this when failed to create,publish or subscribe web application
      */
-    public void manageWebApplication(WebAppDetail webAppDetail) throws AppManagementException{
+    //create and publish
+    public void createAndPublishWebApplication(WebAppDetail webAppDetail) throws AppManagementException{
         String currentUserName = webAppDetail.getUserName();
         String creatorSession = webAppDetail.getCreatorSession();
         String storeSession = webAppDetail.getStoreSession();
@@ -114,8 +116,9 @@ public class ProxyApplicationCreator {
                                 "&action=login", ""
                         , "application/x-www-form-urlencoded");
             } catch (IOException e) {
-                log.error("Error while requesting publisher session", e);
-                throw  new AppManagementException("Error while requesting publisher session",e);
+                String errorMessage = "Error while requesting publisher session";
+                log.error(errorMessage, e);
+                throw  new AppManagementException(errorMessage,e);
             }
         }
 
@@ -148,31 +151,35 @@ public class ProxyApplicationCreator {
         appCreateRequest.setOverview_transports("http");
         appCreateRequest.setOverview_webAppUrl(httpBackEndUrl +"/" +webAppDetail.getWarFileName()+"/");
         String UUID = null;
+        String errorMessage = "Error while creating a web application"+webAppDetail.getDisplayName();
         try {
             UUID = createWebApplication(appCreateRequest.generateRequestParameters(),webAppDetail);
         } catch (IOException e) {
-            log.error("Error while creating a web application Plan Your Trip", e);
-            throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         } catch (RegistryException e) {
-            log.error("Error while creating a web application Plan Your Trip", e);
-            throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         } catch (InterruptedException e) {
-            log.error("Error while creating a web application Plan Your Trip", e);
-            throw  new AppManagementException("Error while creating a web application Plan Your Trip", e);
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         }
         try {
            applicationPublisher.publishApplication("webapp", UUID,adminPublisherSession);
         } catch (IOException e) {
-            log.error("Error while publishing a web application Plan Your Trip", e);
-            throw  new AppManagementException("Error while publishing a web application Plan Your Trip", e);
+            String publishingErrorMessage = "Error while publishing a web application "
+                    +webAppDetail.getDisplayName();
+            log.error(publishingErrorMessage, e);
+            throw  new AppManagementException(publishingErrorMessage, e);
         }
         log.info(appCreateRequest.getOverview_name() + " published and UUID is " + UUID);
         try {
             applicationSubscriber.subscribeApplication(appCreateRequest,storeSession,
                     currentUserName);
         } catch (IOException e) {
-            log.error("Error while subscribing a web application Plan Your Trip", e);
-            throw  new AppManagementException("Error while subscribing a web application Plan Your Trip", e);
+            String subscribingErrorMessage = "Error while subscribing a web application "+webAppDetail.getDisplayName();
+            log.error(subscribingErrorMessage, e);
+            throw  new AppManagementException(subscribingErrorMessage, e);
         }
         log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_"+currentUserName);
     }
@@ -180,142 +187,48 @@ public class ProxyApplicationCreator {
     /**
      * This method is use for create and publish sample mobile application
      *
-     * @param publisherSession
-     *            Current logged publisher session
+     * @param mobileApplicationBean
+     *            bean class of the mobile application
      *
      * @throws AppManagementException
      *            Throws this when apk file is failed while uploading
      *            Throws this when failed to create or publish web application
      */
-    public void manageMobilebApplication(String publisherSession) throws AppManagementException {
+    public void manageMobilebApplication(MobileApplicationBean mobileApplicationBean) throws AppManagementException {
         log.info("publishing CleanCalc mobile application");
-        MobileApplicationBean mobileApplicationBean = new MobileApplicationBean();
-        mobileApplicationBean.setApkFile(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/CleanCalc.apk");//to do use a constant
         String appMeta = null;
-        try {
-            appMeta = httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/mobileapp/upload",
-                    true, mobileApplicationBean, publisherSession);
-        } catch (IOException e) {
-            log.error("Error while uploading an APK file of CLeanCalc Mobile Application", e);
-            throw  new AppManagementException("Error while uploading an APK file of CLeanCalc Mobile Application", e);
+        if(mobileApplicationBean.isApkAvailable()){
+            try {
+                appMeta = httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/mobileapp/upload",
+                        true, mobileApplicationBean, mobileApplicationBean.getPublisherSession());
+            } catch (IOException e) {
+                log.error("Error while uploading an APK file of CLeanCalc Mobile Application", e);
+                throw  new AppManagementException("Error while uploading an APK file of CLeanCalc Mobile Application", e);
+            }
+        }else{
+            JSONObject appMetaJson = new JSONObject();
+            appMetaJson.put("package",mobileApplicationBean.getPackageName());
+            appMetaJson.put("version",mobileApplicationBean.getVersion());
+            appMeta = appMetaJson.toJSONString();
         }
-        mobileApplicationBean.setVersion("1.0.0");
-        mobileApplicationBean.setProvider("1WSO2Mobile");
-        mobileApplicationBean.setMarkettype("Enterprise");
-        mobileApplicationBean.setPlatform("android");
-        mobileApplicationBean.setName("CleanCalc");
-        mobileApplicationBean.setDescription("this is a clean calucultor");
-        mobileApplicationBean.setBannerFilePath(appmHomePath + "/repository/resources/mobileapps/" +
-                "CleanCalc/Resources/banner.png");
-        mobileApplicationBean.setIconFile(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/icon.png");
-        mobileApplicationBean.setScreenShot1File(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/screen1.png");
-        mobileApplicationBean.setScreenShot2File(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/screen2.png");
-        mobileApplicationBean.setScreenShot3File(appmHomePath + "/repository/resources/mobileapps/CleanCalc" +
-                "/Resources/screen3.png");
-        mobileApplicationBean.setMobileapp("mobileapp");
         mobileApplicationBean.setAppmeta(appMeta);
         String UUID = null;
+        String creatingErrorMessage  = "Error while creating "+mobileApplicationBean.getName()+" Mobile Application";
         try {
-            UUID = createMobielAppliaction(mobileApplicationBean, publisherSession);
+            UUID = createMobielAppliaction(mobileApplicationBean,mobileApplicationBean.getPublisherSession());
         } catch (IOException e) {
-            log.error("Error while creating CLeanCalc Mobile Application", e);
-            throw  new AppManagementException("Error while creating CLeanCalc Mobile Application", e);
+            log.error(creatingErrorMessage, e);
+            throw  new AppManagementException(creatingErrorMessage, e);
         } catch (InterruptedException e) {
-            log.error("Error while creating CLeanCalc Mobile Application", e);
-            throw  new AppManagementException("Error while creating CLeanCalc Mobile Application", e);
-        }
-        try {
-            applicationPublisher.publishApplication("webapp", UUID, adminPublisherSession);
-        } catch (IOException e) {
-            log.error("Error while publishing CLeanCalc Mobile Application", e);
-            throw  new AppManagementException("Error while publishing CLeanCalc Mobile Application", e);
-        }
-        //wso2Con mobile application
-        log.info("publishing WSO2Con mobile application");
-        mobileApplicationBean.setAppmeta("{\"package\":\"com.wso2.wso2con.mobile\",\"version\":\"1.0.0\"}");
-        mobileApplicationBean.setVersion("1.0.0");
-        mobileApplicationBean.setProvider("1WSO2Mobile");
-        mobileApplicationBean.setMarkettype("public");
-        mobileApplicationBean.setPlatform("android");
-        mobileApplicationBean.setName("Wso2Con");
-        mobileApplicationBean.setDescription("WSO2Con mobile app provides the agenda and meeting tool for " +
-                "WSO2Con. Get the app to follow the agenda, find out about the sessions and speakers, provide " +
-                "feedback on the sessions, and get more information on the venue and sponsors. Join us at " +
-                "WSO2Con, where we will place emerging technology, best practices, and WSO2 product features " +
-                "in the perspective of accelerating development and building a connected business. We hope you " +
-                "enjoy WSO2Con!");//to do read from properties file
-        mobileApplicationBean.setBannerFilePath(appmHomePath + "/repository/resources/mobileapps/WSO2Con" +
-                "/Resources/banner.png");
-        mobileApplicationBean.setIconFile(appmHomePath + "/repository/resources/mobileapps/WSO2Con" +
-                "/Resources/icon.png");
-        mobileApplicationBean.setScreenShot1File(appmHomePath + "/repository/resources/mobileapps/WSO2Con" +
-                "/Resources/screen1.png");
-        mobileApplicationBean.setScreenShot2File(appmHomePath + "/repository/resources/mobileapps" +
-                "/WSO2Con/Resources/screen2.png");
-        mobileApplicationBean.setMobileapp("mobileapp");
-        try {
-            UUID = createMobielAppliaction(mobileApplicationBean, publisherSession);
-        } catch (IOException e) {
-            log.error("Error while creating WSO2Con Mobile Application", e);
-            throw  new AppManagementException("Error while creating WSO2Con Mobile Application", e);
-        } catch (InterruptedException e) {
-            log.error("Error while creating WSO2Con Mobile Application", e);
-            throw  new AppManagementException("Error while creating WSO2Con Mobile Application", e);
         }
         try {
             applicationPublisher.publishApplication("mobileapp", UUID, adminPublisherSession);
         } catch (IOException e) {
-            log.error("Error while publishing WSO2Con Mobile Application", e);
-            throw  new AppManagementException("Error while publishing WSO2Con Mobile Application", e);
+            String publishingErrorMessage  ="Error while publishing "+mobileApplicationBean.getName()
+                    +" Mobile Application";
+            log.error(publishingErrorMessage, e);
+            throw  new AppManagementException(publishingErrorMessage, e);
         }
-        //MyTrack mobile application
-        log.info("publishing MyTrack mobile application");
-        mobileApplicationBean.setAppmeta("{\"package\":\"com.google.android.maps.mytracks\",\"version\":\"1.0" +
-                ".0\"}");
-        mobileApplicationBean.setVersion("1.0.0");
-        mobileApplicationBean.setProvider("1WSO2Mobile");
-        mobileApplicationBean.setMarkettype("public");
-        mobileApplicationBean.setPlatform("android");
-        mobileApplicationBean.setName("MyTracks");
-        mobileApplicationBean.setDescription("My Tracks records your path, speed, distance, and elevation while " +
-                "you walk, run, bike, or do anything else outdoors. While recording, you can view your data live" +
-                ", annotate your path, and hear periodic voice announcements of your progress.\n" +
-                "With My Tracks, you can sync and share your tracks via Google Drive. For sharing, you can share" +
-                " tracks with friends, see the tracks your friends have shared with you, or make tracks public " +
-                "and share their URLs via Google+, Facebook, Twitter, etc. In addition to Google Drive, you can " +
-                "also export your tracks to Google My Maps, Google Spreadsheets, or external storage.\n" +
-                "My Tracks also supports Android Wear. For watches with GPS, My Tracks can perform GPS recording" +
-                " of tracks without a phone and sync tracks to the phone. For watches without GPS, you can see " +
-                "your current distance and time, and control the recording of your tracks from your wrist.");
-        mobileApplicationBean.setBannerFilePath(appmHomePath + "/repository/resources/" +
-                "mobileapps/MyTracks/Resources/banner.png");
-        mobileApplicationBean.setIconFile(appmHomePath + "/repository/resources/mobileapps" +
-                "/MyTracks/Resources/icon.png");
-        mobileApplicationBean.setScreenShot1File(appmHomePath + "/repository/resources/mobileapps/MyTracks" +
-                "/Resources/screen1.png");
-        mobileApplicationBean.setScreenShot2File(appmHomePath + "/repository/resources/mobileapps/MyTracks" +
-                "/Resources/screen2.png");
-        mobileApplicationBean.setMobileapp("mobileapp");
-        try {
-            UUID = createMobielAppliaction(mobileApplicationBean, publisherSession);
-        } catch (IOException e) {
-            log.error("Error while creating MyTrack Mobile Application", e);
-            throw  new AppManagementException("Error while creating MyTrack Mobile Application", e);
-        } catch (InterruptedException e) {
-            log.error("Error while creating MyTrack Mobile Application", e);
-            throw  new AppManagementException("Error while creating MyTrack Mobile Application", e);
-        }
-        try {
-            applicationPublisher.publishApplication("mobileapp", UUID, adminPublisherSession);
-        } catch (IOException e) {
-            log.error("Error while publishing MyTrack Mobile Application", e);
-            throw  new AppManagementException("Error while publishing MyTrack Mobile Application", e);
-        }
-
     }
 
     /**
@@ -352,7 +265,7 @@ public class ProxyApplicationCreator {
             claimsAry.add(claimMap.get(claimName)[0]);
         }
         JSONObject configJson = new JSONObject();
-        configJson.put("provider", "wso2is-5.0.0");
+        configJson.put("provider", "wso2is-5.0.0");//use a constant
         configJson.put("logout_url", "");
         configJson.put("claims", claimsAry);
         configJson.put("app_name", webAppDetail.getWebAppName());
