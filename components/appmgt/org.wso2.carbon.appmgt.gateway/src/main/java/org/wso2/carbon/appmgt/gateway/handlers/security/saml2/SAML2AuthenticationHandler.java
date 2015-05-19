@@ -823,7 +823,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             }
 
             String loggedInUser = getCachedLoggedInUser(samlCookieValue);
-            AuthenticatedIDP authenticatedIDP = getCachedAuthenticatedIDP(samlCookieValue);
+            AuthenticatedIDP[] authenticatedIDP = getCachedAuthenticatedIDP(samlCookieValue);
 
             try {
 
@@ -1127,15 +1127,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @param key
      * @return Cached authenticated IDP if there is one, null otherwise.
      */
-    private AuthenticatedIDP getCachedAuthenticatedIDP(String key){
+    private AuthenticatedIDP[] getCachedAuthenticatedIDP(String key){
 
         Cache cache = Caching.getCacheManager(AppMConstants.AUTHENTICATED_IDP_CACHE_MANAGER)
                 .getCache(AppMConstants.AUTHENTICATED_IDP_CACHE);
 
         Object cachedObject = cache.get(key);
 
-        if(cachedObject != null && cachedObject instanceof AuthenticatedIDP){
-            return (AuthenticatedIDP) cachedObject;
+        if(cachedObject != null && cachedObject instanceof AuthenticatedIDP[]){
+            return (AuthenticatedIDP[]) cachedObject;
         }else{
             return null;
         }
