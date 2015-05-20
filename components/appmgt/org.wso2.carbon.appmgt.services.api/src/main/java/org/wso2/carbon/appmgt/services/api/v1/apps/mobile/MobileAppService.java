@@ -63,7 +63,7 @@ public class MobileAppService {
         public AppListResponse getApplicationList(@Context final HttpServletResponse servletResponse,
                                                   @Context HttpHeaders headers, @PathParam("tenantDomain")
                             String tenantDomain, @QueryParam("limit") int limit, @QueryParam("offset") int offset,
-                                                  @QueryParam("platform") String platform){
+                                                  @QueryParam("platform") String platform, @QueryParam("search") String search){
 
             boolean noLimit = false;
 
@@ -90,6 +90,11 @@ public class MobileAppService {
                 if(platform != null){
                     map.put("overview_platform", Arrays.asList(platform));
                 }
+
+                if(search != null){
+                    map.put("overview_name", Arrays.asList("*" + search + "*"));
+                }
+
                 map.put("lcState", Arrays.asList("Published"));
                 GenericArtifact[] artifacts = artifactManager.findGenericArtifacts(map);
 

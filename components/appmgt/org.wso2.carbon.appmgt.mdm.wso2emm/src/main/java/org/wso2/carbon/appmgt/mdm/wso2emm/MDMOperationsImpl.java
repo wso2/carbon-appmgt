@@ -64,8 +64,6 @@ public class MDMOperationsImpl implements MDMOperations {
     public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params,
                               HashMap<String, String> configProperties) {
 
-
-
         String serverURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
         String authUser = configProperties.get(Constants.PROPERTY_AUTH_USER);
         String authPass = configProperties.get(Constants.PROPERTY_AUTH_PASS);
@@ -205,6 +203,10 @@ public class MDMOperationsImpl implements MDMOperations {
                        if("1".equals(deviceObj.get("platform_id").toString())){
                            device.setPlatform("android");
                        }else if("2".equals(deviceObj.get("platform_id").toString())){
+                           device.setPlatform("ios");
+                       }else if("3".equals(deviceObj.get("platform_id").toString())){
+                           device.setPlatform("ios");
+                       }else if("4".equals(deviceObj.get("platform_id").toString())){
                            device.setPlatform("ios");
                        }
                        device.setImage(String.format(configProperties.get("ImageURL"), properties.get("model").toString()));
