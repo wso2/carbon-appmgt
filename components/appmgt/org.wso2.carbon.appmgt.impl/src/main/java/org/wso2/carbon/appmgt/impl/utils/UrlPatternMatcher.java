@@ -21,158 +21,21 @@
 package org.wso2.carbon.appmgt.impl.utils;
 
 public class UrlPatternMatcher {
+	
+	private static final String REGEX_SPECIAL_CHARACTERS = "([\\\\\\.\\[\\{\\(\\)\\+\\?\\^\\$\\|])";
+	private static final String REGEXP_SPECIAL_CHARACCTERS_ESCAPE_PATTERN = "\\\\Q$1\\\\E";
 
-    private static enum State {
+	public static boolean match(String pattern, String url){
+		
+		// The format of a URL pattern is abc/cde/*/a.jsp
+		// * denotes any character. So we need to convert the pattern to a property regular expression.
+		
+		// Escape all the regular expression special characters other than '*'
+		String regexEscapedPattern = pattern.replaceAll(REGEX_SPECIAL_CHARACTERS, REGEXP_SPECIAL_CHARACCTERS_ESCAPE_PATTERN);
+		
+		// Replace the any (*) character with the regular expression version (.*) of it.
+		String regexString = regexEscapedPattern.replace("*", ".*");
 
-        JUST_STARTED, NORMAL, EAGER, END
-    }
-
-    private final int patternLength;
-    private final int patternOutBound;
-    private final int urlLength;
-    private final int urlOutBound;
-    private final String pattern;
-    private final String url;
-
-    private static final char MATCH_ALL = '*';
-    private static final char MATCH_ONE = '?';
-
-    private int patternPrefix;
-    private int patternSuffix;
-    private State state;
-    private boolean matched = false;
-
-    public UrlPatternMatcher(String pattern, String url) {
-
-        if (pattern == null || url == null) {
-            throw new IllegalArgumentException(
-                    "Pattern and String must not be null");
-        }
-
-        this.pattern = pattern;
-        this.url = url;
-        patternLength = pattern.length();
-        urlLength = url.length();
-        if (patternLength == 0 || urlLength == 0) {
-            throw new IllegalArgumentException(
-                    "Pattern and String must have at least one character");
-        }
-        patternOutBound = patternLength - 1;
-        urlOutBound = urlLength - 1;
-        patternPrefix = 0;
-        patternSuffix = 0;
-        state = State.JUST_STARTED;
-
-    }
-
-    public UrlPatternMatcher(String pattern, String url, int patternPrefix, int patternSuffix) {
-
-        this(pattern, url);
-        this.patternPrefix = patternPrefix;
-        this.patternSuffix = patternSuffix;
-    }
-
-    private void calcState() {
-        if (state == State.END) {
-            return;
-        }
-
-        if (!psafe() || !ssafe()) {
-            state = State.END;
-        } else if (getPatternCharAt() == MATCH_ALL) {
-            if (!pnsafe()) {
-                state = State.END;
-                matched = true;
-            } else {
-                state = State.EAGER;
-            }
-        } else {
-            state = State.NORMAL;
-        }
-    }
-
-    private void eat() {
-
-        if (state == State.END) {
-            return;
-        }
-
-        matched = false;
-
-        if (state == State.EAGER) {
-            UrlPatternMatcher smo = new UrlPatternMatcher(pattern, url, patternPrefix + 1, patternSuffix + 1);
-            if (smo.match()) {
-                state = State.END;
-                matched = true;
-                return;
-            }
-            ips();
-        } else if (state == State.NORMAL) {
-            if (getPatternMatchedForChar()) {
-                ips();
-                ipp();
-                matched = true;
-            } else {
-                state = State.END;
-                matched = false;
-            }
-        }
-    }
-
-    private boolean getPatternMatchedForChar() {
-        char pc = getPatternCharAt();
-        return (pc == MATCH_ONE || pc == getUrlCharAt());
-    }
-
-    private boolean mn() {
-        return (pn() == getUrlCharAt());
-    }
-
-    private char getPatternCharAt() {
-        return pattern.charAt(patternPrefix);
-    }
-
-    private char pn() {
-        return pattern.charAt(patternPrefix + 1);
-    }
-
-    private char getUrlCharAt() {
-        return url.charAt(patternSuffix);
-    }
-
-    private boolean psafe() {
-        return patternPrefix <= patternOutBound;
-    }
-
-    private boolean pnsafe() {
-        return (patternPrefix + 1) <= patternOutBound;
-    }
-
-    private boolean ssafe() {
-        return patternSuffix <= urlOutBound;
-    }
-
-    private void ipp() {
-        patternPrefix++;
-    }
-
-    private void ips() {
-        patternSuffix++;
-    }
-
-    public boolean match() {
-        if (patternOutBound > urlOutBound) {
-            return false;
-        }
-        while (state != State.END) {
-            calcState();
-            eat();
-        }
-        return matched;
-    }
-
-    public static boolean match(String p, String s) throws
-            IllegalArgumentException {
-        return new UrlPatternMatcher(p, s).match();
+		return url.matches(regexString);
     }
 }

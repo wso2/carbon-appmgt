@@ -396,17 +396,30 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // Get App URL Pattern Info
         VerbInfoDTO verbInfoDTO = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
     	
-    	//Make request path and verbInfoDTO.mapAllowAnonymousUrl keys consistence.
-        if (!requestPath.endsWith("/")) {
-            requestPath = requestPath + "/";
-        }
-        if (verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + requestPath) == null) {
-            return false;
-        } else {
-            return verbInfoDTO.mapAllowAnonymousUrl.get(httpVerb + requestPath);
-        }
-    }
+        if(verbInfoDTO != null && verbInfoDTO.mapAllowAnonymousUrl != null){
 
+        	NamedMatchList<String> matcher = new NamedMatchList<String>();
+        	
+        	for(String pattern : verbInfoDTO.mapAllowAnonymousUrl.keySet()){
+        		matcher.add(pattern,pattern);
+        	}
+        	
+        	String httpVerbAndRequestPath = httpVerb + requestPath;
+        	
+        	String matchedPattern = matcher.match(httpVerbAndRequestPath);
+        	
+        	Boolean allowAnnoymous = verbInfoDTO.mapAllowAnonymousUrl.get(matchedPattern);
+        	
+        	if(allowAnnoymous != null){
+        		return allowAnnoymous;
+        	}
+        	
+        }
+        
+        return false;
+        
+    }
+    
     public boolean handleResponse(MessageContext messageContext) {
         
     	try {
