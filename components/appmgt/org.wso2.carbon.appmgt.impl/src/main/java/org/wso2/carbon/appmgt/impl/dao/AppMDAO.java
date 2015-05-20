@@ -29,6 +29,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
+import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
@@ -36,6 +37,7 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
+import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dto.*;
@@ -3996,8 +3998,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 		String query =
 				"INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT,TRACKING_CODE,UUID, SAML2_SSO_ISSUER, " +
-                "LOG_OUT_URL,APP_ALLOW_ANONYMOUS) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?)";
+                "LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
 
 		try {
 
@@ -4032,6 +4034,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
             prepStmt.setString(8, app.getSaml2SsoIssuer());
 			prepStmt.setString(9, logoutURL);
 			prepStmt.setBoolean(10, app.getAllowAnonymous());
+            prepStmt.setString(11, app.getUrl());
 
 			prepStmt.execute();
 
@@ -4439,7 +4442,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		PreparedStatement prepStmt = null;
 		ResultSet rs = null;
 		String query =
-				"UPDATE APM_APP SET CONTEXT = ?, LOG_OUT_URL  =?, APP_ALLOW_ANONYMOUS=? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND"
+				"UPDATE APM_APP SET CONTEXT = ?, LOG_OUT_URL  =?, APP_ALLOW_ANONYMOUS=?, APP_ENDPOINT=? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND"
 						+ " APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4463,9 +4466,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			prepStmt.setString(1, api.getContext());
 			prepStmt.setString(2, logoutURL);
 			prepStmt.setBoolean(3, api.getAllowAnonymous());
-			prepStmt.setString(4, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-			prepStmt.setString(5, api.getId().getApiName());
-			prepStmt.setString(6, api.getId().getVersion());
+            prepStmt.setString(4, api.getUrl());
+			prepStmt.setString(5, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+			prepStmt.setString(6, api.getId().getApiName());
+			prepStmt.setString(7, api.getId().getVersion());
 			prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);
@@ -6235,7 +6239,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 "APP.APP_PROVIDER AS APP_PROVIDER, " +
                 "APP.APP_NAME AS APP_NAME, " +
                 "APP.APP_VERSION AS APP_VERSION, " +
-                "APP.CONTEXT AS CONTEXT " +
+                "APP.CONTEXT AS CONTEXT, " +
+                "APP.APP_ENDPOINT AS APP_ENDPOINT " +
                 "FROM " +
                 "APM_APP APP";
 
@@ -6250,8 +6255,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                         appInfoResult.getString("APP_PROVIDER"),
                         appInfoResult.getString("APP_NAME"),
                         appInfoResult.getString("APP_VERSION"));
+
                 webApp = new WebApp(identifier);
                 webApp.setContext(appInfoResult.getString("CONTEXT"));
+                webApp.setUrl(appInfoResult.getString("APP_ENDPOINT"));
                 webApps.add(webApp);
             }
 

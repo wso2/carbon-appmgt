@@ -25,7 +25,10 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RefererRewriteMediator extends AbstractMediator{
@@ -38,7 +41,7 @@ public class RefererRewriteMediator extends AbstractMediator{
     public boolean mediate(MessageContext messageContext) {
 
         Cache cache = this.getAppContextVersionConfigCache();
-        ArrayList<String> contextVersionList = (ArrayList) cache.get
+        Map<String,String> contextVersionMap = (HashMap<String, String>) cache.get
                 (AppMConstants.APP_CONTEXT_VERSION_CACHE_KEY);
         //ToDo: handle if cache has expired
 
@@ -50,10 +53,24 @@ public class RefererRewriteMediator extends AbstractMediator{
 
         //Identify http/https
         String transport = referer.split(AppMConstants.URL_DELIMITER)[0];
-        for (String contextVersion : contextVersionList){
+        String endpoint;
+        String restFullRequestPath = (String) messageContext.getProperty("REST_FULL_REQUEST_PATH");
+        for (String contextVersion : contextVersionMap.keySet()){
             if (referer.contains(contextVersion)){
-                referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion;
-                break;
+                endpoint = contextVersionMap.get(contextVersion);
+                try {
+                    URL epUrl = new URL(endpoint);
+                    if (restFullRequestPath.startsWith(epUrl.getPath())) {
+                        referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion +
+                                  "/" + restFullRequestPath.substring(epUrl.getPath().length());
+                    } else {
+                        referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion +
+                                "/" + restFullRequestPath;
+                    }
+                    break;
+                } catch (MalformedURLException e) {
+                    log.error("Error while parsing endpoint url : " + endpoint, e);
+                }
             }
         }
 
