@@ -234,7 +234,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if (shouldAuthenticateWithCookie(messageContext)) {
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
                 isAuthorized = handleSecurityUsingCookie(messageContext);
-            	isResourceAccessible = checkResourceAccessible(messageContext,true);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Processing SAML response");
@@ -243,20 +242,22 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 0);
                 
             	isAuthorized = handleAuthorizationUsingSAMLResponse(messageContext);
-                isResourceAccessible = checkResourceAccessible(messageContext,false);
                 
-                //if a relay state is available, redirect to the relay state path
-                if (!redirectToRelayState(messageContext)) {
-                    return false;
-                }
 
                 if (isAuthorized) {
-                    //Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
+                	
+                	//if a relay state is available, redirect to the relay state path
+                	if (!redirectToRelayState(messageContext)) {
+                		return false;
+                	}
+
+                	//Note: When user authenticated, IdP sends the SAMLResponse to gateway as a POST request.
                     //We validate this SAMLResponse and allow request to go to backend.
                     //This is the first request goes to access the web-app which need to go as a GET request
                     //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
                     //segment is to set the HTTP_METHOD as GET and set empty body in request.
-                    getAxis2MessageContext(messageContext).setProperty("HTTP_METHOD", "GET");
+
+                	getAxis2MessageContext(messageContext).setProperty("HTTP_METHOD", "GET");
                     try {
                         SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
                         env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
@@ -274,14 +275,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             if (isAuthorized) {
             	if (!isLogoutRequest(messageContext)) {
 
-                	if (!isResourceAccessible) {
+                	if (checkResourceAccessible(messageContext)) {
+                		setAppmSamlSsoCookie(messageContext);
+                	}else{
                 		handleAuthFailure(messageContext,
                 				new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
                 		return false;
                 	}
                     
                 	//Include appmSamlSsoCookie to "Cookie" header before request send to backend
-                    setAppmSamlSsoCookie(messageContext);
                 }
                 
                 return true;
@@ -881,25 +883,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * Role claim should be passed by default
      */
 
-    private boolean checkResourceAccessible(MessageContext synapseMessageContext, boolean isCachedRequest){
+    private boolean checkResourceAccessible(MessageContext synapseMessageContext){
 
         Map<String, String> idpResponseAttributes = null;
         Map<String, Object> samlAttributes =null;
-        String roles = null;
         String inUrl = getAxis2MessageContext(synapseMessageContext).getProperty("TransportInURL").toString();
         String webAppContext = (String) synapseMessageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) synapseMessageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
 
-        if(isCachedRequest){
-            roles = getCachedUserRoles(AppMConstants.USER_ROLES_CACHE_KEY);
-        }
-        else{
-            idpResponseAttributes = getIDPResponseAttributes(synapseMessageContext);
-            samlAttributes = getAttributesOfSAMLResponse(idpResponseAttributes);
-            roles = getUserRolesFromTheSAMLResponse(samlAttributes);
-            //put roles to the cache
-            getSAML2ConfigCache().put(AppMConstants.USER_ROLES_CACHE_KEY, roles);
-        }
+        String roles = getCachedUserRoles(AppMConstants.USER_ROLES_CACHE_KEY);
 
         org.apache.axis2.context.MessageContext axis2MsgContext;
         axis2MsgContext = ((Axis2MessageContext) synapseMessageContext).getAxis2MessageContext();
@@ -1080,6 +1072,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             //APISecurityConstants.SUBJECT maps to authenticated userName
             messageContext.setProperty(APISecurityConstants.SUBJECT, samlAttributes.get(APISecurityConstants.SUBJECT));
 
+            // Get the user roles and cache them.
+            String roles = getUserRolesFromTheSAMLResponse(samlAttributes);
+            getSAML2ConfigCache().put(AppMConstants.USER_ROLES_CACHE_KEY, roles);
+            
             // Get the authenticated IDP if there is one.
             AuthenticatedIDP[] authenticatedIDP = getAuthenticatedIDP(idpResponseAttributes, samlAttributes);
 
