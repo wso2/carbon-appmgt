@@ -28,7 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-public class RefererRewriteMediator extends AbstractMediator{
+public class RefererRewriteMediator extends AbstractMediator {
 
     /**
      *
@@ -37,12 +37,12 @@ public class RefererRewriteMediator extends AbstractMediator{
      */
     public boolean mediate(MessageContext messageContext) {
 
-        Map<String,String> contextVersionMap = AppContextCacheUtil.getTenantContextVersionUrlMap();
-        org.apache.axis2.context.MessageContext axis2MC =
-                ((Axis2MessageContext) messageContext). getAxis2MessageContext();
-        Map map = (Map)axis2MC.getProperty(AppMConstants.TRANSPORT_HEADERS);
-                String host = (String) map.get(AppMConstants.HOST);
-        String referer = (String)map.get(AppMConstants.REFERER);
+        Map<String, String> contextVersionMap = AppContextCacheUtil.getTenantContextVersionUrlMap();
+        org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext)
+                .getAxis2MessageContext();
+        Map map = (Map) axis2MC.getProperty(AppMConstants.TRANSPORT_HEADERS);
+        String host = (String) map.get(AppMConstants.HOST);
+        String referer = (String) map.get(AppMConstants.REFERER);
 
         //Identify http/https
         String transport = referer.split(AppMConstants.URL_DELIMITER)[0];
@@ -56,10 +56,12 @@ public class RefererRewriteMediator extends AbstractMediator{
                     URL epUrl = new URL(endpoint);
                     if (restFullRequestPath.startsWith(epUrl.getPath())) {
                         referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion +
-                                "/" + restFullRequestPath.substring(epUrl.getPath().length());
+                                "/" +
+                                stripLeadingSlash(
+                                        restFullRequestPath.substring(epUrl.getPath().length()));
                     } else {
                         referer = transport + AppMConstants.URL_DELIMITER + host + contextVersion +
-                                "/" + restFullRequestPath;
+                                "/" + stripLeadingSlash(restFullRequestPath);
                     }
                     break;
                 } catch (MalformedURLException e) {
@@ -68,9 +70,20 @@ public class RefererRewriteMediator extends AbstractMediator{
             }
         }
 
-        map.put(AppMConstants.REFERER,referer);
-        axis2MC.setProperty(AppMConstants.TRANSPORT_HEADERS , map);
+        map.put(AppMConstants.REFERER, referer);
+        axis2MC.setProperty(AppMConstants.TRANSPORT_HEADERS, map);
 
         return true;
+    }
+
+    private String stripLeadingSlash(String urlString) {
+        if (urlString == null || urlString.length() == 0) {
+            return urlString;
+        }
+
+        if (urlString.startsWith("/")) {
+            urlString = urlString.substring(1, urlString.length());
+        }
+        return urlString;
     }
 }
