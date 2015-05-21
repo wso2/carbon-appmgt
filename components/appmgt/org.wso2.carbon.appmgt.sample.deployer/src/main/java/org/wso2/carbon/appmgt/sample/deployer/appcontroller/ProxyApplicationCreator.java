@@ -197,7 +197,7 @@ public class ProxyApplicationCreator {
     public void manageMobilebApplication(MobileApplicationBean mobileApplicationBean) throws AppManagementException {
         log.info("publishing CleanCalc mobile application");
         String appMeta = null;
-        if(mobileApplicationBean.isApkAvailable()){
+        if(mobileApplicationBean.isApk()){
             try {
                 appMeta = httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/mobileapp/upload",
                         true, mobileApplicationBean, mobileApplicationBean.getPublisherSession());
@@ -207,7 +207,7 @@ public class ProxyApplicationCreator {
             }
         }else{
             JSONObject appMetaJson = new JSONObject();
-            appMetaJson.put("package",mobileApplicationBean.getPackageName());
+           // appMetaJson.put("package",mobileApplicationBean.getPackageName());
             appMetaJson.put("version",mobileApplicationBean.getVersion());
             appMeta = appMetaJson.toJSONString();
         }

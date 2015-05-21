@@ -40,6 +40,8 @@ public class MobileApplicationBean {
     private String screenShot3File;
     private String mobileapp;
     private String apkFile;
+    private boolean isApk;
+    private String publisherSession;
 
     public String getVersion() {
         return version;
@@ -160,5 +162,22 @@ public class MobileApplicationBean {
 
     public void setSso_ssoProvider(String sso_ssoProvider) {
         this.sso_ssoProvider = sso_ssoProvider;
+    }
+
+    public String getPublisherSession() {
+        return publisherSession;
+    }
+
+    public void setPublisherSession(String publisherSession) {
+        this.publisherSession = publisherSession;
+    }
+
+
+    public boolean isApk() {
+        return isApk;
+    }
+
+    public void setApk(boolean isApk) {
+        this.isApk = isApk;
     }
 }

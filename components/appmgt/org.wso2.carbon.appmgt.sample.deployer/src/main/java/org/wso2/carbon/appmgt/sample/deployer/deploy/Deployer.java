@@ -114,7 +114,7 @@ public class Deployer {
                 backEndApplicationCreator.copyFileUsingFileStreams(webAppDetail.getWarFileName());
                 claimManager.addClaimMapping(claimsMap);
                 claimManager.setClaimValues(claimsMap, "subscriber_" + username);
-                proxyApplicationCreator.manageWebApplication(webAppDetail);
+                proxyApplicationCreator.createAndPublishWebApplication(webAppDetail);
                 if (Configuration.isStactsEnabled().equals("true")) {
                     WebpageAccessor.accsesWebPages(webAppDetail, ipAddress);
                 }
