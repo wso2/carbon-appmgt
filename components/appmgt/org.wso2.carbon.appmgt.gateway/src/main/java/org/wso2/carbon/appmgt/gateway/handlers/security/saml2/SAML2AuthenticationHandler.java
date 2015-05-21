@@ -55,25 +55,20 @@ import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.util.Base64;
 import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Element;
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
-import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.Authenticator;
 import org.wso2.carbon.appmgt.gateway.handlers.security.oauth.OAuthAuthenticator;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
-import org.wso2.carbon.appmgt.impl.AbstractAPIManager;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
-import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppContextCacheUtil;
 import org.wso2.carbon.appmgt.impl.utils.NamedMatchList;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
@@ -81,7 +76,6 @@ import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 import javax.cache.Cache;
 import javax.cache.Caching;
 import javax.xml.namespace.QName;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -132,41 +126,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     "type: " + authenticatorType);
         }
 
-        //Set the app context+version list in cache
-        getAppContextVersionConfigCache().put(AppMConstants.APP_CONTEXT_VERSION_CACHE_KEY,
-                this.getAppContextWithVersion());
+        //Initialize the context cache by calling AppContextCacheUtil to pre-load cache
+        AppContextCacheUtil.getTenantContextVersionUrlMap();
+
         authenticator.init(synapseEnvironment);
         saml2Authenticator.init(synapseEnvironment);
     }
 
-    /**
-     * retrieving context+version string list from database.
-     * @return context+version list
-     */
-    private Map<String, String> getAppContextWithVersion() {
-        if (log.isDebugEnabled()) {
-            log.debug("Calling getAppContextWithVersion");
-        }
-        try {
-            APIMgtDBUtil.initialize();
-            AppMDAO dao = new AppMDAO();
-            Map<String, String> contextVersion = new HashMap<String, String>();
-            Iterator listI = dao.getAllWebApps().listIterator();
 
-            while(listI.hasNext()) {
-                WebApp app = (WebApp) listI.next();
-                contextVersion.put((app.getContext().startsWith("/") ? app.getContext() : "/" + app.getContext()) +
-                        "/" + app.getId().getVersion(), app.getUrl());
-            }
-            return contextVersion;
-        } catch (AppManagementException e) {
-            throw new SynapseException("Error while retrieving context+version list from database\n"
-                    + "Error : " + e.getMessage());
-        } catch (Exception e) {
-            throw new SynapseException("Error while initialize database util\n"
-                    + "Error : " + e.getMessage());
-        }
-    }
     /**
      * Applies SAML 2 authentication if SSO is enabled.
      * @param messageContext
