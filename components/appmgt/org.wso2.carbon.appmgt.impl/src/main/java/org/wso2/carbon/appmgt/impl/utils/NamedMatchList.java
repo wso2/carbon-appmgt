@@ -65,11 +65,25 @@ public class NamedMatchList<T> {
      * @return identifier of pattern if matched else null;
      */
     public T match(String s) {
+    	
+    	T mostSpecificMatchingPatternIdentifier = null;
+    	String mostSpecificMatchingPattern = null;
+    	
         for (NamedPattern<T> m : queue) {
             if (UrlPatternMatcher.match(m.getPattern(), s)) {
-                return m.getIdentifier();
+            	
+            	if(mostSpecificMatchingPatternIdentifier == null){
+            		mostSpecificMatchingPatternIdentifier = m.getIdentifier();
+            		mostSpecificMatchingPattern = m.getPattern();
+            	}else{
+            		// Segment count in the pattern is a measure of the specificness of the pattern. 
+            		if(mostSpecificMatchingPattern.split("/").length < m.getPattern().split("/").length){
+            			mostSpecificMatchingPatternIdentifier = m.getIdentifier();
+            			mostSpecificMatchingPattern = m.getPattern();
+            		}
+            	}
             }
         }
-        return null;
+        return mostSpecificMatchingPatternIdentifier;
     }
 }

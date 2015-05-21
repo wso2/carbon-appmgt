@@ -719,22 +719,14 @@ public class AppMDAO {
 			String mapKey; // contains the unique key
 			String urlPattern; // url pattern
 			while (rs.next()) {
-				urlPattern = rs.getString("URL_PATTERN");
-				// skip the '/*'
-				if ("/*".equals(urlPattern)) {
-					urlPattern = "";
-				}
 
-                // key is constructed using the http Method + URL pattern
+				urlPattern = rs.getString("URL_PATTERN");
+
+                // Key is constructed using the http Method + URL pattern
                 if (urlPattern != null && urlPattern.startsWith("/")) {
                     mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + urlPattern;
                 } else {
                     mapKey = rs.getString("HTTP_METHOD") + context + "/" + version + "/" + urlPattern;
-                }
-
-                //Need to make key consistence with RESTConstants.REST_FULL_REQUEST_PATH
-                if (!mapKey.endsWith("/")) {
-                    mapKey = mapKey + "/";
                 }
 
 				// store the values (is anonymous allowed) per each URL pattern
