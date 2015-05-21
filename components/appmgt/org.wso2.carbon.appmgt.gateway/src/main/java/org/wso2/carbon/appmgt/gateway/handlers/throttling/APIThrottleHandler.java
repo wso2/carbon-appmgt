@@ -45,6 +45,7 @@ import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
+import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
 import org.wso2.carbon.appmgt.gateway.handlers.security.AuthenticationContext;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -184,6 +185,9 @@ public class APIThrottleHandler extends AbstractHandler {
 				            throttleByAccessRate(axis2MC, cc) &&
 				                    doRoleBasedAccessThrottling(messageContext, cc, verbInfo,
 				                                                resourceManager);
+                if (!canAccess) {
+                    return false;
+                }
 			}
 		}
 
@@ -581,8 +585,46 @@ public class APIThrottleHandler extends AbstractHandler {
 				if (verbInfo == null) {
 					canAccess = false;
 					log.warn("Error while getting throttling information for resource and http verb");
-					return canAccess;
-				} else {
+
+                    synCtx.setProperty(SynapseConstants.ERROR_CODE, HttpStatus.SC_FORBIDDEN);
+                    synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE);
+
+                    Mediator sequence =
+                            synCtx.getSequence(APISecurityConstants.API_AUTH_FAILURE_HANDLER);
+                    if (sequence != null && !sequence.mediate(synCtx)) {
+                        return false;
+                    }
+
+                    org.apache.axis2.context.MessageContext axis2MC =
+                            ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+                    try {
+                        RelayUtils.buildMessage(axis2MC);
+                    } catch (IOException e) {
+                        log.error("Error While building message.", e);
+                    } catch (XMLStreamException e) {
+                        log.error("Error While building message.", e);
+                    }
+
+
+                    Utils.setSOAPFault(synCtx, "Server", "Resource not found",
+                            APISecurityConstants.API_AUTH_INCORRECT_API_RESOURCE_MESSAGE);
+
+
+                    if (Utils.isCORSEnabled()) {
+                        Map<String, String> headers =
+                                (Map) axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+                                Utils.getAllowedOrigin((String) headers.get("Origin")));
+                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_METHODS,
+                                Utils.getAllowedMethods());
+                        headers.put(AppMConstants.CORSHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
+                                Utils.getAllowedHeaders());
+                        axis2MC.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+                    }
+                    Utils.sendFault(synCtx, HttpStatus.SC_FORBIDDEN);
+                    return canAccess;
+                } else {
 					// Not only we can proceed
 					String resourceAndHTTPVerbThrottlingTier = verbInfo.getThrottling();
 					// If there no any tier then we need to set it as unlimited
