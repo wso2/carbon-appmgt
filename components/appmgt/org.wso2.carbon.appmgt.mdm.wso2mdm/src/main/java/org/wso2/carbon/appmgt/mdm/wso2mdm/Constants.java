@@ -23,7 +23,7 @@ package org.wso2.carbon.appmgt.mdm.wso2mdm;
 public class Constants {
 
     public static final String MDM_NAME = "WSO2MDM";
-    public static final String API_DEVICE_LIST = "/mdm-admin/devices/%s/%s";
+    public static final String API_DEVICE_LIST = "/mdm-admin/devices/user/%s/%s";
     public static final String API_INSTALL_APP = "/mdm-admin/operations/installApp/%s";
     public static final String API_UNINSTALL_APP = "/mdm-admin/operations/uninstallApp/%s";
 
