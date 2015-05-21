@@ -80,12 +80,13 @@ public class WebpageAccessor {
             Element postHTMLResponse = postHtml.select("input[name=SAMLResponse]").first();
             String samlResponse = postHTMLResponse.val();
             String appmSamlSsoTokenId = httpHandler.doPostHttp(webAppurl,
-                    "SAMLResponse=" + URLEncoder.encode(samlResponse, "UTF-8"), "appmSamlSsoTokenId",
+                    "SAMLResponse=" + URLEncoder.encode(samlResponse, "UTF-8")+"&RelayState=null", "appmSamlSsoTokenId",
                     "application/x-www-form-urlencoded; charset=UTF-8");
             Object[][] webPages = webAppDetail.getWebPagesurl();
             for(int i = 0;i < webPages.length ;i++){
                 if(webPages[i][0].toString().equals("default")){
-                    sendHit(Integer.parseInt(webPages[i][1].toString()),appmSamlSsoTokenId,webAppurl,webAppDetail.getTrackingCode());
+                    sendHit(Integer.parseInt(webPages[i][1].toString()),appmSamlSsoTokenId,webAppurl,
+                            webAppDetail.getTrackingCode());
                 }else{
                     if(i == 1){
                         webAppurl = appendPageToUrl(webPages[i][0].toString(),webAppurl,true);
@@ -96,8 +97,9 @@ public class WebpageAccessor {
                 }
             }
         } catch (IOException e) {
-            log.error("Error while accessing a web page", e);
-            throw  new AppManagementException("Error while accessing a web page", e);
+            String errorMessage = "Error while accessing a web page";
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         }
 
     }
