@@ -411,6 +411,12 @@
             <artifactId>httpclient</artifactId>
             <version>4.1.1</version>
         </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents.wso2</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.3.0.wso2v1</version>
+            </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.mobile</artifactId>
