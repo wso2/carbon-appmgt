@@ -56,6 +56,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private static final String DEFAULT_GENERATED_VERSION = "1.0";
     private static final String DEFAULT_VERSION_STRING = "/default";
     private static final String CONTEXT_DATA_LOGGED_IN_USER = "LOGGED_IN_USER";
+    private static final String AUTO_GENERATED_DISPLAY_NAME_PREFIX = "no name: ";
 
     private static final String CONTEXT_DATA_PAGE_MAP = "PageMap";
     private static final String CONTEXT_DATA_SEARCH_APPLICATION_NAME = "SearchApplicationName";
@@ -115,8 +116,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
 
             if (criteria.getStatus() != null && criteria.getStatus().length() > 0) {
                 return discoverApplicationsWithPaging(discoveryContext, credentials, criteria,
-                        locale, webappAdminClient, providerName, loggedInUsername,
-                        apiProvider);
+                        locale, webappAdminClient, providerName, loggedInUsername, apiProvider);
             } else {
                 List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
                 List<WebappMetadata> filteredMetadataList = filter(webappsWrapper,
@@ -283,7 +283,11 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         result = new DiscoveredApplicationDTO();
         String version = getVersion(webappMetadata);
         String context = webappMetadata.getContextPath();
-        result.setDisplayName(webappMetadata.getDisplayName());
+        String displayName = webappMetadata.getDisplayName();
+        if (displayName == null) {
+            displayName = AUTO_GENERATED_DISPLAY_NAME_PREFIX + currentWebappId;
+        }
+        result.setDisplayName(displayName);
         result.setVersion(version);
         result.setApplicationType(webappMetadata.getWebappType());
         result.setRemoteContext(context);
@@ -660,8 +664,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
                             translateStatus(criteria), lastAppServerPage);
             List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
             List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
-                    discoveryContext, credentials, criteria, locale, providerName,
-                    loggedInUserName, apiProvider);
+                    discoveryContext, credentials, criteria, locale, providerName, loggedInUserName,
+                    apiProvider);
             int recordsToAdd = Math
                     .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
             List subList = filteredMetadataList.subList(0, recordsToAdd);
