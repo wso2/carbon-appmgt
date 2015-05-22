@@ -40,6 +40,7 @@ import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.ResourceInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 public class APPResourceManager {
 
@@ -260,7 +261,12 @@ public class APPResourceManager {
 	                                                      String user, String accessToken)
 	                                                                                      throws APISecurityException {
 
-		APIKeyValidationInfoDTO info = dataStore.getAPPData(appContext, appVersion, user, null);
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        if (!tenantDomain.equalsIgnoreCase("carbon.super")) {
+            user = user + '@' + tenantDomain;
+        }
+
+        APIKeyValidationInfoDTO info = dataStore.getAPPData(appContext, appVersion, user, null);
 		if (info == null) {
 			log.warn("cannot load application data for the provided context and version");
 			return null;
