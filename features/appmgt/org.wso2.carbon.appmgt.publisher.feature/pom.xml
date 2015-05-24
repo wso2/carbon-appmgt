@@ -38,8 +38,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>4.2.0</version>
+            <artifactId>org.wso2.carbon.registry.core</artifactId>            
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -48,23 +47,16 @@
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>
-            <version>4.2.0</version>
-        </dependency>
+        
     </dependencies>
 
     <build>
@@ -95,14 +87,14 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${carbon.platform.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.registry.core:${carbon.platform.version}</importFeatureDef>
+				<importFeatureDef>org.wso2.store:1.1.0</importFeatureDef>
                             </importFeatures>
                             <importBundles>
-                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.hostobjects.sso:${carbon.platform.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.hostobjects.sso:4.2.0</importBundleDef>
 
                             </importBundles>
                         </configuration>
