@@ -36,8 +36,8 @@
     <modules>
 	<module>org.wso2.carbon.appmgt.core.feature</module>
 	<module>org.wso2.carbon.appmgt.gateway.feature</module>
-	<!--<module>org.wso2.carbon.appmgt.publisher.feature</module>
-	<module>org.wso2.carbon.appmgt.store.feature</module> -->
+	<module>org.wso2.carbon.appmgt.publisher.feature</module>
+	<module>org.wso2.carbon.appmgt.store.feature</module>
 	<!--<module>org.wso2.carbon.appmgt.interceptor.feature</module>-->
 	<!--<module>org.wso2.carbon.appmgt.startup.publisher.feature</module>-->
 	<module>org.wso2.carbon.appmgt.feature</module>
