@@ -46,7 +46,6 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
     //TODO refactor caching implementation
 
     private String dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
-    private Cache claimsLocalCache;
 
     /**
      * Reads the DialectURI of the ClaimURIs to be retrieved from app-manager.xml ->
@@ -56,7 +55,6 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
     public void init() {
         dialectURI = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
                 getAPIManagerConfiguration().getFirstProperty(CONSUMER_DIALECT_URI);
-        claimsLocalCache = getClaimsLocalCache();
         if (dialectURI == null) {
             dialectURI = ClaimsRetriever.DEFAULT_DIALECT_URI;
         }
@@ -74,7 +72,7 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
             String key = endUserName + ":" + tenantId;
             ClaimCacheKey cacheKey = new ClaimCacheKey(key);
             //Object result = claimsLocalCache.getValueFromCache(cacheKey);
-            Object result = claimsLocalCache.get(cacheKey);
+            Object result = getClaimsLocalCache().get(cacheKey);
             if (result != null) {
                 claimValues = ((UserClaims) result).getClaimValues();
             } else {
@@ -93,7 +91,7 @@ public class DefaultClaimsRetriever implements ClaimsRetriever {
                 claimValues = new TreeMap(userStoreManager.getUserClaimValues(tenantAwareUserName, claimURIs, null));
                 UserClaims userClaims = new UserClaims(claimValues);
                 //add to cache
-                claimsLocalCache.put(cacheKey, userClaims);
+                getClaimsLocalCache().put(cacheKey, userClaims);
             }
         } catch (UserStoreException e) {
             throw new AppManagementException("Error while retrieving user claim values from "
