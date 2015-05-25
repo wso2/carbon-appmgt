@@ -202,6 +202,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             	messageContext.setProperty(AppMConstants.APPM_SAML2_CACHE_HIT, 1);
                 isAuthorized = handleSecurityUsingCookie(messageContext);
             } else if (shouldAuthenticateWithSAMLResponse(messageContext)) {
+
                 if (log.isDebugEnabled()) {
                     log.debug("Processing SAML response");
                 }

@@ -70,6 +70,8 @@ public class MDMOperationsImpl implements MDMOperations {
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
         String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
+        String authUser = configProperties.get(Constants.PROPERTY_AUTH_USER);
+        String authPass = configProperties.get(Constants.PROPERTY_AUTH_PASS);
 
 
 
@@ -190,7 +192,7 @@ public class MDMOperationsImpl implements MDMOperations {
         PostMethod postMethod = new PostMethod(requestURL + actionURL);
         postMethod.setRequestEntity(requestEntity);
 
-        if(executeMethod(tokenApiURL, clientKey, clientSecret, httpClient, postMethod)){
+        if(executeMethod(tokenApiURL, clientKey, clientSecret, authUser, authPass, httpClient, postMethod)){
             if(log.isDebugEnabled()) log.debug(action + " operation performed successfully on " + type + " " + params.toString());
         }else{
             if(log.isDebugEnabled()) log.debug(action + " operation unsuccessful");
@@ -216,6 +218,8 @@ public class MDMOperationsImpl implements MDMOperations {
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
         String clientSecret = configProperties.get(Constants.PROPERTY_CLIENT_SECRET);
+        String authUser = configProperties.get(Constants.PROPERTY_AUTH_USER);
+        String authPass = configProperties.get(Constants.PROPERTY_AUTH_PASS);
 
         JSONArray jsonArray = null;
 
@@ -242,7 +246,7 @@ public class MDMOperationsImpl implements MDMOperations {
             getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
             getMethod.setRequestHeader("Accept", "application/json");
 
-            if(executeMethod(tokenApiURL, clientKey, clientSecret, httpClient, getMethod)){
+            if(executeMethod(tokenApiURL, clientKey, clientSecret, authUser, authPass, httpClient, getMethod)){
                 try {
                     jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
                     if(jsonArray != null){
@@ -287,10 +291,10 @@ public class MDMOperationsImpl implements MDMOperations {
     }
 
 
-    private String getAPIToken(String tokenApiURL, String clientKey, String clientSecret, boolean generateNewKey){
+    private String getAPIToken(String tokenApiURL, String clientKey, String clientSecret, String authUser, String authPass, boolean generateNewKey){
 
         if(!generateNewKey){
-            if(AuthHandler.authKey != null){
+            if(!(AuthHandler.authKey == null || "null".equals(AuthHandler.authKey))){
                 return AuthHandler.authKey;
             }
         }
@@ -299,7 +303,9 @@ public class MDMOperationsImpl implements MDMOperations {
         PostMethod postMethod = new PostMethod(tokenApiURL);
 
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-        nameValuePairs.add(new NameValuePair("grant_type", "client_credentials"));
+        nameValuePairs.add(new NameValuePair("grant_type", "password"));
+        nameValuePairs.add(new NameValuePair("username", authUser));
+        nameValuePairs.add(new NameValuePair("password", authPass));
         postMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
         postMethod.addRequestHeader("Authorization" , "Basic " +
                 new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
@@ -307,6 +313,7 @@ public class MDMOperationsImpl implements MDMOperations {
         try {
             if(log.isDebugEnabled()) log.debug("Sending POST request to API Token endpoint. Request path:  "  + tokenApiURL);
             int statusCode = httpClient.executeMethod(postMethod);
+            if(log.isDebugEnabled()) log.debug("Status code " + statusCode + " received while accessing the API Token endpoint." );
         } catch (IOException e) {
             String errorMessage = "Cannot connect to Token API Endpoint";
             if(log.isDebugEnabled()){
@@ -337,9 +344,9 @@ public class MDMOperationsImpl implements MDMOperations {
     }
 
 
-    private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, HttpClient httpClient,
+    private boolean executeMethod(String tokenApiURL, String clientKey, String clientSecret, String authUser, String authPass,  HttpClient httpClient,
                                   HttpMethodBase httpMethod){
-                String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, false);
+                String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, authUser, authPass, false);
                 if(log.isDebugEnabled()) log.debug("Access token received : " + authKey);
                 //String authKey = "12345";
                 try {
@@ -357,7 +364,7 @@ public class MDMOperationsImpl implements MDMOperations {
                             return false;
                         }
                         if(statusCode == 401){
-                            authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, true);
+                            authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, authUser, authPass, true);
                             if(log.isDebugEnabled()) log.debug("Access token getting again, Access token received :  "
                                     + authKey + " in  try " + tries );
                         }

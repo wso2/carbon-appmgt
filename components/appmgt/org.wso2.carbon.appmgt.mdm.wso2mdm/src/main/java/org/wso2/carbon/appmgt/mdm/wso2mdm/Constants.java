@@ -31,5 +31,7 @@ public class Constants {
     public static final String PROPERTY_TOKEN_API_URL = "TokenApiURL";
     public static final String PROPERTY_CLIENT_KEY = "ClientKey";
     public static final String PROPERTY_CLIENT_SECRET = "ClientSecret";
+    public static final String PROPERTY_AUTH_USER = "AuthUser";
+    public static final String PROPERTY_AUTH_PASS = "AuthPass";
 
 }
