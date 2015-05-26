@@ -81,7 +81,7 @@ public class APIVersionStringComparator implements Comparator<String> {
             if (suffix1 == null && suffix2 == null) {
                 continue; // No suffixes
             } else if (suffix1 == null) {
-                return 1; // First suffix is empty (2.0 > 2.0-SNAPSHOT)
+                return 1; // First suffix is empty (2.0 > 2.0)
             } else if (suffix2 == null) {
                 return -1; // Second suffix is empty (2.0-alpha < 2.0)
             } else {

@@ -5,7 +5,7 @@
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>carbon-appmgt</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>WSO2 Carbon - App Management Aggregator Pom</name>
     <url>http://wso2.org</url>
 
@@ -587,10 +587,10 @@
         
     <properties>
 	<!-- AppM Component Version -->
-        <carbon.appmgt.version>1.0.0-SNAPSHOT</carbon.appmgt.version>
+        <carbon.appmgt.version>1.0.0</carbon.appmgt.version>
         <carbon.appmgt.imp.pkg.version>[1.0.0, 1.1.0)</carbon.appmgt.imp.pkg.version>
 	<apimgt.keymgt.stub.version>4.2.2</apimgt.keymgt.stub.version>
-	<appmgt.feature.version>1.0.0-SNAPSHOT</appmgt.feature.version>
+	<appmgt.feature.version>1.0.0</appmgt.feature.version>
 
 	<!-- Carbon kernel version -->
         <wso2carbon.version>4.2.0</wso2carbon.version>
