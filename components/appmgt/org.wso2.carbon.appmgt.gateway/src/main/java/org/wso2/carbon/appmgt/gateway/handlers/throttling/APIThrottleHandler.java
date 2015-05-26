@@ -186,6 +186,7 @@ public class APIThrottleHandler extends AbstractHandler {
 				                    doRoleBasedAccessThrottling(messageContext, cc, verbInfo,
 				                                                resourceManager);
                 if (!canAccess) {
+                    handleThrottleOut(messageContext);
                     return false;
                 }
 			}
