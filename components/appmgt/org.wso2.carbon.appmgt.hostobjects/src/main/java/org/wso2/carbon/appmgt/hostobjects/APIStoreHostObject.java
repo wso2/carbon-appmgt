@@ -24,15 +24,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
@@ -1122,7 +1114,8 @@ public class APIStoreHostObject extends ScriptableObject {
             row.put("endpoint", row, api.getUrl());
             row.put("wsdl", row, api.getWsdlUrl());
             row.put("wadl", row, api.getWadlUrl());
-            DateFormat dateFormat= new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss a z");
+            DateFormat dateFormat= new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String dateFormatted= dateFormat.format(api.getLastUpdated());
             row.put("updatedDate", row, dateFormatted);
             row.put("context", row, api.getContext());
