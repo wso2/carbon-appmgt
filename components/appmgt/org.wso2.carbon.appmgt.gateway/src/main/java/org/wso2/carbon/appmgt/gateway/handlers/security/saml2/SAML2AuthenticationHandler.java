@@ -930,26 +930,25 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return true if the user is permitted to access the resource.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-
-    private boolean checkResourseAccessibleByRole(String urlMapping, String roles, int appId, String httpVerb) throws
-                                                                                                               AppManagementException {
+    private boolean checkResourseAccessibleByRole(String urlMapping, String roles, int appId,
+            String httpVerb) throws AppManagementException {
 
         AppMDAO appMDAO = new AppMDAO();
-        String toBeMatchedRoles = appMDAO.getInUrlMappingRoles(appId,urlMapping,httpVerb);
+        String toBeMatchedRoles = appMDAO.getInUrlMappingRoles(appId, urlMapping, httpVerb);
+        if (roles == null || roles.equalsIgnoreCase("")) {
+            return true;
+        }
+        if (toBeMatchedRoles == null || toBeMatchedRoles.equals("")) {
+            return true;
+        }
+
         String toBeMatchedRole[] = getDelimitedRoles(toBeMatchedRoles);
         String contextRoles[] = getDelimitedRoles(roles);
-        if(roles.equalsIgnoreCase("")){
-            return true;
-        }
-        if(toBeMatchedRoles.equals("") || toBeMatchedRoles ==null){
-            return true;
-        }
 
-
-        for(int i=0; i<contextRoles.length; i++){
-            for(int j=0; j<toBeMatchedRole.length; j++){
-                if(contextRoles[i].equalsIgnoreCase(toBeMatchedRole[j])){
-                        return true;
+        for (int i = 0; i < contextRoles.length; i++) {
+            for (int j = 0; j < toBeMatchedRole.length; j++) {
+                if (contextRoles[i].equalsIgnoreCase(toBeMatchedRole[j])) {
+                    return true;
                 }
             }
         }
