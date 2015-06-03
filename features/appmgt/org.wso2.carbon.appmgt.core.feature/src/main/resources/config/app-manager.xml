@@ -592,6 +592,11 @@
             <Handler name="WSO2-AS" class="org.wso2.carbon.appmgt.impl.discovery.Wso2AppServerDiscoveryHandler" />
         </DiscoveryHandlers>
     </DiscoveryConfiguration>
+    
+	<!-- This property is there to configure velocity log output into existing Log4j carbon Logger.
+		You can enable this and set preferable Logger name. 
+	-->
+	<!--VelocityLogger>VELOCITY</VelocityLogger-->
 
 </APIManager>
 
