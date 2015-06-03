@@ -191,19 +191,19 @@ public final class APIMgtDBUtil {
 		throw new SQLException(
 				"UI activity Publish Data source is not configured properly.");
 	}
-    
 
     /**
      * Utility method to close the connection streams.
+     *
      * @param preparedStatement PreparedStatement
-     * @param connection Connection
-     * @param resultSet ResultSet
+     * @param connection        Connection
+     * @param resultSet         ResultSet
      */
-    public static void closeAllConnections(PreparedStatement preparedStatement, Connection connection,
-                                           ResultSet resultSet) {
-        closeConnection(connection);
+    public static void closeAllConnections(PreparedStatement preparedStatement,
+                                           Connection connection, ResultSet resultSet) {
         closeResultSet(resultSet);
         closeStatement(preparedStatement);
+        closeConnection(connection);
     }
 
     /**
