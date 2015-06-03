@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -48,7 +47,6 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.registry.app.APPConstants;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -792,7 +790,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
     
     
-    
+    @Override
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException {
         APIStatus currentStatus = api.getStatus();
@@ -963,6 +961,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @param newVersion The version of the new WebApp
      * @throws AppManagementException
      */
+    @Override
     public void copyWebappDocumentations(WebApp webapp, String newVersion) throws AppManagementException {
 
         try {
@@ -1040,6 +1039,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @param docType the type of the documentation
      * @throws AppManagementException
      */
+    @Override
     public void removeDocumentation(APIIdentifier apiId, String docName, String docType)
             throws AppManagementException {
         String docPath = AppManagerUtil.getAPIDocPath(apiId) + docName;
@@ -1087,6 +1087,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          if failed to add documentation
      */
+    @Override
     public void addDocumentation(APIIdentifier apiId, Documentation documentation)
             throws AppManagementException {
         createDocumentation(apiId, documentation);
@@ -1139,7 +1140,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException(msg, e);
         }
     }
-    
+
     /**
      * This method used to update the WebApp definition content - Swagger
      *
@@ -1429,6 +1430,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         appMDAO.updateSubscription(apiId,subStatus,appId);
     }
 
+	/**
+	 * Moves subscriptions of one app to another app
+	 *
+	 * @param fromIdentifier subscriptions of this app
+	 * @param toIdentifier   will be moved into this app
+	 * @return number of subscriptions moved
+	 * @throws AppManagementException
+	 */
+	@Override
+	public int moveSubscriptions(APIIdentifier fromIdentifier, APIIdentifier toIdentifier) throws
+																						   AppManagementException {
+		return appMDAO.moveSubscriptions(fromIdentifier, toIdentifier);
+	}
+
     /**
      * Delete applicatoion
      * @param identifier AppIdentifier
@@ -1603,7 +1618,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *
      * @param tierName Tier Name
      * @param permissionType Permission Type
-     * @param roles Roles          
+     * @param roles Roles
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          If failed to update subscription status
      */
@@ -1620,7 +1635,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 	/**
 	 * Get stored custom inSequences from governanceSystem registry
-	 * 
+	 *
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 
