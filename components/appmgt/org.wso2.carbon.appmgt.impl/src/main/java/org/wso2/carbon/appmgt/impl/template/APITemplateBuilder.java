@@ -21,8 +21,10 @@ import org.wso2.carbon.appmgt.impl.dto.Environment;
 
 public interface APITemplateBuilder {
 
-    public String getConfigStringForTemplate(Environment environment) throws APITemplateException;
+	String getConfigStringForVersionedWebAppTemplate(Environment environment)
+			throws APITemplateException;
 
-    public OMElement getConfigXMLForTemplate(Environment environment) throws APITemplateException;
+	String getConfigStringForNonVersionedWebAppTemplate() throws APITemplateException;
 
+	OMElement getConfigXMLForTemplate(Environment environment) throws APITemplateException;
 }

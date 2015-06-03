@@ -25,6 +25,9 @@ import javax.xml.namespace.QName;
  */
 public final class AppMConstants {
 
+    // Velocity logger name parameter in app-manager.xml
+	public static final String VELOCITY_LOGGER = "VelocityLogger";
+
     //key value of the provider rxt
     public static final String PROVIDER_KEY = "provider";
 
