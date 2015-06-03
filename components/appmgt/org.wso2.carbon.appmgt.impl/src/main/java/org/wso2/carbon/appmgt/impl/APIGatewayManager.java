@@ -80,7 +80,7 @@ public class APIGatewayManager {
 			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
 			String operation; 
 			// If the WebApp exists in the Gateway
-			if (client.getApi(tenantDomain) != null) {
+			if (client.getVersionedWebApp(tenantDomain) != null) {
 
 				// If the Gateway type is 'production' and the production url
 				// has been removed
@@ -96,8 +96,11 @@ public class APIGatewayManager {
 					// We need to remove the api from the environment since its
 					// relevant url has been removed.
 					operation ="delete";
-					client.deleteApi(tenantDomain);
-					setSecurevaultProperty(api,tenantDomain,environment,operation);
+					if (client.getNonVersionedWebAppData(tenantDomain) != null) {
+						client.deleteNonVersionedWebApp(tenantDomain);
+					}
+					client.deleteVersionedWebApp(tenantDomain);
+					setSecurevaultProperty(api, tenantDomain, environment, operation);
 					undeployCustomSequences(api,tenantDomain, environment);
 				} else {
 					if (debugEnabled) {
@@ -105,7 +108,7 @@ public class APIGatewayManager {
 						          " in environment " + environment.getName());
 					}
 					operation ="update";
-					client.updateApi(builder, tenantDomain);
+					client.updateVersionedWebApp(builder, tenantDomain);
 					setSecurevaultProperty(api,tenantDomain,environment,operation);
 					updateCustomSequences(api, tenantDomain, environment);
 				}
@@ -128,8 +131,13 @@ public class APIGatewayManager {
 						log.debug("WebApp does not exist, adding new WebApp " + api.getId().getApiName() +
 						          " in environment " + environment.getName());
 					}
-					operation ="add";
-					client.addApi(builder, tenantDomain);
+					operation = "add";
+					if (client.getNonVersionedWebAppData(tenantDomain) != null) {
+						client.updateNonVersionedWebApp(builder, tenantDomain);
+					} else {
+						client.addNonVersionedWebApp(builder, tenantDomain);
+					}
+					client.addVersionedWebApp(builder, tenantDomain);
 					setSecurevaultProperty(api,tenantDomain,environment,operation);
 					deployCustomSequences(api, tenantDomain, environment);
 				}
@@ -152,16 +160,17 @@ public class APIGatewayManager {
 	public void removeFromGateway(WebApp api, String tenantDomain) throws Exception {
 		for (Environment environment : environments) {
 			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
-			
-			if (client.getApi(tenantDomain) != null) {
+
+			if (client.getVersionedWebApp(tenantDomain) != null) {
 				if (debugEnabled) {
 					log.debug("Removing WebApp " + api.getId().getApiName() + " From environment " +
-					          environment.getName());
+									  environment.getName());
 				}
-				String operation ="delete";
-				client.deleteApi(tenantDomain);
-				undeployCustomSequences(api, tenantDomain,environment);
-				setSecurevaultProperty(api,tenantDomain,environment,operation);
+				String operation = "delete";
+				client.deleteNonVersionedWebApp(tenantDomain);
+				client.deleteVersionedWebApp(tenantDomain);
+				undeployCustomSequences(api, tenantDomain, environment);
+				setSecurevaultProperty(api, tenantDomain, environment, operation);
 			}
 		}
 	}
@@ -183,7 +192,7 @@ public class APIGatewayManager {
 			RESTAPIAdminClient client = new RESTAPIAdminClient(api.getId(), environment);
 			// If the WebApp exists in at least one environment, consider as
 			// published and return true.
-			if (client.getApi(tenantDomain) != null) {
+			if (client.getVersionedWebApp(tenantDomain) != null) {
 				return true;
 			}
 		}
