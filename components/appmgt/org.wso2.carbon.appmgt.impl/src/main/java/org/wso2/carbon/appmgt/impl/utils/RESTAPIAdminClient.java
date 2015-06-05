@@ -26,71 +26,77 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 
-    private RestApiAdminStub restApiAdminStub;
-    private String qualifiedName;
-    private Environment environment;
-    
-    public RESTAPIAdminClient(APIIdentifier apiId, Environment environment) throws AxisFault {
-        this.qualifiedName = apiId.getProviderName() + "--" + apiId.getApiName() + ":v" + apiId.getVersion();
-        String providerDomain = apiId.getProviderName();
-        providerDomain=providerDomain.replace("-AT-", "@");
-        restApiAdminStub = new RestApiAdminStub(null, environment.getServerURL() + "RestApiAdmin");
-        setup(restApiAdminStub, environment);
-        this.environment = environment;
-    }
-    
+	private RestApiAdminStub restApiAdminStub;
+	private String qualifiedName;
+	private String qualifiedNonVersionedWebAppName;
+	private Environment environment;
+
+	public RESTAPIAdminClient(APIIdentifier apiId, Environment environment) throws AxisFault {
+		this.qualifiedName = apiId.getProviderName() + "--" + apiId.getApiName() + ":v" +
+				apiId.getVersion();
+		this.qualifiedNonVersionedWebAppName = apiId.getProviderName() + "--" + apiId.getApiName();
+		restApiAdminStub = new RestApiAdminStub(null, environment.getServerURL() + "RestApiAdmin");
+		setup(restApiAdminStub, environment);
+		this.environment = environment;
+	}
+
 	/**
-	 * Add the WebApp to the gateway
+	 * Adds versioned web app configuration to the gateway
+	 *
 	 * @param builder
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void addApi(APITemplateBuilder builder, String tenantDomain ) throws AxisFault {
-        try {
-            String apiConfig = builder.getConfigStringForTemplate(environment);
-            if (tenantDomain != null && !("").equals(tenantDomain)
-                    && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            	restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
-            }else {
-            	 restApiAdminStub.addApiFromString(apiConfig);	
-            }
-        } catch (Exception e) {
-            throw new AxisFault("Error while adding new WebApp", e);
-        }
+	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
+			throws AxisFault {
+		try {
+			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
+			if (tenantDomain != null && !("").equals(tenantDomain)
+					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+				restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
+			} else {
+				restApiAdminStub.addApiFromString(apiConfig);
+			}
+		} catch (Exception e) {
+			throw new AxisFault("Error while adding new WebApp", e);
+		}
 	}
 
 	/**
-	 * Get WebApp from the gateway
+	 * Returns versioned web app configuration from the gateway
+	 *
 	 * @param tenantDomain
 	 * @return
 	 * @throws AxisFault
 	 */
-    public APIData getApi(String tenantDomain) throws AxisFault {
-        try {
-        	APIData apiData;
-        	 if (tenantDomain != null && !("").equals(tenantDomain)
-                     && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-        		 apiData = restApiAdminStub.getApiForTenant(qualifiedName,tenantDomain);
-             }else {
-            	 apiData = restApiAdminStub.getApiByName(qualifiedName);	
-             }
-            return (APIData) apiData;
-        } catch (Exception e) {
-            throw new AxisFault("Error while obtaining WebApp information from gateway", e);
-        }
-    }
-
-    /**
-     * Update the WebApp in the Gateway
-     * @param builder
-     * @param tenantDomain
-     * @throws AxisFault
-     */
-	public void updateApi(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
+	public APIData getVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
-			String apiConfig = builder.getConfigStringForTemplate(environment);
+			APIData apiData;
+			if (tenantDomain != null && !("").equals(tenantDomain)
+					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+				apiData = restApiAdminStub.getApiForTenant(qualifiedName, tenantDomain);
+			} else {
+				apiData = restApiAdminStub.getApiByName(qualifiedName);
+			}
+			return apiData;
+		} catch (Exception e) {
+			throw new AxisFault("Error while obtaining WebApp information from gateway", e);
+		}
+	}
+
+	/**
+	 * Updates versioned web app configuration in the gateway
+	 *
+	 * @param builder
+	 * @param tenantDomain
+	 * @throws AxisFault
+	 */
+	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
+			throws AxisFault {
+		try {
+			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
 			if (tenantDomain != null && !("").equals(tenantDomain) &&
-			    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
 
 				restApiAdminStub.updateApiForTenant(qualifiedName, apiConfig, tenantDomain);
 			} else {
@@ -102,21 +108,112 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Delete the WebApp from Gateway
+	 * Deletes versioned web app configuration from the gateway
+	 *
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void deleteApi(String tenantDomain) throws AxisFault {
+	public void deleteVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
 			if (tenantDomain != null && !("").equals(tenantDomain) &&
-			    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
 				restApiAdminStub.deleteApiForTenant(qualifiedName, tenantDomain);
 			} else {
 				restApiAdminStub.deleteApi(qualifiedName);
 			}
-			
+
 		} catch (Exception e) {
 			throw new AxisFault("Error while deleting WebApp", e);
+		}
+	}
+
+	/**
+	 * Adds non-versioned web app configuration to the gateway
+	 *
+	 * @param builder
+	 * @param tenantDomain
+	 * @throws AxisFault
+	 */
+	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
+			throws AxisFault {
+
+		try {
+			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
+			if (tenantDomain != null && !("").equals(tenantDomain)
+					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+				restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
+			} else {
+				restApiAdminStub.addApiFromString(apiConfig);
+			}
+		} catch (Exception e) {
+			throw new AxisFault("Error publishing non-versioned web app to the gateway", e);
+		}
+	}
+
+	/**
+	 * Updates non-versioned web app configuration in the gateway
+	 *
+	 * @param builder
+	 * @param tenantDomain
+	 * @throws AxisFault
+	 */
+	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
+			throws AxisFault {
+		try {
+			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
+			if (tenantDomain != null && !("").equals(tenantDomain) &&
+					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+
+				restApiAdminStub.updateApiForTenant(qualifiedNonVersionedWebAppName, apiConfig,
+													tenantDomain);
+			} else {
+				restApiAdminStub.updateApiFromString(qualifiedNonVersionedWebAppName, apiConfig);
+			}
+		} catch (Exception e) {
+			throw new AxisFault("Error while updating non-versioned web app in the gateway", e);
+		}
+	}
+
+	/**
+	 * Deletes non-versioned web app configuration form the gateway
+	 *
+	 * @param tenantDomain
+	 * @throws AxisFault
+	 */
+	public void deleteNonVersionedWebApp(String tenantDomain) throws AxisFault {
+		try {
+			if (tenantDomain != null && !("").equals(tenantDomain) &&
+					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+				restApiAdminStub.deleteApiForTenant(qualifiedNonVersionedWebAppName, tenantDomain);
+			} else {
+				restApiAdminStub.deleteApi(qualifiedNonVersionedWebAppName);
+			}
+		} catch (Exception e) {
+			throw new AxisFault("Error while deleting non-versioned web app from the gateway", e);
+		}
+	}
+
+	/**
+	 * Returns the non-versioned web app configuration from the gateway
+	 *
+	 * @param tenantDomain
+	 * @return
+	 * @throws AxisFault
+	 */
+	public APIData getNonVersionedWebAppData(String tenantDomain) throws AxisFault {
+		try {
+			APIData apiData;
+			if (tenantDomain != null && !("").equals(tenantDomain)
+					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+				apiData = restApiAdminStub.getApiForTenant(qualifiedNonVersionedWebAppName,
+														   tenantDomain);
+			} else {
+				apiData = restApiAdminStub.getApiByName(qualifiedNonVersionedWebAppName);
+			}
+			return apiData;
+		} catch (Exception e) {
+			throw new AxisFault(
+					"Error while obtaining non-versioned web app information from gateway", e);
 		}
 	}
 }
