@@ -1449,7 +1449,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         try {
             long subsCount = appMDAO.getAPISubscriptionCountByAPI(identifier);
             Resource appArtifactResource = registry.get(appArtifactPath);
-            String applicationStatus =appArtifactResource.getProperty(AppMConstants.APP_RESOURCE_STATUS);
+            String applicationStatus = appArtifactResource.getProperty(AppMConstants.APP_RESOURCE_STATUS);
             if (subsCount > 0 && !applicationStatus.equals("Retired")) {
                return isAppDeleted;
             }
