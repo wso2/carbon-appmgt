@@ -41,6 +41,9 @@ public final class AppMConstants {
     //This is the resource name of API
     public static final String API_RESOURCE_NAME ="/webapp";
 
+    //This is registry status property
+    public static final String APP_RESOURCE_STATUS ="registry.lifecycle.WebAppLifeCycle.state";
+
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
 
@@ -571,4 +574,5 @@ public final class AppMConstants {
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
+
 }
