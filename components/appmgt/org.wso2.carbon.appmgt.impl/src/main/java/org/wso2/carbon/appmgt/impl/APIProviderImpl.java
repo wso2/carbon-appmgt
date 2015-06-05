@@ -324,9 +324,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         Set<Tier> finalTiers = new HashSet<Tier>();
-        for (Tier t : tiers) {
-            if (!t.getName().equals(tier.getName())) {
-                finalTiers.add(t);
+        for (Tier tet : tiers) {
+            if (!tet.getName().equals(tier.getName())) {
+                finalTiers.add(tet);
             }
         }
         finalTiers.add(tier);
@@ -1463,7 +1463,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         try {
             long subsCount = appMDAO.getAPISubscriptionCountByAPI(identifier);
-            if (subsCount > 0) {
+            Resource appArtifactResource = registry.get(appArtifactPath);
+            String applicationStatus = appArtifactResource.getProperty(AppMConstants.APP_RESOURCE_STATUS);
+            if (subsCount > 0 && !applicationStatus.equals("Retired")) {
                return isAppDeleted;
             }
 
@@ -1482,7 +1484,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             Resource appResource = registry.get(path);
             String artifactId = appResource.getUUID();
 
-            Resource appArtifactResource = registry.get(appArtifactPath);
+
             String appArtifactResourceId = appArtifactResource.getUUID();
             if (artifactId == null) {
                 throw new AppManagementException("artifact id is null for : " + path);
