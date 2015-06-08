@@ -6646,10 +6646,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param userId
 	 *            : User Id
 	 */
-	public static void saveStoreHits(String webAppUUID, String userId,
-			Integer tenantId) throws SQLException,
-                                                   AppManagementException {
-		Connection conn = null;
+    public static void saveStoreHits(String webAppUUID, String userId,
+                                     Integer tenantId) throws SQLException, AppManagementException {
+        Connection conn = null;
 		try {
 			// get the connection for the specific UI Activity Publish data
 			// source
