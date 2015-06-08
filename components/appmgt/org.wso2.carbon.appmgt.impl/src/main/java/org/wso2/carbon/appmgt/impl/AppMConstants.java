@@ -575,4 +575,6 @@ public final class AppMConstants {
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
 
+    public static final String PAGE_LOAD_EVENT = "page-load";
+
 }

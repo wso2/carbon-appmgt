@@ -6645,22 +6645,18 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : Application UUID
 	 * @param userId
 	 *            : User Id
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 */
 	public static void saveStoreHits(String webAppUUID, String userId,
-			Integer tenantId, String strDataContext) throws SQLException,
+			Integer tenantId) throws SQLException,
                                                    AppManagementException {
 		Connection conn = null;
 		try {
 			// get the connection for the specific UI Activity Publish data
 			// source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-			Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn,
-					strDataContext);
-			insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn,
-					strDataContext);
-			conn.commit();
+            Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
+            insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn);
+            conn.commit();
 		} finally {
 			APIMgtDBUtil.closeAllConnections(null, conn, null);
 		}
@@ -6677,13 +6673,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : Maximum hit count to be inserted
 	 * @param conn
 	 *            : DB connection
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 */
-	public static void insertUpdateStoreHits(String webAppUUID, String userId,
-			Integer maxCount, Integer tenantId, Connection conn,
-			String strDataContext) throws AppManagementException {
-		ResultSet rs = null;
+    public static void insertUpdateStoreHits(String webAppUUID, String userId,
+                                             Integer maxCount, Integer tenantId, Connection conn)
+            throws AppManagementException {
+        ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
 			String query = "";
@@ -6707,12 +6701,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 			ps.executeUpdate();
 			if (log.isDebugEnabled()) {
-				log.debug("Record saved successfully : " + strDataContext);
-			}
+                log.debug("Record relevant to webapp id " + webAppUUID + " saved successfully");
+            }
 		} catch (SQLException e) {
-			handleException("Error in updating Store hit count: "
-					+ strDataContext + " : " + e.getMessage(), e);
-		} finally {
+            String strDataContext = "(Webapp UUID: " + webAppUUID + ", UserId : " + userId + ", TenantId : " +
+                    tenantId + ", Hit count : " + maxCount + ")";
+            handleException("Error in updating Store hit count: "
+                    + strDataContext + " : " + e.getMessage(), e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
 	}
@@ -6726,16 +6722,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : User Id
 	 * @param conn
 	 *            : DB connection
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 * @return maxId : Max Hit Count (against user,asset)
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             : if an error occurred while retrieving data
 	 *             : if an error occurred while retrieving data
 	 */
-	private static int getMaxStoreHitCount(String webAppUUID, String userId,
-			Connection conn, String strDataContext)
-			throws AppManagementException {
+    private static int getMaxStoreHitCount(String webAppUUID, String userId, Connection conn)
+            throws AppManagementException {
 		PreparedStatement statementToGetWebAppId = null;
 		int maxId = 0;
 		ResultSet rs = null;
@@ -6752,10 +6745,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 
 		} catch (SQLException e) {
-			handleException(
-					"Error while retrieving the store hit maxId. webUUID: "
-							+ strDataContext + " : " + webAppUUID, e);
-		} finally {
+            handleException(
+                    "Error while retrieving the store hit maxId. webUUID: "
+                            + webAppUUID + ", UserId : " + userId + " : " + webAppUUID, e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(statementToGetWebAppId, null, rs);
 		}
 		return maxId;
