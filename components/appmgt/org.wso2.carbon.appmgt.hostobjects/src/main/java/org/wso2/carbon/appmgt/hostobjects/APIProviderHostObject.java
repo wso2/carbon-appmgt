@@ -643,7 +643,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static int jsFunction_saveEntitlementPolicyPartial(Context context, Scriptable thisObj,
                                                               Object[] args,
                                                               Function funObj) throws
-                                                                               AppManagementException { 
+                                                                               AppManagementException {
         if (args == null || args.length != 4) {
             handleException("Invalid number of input parameters.");
         }
@@ -828,7 +828,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
         return myn;
     }
- 
+
 
     /**
      * Get application wise policy group list
@@ -977,13 +977,8 @@ public class APIProviderHostObject extends ScriptableObject {
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
         logoutURL = logoutURL.replace(endpoint, "");
-        Boolean allowAnonymous;
-        if (AppMConstants.API_CONST_TRUE.equals((String) apiData.get("overview_allowAnonymous",
-                apiData))) {
-            allowAnonymous = true;
-        } else {
-            allowAnonymous = false;
-        }
+        Boolean allowAnonymous = "TRUE".equals((String) apiData.get("overview_allowAnonymous", apiData));
+
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
         String visibleRoles = "";
@@ -2502,7 +2497,7 @@ public class APIProviderHostObject extends ScriptableObject {
             list = client.getAPIUsageByUser(providerName, fromDate, toDate, tenantDomainName);
         } catch (APIMgtUsageQueryServiceClientException e) {
             log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
-        } 
+        }
 
         Iterator it = null;
         if (list != null) {

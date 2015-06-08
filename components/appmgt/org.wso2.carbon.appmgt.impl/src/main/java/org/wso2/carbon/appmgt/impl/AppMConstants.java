@@ -509,9 +509,6 @@ public final class AppMConstants {
 
     public static final String SWAGGER_VERSION = "1.1";
 
-    public static final String API_CONST_TRUE="TRUE";
-    public static final String API_CONST_FALSE="FALSE";
-
     public static class OperationParameter {
     	public static final String AUTH_PARAM_NAME = "Authorization";
     	public static final String AUTH_PARAM_DESCRIPTION = "Access Token";

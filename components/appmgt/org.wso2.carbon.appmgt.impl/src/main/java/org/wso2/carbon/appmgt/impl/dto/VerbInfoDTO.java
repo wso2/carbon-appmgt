@@ -82,5 +82,6 @@ public class VerbInfoDTO implements Serializable {
 		return httpVerb != null ? httpVerb.hashCode() : 0;
 	}
 
-	public HashMap<String,Boolean> mapAllowAnonymousUrl= new HashMap<String, Boolean>();
+	public HashMap<String,Boolean> allowAnonymousUrlMap = new HashMap<String, Boolean>();
+
 }

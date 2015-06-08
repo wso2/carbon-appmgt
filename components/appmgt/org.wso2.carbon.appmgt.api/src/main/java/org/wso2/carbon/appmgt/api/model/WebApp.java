@@ -17,11 +17,10 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.Collections;
 
 /**
  * Provider's & system's view of WebApp
