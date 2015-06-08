@@ -1,4 +1,22 @@
 /*
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+/*
 	Description: Renders the asset.jag view
 	Filename:asset.js
 	Created Date: 29/7/2013
@@ -35,9 +53,15 @@ var render=function(theme,data,meta,require){
         heading = "Create New Mobile App";
 		break;
 	case 'view':
-		listPartial='view-asset';
-        data = require('/helpers/splitter.js').splitData(data);
-        heading = data.newViewData.name.value;
+		listPartial='add-mobileapp-version';
+        data = require('/helpers/edit-asset.js').screenshots(data);
+        if(data.artifact.attributes.overview_platform == 'android' && data.artifact.attributes.overview_type == 'public') {
+            data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_packagename;
+        }else if(data.artifact.attributes.overview_platform == 'ios' && data.artifact.attributes.overview_type == 'public'){
+            data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_appid;
+        }
+        heading = "Add new Mobile App version for " + (data.artifact.attributes.overview_name);
+
 		break;
     case 'edit':
         listPartial='edit-asset';

@@ -123,8 +123,10 @@
             <br />
             No web applications added yet.
             {{#ifCond cuser.um.tenantId "==" "-1234"}}
-                <a class="btn-deploySample" data-type="{{shortName}}">Click here</a> 
-                to deploy sample web applications.    
+                {{#if createPermission}}
+                    <a class="btn-deploySample" data-type="{{shortName}}">Click here</a>
+                    to deploy sample web applications.
+                {{/if}}
             {{/ifCond}}
             <br />
             {{#if createPermission}}
@@ -167,8 +169,8 @@
                 <input type="hidden" value="" name="action" id="action" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-reject-proceed">Proceed</button>
+                <button type="button" class="btn btn-info btn-reject-proceed">Proceed</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
