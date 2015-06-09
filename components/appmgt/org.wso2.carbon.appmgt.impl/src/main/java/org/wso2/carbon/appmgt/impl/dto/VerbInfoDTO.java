@@ -4,6 +4,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Set;
 
 public class VerbInfoDTO implements Serializable {
 
@@ -82,6 +83,45 @@ public class VerbInfoDTO implements Serializable {
 		return httpVerb != null ? httpVerb.hashCode() : 0;
 	}
 
-	public HashMap<String,Boolean> allowAnonymousUrlMap = new HashMap<String, Boolean>();
+	private HashMap<String,Boolean> allowAnonymousUrlMap = new HashMap<String, Boolean>();
+
+    /**
+     * add values to allowAnonymousUrlMap
+     *
+     * @param key
+     * @param value
+     */
+    public void addAllowAnonymousUrl(String key, Boolean value) {
+        allowAnonymousUrlMap.put(key, value);
+    }
+
+    /**
+     * get value from allowAnonymousUrlMap for the given key
+     *
+     * @param key
+     * @return boolean result
+     */
+    public boolean getAllowAnonymousUrl(String key) {
+        return allowAnonymousUrlMap.get(key);
+    }
+
+    /**
+     * check if the allowAnonymousUrlMap is empty/null
+     *
+     * @return boolean result
+     */
+    public boolean isEmptyAllowAnonymousUrlMap() {
+        return (allowAnonymousUrlMap == null);
+    }
+
+    /**
+     * Get all allowAnonymousUrlMap key/value list
+     *
+     * @return keySet list
+     */
+    public Set<String> getAllowAnonymousUrlList() {
+        return allowAnonymousUrlMap.keySet();
+    }
+
 
 }

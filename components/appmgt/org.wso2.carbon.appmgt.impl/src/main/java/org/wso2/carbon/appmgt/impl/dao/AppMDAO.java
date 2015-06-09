@@ -727,7 +727,7 @@ public class AppMDAO {
                 }
 
 				// store the values (is anonymous allowed) per each URL pattern
-				verbInfoDTO.allowAnonymousUrlMap.put(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
+				verbInfoDTO.addAllowAnonymousUrl(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 			}
 		} catch (SQLException e) {
 			handleException("Error when executing the SQL : " + query + " (Context:" + context +

@@ -362,21 +362,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) throws AppManagementException {
 
         // Get App URL Pattern Info
-        VerbInfoDTO verbInfoDTO = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
+        VerbInfoDTO httpVerbInfo = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
 
-        if(verbInfoDTO != null && verbInfoDTO.allowAnonymousUrlMap != null){
+        if (httpVerbInfo != null && httpVerbInfo.isEmptyAllowAnonymousUrlMap() == false) {
 
         	NamedMatchList<String> matcher = new NamedMatchList<String>();
-        	
-        	for(String pattern : verbInfoDTO.allowAnonymousUrlMap.keySet()){
-        		matcher.add(pattern,pattern);
-        	}
-        	
-        	String httpVerbAndRequestPath = httpVerb + requestPath;
+
+            for (String pattern : httpVerbInfo.getAllowAnonymousUrlList()) {
+                matcher.add(pattern, pattern);
+            }
+
+            String httpVerbAndRequestPath = httpVerb + requestPath;
         	
         	String matchedPattern = matcher.match(httpVerbAndRequestPath);
         	
-        	Boolean allowAnonymous = verbInfoDTO.allowAnonymousUrlMap.get(matchedPattern);
+        	Boolean allowAnonymous = httpVerbInfo.getAllowAnonymousUrl(matchedPattern);
         	
         	if(allowAnonymous != null){
         		return allowAnonymous;
