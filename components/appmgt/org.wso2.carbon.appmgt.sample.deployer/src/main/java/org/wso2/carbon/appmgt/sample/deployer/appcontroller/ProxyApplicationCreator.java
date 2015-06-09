@@ -32,9 +32,8 @@ import org.wso2.carbon.appmgt.sample.deployer.http.HttpHandler;
 import org.wso2.carbon.appmgt.sample.deployer.javascriptwrite.InvokeStatistcsJavascriptBuilder;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.NetworkUtils;
+
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -126,7 +125,8 @@ public class ProxyApplicationCreator {
         try {
             policyIDResponce = httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/entitlement/policy/partial" +
                             "/policyGroup/save", "anonymousAccessToUrlPattern=false&policyGroupName" +
-                            "=samples&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=null&userRoles=",
+                            "=samples&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=samples" +
+                                                               "&userRoles=",
                     creatorSession, "application/x-www-form-urlencoded; charset=UTF-8").split(":")[3];
         } catch (IOException e) {
             log.error("Error while requesting a policy id", e);
