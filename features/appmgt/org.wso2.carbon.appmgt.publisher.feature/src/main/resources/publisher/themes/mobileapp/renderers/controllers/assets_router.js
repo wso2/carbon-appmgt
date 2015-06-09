@@ -36,7 +36,17 @@ var render = function (theme, data, meta, require) {
 
 	}
 
-	var lifecycleColors = {"Demote": "btn-blue", "Submit for Review": "btn-blue", "Publish": "btn-blue", "Unpublish": "btn-orange", "Re-Publish": "btn-blue","Deprecate": "btn-danger", "Retire": "btn-danger", "Approve": "btn-blue", "Reject": "btn-danger"};
+	var lifecycleColors = {
+		"Demote": "btn-blue",
+		"Submit for Review": "btn-blue",
+		"Publish": "btn-blue",
+		"Unpublish": "btn-orange",
+		"Re-Publish": "btn-blue",
+		"Deprecate": "btn-danger",
+		"Retire": "btn-danger",
+		"Approve": "btn-blue",
+		"Reject": "btn-danger"
+	};
 	if(data.artifacts){
         var log = new Log();
 
