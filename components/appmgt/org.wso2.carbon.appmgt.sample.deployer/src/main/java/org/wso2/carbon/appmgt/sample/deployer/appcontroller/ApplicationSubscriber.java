@@ -24,15 +24,15 @@ import org.wso2.carbon.appmgt.sample.deployer.http.HttpHandler;
 import java.io.IOException;
 
 /**
- *  this class is use to subscribe applications
+ * this class is use to subscribe applications
  */
 public class ApplicationSubscriber {
 
     private HttpHandler httpHandler;
     private String httpsBackEndUrl;
 
-    ApplicationSubscriber(){
-        httpHandler =  new HttpHandler();
+    ApplicationSubscriber() {
+        httpHandler = new HttpHandler();
         httpsBackEndUrl = Configuration.getHttpsUrl();
 
     }
@@ -40,17 +40,12 @@ public class ApplicationSubscriber {
     /**
      * This method is use for suscribe web application
      *
-     * @param appCreateRequest
-     *           Bean of the web application
-     *
-     * @param storeSession
-     *           Bean of the web application
-     *
-     * @throws java.io.IOException
-     *           Throws this when failed to suscribe web application
+     * @param appCreateRequest Bean of the web application
+     * @param storeSession     Bean of the web application
+     * @throws java.io.IOException Throws this when failed to suscribe web application
      */
-     public void subscribeApplication(AppCreateRequest appCreateRequest,String storeSession,String currentUserName)
-             throws IOException {
+    public void subscribeApplication(AppCreateRequest appCreateRequest, String storeSession, String currentUserName)
+            throws IOException {
         httpHandler.doPostHttps(httpsBackEndUrl + "/store/resources/webapp/v1/subscription/app",
                 "apiName=" + appCreateRequest.getOverview_name() + "" +
                         "&apiVersion=" + appCreateRequest.getOverview_version() + "&apiTier=" +

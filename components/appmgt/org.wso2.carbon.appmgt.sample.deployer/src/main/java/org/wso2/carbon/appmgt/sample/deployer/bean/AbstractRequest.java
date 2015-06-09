@@ -25,8 +25,7 @@ import java.util.Random;
 
 /**
  * This class is use to build payload and generate tracking id for web application
- *
- * */
+ */
 public abstract class AbstractRequest {
 
     private Map<String, String> parameterMap = new HashMap<String, String>();
@@ -34,40 +33,31 @@ public abstract class AbstractRequest {
     /**
      * This method is use to build payload for web application creating request
      *
-     *@return  payload for web application
-     *
-     * */
+     * @return payload for web application
+     */
     public String generateRequestParameters() {
         parameterMap.clear();
         init();
-        String requestParams = "";
+        StringBuilder requestParams = new StringBuilder();
+        requestParams.append("");
         Iterator<String> irt = parameterMap.keySet().iterator();
         while (irt.hasNext()) {
             String key = irt.next();
-            if (key.equals("claimPropertyName0") && parameterMap.get(key).contains(",")) {
-                String[] claims = parameterMap.get(key).split(",");
-
-                for (int i = 0; i < claims.length; i++) {
-                    requestParams += "&claimPropertyName" + i + "=" + claims[i].trim();
-                }
-
-                //parameterMap.remove("claimPropertyCounter");
-            } else {
-                if (!requestParams.equals("")) {
-                    requestParams += "&";
-                }
-                requestParams += key + "=" + parameterMap.get(key);
+            if (!requestParams.toString().equals("")) {
+                requestParams.append("&");
             }
+            requestParams.append(key);
+            requestParams.append("=");
+            requestParams.append(parameterMap.get(key));
         }
-        return requestParams;
+        return requestParams.toString();
     }
 
     /**
      * This method is use to generate tracking id for web application
      *
-     *@return  generated tracking id for web application
-     *
-     * */
+     * @return generated tracking id for web application
+     */
     public String generateTrackingID() {
         Random rand = new Random();
         StringBuilder randomNumber = new StringBuilder();

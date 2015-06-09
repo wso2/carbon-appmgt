@@ -23,12 +23,10 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * This class is use to deploy war file in server
- * */
+ */
 public class BackEndApplicationCreator {
 
     final static Logger log = Logger.getLogger(BackEndApplicationCreator.class.getName());
@@ -37,17 +35,13 @@ public class BackEndApplicationCreator {
     /**
      * This method is use deploy war file according to given name
      *
-     * @param warFileName
-     *            Name of the war file that need to be deploy
-     *
-     * @throws AppManagementException
-     *            Throws this when failed to deploy web application
+     * @param warFileName Name of the war file that need to be deploy
+     * @throws AppManagementException Throws this when failed to deploy web application
      */
     public void copyFileUsingFileStreams(String warFileName) throws AppManagementException {
-        homePath = CarbonUtils.getCarbonHome();
-        File warFile = new File(homePath + "/samples/" + warFileName+".war");
+        File warFile = new File(homePath + "/samples/" + warFileName + ".war");
         log.info(warFile.getAbsolutePath());
-        File outputFolder = new File(homePath + "/repository/deployment/server/webapps/"+warFile.getName());
+        File outputFolder = new File(homePath + "/repository/deployment/server/webapps/" + warFile.getName());
         InputStream is = null;
         OutputStream os = null;
 
@@ -61,21 +55,26 @@ public class BackEndApplicationCreator {
             }
         } catch (IOException e) {
             log.error("Error while deploying a " + warFileName + ".war", e);
-            throw  new AppManagementException("Error while deploying a "+warFileName+".war", e);
+            throw new AppManagementException("Error while deploying a " + warFileName + ".war", e);
         } finally {
             try {
-                is.close();
-                os.close();
+                if (is != null) {
+                    is.close();
+                }
+                if (os != null) {
+                    os.close();
+                }
             } catch (IOException e) {
-                log.error("Error while deploying a "+warFileName+".war", e);
-                throw  new AppManagementException("Error while deploying a "+warFileName+".war", e);
+                String erroMessge = "Error while deploying a " + warFileName + ".war";
+                log.error(erroMessge, e);
+                throw new AppManagementException(erroMessge, e);
             }
 
         }
-        File webAppFolder = new File(homePath + "/repository/deployment/server/webapps/"+warFileName);
-        while(!webAppFolder.exists()){}
+        File webAppFolder = new File(homePath + "/repository/deployment/server/webapps/" + warFileName);
+        while (!webAppFolder.exists()) {
+        }
     }
-
 
 
 }

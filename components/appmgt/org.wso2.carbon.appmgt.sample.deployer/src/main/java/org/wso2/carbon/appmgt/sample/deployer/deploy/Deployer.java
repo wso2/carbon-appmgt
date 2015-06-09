@@ -21,6 +21,8 @@ import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -84,9 +86,11 @@ public class Deployer {
             log.error("Error while requesting a store session", e);
             throw new AppManagementException("Error while requesting a store session", e);
         }
-
-        for (Object webappName : webAppsJasonObject.keySet()) {
-            JSONObject webAppJsonObject = (JSONObject) webAppsJasonObject.get(webappName);
+        Iterator webappEntries = webAppsJasonObject.entrySet().iterator();
+        while (webappEntries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) webappEntries.next();
+            Object webappName = thisEntry.getKey();
+            JSONObject webAppJsonObject = (JSONObject) thisEntry.getValue();
             webAppDetail.setWebAppName(webappName.toString() + "_" + username);
             webAppDetail.setVersion(webAppJsonObject.get("version").toString());
             if (!AppMDAO.isWebAppAvailable(webAppDetail.getWebAppName(), webAppDetail.getVersion())) {
