@@ -425,6 +425,17 @@ public interface APIProvider extends APIManager {
     public Set getTierPermissions() throws AppManagementException;
 
     /**
+     * Moves subscriptions from one app (@{code fromApp}) to another app ({@code toApp})
+     *
+     * @param fromIdentifier subscriptions of this app
+     * @param toIdentifier   will be moved into this app
+     * @return number of subscriptions moved
+     * @throws AppManagementException
+     */
+    public int moveSubscriptions(APIIdentifier fromIdentifier, APIIdentifier toIdentifier)
+            throws AppManagementException;
+
+    /**
      * Delete an WebApp
      *
      * @param identifier APIIdentifier

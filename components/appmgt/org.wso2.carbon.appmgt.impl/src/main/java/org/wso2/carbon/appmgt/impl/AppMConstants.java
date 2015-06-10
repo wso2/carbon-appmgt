@@ -25,6 +25,9 @@ import javax.xml.namespace.QName;
  */
 public final class AppMConstants {
 
+    // Velocity logger name parameter in app-manager.xml
+	public static final String VELOCITY_LOGGER = "VelocityLogger";
+
     //key value of the provider rxt
     public static final String PROVIDER_KEY = "provider";
 
@@ -40,6 +43,9 @@ public final class AppMConstants {
     public static final String API_CONTEXT_ID = "api.context.id";
     //This is the resource name of API
     public static final String API_RESOURCE_NAME ="/webapp";
+
+    //This is registry status property
+    public static final String APP_RESOURCE_STATUS ="registry.lifecycle.WebAppLifeCycle.state";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
@@ -571,4 +577,5 @@ public final class AppMConstants {
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
+
 }
