@@ -20,8 +20,7 @@ package org.wso2.carbon.appmgt.sample.deployer.bean;
 
 /**
  * This class is use as a bean class for web applications
- *
- * */
+ */
 public class AppCreateRequest extends AbstractRequest {
     private String overview_provider = "admin";
     private String overview_name = "test";
@@ -87,8 +86,7 @@ public class AppCreateRequest extends AbstractRequest {
 
     /**
      * Add all the attributes in to hasmap with there values
-     *
-     * */
+     */
     @Override
     public void init() {
         addParameter("overview_provider", getOverview_provider());

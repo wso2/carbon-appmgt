@@ -31,7 +31,7 @@ public class ApplicationPublisher {
     private String httpsBackEndUrl;
 
 
-    public  ApplicationPublisher(){
+    public ApplicationPublisher() {
         httpHandler = new HttpHandler();
         httpsBackEndUrl = Configuration.getHttpsUrl();
     }
@@ -39,17 +39,12 @@ public class ApplicationPublisher {
     /**
      * This method is use for publish web application or mobile application
      *
-     * @param applicationType
-     *           type of the application whether mobile application or web application
-     * @param UUID
-     *           UUID of the application
-     *
-     * @throws java.io.IOException
-     *           Throws this when failed to create web application
-     *
+     * @param applicationType type of the application whether mobile application or web application
+     * @param UUID            UUID of the application
+     * @throws java.io.IOException Throws this when failed to create web application
      */
-    public void publishApplication(String applicationType, String UUID,String adminPublisherSession
-                                    ) throws IOException {
+    public void publishApplication(String applicationType, String UUID, String adminPublisherSession
+    ) throws IOException {
         httpHandler.doPut(httpsBackEndUrl + "/publisher/api/lifecycle/Submit%20for%20Review/" + applicationType + "/"
                 + UUID
                 , adminPublisherSession);

@@ -28,21 +28,16 @@ import java.rmi.RemoteException;
 
 /**
  * This class is use as a client for Remote UserStore Manager Service
- * */
+ */
 public class RemoteUserStoreManagerServiceClient {
     private RemoteUserStoreManagerServiceStub userStoreManagerStub;
 
     /**
      * Creates a new RemoteUserStoreManagerServiceClient object and initialising the RemoteUserStoreManagerServiceStub
      *
-     * @param cookie
-     *            cookie to get authentication for RemoteUserStoreManagerService
-     *
-     * @param url
-     *            https server url
-     *
-     * @throws AxisFault
-     *            Throws this when RemoteUserStoreManagerServiceStub failed initialise
+     * @param cookie cookie to get authentication for RemoteUserStoreManagerService
+     * @param url    https server url
+     * @throws AxisFault Throws this when RemoteUserStoreManagerServiceStub failed initialise
      */
     public RemoteUserStoreManagerServiceClient(String cookie, String url) throws AxisFault {
         String serviceURL = url + "/services/RemoteUserStoreManagerService";
@@ -57,20 +52,12 @@ public class RemoteUserStoreManagerServiceClient {
     /**
      * This method is use to set a value for given claim
      *
-     *@param userName
-     *           currently logged user
-     *
-     *@param claimURI
-     *           URI of the claim
-     *
-     *@param climValue
-     *           value of the claim
-     *
-     *@throws RemoteException
-     *           Throws this when failed to update a claim value
-     *
-     * */
-    public void updateClaims(String userName,String claimURI, String climValue) throws RemoteException,
+     * @param userName  currently logged user
+     * @param claimURI  URI of the claim
+     * @param climValue value of the claim
+     * @throws RemoteException Throws this when failed to update a claim value
+     */
+    public void updateClaims(String userName, String claimURI, String climValue) throws RemoteException,
             RemoteUserStoreManagerServiceUserStoreExceptionException {
         userStoreManagerStub.setUserClaimValue(userName, claimURI, climValue, "default");
     }

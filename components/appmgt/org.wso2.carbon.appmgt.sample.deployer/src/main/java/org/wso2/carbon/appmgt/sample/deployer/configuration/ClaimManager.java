@@ -25,10 +25,13 @@ import org.wso2.carbon.appmgt.sample.deployer.appm.ClaimManagementServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.appm.RemoteUserStoreManagerServiceClient;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
 import org.wso2.carbon.um.ws.api.stub.RemoteUserStoreManagerServiceUserStoreExceptionException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.rmi.RemoteException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClaimManager {
 
     final static Logger log = Logger.getLogger(ClaimManager.class.getName());
-    private static String session;
-    private static RemoteUserStoreManagerServiceClient remoteUserStoreManagerServiceClient;
+    private String session;
+    private RemoteUserStoreManagerServiceClient remoteUserStoreManagerServiceClient;
     private static String appmPath = CarbonUtils.getCarbonHome();
     private static String backendUrl = Configuration.getHttpsUrl();
     private ClaimManagementServiceClient claimManagementServiceClient;
@@ -102,17 +105,26 @@ public class ClaimManager {
      * */
     public void addClaimMapping(ConcurrentHashMap<String,String[]> claims) throws AppManagementException {
         try {
-            for(String claimName : claims.keySet()){
-                if(claims.get(claimName)[2].equalsIgnoreCase("true")){
-                    claimManagementServiceClient.addClaim(claimName
-                            ,claims.get(claimName)[0], false);
+            Iterator claimEntries = claims.entrySet().iterator();
+            while (claimEntries.hasNext()) {
+                Map.Entry thisEntry = (Map.Entry) claimEntries.next();
+                Object key = thisEntry.getKey();
+                String[] value = (String[]) thisEntry.getValue();
+                if (value[2].equalsIgnoreCase("true")) {
+                    claimManagementServiceClient.addClaim(key.toString()
+                            , value[0], false);
                 }
             }
-        } catch (Exception e) {
+        } catch (RemoteException e) {
             if(!e.getMessage().equals("Duplicate claim exist in the system. Please pick a different Claim Uri")){
-                log.error("Error while adding a ClaimMapping", e);
-                throw  new AppManagementException("Error while adding a ClaimMapping",e);
+                String errorMessage = "Error while adding a ClaimMapping";
+                log.error(errorMessage, e);
+                throw  new AppManagementException(errorMessage,e);
             }
+        } catch (ClaimManagementServiceException e) {
+            String errorMessage = "Error while adding a ClaimMapping";
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage,e);
         }
     }
 
@@ -131,16 +143,22 @@ public class ClaimManager {
      * */
     public void setClaimValues(ConcurrentHashMap<String,String[]> claims,String userName) throws AppManagementException {
         try {
-            for(String claimName : claims.keySet()){
-                remoteUserStoreManagerServiceClient.updateClaims(userName,claims.get(claimName)[0]
-                            , claims.get(claimName)[1]);
+            Iterator claimEntries = claims.entrySet().iterator();
+            while (claimEntries.hasNext()) {
+                Map.Entry thisEntry = (Map.Entry) claimEntries.next();
+                Object key = thisEntry.getKey();
+                String[] value = (String[]) thisEntry.getValue();
+                remoteUserStoreManagerServiceClient.updateClaims(userName,value[0]
+                        , value[1]);
             }
         } catch (RemoteException e) {
-            log.error("Error while updating a claim vaue", e);
-            throw  new AppManagementException("Error while updating a claim vaue", e);
+            String errorMessage = "Error while updating a claim vaue";
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         } catch (RemoteUserStoreManagerServiceUserStoreExceptionException e) {
-            log.error("Error while updating a claim vaue", e);
-            throw  new AppManagementException("Error while updating a claim vaue", e);
+            String errorMessage = "Error while updating a claim vaue";
+            log.error(errorMessage, e);
+            throw  new AppManagementException(errorMessage, e);
         }
     }
 }

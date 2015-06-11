@@ -25,25 +25,23 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.sample.deployer.appm.WSRegistryServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.bean.AppCreateRequest;
-import org.wso2.carbon.appmgt.sample.deployer.bean.MobileApplicationBean;
 import org.wso2.carbon.appmgt.sample.deployer.bean.WebAppDetail;
 import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
 import org.wso2.carbon.appmgt.sample.deployer.http.HttpHandler;
 import org.wso2.carbon.appmgt.sample.deployer.javascriptwrite.InvokeStatistcsJavascriptBuilder;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.NetworkUtils;
+
 import java.io.IOException;
-import java.net.SocketException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
-*
-* This class is use to create,publish and subscribe web applications.
-* This also create and publish mobile applications.
-*
-*/
+ * This class is use to create,publish and subscribe web applications.
+ * This also create and publish mobile applications.
+ */
 public class ProxyApplicationCreator {
 
     final static Logger log = Logger.getLogger(ProxyApplicationCreator.class.getName());
@@ -58,14 +56,13 @@ public class ProxyApplicationCreator {
     private Random random;
     private String adminPublisherSession;
     private ApplicationPublisher applicationPublisher;
-    private ApplicationSubscriber  applicationSubscriber;
+    private ApplicationSubscriber applicationSubscriber;
 
     /**
      * Creates a new ProxyApplicationCreator object and initialising objects,attributes
      *
-     * @throws AppManagementException
-     *            Throws this when failed to initialise the ip address
-     *            Throws this when failed to initialise the WSRegistryServiceClient
+     * @throws AppManagementException Throws this when failed to initialise the ip address
+     *                                Throws this when failed to initialise the WSRegistryServiceClient
      */
     public ProxyApplicationCreator() throws AppManagementException {
         this.ipAddress = Configuration.getIPAddress();
@@ -74,51 +71,47 @@ public class ProxyApplicationCreator {
         httpHandler = new HttpHandler();
         trackingCodes = new ConcurrentHashMap<String, String>();
         applicationPublisher = new ApplicationPublisher();
-        applicationSubscriber =  new ApplicationSubscriber();
+        applicationSubscriber = new ApplicationSubscriber();
         random = new Random();
         String errorMessage = "Error while creating a WSRegistryServiceClient";
         try {
             wsRegistryServiceClient = new WSRegistryServiceClient(httpsBackEndUrl);
         } catch (RegistryException e) {
-            log.error(errorMessage,e);
-            throw  new AppManagementException(errorMessage,e);
+            log.error(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         } catch (AxisFault axisFault) {
             log.error(errorMessage, axisFault);
-            throw  new AppManagementException(errorMessage,axisFault);
+            throw new AppManagementException(errorMessage, axisFault);
         }
     }
 
     /**
      * This method is use for create,publish and subscribe given web application
      *
-     * @param webAppDetail
-     *            Bean object of the web application
-     *
-     * @throws AppManagementException
-     *            Throws this when failed to add an user
-     *            Throws this when store session is failed while requesting
-     *            Throws this when policy id is failed while requesting
-     *            Throws this when failed to create,publish or subscribe web application
+     * @param webAppDetail Bean object of the web application
+     * @throws AppManagementException Throws this when failed to add an user
+     *                                Throws this when store session is failed while requesting
+     *                                Throws this when policy id is failed while requesting
+     *                                Throws this when failed to create,publish or subscribe web application
      */
-    //create and publish
-    public void createAndPublishWebApplication(WebAppDetail webAppDetail) throws AppManagementException{
+    public void createAndPublishWebApplication(WebAppDetail webAppDetail) throws AppManagementException {
         String currentUserName = webAppDetail.getUserName();
         String creatorSession = webAppDetail.getCreatorSession();
         String storeSession = webAppDetail.getStoreSession();
         String java_policyId = AppMDAO.getDisplayOrderSeqNo();
         webAppDetail.setContext(generateWebAppContext(webAppDetail.getContext()));
-        if(currentUserName.equals("admin")){
+        if (currentUserName.equals("admin")) {
             adminPublisherSession = webAppDetail.getCreatorSession();
-        }else{
+        } else {
             try {
-                adminPublisherSession =  httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/authenticate",
+                adminPublisherSession = httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/authenticate",
                         "username=" + Configuration.getUserName() + "&password=" + Configuration.getPassword() +
                                 "&action=login", ""
                         , "application/x-www-form-urlencoded");
             } catch (IOException e) {
                 String errorMessage = "Error while requesting publisher session";
                 log.error(errorMessage, e);
-                throw  new AppManagementException(errorMessage,e);
+                throw new AppManagementException(errorMessage, e);
             }
         }
 
@@ -130,7 +123,7 @@ public class ProxyApplicationCreator {
                     creatorSession, "application/x-www-form-urlencoded; charset=UTF-8").split(":")[3];
         } catch (IOException e) {
             log.error("Error while requesting a policy id", e);
-            throw  new AppManagementException("Error while requesting a policy id",e);
+            throw new AppManagementException("Error while requesting a policy id", e);
         }
         String policyId = policyIDResponce.substring(1, (policyIDResponce.length() - 2)).trim();
         AppCreateRequest appCreateRequest = new AppCreateRequest();
@@ -141,118 +134,60 @@ public class ProxyApplicationCreator {
         appCreateRequest.setUritemplate_policyGroupId1(policyId);
         appCreateRequest.setUritemplate_policyGroupId0(policyId);
         appCreateRequest.setOverview_provider(currentUserName);
-        appCreateRequest.setUritemplate_javaPolicyIds("["+java_policyId+"]");
-        appCreateRequest.setClaimPropertyCounter(webAppDetail.getClaims().size()+"");
+        appCreateRequest.setUritemplate_javaPolicyIds("[" + java_policyId + "]");
+        appCreateRequest.setClaimPropertyCounter(webAppDetail.getClaims().size() + "");
         appCreateRequest.setOverview_name(webAppDetail.getWebAppName());
         appCreateRequest.setOverview_displayName(webAppDetail.getDisplayName());
         appCreateRequest.setOverview_context(webAppDetail.getContext());
         appCreateRequest.setOverview_version(webAppDetail.getVersion());
         appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
         appCreateRequest.setOverview_transports("http");
-        appCreateRequest.setOverview_webAppUrl(httpBackEndUrl +"/" +webAppDetail.getWarFileName()+"/");
+        appCreateRequest.setOverview_webAppUrl(httpBackEndUrl + "/" + webAppDetail.getWarFileName() + "/");
         String UUID = null;
-        String errorMessage = "Error while creating a web application"+webAppDetail.getDisplayName();
+        String errorMessage = "Error while creating a web application" + webAppDetail.getDisplayName();
         try {
-            UUID = createWebApplication(appCreateRequest.generateRequestParameters(),webAppDetail);
+            UUID = createWebApplication(appCreateRequest.generateRequestParameters(), webAppDetail);
         } catch (IOException e) {
             log.error(errorMessage, e);
-            throw  new AppManagementException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         } catch (RegistryException e) {
             log.error(errorMessage, e);
-            throw  new AppManagementException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         } catch (InterruptedException e) {
             log.error(errorMessage, e);
-            throw  new AppManagementException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         }
         try {
-           applicationPublisher.publishApplication("webapp", UUID,adminPublisherSession);
+            applicationPublisher.publishApplication("webapp", UUID, adminPublisherSession);
         } catch (IOException e) {
             String publishingErrorMessage = "Error while publishing a web application "
-                    +webAppDetail.getDisplayName();
+                    + webAppDetail.getDisplayName();
             log.error(publishingErrorMessage, e);
-            throw  new AppManagementException(publishingErrorMessage, e);
+            throw new AppManagementException(publishingErrorMessage, e);
         }
         log.info(appCreateRequest.getOverview_name() + " published and UUID is " + UUID);
         try {
-            applicationSubscriber.subscribeApplication(appCreateRequest,storeSession,
+            applicationSubscriber.subscribeApplication(appCreateRequest, storeSession,
                     currentUserName);
         } catch (IOException e) {
-            String subscribingErrorMessage = "Error while subscribing a web application "+webAppDetail.getDisplayName();
+            String subscribingErrorMessage = "Error while subscribing a web application " + webAppDetail.getDisplayName();
             log.error(subscribingErrorMessage, e);
-            throw  new AppManagementException(subscribingErrorMessage, e);
+            throw new AppManagementException(subscribingErrorMessage, e);
         }
-        log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_"+currentUserName);
-    }
-
-    /**
-     * This method is use for create and publish sample mobile application
-     *
-     * @param mobileApplicationBean
-     *            bean class of the mobile application
-     *
-     * @throws AppManagementException
-     *            Throws this when apk file is failed while uploading
-     *            Throws this when failed to create or publish web application
-     */
-    public void manageMobilebApplication(MobileApplicationBean mobileApplicationBean) throws AppManagementException {
-        log.info("publishing CleanCalc mobile application");
-        String appMeta = null;
-        if(mobileApplicationBean.isApk()){
-            try {
-                appMeta = httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/mobileapp/upload",
-                        true, mobileApplicationBean, mobileApplicationBean.getPublisherSession());
-            } catch (IOException e) {
-                log.error("Error while uploading an APK file of CLeanCalc Mobile Application", e);
-                throw  new AppManagementException("Error while uploading an APK file of CLeanCalc Mobile Application", e);
-            }
-        }else{
-            JSONObject appMetaJson = new JSONObject();
-           // appMetaJson.put("package",mobileApplicationBean.getPackageName());
-            appMetaJson.put("version",mobileApplicationBean.getVersion());
-            appMeta = appMetaJson.toJSONString();
-        }
-        mobileApplicationBean.setAppmeta(appMeta);
-        String UUID = null;
-        String creatingErrorMessage  = "Error while creating "+mobileApplicationBean.getName()+" Mobile Application";
-        try {
-            UUID = createMobielAppliaction(mobileApplicationBean,mobileApplicationBean.getPublisherSession());
-        } catch (IOException e) {
-            log.error(creatingErrorMessage, e);
-            throw  new AppManagementException(creatingErrorMessage, e);
-        } catch (InterruptedException e) {
-        }
-        try {
-            applicationPublisher.publishApplication("mobileapp", UUID, adminPublisherSession);
-        } catch (IOException e) {
-            String publishingErrorMessage  ="Error while publishing "+mobileApplicationBean.getName()
-                    +" Mobile Application";
-            log.error(publishingErrorMessage, e);
-            throw  new AppManagementException(publishingErrorMessage, e);
-        }
+        log.info(appCreateRequest.getOverview_name() + "application subscribed by subsciber_" + currentUserName);
     }
 
     /**
      * This method is use for create web application
      *
-     * @param payload
-     *          request payload for web app create api
-     *
-     * @param webAppDetail
-     *           bean object of the web application
-     *
-     * @throws IOException
-     *           Throws this when failed to create web application
-     *
-     * @throws RegistryException
-     *           Throws this when UUID failed while requesting
-     *
-     * @throws AppManagementException
-     *           Throws this when gateway port failed while retrieving
-     *
-     * @throws java.lang.InterruptedException
-     *           Throws this when thread failed
+     * @param payload      request payload for web app create api
+     * @param webAppDetail bean object of the web application
+     * @throws IOException                    Throws this when failed to create web application
+     * @throws RegistryException              Throws this when UUID failed while requesting
+     * @throws AppManagementException         Throws this when gateway port failed while retrieving
+     * @throws java.lang.InterruptedException Throws this when thread failed
      */
-    private String createWebApplication(String payload,WebAppDetail webAppDetail)
+    private String createWebApplication(String payload, WebAppDetail webAppDetail)
             throws IOException, RegistryException, AppManagementException, InterruptedException {
         String currentUserName = webAppDetail.getUserName();
         String creatorSession = webAppDetail.getCreatorSession();
@@ -260,9 +195,12 @@ public class ProxyApplicationCreator {
                 , creatorSession, "application/x-www-form-urlencoded");
 
         JSONArray claimsAry = new JSONArray();
-        ConcurrentHashMap<String,String[]> claimMap =  webAppDetail.getClaims();
-        for (String claimName : claimMap.keySet()) {
-            claimsAry.add(claimMap.get(claimName)[0]);
+        ConcurrentHashMap<String, String[]> claimMap = webAppDetail.getClaims();
+        Iterator entries = claimMap.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry thisEntry = (Map.Entry) entries.next();
+            String claimName = ((String[]) thisEntry.getValue())[0];
+            claimsAry.add(claimName);
         }
         JSONObject configJson = new JSONObject();
         configJson.put("provider", "wso2is-5.0.0");//use a constant
@@ -274,22 +212,22 @@ public class ProxyApplicationCreator {
         configJson.put("app_context", webAppDetail.getContext());
         configJson.put("app_provider", webAppDetail.getUserName());
         configJson.put("app_allowAnonymous", "false");
-        httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/sso/addConfig", configJson.toJSONString(), creatorSession
-                , "application/json; charset=UTF-8");
+        httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/sso/addConfig", configJson.toJSONString(),
+                creatorSession, "application/json; charset=UTF-8");
         String appPath = "/_system/governance/appmgt/applicationdata/provider/"
                 + currentUserName + "/" +
-                webAppDetail.getWebAppName()+ "/1.0.0/webapp";
+                webAppDetail.getWebAppName() + "/1.0.0/webapp";
         String UUID = wsRegistryServiceClient.getUUID(appPath);
         String trackingIDResponse = httpHandler.doGet(httpsBackEndUrl + "/publisher/api/asset/webapp/trackingid/" + UUID
                 , "", creatorSession, "").split(":")[1].trim();
         String trackingID = trackingIDResponse.substring(1, (trackingIDResponse.length() - 2));
         webAppDetail.setTrackingCode(trackingID);
         invokeStatistcsJavascriptBuilder = new InvokeStatistcsJavascriptBuilder
-                (trackingID, ipAddress,Configuration.getGatewayPort("http"));
-        if (webAppDetail.getWebAppName().equals("PlanYourTrip_"+currentUserName)) {
+                (trackingID, ipAddress, Configuration.getGatewayPort("http"));
+        if (webAppDetail.getWebAppName().equals("PlanYourTrip_" + currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/plan-your-trip-1.0");
-        } else if (webAppDetail.getWebAppName().equals("TravelBooking_"+currentUserName)) {
+        } else if (webAppDetail.getWebAppName().equals("TravelBooking_" + currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
                     "/repository/deployment/server/webapps/travel-booking-1.0/js");
         }
@@ -297,41 +235,16 @@ public class ProxyApplicationCreator {
         return UUID;
     }
 
-
-
-
-
-    /**
-     * This method is use for suscribe web application
-     *
-     * @param mobileApplicationBean
-     *            Bean of the mobile application
-     *
-     * @param publisherSession
-     *            Current logged publisher session
-     *
-     * @throws IOException
-     *            Throws this when failed to suscribe web application
-     */
-    private String createMobielAppliaction(MobileApplicationBean mobileApplicationBean, String publisherSession
-            ) throws IOException, InterruptedException {
-        return httpHandler.doPostMultiData(httpsBackEndUrl + "/publisher/api/asset/mobileapp",false,
-                mobileApplicationBean, publisherSession);
-    }
-
     /**
      * This method is use to check the availabilty of given context and if it is available generate new context
      *
-     * @param context
-     *            Page name of the web application
-     *
+     * @param context Page name of the web application
      * @return generated or given context
-     *
      */
-    private String generateWebAppContext(String context){
-        if(!AppMDAO.isContextExist(context)){
+    private String generateWebAppContext(String context) {
+        if (!AppMDAO.isContextExist(context)) {
             return context;
-        }else {
+        } else {
             context += (random.nextInt(10 - 0 + 1));
             return generateWebAppContext(context);
         }

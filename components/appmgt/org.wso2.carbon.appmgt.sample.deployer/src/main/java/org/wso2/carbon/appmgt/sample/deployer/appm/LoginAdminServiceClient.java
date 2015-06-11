@@ -33,7 +33,7 @@ import java.rmi.RemoteException;
  * */
 public class LoginAdminServiceClient {
 
-    private final String serviceName = "AuthenticationAdmin";
+    private static final String serviceName = "AuthenticationAdmin";
     private AuthenticationAdminStub authenticationAdminStub;
     private String endPoint;
 

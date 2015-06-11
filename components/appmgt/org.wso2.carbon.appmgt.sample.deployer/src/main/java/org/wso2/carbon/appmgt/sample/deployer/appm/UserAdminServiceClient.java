@@ -22,7 +22,6 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
-import org.wso2.carbon.appmgt.sample.deployer.appm.LoginAdminServiceClient;
 import org.wso2.carbon.appmgt.sample.deployer.configuration.Configuration;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -36,15 +35,14 @@ import java.rmi.RemoteException;
 
 /**
  * This class is use as a client of UserAdminService
- *
- * */
+ */
 public class UserAdminServiceClient {
 
-    private static final String appmHome = CarbonUtils.getCarbonHome();
+    private static final String APPM_HOME = CarbonUtils.getCarbonHome();
 
-    private static final String axis2Repo = appmHome + File.separator + "repository" +
+    private static final String AXIS_2REPO = APPM_HOME + File.separator + "repository" +
             File.separator + "deployment" + File.separator + "client";
-    private static final String axis2Conf =
+    private static final String AXIS_2CONF =
             ServerConfiguration.getInstance().getFirstProperty("Axis2Config.clientAxis2XmlLocation");
     private UserAdminStub userAdminStub;
 
@@ -52,16 +50,13 @@ public class UserAdminServiceClient {
      * Creates a new UserAdminServiceClient object and initialising
      * the UserAdminStub
      *
-     * @throws RemoteException
-     *             Throws this when UserAdminStub failed initialise
-     *
-     * @throws LoginAuthenticationExceptionException
-     *             Throws this when authentication failed
+     * @throws RemoteException                       Throws this when UserAdminStub failed initialise
+     * @throws LoginAuthenticationExceptionException Throws this when authentication failed
      */
     public UserAdminServiceClient() throws RemoteException, LoginAuthenticationExceptionException {
         String backEndUrl = Configuration.getHttpsUrl();
         ConfigurationContext configContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                axis2Repo, axis2Conf);
+                AXIS_2REPO, AXIS_2CONF);
         userAdminStub = new UserAdminStub(configContext, backEndUrl + "/services/UserAdmin");
         LoginAdminServiceClient loginAdminServiceClient = new LoginAdminServiceClient(backEndUrl);
         String session = loginAdminServiceClient.authenticate(Configuration.getUserName()
@@ -77,16 +72,10 @@ public class UserAdminServiceClient {
     /**
      * This method is use to add a user
      *
-     * @param userName
-     *             User name
-     *
-     * @throws java.rmi.RemoteException
-     *             Throws this when user admin service failed to connect
-     *
-     * @throws UserAdminUserAdminException
-     *             Throws this when user failed to register
-     *
-     * */
+     * @param userName User name
+     * @throws java.rmi.RemoteException    Throws this when user admin service failed to connect
+     * @throws UserAdminUserAdminException Throws this when user failed to register
+     */
     public void addUser(String userName) throws RemoteException, UserAdminUserAdminException {
         userAdminStub.addUser(userName, "subscriber",
                 new String[]{"Internal/subscriber"}, new ClaimValue[]{}, "default");
