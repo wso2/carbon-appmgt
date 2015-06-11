@@ -1,6 +1,6 @@
 <%
 /*
- *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -53,10 +53,10 @@ require('/modules/store.js').exec(function (ctx) {
 
     caramel = require('caramel');
     process = require('process'),
-    localIP = "https://" + process.getProperty('server.host'),
-    httpsPort = process.getProperty('https.port');
+            localIP = "https://" + process.getProperty('server.host'),
+            httpsPort = process.getProperty('https.port');
 
-        
+
     url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
@@ -170,7 +170,7 @@ require('/modules/store.js').exec(function (ctx) {
 
                 var ratingApi = require('/modules/rating-api.js').api;
                 registry = storeServer.systemRegistry(tenantId),
-                 am = store.assetManager(type, registry);
+                        am = store.assetManager(type, registry);
 
                 var getNextassetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -202,7 +202,7 @@ require('/modules/store.js').exec(function (ctx) {
                             }
                         } catch (e) {
                             log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                                    aid);
+                            aid);
                         }
                     }
                 }
@@ -217,23 +217,27 @@ require('/modules/store.js').exec(function (ctx) {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
 
-                    var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), 12);
+                    var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
                     if (log.isDebugEnabled()) {
-                        log.debug("Query executed successfully to get the assets hit count");
+                        var recordCount = 0;
+                        if (result != null) {
+                            recordCount = result.length;
+                        }
+                        log.debug("Query executed successfully to get the assets hit count. " + recordCount
+                        + " records found");
                     }
                     index += 12;
                     return JSON.parse(result);
                 };
 
                 assets = [];
-                var aid, asset;
-                while (assets.length < 12 && maxTry < 10) {
+                while (assets.length < PAGE_SIZE && maxTry < 10) {
                     maxTry++;
                     var result = getNextassetSet();
-                    for (var n = 0; n < result.length && assets.length < 12; n++) {
-                        aid = String(result[n].UUID);
+                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                        var aid = String(result[n].UUID);
                         try {
-                            asset = store.asset(type, aid);
+                            var asset = store.asset(type, aid);
                             asset.indashboard = store.isuserasset(aid, type);
                             if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
                                 assets.push(asset);
@@ -345,8 +349,8 @@ require('/modules/store.js').exec(function (ctx) {
             ];
         },
         config:{
-			localIP : localIP,
-			httpsPort : httpsPort
+            localIP : localIP,
+            httpsPort : httpsPort
         },
         assets: assets,
         paging: {
