@@ -29,7 +29,6 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
-import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
@@ -37,7 +36,6 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dto.*;
@@ -703,11 +701,10 @@ public class AppMDAO {
 		ResultSet rs = null;
 		VerbInfoDTO verbInfoDTO = new VerbInfoDTO();
 
-		String query =
-				"SELECT HTTP_METHOD, URL_PATTERN, URL_ALLOW_ANONYMOUS  "
-						+ " FROM APM_APP_URL_MAPPING MAP "
-						+ " LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID  "
-						+ " WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=? ) ";
+        String query = "SELECT HTTP_METHOD, URL_PATTERN, URL_ALLOW_ANONYMOUS  "
+                + " FROM APM_APP_URL_MAPPING MAP "
+                + " LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID  "
+                + " WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=? ) ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -730,7 +727,7 @@ public class AppMDAO {
                 }
 
 				// store the values (is anonymous allowed) per each URL pattern
-				verbInfoDTO.mapAllowAnonymousUrl.put(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
+				verbInfoDTO.addAllowAnonymousUrl(mapKey, rs.getBoolean("URL_ALLOW_ANONYMOUS"));
 			}
 		} catch (SQLException e) {
 			handleException("Error when executing the SQL : " + query + " (Context:" + context +
@@ -4519,10 +4516,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	public void updateAPI(WebApp api) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
-		ResultSet rs = null;
-		String query =
-				"UPDATE APM_APP SET CONTEXT = ?, LOG_OUT_URL  =?, APP_ALLOW_ANONYMOUS=?, APP_ENDPOINT=? WHERE APP_PROVIDER = ? AND APP_NAME = ? AND"
-						+ " APP_VERSION = ? ";
+        ResultSet rs = null;
+        String query = "UPDATE APM_APP SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? "
+                + " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
 				getAPIManagerConfiguration().getFirstProperty(GATEWAY_URL);
@@ -6649,22 +6645,17 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : Application UUID
 	 * @param userId
 	 *            : User Id
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 */
-	public static void saveStoreHits(String webAppUUID, String userId,
-			Integer tenantId, String strDataContext) throws SQLException,
-                                                   AppManagementException {
-		Connection conn = null;
+    public static void saveStoreHits(String webAppUUID, String userId,
+                                     Integer tenantId) throws SQLException, AppManagementException {
+        Connection conn = null;
 		try {
 			// get the connection for the specific UI Activity Publish data
 			// source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-			Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn,
-					strDataContext);
-			insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn,
-					strDataContext);
-			conn.commit();
+            Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
+            insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn);
+            conn.commit();
 		} finally {
 			APIMgtDBUtil.closeAllConnections(null, conn, null);
 		}
@@ -6681,13 +6672,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : Maximum hit count to be inserted
 	 * @param conn
 	 *            : DB connection
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 */
-	public static void insertUpdateStoreHits(String webAppUUID, String userId,
-			Integer maxCount, Integer tenantId, Connection conn,
-			String strDataContext) throws AppManagementException {
-		ResultSet rs = null;
+    public static void insertUpdateStoreHits(String webAppUUID, String userId,
+                                             Integer maxCount, Integer tenantId, Connection conn)
+            throws AppManagementException {
+        ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
 			String query = "";
@@ -6711,12 +6700,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 			ps.executeUpdate();
 			if (log.isDebugEnabled()) {
-				log.debug("Record saved successfully : " + strDataContext);
-			}
+                log.debug("Record relevant to webapp id " + webAppUUID + " saved successfully");
+            }
 		} catch (SQLException e) {
-			handleException("Error in updating Store hit count: "
-					+ strDataContext + " : " + e.getMessage(), e);
-		} finally {
+            String strDataContext = "(Webapp UUID: " + webAppUUID + ", UserId : " + userId + ", TenantId : " +
+                    tenantId + ", Hit count : " + maxCount + ")";
+            handleException("Error in updating Store hit count: "
+                    + strDataContext + " : " + e.getMessage(), e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
 	}
@@ -6730,16 +6721,13 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 *            : User Id
 	 * @param conn
 	 *            : DB connection
-	 * @param strDataContext
-	 *            : Contains the input parameter values for the logging purposes
 	 * @return maxId : Max Hit Count (against user,asset)
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             : if an error occurred while retrieving data
 	 *             : if an error occurred while retrieving data
 	 */
-	private static int getMaxStoreHitCount(String webAppUUID, String userId,
-			Connection conn, String strDataContext)
-			throws AppManagementException {
+    private static int getMaxStoreHitCount(String webAppUUID, String userId, Connection conn)
+            throws AppManagementException {
 		PreparedStatement statementToGetWebAppId = null;
 		int maxId = 0;
 		ResultSet rs = null;
@@ -6756,10 +6744,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 
 		} catch (SQLException e) {
-			handleException(
-					"Error while retrieving the store hit maxId. webUUID: "
-							+ strDataContext + " : " + webAppUUID, e);
-		} finally {
+            handleException(
+                    "Error while retrieving the store hit maxId. webUUID: "
+                            + webAppUUID + ", UserId : " + userId + " : " + webAppUUID, e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(statementToGetWebAppId, null, rs);
 		}
 		return maxId;

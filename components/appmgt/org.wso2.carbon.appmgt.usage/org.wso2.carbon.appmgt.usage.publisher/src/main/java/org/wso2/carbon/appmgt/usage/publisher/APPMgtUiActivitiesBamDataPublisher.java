@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.NativeObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.databridge.agent.thrift.Agent;
 import org.wso2.carbon.databridge.agent.thrift.conf.AgentConfiguration;
 import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
@@ -85,10 +86,10 @@ public class APPMgtUiActivitiesBamDataPublisher {
 
 	}
 
-	private static APPMgtUiActivitiesBamDataPublisher aPPMgtUiActivitiesBamDataPublisher = new APPMgtUiActivitiesBamDataPublisher();
+	private static APPMgtUiActivitiesBamDataPublisher appMgtUiActivitiesBamDataPublisher = new APPMgtUiActivitiesBamDataPublisher();
 
 	public static APPMgtUiActivitiesBamDataPublisher getInstance() {
-		return aPPMgtUiActivitiesBamDataPublisher;
+		return appMgtUiActivitiesBamDataPublisher;
 	}
 
 	public APPMgtUiActivitiesBamDataPublisher() {
@@ -172,12 +173,12 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			tenantId = Integer.parseInt(obj.get("tenantId", obj).toString());
 			obj = null;
 
-			// consider only form load event
-			if ("page-load".equals(action)) {
-				publishUserActivityEvents(action, item, timestamp, appId,
-						userId, tenantId);
-			}
-		}
+            // consider only form load event
+            if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
+                publishUserActivityEvents(action, item, timestamp, appId,
+                        userId, tenantId);
+            }
+        }
 	}
 
 	/**
@@ -196,24 +197,11 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 * @param tenantId
 	 *            : Tenant Id
 	 */
-	public void publishUserActivityEvents(String action, String item,
-			String timestampStr, String appId, String userId, Integer tenantId) {
-		StringBuilder builder = new StringBuilder();
-
-		// Create a string with input parameters for logging purposes
-		String strDataContext = "";
-		try {
-			Long timeStamp = new BigDecimal(timestampStr).longValue();
-			strDataContext = builder.append("(StreamName:")
-					.append(USER_ACTIVITY_STREAM).append(", StreamVersion:")
-					.append(USER_ACTIVITY_STREAM_VERSION).append(", Action:")
-					.append(action).append(", Item:").append(item)
-					.append(", Timestamp:").append(timeStamp)
-					.append(", AppId:").append(appId).append(" ,UserId:")
-					.append(userId).append(", tenantId:").append(tenantId)
-					.append(")").toString();
-
-			// if BAM is configured
+    public void publishUserActivityEvents(String action, String item,
+                                          String timestampStr, String appId, String userId, Integer tenantId) {
+         try {
+             Long timeStamp = new BigDecimal(timestampStr).longValue();
+             // if BAM is configured
 			if (enableUiActivityBamPublishing) {
 				// publish to BAM
 				if (!loadBalancingDataPublisher.isStreamDefinitionAdded(
@@ -232,20 +220,18 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				}
 			} else {
 				// Write directly to DB
-				AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId,
-						strDataContext);
-			}
+                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId);
+            }
 		} catch (AgentException e) {
-			// Here I'm only logging the exceptions but not throwing externally
-			// as this method is used only to store the store hit count, An
-			// exception in this method should not effect/block the users other
-			// actions
-			log.error("Failed to publish build event : " + strDataContext
-					+ " : " + e.getMessage(), e);
-		} catch (AppManagementException e) {
-			log.error("Failed to write to table : " + e.getMessage(), e);
-		} catch (SQLException e) {
-			log.error("SQL exception found : " + e.getMessage(), e);
-		}
-	}
+             // Here I'm only logging the exceptions but not throwing externally
+             // as this method is used only to store the store hit count, An
+             // exception in this method should not effect/block the users other
+             // actions
+             log.error("Failed to publish build event : " + e.getMessage(), e);
+        } catch (AppManagementException e) {
+            log.error("Failed to write to table : " + e.getMessage(), e);
+        } catch (SQLException e) {
+            log.error("SQL exception found : " + e.getMessage(), e);
+        }
+    }
 }

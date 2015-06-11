@@ -509,9 +509,6 @@ public final class AppMConstants {
 
     public static final String SWAGGER_VERSION = "1.1";
 
-    public static final String API_CONST_TRUE="TRUE";
-    public static final String API_CONST_FALSE="FALSE";
-
     public static class OperationParameter {
     	public static final String AUTH_PARAM_NAME = "Authorization";
     	public static final String AUTH_PARAM_DESCRIPTION = "Access Token";
@@ -577,5 +574,7 @@ public final class AppMConstants {
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
+
+    public static final String PAGE_LOAD_EVENT = "page-load";
 
 }

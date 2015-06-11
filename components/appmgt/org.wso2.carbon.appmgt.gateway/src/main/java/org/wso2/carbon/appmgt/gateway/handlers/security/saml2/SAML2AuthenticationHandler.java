@@ -147,9 +147,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         String webAppVersion =
                 (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
         // http verb (eg: GET,POST)
-        String httpVerb =
-                (String) ((Axis2MessageContext) messageContext).getAxis2MessageContext()
-                        .getProperty("HTTP_METHOD");
+        String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
         // request full path (eg: /context/version/pattern)
         String fullReqPath =
                 (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
@@ -351,7 +349,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      *
      * @return result : boolean result relevant to registry value
      */
-    public boolean isAllowAnonymousApplication() {
+    private boolean isAllowAnonymousApplication() {
         return webAppInfoDTO.getAllowAnonymous();
     }
 
@@ -361,27 +359,27 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return boolean result either anonymous access allowed or not
      * @throws AppManagementException 
      */
-    public boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) throws AppManagementException {
+    private boolean isAllowAnonymousUrlPattern(String httpVerb, String requestPath) throws AppManagementException {
 
         // Get App URL Pattern Info
-        VerbInfoDTO verbInfoDTO = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
-    	
-        if(verbInfoDTO != null && verbInfoDTO.mapAllowAnonymousUrl != null){
+        VerbInfoDTO httpVerbInfo = getVerbInfoForApp(webAppInfoDTO.getContext(), webAppInfoDTO.getVersion());
+
+        if (httpVerbInfo != null && httpVerbInfo.isEmptyAllowAnonymousUrlMap() == false) {
 
         	NamedMatchList<String> matcher = new NamedMatchList<String>();
-        	
-        	for(String pattern : verbInfoDTO.mapAllowAnonymousUrl.keySet()){
-        		matcher.add(pattern,pattern);
-        	}
-        	
-        	String httpVerbAndRequestPath = httpVerb + requestPath;
+
+            for (String pattern : httpVerbInfo.getAllowAnonymousUrlList()) {
+                matcher.add(pattern, pattern);
+            }
+
+            String httpVerbAndRequestPath = httpVerb + requestPath;
         	
         	String matchedPattern = matcher.match(httpVerbAndRequestPath);
         	
-        	Boolean allowAnnoymous = verbInfoDTO.mapAllowAnonymousUrl.get(matchedPattern);
+        	Boolean allowAnonymous = httpVerbInfo.getAllowAnonymousUrl(matchedPattern);
         	
-        	if(allowAnnoymous != null){
-        		return allowAnnoymous;
+        	if(allowAnonymous != null){
+        		return allowAnonymous;
         	}
         	
         }
@@ -711,11 +709,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @throws AppManagementException when an error returns while fetching data from database
      */
     private VerbInfoDTO getVerbInfoForApp(String webAppContext, String webAppVersion) throws AppManagementException {
-        try {
-            return AppMDAO.getVerbConfigInfo(webAppContext, webAppVersion);
-        } catch (AppManagementException e) {
-            throw e;
-        }
+        return AppMDAO.getVerbConfigInfo(webAppContext, webAppVersion);
     }
 
     /**
