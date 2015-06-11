@@ -27,8 +27,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
  * This class is use to get SSOConfiguration properties
- *
- * */
+ */
 public class Configuration {
     private static AppManagerConfiguration config;
     private static ConfigurationContextService configContextService = null;
@@ -44,24 +43,21 @@ public class Configuration {
 
     /**
      * @return stored username of the SSOConfiguration
-     *
-     * */
+     */
     public static String getUserName() {
         return config.getFirstProperty("SSOConfiguration.Configurators.Configurator.parameters.username");
     }
 
     /**
      * @return stored password of the SSOConfiguration
-     *
-     * */
+     */
     public static String getPassword() {
         return config.getFirstProperty("SSOConfiguration.Configurators.Configurator.parameters.password");
     }
 
     /**
      * @return https url of server
-     *
-     * */
+     */
     public static String getHttpsUrl() {
         try {
             return "https://localhost:" + getBackendPort("https");
@@ -73,8 +69,7 @@ public class Configuration {
 
     /**
      * @return http url of the server
-     *
-     * */
+     */
     public static String getHttpUrl() {
         try {
             return "http://localhost:" + getBackendPort("http");
@@ -86,8 +81,7 @@ public class Configuration {
 
     /**
      * @return ConfigurationContext
-     *
-     * */
+     */
     public static ConfigurationContext getConfigContext() throws AppManagementException {
         if (configContextService == null) {
             throw new AppManagementException("ConfigurationContextService is null");
@@ -96,11 +90,8 @@ public class Configuration {
     }
 
     /**
-     *
      * @return appm gateway port
-     *
-     *
-     * */
+     */
     public static String getBackendPort(String transport) throws AppManagementException {
         int port;
         String backendPort;
@@ -114,30 +105,24 @@ public class Configuration {
     }
 
     /**
-     *
      * @return nio port according to given transport method
-     *
-     * */
-     public static String getGatewayPort(String transport){
-         return  System.getProperty(transport+".nio.port");
-     }
+     */
+    public static String getGatewayPort(String transport) {
+        return System.getProperty(transport + ".nio.port");
+    }
 
 
     /**
-     *
      * @return local ip address
-     *
-     * */
-    public static String getIPAddress(){
-        return  System.getProperty("carbon.local.ip");
+     */
+    public static String getIPAddress() {
+        return System.getProperty("carbon.local.ip");
     }
 
     /**
-     *
      * @return value of the APIUsageTracking.Enabled property
-     *
-     * */
-    public static  String isStactsEnabled(){
+     */
+    public static String isStactsEnabled() {
         return config.getFirstProperty("APIUsageTracking.Enabled");
     }
 }

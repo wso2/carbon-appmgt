@@ -21,17 +21,9 @@ package org.wso2.carbon.appmgt.sample.deployer.http;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.wso2.carbon.appmgt.sample.deployer.bean.MobileApplicationBean;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -42,7 +34,6 @@ import java.net.URL;
 
 /**
  * This class is use as a http client
- *
  */
 public class HttpHandler {
 
@@ -59,13 +50,9 @@ public class HttpHandler {
     /**
      * This method is use get a html file for given url
      *
-     * @param url
-     *          Web page url
-     *
+     * @param url Web page url
      * @return response
-     *
-     * @throws  java.io.IOException
-     *            Throws this when failed to retrieve web page
+     * @throws java.io.IOException Throws this when failed to retrieve web page
      */
     public static String getHtml(String url) throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
@@ -76,9 +63,12 @@ public class HttpHandler {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(content));
         StringBuffer responseBuffer = new StringBuffer();
-        String line = "";
+        String line;
         while ((line = in.readLine()) != null) {
             responseBuffer.append(line);
+        }
+        if (in != null) {
+            in.close();
         }
         return responseBuffer.toString();
     }
@@ -86,22 +76,12 @@ public class HttpHandler {
     /**
      * This method is used to do a https post request
      *
-     * @param url
-     *           request url
-     *
-     * @param payload
-     *            Content of the post request
-     *
-     * @param sessionId
-     *            sessionId for authentication
-     *
-     * @param contentType
-     *            content type of the post request
-     *
+     * @param url         request url
+     * @param payload     Content of the post request
+     * @param sessionId   sessionId for authentication
+     * @param contentType content type of the post request
      * @return response
-     *
-     * @throws  java.io.IOException
-     *             - Throws this when failed to fulfill a https post request
+     * @throws java.io.IOException - Throws this when failed to fulfill a https post request
      */
     public String doPostHttps(String url, String payload, String sessionId, String contentType)
             throws IOException {
@@ -148,22 +128,12 @@ public class HttpHandler {
     /**
      * This method is used to do a http post request
      *
-     * @param url
-     *            request url
-     *
-     * @param payload
-     *            Content of the post request
-     *
-     * @param sessionId
-     *            sessionId for authentication
-     *
-     * @param contentType
-     *            content type of the post request
-     *
+     * @param url         request url
+     * @param payload     Content of the post request
+     * @param sessionId   sessionId for authentication
+     * @param contentType content type of the post request
      * @return response
-     *
-     * @throws  java.io.IOException
-     *             - Throws this when failed to fulfill a http post request
+     * @throws java.io.IOException - Throws this when failed to fulfill a http post request
      */
     public String doPostHttp(String url, String payload, String sessionId, String contentType)
             throws IOException {
@@ -209,16 +179,10 @@ public class HttpHandler {
     /**
      * This method is used to do a http put request
      *
-     * @param url
-     *          request url
-     *
-     * @param sessionId
-     *          sessionId for authentication
-     *
+     * @param url       request url
+     * @param sessionId sessionId for authentication
      * @return response
-     *
-     * @throws  java.io.IOException
-     *             - Throws this when failed to fulfill a http put request
+     * @throws java.io.IOException - Throws this when failed to fulfill a http put request
      */
     public String doPut(String url, String sessionId) throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -239,100 +203,21 @@ public class HttpHandler {
         while ((output = br.readLine()) != null) {
             result.append(output);
         }
+        if (br != null) {
+            br.close();
+        }
         return result.toString();
-    }
-
-    /**
-     * This method is used to do a http post request in multi data format
-     *
-     * @param url
-     *          request url
-     *
-     * @param isApkFile
-     *          if content is an apk file
-     *
-     * @param mobileApplicationBean
-     *          bean object of mobile application
-     *
-     * @param sessionId
-     *          - sessionId for authentication
-     *
-     * @return response
-     *
-     * @throws  java.io.IOException
-     *             - Throws this when failed to fulfill a http post request
-     */
-    public String doPostMultiData(String url,boolean isApkFile, MobileApplicationBean mobileApplicationBean, String sessionId)
-            throws IOException {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Cookie", "JSESSIONID=" + sessionId);
-        MultipartEntityBuilder reqEntity;
-        if (isApkFile) {
-            reqEntity = MultipartEntityBuilder.create();
-            FileBody fileBody = new FileBody(new File(mobileApplicationBean.getApkFile()));
-            reqEntity.addPart("file", fileBody);
-        } else {
-            reqEntity = MultipartEntityBuilder.create();
-            reqEntity.addPart("version", new StringBody(mobileApplicationBean.getVersion(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("provider", new StringBody(mobileApplicationBean.getMarkettype(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("markettype", new StringBody(mobileApplicationBean.getMarkettype(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("platform", new StringBody(mobileApplicationBean.getPlatform(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("name", new StringBody(mobileApplicationBean.getName(), ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("description", new StringBody(mobileApplicationBean.getDescription(),
-                    ContentType.MULTIPART_FORM_DATA));
-            FileBody bannerImageFile = new FileBody(new File(mobileApplicationBean.getBannerFilePath()));
-            reqEntity.addPart("bannerFile", bannerImageFile);
-            FileBody iconImageFile = new FileBody(new File(mobileApplicationBean.getIconFile()));
-            reqEntity.addPart("iconFile", iconImageFile);
-            FileBody screenShot1 = new FileBody(new File(mobileApplicationBean.getScreenShot1File()));
-            reqEntity.addPart("screenshot1File", screenShot1);
-            FileBody screenShot2 = new FileBody(new File(mobileApplicationBean.getScreenShot2File()));
-            reqEntity.addPart("screenshot2File", screenShot2);
-            FileBody screenShot3 = new FileBody(new File(mobileApplicationBean.getScreenShot3File()));
-            reqEntity.addPart("screenshot3File", screenShot3);
-            reqEntity.addPart("addNewAssetButton", new StringBody("Submit", ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("mobileapp", new StringBody(mobileApplicationBean.getMobileapp(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("sso_ssoProvider", new StringBody(mobileApplicationBean.getSso_ssoProvider(),
-                    ContentType.MULTIPART_FORM_DATA));
-            reqEntity.addPart("appmeta", new StringBody(mobileApplicationBean.getAppmeta(),
-                    ContentType.MULTIPART_FORM_DATA));
-        }
-        final HttpEntity entity = reqEntity.build();
-        httpPost.setEntity(entity);
-        ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        String responseBody = httpClient.execute(httpPost, responseHandler);
-        if (!isApkFile) {
-            String id_part = responseBody.split(",")[2].split(":")[1];
-            return id_part.substring(2, (id_part.length() - 2));
-        }
-        return responseBody;
     }
 
     /**
      * This method is used to do a http get request
      *
-     * @param url
-     *          request url
-     *
-     * @param trackingCode
-     *          tracking code of the web application
-     *
-     * @param appmSamlSsoTokenId
-     *          appmSamlSsoTokenId id of the web application
-     *
-     * @param refer
-     *          web page url
-     *
+     * @param url                request url
+     * @param trackingCode       tracking code of the web application
+     * @param appmSamlSsoTokenId appmSamlSsoTokenId id of the web application
+     * @param refer              web page url
      * @return response
-     *
-     * @throws  java.io.IOException
-     *             Throws this when failed to fulfill a http get request
+     * @throws java.io.IOException Throws this when failed to fulfill a http get request
      */
     public String doGet(String url, String trackingCode, String appmSamlSsoTokenId, String refer) throws IOException {
         URL obj = new URL(url);
@@ -349,7 +234,6 @@ public class HttpHandler {
             con.setRequestProperty("trackingCode", trackingCode);
             con.setRequestProperty("Referer", refer);
         }
-        int responseCode = con.getResponseCode();
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;

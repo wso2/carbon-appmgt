@@ -3,14 +3,14 @@ package org.wso2.carbon.appmgt.sample.deployer.bean;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *  This class is use to store web application details
+ * This class is use to store web application details
  */
 public class WebAppDetail {
 
     private String userName;
     private String creatorSession;
     private String storeSession;
-    private ConcurrentHashMap<String,String[]> claims;
+    private ConcurrentHashMap<String, String[]> claims;
     private String context;
     private String webAppName;
     private Object[][] webPagesurl;

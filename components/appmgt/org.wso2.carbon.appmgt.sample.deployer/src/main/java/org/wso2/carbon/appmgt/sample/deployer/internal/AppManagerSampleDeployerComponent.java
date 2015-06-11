@@ -27,6 +27,7 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
 import java.io.File;
 
 /**
@@ -38,16 +39,13 @@ import java.io.File;
 public class AppManagerSampleDeployerComponent {
 
     private static final Log log = LogFactory.getLog(AppManagerSampleDeployerComponent.class);
-
-    private static BundleContext bundleContext;
     private static AppManagerConfigurationService amConfigService;
+    private BundleContext bundleContext;
 
     /**
      * This method is triggered when component is activated
      *
-     * @param context
-     *            smaple deployer component context
-     *
+     * @param context smaple deployer component context
      */
     protected void activate(ComponentContext context) {
         bundleContext = context.getBundleContext();
@@ -72,9 +70,7 @@ public class AppManagerSampleDeployerComponent {
     /**
      * This method is triggered when component is deactivated
      *
-     * @param context
-     *            smaple deployer component context
-     *
+     * @param context smaple deployer component context
      */
     protected void deactivate(ComponentContext context) {
         if (log.isDebugEnabled()) {
@@ -86,9 +82,7 @@ public class AppManagerSampleDeployerComponent {
     /**
      * Set the given ConfigurationContextService to ServiceReferenceHolder instance
      *
-     * @param cfgCtxService
-     *            smaple deployer component configuration context service
-     *
+     * @param cfgCtxService smaple deployer component configuration context service
      */
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         if (log.isDebugEnabled()) {
@@ -100,9 +94,7 @@ public class AppManagerSampleDeployerComponent {
     /**
      * Unset the ConfigurationContextService from ServiceReferenceHolder instance
      *
-     * @param cfgCtxService
-     *            smaple deployer component configuration context service
-     *
+     * @param cfgCtxService smaple deployer component configuration context service
      */
     protected void unsetConfigurationContextService(ConfigurationContextService cfgCtxService) {
         if (log.isDebugEnabled()) {

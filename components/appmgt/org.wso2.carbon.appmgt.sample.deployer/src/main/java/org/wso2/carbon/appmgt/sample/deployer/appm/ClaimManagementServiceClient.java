@@ -25,12 +25,13 @@ import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceException;
 import org.wso2.carbon.claim.mgt.stub.ClaimManagementServiceStub;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimDTO;
 import org.wso2.carbon.claim.mgt.stub.dto.ClaimMappingDTO;
+
 import java.rmi.RemoteException;
 
 /**
  * This class is use as a claim management service client for new ClaimManagementServiceStub;
  * This is use to add given claim mapping
- * */
+ */
 public class ClaimManagementServiceClient {
 
     private ClaimManagementServiceStub claimManagementServiceStub;
@@ -38,14 +39,9 @@ public class ClaimManagementServiceClient {
     /**
      * Creates a new ClaimManagementServiceClient object and initialising the ClaimManagementServiceStub
      *
-     * @param cookie
-     *            cookie to get authentication for ClaimManagementService
-     *
-     * @param url
-     *            https server url
-     *
-     * @throws AxisFault
-     *            Throws this when ClaimManagementServiceStub failed initialise
+     * @param cookie cookie to get authentication for ClaimManagementService
+     * @param url    https server url
+     * @throws AxisFault Throws this when ClaimManagementServiceStub failed initialise
      */
     public ClaimManagementServiceClient(String cookie, String url) throws AxisFault {
         String serviceURL = url + "/services/ClaimManagementService";
@@ -60,17 +56,10 @@ public class ClaimManagementServiceClient {
     /**
      * This method is use for accses a web application according to user given hit count
      *
-     * @param description
-     *            Name of the claim
-     *
-     * @param claimURI
-     *            URI of the claim
-     *
-     * @param isRequired
-     *            Whether claim is required or not
-     *
-     * @throws RemoteException
-     *            Throws this when failed to add a claim mapping
+     * @param description Name of the claim
+     * @param claimURI    URI of the claim
+     * @param isRequired  Whether claim is required or not
+     * @throws RemoteException Throws this when failed to add a claim mapping
      */
     public void addClaim(String description, String claimURI, boolean isRequired) throws RemoteException,
             ClaimManagementServiceException {

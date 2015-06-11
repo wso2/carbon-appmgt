@@ -21,21 +21,22 @@ package org.wso2.carbon.appmgt.sample.deployer.internal;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
 /**
  * This class is use as a bridge between AppManagerSampleDeployerComponent class and
  * other classes in component
- * */
+ */
 public class ServiceReferenceHolder {
 
     private static final ServiceReferenceHolder instance = new ServiceReferenceHolder();
     private ConfigurationContextService cfgCtxService;
     private AppManagerConfigurationService amConfigService;
 
-    private ServiceReferenceHolder() {}
+    private ServiceReferenceHolder() {
+    }
 
     /**
      * @return instance of ServiceReferenceHolder
-     *
      */
     public static ServiceReferenceHolder getInstance() {
         return instance;
@@ -43,34 +44,28 @@ public class ServiceReferenceHolder {
 
     /**
      * @return ConfigurationContextService
-     *
      */
     public ConfigurationContextService getConfigurationContextService() {
         return cfgCtxService;
     }
 
     /**
-     *
-     *@param  cfgCtxService
-     *              ConfigurationContextService
+     * @param cfgCtxService ConfigurationContextService
      */
     public void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         this.cfgCtxService = cfgCtxService;
     }
 
     /**
-     *
-     *@return  AppManagerConfiguration
-     *              APIManagerConfiguration
+     * @return AppManagerConfiguration
+     * APIManagerConfiguration
      */
     public AppManagerConfiguration getAPIManagerConfiguration() {
         return amConfigService.getAPIManagerConfiguration();
     }
 
     /**
-     *
-     *@param  amConfigService
-     *              AppManagerConfigurationService
+     * @param amConfigService AppManagerConfigurationService
      */
     public void setAPIManagerConfigurationService(AppManagerConfigurationService amConfigService) {
         this.amConfigService = amConfigService;

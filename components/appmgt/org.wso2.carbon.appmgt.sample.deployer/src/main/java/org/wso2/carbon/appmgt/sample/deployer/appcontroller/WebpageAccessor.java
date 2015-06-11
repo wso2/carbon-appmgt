@@ -28,7 +28,6 @@ import org.wso2.carbon.appmgt.sample.deployer.http.HttpHandler;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.Random;
 
 /**
  * This class is use to accses web pages in sample web pages
@@ -42,22 +41,16 @@ public class WebpageAccessor {
     /**
      * This method is use for accses a web application according to user given hit count
      *
-     * @param webAppDetail
-     *            bean class of the web application
-     *
-     * @param ip
-     *            IP address of the user mashine
-     *
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     *            Throws this when failed to accses web application
-     *            Throws this when thread failed to sleep
+     * @param webAppDetail bean class of the web application
+     * @param ip           IP address of the user mashine
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Throws this when failed to accses web application
+     *                                                           Throws this when thread failed to sleep
      */
     public static void accsesWebPages(WebAppDetail webAppDetail, String ip)
             throws AppManagementException {
-        ipAddress =ip;
-        String webContext = webAppDetail.getContext();
+        ipAddress = ip;
         httpHandler = new HttpHandler();
-        String httpsBackEndUrl =Configuration.getHttpsUrl();
+        String httpsBackEndUrl = Configuration.getHttpsUrl();
         String loginHtmlPage = null;
         StringBuilder webAppUrlBuilder = new StringBuilder();
         webAppUrlBuilder.append("http://");
@@ -74,32 +67,38 @@ public class WebpageAccessor {
             Element sessionDataKeyElement = html.select("input[name=sessionDataKey]").first();
             String sessionDataKey = sessionDataKeyElement.val();
             responceHtml = httpHandler.doPostHttps(httpsBackEndUrl + "/commonauth"
-                    ,"username=subscriber_"+webAppDetail.getUserName()+"&password=subscriber&" +
-                    "sessionDataKey=" + sessionDataKey+"&chkRemember=on", "none", "application/x-www-form-urlencoded");
+                    , "username=subscriber_" + webAppDetail.getUserName() + "&password=subscriber&" +
+                    "sessionDataKey=" + sessionDataKey + "&chkRemember=on", "none", "application/x-www-form-urlencoded");
             Document postHtml = Jsoup.parse(responceHtml);
             Element postHTMLResponse = postHtml.select("input[name=SAMLResponse]").first();
             String samlResponse = postHTMLResponse.val();
             String appmSamlSsoTokenId = httpHandler.doPostHttp(webAppurl,
-                    "SAMLResponse=" + URLEncoder.encode(samlResponse, "UTF-8")+"&RelayState=null", "appmSamlSsoTokenId",
+                    "SAMLResponse=" + URLEncoder.encode(samlResponse, "UTF-8") + "&RelayState=null", "appmSamlSsoTokenId",
                     "application/x-www-form-urlencoded; charset=UTF-8");
             Object[][] webPages = webAppDetail.getWebPagesurl();
-            for(int i = 0;i < webPages.length ;i++){
-                if(webPages[i][0].toString().equals("default")){
-                    sendHit(Integer.parseInt(webPages[i][1].toString()),appmSamlSsoTokenId,webAppurl,
+            for (int i = 0; i < webPages.length; i++) {
+                if (webPages[i][0].toString().equals("default")) {
+                    sendHit(Integer.parseInt(webPages[i][1].toString()), appmSamlSsoTokenId, webAppurl,
                             webAppDetail.getTrackingCode());
-                }else{
-                    if(i == 1){
-                        webAppurl = appendPageToUrl(webPages[i][0].toString(),webAppurl,true);
-                    }else {
+                } else {
+                    if (i == 1) {
+                        webAppurl = appendPageToUrl(webPages[i][0].toString(), webAppurl, true);
+                    } else {
                         webAppurl = appendPageToUrl(webPages[i][0].toString(), webAppurl, false);
                     }
                     sendHit(Integer.parseInt(webPages[i][1].toString()), appmSamlSsoTokenId, webAppurl, webAppDetail.getTrackingCode());
                 }
             }
         } catch (IOException e) {
-            String errorMessage = "Error while accessing a web page";
+            String errorMessage = "Error while accessing a web page in " + webAppDetail.getDisplayName()
+                    + " web application";
             log.error(errorMessage, e);
-            throw  new AppManagementException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
+        } catch (InterruptedException e) {
+            String errorMessage = "Error while accessing a web page in " + webAppDetail.getDisplayName()
+                    + " web application";
+            log.error(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         }
 
     }
@@ -107,51 +106,30 @@ public class WebpageAccessor {
     /**
      * This method is send hits for give web page
      *
-     * @param hitCount
-     *            hit count of a web page
-     *
-     * @param appmSamlSsoTokenId
-     *            appmSamlSsoTokenId of the web application
-     *
-     * @param webAppurl
-     *            url of the web page
-     *
-     * @param trackingCode
-     *            tracking code of the web application
-     *
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     *            Throws this when failed to accses web application
-     *            Throws this when thread failed to sleep
+     * @param hitCount           hit count of a web page
+     * @param appmSamlSsoTokenId appmSamlSsoTokenId of the web application
+     * @param webAppurl          url of the web page
+     * @param trackingCode       tracking code of the web application
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Throws this when failed to accses web application
+     *                                                           Throws this when thread failed to sleep
      */
-    private static void sendHit(int hitCount,String appmSamlSsoTokenId,String webAppurl,String trackingCode)
-            throws AppManagementException, IOException {
+    private static void sendHit(int hitCount, String appmSamlSsoTokenId, String webAppurl, String trackingCode)
+            throws AppManagementException, IOException, InterruptedException {
         for (int i = 0; i < hitCount; i++) {
 
-            httpHandler.doGet("http://" + ipAddress + ":"+Configuration.getGatewayPort("http")+"/statistics/",
+            httpHandler.doGet("http://" + ipAddress + ":" + Configuration.getGatewayPort("http") + "/statistics/",
                     trackingCode, appmSamlSsoTokenId, webAppurl);
             log.debug("Web Page : " + webAppurl + " Hit count : " + i);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                log.error("Error while accessing a web page", e);
-                throw  new AppManagementException("Error while accessing a web page", e);
-            }
+            Thread.sleep(1000);
         }
-
     }
 
     /**
      * This method is use to build a url
      *
-     * @param pageName
-     *            Page name of the web application
-     *
-     * @param webAppUrl
-     *            Current url of web application
-     *
+     * @param pageName        Page name of the web application
+     * @param webAppUrl       Current url of web application
      * @param isAppendLastOne
-     *
-     *
      */
     private static String appendPageToUrl(String pageName, String webAppUrl, boolean isAppendLastOne) {
         String elements[] = webAppUrl.split("/");
