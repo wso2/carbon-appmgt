@@ -36,7 +36,17 @@ var render = function (theme, data, meta, require) {
 
 	}
 
-	var lifecycleColors = {"Demote": "btn-blue", "Submit for Review": "btn-blue", "Publish": "btn-blue", "Unpublish": "btn-orange", "Deprecate": "btn-danger", "Retire": "btn-danger", "Approve": "btn-blue", "Reject": "btn-danger"};
+	var lifecycleColors = {
+		"Demote": "btn-blue",
+		"Submit for Review": "btn-blue",
+		"Publish": "btn-blue",
+		"Unpublish": "btn-orange",
+		"Re-Publish": "btn-blue",
+		"Deprecate": "btn-danger",
+		"Retire": "btn-danger",
+		"Approve": "btn-blue",
+		"Reject": "btn-danger"
+	};
 	if(data.artifacts){
         var log = new Log();
 
@@ -73,33 +83,7 @@ var render = function (theme, data, meta, require) {
                 }
 
                 if(!skipFlag) {
-                    if (name == "Publish") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Reject") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Submit for Review") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Recycle") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Deprecate") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Re-Publish") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Unpublish") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Retire") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
-                    if (name == "Approve") {
-                        lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                    }
+                    lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
                     break;
                 }
 			}
