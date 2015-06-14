@@ -22,9 +22,9 @@ $(function () {
 });
 
 function drawGraphs() {
-$('.twitter-typeahead').remove();
-$('#searchUserForm label').html("<input type='text' class='form-control' style='width: 230px; ' id='search' placeholder='Enter Subscribed User name'/>")
- $('#webAppTable2').hide();
+    $('.twitter-typeahead').remove();
+    $('#searchUserForm label').append("<input type='text' class='form-control type-ahead' style='width: 230px; ' id='search' placeholder='Enter Subscribed User name'/>")
+    $('#webAppTable2').hide();
 
     var url = window.location.pathname;
     var comps = url.split('/');

@@ -119,7 +119,8 @@ public class ProxyApplicationCreator {
         try {
             policyIDResponce = httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/entitlement/policy/partial" +
                             "/policyGroup/save", "anonymousAccessToUrlPattern=false&policyGroupName" +
-                            "=samples&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=null&userRoles=",
+                            "=samples&throttlingTier=Unlimited&objPartialMappings=[]&policyGroupDesc=samples" +
+                                                               "&userRoles=",
                     creatorSession, "application/x-www-form-urlencoded; charset=UTF-8").split(":")[3];
         } catch (IOException e) {
             log.error("Error while requesting a policy id", e);
