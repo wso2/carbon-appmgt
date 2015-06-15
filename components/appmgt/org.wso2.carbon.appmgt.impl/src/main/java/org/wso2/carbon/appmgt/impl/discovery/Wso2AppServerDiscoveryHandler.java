@@ -205,9 +205,9 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
             }
             String appServerUrl = getAppServerUrl(userNamePasswordCredentials.getAppServerUrl());
             webappAdminClient = new AppServerWebappAdminClient(
-                    userNamePasswordCredentials.getUserName(),
-                    userNamePasswordCredentials.getPassword(),
                     userNamePasswordCredentials.getAppServerUrl(), configurationContext, locale);
+            webappAdminClient.login(userNamePasswordCredentials.getUserName(),
+                    userNamePasswordCredentials.getPassword());
         }
         return webappAdminClient;
     }
@@ -332,9 +332,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
     private List<WebappMetadata> filter(WebappsWrapper webappsWrapper,
             List<WebappMetadata> applicationListElementList,
             ApplicationDiscoveryContext discoveryContext, DiscoveryCredentials credentials,
-            DiscoverySearchCriteria criteria, Locale locale,
-            String providerName, String userName, APIProvider apiProvider)
-            throws AppManagementException {
+            DiscoverySearchCriteria criteria, Locale locale, String providerName, String userName,
+            APIProvider apiProvider) throws AppManagementException {
 
         APP_STATUS status = parseAppStatus(criteria.getStatus());
         if (status == APP_STATUS.ANY) {
@@ -620,8 +619,7 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
      */
     private PagingResult getNextPage(ApplicationDiscoveryContext discoveryContext,
             DiscoveryCredentials credentials, String searchString, DiscoverySearchCriteria criteria,
-            Locale locale,
-            AppServerWebappAdminClient webappAdminClient, String providerName,
+            Locale locale, AppServerWebappAdminClient webappAdminClient, String providerName,
             String loggedInUserName, APIProvider apiProvider) throws AppManagementException {
 
         int pageSize = criteria.getPageSize() > 0 ? criteria.getPageSize() : DEFAULT_PAGE_SIZE;
@@ -646,8 +644,8 @@ public class Wso2AppServerDiscoveryHandler implements ApplicationDiscoveryHandle
         if (webappsWrapper != null) {
             List<WebappMetadata> webappMetadataList = flatten(webappsWrapper.getWebapps());
             List<WebappMetadata> filteredMetadataList = filter(webappsWrapper, webappMetadataList,
-                    discoveryContext, credentials, criteria, locale, providerName,
-                    loggedInUserName, apiProvider);
+                    discoveryContext, credentials, criteria, locale, providerName, loggedInUserName,
+                    apiProvider);
             int recordsToAdd = Math
                     .min(pageSize - accumulatedMetadataList.size(), filteredMetadataList.size());
             if (lastAppServerIndex >= recordsToAdd) {
