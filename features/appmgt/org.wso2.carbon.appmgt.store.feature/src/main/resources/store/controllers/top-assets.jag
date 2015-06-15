@@ -44,10 +44,6 @@ require('/modules/store.js').exec(function (ctx) {
     paging = store.assetsPaging(request);
     query = query ? search.build(String(query)) : null;
 
-
-
-
-
     // Init subscription service.
     var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
     var subscriptionService = new subscriptionServiceModule.SubscriptionService();
@@ -66,16 +62,14 @@ require('/modules/store.js').exec(function (ctx) {
         var enterpriseSubscription;
         if (authenticator.getLoggedInUser()) {
             enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
-        }
-        else {
+        } else {
             enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
         }
 
         var individualSubscription;
         if (authenticator.getLoggedInUser()) {
             individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
-        }
-        else {
+        } else {
             individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
         }
 
@@ -90,8 +84,7 @@ require('/modules/store.js').exec(function (ctx) {
     authenticator=new AuthService.Authenticator();
     authenticator.init(jagg,session);
     user=authenticator.getLoggedInUser();
-	
-	
+
     //Validate user's role and send error if user is not a subscriber. 
     if (user != null) {
 	var role = require('/modules/role.js').checkeRole(user.username, session);

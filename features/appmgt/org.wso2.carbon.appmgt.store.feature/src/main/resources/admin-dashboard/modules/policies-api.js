@@ -19,10 +19,8 @@
 
 var apiProvider = jagg.module('manager').getAPIProviderObj();
 var log = new Log();
-var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-var appMDAOObj = new appMDAO();
-var apiUtil = Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-var apiUtil = new apiUtil();
+var appMDAOObj = new Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+var apiUtil = new Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 
 /**
  * Get the list of Shared policy partials
@@ -40,8 +38,7 @@ var getXACMLPolicyTemplate = function () {
 var validateResult = function (policyContent) {
     var validationResult = validateEntitlementPolicyPartial(policyContent);
     var validationResultJson = {"isValid": validationResult.isValid()};
-    return validationResultJson
-
+    return validationResultJson;
 }
 /**
  * Validates the given policy content
