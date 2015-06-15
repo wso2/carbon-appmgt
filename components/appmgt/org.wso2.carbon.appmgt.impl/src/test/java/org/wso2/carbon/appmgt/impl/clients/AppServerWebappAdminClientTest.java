@@ -74,12 +74,10 @@ public class AppServerWebappAdminClientTest {
 
     private AppServerWebappAdminClient getAppServerWebappAdminClient()
             throws AxisFault, AppManagementException {
-        System.setProperty("javax.net.ssl.trustStore", "/Users/ruwan/Dev/wso2/appm/trunk/product-app-manager/modules/integration/tests-ui/src/test/resources/keystores/products/wso2carbon.jks");
+        System.setProperty("javax.net.ssl.trustStore", "product-app-manager/modules/integration/tests-ui/src/test/resources/keystores/products/wso2carbon.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "wso2carbon");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
-        ConfigurationContext myConfigContext = ConfigurationContextFactory
-                .createEmptyConfigurationContext();
         return new AppServerWebappAdminClient("https://localhost:9545/services/", null,
                 Locale.ENGLISH);
     }
