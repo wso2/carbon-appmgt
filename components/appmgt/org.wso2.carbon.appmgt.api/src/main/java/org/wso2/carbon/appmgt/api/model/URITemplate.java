@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.appmgt.api.model;
 
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartialMapping;
 
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class URITemplate {
 	private String throttlingTier;
 	private List<String> throttlingTiers = new ArrayList<String>();
     private List<EntitlementPolicyPartialMapping> entitlementPolicyPartialMappings;
-	private int policyGroupId; //Policy Group Id
+	private int policyGroupId;
 
     public URITemplate(){
         entitlementPolicyPartialMappings = new ArrayList<EntitlementPolicyPartialMapping>();
