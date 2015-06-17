@@ -518,7 +518,7 @@ $(document).on("click", ".policy-delete-button", function () {
 
             },
             error: function (response) {
-                if (response.status==500){
+                if (response.status == 500) {
                     Showalert('Sorry, your session has expired', "alert-error", "statusError");
                     location.reload();
                 }
@@ -549,7 +549,7 @@ $(document).on("click", ".policy-delete-button", function () {
 
             },
             error: function (response) {
-                if (response.status==403){
+                if (response.status == 403) {
                     Showalert("Couldn't delete the policy '" + policyName + "'. This policy is being used by web apps.  ", "alert-error", "statusError");
                 } else {
                     Showalert('Error occured while fetching entitlement policy content', "alert-error", "statusError");

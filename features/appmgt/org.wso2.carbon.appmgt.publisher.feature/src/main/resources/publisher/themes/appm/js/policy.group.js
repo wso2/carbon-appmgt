@@ -52,10 +52,10 @@ function validate(policyGroupName) {
  * @param anonymousAccessToUrlPattern : if anonymous access allowed for the related url pattern/verb
  * @param userRoles : User Roles
  * @param appliedXacmlRules : Applied XACML rules.
- * @param policyGroupDesc : Policy Group DEscription
+ * @param policyGroupDesc : Policy Group Description
  * @param isSaveAndClose : check if the call is from the save and close button
  */
-function insertPolicyGroup( policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRules, isSaveAndClose ,policyGroupDesc) {
+function insertPolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRules, isSaveAndClose, policyGroupDesc) {
 
     $.ajax({
         async: false,
@@ -188,7 +188,7 @@ function savePolicyGroupData(isSaveAndClose) {
     //User Roles
     var userRoles = $('#policy-group-editor #userRoles').val();
 
-    var policyGroupDesc = $('#policy-group-editor #policyGroupDescription').val();
+    var policyGroupDescription = $('#policy-group-editor #policyGroupDescription').val();
 
     hidePolicyGroupNotification();
 
@@ -206,10 +206,10 @@ function savePolicyGroupData(isSaveAndClose) {
     if (validate(policyGroupName)) {
         // editedPolicyGroup : 0 > then insert else update
         if (editedPolicyGroup == 0) {
-            insertPolicyGroup( policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose , policyGroupDesc);
+            insertPolicyGroup( policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose , policyGroupDescription);
         }
         else {
-            updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose, policyGroupDesc);
+            updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose, policyGroupDescription);
         }
     }
 }
@@ -385,7 +385,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
     var conf = false;
 
     $.ajax({
-        async: false,
+        async: true,
         url: '/publisher/api/entitlement/policyGroup/associate/url/pattern/list/to/avoid/delete/' + policyGroupId,
         type: 'GET',
         contentType: 'application/json',
@@ -393,7 +393,6 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
         success: function (response) {
             var urlPattern = "";
             if (response.length != 0) {
-
                 // construct and show the  the warning message with app names which use this partial before delete
                 for (var i = 0; i < response.length; i++) {
                     var j = i + 1;
@@ -402,7 +401,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
 
                 }
                 var msg = "You cannot delete the policy group " + policyGroupName +
-                    " because it is been used in following URl patterns \n\n" +
+                    " because it has been used in following URl patterns \n\n" +
                     urlPattern;
                 alert(msg);
                 return;
@@ -410,13 +409,11 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
             } else {
                 conf = confirm("Are you sure you want to delete the policy " + policyGroupName + "?");
             }
-
         },
         error: function (response) {
-
+            alert('An error occurred while deleting policy group - ' + policyGroupName);
         }
     });
-
 
     if (conf) {
         $.each(policyGroupsArray, function (index, obj) {
