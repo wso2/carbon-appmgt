@@ -7109,7 +7109,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @return : array of policy partial details objects
 	 * @throws AppManagementException on error
 	 */
-	public JSONArray getEntitledPartialListForPolicyGroup(Integer policyGroupId, Connection connection) throws
+	private JSONArray getEntitledPartialListForPolicyGroup(Integer policyGroupId, Connection connection) throws
 			AppManagementException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -7129,10 +7129,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				arrPartials.add(objPartial);
 			}
 		} catch (SQLException e) {
-			handleException("SQL Error while executing the query to fetch policy group wise entitled partials list  : "
-					+ query + " : (Policy Group Id" +
-					policyGroupId + ") : " + e.getMessage(), e);
-		} finally {
+            handleException("SQL Error while executing the query to fetch policy group wise entitled partials list  : "
+                    + query + " : (Policy Group Id" +
+                    policyGroupId + ")", e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
 		return arrPartials;
@@ -7174,14 +7174,14 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 try {
                     conn.rollback();
                 } catch (SQLException e1) {
-                    log.error("Rollback while deleting the policy group", e);
+                    log.error("Rollback while deleting the policy group : " + policyGroupId, e);
                 }
             }
-			String strDataContext =
-					"(applicationId:" + applicationId + ", policyGroupId:" + policyGroupId + ")";
-			handleException("Error while executing the query to delete XACML policies : " + query + " : " +
-					strDataContext + " : " + e.getMessage(), e);
-		} finally {
+            String strDataContext =
+                    "(applicationId:" + applicationId + ", policyGroupId:" + policyGroupId + ")";
+            handleException("Error while executing the query to delete XACML policies : " + query + " : " +
+                    strDataContext, e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, null);
 		}
 	}
@@ -7233,8 +7233,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @param conn          :sql connection
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
-	public static void deletePolicyPartialMappings(Integer policyGroupId, Connection conn)
-			throws SQLException {
+    private static void deletePolicyPartialMappings(Integer policyGroupId, Connection conn)
+            throws SQLException {
 
 		String query =
 				" DELETE FROM APM_POLICY_GRP_PARTIAL_MAPPING WHERE POLICY_GRP_ID = ? ";
@@ -7245,10 +7245,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
-			log.error("SQL Error while executing the query to delete policy partial mappings: "
-					+ query + " : (Policy Group Id:" +
-					policyGroupId + ") : " + e.getMessage(), e);
-			/*
+            log.error("SQL Error while executing the query to delete policy partial mappings: "
+                    + query + " : (Policy Group Id:" +
+                    policyGroupId + ")", e);
+            /*
 			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
 			and throwing the SQLException so  the connection will be disposed by the parent function.
 			*/
@@ -7312,7 +7312,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		JSONObject objPartial;
 		JSONArray objPartialArr = new JSONArray();
 
 		// query to get policies under each policy group mapped with the
@@ -7330,8 +7329,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			ps.setString(1, AppUUID);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				objPartial = new JSONObject();
-				objPartial.put("POLICY_GRP_ID", rs.getInt("POLICY_GRP_ID"));
+                JSONObject objPartial = new JSONObject();
+                objPartial.put("POLICY_GRP_ID", rs.getInt("POLICY_GRP_ID"));
 				objPartial.put("POLICY_GRP_NAME", rs.getString("POLICY_GRP_NAME"));
 				objPartial.put("THROTTLING_TIER", rs.getString("THROTTLING_TIER"));
 				objPartial.put("USER_ROLES", rs.getString("USER_ROLES"));
@@ -7342,7 +7341,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			}
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get policies under each policy group mapped " +
-					"with the application : " + query + " : (Application UUID:" + AppUUID + ") : " + e.getMessage(), e);
+					"with the application : " + query + " : (Application UUID:" + AppUUID + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -7361,38 +7360,38 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	 * @throws AppManagementException
 	 *             on error
 	 */
-	public static String getPolicyGroupWisePolicyPartials(Integer policyGroupId, Connection conn)
+	private static String getPolicyGroupWisePolicyPartials(Integer policyGroupId, Connection conn)
 			throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String policyNamelist = ""; // contains policy partial name list
+		String policyPartialNamesList = "";
 
-		// query to get policies under each policy group mapped with the
-		// application
-		String query =
-				"SELECT MAP.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID,POL.NAME AS POLICY_PARTIAL_NAME,MAP.EFFECT AS EFFECT "
-						+ "FROM  APM_POLICY_GRP_PARTIAL_MAPPING MAP "
-						+ "LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL  POL "
-						+ "ON MAP.POLICY_PARTIAL_ID =POL.ENTITLEMENT_POLICY_PARTIAL_ID "
-						+ "WHERE MAP.POLICY_GRP_ID = ? ";
+        // query to get policies under each policy group mapped with the
+        // application
+        String query = "SELECT MAP.POLICY_PARTIAL_ID AS POLICY_PARTIAL_ID, POL.NAME AS POLICY_PARTIAL_NAME, "
+                + "MAP.EFFECT AS EFFECT "
+                + "FROM APM_POLICY_GRP_PARTIAL_MAPPING MAP "
+                + "LEFT JOIN APM_ENTITLEMENT_POLICY_PARTIAL  POL "
+                + "ON MAP.POLICY_PARTIAL_ID = POL.ENTITLEMENT_POLICY_PARTIAL_ID "
+                + "WHERE MAP.POLICY_GRP_ID = ? ";
 
 		try {
 			ps = conn.prepareStatement(query);
 			ps.setInt(1, policyGroupId);
 			rs = ps.executeQuery();
-			while (rs.next()) {
-				// creates the policy partial name list with effect
-				policyNamelist +=
-						"[ Name: " + rs.getString("POLICY_PARTIAL_NAME") + ", Effect: " +
-								rs.getString("EFFECT") + "], ";
-			}
-
-			if (policyNamelist.endsWith(",")) {
-				policyNamelist = policyNamelist.substring(0, policyNamelist.length() - 1);
-			}
-		} catch (SQLException e) {
+            if (rs.next()) {
+                // creates the policy partial name list with effect
+                policyPartialNamesList = "[ Name: " + rs.getString("POLICY_PARTIAL_NAME") + ", Effect: " +
+                        rs.getString("EFFECT") + "]";
+                //add comma sign in the begining for other records
+                while (rs.next()) {
+                    policyPartialNamesList += ",[ Name: " + rs.getString("POLICY_PARTIAL_NAME") + ", Effect: " +
+                            rs.getString("EFFECT") + "]";
+                }
+            }
+        } catch (SQLException e) {
 			log.error("SQL Error while executing the query to get policies under each policy group mapped with " +
-					"the application : " + query + " : (Policy Group Id:" + policyGroupId + ") : " + e.getMessage(), e);
+					"the application : " + query + " : (Policy Group Id:" + policyGroupId + ")", e);
 			/*
 			In the code im using a single SQL connection passed from the parent function so I'm logging the error here
 			and throwing the SQLException so  the connection will be disposed by the parent function.
@@ -7401,7 +7400,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
-		return policyNamelist;
+		return policyPartialNamesList;
 	}
 
 	/**
