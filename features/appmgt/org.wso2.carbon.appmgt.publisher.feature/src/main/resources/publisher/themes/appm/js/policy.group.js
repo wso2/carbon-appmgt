@@ -24,11 +24,7 @@ var policyPartialsArray = new Array();
 
 $('#userRoles').tokenInput('/publisher/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
     theme: 'facebook',
-    preventDuplicates: true,
-    onAdd: function (role) {
-    },
-    onDelete: function (role) {
-    }
+    preventDuplicates: true
 });
 
 /** validate data before saving
@@ -116,7 +112,8 @@ function insertPolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
  * @param objPartialMappings : Object which contains XACML policy partial details arrays
  * @param isSaveAndClose : check if the call is from the save and close button
  */
-function updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, objPartialMappings, isSaveAndClose, policyGroupDesc) {
+function updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, objPartialMappings,
+                           isSaveAndClose, policyGroupDesc) {
     $.ajax({
         async: false,
         url: '/publisher/api/entitlement/policy/partial/policyGroup/details/update',
@@ -209,7 +206,8 @@ function savePolicyGroupData(isSaveAndClose) {
             insertPolicyGroup( policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose , policyGroupDescription);
         }
         else {
-            updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles, appliedXacmlRuleIds, isSaveAndClose, policyGroupDescription);
+            updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrlPattern, userRoles,
+                appliedXacmlRuleIds, isSaveAndClose, policyGroupDescription);
         }
     }
 }

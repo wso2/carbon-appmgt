@@ -34,10 +34,7 @@ $( document ).ready(function() {
                 output.push(value);
             }
         });
-
         $('#overview_transports').val(output);
-
-
     });
 
 
@@ -103,8 +100,6 @@ $( document ).ready(function() {
                     description: data[i].description
                 });
             }
-        },
-        error: function () {
         }
     });
 
@@ -328,8 +323,6 @@ function loadPolicyGroupData(uuid) {
                             policyPartialsArray.push(obj);
                         }
                     }
-                },
-                error: function () {
                 }
             });
 
@@ -342,7 +335,6 @@ function loadPolicyGroupData(uuid) {
                 async: false,
                 success: function (data) {
                     for (var i = 0; i < data.length; i++) {
-
                         policyGroupsArray.push({
                             policyGroupId: data[i].policyGroupId,
                             policyGroupName: data[i].policyGroupName,
@@ -354,13 +346,9 @@ function loadPolicyGroupData(uuid) {
                         })
                     }
                     updatePolicyGroupPartial(policyGroupsArray);
-                },
-                error: function () {
                 }
             });
 
-        },
-        error: function () {
         }
     });
 }
