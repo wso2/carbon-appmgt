@@ -844,7 +844,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                                           Function funObj) throws
             AppManagementException {
         NativeArray policyGroupArr = new NativeArray(0);
-        Integer applicationId = Integer.parseInt(args[0].toString());
+        int applicationId = Integer.parseInt(args[0].toString());
         APIProvider apiProvider = getAPIProvider(thisObj);
         List<EntitlementPolicyGroup> policyGroupList = apiProvider.getPolicyGroupListByApplication(applicationId);
         int count = 0;

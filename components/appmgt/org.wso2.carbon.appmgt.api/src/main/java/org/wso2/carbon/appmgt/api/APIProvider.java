@@ -505,11 +505,11 @@ public interface APIProvider extends APIManager {
     /**
      * Get Application wise policy group list
      *
-     * @param appId : Application Id
-     * @return list of policy groups
+     * @param appId Application Id
+     * @return List of policy groups
      * @throws AppManagementException on error
      */
-    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(int appId) throws
             AppManagementException;
 
     /**
