@@ -13,6 +13,27 @@ $(function() {
 	var DESC_MAX_CHARS = 995;
 
 	$('#overview_description').after('<span class="span8 ' + CHARS_REM + '"></span>');
+
+    //Validates the Web App URL
+    $("#overview_webAppUrl").blur(function () {
+        var $this = $(this), flag = $('.icon-check-appurl'), btnCreate = $('#btn-create-asset');
+        if (!flag.length) {
+            $this.after('<i class="icon-check-appurl"></i>');
+            flag = $('.icon-check-appurl');
+        }
+
+        if (isValidURL(this.value)) {
+            //if URL is valid, then proceed
+            flag.removeClass().addClass('icon-ok icon-check-appurl').show();
+            btnCreate.removeAttr('disabled');
+            $(".alert-error");
+        } else {
+            //if URL is invalid then validate
+            flag.removeClass().addClass('icon-ban-circle icon-check-appurl').show();
+            btnCreate.attr('disabled', 'disabled');
+            showAlert("Invalid URL. Please type a valid Web App URL.", 'error');
+        }
+    });
 		
 	  // let's fill all the permissions
     $.each($('.perm-check'), function () {
@@ -610,3 +631,18 @@ function removeClaimTable() {
     $('#claimTableId').hide();
     $('#claimPropertyCounter').val(0);
 }
+
+/**
+ * Checks If the passed URL is valid
+ * @param url Website URL
+ * @returns {boolean} Either valid(true) or not(false)
+ */
+function isValidURL(url) {
+    var RegExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    if (RegExp.test(url)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
