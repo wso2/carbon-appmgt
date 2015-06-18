@@ -523,12 +523,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Get Policy Groups Application wise
      *
-     * @param appId : Application Id
-     * @return
+     * @param appId Application Id
+     * @return List of policy groups
      * @throws AppManagementException
      */
     @Override
-    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(Integer appId) throws
+    public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(int appId) throws
             AppManagementException {
         return appMDAO.getPolicyGroupListByApplication(appId);
     }
@@ -912,12 +912,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException on error
      */
     private APITemplateBuilder getAPITemplateBuilder(WebApp api) throws AppManagementException {
-        APITemplateBuilderImpl vtb = new APITemplateBuilderImpl(api);
+        APITemplateBuilderImpl velocityTemplateBuilder = new APITemplateBuilderImpl(api);
 
         //List of JavaPolicy class which contains policy related details
         List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
-        //contains properties related to all the policies
-        JSONObject objPolicyProperties;
         //contains properties related to relevant policy and will be used to generate the synapse api config file
         Map<String, String> properties;
         int counterPolicies; //counter :policies
@@ -929,9 +927,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             for (counterPolicies = 0; counterPolicies < policies.size(); counterPolicies++) {
                 if (policies.get(counterPolicies).getProperties() == null) {
                     //if policy doesn't contain any properties assign an empty map and add java policy as a handler
-                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), Collections.EMPTY_MAP);
+                    velocityTemplateBuilder.addHandler(policies.get(counterPolicies).getFullQualifiName(),
+                            Collections.EMPTY_MAP);
                 } else {
-                    objPolicyProperties = new JSONObject();
+                    //contains properties related to all the policies
+                    JSONObject objPolicyProperties;
                     properties = new HashMap<String, String>();
 
                     //get property JSON object related to current policy in the loop
@@ -942,9 +942,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     for (String key : keys) {
                         properties.put(key, objPolicyProperties.get(key).toString());
                     }
-
                     //add policy as a handler and also the relevant properties
-                    vtb.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
+                    velocityTemplateBuilder.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
                 }
             }
 
@@ -952,8 +951,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error occurred while adding java policy handlers to Application : " +
                     api.getId().toString(), e);
         }
-        return vtb;
-
+        return velocityTemplateBuilder;
     }
 
     /**

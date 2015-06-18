@@ -35,7 +35,7 @@ var Showalert = function(msg, type, target) {
 
 policyPartialsArray = new Array(); // xacml policy details array
 var editedpolicyPartialId = 0; //if 1 then edit else save
-var context = "/admin-dashboard";
+var context = "/" + window.location.pathname.split("/")[1];  // default value is "/admin-dashboard"
 var tags =[];
 var editor;
 

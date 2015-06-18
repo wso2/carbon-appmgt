@@ -34,10 +34,7 @@ $( document ).ready(function() {
                 output.push(value);
             }
         });
-
         $('#overview_transports').val(output);
-
-
     });
 
 
@@ -103,8 +100,6 @@ $( document ).ready(function() {
                     description: data[i].description
                 });
             }
-        },
-        error: function () {
         }
     });
 
@@ -214,6 +209,7 @@ $( document ).ready(function() {
             $('#overview_logoutUrl').hide();
         }
     })
+
     //set default on loading
     if($('#overview_logoutUrl').val() !=' '){
         $('.controll_overview_logoutUrl').prop('checked', true);
@@ -222,24 +218,20 @@ $( document ).ready(function() {
         $('#overview_logoutUrl').hide()
     }
 
-
     //set skip gateway checkbox value in edit mode
     var skipGateway = $('#overview_skipGateway').val();
     if (skipGateway == "true") {
         $('.skip_gateway_checkbox').prop('checked', true);
-    }
-    else {
+    } else {
         $('.skip_gateway_checkbox').prop('checked', false);
     }
-
 
     //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
     $(".skip_gateway_checkbox").click(function () {
         var output = [];
         if ($('.skip_gateway_checkbox').is(':checked')) {
             output.push("true");
-        }
-        else {
+        } else {
             output.push("false");
         }
         $('#overview_skipGateway').val(output);
@@ -256,8 +248,6 @@ $( document ).ready(function() {
             $('.authPolicies').show(200);
         }
     });
-
-
 });
 
 // NOTE : This function is used as a workaround for a bug in registry model import and export.
@@ -333,8 +323,6 @@ function loadPolicyGroupData(uuid) {
                             policyPartialsArray.push(obj);
                         }
                     }
-                },
-                error: function () {
                 }
             });
 
@@ -347,7 +335,6 @@ function loadPolicyGroupData(uuid) {
                 async: false,
                 success: function (data) {
                     for (var i = 0; i < data.length; i++) {
-
                         policyGroupsArray.push({
                             policyGroupId: data[i].policyGroupId,
                             policyGroupName: data[i].policyGroupName,
@@ -359,13 +346,9 @@ function loadPolicyGroupData(uuid) {
                         })
                     }
                     updatePolicyGroupPartial(policyGroupsArray);
-                },
-                error: function () {
                 }
             });
 
-        },
-        error: function () {
         }
     });
 }
