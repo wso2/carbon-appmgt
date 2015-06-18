@@ -933,6 +933,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     return;
                 }
                 model.set('overview.name',ctx.name);
+                model.set('overview.displayName', ctx.displayName);
                 model.set('overview.category',ctx.platform);
                 model.set('overview.platform',ctx.platform);
                 model.set('overview.provider', username);
@@ -984,8 +985,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         catch (e) {
-            log.debug(e);
-            log.debug('An asset of type: ' + shortName + ' could not be created.The following exception was thrown: ' + e);
+            log.error(e);
+            log.error('An asset of type: ' + shortName + ' could not be created.');
             response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
         }
 
@@ -1072,6 +1073,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     return;
                 }
                 modelA.set('overview.name',originalArtifact.attributes.overview_name);
+				modelA.set('overview.displayName', ctx.displayName);
                 modelA.set('overview.version', originalArtifact.attributes.overview_version);
                 modelA.set('overview.description',ctx.description);
                 modelA.set('overview.recentchanges',ctx.recentChanges);
@@ -1121,10 +1123,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(msg);
 
         } catch (e) {
-            log.debug(e);
+            log.error(e);
+			log.error('The asset ' + id + ' could not be updated.');
             print({"ok" : false, "message" : "Permission denied", "report" : {"failed" : true, "name" : ["You are not allowed to edit at this stage"]}});
-            log.debug('The asset ' + id + ' could not be updated.The following exception was thrown: ' + e);
-            // response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
         }
 
     }
