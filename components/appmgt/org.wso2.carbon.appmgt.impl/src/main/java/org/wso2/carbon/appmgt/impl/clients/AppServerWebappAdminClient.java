@@ -26,9 +26,14 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
+import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+import org.wso2.carbon.authenticator.stub.LogoutAuthenticationExceptionException;
 import org.wso2.carbon.webapp.mgt.stub.WebappAdminStub;
 import org.wso2.carbon.webapp.mgt.stub.types.carbon.WebappsWrapper;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Locale;
 
@@ -39,60 +44,103 @@ import java.util.Locale;
  */
 public class AppServerWebappAdminClient {
 
-    private WebappAdminStub stub;
+    private WebappAdminStub webappAdminStub;
+    private AuthenticationAdminStub authenticationAdminStub;
     private String serviceURL;
+    private String backendServerURL;
     private String userName;
+    private String sessionCookie;
+    private ConfigurationContext configCtx;
 
-    public AppServerWebappAdminClient(String userName, String password, String backendServerURL,
+    public AppServerWebappAdminClient(String backendServerURL,
             ConfigurationContext configCtx, Locale locale) throws AppManagementException {
-        this.userName = userName;
+        this.configCtx = configCtx;
+        this.backendServerURL = backendServerURL;
         serviceURL = backendServerURL + "WebappAdmin";
-
-        try {
-            stub = new WebappAdminStub(configCtx, serviceURL);
-        } catch (AxisFault axisFault) {
-            final String msg = String
-                    .format("Could not initialize Admin Service Stub. Server [%s],Reason: %s",
-                            serviceURL, axisFault.getMessage());
-            throw new AppManagementException(msg, axisFault);
-        }
-
-        ServiceClient client = stub._getServiceClient();
-        Options options = client.getOptions();
-        options.setManageSession(true);
-
-        HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
-        auth.setUsername(userName);
-        auth.setPassword(password);
-        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.AUTHENTICATE, auth);
     }
 
-    public AppServerWebappAdminClient(String sessionCookie, String backendServerURL,
-            ConfigurationContext configCtx, Locale locale) throws AppManagementException {
-        serviceURL = backendServerURL + "WebappAdmin";
-
+    /**
+     * Logs in to the webapp admin client
+     * @param userName
+     * @param password
+     * @throws AppManagementException
+     */
+    public void login(String userName, String password) throws AppManagementException {
+        this.userName = userName;
         try {
-            stub = new WebappAdminStub(configCtx, serviceURL);
+            authenticationAdminStub = new AuthenticationAdminStub(configCtx,
+                    backendServerURL + "AuthenticationAdmin");
+            webappAdminStub = new WebappAdminStub(configCtx, serviceURL);
+            ServiceClient client = webappAdminStub._getServiceClient();
+            Options options = client.getOptions();
+
+            String host = new URL(serviceURL).getHost();
+            //Try to use SAML autnentication. If fails use basic authentication.
+            if (authenticationAdminStub.login(userName, password, host)) {
+                ServiceContext serviceContext = authenticationAdminStub.
+                        _getServiceClient().getLastOperationContext().getServiceContext();
+                sessionCookie = (String) serviceContext.getProperty(HTTPConstants.COOKIE_STRING);
+                options.setManageSession(true);
+                options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
+                        sessionCookie);
+            } else {
+                HttpTransportProperties.Authenticator auth = new HttpTransportProperties.Authenticator();
+                auth.setUsername(userName);
+                auth.setPassword(password);
+                options.setProperty(org.apache.axis2.transport.http.HTTPConstants.AUTHENTICATE,
+                        auth);
+            }
         } catch (AxisFault axisFault) {
             final String msg = String
-                    .format("Could not initialize Admin Service Stub. Server [%s],Reason: %s",
-                            serviceURL, axisFault.getMessage());
+                    .format("Could not login to Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, axisFault.getMessage());
             throw new AppManagementException(msg, axisFault);
+        } catch (RemoteException e) {
+            final String msg = String
+                    .format("Could not login to Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, e.getMessage());
+            throw new AppManagementException(msg, e);
+        } catch (LoginAuthenticationExceptionException e) {
+            final String msg = String
+                    .format("Error in authentication on Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, e.getMessage());
+            throw new AppManagementException(msg, e);
+        } catch (MalformedURLException e) {
+            final String msg = String
+                    .format("Could not login to Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, e.getMessage());
+            throw new AppManagementException(msg, e);
         }
+    }
 
-        ServiceClient client = stub._getServiceClient();
-        Options options = client.getOptions();
-        options.setManageSession(true);
-
-        options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-                sessionCookie);
-
+    /**
+     * Logs out of the previously logged in client.
+     *
+     * @throws AppManagementException if not already logged in or any error occurs while logging out
+     */
+    public void logout() throws AppManagementException {
+        if (authenticationAdminStub == null) {
+            throw new AppManagementException("Logout called on previously not logged in client");
+        }
+        try {
+            authenticationAdminStub.logout();
+        } catch (RemoteException e) {
+            final String msg = String
+                    .format("Could not logout from Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, e.getMessage());
+            throw new AppManagementException(msg, e);
+        } catch (LogoutAuthenticationExceptionException e) {
+            final String msg = String
+                    .format("Could not logout from Admin Service. Server [%s],Reason: %s",
+                            backendServerURL, e.getMessage());
+            throw new AppManagementException(msg, e);
+        }
     }
 
     public WebappsWrapper getPagedWebappsSummary(String webappSearchString, String webappState,
             String webappType, int pageNumber) throws AppManagementException {
         try {
-            WebappsWrapper result = stub
+            WebappsWrapper result = webappAdminStub
                     .getPagedWebappsSummary(webappSearchString, webappState, webappType,
                             pageNumber);
             return result;
