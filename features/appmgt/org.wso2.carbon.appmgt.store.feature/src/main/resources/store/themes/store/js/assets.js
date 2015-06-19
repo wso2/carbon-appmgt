@@ -20,7 +20,8 @@ $(function() {
 		location.href = link;
 	});
 
-//	mouseStop();
+    //show App details in mouse hover event
+    mouseStop();
 
 	History.Adapter.bind(window, 'statechange', function() {
 		var state = History.getState();
