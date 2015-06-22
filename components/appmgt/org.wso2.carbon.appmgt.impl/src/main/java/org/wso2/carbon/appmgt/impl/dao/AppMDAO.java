@@ -7306,7 +7306,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @return comma separated list of policy partial names
      * @throws AppManagementException on error
      */
-    private static String getPolicyGroupWisePolicyPartials(Integer policyGroupId, Connection conn)
+    private static String getPolicyGroupWisePolicyPartials(int policyGroupId, Connection conn)
 			throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;

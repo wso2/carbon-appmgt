@@ -20,8 +20,6 @@ $(function() {
 		location.href = link;
 	});
 
-//	mouseStop();
-
 	History.Adapter.bind(window, 'statechange', function() {
 		var state = History.getState();
 		if (state.data.id === 'assets') {
@@ -129,6 +127,9 @@ $(function() {
 		}
 		$('#my-assets').slideToggle("fast");
 	});
+
+    //show App details in mouse hover event
+    mouseStop();
 
 	caramel.loaded('js', 'assets');
 	caramel.loaded('js', 'sort-assets');
