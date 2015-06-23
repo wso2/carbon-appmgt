@@ -53,16 +53,18 @@ var render=function(theme,data,meta,require){
         heading = "Create New Mobile App";
 		break;
 	case 'view':
-		listPartial='add-mobileapp-version';
+        listPartial='view-mobileapp';
         data = require('/helpers/edit-asset.js').screenshots(data);
         if(data.artifact.attributes.overview_platform == 'android' && data.artifact.attributes.overview_type == 'public') {
             data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_packagename;
         }else if(data.artifact.attributes.overview_platform == 'ios' && data.artifact.attributes.overview_type == 'public'){
             data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_appid;
         }
-        heading = "Add new Mobile App version for " + (data.artifact.attributes.overview_name);
-
-		break;
+         var createdDate = new Date();
+        createdDate.setTime(data.artifact.attributes.overview_createdtime);
+        data.artifact.attributes['overview_createdtime'] = createdDate.toUTCString();
+        heading = data.artifact.attributes.overview_displayName;
+        break;
     case 'edit':
         listPartial='edit-asset';
         if(data.data.meta.shortName=='mobileapp'){
