@@ -8,16 +8,16 @@ var AuthService=require('../extensions/assets/webapp/services/authentication.js'
 
 require('/modules/store.js').exec(function (ctx) {
     var action, data, message, exists, showWorkflowTip,
-            error = false,
-            log = new Log(),
-            user = require('store').user,
-            matcher = new URIMatcher(request.getRequestURI()),
-            userDetails={},
-            parameters;
-  
+    error = false,
+    log = new Log(),
+    user = require('store').user,
+    matcher = new URIMatcher(request.getRequestURI()),
+    userDetails={},
+    parameters,
+    isEmailUsername = false;
 
-   var authenticator=new AuthService.Authenticator();
-   authenticator.init(jagg,session);
+    var authenticator=new AuthService.Authenticator();
+    authenticator.init(jagg,session);
 
     if (matcher.match('/{context}/apis/user/{action}')) {
         action = matcher.elements().action;
@@ -136,6 +136,24 @@ require('/modules/store.js').exec(function (ctx) {
                 print({
                     error: error,
                     exists: exists,
+                    message: message
+                });
+                return;
+
+            case 'emailLogin':
+                try {
+                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername(null);
+                    if (isEnableEmailUsername) {
+                        isEmailUsername = true;
+                    }
+                } catch (e) {
+                    log.error(e);
+                    error = true;
+                    message = e.message;
+                }
+                print({
+                    error: error,
+                    isEmailUsername: isEmailUsername,
                     message: message
                 });
                 return;

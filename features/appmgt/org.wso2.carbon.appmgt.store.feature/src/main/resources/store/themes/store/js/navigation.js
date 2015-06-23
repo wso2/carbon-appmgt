@@ -12,7 +12,7 @@ $(function() {
         $('#btn-signin').text('Sign In').removeClass('disabled');
     };
 
-    	var login = function() {
+    var login = function() {
 		if (!$("#form-login").valid())
 			return;
 		$('#btn-signin').addClass('disabled').text('Signing In');
@@ -21,26 +21,26 @@ $(function() {
 		var password = $('#inp-password').val();
 
         	caramel.ajax({
-            		type: 'POST',
-            		url: '/apis/user/login',
-            		data: JSON.stringify({
-                		username: username,
-                		password: password
-            		}),
-            		success: function (data) {
-                		if (!data.error) {
-					var assetId = $('#modal-login').data('value');
-                    			if(assetId == "" || assetId == null){
-              		   			location.reload();  
-                    			}else  {
-                 	  			window.location = '/store/assets/webapp/'+ assetId;
-                    			}
-                		} else {
-                            showLoginError(data.message);
-                		}
-            		},
-            		contentType: 'application/json',
-            		dataType: 'json'
+                type: 'POST',
+                url: '/apis/user/login',
+                data: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+                success: function (data) {
+                    if (!data.error) {
+                var assetId = $('#modal-login').data('value');
+                            if(assetId == "" || assetId == null){
+                            location.reload();
+                            }else  {
+                            window.location = '/store/assets/webapp/'+ assetId;
+                            }
+                    } else {
+                        showLoginError(data.message);
+                    }
+                },
+                contentType: 'application/json',
+                dataType: 'json'
         	});
  	};
     var validateUsername = function(username) {
@@ -83,11 +83,28 @@ $(function() {
         return error;
     }
 
-    var doValidation = function(usename, pw1, pw2) {
+    var isEnableEmailUsername = function() {
+        var isEmailUsername = false;
+        caramel.ajax({
+            type: 'POST',
+            url: '/apis/user/emailLogin',
+            async : false,
+            success: function (data) {
+                isEmailUsername = data.isEmailUsername
+                return isEmailUsername;
+            },
+            contentType: 'application/json',
+            dataType: 'json'
+        });
+        return isEmailUsername;
+    }
 
-        if (usename.indexOf("@") != -1) {
-            showError("Username cannot contain @ sign.");
-            return;
+    var doValidation = function(usename, pw1, pw2) {
+        if (!isEnableEmailUsername()) {
+            if (usename.indexOf("@") != -1) {
+                showError("Username cannot contain @ sign.");
+                return;
+            }
         }
 
         var reason = "";
