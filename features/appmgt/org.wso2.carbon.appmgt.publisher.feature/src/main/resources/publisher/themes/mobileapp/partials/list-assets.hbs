@@ -72,16 +72,8 @@
             <img src="{{this.attributes.images_thumbnail}}" class="" />
         </td>
         <td class="asset-listing-name">
-            {{#if ../updateMobileAppAuthorized}}
-                {{#if this.enableEdit}}
-                    <a href='/publisher/asset/operations/edit/mobileapp/{{this.id}}'>
-                  {{else}}
-                    <a href='#'>
-                {{/if}}
-             {{else}}
-                 <a href='#'>
-            {{/if}}
-                    {{this.attributes.overview_displayName}}
+            <a href='/publisher/asset/mobileapp/{{this.id}}'>
+                {{this.attributes.overview_displayName}}
             </a>
         </td>
 
