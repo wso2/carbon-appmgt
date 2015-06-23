@@ -75,13 +75,6 @@ var generateLeftNavJson = function(data, listPartial) {
                 leftNavItems = {
                     leftNavLinks: [
                         {
-                            name: "Edit",
-                            iconClass: "icon-edit",
-                            additionalClasses: (listPartial == "edit-asset" ) ? "active" : false,
-                            url: "#",
-                            title: "Edit Action not permitted."
-                        },
-                        {
                             name: "Create New Version",
                             iconClass: "icon-file",
                             additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
