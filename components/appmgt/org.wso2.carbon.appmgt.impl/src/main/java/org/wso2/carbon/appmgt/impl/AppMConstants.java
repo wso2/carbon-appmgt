@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -388,6 +388,7 @@ public final class AppMConstants {
     public static final String ENABLE_UNLIMITED_TIER = TIER_MANAGEMENT + "EnableUnlimitedTier";
     
     public static final String UNLIMITED_TIER = "Unlimited";
+    public static final int UNLIMITED_TIER_REQUEST_PER_MINUTE = 10000;
     public static final String UNLIMITED_TIER_DESC = "Allows unlimited requests";
 
     public static final String UNAUTHENTICATED_TIER = "Unauthenticated";
@@ -407,7 +408,8 @@ public final class AppMConstants {
     public static final String THROTTLE_ATTRIBUTE_DISPLAY_NAME= "displayName";
 
     public static final String TIER_DESC_NOT_AVAILABLE = "Tire Description is not available";
-    
+    public static final int TIER_MAX_COUNT = 0;
+
     public static final String AUTH_TYPE_DEFAULT = "DEFAULT";
     public static final String AUTH_TYPE_NONE = "NONE";
     public static final String AUTH_TYPE_USER = "USER";

@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -28,8 +28,9 @@ public class Tier {
     private String name;
     private String displayName;
     private String description;
+    private int requestPerMinute;
     private byte[] policyContent;
-    private Map<String,Object> tierAttributes;
+    private Map<String, Object> tierAttributes;
 
     public Tier(String name) {
         this.name = name;
@@ -55,6 +56,14 @@ public class Tier {
         this.displayName = displayName;
     }
 
+    public int getRequestPerMinute() {
+        return requestPerMinute;
+    }
+
+    public void setRequestPerMinute(int requestPerMinute) {
+        this.requestPerMinute = requestPerMinute;
+    }
+
     public byte[] getPolicyContent() {
         return policyContent;
     }
@@ -62,18 +71,23 @@ public class Tier {
     public void setPolicyContent(byte[] policyContent) {
         this.policyContent = policyContent;
     }
-    public Map<String,Object> getTierAttributes() {
+
+    public Map<String, Object> getTierAttributes() {
         return tierAttributes;
     }
 
-    public void setTierAttributes(Map<String,Object> tierAttributes) {
+    public void setTierAttributes(Map<String, Object> tierAttributes) {
         this.tierAttributes = tierAttributes;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Tier tier = (Tier) o;
 
