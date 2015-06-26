@@ -131,17 +131,12 @@ public class AppMDAO {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String sqlQuery =
-		                  "SELECT " + "   API.APP_PROVIDER AS APP_PROVIDER,"
-		                          + "   API.APP_NAME AS APP_NAME,"
-		                          + "   API.APP_VERSION AS APP_VERSION " + "FROM "
-		                          + "   APM_SUBSCRIPTION SP, " + "   APM_APP API,"
-		                          + "   APM_SUBSCRIBER SB, " + "   APM_APPLICATION APP " + "WHERE "
-		                          + "   SB.USER_ID = ? " + "   AND SB.TENANT_ID = ? "
-		                          + "   AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID "
-		                          + "   AND APP.APPLICATION_ID=SP.APPLICATION_ID "
-		                          + "   AND API.APP_ID = SP.APP_ID";
-		try {
+        String sqlQuery = "SELECT API.APP_PROVIDER AS APP_PROVIDER, API.APP_NAME AS APP_NAME, " +
+                "API.APP_VERSION AS APP_VERSION " +
+                "FROM APM_SUBSCRIPTION SP, APM_APP API, APM_SUBSCRIBER SB, APM_APPLICATION APP " +
+                "WHERE SB.USER_ID = ? AND SB.TENANT_ID = ? AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
+                "AND APP.APPLICATION_ID = SP.APPLICATION_ID AND API.APP_ID = SP.APP_ID";
+        try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(sqlQuery);
 			ps.setString(1, tenantAwareUsername);
@@ -181,16 +176,12 @@ public class AppMDAO {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String sqlQuery =
-		                  "SELECT " + "   SB.USER_ID, " + "   SB.TENANT_ID " + "FROM "
-		                          + "   APM_SUBSCRIBER SB, " + "   APM_APPLICATION APP, "
-		                          + "   APM_SUBSCRIPTION SP, " + "   APM_APP API " + "WHERE "
-		                          + "   API.APP_PROVIDER = ? " + "   AND API.APP_NAME = ?"
-		                          + "   AND API.APP_VERSION = ?"
-		                          + "   AND SP.APPLICATION_ID = APP.APPLICATION_ID "
-		                          + "   AND APP.SUBSCRIBER_ID=SB.SUBSCRIBER_ID "
-		                          + "   AND API.APP_ID = SP.APP_ID";
-		try {
+        String sqlQuery = "SELECT SB.USER_ID, SB.TENANT_ID " +
+                "FROM APM_SUBSCRIBER SB, APM_APPLICATION APP, APM_SUBSCRIPTION SP, APM_APP API " +
+                "WHERE API.APP_PROVIDER = ? AND API.APP_NAME = ? AND API.APP_VERSION = ? " +
+                "AND SP.APPLICATION_ID = APP.APPLICATION_ID AND APP.SUBSCRIBER_ID=SB.SUBSCRIBER_ID " +
+                "AND API.APP_ID = SP.APP_ID";
+        try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(sqlQuery);
 			ps.setString(1, AppManagerUtil.replaceEmailDomainBack(apiInfoDTO.getProviderId()));
@@ -200,21 +191,11 @@ public class AppMDAO {
 			List<APIKeyInfoDTO> apiKeyInfoList = new ArrayList<APIKeyInfoDTO>();
 			while (rs.next()) {
 				String userId = rs.getString(AppMConstants.SUBSCRIBER_FIELD_USER_ID);
-				// int tenantId =
-				// rs.getInt(AppMConstants.SUBSCRIBER_FIELD_TENANT_ID);
-				// If the tenant Id > 0, get the tenant domain and append it to
-				// the username.
-				// if (tenantId > 0) {
-				// userId = userId + "@" +
-				// APIKeyMgtUtil.getTenantDomainFromTenantId(tenantId);
-				// }
 				APIKeyInfoDTO apiKeyInfoDTO = new APIKeyInfoDTO();
 				apiKeyInfoDTO.setUserId(userId);
-				// apiKeyInfoDTO.setStatus(rs.getString(3));
 				apiKeyInfoList.add(apiKeyInfoDTO);
 			}
 			apiKeyInfoDTOs = apiKeyInfoList.toArray(new APIKeyInfoDTO[apiKeyInfoList.size()]);
-
 		} catch (SQLException e) {
 			handleException("Error while executing SQL", e);
 		} finally {
@@ -253,17 +234,19 @@ public class AppMDAO {
 
 		Connection conn = null;
 		PreparedStatement ps = null;
-		String sqlQuery =
-		                  "UPDATE " + accessTokenStoreTable + " IAT , APM_SUBSCRIBER SB," +
-		                          " APM_SUBSCRIPTION SP , APM_APPLICATION APP, APM_APP API" +
-		                          " SET IAT.TOKEN_STATE=?" + " WHERE SB.USER_ID=?" +
-		                          " AND SB.TENANT_ID=?" + " AND API.APP_PROVIDER=?" +
-		                          " AND API.APP_NAME=?" + " AND API.APP_VERSION=?" +
-		                          " AND SP.ACCESS_TOKEN=IAT.ACCESS_TOKEN" +
-		                          " AND SB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID" +
-		                          " AND APP.APPLICATION_ID = SP.APPLICATION_ID" +
-		                          " AND API.APP_ID = SP.APP_ID";
-		try {
+        String sqlQuery = "UPDATE " + accessTokenStoreTable + " IAT, APM_SUBSCRIBER SB, " +
+                "APM_SUBSCRIPTION SP, APM_APPLICATION APP, APM_APP API " +
+                "SET IAT.TOKEN_STATE = ? " +
+                "WHERE SB.USER_ID = ? " +
+                "AND SB.TENANT_ID = ? " +
+                "AND API.APP_PROVIDER = ? " +
+                "AND API.APP_NAME = ? " +
+                "AND API.APP_VERSION = ? " +
+                "AND SP.ACCESS_TOKEN = IAT.ACCESS_TOKEN " +
+                "AND SB.SUBSCRIBER_ID = APP.SUBSCRIBER_ID " +
+                "AND APP.APPLICATION_ID = SP.APPLICATION_ID " +
+                "AND API.APP_ID = SP.APP_ID";
+        try {
 
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(sqlQuery);
@@ -351,32 +334,14 @@ public class AppMDAO {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String applicationSqlQuery =
-		                             "SELECT " + "   IAT.VALIDITY_PERIOD, " +
-		                                     "   IAT.TIME_CREATED ," + "   IAT.TOKEN_STATE," +
-		                                     "   IAT.USER_TYPE," + "   IAT.AUTHZ_USER," +
-		                                     "   IAT.TIME_CREATED," + "   SUB.TIER_ID," +
-		                                     "   SUBS.USER_ID," + "   SUB.SUB_STATUS," +
-		                                     "   APP.APPLICATION_ID," + "   APP.NAME," +
-		                                     "   APP.APPLICATION_TIER," +
-		                                     "   API.APP_NAME," +
-		                                     "   API.APP_PROVIDER" +
-		                                     " FROM " +
-		                                     accessTokenStoreTable +
-		                                     " IAT," +
-		                                     "   APM_SUBSCRIPTION SUB," +
-		                                     "   APM_SUBSCRIBER SUBS," +
-		                                     "   APM_APPLICATION APP," +
-		                                     "   APM_APP API" +
-		                                     " WHERE " +
-		                                     "   IAT.ACCESS_TOKEN = ? " +
-		                                     "   AND API.CONTEXT = ? " +
-		                                     "   AND API.APP_VERSION = ? " +
-		                                     // "   AND APP.APPLICATION_ID = APP.APPLICATION_ID"
-		                                     // +
-		                                     "   AND SUB.APPLICATION_ID = APP.APPLICATION_ID" +
-		                                     "   AND APP.SUBSCRIBER_ID = SUBS.SUBSCRIBER_ID" +
-		                                     "   AND API.APP_ID = SUB.APP_ID" ;
+        String applicationSqlQuery = "SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED, IAT.TOKEN_STATE, IAT.USER_TYPE, " +
+                "IAT.AUTHZ_USER, IAT.TIME_CREATED, SUB.TIER_ID, SUBS.USER_ID, SUB.SUB_STATUS, APP.APPLICATION_ID, " +
+                "APP.NAME, APP.APPLICATION_TIER, API.APP_NAME, API.APP_PROVIDER " +
+                "FROM " + accessTokenStoreTable + " IAT, APM_SUBSCRIPTION SUB, APM_SUBSCRIBER SUBS, " +
+                "APM_APPLICATION APP, APM_APP API " +
+                "WHERE IAT.ACCESS_TOKEN = ? AND API.CONTEXT = ? AND API.APP_VERSION = ? " +
+                "AND SUB.APPLICATION_ID = APP.APPLICATION_ID AND APP.SUBSCRIBER_ID = SUBS.SUBSCRIBER_ID " +
+                "AND API.APP_ID = SUB.APP_ID";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -567,8 +532,7 @@ public class AppMDAO {
         String userRoles = null;
         ArrayList<String> urlsPattern = new ArrayList<String>();
 
-        String ssoInfoSqlQuery = "SELECT URL_PATTERN FROM APM_APP_URL_MAPPING WHERE " +
-                "APP_ID= ?";
+        String ssoInfoSqlQuery = "SELECT URL_PATTERN FROM APM_APP_URL_MAPPING WHERE APP_ID = ?";
             try {
                 conn = APIMgtDBUtil.getConnection();
                 ps = conn.prepareStatement(ssoInfoSqlQuery);
@@ -653,10 +617,9 @@ public class AppMDAO {
 		WebAppInfoDTO webAppInfoDTO = new WebAppInfoDTO();
 		String saml2SsoIssuer;
 
-		String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, " +
-				" APP_ALLOW_ANONYMOUS "
-				+ " FROM APM_APP app "
-				+ " WHERE app.CONTEXT = ? AND app.APP_VERSION = ? ";
+        String ssoInfoSqlQuery = "SELECT app.APP_NAME, app.LOG_OUT_URL, app.APP_ID, APP_ALLOW_ANONYMOUS " +
+                "FROM APM_APP app " +
+                "WHERE app.CONTEXT = ? AND app.APP_VERSION = ? ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -700,10 +663,10 @@ public class AppMDAO {
 		ResultSet rs = null;
 		VerbInfoDTO verbInfoDTO = new VerbInfoDTO();
 
-        String query = "SELECT HTTP_METHOD, URL_PATTERN, URL_ALLOW_ANONYMOUS  "
-                + " FROM APM_APP_URL_MAPPING MAP "
-                + " LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID  "
-                + " WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT=? AND APP_VERSION=? ) ";
+        String query = "SELECT HTTP_METHOD, URL_PATTERN, URL_ALLOW_ANONYMOUS " +
+                "FROM APM_APP_URL_MAPPING MAP " +
+                "LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID " +
+                "WHERE MAP.APP_ID = (SELECT APP_ID FROM APM_APP WHERE CONTEXT = ? AND APP_VERSION = ?)";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -768,10 +731,9 @@ public class AppMDAO {
 		long currentTime;
 		long remainingTime = 0;
 
-		String applicationSqlQuery =
-		                             "SELECT " + " IAT.VALIDITY_PERIOD, " + " IAT.TIME_CREATED " +
-		                                     " FROM " + accessTokenStoreTable + " IAT" + " WHERE " +
-		                                     " IAT.ACCESS_TOKEN = ? ";
+        String applicationSqlQuery = "SELECT IAT.VALIDITY_PERIOD, IAT.TIME_CREATED " +
+                "FROM " + accessTokenStoreTable + " IAT " +
+                "WHERE IAT.ACCESS_TOKEN = ? ";
 
 		try {
 			conn = APIMgtDBUtil.getConnection();
@@ -3097,10 +3059,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
 		ResultSet rSet = null;
-		String sqlQuery = "SELECT * FROM IDN_OAUTH_CONSUMER_APPS " + "WHERE CONSUMER_KEY=?";
-
-		boolean isDuplicateConsumer = false;
-
+        String sqlQuery = "SELECT APP_NAME FROM IDN_OAUTH_CONSUMER_APPS WHERE CONSUMER_KEY = ?";
+        boolean isDuplicateConsumer = false;
 		try {
 			consumerKey = AppManagerUtil.encryptToken(consumerKey);
 			connection = APIMgtDBUtil.getConnection();
@@ -3675,9 +3635,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		int applicationId = getApplicationId(appName, userId);
 		try {
 			conn = APIMgtDBUtil.getConnection();
-			String sqlQuery =
-			                  "SELECT   APPLICATION_STATUS FROM   APM_APPLICATION " + "WHERE "
-			                          + "   APPLICATION_ID= ?";
+            String sqlQuery = "SELECT APPLICATION_STATUS FROM APM_APPLICATION WHERE APPLICATION_ID = ?";
 
 			ps = conn.prepareStatement(sqlQuery);
 			ps.setInt(1, applicationId);
@@ -4292,9 +4250,11 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		ResultSet rs = null;
 		WorkflowDTO workflowDTO = null;
 
-		String query = "SELECT * FROM APM_WORKFLOWS WHERE WF_EXTERNAL_REFERENCE=?";
-		try {
-
+        String query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
+                "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
+                "FROM APM_WORKFLOWS " +
+                "WHERE WF_EXTERNAL_REFERENCE = ?";
+        try {
 			connection = APIMgtDBUtil.getConnection();
 			prepStmt = connection.prepareStatement(query);
 			prepStmt.setString(1, workflowReference);
@@ -4312,7 +4272,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 				workflowDTO.setWorkflowType(rs.getString("WF_TYPE"));
 				workflowDTO.setWorkflowDescription(rs.getString("WF_STATUS_DESC"));
 			}
-
 		} catch (SQLException e) {
 			handleException("Error while retrieving workflow details for " + workflowReference, e);
 		} finally {
@@ -6736,14 +6695,10 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		builderDataContext.append("(userId:").append(userId)
 				.append(", startIndex:").append(startIndex)
 				.append(", pageSize:").append(pageSize).append(")");
-
-
         String query = "";
-
 		try {
 			// get the connection for the UI Activity Publish data source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-
 
             //oracle specific query
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
@@ -7689,8 +7644,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		PreparedStatement ps = null;
 		boolean status = true;
 		ResultSet rs = null;
-		String query = "SELECT * FROM APM_APP WHERE APP_NAME=? AND APP_VERSION =?";
-		try {
+        String query = "SELECT APP_ID FROM APM_APP WHERE APP_NAME = ? AND APP_VERSION = ?";
+        try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
 			ps.setString(1, webAppName);
