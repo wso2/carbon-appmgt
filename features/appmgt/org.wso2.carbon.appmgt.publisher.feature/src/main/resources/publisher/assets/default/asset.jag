@@ -76,7 +76,15 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var output = model.export('form');
         var title = shortName;
-        caramel.render({op: operation, cuser: server.current(session), shortName: shortName, rxtTemplate: rxtTemplate, data: output, title: title});
+        output.sso_provider = getIdentityProviderUrl();
+        caramel.render({
+            op: operation,
+            cuser: server.current(session),
+            shortName: shortName,
+            rxtTemplate: rxtTemplate,
+            data: output,
+            title: title}
+        );
     }
 });
 
@@ -423,6 +431,13 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
         overridePermissions(assetId, artifactManager, permissions);
     });
+
+    /**
+    * Get identity provider URL
+    */
+    function getIdentityProviderUrl() {
+        return apiProvider.getIdentityProviderUrl();
+    }
 
 /**
 * Generates entitlement policies.
