@@ -124,8 +124,35 @@ $(document).ready(function() {
 		$(this).next().click();
 	});
 
-	$('input[type="file"]').change(function() {
-		$(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+	$('input[type="file"]').change(function(evt) {
+        var acceptFileType = $(this).attr('acceptType');
+
+        if (acceptFileType.toLowerCase() == "image") {
+            var iconIdValue = $(this).attr('inputId');
+            var iconId = $("#".concat(iconIdValue));
+            var flagId= ("validity").concat(this.id);
+            var flag =  $("#".concat(flagId));
+
+            if (!flag.length) {
+               iconId.after(('<i id = "').concat(flagId).concat('"; class="icon-check-fileType"></i>'));
+               flag = $("#".concat(flagId));
+            }
+
+            var files = evt.target.files;
+            var isValidated = validateImages(files);
+            var btnCreate = $('#btn-create-asset');
+            if (isValidated == true) {
+                flag.removeClass().addClass('icon-ok icon-check-fileType').show();
+                btnCreate.removeAttr('disabled');
+                $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+            } else {
+                flag.removeClass().addClass('icon-ban-circle icon-check-fileType').show();
+                btnCreate.attr('disabled', 'disabled');
+                showAlert("File must be in image file format.", 'error');
+            }
+        } else {
+            $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+        }
 	})
 	/*
 	 The function is used to check if the version entered by the user exists
@@ -266,7 +293,14 @@ $(document).ready(function() {
 	function checkNonSpecial(value){
         	var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
         	return non_special_regex.test(value);
-    	}
+    }
+
+    function validateImages(files){
+        var inputType = files[0].type;
+        var validFileType = ["image"];
+        var inputFileType = inputType.split('/')[0];
+        return ($.inArray(inputFileType, validFileType)) > -1;
+    }
 
     /* expand collapse container */
     $("h2.exp_col").click(function() {
