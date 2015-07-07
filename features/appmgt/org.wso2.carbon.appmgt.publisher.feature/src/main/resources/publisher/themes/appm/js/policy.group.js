@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -470,7 +470,9 @@ function getApplicationId(uuid) {
  */
 function drawThrottlingTiersDynamically() {
     var strContent = "";
-    tiers.reverse();
+    tiers.sort(function(tiersA, tiersB) {
+        return parseFloat(tiersA.tireSortKey) - parseFloat(tiersB.tireSortKey);
+    });
     for (var i = 0; i < tiers.length; i++) {
         strContent += "<option title='" + tiers[i].tierDescription + "' value='" + tiers[i].tierName + "' id='" + tiers[i].tierName + "'>" + tiers[i].tierDisplayName + "</option>";
     }

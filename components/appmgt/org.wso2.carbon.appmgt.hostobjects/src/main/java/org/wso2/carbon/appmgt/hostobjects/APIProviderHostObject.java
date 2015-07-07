@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -42,7 +42,6 @@ import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
-import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -94,8 +93,6 @@ public class APIProviderHostObject extends ScriptableObject {
     public static Scriptable jsConstructor(Context cx, Object[] args, Function Obj,
                                            boolean inNewExpr)
             throws AppManagementException {
-
-
         if (args!=null && args.length != 0) {
             String username = (String) args[0];
             return new APIProviderHostObject(username);
@@ -1544,6 +1541,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     row.put("tierDisplayName", row, tier.getDisplayName());
                     row.put("tierDescription", row,
                             tier.getDescription() != null ? tier.getDescription() : "");
+                    row.put("tireSortKey", row, tier.getRequestPerMinute());
                     myn.put(i, myn, row);
                     i++;
                 }
