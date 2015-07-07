@@ -1642,6 +1642,27 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Get the identity provider URL from app-manager.xml file
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return identity provider URL
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     */
+    public static String jsFunction_getIdentityProviderUrl(Context context, Scriptable thisObj,
+                                                           Object[] args,
+                                                           Function funObj) throws AppManagementException {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        String url = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
+        if (url == null) {
+            handleException("Identity provider URL unspecified");
+        }
+        return url;
+    }
+
+    /**
      * This method is to functionality of getting all the APIs stored
      *
      * @param cx      Rhino context
