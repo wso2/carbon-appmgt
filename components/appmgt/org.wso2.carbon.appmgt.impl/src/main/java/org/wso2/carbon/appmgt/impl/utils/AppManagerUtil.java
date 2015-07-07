@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * 
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,36 +18,7 @@
 
 package org.wso2.carbon.appmgt.impl.utils;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.TimeUnit;
-
-import javax.cache.Cache;
-import javax.cache.CacheConfiguration;
-import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.gson.Gson;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -68,15 +39,7 @@ import org.wso2.carbon.appmgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.appmgt.api.doc.model.APIResource;
 import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.APIStore;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -101,10 +64,7 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceConstants;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
-import org.wso2.carbon.registry.core.ActionConstants;
-import org.wso2.carbon.registry.core.Registry;
-import org.wso2.carbon.registry.core.RegistryConstants;
-import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.Tag;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -113,11 +73,7 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
-import org.wso2.carbon.user.api.AuthorizationManager;
-import org.wso2.carbon.user.api.Permission;
-import org.wso2.carbon.user.api.Tenant;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.api.*;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.mgt.UserMgtConstants;
@@ -126,7 +82,23 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.FileUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import com.google.gson.Gson;
+import javax.cache.Cache;
+import javax.cache.CacheConfiguration;
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.rmi.RemoteException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class contains the utility methods used by the implementations of
@@ -1154,6 +1126,8 @@ public final class AppManagerUtil {
 				OMElement assertion = element.getFirstChildWithName(AppMConstants.ASSERTION_ELEMENT);
 				Iterator policies = assertion.getChildrenWithName(AppMConstants.POLICY_ELEMENT);
 				while (policies.hasNext()) {
+					String desc;
+					int tierMaxCount;
 					OMElement policy = (OMElement) policies.next();
 					OMElement id = policy.getFirstChildWithName(AppMConstants.THROTTLE_ID_ELEMENT);
 					String displayName = null;
@@ -1167,21 +1141,25 @@ public final class AppManagerUtil {
 					Tier tier = new Tier(id.getText());
 					tier.setPolicyContent(policy.toString().getBytes());
 					tier.setDisplayName(displayName);
-					// String desc =
-					// resource.getProperty(AppMConstants.TIER_DESCRIPTION_PREFIX
-					// + id.getText());
-					String desc;
+
 					try {
 						desc = APIDescriptionGenUtil.generateDescriptionFromPolicy(policy);
 					} catch (AppManagementException ex) {
 						desc = AppMConstants.TIER_DESC_NOT_AVAILABLE;
 					}
+					try {
+						tierMaxCount = APIDescriptionGenUtil.generateMaxCountFromPolicy(policy);
+					} catch (AppManagementException ex) {
+						tierMaxCount = AppMConstants.TIER_MAX_COUNT;
+					}
+
 					Map<String, Object> tierAttributes =
 					                                     APIDescriptionGenUtil.getTierAttributes(policy);
 					if (tierAttributes != null && tierAttributes.size() != 0) {
 						tier.setTierAttributes(APIDescriptionGenUtil.getTierAttributes(policy));
 					}
 					tier.setDescription(desc);
+					tier.setRequestPerMinute(tierMaxCount);
 					if (!tier.getName().equalsIgnoreCase("Unauthenticated")) {
 						tiers.put(tier.getName(), tier);
 					}
@@ -1196,6 +1174,7 @@ public final class AppManagerUtil {
 				Tier tier = new Tier(AppMConstants.UNLIMITED_TIER);
 				tier.setDescription(AppMConstants.UNLIMITED_TIER_DESC);
 				tier.setDisplayName(AppMConstants.UNLIMITED_TIER);
+				tier.setRequestPerMinute(AppMConstants.UNLIMITED_TIER_REQUEST_PER_MINUTE);
 				tiers.put(tier.getName(), tier);
 			}
 		} catch (RegistryException e) {
