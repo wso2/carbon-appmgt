@@ -124,34 +124,34 @@ $(document).ready(function() {
 		$(this).next().click();
 	});
 
-	$('input[type="file"]').change(function(evt) {
-        var acceptFileType = $(this).attr('acceptType');
+    $('input[type="file"][accept!="image/*"]').change(function(evt) {
+        $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+    });
 
-        if (acceptFileType.toLowerCase() == "image") {
-            var iconIdValue = $(this).attr('inputId');
-            var iconId = $("#".concat(iconIdValue));
-            var flagId= ("validity").concat(this.id);
-            var flag =  $("#".concat(flagId));
 
-            if (!flag.length) {
-               iconId.after(('<i id = "').concat(flagId).concat('"; class="icon-check-fileType"></i>'));
-               flag = $("#".concat(flagId));
-            }
+    $('input[type="file"][accept="image/*"]').change(function(evt) {
+        var files = evt.target.files;
+        var isValidated = validateImages(files);
 
-            var files = evt.target.files;
-            var isValidated = validateImages(files);
-            var btnCreate = $('#btn-create-asset');
-            if (isValidated == true) {
-                flag.removeClass().addClass('icon-ok icon-check-fileType').show();
-                btnCreate.removeAttr('disabled');
-                $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
-            } else {
-                flag.removeClass().addClass('icon-ban-circle icon-check-fileType').show();
-                btnCreate.attr('disabled', 'disabled');
-                showAlert("File must be in image file format.", 'error');
-            }
-        } else {
+        var btnCreate = $('#btn-create-asset');
+        var parentDiv = $(this).parents('.tbl-upload-row');
+        var iconIdValue = $('.txt-filepath', parentDiv);
+        var flagId= "validity_" + this.id;
+        var flag =  $("#" + flagId);
+
+        if (!flag.length) {
+            iconIdValue.after('<i id = "' + flagId + '"; class="icon-check-fileType"></i>');
+            flag = $("#" + flagId);
+        }
+
+        if (isValidated == true) {
+            flag.removeClass().addClass('icon-ok icon-check-fileType').show();
+            btnCreate.removeAttr('disabled');
             $(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+        } else {
+            flag.removeClass().addClass('icon-ban-circle icon-check-fileType').show();
+            btnCreate.attr('disabled', 'disabled');
+            showAlert("File must be in image file format.", 'error');
         }
 	})
 	/*
@@ -297,9 +297,7 @@ $(document).ready(function() {
 
     function validateImages(files){
         var inputType = files[0].type;
-        var validFileType = ["image"];
-        var inputFileType = inputType.split('/')[0];
-        return ($.inArray(inputFileType, validFileType)) > -1;
+        return inputType.toLowerCase().startsWith('image');
     }
 
     /* expand collapse container */
