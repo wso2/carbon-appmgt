@@ -3,6 +3,7 @@
     <li class="active"><a href="#" data-toggle="tab" id="upload-app-again">01 - Upload application/provide URL</a><div class="nav-arrow"></div></li>
     <li><div class="nav-wedge"></div><a href="#" >Give application details</a><div class="nav-arrow"></div></li>
 </ul>
+
 <div id="modal-upload-progress" style="display: none;">
     <h2>Uploading.... Please wait.</h2>
     <div class="progress">
@@ -97,14 +98,30 @@
                 </div>
             </div>
 
-
-
-
             <div id="control-packagename"	class="form-group">
                 <label class="control-label col-sm-2" for="txtName">Version <span style="color:#FF0000">*</span></label>
                 <div class="col-sm-10">
                     <input class="field span6" style="width: 110px" type="text" name="version"
                            id="txtVersion">
+                </div>
+            </div>
+
+            <div id="control-packagename"	class="form-group">
+                <label class="control-label col-sm-2" for="txtKind">Category <span style="color:#FF0000">*</span></label>
+                <div class="col-sm-10">
+                    <select name="kind"  id="txtKind" class="field span3" >
+                        {{#categories}}
+                            <option {{#compare this ../artifact.attributes.overview_kind}}selected{{/compare}}>{{this}}</option>
+                        {{/categories}}
+                    </select>
+                </div>
+            </div>
+
+            <div id="control-packagename"	class="form-group">
+                <label class="control-label col-sm-2" for="txtVisibility">Visibility</label>
+                <div class="col-sm-10">
+                    <input class="field span6" style="width: 110px" type="text" name="visibility" value="{{artifact.attributes.overview_visibility}}"
+                           id="txtVisibility">
                 </div>
             </div>
 

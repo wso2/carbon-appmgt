@@ -38,6 +38,8 @@ var render=function(theme,data,meta,require){
         return;
     }
 
+
+
 	var listPartial='view-asset';
     var heading = "";
     var mobileNotifications = session.get('mobileNotifications');
@@ -96,6 +98,9 @@ var render=function(theme,data,meta,require){
     var breadCrumbData = require('/helpers/breadcrumb.js').generateBreadcrumbJson(data);
     breadCrumbData.activeRibbonElement = listPartial;
     breadCrumbData.createMobileAppPerm = createMobileAppAuthorized;
+
+    //setting categories
+    data.categories = config.mobileApps.categories;
 
 	theme('single-col-fluid', {
         title: data.title,
