@@ -46,6 +46,9 @@ var renderAssets, mouseStop, renderAssetsScroll;
         temp += '{{#each .}}';
         temp += '<div class="span3 asset" data-id="{{id}}" data-path="{{path}}" data-type="{{type}}">';
         temp += '	{{#attributes}}';
+        temp +=         '{{#if ../isSubscribed}}';
+        temp +=             ' <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>';
+        temp +=         '{{/if}}'
         temp += '	<a href="{{url "/assets"}}/{{../type}}/{{../id}}">';
         temp += '	<div class="asset-icon">';
         temp += '		{{#if ../indashboard}}';
