@@ -52,6 +52,12 @@ $("#txtName").change(function() {
 });
 
 
+$('#txtVisibility').tokenInput('/publisher/api/lifecycle/information/meta/webapp/roles', {
+    theme: 'facebook',
+    preventDuplicates: true,
+    hintText: "Type in a user role"
+});
+
 
 $('#txtOS').on("change",function() {
 	  if($('#txtOS').val() == 'webapp'){

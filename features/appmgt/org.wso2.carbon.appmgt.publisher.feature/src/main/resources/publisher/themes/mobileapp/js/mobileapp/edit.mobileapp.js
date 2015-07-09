@@ -6,6 +6,29 @@ $('#application-tab a').click(function(e) {
 });
 
 
+$('#txtVisibility').tokenInput('/publisher/api/lifecycle/information/meta/webapp/roles', {
+	theme: 'facebook',
+	preventDuplicates: true,
+	hintText: "Type in a user role"
+});
+
+function populateVisibleRoles(){
+
+	var visibilityComponent = $('#txtVisibility');
+	var visibleRoles = visibilityComponent.data('roles');
+
+	if(visibleRoles){
+		visibleRoles = visibleRoles.split(",");
+
+		for(var i = 0; i < visibleRoles.length; i++){
+			var role = visibleRoles[i];
+			visibilityComponent.tokenInput("add", {id: role, name: role});
+		}
+	}
+
+}
+
+populateVisibleRoles();
  
  
 $('#txtOS').on("change",function() {
