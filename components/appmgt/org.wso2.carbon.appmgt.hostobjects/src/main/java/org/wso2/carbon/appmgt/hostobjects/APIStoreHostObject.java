@@ -18,14 +18,6 @@
 
 package org.wso2.carbon.appmgt.hostobjects;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -38,12 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.apimgt.impl.dto.xsd.APIInfoDTO;
 import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.ApplicationKeysDTO;
 import org.wso2.carbon.appmgt.api.APIConsumer;
@@ -51,9 +38,9 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
@@ -61,11 +48,7 @@ import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
+import org.wso2.carbon.appmgt.impl.workflow.*;
 import org.wso2.carbon.appmgt.keymgt.client.APIAuthenticationServiceClient;
 import org.wso2.carbon.appmgt.keymgt.client.SubscriberKeyMgtClient;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
@@ -90,6 +73,14 @@ import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
 import org.wso2.carbon.user.mgt.stub.types.carbon.FlaggedName;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class APIStoreHostObject extends ScriptableObject {
@@ -216,6 +207,27 @@ public class APIStoreHostObject extends ScriptableObject {
         return url;
     }
 
+    /**
+     * Get the identity provider URL from app-manager.xml file
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return identity provider URL
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     */
+    public static String jsFunction_getIdentityProviderUrl(Context context, Scriptable thisObj,
+                                                           Object[] args,
+                                                           Function funObj) throws AppManagementException {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        String url = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
+        if (url == null) {
+            handleException("Identity provider URL unspecified");
+        }
+        return url;
+    }
+    
     public static String jsFunction_getHTTPsURL(Context cx, Scriptable thisObj,
                                                 Object[] args, Function funObj)
             throws AppManagementException {
