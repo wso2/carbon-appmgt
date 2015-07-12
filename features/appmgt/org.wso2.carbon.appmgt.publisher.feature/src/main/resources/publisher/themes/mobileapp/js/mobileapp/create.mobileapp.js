@@ -101,9 +101,9 @@ $('#txtMarket').on("change",function() {
 	  }
 
 	   if($('#txtOS').val() == 'android'){
-	   		$('#file-upload-text').txt('SELECT .APK FILE');
+	   		$('#file-upload-text').text('SELECT .APK FILE');
 	   }else if($('#txtOS').val() == 'android'){
-	   		$('#file-upload-text').txt('SELECT .PLIST FILE');
+	   		$('#file-upload-text').text('SELECT .PLIST FILE');
 	   }
 });
 
