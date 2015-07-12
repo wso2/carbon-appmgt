@@ -26,7 +26,7 @@ var config = require('/config/publisher.json');
 
 var log = new Log();
 
-breadcrumbItems = deploymentManager.getAssetData()
+breadcrumbItems = deploymentManager.getAssetData();
 
 var generateLeftNavJson = function (data, listPartial) {
 
@@ -64,6 +64,12 @@ var generateLeftNavJson = function (data, listPartial) {
 					additionalClasses: (listPartial == "edit-asset" ) ? "active" : null,
 					url: "/publisher/asset/operations/edit/" + data.shortName + "/" + data.artifact.id,
 					isEditable: editEnabled
+				},
+				{
+					name: "Create New Version",
+					iconClass: "icon-file",
+					additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
+					url: "/publisher/asset/operations/copyapp/" + data.shortName + "/" + data.artifact.id
 				}
 			]
 		};
@@ -77,6 +83,12 @@ var generateLeftNavJson = function (data, listPartial) {
 					url: "#",
 					title: "Edit action not permitted.",
 					isEditable: editEnabled
+				},
+				{
+					name: "Create New Version",
+					iconClass: "icon-file",
+					additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
+					url: "/publisher/asset/operations/copyapp/" + data.shortName + "/" + data.artifact.id
 				}
 			]
 		};
@@ -87,7 +99,7 @@ var generateLeftNavJson = function (data, listPartial) {
 
 getTypeObj = function (type) {
 	for (item in breadcrumbItems) {
-		var obj = breadcrumbItems[item]
+		var obj = breadcrumbItems[item];
 		if (obj.assetType == type) {
 			return obj;
 		}
