@@ -1620,3 +1620,8 @@ textarea#txtDescription, textarea#txtRecentChanges {
 .dropdown-menu>.active>a{
     background-color: #444;
 }
+
+.validation-error {
+    border: 1px solid #CD0A0A !important;
+    background: #FEF1EC !important;
+}
