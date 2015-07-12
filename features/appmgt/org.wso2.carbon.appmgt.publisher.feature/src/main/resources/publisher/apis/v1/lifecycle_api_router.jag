@@ -34,7 +34,6 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var lifecycle = context.post.lifecycle;
-		//var autoPromote=context.post.promote||false;    //If promote is not specified do not auto promote
 		var invokeAction = '';
 		//Check the config for a lifeCycleBehaviour block
 		utility.isPresent(config, 'lifeCycleBehaviour', function (lifeCycleBehaviour) {
@@ -147,8 +146,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var id = context.params.id; // UUID
 		var roles = context.content.roles || [];
 
-		var content = {};
-		content.message = [];
+        var content = {status: "", message: []};
 
 		// validating action
 		if (config.publisherActions.indexOf(action) == -1) {
@@ -432,7 +430,8 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 	function getMessageForLifeCyclePromotion(artifact, artifactType, action, isSuccess) {
 		// actions (from '/config/publisher.json' --> publisherActions):
-		// Submit for Review, Approve , Reject, Publish, Unpublish, Re-Publish, Deprecate, Retire, Recycle
+        // Submit for Review, Approve , Reject, Publish, Unpublish, Re-Publish, Deprecate, Retire,
+        // Recycle
 		if (isSuccess) {
 			var msgAction = null;
 			if (action == "Submit for Review") {
@@ -625,7 +624,8 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 			for (var i = 0; i < allRoles.length; i++) {
 				if (relatedRoles.indexOf(allRoles[i]) === -1) {
-					// if the role is not included in the lifecycle, remove the role from the list of possible roles
+					// if the role is not included in the lifecycle, remove the role from the list
+                    // of possible roles
 					allRoles.splice(i, 1);
 				}
 			}
