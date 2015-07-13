@@ -508,11 +508,39 @@ Store.prototype.assets = function (type, paging) {
 
     var assetz = this.assetManager(type).search(options, newPaging);
 
+    var assetszReturn = [];
+
 
     for (i = 0; i < assetz.length; i++) {
         assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
+
+        if( assetz[i].attributes.overview_visibility != "null"){
+
+            if(this.user){
+                var assetRoles = assetz[i].attributes.overview_visibility.split(",");
+                var server = require('store').server;
+                var um = server.userManager(this.tenantId);
+                var userRoles = um.getRoleListOfUser(this.user.username);
+
+                commonRoles = userRoles.filter(function(n) {
+                    return assetRoles.indexOf(String(n)) != -1
+                });
+                if(commonRoles.length > 0){
+                    assetszReturn.push(assetz[i]);
+                }
+            }
+
+        }else{
+            assetszReturn.push(assetz[i]);
+        }
+
+
+
+        //print(assetz);
+
+
     }
-    return assetz;
+    return assetszReturn;
 };
 
 Store.prototype.assetsLazy = function (type, paging) {
@@ -676,6 +704,8 @@ Store.prototype.recentAssets = function (type, count) {
 
     var recent = this.assetManager(type).search(options, paging);
 
+    var recentReturn = [];
+
     //log.debug('re')
     /* var recent = this.assetManager(type).list({
      start: 0,
@@ -686,8 +716,32 @@ Store.prototype.recentAssets = function (type, count) {
     for (i = 0; i < length; i++) {
         recent[i].rating = this.rating(recent[i].path).average;
         recent[i].indashboard = this.isuserasset(recent[i].id, type);
+
+
+        if( recent[i].attributes.overview_visibility != "null"){
+
+            if(this.user){
+                var assetRoles = recent[i].attributes.overview_visibility.split(",");
+                var server = require('store').server;
+                var um = server.userManager(this.tenantId);
+                var userRoles = um.getRoleListOfUser(this.user.username);
+
+                commonRoles = userRoles.filter(function(n) {
+                    return assetRoles.indexOf(String(n)) != -1
+                });
+                if(commonRoles.length > 0){
+                    recentReturn.push(recent[i]);
+                }
+            }
+
+        }else{
+            recentReturn.push(recent[i]);
+        }
+
+
+
     }
-    return recent;
+    return recentReturn;
 };
 
 /**

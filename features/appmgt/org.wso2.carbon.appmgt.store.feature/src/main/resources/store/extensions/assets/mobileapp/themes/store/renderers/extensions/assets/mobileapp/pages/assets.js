@@ -21,7 +21,7 @@ var render = function (theme, data, meta, require) {
 
         var assets = [];
 
-        for( i = 0; i < data.assets.length; i++){
+        for( var i = 0; i < data.assets.length; i++){
 
             var platform = data.assets[i].attributes.overview_platform;
             switch(userOS){
@@ -38,6 +38,8 @@ var render = function (theme, data, meta, require) {
                 default:
                     assets.push(data.assets[i]);
             }
+
+
         }
 
         data.assets = assets;
