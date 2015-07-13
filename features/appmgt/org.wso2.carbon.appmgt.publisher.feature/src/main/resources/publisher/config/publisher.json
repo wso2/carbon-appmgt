@@ -81,8 +81,5 @@
       "mobileapp_delete": "/permission/admin/manage/mobileapp/delete"
     },
     "publisherActions":["Publish","Approve","Reject","Unpublish","Deprecate","Retire","Recycle","Re-Publish","Submit for Review"],
-    "hiddenRoles":["admin","Internal/subscriber","Internal/publisher","Internal/creator"],
-    "mobileApps": {
-        "categories" : ["Business", "Communication", "Finance", "Health", "Productivity", "Tools", "Travel"]
-    }
+    "hiddenRoles":["admin","Internal/subscriber","Internal/publisher","Internal/creator"]
 }

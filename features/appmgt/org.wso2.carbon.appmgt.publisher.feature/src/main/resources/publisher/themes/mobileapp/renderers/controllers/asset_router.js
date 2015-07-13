@@ -100,7 +100,16 @@ var render=function(theme,data,meta,require){
     breadCrumbData.createMobileAppPerm = createMobileAppAuthorized;
 
     //setting categories
-    data.categories = config.mobileApps.categories;
+
+    for(var i = 0;  i < data.rxtTemplate.contentBlock.tables.length; i++){
+       if( data.rxtTemplate.contentBlock.tables[i].name === 'overview'){
+           for( var j = 0;  j < data.rxtTemplate.contentBlock.tables[i].fieldsArray.length; j++){
+               if(data.rxtTemplate.contentBlock.tables[i].fieldsArray[j].name.name == "category"){
+                   data.categories = (data.rxtTemplate.contentBlock.tables[i].fieldsArray[j].values);
+               }
+           }
+       }
+    }
 
 	theme('single-col-fluid', {
         title: data.title,
