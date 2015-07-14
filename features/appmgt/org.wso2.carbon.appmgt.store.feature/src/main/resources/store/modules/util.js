@@ -25,8 +25,6 @@ var getCategories = function (tenantId, type) {
                 return fieldArr[i].valueList;
         }
     }
-
-
 };
 
 

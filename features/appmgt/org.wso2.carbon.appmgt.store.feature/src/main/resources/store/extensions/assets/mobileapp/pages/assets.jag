@@ -188,7 +188,7 @@ require('/modules/store.js').exec(function (ctx) {
     if(nextPageAvailable && (assets.length == PAGE_SIZE)){
         var rightnav = currentPage+1;
     }
-    
+
     caramel.render({
         title: 'Store | Assets',
         user: user,

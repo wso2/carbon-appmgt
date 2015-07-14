@@ -934,11 +934,10 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
                 model.set('overview.name',ctx.name);
                 model.set('overview.displayName', ctx.displayName);
-                model.set('overview.category',ctx.platform);
+                model.set('overview.category',ctx.category);
                 model.set('overview.platform',ctx.platform);
                 model.set('overview.provider', username);
                 model.set('overview.visibility',ctx.visibility);
-                model.set('overview.kind',ctx.kind);
                 model.set('overview.description',ctx.description);
                 model.set('overview.type',ctx.markettype);
                 if(ctx.recentChanges == ""){
@@ -1078,7 +1077,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 				modelA.set('overview.displayName', ctx.displayName);
                 modelA.set('overview.version', originalArtifact.attributes.overview_version);
                 modelA.set('overview.visibility',ctx.visibility);
-                modelA.set('overview.kind',ctx.kind);
+                modelA.set('overview.category',ctx.category);
                 modelA.set('overview.description',ctx.description);
                 modelA.set('overview.recentchanges',ctx.recentChanges);
                 modelA.set('overview.provider', originalArtifact.attributes.overview_provider);
