@@ -18,7 +18,6 @@ require('/modules/store.js').exec(function (ctx) {
             avaliablePages,
             mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
 
-
             var  isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
 
             var mdmUIConfig  = {enabled : isNotCatalog};
@@ -91,6 +90,7 @@ require('/modules/store.js').exec(function (ctx) {
         }
         subPage = '/ Search: "' + query + '"';
         assets = store.search(options, paging);
+
     } else {
         if (paging.sort == 'popular') {
             server.privileged(function () {
@@ -188,8 +188,7 @@ require('/modules/store.js').exec(function (ctx) {
     if(nextPageAvailable && (assets.length == PAGE_SIZE)){
         var rightnav = currentPage+1;
     }
-
-
+    
     caramel.render({
         title: 'Store | Assets',
         user: user,
