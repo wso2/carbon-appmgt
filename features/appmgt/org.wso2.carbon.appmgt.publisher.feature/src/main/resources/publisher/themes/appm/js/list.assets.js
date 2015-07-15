@@ -89,9 +89,7 @@ $(".btn-deploySample").click(function (e) {
 });
 
 $(".tab-button").click(function () {
-
 	var status = $(this).data("status");
-
 	$(".app-row").each(function (index) {
 		$(this).css("display", "none");
 		var appRowStatus = $(this).data("status");
@@ -101,16 +99,23 @@ $(".tab-button").click(function () {
 			$(this).css("display", "table-row");
 		}
 	});
+});
 
-
+//apply the sorting when changing pages.
+$(".paginated-list").click(function (e) {
+    var currentUrl = window.location.href;
+    if((currentUrl.indexOf("?sortby") != -1) && (currentUrl.charAt(currentUrl.length - 1) != "#")) {
+        if(currentUrl.indexOf("&page") != -1) {
+            currentUrl = currentUrl.split('&page')[0];
+        }
+        var sortUrl = $(this).attr("href");
+        sortUrl = sortUrl.split('?')[1];
+        $(this).attr("href", currentUrl + "&" + sortUrl);
+    }
 });
 
 $(".btn-view-app").click(function (e) {
-
-
-	// alert($(this).data("id"));
-	//alert($(this).data("category") );
-	if ($(this).data("category") === "webapp") {
+    if ($(this).data("category") === "webapp") {
 		var url = $(this).data("url");
 	} else {
 		if ($(this).data("url") == 'undefined') {
@@ -120,9 +125,7 @@ $(".btn-view-app").click(function (e) {
 				{
 					var url = "https://itunes.apple.com/en/app/id" + $(this).data("appid");
 				}
-
 			}
-
 		} else {
 			var url = window.location.protocol + "//" + window.location.host + $(this).data("url");
 		}
@@ -133,8 +136,6 @@ $(".btn-view-app").click(function (e) {
 
 	$("#appModal").modal('show');
 	e.stopPropagation();
-
-
 });
 
 var showMessageModel = function (msg, head, type) {
@@ -170,5 +171,4 @@ function updateQRCode(text) {
 		element.replaceChild(showQRCode(text), element.lastChild);
 	else
 		element.appendChild(showQRCode(text));
-
 }
