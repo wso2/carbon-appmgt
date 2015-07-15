@@ -77,9 +77,9 @@
             <div id="control-packagename"	class="form-group">
                 <label class="control-label col-sm-2" for="txtKind">Category <span style="color:#FF0000">*</span></label>
                 <div class="col-sm-10">
-                    <select name="kind"  id="txtKind" class="field span3" >
+                    <select name="category"  id="txtCategory" class="field span3" >
 						{{#categories}}
-                            <option {{#compare this ../artifact.attributes.overview_kind}}selected{{/compare}}>{{this}}</option>
+                            <option {{#compare this ../artifact.attributes.overview_category}}selected{{/compare}}>{{this}}</option>
 						{{/categories}}
                     </select>
                 </div>
