@@ -12,6 +12,7 @@
 						{{/if}}
 						<i class="icon-caret-down"></i>
 					</div>
+
 					<ul class="breadcrumb-body">
 						<li>
 							<a href="{{url "/assets"}}/{{type}}">All Categories</a>
@@ -26,7 +27,49 @@
 						</li>
 						{{/each}}
 					</ul>
+
+
 				</div>
+
+                <div class="breadcrumb-l1" style="margin-left: 20px">
+                    <div class="breadcrumb-head">
+						{{#if selectedPlatform}}
+                            <span>{{selectedPlatform}}</span>
+						{{else}}
+                            <span>All Platforms</span>
+						{{/if}}
+                        <i class="icon-caret-down"></i>
+                    </div>
+
+                    <ul class="breadcrumb-body">
+                        <li>
+                            <a href="{{url "/assets"}}/{{type}}">All Platofrms</a>
+                        </li>
+
+                            <li>
+                                <a href='{{url "/assets"}}/{{../type}}?query=platform:"android"'
+									{{#compare selectedPlatform this operator="=="}}
+                                   class="os-active"
+									{{/compare}}
+                                        >android</a>
+                                <a href='{{url "/assets"}}/{{../type}}?query=platform:"ios"'
+									{{#compare selectedPlatform this operator="=="}}
+                                   class="os-active"
+									{{/compare}}
+                                        >ios</a>
+                                <a href='{{url "/assets"}}/{{../type}}?query=platform:"webapp"'
+									{{#compare selectedPlatform this operator="=="}}
+                                   class="os-active"
+									{{/compare}}
+                                        >webapp</a>
+                            </li>
+
+                    </ul>
+
+
+                </div>
+
+
 				<!--
 				<div class="breadcrumb-l2">
 				<div class="breadcrumb-head">

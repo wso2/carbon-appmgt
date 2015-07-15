@@ -2,7 +2,7 @@
 var caramel;
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
+    var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, selectedPlatform, key,
             log = ctx.log,
             sso = ctx.sso,
             query = ctx.params.query,
@@ -83,10 +83,15 @@ require('/modules/store.js').exec(function (ctx) {
             type: type,
             attributes: query
         };
+
         for (key in query) {
             if (query.hasOwnProperty(key) && key === 'overview_category') {
                 selectedCategory = query[key];
             }
+            if (query.hasOwnProperty(key) && key === 'overview_platform') {
+                selectedPlatform = query[key];
+            }
+
         }
         subPage = '/ Search: "' + query + '"';
         assets = store.search(options, paging);
@@ -207,6 +212,7 @@ require('/modules/store.js').exec(function (ctx) {
         },
         type: type,
         selectedCategory: selectedCategory,
+        selectedPlatform: selectedPlatform,
         tags: function () {
             return [
                 {
