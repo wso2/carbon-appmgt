@@ -101,19 +101,6 @@ $(".tab-button").click(function () {
 	});
 });
 
-//apply the sorting when changing pages.
-$(".paginated-list").click(function (e) {
-    var currentUrl = window.location.href;
-    if((currentUrl.indexOf("?sortby") != -1) && (currentUrl.charAt(currentUrl.length - 1) != "#")) {
-        if(currentUrl.indexOf("&page") != -1) {
-            currentUrl = currentUrl.split('&page')[0];
-        }
-        var sortUrl = $(this).attr("href");
-        sortUrl = sortUrl.split('?')[1];
-        $(this).attr("href", currentUrl + "&" + sortUrl);
-    }
-});
-
 $(".btn-view-app").click(function (e) {
     if ($(this).data("category") === "webapp") {
 		var url = $(this).data("url");
