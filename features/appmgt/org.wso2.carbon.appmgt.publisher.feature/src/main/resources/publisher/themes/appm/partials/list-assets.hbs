@@ -96,23 +96,24 @@
 								id="meta-asset-type" />
 						</td>
                     </tr>
+
                 {{/each}}
                 </tbody>
             </table>
             <nav>
                 <ul class="pagination">
                     {{#if leftNav}}
-                    <li><a href="/publisher/assets/webapp/?page={{this.leftNav}}" class="paginated-list"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+                    <li><a href="/publisher/assets/webapp/?page={{this.leftNav}}{{concatQueryParams "&" sortby= ../sortOptions.sortBy sort =../sortOptions.sort}}"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
                     {{/if}}
                     {{#each pageIndices}}
                          {{#if this.isDisabled}}
                              <li class="disabled"><a class="paginated-list">{{this.index}}</a></li>
                          {{else}}
-                             <li><a href="/publisher/assets/webapp/?page={{this.index}}" class="paginated-list">{{this.index}}</a></li>
+                             <li><a href="/publisher/assets/webapp/?page={{this.index}}{{concatQueryParams "&" sortby=../../sortOptions.sortBy sort =../../sortOptions.sort}}">{{this.index}}</a></li>
                          {{/if}}
                     {{/each}}
                     {{#if rightNav}}
-                    <li><a href="/publisher/assets/webapp/?page={{this.rightNav}}" class="paginated-list"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+                    <li><a href="/publisher/assets/webapp/?page={{this.rightNav}}{{concatQueryParams "&" sortby= ../sortOptions.sortBy sort =../sortOptions.sort}}"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
                     {{/if}}
                 </ul>
             </nav>
