@@ -257,9 +257,11 @@ require('/modules/store.js').exec(function (ctx) {
 
     //Checking if there are any assets for the next page
     var nextPage = store.buildNextPage(request,avaliablePages);
-    var nextAssetSet = store.assets(type, nextPage);
+    //TODO: Need proper pagination
+    //var nextAssetSet = store.assets(type, nextPage);
     var nextPageAvailable = false;
-    if(nextAssetSet.length > 0){
+    //if(nextAssetSet.length > 0){
+    if(assets.length >= PAGE_SIZE) {
         nextPageAvailable = true;
     }
 

@@ -64,7 +64,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Version>1.0.0</Bundle-Version>
+                        <Bundle-Version>${carbon.appmgt.bundle.version}</Bundle-Version>
                         <Private-Package>org.wso2.carbon.appmgt.mdm.wso2emm.internal</Private-Package>
                         <Import-Package>
                             org.wso2.carbon.appmgt.mobile.utils.*,
@@ -107,7 +107,7 @@
             <artifactId>org.wso2.carbon.ndatasource.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
         </dependency>
         <dependency>

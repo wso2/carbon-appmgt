@@ -176,7 +176,7 @@ var module = function () {
 
             artifactManager.add(asset);
 
-            log.debug('Finished saving asset : ' + name);
+            log.debug('Finished saving asset (webapp): ' + name);
 
             log.debug(asset);
 
@@ -193,7 +193,7 @@ var module = function () {
                 return utility.assertEqual(adapter, predicate);
             }, null);
 
-            log.debug('Locating saved asset: ' + stringify(artifact) + ' to get the asset id.');
+            log.debug('Locating saved asset: ' + artifact + ' to get the asset id.');
 
             var id = artifact[0].id || ' ';
 

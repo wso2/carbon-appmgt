@@ -45,6 +45,7 @@
 	<module>org.wso2.carbon.appmgt.services.api</module>
         <module>org.wso2.carbon.appmgt.sample.deployer</module>
         <module>org.wso2.carbon.appmgt.custom.mediators</module>
+        <module>throttling</module>
 
     </modules>
     <build>
@@ -55,24 +56,11 @@
                 <version>2.3.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-        </repository>
-    </repositories>
     
 </project>

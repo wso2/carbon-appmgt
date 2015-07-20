@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-            <version>4.2.0</version>
+            <version>${carbon.kernel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-            <version>4.2.0</version>
+            <version>${carbon.logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>

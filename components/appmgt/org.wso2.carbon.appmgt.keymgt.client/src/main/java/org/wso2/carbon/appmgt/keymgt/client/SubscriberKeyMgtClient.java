@@ -18,15 +18,12 @@
 
 package org.wso2.carbon.appmgt.keymgt.client;
 
-import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.impl.dto.xsd.APIInfoDTO;
-import org.wso2.carbon.apimgt.keymgt.stub.subscriber.APIKeyMgtSubscriberServiceStub;
-import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.ApplicationKeysDTO;
+import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 
 import java.net.URL;
@@ -34,8 +31,6 @@ import java.net.URL;
 public class SubscriberKeyMgtClient {
 
     private static Log log = LogFactory.getLog(SubscriberKeyMgtClient.class);
-
-    private APIKeyMgtSubscriberServiceStub subscriberServiceStub;
 
     public SubscriberKeyMgtClient(String backendServerURL, String username, String password)
             throws Exception {
@@ -53,13 +48,13 @@ public class SubscriberKeyMgtClient {
                           "Authenticated Cookie ID : " + authenticatedCookie);
             }
 
-            subscriberServiceStub = new APIKeyMgtSubscriberServiceStub(
-                    null, backendServerURL + "APIKeyMgtSubscriberService");
-            ServiceClient client = subscriberServiceStub._getServiceClient();
-            Options options = client.getOptions();
-            options.setManageSession(true);
-            options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-                                authenticatedCookie);
+//            subscriberServiceStub = new APIKeyMgtSubscriberServiceStub(
+//                    null, backendServerURL + "APIKeyMgtSubscriberService");
+//            ServiceClient client = subscriberServiceStub._getServiceClient();
+//            Options options = client.getOptions();
+//            options.setManageSession(true);
+//            options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
+//                                authenticatedCookie);
         } catch (Exception e) {
             String errorMsg = "Error when instantiating SubscriberKeyMgtClient.";
             log.error(errorMsg, e);
@@ -69,19 +64,20 @@ public class SubscriberKeyMgtClient {
 
     public String getAccessKey(String userId, APIInfoDTO apiInfoDTO,
                                String applicationName, String keyType, String callbackUrl) throws Exception {
-        return subscriberServiceStub.getAccessToken(userId, apiInfoDTO, applicationName, keyType, callbackUrl);
+//        return subscriberServiceStub.getAccessToken(userId, apiInfoDTO, applicationName, keyType, callbackUrl);
+        throw new UnsupportedOperationException("API Manager legacy code");
     }
 
     public String regenerateApplicationAccessKey(String keyType, String oldAccessToken, String[] allowedDomains,
                                                  String clientId, String clientSecret, String validityTime)
             throws Exception {
-        return subscriberServiceStub.renewAccessToken(keyType, oldAccessToken, allowedDomains, clientId, clientSecret, validityTime);
-
+//        return subscriberServiceStub.renewAccessToken(keyType, oldAccessToken, allowedDomains, clientId, clientSecret, validityTime);
+        throw new UnsupportedOperationException("API Manager legacy code");
     }
 
     public void revokeAccessToken(String token,String consumerKey,String authUser) throws Exception {
-       subscriberServiceStub.revokeAccessToken(token,consumerKey,authUser);
-
+//       subscriberServiceStub.revokeAccessToken(token,consumerKey,authUser);
+        throw new UnsupportedOperationException("API Manager legacy code");
     }
 
 }

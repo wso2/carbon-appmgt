@@ -18,7 +18,7 @@ import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.identity.oauth.common.OAuth2ErrorCodes;
 import org.wso2.carbon.identity.oauth2.dto.*;
-import sun.misc.BASE64Encoder;
+import org.apache.axiom.util.base64.Base64Utils;
 
 import javax.cache.Caching;
 import java.io.BufferedReader;
@@ -114,8 +114,7 @@ public class AppManagerOAuth2Service extends AbstractAdmin {
     public Token getAccessToken(String consumerKey, String consumerSecret, String encodedSamlAssertion, String tokenEndPoint) {
         try {
             String applicationToken = consumerKey + ":" + consumerSecret;
-            BASE64Encoder base64Encoder = new BASE64Encoder();
-            applicationToken = "Basic " + base64Encoder.encode(applicationToken.getBytes()).trim();
+            applicationToken = "Basic " + Base64Utils.encode(applicationToken.getBytes()).trim();
 
             String payload = "grant_type=urn:ietf:params:oauth:grant-type:saml2-bearer&assertion=" + encodedSamlAssertion;
             // String payload = "grant_type=password&username=" + "admin" + "&password=admin";

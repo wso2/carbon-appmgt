@@ -50,6 +50,7 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.generic.GenericArtifactFilter;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -93,7 +94,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static Scriptable jsConstructor(Context cx, Object[] args, Function Obj,
                                            boolean inNewExpr)
             throws AppManagementException {
-        if (args!=null && args.length != 0) {
+        if (args != null && args.length != 0) {
             String username = (String) args[0];
             return new APIProviderHostObject(username);
         }
@@ -116,6 +117,13 @@ public class APIProviderHostObject extends ScriptableObject {
     private static void handleException(String msg, Throwable t) throws AppManagementException {
         log.error(msg, t);
         throw new AppManagementException(msg, t);
+    }
+
+    public static String jsFunction_check(Context cx, Scriptable thisObj, Object[] args,
+            Function funObj) {
+        Class c = GenericArtifactFilter.class;
+        System.out.println("GenericArtifactFilter "+c.getClassLoader().toString());
+        return "OK";
     }
 
     public static NativeObject jsFunction_login(Context cx, Scriptable thisObj,
@@ -2856,17 +2864,20 @@ public class APIProviderHostObject extends ScriptableObject {
         return false;
     }
 
-    public static void jsFunction_loadRegistryOfTenant(Context cx,
-                                                       Scriptable thisObj, Object[] args, Function funObj){
+    public static void jsFunction_loadRegistryOfTenant(Context cx, Scriptable thisObj,
+            Object[] args, Function funObj) {
         String tenantDomain = args[0].toString();
-        if(tenantDomain != null && !org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+        if (tenantDomain != null
+                && !org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME
+                .equals(tenantDomain)) {
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
                         getTenantManager().getTenantId(tenantDomain);
                 AppManagerUtil.loadTenantRegistry(tenantId);
-            } catch (org.wso2.carbon.user.api.UserStoreException e) {
-                log.error("Could not load tenant registry. Error while getting tenant id from tenant domain " +
-                        tenantDomain);
+            } catch (org.wso2.carbon.user.api.UserStoreException | AppManagementException e) {
+                log.error(
+                        "Could not load tenant registry. Error while getting tenant id from tenant domain "
+                                + tenantDomain);
             }
         }
 

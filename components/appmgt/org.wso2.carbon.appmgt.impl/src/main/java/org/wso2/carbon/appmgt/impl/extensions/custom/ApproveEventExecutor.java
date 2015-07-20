@@ -169,7 +169,7 @@ public class ApproveEventExecutor implements Execution
             DynamicValueInjector dynamicValueInjector=new DynamicValueInjector();
 
             boolean isEmailEnabled = Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
-            String provider = requestContext.getResource().getProperty("overview_provider");
+            String provider = requestContext.getResource().getAuthorUserName();
             if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
                 provider = provider.substring(0, provider.indexOf("-AT-"));
 

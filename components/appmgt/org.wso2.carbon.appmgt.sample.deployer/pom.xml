@@ -22,7 +22,7 @@
             <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
         </dependency>
         <dependency>
@@ -54,7 +54,7 @@
             <artifactId>axis2</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.registry</groupId>
             <artifactId>org.wso2.carbon.registry.ws.client</artifactId>
         </dependency>
         <dependency>
@@ -66,7 +66,7 @@
             <artifactId>httpcore</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.um.ws.api</artifactId>
         </dependency>
         <dependency>
@@ -107,7 +107,7 @@
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.appmgt.sample.deployer.internal;
-                            org.wso2.carbon.appmgt.sample.deployer.*;version="${carbon.appmgt.version}"
+                            org.wso2.carbon.appmgt.sample.deployer.*;version="${carbon.appmgt.bundle.version}"
                         </Export-Package>
                         <Import-Package>
                             org.apache.httpcomponents.wso2.*

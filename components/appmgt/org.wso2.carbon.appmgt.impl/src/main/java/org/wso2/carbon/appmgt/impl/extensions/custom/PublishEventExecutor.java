@@ -177,11 +177,11 @@ public class PublishEventExecutor implements Execution
         DynamicValueInjector dynamicValueInjector=new DynamicValueInjector();
 
         boolean isEmailEnabled = Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
-        String provider = requestContext.getResource().getProperty("overview_provider");
-        if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
-            provider = provider.substring(0, provider.indexOf("-AT-"));
-
-        }
+        String provider = requestContext.getResource().getAuthorUserName();
+//        if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
+//            provider = provider.substring(0, provider.indexOf("-AT-"));
+//
+//        }
 
         //Set the asset author key
         dynamicValueInjector.setDynamicValue(DynamicValueInjector.ASSET_AUTHOR_KEY, provider);

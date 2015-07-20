@@ -41,11 +41,11 @@
             <artifactId>org.wso2.carbon.user.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.registry</groupId>
             <artifactId>org.wso2.carbon.registry.ws.client</artifactId>
         </dependency>
         <dependency>
@@ -57,11 +57,11 @@
             <artifactId>org.wso2.carbon.appmgt.api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
         </dependency>
       <dependency>
@@ -83,19 +83,19 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.rest.api.stub</artifactId>
         </dependency>
+        <!-- APPM 1.1.0 <dependency>-->
+            <!--<groupId>org.wso2.carbon.apimgt</groupId>-->
+            <!--<artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>
-        </dependency>
-        <dependency>
-             <groupId>org.wso2.carbon</groupId>
+             <groupId>org.wso2.carbon.commons</groupId>
              <artifactId>org.wso2.carbon.user.mgt.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.um.ws.api</artifactId>
         </dependency>
         <dependency>
@@ -107,19 +107,19 @@
             <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.registry</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
         </dependency>
 	<dependency>
@@ -133,10 +133,9 @@
 	<dependency>
 	   <groupId>org.wso2.carbon</groupId>
 	   <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
-	   <version>${wso2carbon.version}</version>
 	</dependency>
         <dependency>
-          <groupId>org.wso2.carbon</groupId>
+          <groupId>org.wso2.carbon.registry</groupId>
           <artifactId>org.wso2.carbon.registry.indexing</artifactId>
         </dependency>
         <dependency>
@@ -144,7 +143,7 @@
             <artifactId>json-simple</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon</groupId>
+          <groupId>org.wso2.carbon.governance</groupId>
           <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
         </dependency>
         <dependency>
@@ -152,7 +151,7 @@
           <artifactId>jaggery-scxml-executors</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon</groupId>
+          <groupId>org.wso2.carbon.identity</groupId>
           <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
         </dependency>
         <dependency>
@@ -160,72 +159,21 @@
           <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon</groupId>
+          <groupId>org.wso2.carbon.identity</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.carbon</groupId>
+          <groupId>org.wso2.carbon.identity</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
+      <dependency>
+          <groupId>org.wso2.carbon.mediation</groupId>
+          <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
+      </dependency>
     </dependencies>
 
     <build>
         <plugins>
-	    <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.0-alpha-4</version>
-                <inherited>false</inherited>
-                <executions>
-
-                    <execution>
-                        <id>unpack-kernel-patch</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.wso2.carbon</groupId>
-                                    <artifactId>WSO2-CARBON-PATCH-4.2.0</artifactId>
-                                    <version>0001</version>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>target</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>mvn</executable>
-                            <workingDirectory>${project.basedir}</workingDirectory>
-                            <arguments>
-                                <argument>install:install-file</argument>
-                                <argument>-Dfile=${project.build.directory}/WSO2-CARBON-PATCH-4.2.0-0001/patch0001/org.wso2.carbon.registry.core_4.2.0.jar</argument>
-                                <argument>-DgroupId=org.wso2.carbon</argument>
-                                <argument>-DartifactId=org.wso2.carbon.registry.core</argument>
-                                <argument>-Dversion=4.2.0</argument>
-                                <argument>-Dpackaging=jar</argument>
-                            </arguments>
-                        </configuration>
-
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -286,7 +234,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>1.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -297,7 +244,8 @@
                         </Private-Package>
                         <Export-Package>
                             !org.wso2.carbon.appmgt.impl.internal,
-                            org.wso2.carbon.appmgt.impl.*;version="${carbon.appmgt.version}",
+                            org.wso2.carbon.appmgt.impl.*;version="${carbon.appmgt.bundle.version}",
+                            org.wso2.carbon.appmgt.impl.discovery;version="${carbon.appmgt.bundle.version}"
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.governance.api.*,
@@ -311,7 +259,6 @@
                             org.eclipse.equinox.http.helper,
                             *;resolution:=optional
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

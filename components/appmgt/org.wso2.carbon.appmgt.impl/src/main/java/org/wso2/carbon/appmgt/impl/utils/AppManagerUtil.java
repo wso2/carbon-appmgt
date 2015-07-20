@@ -371,7 +371,7 @@ public final class AppManagerUtil {
 	 * @param api
 	 *            WebApp object with the attributes value
 	 * @return GenericArtifact
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to create WebApp
 	 */
 	public static GenericArtifact createAPIArtifactContent(GenericArtifact artifact, WebApp api)
@@ -2377,7 +2377,7 @@ public final class AppManagerUtil {
 	 * 
 	 * @param api
 	 *            WebApp
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 *             if failed to generate the content and save
 	 */
 	public static String createSwaggerJSONContent(WebApp api) throws AppManagementException {
@@ -2627,10 +2627,19 @@ public final class AppManagerUtil {
 		return token;
 	}
 
-	public static void loadTenantRegistry(int tenantId) {
+	public static void loadTenantRegistry(int tenantId) throws AppManagementException {
 		TenantRegistryLoader tenantRegistryLoader = AppManagerComponent.getTenantRegistryLoader();
 		ServiceReferenceHolder.getInstance().getIndexLoaderService().loadTenantIndex(tenantId);
-		tenantRegistryLoader.loadTenantRegistry(tenantId);
+		try {
+			tenantRegistryLoader.loadTenantRegistry(tenantId);
+		} catch (RegistryException e) {
+			if (log.isErrorEnabled()) {
+				String errorMessage =
+						"Could not load the tenant registry for tenant ID :" + tenantId;
+				log.error(errorMessage);
+				throw new AppManagementException(errorMessage, e);
+			}
+		}
 	}
 
 	/**
