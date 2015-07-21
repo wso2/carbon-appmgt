@@ -117,17 +117,17 @@ var engine = caramel.engine('handlebars', (function () {
              *                      Should be a positive integer. Default value is 1.
              *
              * Usage:
-             *     {{#foreach items}}
+             *     {{#for items}}
              *         <div>Index of {{this}} value is {{index}}</div>
-             *     {{/foreach}}
+             *     {{/for}}
              *
-             *     {{#foreach items startIndex="5" endIndex="1"}}
+             *     {{#for items startIndex="5" endIndex="1"}}
              *         {{this}}
-             *     {{/foreach}}
+             *     {{/for}}
              *
-             *     {{#foreach items startIndex="2" endIndex="10" jump="2"}}
+             *     {{#for items startIndex="2" endIndex="10" jump="2"}}
              *         {{this}}
-             *     {{/foreach}}
+             *     {{/for}}
              */
             Handlebars.registerHelper('for', function (data, options) {
                 if (!Array.isArray(data)) {
