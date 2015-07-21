@@ -76,8 +76,9 @@ var render=function(theme,data,meta,require){
         break;
 	case 'copyapp':
 		listPartial = 'add-mobileapp-version';
-		data = require('/helpers/edit-asset.js').selectCategory(data);
-		data = require('/helpers/edit-asset.js').screenshots(data);
+        var editHelper = require('/helpers/edit-asset.js');
+		data = editHelper.selectCategory(data);
+		data = editHelper.screenshots(data);
 
 		data = require('/helpers/splitter.js').splitData(data);
 		if (data.artifact.lifecycleState == "Published") {
