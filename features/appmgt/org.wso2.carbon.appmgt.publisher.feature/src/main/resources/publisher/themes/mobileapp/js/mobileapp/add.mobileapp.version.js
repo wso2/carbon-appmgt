@@ -26,6 +26,8 @@ var UploadStatus = Object.freeze({
 var fileUploadStatus = UploadStatus.EMPTY;
 var fileUploadData = null;
 var NUMBER_OF_SCREENSHOTS = 3;
+var CSS_CLASS_VALIDATION_ERROR = 'validation-error';
+var DATA_ATTRIBUTE_VALIDATION_MESSAGE = 'validation-message';
 
 function showModal(options) {
     if (!options) {
@@ -81,6 +83,68 @@ function updateFileUploadProgress(options) {
             $("#file-upload-progress").hide();
             $("#file-upload-success-msg").hide();
     }
+}
+
+function gotoWizardStep(step) {
+    if (step == 1) {
+
+        if (fileUploadStatus == UploadStatus.UPLOADING) {
+            return;
+        }
+        $("#wizard-step-1").show();
+        $('#wizard-step-1-link').addClass("active");
+        $('#wizard-step-2').hide();
+        $('#wizard-step-2-link').removeClass("active");
+
+    } else if (step == 2) {
+
+        if (fileUploadStatus == UploadStatus.SELECTED) {
+            fileUploadData.submit();
+            fileUploadData = null;
+        }
+
+        $("#wizard-step-2").show();
+        $('#wizard-step-2-link').addClass("active");
+        $('#wizard-step-1').hide();
+        $('#wizard-step-1-link').removeClass("active");
+
+        var wizardStep2Form = $('#wizard-step-2-form');
+        var webappUrlInput = $('#txtWebappUrl');
+        if (webappUrlInput.length == 1) {
+            wizardStep2Form.append("<input type='hidden' id='" + webappUrlInput.attr('id')
+                                   + "' name='-2" + webappUrlInput.attr('name') + "' value='"
+                                   + webappUrlInput.val() + "' />");
+        }
+        var packageNameInput = $('#txtPackageName');
+        if (packageNameInput.length == 1) {
+            wizardStep2Form.append("<input type='hidden' id='" + packageNameInput.attr('id')
+                                   + "-2' name='" + packageNameInput.attr('name') + "' value='"
+                                   + packageNameInput.val() + "' />");
+        }
+        var appIdentifierInput = $('#txtAppIdentifier');
+        if (appIdentifierInput.length == 1) {
+            wizardStep2Form.append("<input type='hidden' id='" + appIdentifierInput.attr('id')
+                                   + "-2' name='" + appIdentifierInput.attr('name') + "' value='"
+                                   + appIdentifierInput.val() + "' />");
+        }
+    }
+}
+
+function validateAjaxFileUpload() {
+    var platform = $('#txtPlatform').val();
+    var storeType = $('#txtStoreType').val();
+    // if this is an enterprise android/ios mobile app
+    if ((platform == 'android' || platform == 'ios') && (storeType == 'enterprise')) {
+        // then user should upload a file
+        if ((fileUploadStatus == UploadStatus.EMPTY) ||
+            (fileUploadStatus == UploadStatus.FINISHED_FAIL)) {
+            return {
+                valid: false,
+                message: "Please select a file to upload before proceed into next step."
+            };
+        }
+    }
+    return {valid: true, message: ""};
 }
 
 function isValidURL(url) {
@@ -190,14 +254,83 @@ function validateWizardStep2Form() {
 
 $(document).ready(function () {
 
+    $('#wizard-step-1-link').click(function (e) {
+        gotoWizardStep(1);
+    });
+
+    $('#wizard-step-2-link').click(function (e) {
+        $("#btn-next").trigger("click");
+    });
+
+    $('#btn-next').click(function (e) {
+        var inputElements = $('#wizard-step-1-form select:visible, #wizard-step-1-form input:text:visible');
+        var data = {partial: true};
+        for (var i = 0; i < inputElements.length; i++) {
+            var inputElement = $(inputElements[i]);
+            if (inputElement.hasClass(CSS_CLASS_VALIDATION_ERROR)) {
+                // user have not yet updated a validation failed input
+                var modalOptions = {
+                    title: "Validation Error",
+                    body: inputElement.data(DATA_ATTRIBUTE_VALIDATION_MESSAGE),
+                    type: 'danger'
+                };
+                showModal(modalOptions);
+                return;
+            }
+            data[inputElement.attr('name')] = inputElement.val();
+        }
+
+        var validationResult = validateAjaxFileUpload();
+        if (!validationResult.valid) {
+            var modalOptions = {
+                title: "Validation Error",
+                body: validationResult.message,
+                type: 'danger'
+            };
+            showModal(modalOptions);
+            return;
+        }
+
+        jQuery.ajax({
+            url: '/publisher/api/validate/mobileapp/form/name/copyapp',
+            type: 'GET',
+            data: data,
+            success: function (data, text) {
+                gotoWizardStep(2);
+            },
+            error: function (request, status, error) {
+                if (request.status == 422) {
+                    // validation error
+                    var response = jQuery.parseJSON(request.responseText);
+                    var modalMessage = "";
+                    for (var key in response.messages) {
+                        var relevantInput = $('input[name=' + key + ']');
+                        relevantInput.addClass(CSS_CLASS_VALIDATION_ERROR);
+                        relevantInput.data(DATA_ATTRIBUTE_VALIDATION_MESSAGE,
+                                           response.messages[key]);
+                        modalMessage = modalMessage + "<br/>" + response.messages[key];
+                    }
+                    var modalOptions = {
+                        title: response.status,
+                        body: modalMessage,
+                        type: 'danger'
+                    };
+                    showModal(modalOptions);
+                } else {
+                    console.log(request);
+                }
+            }
+        });
+    });
+
     $('select:enabled, input:text:enabled, textarea:enabled').blur(function (e) {
-        var thisElement = $(e.target);
+        var relevantInput = $(e.target);
         var platform = $('#txtPlatform');
         var storeType = $('#txtStoreType');
 
-        var url = '/publisher/api/validate/mobile/' + thisElement.attr('name');
+        var url = '/publisher/api/validate/mobileapp/field/' + relevantInput.attr('name');
         var data = {};
-        data[thisElement.attr('name')] = thisElement.val();
+        data[relevantInput.attr('name')] = relevantInput.val();
         data[platform.attr('name')] = platform.val();
         data[storeType.attr('name')] = storeType.val();
 
@@ -206,52 +339,20 @@ $(document).ready(function () {
             type: 'GET',
             data: data,
             success: function (data, text) {
-                thisElement.removeClass('validation-error');
+                relevantInput.removeClass(CSS_CLASS_VALIDATION_ERROR);
+                relevantInput.removeData(DATA_ATTRIBUTE_VALIDATION_MESSAGE);
             },
             error: function (request, status, error) {
                 if (request.status == 422) {
                     // validation error
-                    thisElement.addClass('validation-error');
+                    relevantInput.addClass(CSS_CLASS_VALIDATION_ERROR);
+                    var response = jQuery.parseJSON(request.responseText);
+                    relevantInput.data(DATA_ATTRIBUTE_VALIDATION_MESSAGE, response.message);
                 } else {
                     console.log(request);
                 }
             }
         });
-    });
-
-    $('#wizard-step-1-link').click(function (e) {
-        if (fileUploadStatus == UploadStatus.UPLOADING) {
-            return;
-        }
-        $("#wizard-step-1").show();
-        $('#wizard-step-1-link').addClass("active");
-        $('#wizard-step-2').hide();
-        $('#wizard-step-2-link').removeClass("active");
-    });
-
-    $('#wizard-step-2-link').click(function (e) {
-        $("#btn-next").trigger("click");
-    });
-
-    $('#btn-next').click(function (e) {
-        var result = validateWizardStep1Form();
-        if (!result.valid) {
-            var modalOptions = {
-                title: 'Validation Error',
-                body: result.message,
-                type: 'danger'
-            };
-            showModal(modalOptions);
-            return;
-        }
-        if (fileUploadStatus == UploadStatus.SELECTED) {
-            fileUploadData.submit();
-            fileUploadData = null;
-        }
-        $("#wizard-step-2").show();
-        $('#wizard-step-2-link').addClass("active");
-        $('#wizard-step-1').hide();
-        $('#wizard-step-1-link').removeClass("active");
     });
 
     $('#fileAppUpload').fileuploadFile({
@@ -290,8 +391,16 @@ $(document).ready(function () {
                 showModal(modalOptions);
             } else {
                 fileUploadStatus = UploadStatus.FINISHED_SUCCESS;
-                $('#appFileUploadMetaData').val(response);
-                $('#appVersion').val(response.version);
+                $('#txtVersion').val(response.version).attr('disabled', 'disabled');
+                var wizardStep2Form = $('#wizard-step-2-form');
+                wizardStep2Form.append("<input type='hidden' id='appPackageName' "
+                                       + "name='overview_packagename' value='" + response.package
+                                       + "' />");
+                wizardStep2Form.append("<input type='hidden' id='appVersion' "
+                                       + "name='overview_version' value='" + response.version
+                                       + "' />");
+                wizardStep2Form.append("<input type='hidden' id='appFile' "
+                                       + "name='overview_file' value='" + response.path + "' />");
             }
             updateFileUploadProgress();
         }
@@ -299,16 +408,24 @@ $(document).ready(function () {
     });
 
     jQuery("#wizard-step-2-form").submit(function (e) {
-        var result = validateWizardStep2Form();
-        if (!result.valid) {
-            var modalOptions = {
-                title: 'Validation Error',
-                body: result.message,
-                type: 'danger'
-            };
-            showModal(modalOptions);
-            e.stopPropagation();
-            e.preventDefault();
+        if (fileUploadStatus == UploadStatus.UPLOADING) {
+            return;
+        }
+        var inputElements = $('#wizard-step-1-form select:visible, #wizard-step-1-form input:text:visible');
+        for (var i = 0; i < inputElements.length; i++) {
+            var inputElement = $(inputElements[i]);
+            if (inputElement.hasClass(CSS_CLASS_VALIDATION_ERROR)) {
+                // user have not yet updated a validation failed input
+                var modalOptions = {
+                    title: "Validation Error",
+                    body: inputElement.data(DATA_ATTRIBUTE_VALIDATION_MESSAGE),
+                    type: 'danger'
+                };
+                showModal(modalOptions);
+                e.stopPropagation();
+                e.preventDefault();
+                return;
+            }
         }
     });
 
