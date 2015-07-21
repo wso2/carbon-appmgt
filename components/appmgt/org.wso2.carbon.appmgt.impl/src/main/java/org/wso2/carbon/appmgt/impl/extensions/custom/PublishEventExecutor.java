@@ -178,6 +178,7 @@ public class PublishEventExecutor implements Execution
 
         boolean isEmailEnabled = Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
         String provider = requestContext.getResource().getAuthorUserName();
+//        TODO: Check email enabled case and remove or uncomment the following
 //        if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
 //            provider = provider.substring(0, provider.indexOf("-AT-"));
 //

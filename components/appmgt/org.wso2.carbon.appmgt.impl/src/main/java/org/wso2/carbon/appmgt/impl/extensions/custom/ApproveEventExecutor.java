@@ -170,10 +170,11 @@ public class ApproveEventExecutor implements Execution
 
             boolean isEmailEnabled = Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
             String provider = requestContext.getResource().getAuthorUserName();
-            if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
-                provider = provider.substring(0, provider.indexOf("-AT-"));
-
-            }
+//        TODO: Check email enabled case and remove or uncomment the following
+//            if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
+//                provider = provider.substring(0, provider.indexOf("-AT-"));
+//
+//            }
 
             //Set the asset author key
             dynamicValueInjector.setDynamicValue(DynamicValueInjector.ASSET_AUTHOR_KEY, provider);

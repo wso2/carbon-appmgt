@@ -50,7 +50,6 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.governance.api.generic.GenericArtifactFilter;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -117,13 +116,6 @@ public class APIProviderHostObject extends ScriptableObject {
     private static void handleException(String msg, Throwable t) throws AppManagementException {
         log.error(msg, t);
         throw new AppManagementException(msg, t);
-    }
-
-    public static String jsFunction_check(Context cx, Scriptable thisObj, Object[] args,
-            Function funObj) {
-        Class c = GenericArtifactFilter.class;
-        System.out.println("GenericArtifactFilter "+c.getClassLoader().toString());
-        return "OK";
     }
 
     public static NativeObject jsFunction_login(Context cx, Scriptable thisObj,
