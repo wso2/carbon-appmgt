@@ -1,5 +1,5 @@
 var resources = function (page, meta) {
     return {
-       	js: ['mobileapp/add.mobileapp.version.js']
+        js: ['mobileapp/add.mobileapp.version.js']
     };
 };
