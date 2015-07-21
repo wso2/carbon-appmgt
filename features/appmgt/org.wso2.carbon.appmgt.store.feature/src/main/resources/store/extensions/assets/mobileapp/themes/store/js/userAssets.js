@@ -3,6 +3,26 @@ appToReinstall = null;
 
 
 $(function(){
+
+
+	var visibleToDevices = function(){
+		var ua = navigator.userAgent;
+		var checker = {
+			iphone: ua.match(/(iPhone|iPod|iPad)/),
+			blackberry: ua.match(/BlackBerry/),
+			android: ua.match(/Android/)
+		};
+
+		if (checker.android){
+			$('.type-ios').hide();
+		}
+
+		if (checker.iphone){
+			$('.type-android').hide();
+		}
+
+	};
+	visibleToDevices();
 	
 
 

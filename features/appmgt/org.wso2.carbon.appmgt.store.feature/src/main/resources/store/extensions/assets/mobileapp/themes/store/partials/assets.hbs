@@ -7,7 +7,7 @@
 			{{#slice assets size="4"}}
                 <div class="row-fluid">
 					{{#each .}}
-                        <div class="span3 asset" data-id="{{id}}" data-type="{{type}}">
+                        <div class="span3 type-{{attributes.overview_platform}} asset" data-id="{{id}}" data-type="{{type}}">
 							{{#attributes}}
                                 <a href="{{url "/assets"}}/{{../type}}/{{../id}}{{#if ../../../device}}?device={{../../../../device}}{{/if}}">
                                     <div class="asset-icon">
