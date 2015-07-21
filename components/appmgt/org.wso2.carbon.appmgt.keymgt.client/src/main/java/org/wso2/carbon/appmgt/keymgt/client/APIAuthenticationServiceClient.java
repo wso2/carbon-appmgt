@@ -24,16 +24,18 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.handlers.security.stub.APIAuthenticationServiceStub;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 
 import java.net.URL;
 
+/**
+ * @Deprecated API Manager legacy code
+ */
+@Deprecated
 public class APIAuthenticationServiceClient {
 
     private static Log log = LogFactory.getLog(APIAuthenticationServiceClient.class);
 
-    private APIAuthenticationServiceStub stub;
 
     public APIAuthenticationServiceClient(String backendServerURL, String username, String password)
             throws Exception {
@@ -51,13 +53,6 @@ public class APIAuthenticationServiceClient {
                           "Authenticated Cookie ID : " + authenticatedCookie);
             }
 
-            stub = new APIAuthenticationServiceStub(
-                    null, backendServerURL + "APIAuthenticationService");
-            ServiceClient client = stub._getServiceClient();
-            Options options = client.getOptions();
-            options.setManageSession(true);
-            options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-                                authenticatedCookie);
         } catch (Exception e) {
             String errorMsg = "Error when instantiating APIAuthenticationServiceClient.";
             log.error(errorMsg, e);
@@ -66,11 +61,7 @@ public class APIAuthenticationServiceClient {
     }
 
     public void invalidateKey(String accessToken) throws AxisFault {
-        try {
-            stub.invalidateKey(accessToken);
-        } catch (Exception e) {
-            throw new AxisFault("Error while invalidating API keys", e);
-        }
+        throw new AxisFault("Unsupported operation: Legacy API Manager code executed");
     }
 
 }

@@ -57,7 +57,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
 				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
 				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
-                                                          commonUtil.getRootSystemRegistry(tenantId), false);
+                                                          commonUtil.getRootSystemRegistry(tenantId));
 
                         	log.debug("session index :: " + sessionObj.sessionIndex);
                         	log.debug("session :: " + sessionObj.sessionId);

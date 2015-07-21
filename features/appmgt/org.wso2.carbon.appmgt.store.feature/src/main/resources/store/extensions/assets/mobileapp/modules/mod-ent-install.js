@@ -154,8 +154,6 @@
                     }
                 }
 
-
-
                 print({redirect: true, location : location});
 
             }else{

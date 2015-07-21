@@ -21,7 +21,7 @@
                     {{#if assets}}
                         {{#each assets}}
                             {{#attributes}}
-                                <div class="slide asset" data-id="{{../id}}" data-type="{{../type}}" id="slideAsset">
+                                <div class="slide asset {{#compare "mobileapp" ../type}} mobileapp type-{{../../attributes.overview_platform}} {{/compare}}" data-id="{{../id}}" data-type="{{../type}}" id="slideAsset">
                                     {{#if ../isSubscribed}}
                                         <div class="ribbon-wrapper-green">
                                             <div class="ribbon-green">Subscribed</div>

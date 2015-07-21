@@ -32,6 +32,7 @@ import org.wso2.carbon.appmgt.impl.utils.TierNameComparator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.Collection;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -100,8 +101,9 @@ public abstract class AbstractAPIManager implements APIManager {
             handleException("Error while obtaining registry objects", e);
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             handleException("Error while getting user registry for user:"+username, e);
+        } catch (AppManagementException e) {
+            handleException("Error while loading tenant for user:"+username, e);
         }
-
     }
 
     /**
@@ -566,7 +568,8 @@ public abstract class AbstractAPIManager implements APIManager {
     public boolean isContextExist(String context) throws AppManagementException {
     	boolean isTenantFlowStarted = false;
         try {
-        	if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+            GovernanceUtils.loadGovernanceArtifacts((UserRegistry)registry);
+            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
         		isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
@@ -718,7 +721,7 @@ public abstract class AbstractAPIManager implements APIManager {
     }
 
     /**
-     * Returns a list of pre-defined # {@link org.wso2.carbon.apimgt.api.model.Tier} in the system.
+     * Returns a list of pre-defined # {@link org.wso2.carbon.appmgt.api.model.Tier} in the system.
      *
      * @return Set<Tier>
      */
@@ -742,7 +745,7 @@ public abstract class AbstractAPIManager implements APIManager {
     }
 
     /**
-     * Returns a list of pre-defined # {@link org.wso2.carbon.apimgt.api.model.Tier} in the system.
+     * Returns a list of pre-defined # {@link org.wso2.carbon.appmgt.api.model.Tier} in the system.
      *
      * @return Set<Tier>
      */

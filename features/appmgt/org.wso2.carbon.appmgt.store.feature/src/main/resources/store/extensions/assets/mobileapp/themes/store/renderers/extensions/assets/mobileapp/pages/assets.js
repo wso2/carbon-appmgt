@@ -5,51 +5,6 @@ var render = function (theme, data, meta, require) {
 
 
 
-
-    //filter assets by useragent
-    if(data.assets){
-
-        useragent = request.getHeader("User-Agent");
-
-        if(useragent.match(/iPad/i) || useragent.match(/iPhone/i)) {
-            userOS = 'ios';
-        } else if (useragent.match(/Android/i)) {
-            userOS = 'android';
-        } else {
-            userOS = 'unknown';
-        }
-
-        var assets = [];
-
-        for( var i = 0; i < data.assets.length; i++){
-
-            var platform = data.assets[i].attributes.overview_platform;
-            switch(userOS){
-                case "android":
-                    if(platform === "android" || platform === "webapp"){
-                        assets.push(data.assets[i]);
-                    }
-                    break;
-                case "ios":
-                    if(platform === "ios" || platform === "webapp"){
-                        assets.push(data.assets[i]);
-                    }
-                    break;
-                default:
-                    assets.push(data.assets[i]);
-            }
-
-
-        }
-
-        data.assets = assets;
-
-    }
-
-
-
-
-	
 		
     var assets = require('/helpers/assets.js');
     theme('2-column-right', {

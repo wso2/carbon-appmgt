@@ -20,8 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.gateway.handlers.security.keys.APIKeyValidatorClientPool;
-import org.wso2.carbon.appmgt.gateway.handlers.security.thrift.ThriftKeyValidatorClientPool;
 import org.wso2.carbon.appmgt.gateway.service.AppManagerOAuth2Service;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
