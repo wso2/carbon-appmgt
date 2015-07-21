@@ -16,7 +16,9 @@ var ValidationStatus = Object.freeze({
 var Field = Object.freeze({
     OVERVIEW_PLATFORM: 'overview_platform',
     OVERVIEW_TYPE: 'overview_type',
+    OVERVIEW_FILE: 'overview_file',
     OVERVIEW_PACKAGE_NAME: 'overview_packagename',
+    OVERVIEW_APP_ID: 'overview_appid',
     OVERVIEW_URL: 'overview_url',
     OVERVIEW_NAME: 'overview_name',
     OVERVIEW_DISPLAY_NAME: 'overview_displayName',
@@ -24,7 +26,9 @@ var Field = Object.freeze({
     OVERVIEW_DESCRIPTION: 'overview_description',
     OVERVIEW_RECENT_CHANGES: 'overview_recentchanges',
     IMAGES_BANNER: 'images_banner',
-    IMAGES_SCREENSHOTS: 'images_screenshots',
+    IMAGES_SCREENSHOTS_0: 'images_screenshots0',
+    IMAGES_SCREENSHOTS_1: 'images_screenshots1',
+    IMAGES_SCREENSHOTS_2: 'images_screenshots2',
     IMAGES_THUMBNAIL: 'images_thumbnail'
 });
 
@@ -42,23 +46,24 @@ function getInstance(configurations) {
         this.configurations = configurations;
     }
 
-    Validator.prototype.validateFormData = function (formName, formData) {
-        var result = {valid: true, messages: {}};
-        var fields = Field;
-        for (var fieldName in fields) {
-            if (!fields.hasOwnProperty(fieldName)) {
+    Validator.prototype.validateFormData = function (formName, formData, isPartialValidation) {
+        var result = {valid: true, status: ValidationStatus.VALID, messages: {}};
+        for (var key in Field) {
+            if (!Field.hasOwnProperty(key)) {
                 // this is not a property of the 'Field' object,
                 // might be a property inherited from Object class
                 continue;
             }
+            var fieldName = Field[key];
             var fieldValue = formData[fieldName];
-            if (fieldValue == 'undefined') {
-                // this might be a partial form validation, just ignore
+            if (((typeof fieldValue) == 'undefined') && isPartialValidation) {
+                // this is a partial form validation, just ignore empty fields
                 continue;
             }
             var validationResult = this.validateField(fieldName, fieldValue, formData);
             if (validationResult.status != ValidationStatus.VALID) {
                 result.valid = false;
+                result.status = validationResult.status;
                 result.messages[fieldName] = validationResult.message;
             }
         }
@@ -78,48 +83,64 @@ function getInstance(configurations) {
             case Field.OVERVIEW_TYPE:
                 var platform = optionalValues[Field.OVERVIEW_PLATFORM];
                 var optionalValidation = this.validatePlatform(platform);
-                if (optionalValidation != ValidationStatus.VALID) {
+                if (optionalValidation.status != ValidationStatus.VALID) {
                     return valueAdded(optionalValidation);
                 }
+
                 if (platform == 'webapp') {
                     return valueAdded({status: ValidationStatus.VALID, message: ""});
+                } else {
+                    // android, ios
+                    return valueAdded(this.validateType(fieldValue));
                 }
-                return valueAdded(this.validateType(fieldValue)); // android, ios
             case Field.OVERVIEW_PACKAGE_NAME:
-                var type = optionalValues[Field.OVERVIEW_TYPE];
-                var optionalValidation = this.validateType(type);
-                if (optionalValidation != ValidationStatus.VALID) {
+                var platform = optionalValues[Field.OVERVIEW_PLATFORM];
+                var optionalValidation = this.validatePlatform(platform);
+                if (optionalValidation.status != ValidationStatus.VALID) {
                     return valueAdded(optionalValidation);
                 }
-                if (type == 'enterprise') {
-                    return valueAdded({status: ValidationStatus.VALID, message: ""});
-                } else {
-                    // public
-                    var platform = optionalValues[Field.OVERVIEW_PLATFORM];
-                    var optionalValidation = this.validatePlatform(platform);
-                    if (optionalValidation != ValidationStatus.VALID) {
-                        return valueAdded(optionalValidation);
-                    }
-                    switch (platform) {
-                        case 'android':
-                            return valueAdded(this.validateAndroidPackageName(fieldValue));
-                        case 'ios':
-                            return valueAdded(this.validateIosAppIdentifier(fieldValue));
-                        case 'webapp':
-                            return valueAdded({status: ValidationStatus.VALID, message: ""});
-                    }
+                var type = optionalValues[Field.OVERVIEW_TYPE];
+                optionalValidation = this.validateType(type);
+                if (optionalValidation.status != ValidationStatus.VALID) {
+                    return valueAdded(optionalValidation);
                 }
-                break;
+
+                if ((platform == 'android') && (type == 'public')) {
+                    return valueAdded(this.validateAndroidPackageName(fieldValue));
+                } else {
+                    // ios, enterprise, webapp
+                    return valueAdded({status: ValidationStatus.VALID, message: ""});
+                }
+            case Field.OVERVIEW_APP_ID:
+                var platform = optionalValues[Field.OVERVIEW_PLATFORM];
+                var optionalValidation = this.validatePlatform(platform);
+                if (optionalValidation.status != ValidationStatus.VALID) {
+                    return valueAdded(optionalValidation);
+                }
+                var type = optionalValues[Field.OVERVIEW_TYPE];
+                optionalValidation = this.validateType(type);
+                if (optionalValidation.status != ValidationStatus.VALID) {
+                    return valueAdded(optionalValidation);
+                }
+
+                if ((platform == 'ios') && (type == 'public')) {
+                    return valueAdded(this.validateIosAppIdentifier(fieldValue));
+                } else {
+                    // android, enterprise, webapp
+                    return valueAdded({status: ValidationStatus.VALID, message: ""});
+                }
             case Field.OVERVIEW_URL:
                 var platform = optionalValues[Field.OVERVIEW_PLATFORM];
                 var optionalValidation = this.validatePlatform(platform);
-                if (optionalValidation != ValidationStatus.VALID) {
+                if (optionalValidation.status != ValidationStatus.VALID) {
                     return valueAdded(optionalValidation);
                 }
                 if (platform == 'webapp') {
                     return valueAdded(this.validateURL(fieldValue));
+                } else {
+                    // android, ios
+                    return valueAdded({status: ValidationStatus.VALID, message: ""});
                 }
-                return valueAdded({status: ValidationStatus.VALID, message: ""}); // android, ios
             case Field.OVERVIEW_NAME:
                 return valueAdded(this.validateName(fieldValue));
             case Field.OVERVIEW_DISPLAY_NAME:
@@ -132,16 +153,18 @@ function getInstance(configurations) {
                 return valueAdded(this.validateRecentChanges(fieldValue));
             case Field.IMAGES_BANNER:
                 return valueAdded(this.validateBannerImage(fieldValue));
-            case Field.IMAGES_SCREENSHOTS:
-                return valueAdded(this.validateScreenshotsImages(fieldValue));
+            case Field.IMAGES_SCREENSHOTS_0:
+            case Field.IMAGES_SCREENSHOTS_1:
+            case Field.IMAGES_SCREENSHOTS_2:
+                var screenshots = [];
+                screenshots.push(optionalValues[Field.IMAGES_SCREENSHOTS_0]);
+                screenshots.push(optionalValues[Field.IMAGES_SCREENSHOTS_1]);
+                screenshots.push(optionalValues[Field.IMAGES_SCREENSHOTS_2]);
+                return valueAdded(this.validateScreenshotsImages(screenshots));
             case Field.IMAGES_THUMBNAIL:
                 return valueAdded(this.validateThumbnailImage(fieldValue));
             default:
-                return {
-                    valid: false,
-                    status: ValidationStatus.UNKNOWN,
-                    message: "Unknown field '" + fieldName + "'."
-                };
+                return valueAdded({status: ValidationStatus.VALID});
         }
     };
 
@@ -233,6 +256,14 @@ function getInstance(configurations) {
         try {
             var httpResponse = get(URL + appIdentifier);
             if (httpResponse.xhr.status != 200) {
+                result.status = ValidationStatus.UNKNOWN;
+                result.message = "iOS app identifier validation operation failed. "
+                                 + "iTunes server responded with HTTP status "
+                                 + httpResponse.xhr.status + ".";
+                return result;
+            }
+            var responseData = JSON.parse(httpResponse.data);
+            if (responseData.resultCount != 1) {
                 result.status = ValidationStatus.INVALID.VALUE;
                 result.message = "Value entered as iOS app identifier is invalid. "
                                  + "Please enter a valid iOS app identifier.";
@@ -332,7 +363,7 @@ function getInstance(configurations) {
 
     Validator.prototype.validateRecentChanges = function (recentChanges) {
         var result = {status: null, message: ""};
-        if (recentChanges.length > Constant.MAX_LENGTH_OF_RECENT_CHANGES) {
+        if (recentChanges && (recentChanges.length > Constant.MAX_LENGTH_OF_RECENT_CHANGES)) {
             result.status = ValidationStatus.INVALID.LENGTH.MAX;
             result.message = "Recent changes cannot contain more than "
                              + Constant.MAX_LENGTH_OF_RECENT_CHANGES + " characters.";
