@@ -84,6 +84,7 @@
                         <div style="font-size: xx-small">Please enter a valid url</div>
                     </div>
                 {{else}}
+                    <!-- android, iOS -->
                     {{#ifCond artifact.attributes.overview_type "==" "enterprise"}}
                         <label class="col-sm-2 control-label" for="file-upload-text">
                             App <span style="color:#FF0000">*</span>
@@ -115,15 +116,28 @@
                         </div>
                     {{/ifCond}}
                     {{#ifCond artifact.attributes.overview_type "==" "public"}}
-                        <label class="col-sm-2 control-label" for="txtPackageName">
-                            Package Name <span style="color:#FF0000">*</span>
-                        </label>
-                        <div class="col-sm-10 inner-addon">
-                            <input type="text" id="txtPackageName" name="overview_packagename"
-                                   value="{{artifact.attributes.overview_packagename}}"
-                                   class="field col-md-6"
-                                   placeholder="eg: com.companyname.applicationname" />
-                        </div>
+                        {{#ifCond artifact.attributes.overview_platform "==" "android"}}
+                            <label class="col-sm-2 control-label" for="txtPackageName">
+                                Package Name <span style="color:#FF0000">*</span>
+                            </label>
+
+                            <div class="col-sm-10 inner-addon">
+                                <input type="text" id="txtPackageName" name="overview_packagename"
+                                       class="field col-md-6"
+                                       placeholder="eg: com.companyname.applicationname" />
+                            </div>
+                        {{/ifCond}}
+                        {{#ifCond artifact.attributes.overview_platform "==" "ios"}}
+                            <label class="col-sm-2 control-label" for="txtPackageName">
+                                App Identifier <span style="color:#FF0000">*</span>
+                            </label>
+
+                            <div class="col-sm-10 inner-addon">
+                                <input type="text" id="txtAppIdentifier" name="overview_appid"
+                                       class="field col-md-4"
+                                       placeholder="eg: 420009108" />
+                            </div>
+                        {{/ifCond}}
                     {{/ifCond}}
                 {{/ifCond}}
             </div>
@@ -147,24 +161,14 @@
 <div id="wizard-step-2" class="content-div" style="display: none;">
 
     <div class="row-fluid">
-        <form id="wizard-step-2-form" action="/publisher/api/asset/{{op}}/{{shortName}}/{{artifact.id}}"
+        <form id="wizard-step-2-form" action="/publisher/api/asset/version/{{op}}/{{shortName}}/{{artifact.id}}"
               method="post" enctype="multipart/form-data" class="form-horizontal">
 
             <input type="hidden" id="appParenId" name="appParentId" value="{{artifact.id}}" />
             <input type="hidden" id="appName" name="overview_name" value="{{artifact.attributes.overview_name}}" />
+
             <input type="hidden" id="appPlatform" name="overview_platform" value="{{artifact.attributes.overview_platform}}" />
             <input type="hidden" id="appStoreType" name="overview_type" value="{{artifact.attributes.overview_type}}" />
-            {{#ifCond artifact.attributes.overview_platform "==" "webapp"}}
-                <input type="hidden" id="appWebappUrl" name="overview_url" value="{{artifact.attributes.overview_url}}" />
-            {{else}}
-                <!-- android or ios -->
-                {{#ifCond artifact.attributes.overview_type "==" "enterprise"}}
-                    <input type="hidden" id="appFileUploadMetaData" name="appFileUploadMetaData" value=""/>
-                {{/ifCond}}
-                {{#ifCond artifact.attributes.overview_type "==" "public"}}
-                    <input type="hidden" id="appPackageName" name="overview_identifier" value="{{artifact.attributes.overview_identifier}}" />
-                {{/ifCond}}
-            {{/ifCond}}
 
             <div class="form-group">
                 <label class="control-label col-sm-2" for="txtDisplayName">
@@ -207,8 +211,8 @@
                     Version
                 </label>
                 <div class="col-sm-10">
-                    <input type="text" id="appVersion" name="overview_version"
-                           class="field col-md-3" disabled="disabled"/>
+                    <input type="text" id="txtVersion" name="overview_version"
+                           class="field col-md-3"/>
                 </div>
             </div>
             <div class="form-group">
