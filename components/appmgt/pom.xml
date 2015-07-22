@@ -33,8 +33,6 @@
         <module>org.wso2.carbon.appmgt.api</module>
         <module>org.wso2.carbon.appmgt.impl</module>
         <module>org.wso2.carbon.appmgt.hostobjects</module>
-        <module>org.wso2.carbon.appmgt.keymgt</module>
-	<module>org.wso2.carbon.appmgt.keymgt.client</module>
         <module>org.wso2.carbon.appmgt.gateway</module>
         <module>org.wso2.carbon.appmgt.usage</module>
 	<module>org.wso2.carbon.appmgt.core</module>
@@ -70,7 +68,7 @@
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
+                <checksumPolicy>warn</checksumPolicy>
             </releases>
         </repository>
     </repositories>
