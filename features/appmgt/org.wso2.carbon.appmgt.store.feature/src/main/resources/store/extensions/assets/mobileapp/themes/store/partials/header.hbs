@@ -1,89 +1,52 @@
-<div id="container-header" class="container">
-	<div class="row">
-		<div class="span12">
-			<div class="navbar">
-				<div class="navbar-inner">
-					<div class="container">
+<header>
+    <div class="row wr-global-header">
+        <div class="col-xs-6 col-sm-6 col-lg-8 app-logo">
+            <a href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
+            <div class="wr-auth pull-right">
+                <a href="#" data-toggle="dropdown">
+                    <div class="auth-img">
+                        Administrator
+                            <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-user fw-stack-1-5x"></i>
+                            </span>
+                    </div>
+                </a>
+                <div class="dropdown-menu">
+                    <div class="cu-arrow"></div>
+                    <div class="dropdown-menu-content">
+                        <a class="filter-item">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
 
-						<a class="brand" href="{{url "/"}}"></a>
-						<!--
-						<ul class="nav menu store-menu">
-						{{#itr assets}}
-						<li class="dropdown {{#if value.selected}} selected {{/if}}">
-						<a href="{{url "/assets/"}}{{key}}" data-toggle="dropdown" class="dropdown-toggle"><i
-						class="icon-{{key}}"></i> {{value.title}}</a>
-						{{#if value.isCategorySupport}}
-						{{#if value.categories}}
-						<ul aria-labelledby="dLabel" role="menu" class="dropdown-menu">
-						{{#each value.categories}}
-						<li>
-						<a href='{{url "/assets"}}/{{../../key}}?query=category:"{{this}}"'>{{this}}</a>
-						</li>
-						{{/each}}
-						</ul>
-						{{/if}}
-						{{/if}}
 
-						</li>
-
-						{{/itr}}
-						</ul>-->
-
-						<ul class="nav menu pull-right">
-                            <li class="nav-separator">
-                                <a href="{{url "/assets/webapp"}}"><i class="icon-cog store-topnav-bookmark"></i> {{t "Web Applications"}}</a>
-                            </li>
-                            <li class="nav-separator">
-                                <a href="{{url "/assets/mobileapp"}}"><i class="icon-mobile-phone store-topnav-bookmark"></i> {{t "Mobile Applications"}}</a>
-                            </li>
-							{{#if user}}
-							<li class="nav-separator">
-                                {{#if config.enabled}}
-                                    <a href="{{url "/extensions/assets/mobileapp/subscriptions"}}"><i
-                                    class="icon-mobile-phone store-topnav-bookmark"></i> {{t "My Subscriptions"}}</a>
-                                {{/if}}
-							</li>
-							<li>
-
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i
-								class="icon-user"></i> {{user.username}} <b class="caret"></b></a>
-								<ul class="dropdown-menu dropdown-account" role="menu" aria-labelledby="dLabel">
-									<li>
-										{{#if sso}}<a href="{{url "/logout"}}"><i class="icon-signout"></i> {{t "Sign out"}} </a>{{else}}<a id="btn-signout" href="#"><i class="icon-signout"></i> {{t "Sign out"}} </a>{{/if}}
-									</li>
-								</ul>
-
-							</li>
-							{{else}}
-
-							{{#if sso}}
-							<li>
-								<a href="{{url "/login"}}">{{t "Sign In"}}</a>
-							</li>
-							<li>
-                                <a id="btn-register" class="btn btn-primary" data-toggle="modal"
-                                   data-target="#modal-register">{{t "Register"}}</a>
-							</li>
-							{{else}}
-							<li>
-								<a href="#" data-toggle="modal" data-target="#modal-login">{{t "Sign In"}}</a>
-							</li>
-							<li>
-								<a id="btn-register" class="btn btn-primary" data-toggle="modal"
-								data-target="#modal-register">{{t "Register"}}</a>
-							</li>
-							{{/if}}
-
-							{{/if}}
-
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<!-- secondary header - app bar -->
+<div id="nav" class="row wr-app-bar">
+    <div class="col-md-9 wr-action-container">
+        <div class="wr-action-btn-bar">
+            <a href="javascript:openCollapsedNav()" class="cu-btn wr-hidden-nav-toggle-btn">
+                    <span class="fw-stack">
+                        <i class="fw fw-tiles fw-stack-1-5x"></i>
+                    </span>
+            </a><a class="cu-btn page-title" href='{{url "/assets/mobileapp"}}'>
+            <span class="fw-stack"></span>
+            Mobile Apps
+        </a>
+        </div>
+    </div>
 </div>
-{{>login login}}
+<!-- secondary header - app bar -->
 
-{{>register}}
-
+<!-- common navigation -->
+<div id="hiddenNav" class="wr-hidden-nav">
+    <ul>
+        <li><a href="{{url "/assets/webapp"}}"><i class="fw fw-globe"></i>Web Apps</a></li>
+        <li><a href="{{url "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
+    </ul>
+</div>
+<!-- /common navigation -->

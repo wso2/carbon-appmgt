@@ -1,0 +1,58 @@
+.app-asset{
+
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.app-asset-wrapper{
+    padding-top: 30px;
+}
+
+.app-asset-icon{
+    width: 100%;
+    padding-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left:20px;
+    margin-bottom: 5px;
+}
+
+.app-asset-icon:hover{
+    background: #f1f1f1;
+}
+
+.app-asset-icon-info-platform{
+    width:36px;
+}
+
+.app-asset-info{
+    float: left;
+}
+
+.app-asset-icon-info{
+    padding-right: 25px;
+    float: right;
+}
+
+.app-asset-name{
+   margin-left: 35px;
+   font-weight: bold;
+}
+
+.app-asset-provider{
+    margin-left: 35px;
+    margin-bottom: 5px;
+    font-size: small;
+}
+
+.app-asset-rating {
+    background: url('../img/store-stars.png') no-repeat top left;
+    display: block;
+    height: 20px;
+    width: 100px;
+    margin: auto;
+    overflow: hidden;
+    margin-bottom: 20px;
+    clear: both;
+}
+
