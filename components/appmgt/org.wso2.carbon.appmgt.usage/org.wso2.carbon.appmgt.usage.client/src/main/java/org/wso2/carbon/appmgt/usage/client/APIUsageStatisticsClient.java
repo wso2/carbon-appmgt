@@ -65,7 +65,7 @@ public class APIUsageStatisticsClient {
     private APIConsumer apiConsumerImpl;
     private static volatile DataSource dataSource = null;
     private static PaymentPlan paymentPlan;
-    private static final String API_USAGE_TRACKING = "APIUsageTracking.";
+    private static final String API_USAGE_TRACKING = "Analytics.";
     private static final String DATA_SOURCE_NAME = API_USAGE_TRACKING + "DataSourceName";
    /* private static String text = "    <PaymentPlan name=\"platinam\">    <parameter name=\"call\">  " +
             "      <range0><start>0</start><end>5</end><value>0.0</value></range0>      " +

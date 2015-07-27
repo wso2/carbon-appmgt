@@ -94,7 +94,7 @@ public final class APIUsageStatisticsClientConstants {
     
     public static final String ALL_PROVIDERS = "__all_providers__";
 
-    public static final String API_USAGE_TRACKING = "APIUsageTracking.";
+    public static final String API_USAGE_TRACKING = "Analytics.";
 
     public static final String API_USAGE_JDBC_DRIVER =  API_USAGE_TRACKING + "JDBCDriver";
 

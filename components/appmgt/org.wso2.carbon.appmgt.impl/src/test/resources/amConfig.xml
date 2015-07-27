@@ -11,11 +11,11 @@
     <APIConsumerAuthentication>
         <EnableTokenGeneration>false</EnableTokenGeneration>
     </APIConsumerAuthentication>
-    <APIUsageTracking>
+    <Analytics>
         <Enabled>false</Enabled>
         <ThriftPort>7612</ThriftPort>
         <BAMServerURL>https://localhost:9444/</BAMServerURL>
         <BAMUsername>admin</BAMUsername>
         <BAMPassword>admin</BAMPassword>
-    </APIUsageTracking>
+    </Analytics>
 </APIManager>

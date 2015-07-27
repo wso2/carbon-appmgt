@@ -191,7 +191,7 @@
         API usage tracker configuration used by the BAM data publisher and
         Google Analytics publisher in API gateway.
     -->
-    <APIUsageTracking>
+    <Analytics>
 
 		<!--
 			Enable UI Activity Data publish to BAM
@@ -261,7 +261,7 @@
        </GoogleAnalyticsTracking>
        
 
-    </APIUsageTracking>
+    </Analytics>
 
     <!--
         API key manager configuration used by API key manager (IS), API store and API gateway.
