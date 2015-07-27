@@ -45,7 +45,6 @@
 	<module>org.wso2.carbon.appmgt.mdm.wso2mdm.feature</module>
 	<module>org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
 	<module>org.wso2.carbon.appmgt.services.api.feature</module>
-    <module>throttling</module>
     </modules>
 
     <repositories>

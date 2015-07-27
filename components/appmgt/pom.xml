@@ -45,8 +45,6 @@
 	<module>org.wso2.carbon.appmgt.services.api</module>
         <module>org.wso2.carbon.appmgt.sample.deployer</module>
         <module>org.wso2.carbon.appmgt.custom.mediators</module>
-        <module>throttling</module>
-
     </modules>
     <build>
         <plugins>
