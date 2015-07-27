@@ -146,6 +146,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // application version
         String webAppVersion =
                 (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+
         // http verb (eg: GET,POST)
         String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
         if(httpVerb == null) {
