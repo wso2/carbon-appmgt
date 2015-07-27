@@ -28,6 +28,7 @@
 
     <link href="{{url "/themes/store/css/jquery-ui.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/bootstrap.min.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/bootstrap-theme.min.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/custom-common.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/custom-desktop.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/custom-theme.css"}}" rel="stylesheet">
@@ -75,39 +76,16 @@
 </div>
 
 
-<script src="js/jquery.js"></script>
-<script src="js/jquery-ui.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/sortable-list.js"></script>
 
 <script src="{{url "/themes/store/js/jquery-1.11.3.min.js"}}"></script>
 <script src="{{url "/themes/store/js/jquery-ui.min.js"}}"></script>
 <script src="{{url "/themes/store/js/bootstrap.min.js"}}"></script>
 <script src="{{url "/themes/store/js/sortable-list.js"}}"></script>
 
+{{js}}
+{{code}}
 
 <script type="text/javascript">
-
-    $( document ).ready(function() {
-
-        $('[data-toggle="tooltip"]').tooltip();
-
-        $("[data-toggle=popover]").popover();
-
-        $(".ctrl-filter-type-switcher").popover({
-            html : true,
-            content: function() {
-                return $('#content-filter-types').html();
-            }
-        });
-
-        $('#nav').affix({
-            offset: {
-                top: $('header').height()
-            }
-        });
-
-    });
 
     function openCollapsedNav(){
         $('.wr-hidden-nav-toggle-btn').addClass('active');

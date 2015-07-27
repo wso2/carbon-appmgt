@@ -1,58 +1,92 @@
-.app-asset{
+.app-assets{
 
     box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
     border: 1px solid rgba(0,0,0,0.1);
 }
 
-.app-asset-wrapper{
+.app-assets-wrapper{
     padding-top: 30px;
 }
 
-.app-asset-icon{
+.app-assets-icon{
     width: 100%;
-    padding-right: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left:20px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left:10px;
     margin-bottom: 5px;
 }
 
-.app-asset-icon:hover{
+.app-assets-icon:hover{
     background: #f1f1f1;
 }
 
-.app-asset-icon-info-platform{
+.app-assets-icon-info-platform{
     width:36px;
 }
 
-.app-asset-info{
-    float: left;
+.app-assets-info{
+    text-align: center;
 }
 
-.app-asset-icon-info{
-    padding-right: 25px;
-    float: right;
+.app-assets-icon-info{
+    text-align: center;
+    padding-bottom: 5px;
 }
 
-.app-asset-name{
-   margin-left: 35px;
+.app-assets-name{
    font-weight: bold;
 }
 
-.app-asset-provider{
-    margin-left: 35px;
+.app-assets-provider{
     margin-bottom: 5px;
     font-size: small;
 }
 
-.app-asset-rating {
+.app-assets-rating {
     background: url('../img/store-stars.png') no-repeat top left;
     display: block;
     height: 20px;
     width: 100px;
     margin: auto;
-    overflow: hidden;
-    margin-bottom: 20px;
+    padding-left: 5px;
+
+    margin-bottom: 10px;
     clear: both;
 }
 
+
+.app-asset-title{
+    padding-top: 5px;
+    font-weight: bold;
+    font-size: x-large;
+    text-align: center;
+}
+
+.app-asset-provider{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+}
+
+.app-asset-icon{
+   text-align: center;
+}
+
+.app-asset-buttons{
+    text-align: center;
+}
+
+.btn-add-gadget{
+    width: 100%;
+    margin: 2px;
+}
+
+.app-asset-description-section{
+    padding-top: 30px;
+    padding-left: 30px;
+}
+
+.app-asset-screenshot{
+  
+}

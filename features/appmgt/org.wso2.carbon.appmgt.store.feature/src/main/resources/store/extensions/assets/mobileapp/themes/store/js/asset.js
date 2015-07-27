@@ -1,6 +1,16 @@
 appToInstall = null;
 
+$("#myTab a").click(function(e){
+    e.preventDefault();
+    $(this).tab('show');
+});
+
 $(function () {
+
+
+
+
+
     if (isSocial) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -234,5 +244,7 @@ $(function () {
             });
         }
     });
+
+
 
 });

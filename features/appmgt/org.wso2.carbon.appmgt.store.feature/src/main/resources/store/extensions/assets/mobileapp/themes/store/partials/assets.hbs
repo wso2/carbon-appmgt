@@ -1,32 +1,30 @@
-<div class="raw">
-
+<div class="col-md-8">
 
 {{#if assets}}
 
-
     {{#each assets}}
 
-    <div class="col-md-2 app-asset-wrapper">
-        <div class="app-asset">
+    <div class="col-md-2 app-assets-wrapper">
+        <div class="app-assets">
             <a href="{{url "/assets"}}/{{type}}/{{id}}">
-            <img class="app-asset-icon"
+            <img class="app-assets-icon"
                  src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
             </a>
-            <div class="app-asset-info">
-                <div class="app-asset-name">
+            <div class="app-assets-info">
+                <div class="app-assets-name">
                     {{attributes.overview_displayName}}
                 </div>
-                <div class="app-asset-provider">
+                <div class="app-assets-provider">
                     {{attributes.overview_provider}}
                 </div>
             </div>
 
-            <div class="app-asset-icon-info">
-                <img class="app-asset-icon-info-platform" src="http://icons.iconarchive.com/icons/igh0zt/ios7-style-metro-ui/512/MetroUI-Folder-OS-OS-Android-icon.png">
-                <img class="app-asset-icon-info-platform" src="http://icons.iconarchive.com/icons/igh0zt/ios7-style-metro-ui/512/MetroUI-Folder-OS-OS-Android-icon.png">
+            <div class="app-assets-icon-info">
+                <img class="app-assets-icon-info-platform" src="http://icons.iconarchive.com/icons/igh0zt/ios7-style-metro-ui/512/MetroUI-Folder-OS-OS-Android-icon.png">
+                <img class="app-assets-icon-info-platform" src="http://icons.iconarchive.com/icons/igh0zt/ios7-style-metro-ui/512/MetroUI-Folder-OS-OS-Android-icon.png">
             </div>
 
-            <span class="app-asset-rating"> </span>
+            <span class="app-assets-rating"> </span>
         </div>
     </div>
 
@@ -34,5 +32,7 @@
 
 {{/if}}
 
-
+</div>
+<div class="col-md-3">
+    test
 </div>
