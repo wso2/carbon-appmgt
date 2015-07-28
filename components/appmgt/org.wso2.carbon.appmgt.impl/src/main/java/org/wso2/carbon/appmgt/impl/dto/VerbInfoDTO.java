@@ -4,6 +4,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class VerbInfoDTO implements Serializable {
@@ -83,7 +84,7 @@ public class VerbInfoDTO implements Serializable {
 		return httpVerb != null ? httpVerb.hashCode() : 0;
 	}
 
-	private HashMap<String,Boolean> allowAnonymousUrlMap = new HashMap<String, Boolean>();
+	private Map<String,Boolean> allowAnonymousUrlMap = new HashMap<String, Boolean>();
 
     /**
      * add values to allowAnonymousUrlMap
