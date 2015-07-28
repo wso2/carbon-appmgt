@@ -105,6 +105,15 @@ require('/modules/store.js').exec(function (ctx) {
         assetsFromProvider['overview_provider'] = provider;
         assetsFromProvider['type'] = type;
         assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+
+        //remove the selected asset from the assets list
+        for (var i = 0; i < assetsFromProvider.assets.length; i++) {
+            if (assetsFromProvider.assets[i].id === asset.id) {
+                assetsFromProvider.assets.splice(i, 1);
+                break;
+            }
+        }
+
         return assetsFromProvider;
     }
 

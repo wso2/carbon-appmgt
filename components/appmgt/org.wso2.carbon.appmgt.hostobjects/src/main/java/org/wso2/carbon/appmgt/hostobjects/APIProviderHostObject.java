@@ -3122,32 +3122,34 @@ public class APIProviderHostObject extends ScriptableObject {
         return false;
     }
 
-    private static void validateWsdl(String url) throws Exception {
-
-        URL wsdl = new URL(url);
-        BufferedReader in = new BufferedReader(new InputStreamReader(wsdl.openStream()));
-        String inputLine;
-        boolean isWsdl2 = false;
-        boolean isWsdl10 = false;
-        StringBuilder urlContent = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            String wsdl2NameSpace = "http://www.w3.org/ns/wsdl";
-            String wsdl10NameSpace = "http://schemas.xmlsoap.org/wsdl/";
-            urlContent.append(inputLine);
-            isWsdl2 = urlContent.indexOf(wsdl2NameSpace) > 0;
-            isWsdl10 = urlContent.indexOf(wsdl10NameSpace) > 0;
+    private static void validateWsdl(String url) throws AppManagementException {
+        try {
+            URL wsdl = new URL(url);
+            BufferedReader in = new BufferedReader(new InputStreamReader(wsdl.openStream()));
+            String inputLine;
+            boolean isWsdl2 = false;
+            boolean isWsdl10 = false;
+            StringBuilder urlContent = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                String wsdl2NameSpace = "http://www.w3.org/ns/wsdl";
+                String wsdl10NameSpace = "http://schemas.xmlsoap.org/wsdl/";
+                urlContent.append(inputLine);
+                isWsdl2 = urlContent.indexOf(wsdl2NameSpace) > 0;
+                isWsdl10 = urlContent.indexOf(wsdl10NameSpace) > 0;
+            }
+            in.close();
+            if (isWsdl10) {
+                javax.wsdl.xml.WSDLReader wsdlReader11 = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader();
+                wsdlReader11.readWSDL(url);
+            } else if (isWsdl2) {
+                WSDLReader wsdlReader20 = WSDLFactory.newInstance().newWSDLReader();
+                wsdlReader20.readWSDL(url);
+            } else {
+                handleException("URL is not in format of wsdl1/wsdl2");
+            }
+        } catch (Exception e) {
+            handleException("Error occurred while validating the Wsdl", e);
         }
-        in.close();
-        if (isWsdl10) {
-            javax.wsdl.xml.WSDLReader wsdlReader11 = javax.wsdl.factory.WSDLFactory.newInstance().newWSDLReader();
-            wsdlReader11.readWSDL(url);
-        } else if (isWsdl2) {
-            WSDLReader wsdlReader20 = WSDLFactory.newInstance().newWSDLReader();
-            wsdlReader20.readWSDL(url);
-        } else {
-            handleException("URL is not in format of wsdl1/wsdl2");
-        }
-
     }
 
     private static String getWebContextRoot(String postfixUrl) {
@@ -3161,8 +3163,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
     public static NativeArray jsFunction_searchAccessTokens(Context cx, Scriptable thisObj,
                                                             Object[] args,
-                                                            Function funObj)
-            throws Exception {
+                                                            Function funObj) throws AppManagementException {
         NativeObject tokenInfo;
         NativeArray tokenInfoArr = new NativeArray(0);
         if (args == null || !isStringValues(args)) {
@@ -3218,7 +3219,6 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         return tokenInfoArr;
-
     }
 
     public static NativeArray jsFunction_getAPIResponseFaultCount(Context cx, Scriptable thisObj,
