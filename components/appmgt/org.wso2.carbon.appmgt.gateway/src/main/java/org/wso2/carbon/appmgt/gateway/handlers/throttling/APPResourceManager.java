@@ -51,17 +51,12 @@ public class APPResourceManager {
 	public APPResourceManager() {
 		super();
 
-		String keyValidatorClientType = APISecurityUtils.getKeyValidatorClientType();
-		if (AppMConstants.API_KEY_VALIDATOR_WS_CLIENT.equals(keyValidatorClientType)) {
-			this.dataStore = new WSAPIKeyDataStore();
-		} else if (AppMConstants.API_KEY_VALIDATOR_THRIFT_CLIENT.equals(keyValidatorClientType)) {
-			// this.dataStore = new ThriftAPIDataStore();
-			try {
-				this.dataStore = new JDBCAPIKeyDataStore();
-			} catch (APISecurityException e) {
-				e.printStackTrace();
-			}
+		try {
+			this.dataStore = new JDBCAPIKeyDataStore();
+		} catch (APISecurityException e) {
+			e.printStackTrace();
 		}
+
 		this.getResourceCache();
 
 	}
