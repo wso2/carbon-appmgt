@@ -73,35 +73,35 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     });
 
-    function addSSOProvider(params,type) {
+    function addSSOProvider(params, type) {
         var WebAppModel = Packages.org.wso2.carbon.appmgt.api.model.WebApp;
         var APIIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
         var SSOProvider = Packages.org.wso2.carbon.appmgt.api.model.SSOProvider;
-	
+
         var appId = new APIIdentifier(params.sso_idpProviderUrl, params.app_name, params.app_verison);
         var webApp = new WebAppModel(appId);
         var ssoProvider = new SSOProvider();
 
-	var app_provider = params.app_provider;
-	var result = null;
-	var store = jagg.module("manager").getAPIStoreObj();
-    var isEmailLoginEnabled = store.isEnableEmailUsername();
-    
-	if (!isEmailLoginEnabled && app_provider != null && app_provider.indexOf("-AT-") != -1) {
-		result = app_provider.split("-AT-");	
-	}
+        var app_provider = params.app_provider;
+        var result = null;
+        var store = jagg.module("manager").getAPIStoreObj();
+        var isEmailLoginEnabled = store.isEnableEmailUsername();
+
+        if (!isEmailLoginEnabled && app_provider != null && app_provider.indexOf("-AT-") != -1) {
+            result = app_provider.split("-AT-");
+        }
 
         ssoProvider.setProviderName(params.provider.split("-")[0]);
         ssoProvider.setProviderVersion(params.provider.split("-")[1]);
-        if (result != null ) {
-	    ssoProvider.setIssuerName(params.app_name + "-" + result[1] + "-" + params.app_verison);
-	} else {
-	    ssoProvider.setIssuerName(params.app_name + "-" + params.app_verison);
-	}
+        if (result != null) {
+            ssoProvider.setIssuerName(params.app_name + "-" + result[1] + "-" + params.app_verison);
+        } else {
+            ssoProvider.setIssuerName(params.app_name + "-" + params.app_verison);
+        }
         //ssoProvider.setAssertionConsumerURL();
         ssoProvider.setClaims(params.claims);
 
-        if(params.logout_url != null && params.logout_url != ' '){
+        if (params.logout_url != null && params.logout_url != ' ') {
             ssoProvider.setLogoutUrl(params.logout_url);
         }
 
@@ -110,12 +110,11 @@ require('/modules/publisher.js').exec(function(ctx) {
         webApp.setTransports(params.app_transport);
 
         var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-        if(type == 'editConfig'){
-			ssoConfigUtil.createSSOProvider(webApp, true);
-        }else {
-        	ssoConfigUtil.createSSOProvider(webApp, false);
+        if (type == 'editConfig') {
+            ssoConfigUtil.createSSOProvider(webApp, true);
+        } else {
+            ssoConfigUtil.createSSOProvider(webApp, false);
         }
-        
     }
     
     function createResponseObject(object) {
