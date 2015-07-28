@@ -112,7 +112,7 @@ public class VerbInfoDTO implements Serializable {
      * @return boolean result
      */
     public boolean isEmptyAllowAnonymousUrlMap() {
-        return (allowAnonymousUrlMap == null);
+        return ((allowAnonymousUrlMap == null) || (allowAnonymousUrlMap.isEmpty()));
     }
 
     /**
