@@ -5874,6 +5874,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+    /**
+     * returns the application related data against the given application
+     *
+     * @param appContext
+     * @param appVersion
+     * @param consumer
+     * @param authenticatedIDPs
+     * @return application related data
+     * @throws AppManagementException
+     */
     public APIKeyValidationInfoDTO getApplicationData(String appContext, String appVersion, String consumer,
                                                       AuthenticatedIDP[] authenticatedIDPs)
             throws AppManagementException {
