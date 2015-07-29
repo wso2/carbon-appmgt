@@ -5874,6 +5874,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 
 	}
 
+    /**
+     * returns the application related data against the given application
+     *
+     * @param appContext
+     * @param appVersion
+     * @param consumer
+     * @param authenticatedIDPs
+     * @return application related data
+     * @throws AppManagementException
+     */
     public APIKeyValidationInfoDTO getApplicationData(String appContext, String appVersion, String consumer,
                                                       AuthenticatedIDP[] authenticatedIDPs)
             throws AppManagementException {
@@ -6629,29 +6639,27 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
      * @param pageSize   No of elements per page
      * @return JSONArray with sorted UUID's
      */
-    public static JSONArray getAppsByHitCount(String userId,
-			Integer startIndex, Integer pageSize) {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		String strResult = "";
+    public static List getAppsByHitCount(String userId,
+                                         Integer startIndex, Integer pageSize) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        String strResult = "";
 
-		// build the final result format string
-		StringBuilder builderResult = new StringBuilder();
+        // build the final result format string
+        StringBuilder builderResult = new StringBuilder();
 
-		// Contains the casted final result to be returned
-		JSONArray jsonResultArr = null;
-		JSONParser parser = new JSONParser();
+        List uuidList = new ArrayList();
 
-		// Contains input parameter values for logging purposes
-		StringBuilder builderDataContext = new StringBuilder();
-		builderDataContext.append("(userId:").append(userId)
-				.append(", startIndex:").append(startIndex)
-				.append(", pageSize:").append(pageSize).append(")");
+        // Contains input parameter values for logging purposes
+        StringBuilder builderDataContext = new StringBuilder();
+        builderDataContext.append("(userId:").append(userId)
+                .append(", startIndex:").append(startIndex)
+                .append(", pageSize:").append(pageSize).append(")");
         String query = "";
-		try {
-			// get the connection for the UI Activity Publish data source
-			conn = APIMgtDBUtil.getUiActivityDBConnection();
+        try {
+            // get the connection for the UI Activity Publish data source
+            conn = APIMgtDBUtil.getUiActivityDBConnection();
 
             //oracle specific query
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
@@ -6666,7 +6674,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                         + " LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
                         + " UNION ALL "
                         + " SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                        + " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ))  "
+                        +
+                        " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? )" +
+                        ")  "
                         + " WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + " ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
 
@@ -6676,55 +6686,42 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                         + " LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
                         + " UNION ALL "
                         + " SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                        + " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
+                        +
+                        " WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
                         + " ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ? ";
 
             }
-
 
             ps = conn.prepareStatement(query);
             ps.setString(1, userId);
             ps.setString(2, userId);
             ps.setInt(3, startIndex);
             ps.setInt(4, pageSize);
-			rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
-			// creates the output string format
-			// [{"UUID":"XXX"},{"UUID":"YYY},{"UUID":"ZZZ"}]
-			while (rs.next()) {
-				if (!rs.isFirst()) {
-					builderResult.append(",");
-				}
-				builderResult.append("{\"UUID\":\"")
-						.append(rs.getString("UUID")).append("\"}");
-			}
-			strResult = "[" + builderResult.toString() + "]";
+            while (rs.next()) {
+                uuidList.add(rs.getString("UUID"));
+            }
 
-			if (log.isDebugEnabled()) {
-				log.debug("Output String : " + strResult + " : "
-						+ builderDataContext.toString());
-			}
+            if (log.isDebugEnabled()) {
+                log.debug("Output String : " + strResult + " : "
+                                  + builderDataContext.toString());
+            }
 
-			// casting the formatted string to a JSON Array
-			jsonResultArr = (JSONArray) parser.parse(strResult);
-
-		} catch (SQLException e) {
-			// Here I'm only logging the exceptions but not throwing externally
-			// as this method is used only to sort the assets by usage, An
-			// exception in this method should not effect/block the users other
-			// actions
-			log.error(
-					"SQL Exception while fetching the store hit sorted data : "
-							+ builderDataContext.toString() + " : "
-							+ e.getMessage(), e);
-		} catch (org.json.simple.parser.ParseException e) {
-			log.error("Json parsing error : " + builderDataContext.toString()
-					+ " : " + e.getMessage(), e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
-		}
-		return jsonResultArr;
-	}
+        } catch (SQLException e) {
+            // Exceptions is only logged here (but not thrown externally)
+            // as this method is used only to sort the assets by usage, An
+            // exception in this method should not effect/block the users other
+            // actions
+            log.error(
+                    "SQL Exception while fetching the store hit sorted data : "
+                            + builderDataContext.toString() + " : "
+                            + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return uuidList;
+    }
 
 	/**
 	 * Save policy groups
