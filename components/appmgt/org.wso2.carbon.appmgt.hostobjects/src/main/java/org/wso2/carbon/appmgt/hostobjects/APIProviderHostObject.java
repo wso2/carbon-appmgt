@@ -93,7 +93,7 @@ public class APIProviderHostObject extends ScriptableObject {
     public static Scriptable jsConstructor(Context cx, Object[] args, Function Obj,
                                            boolean inNewExpr)
             throws AppManagementException {
-        if (args!=null && args.length != 0) {
+        if (args != null && args.length != 0) {
             String username = (String) args[0];
             return new APIProviderHostObject(username);
         }
@@ -2856,17 +2856,20 @@ public class APIProviderHostObject extends ScriptableObject {
         return false;
     }
 
-    public static void jsFunction_loadRegistryOfTenant(Context cx,
-                                                       Scriptable thisObj, Object[] args, Function funObj){
+    public static void jsFunction_loadRegistryOfTenant(Context cx, Scriptable thisObj,
+            Object[] args, Function funObj) {
         String tenantDomain = args[0].toString();
-        if(tenantDomain != null && !org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+        if (tenantDomain != null
+                && !org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME
+                .equals(tenantDomain)) {
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
                         getTenantManager().getTenantId(tenantDomain);
                 AppManagerUtil.loadTenantRegistry(tenantId);
-            } catch (org.wso2.carbon.user.api.UserStoreException e) {
-                log.error("Could not load tenant registry. Error while getting tenant id from tenant domain " +
-                        tenantDomain);
+            } catch (org.wso2.carbon.user.api.UserStoreException | AppManagementException e) {
+                log.error(
+                        "Could not load tenant registry. Error while getting tenant id from tenant domain "
+                                + tenantDomain);
             }
         }
 

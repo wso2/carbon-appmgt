@@ -18,7 +18,7 @@
 	<parent>
         	<groupId>org.wso2.carbon.appmgt</groupId>
         	<artifactId>appmgt-feature</artifactId>
-        	<version>1.0.0-SNAPSHOT</version>
+        	<version>1.1.0-SNAPSHOT</version>
         	<relativePath>../pom.xml</relativePath>
     	</parent>
 
@@ -26,7 +26,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.wso2.carbon.appmgt.mdm.wso2mdm.feature</artifactId>
 	<packaging>pom</packaging>
-        <version>1.0.0-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<name>WSO2 Carbon - App Manager WSO2 MDM Feature</name>
 	<url>http://wso2.org</url>
 
