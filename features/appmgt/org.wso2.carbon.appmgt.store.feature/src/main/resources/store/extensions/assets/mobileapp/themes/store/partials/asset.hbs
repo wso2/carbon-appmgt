@@ -21,7 +21,7 @@
             <span class="app-assets-rating"> </span>
             <div class="row app-asset-buttons col-md-12">
                 <a href="#" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
-                <a href="#" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
+                <a href="#" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
             </div>
         </div>
     </div>
@@ -63,7 +63,7 @@
 
 
     <div class="modal fade" id="modalDevices">
-        <div class="modal-dialog">
+        <div class="modal-dialog-devices">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -71,11 +71,20 @@
                 </div>
                 <div class="modal-body">
 
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <div class="carousel slide media-carousel" id="media">
+                                <div class="carousel-inner" id="devicesList">
+
+
+                                </div>
+                                <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
+                                <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
+
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
@@ -86,7 +95,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Modal title</h4>
+                    <h4 class="modal-title">Enterprise Install</h4>
                 </div>
                 <div class="modal-body">
                     <p>One fine body&hellip;</p>

@@ -117,7 +117,21 @@
     margin:auto 10%;
     width:80%;
     height:80%;
+
 }
+
+.modal-dialog-devices {
+    position:absolute;
+    top:50% !important;
+    transform: translate(0, -50%) !important;
+    -ms-transform: translate(0, -50%) !important;
+    -webkit-transform: translate(0, -50%) !important;
+    margin:auto 20%;
+    width:60%;
+    height:50%;
+}
+
+
 .modal-content {
     min-height:100%;
     position:absolute;
@@ -134,11 +148,62 @@
     right:0;
 }
 
-#owl-demo .item{
-    margin: 3px;
+
+
+
+
+
+/* carousel */
+.media-carousel
+{
+    margin-bottom: 0;
+    padding: 0 40px 30px 40px;
+    margin-top: 30px;
 }
-#owl-demo .item img{
-    display: block;
-    width: 100%;
-    height: auto;
+/* Previous button  */
+.media-carousel .carousel-control.left
+{
+    left: -12px;
+    background-image: none;
+    background: none repeat scroll 0 0 #222222;
+    border: 4px solid #FFFFFF;
+    border-radius: 23px 23px 23px 23px;
+    height: 40px;
+    width : 40px;
+    margin-top: 30px
 }
+/* Next button  */
+.media-carousel .carousel-control.right
+{
+    right: -12px !important;
+    background-image: none;
+    background: none repeat scroll 0 0 #222222;
+    border: 4px solid #FFFFFF;
+    border-radius: 23px 23px 23px 23px;
+    height: 40px;
+    width : 40px;
+    margin-top: 30px
+}
+/* Changes the position of the indicators */
+.media-carousel .carousel-indicators
+{
+    right: 50%;
+    top: auto;
+    bottom: 0px;
+    margin-right: -19px;
+}
+/* Changes the colour of the indicators */
+.media-carousel .carousel-indicators li
+{
+    background: #c0c0c0;
+}
+.media-carousel .carousel-indicators .active
+{
+    background: #333333;
+}
+.media-carousel img
+{
+    min-width: 100px;
+
+}
+/* End carousel */
