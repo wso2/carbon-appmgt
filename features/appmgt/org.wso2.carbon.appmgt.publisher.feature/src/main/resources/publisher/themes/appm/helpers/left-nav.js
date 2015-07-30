@@ -37,7 +37,7 @@ var generateLeftNavJson = function(data, listPartial) {
     var editEnabled = true;
 
     var currentTypeObj = getTypeObj(data.shortName);
-	
+
     var leftNavItems = { leftNavLinks :
         [
            /*
@@ -46,7 +46,7 @@ var generateLeftNavJson = function(data, listPartial) {
                            additionalClasses : "active",
                            url : "/publisher/assets/" + data.shortName + "/"
                        },*/
-           
+
          /*   {
                 name : "Add " + data.shortName + "",
                 iconClass : "icon-plus-sign-alt",

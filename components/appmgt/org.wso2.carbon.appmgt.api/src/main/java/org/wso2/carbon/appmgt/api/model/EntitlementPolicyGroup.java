@@ -20,6 +20,9 @@ package org.wso2.carbon.appmgt.api.model;
 
 import org.json.simple.JSONArray;
 
+/**
+ * EntitlementPolicyGroup class contains properties related to Policy Groups
+ */
 public class EntitlementPolicyGroup {
     private int policyGroupId;
     private String policyGroupName;

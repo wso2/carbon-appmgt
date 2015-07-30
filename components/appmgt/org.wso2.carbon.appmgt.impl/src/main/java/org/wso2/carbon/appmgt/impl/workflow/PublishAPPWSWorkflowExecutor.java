@@ -197,7 +197,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                     Resource apiResource = registry.get(apiPath);
                     String artifactId = apiResource.getUUID();
                     GenericArtifact webapp = artifactManager.getGenericArtifact(artifactId);
-                    webapp.invokeAction("Approve");
+                    webapp.invokeAction("Approve", AppMConstants.APP_LIFE_CYCLE);
                 }catch (RegistryException e){
                     log.error("Error occured while retrieving registry artifact", e);
                 }
@@ -236,7 +236,7 @@ public class PublishAPPWSWorkflowExecutor extends WorkflowExecutor{
                     Resource apiResource = registry.get(apiPath);
                     String artifactId = apiResource.getUUID();
                     GenericArtifact webapp = artifactManager.getGenericArtifact(artifactId);
-                    webapp.invokeAction("Reject");
+                    webapp.invokeAction("Reject", AppMConstants.APP_LIFE_CYCLE);
                 }catch (RegistryException e){
                     log.error("Error occured while retrieving registry artifact", e);
                 }

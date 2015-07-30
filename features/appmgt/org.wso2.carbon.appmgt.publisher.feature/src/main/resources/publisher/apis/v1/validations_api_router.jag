@@ -46,6 +46,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/validations/assets/{ty
     
     routeManager.register('POST', 'publisher', '/publisher/api/validations/assets/webapp/overview_context', function (context) {
         var contextVal = context.post.overview_context;
+        var shortName = context.params.type;
 
         try {
 

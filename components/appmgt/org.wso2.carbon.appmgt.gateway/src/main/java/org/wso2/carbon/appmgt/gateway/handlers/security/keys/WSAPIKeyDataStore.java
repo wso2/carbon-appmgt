@@ -31,7 +31,9 @@ import java.util.ArrayList;
  * this stub, one may query the key manager to authenticate and authorize WebApp keys.
  * All service invocations are secured using BasicAuth over TLS. Therefore this class
  * may incur a significant overhead on the key validation process.
+ * @Deprecated API Key validation is a legacy code taken from API Manager. Need to remove this
  */
+@Deprecated
 public class WSAPIKeyDataStore implements APIKeyDataStore {
 
     private static final APIKeyValidatorClientPool clientPool = APIKeyValidatorClientPool.getInstance();

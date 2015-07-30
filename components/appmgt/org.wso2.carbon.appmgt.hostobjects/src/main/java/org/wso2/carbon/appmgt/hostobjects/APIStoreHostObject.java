@@ -30,9 +30,12 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.*;
-import org.wso2.carbon.apimgt.impl.dto.xsd.APIInfoDTO;
-import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.ApplicationKeysDTO;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -43,12 +46,18 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.workflow.*;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
+import org.wso2.carbon.appmgt.keymgt.ApplicationKeysDTO;
 import org.wso2.carbon.appmgt.keymgt.client.APIAuthenticationServiceClient;
 import org.wso2.carbon.appmgt.keymgt.client.SubscriberKeyMgtClient;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
@@ -119,21 +128,23 @@ public class APIStoreHostObject extends ScriptableObject {
     	}
     }
 
-    public static void jsFunction_loadRegistryOfTenant(Context cx,
-                                                Scriptable thisObj, Object[] args, Function funObj){
-        if(!isStringArray(args)) {
+    public static void jsFunction_loadRegistryOfTenant(Context cx, Scriptable thisObj,
+            Object[] args, Function funObj) {
+        if (!isStringArray(args)) {
             return;
         }
 
         String tenantDomain = args[0].toString();
-        if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME
+                .equals(tenantDomain)) {
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
                         getTenantManager().getTenantId(tenantDomain);
                 AppManagerUtil.loadTenantRegistry(tenantId);
-            } catch (org.wso2.carbon.user.api.UserStoreException e) {
-                log.error("Could not load tenant registry. Error while getting tenant id from tenant domain " +
-                        tenantDomain);
+            } catch (org.wso2.carbon.user.api.UserStoreException | AppManagementException e) {
+                log.error(
+                        "Could not load tenant registry. Error while getting tenant id from tenant domain "
+                                + tenantDomain);
             }
         }
 

@@ -36,17 +36,15 @@ import org.wso2.carbon.appmgt.api.model.SSOProvider;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
+import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.core.util.IdentityUtil;
 import org.wso2.carbon.identity.sso.saml.stub.IdentitySAMLSSOConfigServiceStub;
 import org.wso2.carbon.identity.sso.saml.stub.types.SAMLSSOServiceProviderDTO;
 import org.wso2.carbon.identity.sso.saml.stub.types.SAMLSSOServiceProviderInfoDTO;
 
-public class IS460SAMLSSOConfigurator implements SSOConfigurator {
+public class IS460SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implements SSOConfigurator {
 
     private static Log log = LogFactory.getLog(IS460SAMLSSOConfigurator.class);
-
-    private static String SERVER_URL = "providerURL";
-    private static String PASSWORD = "password";
-    private static String USERNAME = "username";
 
     private IdentitySAMLSSOConfigServiceStub stub;
     private Map<String, String> parameters;
@@ -185,31 +183,6 @@ public class IS460SAMLSSOConfigurator implements SSOConfigurator {
         } catch (LoginAuthenticationExceptionException e) {
             throw new AxisFault("Error while authenticating against the SSO IDP admin", e);
         }
-    }
-
-    private SAMLSSOServiceProviderDTO generateDTO(SSOProvider provider) {
-        SAMLSSOServiceProviderDTO dto = new SAMLSSOServiceProviderDTO();
-
-        dto.setIssuer(provider.getIssuerName());
-        dto.setAssertionConsumerUrl(provider.getAssertionConsumerURL());
-        dto.setCertAlias(null);
-
-
-        dto.setNameIDFormat(provider.getNameIdFormat());
-        if (dto.getNameIDFormat()!=null) {
-            dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
-        }
-
-        dto.setDoSingleLogout(true);
-        dto.setLogoutURL(provider.getLogoutUrl());
-        dto.setRequestedClaims(provider.getClaims());
-        dto.setEnableAttributesByDefault(true);
-
-        dto.setAttributeConsumingServiceIndex("");
-
-        dto.setIdPInitSSOEnabled(true);
-
-        return dto;
     }
 
     public SAMLSSOServiceProviderInfoDTO getRegisteredServiceProviders() throws AxisFault {

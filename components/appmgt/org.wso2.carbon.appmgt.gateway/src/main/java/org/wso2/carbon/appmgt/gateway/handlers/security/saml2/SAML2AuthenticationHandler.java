@@ -150,10 +150,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         // http verb (eg: GET,POST)
         String httpVerb = (String) messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
         if(httpVerb == null) {
-            org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
+            org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext)
+                    .getAxis2MessageContext();
             httpVerb =   (String) axis2MC.getProperty(Constants.Configuration.HTTP_METHOD);
         }
-
         // request full path (eg: /context/version/pattern)
         String fullReqPath =
                 (String) messageContext.getProperty(RESTConstants.REST_FULL_REQUEST_PATH);
@@ -381,6 +381,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             String httpVerbAndRequestPath = httpVerb + requestPath;
         	
         	String matchedPattern = matcher.match(httpVerbAndRequestPath);
+
+            if(matchedPattern == null) {
+                return false;
+            }
         	
         	Boolean allowAnonymous = httpVerbInfo.getAllowAnonymousUrl(matchedPattern);
         	

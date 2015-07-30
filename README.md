@@ -41,7 +41,7 @@ Issue Tracker
 Help us make our software better. Please submit any bug reports or feature
 requests through the WSO2 JIRA system:
 
-    https://wso2.org/jira/browse/APPMANAGER
+    <https://wso2.org/jira/browse/APPM>
 
 
 Crypto Notice
