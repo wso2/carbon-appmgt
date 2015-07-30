@@ -4,21 +4,68 @@
             <a href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
         </div>
         <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
+
+
             <div class="wr-auth pull-right">
-                <a href="#" data-toggle="dropdown">
-                    <div class="auth-img">
-                        Administrator
+
+                {{#if user}}
+
+                    <a href="#" data-toggle="dropdown">
+                        <div class="auth-img">
+                            {{user.username}}
                             <span class="fw-stack-md fw-lg">
                                 <i class="fw fw-user fw-stack-1-5x"></i>
                             </span>
+                        </div>
+                    </a>
+
+                    <div class="dropdown-menu">
+                        <div class="cu-arrow"></div>
+                        <div class="dropdown-menu-content">
+                            <a class="filter-item" href="{{url "/logout"}}">Logout</a>
+                        </div>
                     </div>
-                </a>
-                <div class="dropdown-menu">
-                    <div class="cu-arrow"></div>
-                    <div class="dropdown-menu-content">
-                        <a class="filter-item">Logout</a>
-                    </div>
-                </div>
+
+                {{else}}
+
+                    {{#if sso}}
+
+                        <a href="{{url "/login"}}">
+                            <div class="auth-img">
+                                {{t "Sign In"}}
+                            <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                            </div>
+                        </a>
+
+                        {{else}}
+
+                        <a data-toggle="modal" data-target="#modal-login">
+                            <div class="auth-img">
+                                {{t "Sign In"}}
+                            <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                            </div>
+                        </a>
+
+                    {{/if}}
+
+
+
+                    <a href="#" data-toggle="dropdown">
+                        <div class="auth-img">
+                            Register
+                            <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                        </div>
+                    </a>
+
+                {{/if}}
+
+
             </div>
         </div>
     </div>

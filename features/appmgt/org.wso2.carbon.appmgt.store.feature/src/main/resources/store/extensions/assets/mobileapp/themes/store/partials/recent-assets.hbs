@@ -1,29 +1,24 @@
 <div class="row">
-	<div class="span3">
-		<h4><i class="icon-time"></i> {{t "Recently Added"}}</h4>
-		{{#slice . count="20" size="20"}}
-			{{#each .}}
-				<div class="row-fluid type-{{attributes.overview_platform}} recently-added">
-					{{#attributes}}
-						<div class="span3 recent-asset-icon">
-							<input type="hidden" value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous"/>
-							<a href="{{url "/assets"}}/{{../type}}/{{../id}}">
-								<img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"/>
-							</a>
-						</div>
-						<div class="span9 recent-asset-details">
-							<input type="hidden" value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous"/>
-							<strong>
-								<a href="{{url "/assets"}}/{{../type}}/{{../id}}">
-									{{overview_displayName}}
-								</a>
-							</strong>
-							<small>by <a href="#">{{overview_provider}}</a></small>
-						</div>
-					{{/attributes}}
-				</div>
-			{{/each}}
-			<hr/>
-		{{/slice}}
+	<h3>Recent Assets</h3>
+	<hr>
+
+
+{{#slice . count="20" size="20"}}
+	{{#each .}}
+        <div class="row">
+		<div class="col-md-9">
+			<div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
+			<div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
+            <span class="recent-app-assets-rating"> </span>
+		</div>
+        <div class="col-md-3">
+            <img class="col-md-12" src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+        </div>
 	</div>
+
+    <hr>
+	{{/each}}
+{{/slice}}
+
+
 </div>

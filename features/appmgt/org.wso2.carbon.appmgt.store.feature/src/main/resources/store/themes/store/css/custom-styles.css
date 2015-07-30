@@ -90,3 +90,55 @@
 .app-asset-screenshot{
   
 }
+
+
+.recent-app-assets-name{
+    font-weight: bold;
+}
+
+.recent-app-assets-rating {
+    background: url('../img/store-stars.png') no-repeat top left;
+    display: block;
+    height: 20px;
+    width: 100px;
+    clear: both;
+}
+
+.modal-backdrop {
+    z-index: 0;
+}
+
+.modal-dialog {
+    position:absolute;
+    top:50% !important;
+    transform: translate(0, -50%) !important;
+    -ms-transform: translate(0, -50%) !important;
+    -webkit-transform: translate(0, -50%) !important;
+    margin:auto 10%;
+    width:80%;
+    height:80%;
+}
+.modal-content {
+    min-height:100%;
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+.modal-footer {
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+}
+
+#owl-demo .item{
+    margin: 3px;
+}
+#owl-demo .item img{
+    display: block;
+    width: 100%;
+    height: auto;
+}

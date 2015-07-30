@@ -34,6 +34,8 @@
     <link href="{{url "/themes/store/css/custom-theme.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/custom-styles.css"}}" rel="stylesheet">
 
+    {{css}}
+
     <!--[if lt IE 9]>
     <script src="js/html5shiv.min.js"></script>
     <script src="js/respond.min.js"></script>
@@ -62,6 +64,10 @@
             <!-- content -->
             <div class="wr-content">
                 {{include body}}
+
+                <div class="col-md-3">
+                    {{include right}}
+                </div>
             </div>
             <!-- /content -->
 
