@@ -56,14 +56,6 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
-        </dependency>
-        <!-- APPM 1.1.0 <dependency>-->
-            <!--<groupId>org.wso2.carbon.apimgt</groupId>-->
-            <!--<artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>
@@ -94,8 +86,6 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt.client</bundleDef>
-                                <!-- APPM 1.1.0 <bundleDef>org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.handlers.security.stub</bundleDef>-->
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
