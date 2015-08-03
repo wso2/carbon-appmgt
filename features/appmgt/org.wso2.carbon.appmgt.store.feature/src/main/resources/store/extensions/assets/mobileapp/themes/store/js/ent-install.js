@@ -5,7 +5,7 @@ var selectedApp = "";
 
 $(document).ready( function () {
 
-  
+
 if($('#isEnterpriseInstallEnabled').val() === 'true'){
     oTable = $('#roles-table').dataTable({
         "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'f>r>t<'row-fluid'<'span6'i><'span6'p>>",

@@ -218,7 +218,7 @@ jQuery(function ($) {
        var device = getURLParameter("device");	
 		appToInstall = $(this).data("app");
 	   devicePlatform = $(this).data("platform").toLowerCase();
-        
+
 		
 		var showDevices = false;
 		
@@ -268,7 +268,7 @@ jQuery(function ($) {
         rating = el.data('rating');
     $($('input', el)[rating - 1]).attr('checked', 'checked');
 
-    $('.auto-submit-star').rating({
+   /* $('.auto-submit-star').rating({
         callback: function (value, link) {
             if (value == undefined) {
                 value = 0;
@@ -281,7 +281,7 @@ jQuery(function ($) {
 
             });
         }
-    });
+    }); */
 
 
 
