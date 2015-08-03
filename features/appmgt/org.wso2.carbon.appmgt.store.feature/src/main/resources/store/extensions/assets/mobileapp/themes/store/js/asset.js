@@ -1,51 +1,51 @@
 appToInstall = null;
 
-$('#media').carousel({
-    pause: true,
-    interval: false,
-});
 
-$.ajax({
-    url: "/store/apis/enterprise/get-devices",
-    dataType: "json"
-}).done(function(data) {
 
-    var objects = [];
 
-    var length = 6;
-    for(var i = 0; i <= parseInt(data.length / length); i++){
-        objects.push([]);
-    }
 
-    $.each(data, function(key,value) {
-        var index = parseInt(key/ length);
-        objects[index].push(value);
+jQuery(function ($) {
+
+    $('#media').carousel({
+        pause: true,
+        interval: false,
     });
 
-    for(var j = 0; j < objects.length; j++){
-        var isActive = j === 0 ? "active" : "";
-        var item = $("<div>", {class: "item " + isActive });
-        var row = $("<div>", {class: "row"});
+    $.ajax({
+        url: "/store/apis/enterprise/get-devices",
+        dataType: "json"
+    }).done(function(data) {
 
-        for(var k = 0 ; k < objects[j].length; k++){
-                row.append('<div class="col-md-2">' +
+        var objects = [];
+
+        var length = 6;
+        for(var i = 0; i <= parseInt(data.length / length); i++){
+            objects.push([]);
+        }
+
+        $.each(data, function(key,value) {
+            var index = parseInt(key/ length);
+            objects[index].push(value);
+        });
+
+        for(var j = 0; j < objects.length; j++){
+            var isActive = j === 0 ? "active" : "";
+            var item = $("<div>", {class: "item " + isActive });
+            var row = $("<div>", {class: "row"});
+
+            for(var k = 0 ; k < objects[j].length; k++){
+                row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id + '"  class="col-md-2 device-image-block-modal">' +
                     '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
                     '"><div>' + objects[j][k].name + '</div></a>' +
-                '</div>');
+                    '</div>');
+            }
+            item.append(row);
+            $("#devicesList").append(item);
         }
-        item.append(row);
-        $("#devicesList").append(item);
-    }
 
-});
+    });
 
-$(function () {
-
-
-
-
-
-
+    var isSocial = false;
     if (isSocial) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -149,7 +149,7 @@ $(function () {
 
             });
 
-        $('#tab-review-box').find('.btn-primary').live('click', function (e) {
+        $('#tab-review-box').find('.btn-primary').on('click', function (e) {
             if (!$("#form-review").valid()) return;
             caramel.post('/apis/comment', {
                 asset: $('#assetp-tabs').data('aid'),
@@ -159,7 +159,7 @@ $(function () {
             }, 'json');
         });
 
-        $('.text-review-box').live('keyup focus', function (e) {
+        $('.text-review-box').on('keyup focus', function (e) {
             if ($('#comment-content').hasClass('user-review')) {
                 $(".btn-review").removeClass("btn-primary");
                 $(".btn-review").addClass("disabled");
@@ -204,6 +204,9 @@ $(function () {
          }
          })*/
     }
+
+
+
     $('#btn-add-gadget').click(function () {
        /* var elem = $(this);
         if (store.user) {
@@ -215,7 +218,7 @@ $(function () {
        var device = getURLParameter("device");	
 		appToInstall = $(this).data("app");
 	   devicePlatform = $(this).data("platform").toLowerCase();
-	
+        
 		
 		var showDevices = false;
 		

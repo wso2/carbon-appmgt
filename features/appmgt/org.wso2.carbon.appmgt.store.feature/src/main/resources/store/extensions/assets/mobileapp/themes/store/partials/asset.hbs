@@ -20,7 +20,7 @@
 
             <span class="app-assets-rating"> </span>
             <div class="row app-asset-buttons col-md-12">
-                <a href="#" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
+                <a id="btn-add-gadget" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
                 <a href="#" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
             </div>
         </div>

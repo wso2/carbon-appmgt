@@ -68,8 +68,7 @@ $(".device-image-block").click(function(index) {
 
 });
 
-$(".device-image-block-modal").click(function(index) {
-
+$("#devicesList").on( "click", ".device-image-block-modal", function() {
     var deviceId = $(this).data("deviceId");
     performInstalltion(deviceId, appToInstall);
 });
@@ -193,9 +192,6 @@ function updateQueryStringParameter(uri, key, value) {
 }
 
 
-$('#devicesList').on('hidden', function () {
-    //location.reload();
-})
 
 
 function getURLParameter(name) {
