@@ -26,20 +26,20 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         if (appType == 'mobileapp') {
             var queryParams = request.getAllParameters();
-            var mobileValidatorClass = require('/extensions/mobileapp/validations.js');
-            var mobileValidator = new mobileValidatorClass.getInstance(null);
-            var result = mobileValidator.validateField(fieldName, queryParams[fieldName],
-                                                       queryParams);
-            if (!result.valid) {
+            var mobileValidatorModule = require('/extensions/mobileapp/validations.js');
+            var mobileValidator = new mobileValidatorModule.Validator(null);
+            var result = mobileValidator.validateFormField(fieldName, queryParams[fieldName],
+                                                           queryParams);
+            if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
                 response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
                 response.contentType = "application/json";
-                var content = {status: 'Validation Error', message: result.message};
+                var content = {status: "Validation Error", message: result.message};
                 response.content = stringify(content);
                 return;
             }
             response.status = 200;
+            response.content = stringify({status: "Success"});
         }
-
     });
 
     routeManager.register('GET', 'publisher', '/publisher/api/validate/{appType}/form/name/{formName}', function (context) {
@@ -53,20 +53,23 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (queryParams['partial']) {
                 partialValidation = Boolean(queryParams['partial']);
             }
-            var mobileValidatorClass = require('/extensions/mobileapp/validations.js');
-            var mobileValidator = new mobileValidatorClass.getInstance(null);
-            var result = mobileValidator.validateFormData(formName, queryParams, partialValidation);
+            var mobileValidatorModule = require('/extensions/mobileapp/validations.js');
+            var mobileValidator = new mobileValidatorModule.Validator(null);
+            var result = mobileValidator.validateForm(formName, queryParams, partialValidation);
 
-            if (result.status != mobileValidatorClass.ValidationStatus.VALID) {
+            if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
                 response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
                 response.contentType = "application/json";
-                var content = {status: 'Validation Error', messages: result.messages};
+                var content = {
+                    status: "Validation Error",
+                    validationResults: result.validationResults
+                };
                 response.content = stringify(content);
                 return;
             }
             response.status = 200;
+            response.content = stringify({status: "Success"});
         }
-
     });
 
     routeManager.register('POST', 'publisher', '/publisher/api/validations/assets/webapp/overview_context', function (context) {
