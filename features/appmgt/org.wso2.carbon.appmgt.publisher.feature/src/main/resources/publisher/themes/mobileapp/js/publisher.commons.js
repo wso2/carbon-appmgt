@@ -124,9 +124,6 @@ $(document).ready(function() {
 		$(this).next().click();
 	});
 
-	$('input[type="file"]').change(function() {
-		$(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
-	})
 	/*
 	 The function is used to check if the version entered by the user exists
 	 @versionList: A list of versions
