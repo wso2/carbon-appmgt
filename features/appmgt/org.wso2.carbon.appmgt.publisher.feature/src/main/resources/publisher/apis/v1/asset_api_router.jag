@@ -1127,119 +1127,134 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     }
 
-    function copyMobileApp(parentArtifact, context){
+    function copyMobileApp(oldVersionArtifact, context){
 
-        var content = {status: "", messages: []};
         var postContext = context.post;
         var appType = context.params.type;
 
-        // validate context params
-        var mobileValidatorClass = require('/extensions/mobileapp/validations.js');
-        var mobileValidator = new mobileValidatorClass.getInstance(null);
-        var result = mobileValidator.validateFormData('copyapp', postContext, false);
-
-        if (result.status != mobileValidatorClass.ValidationStatus.VALID) {
-            response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-            response.contentType = "application/json";
-            content = {status: 'Validation Error', messages: result.messages};
-            response.content = stringify(content);
-            return;
-        }
-
-        // check version already exists
-        var version = postContext[mobileValidatorClass.Field.OVERVIEW_VERSION];
-        if (version == parentArtifact.attributes.overview_version) {
-            response.status = 409; // Conflict
-            response.contentType = "application/json";
-            content.status = "Validation Error";
-            content.messages.push("Version '" + version + "' of mobile app "
-                                  + parentArtifact.attributes.overview_name + " already exists.");
-            response.content = stringify(content);
-            return;
-        }
-
-        var childModel = modelManager.getModel(appType);
-        childModel.import('asset', parentArtifact);
+        var mobileValidatorModule = require('/extensions/mobileapp/validations.js');
+        var newVersionModel = modelManager.getModel(appType);
+        newVersionModel.import('asset', oldVersionArtifact);
+        newVersionModel.set('*.id', null);
         // these attributes do not change: provider, name, platform, type, category
 
-        if (postContext[mobileValidatorClass.Field.OVERVIEW_FILE]) {
-            childModel.set('overview.url', postContext[mobileValidatorClass.Field.OVERVIEW_FILE]);
+        if (postContext[mobileValidatorModule.Field.OVERVIEW_FILE]) {
+            newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_URL,
+                           postContext[mobileValidatorModule.Field.OVERVIEW_FILE]);
         } else {
-            childModel.set('overview.url', postContext[mobileValidatorClass.Field.OVERVIEW_URL]);
+            newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_URL,
+                           postContext[mobileValidatorModule.Field.OVERVIEW_URL]);
         }
 
-        childModel.set('overview.packagename', postContext[mobileValidatorClass.Field.OVERVIEW_PACKAGE_NAME]);
-        childModel.set('overview.appid', postContext[mobileValidatorClass.Field.OVERVIEW_APP_ID]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_PACKAGE_NAME,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_PACKAGE_NAME]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_APP_ID,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_APP_ID]);
 
-        childModel.set('overview.displayName', postContext[mobileValidatorClass.Field.OVERVIEW_DISPLAY_NAME]);
-        childModel.set('overview.description', postContext[mobileValidatorClass.Field.OVERVIEW_DESCRIPTION]);
-        childModel.set('overview.recentchanges', postContext[mobileValidatorClass.Field.OVERVIEW_RECENT_CHANGES]);
-        childModel.set('overview.version', version);
-        childModel.set('overview.bundleversion', version);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_DISPLAY_NAME,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_DISPLAY_NAME]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_DESCRIPTION,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_DESCRIPTION]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_RECENT_CHANGES,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_RECENT_CHANGES]);
+        var version = postContext[mobileValidatorModule.Field.OVERVIEW_VERSION];
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_VERSION, version);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_BUNDLE_VERSION, version);
 
         // handle images
-        var banner = postContext[mobileValidatorClass.Field.IMAGES_BANNER];
-        if (banner) {
-            childModel.set('images.banner', saveFile(banner));
-        }
-        var screenshots = parentArtifact.attributes.images_screenshots.split(',');
-        var screenshot0 = postContext[mobileValidatorClass.Field.IMAGES_SCREENSHOTS_0];
-        if (screenshot0) {
-            screenshots[0] = saveFile(screenshot0);
-        }
-        var screenshot1 = postContext[mobileValidatorClass.Field.IMAGES_SCREENSHOTS_1];
-        if (screenshot1) {
-            screenshots[1] = saveFile(screenshot1);
-        }
-        var screenshot2 = postContext[mobileValidatorClass.Field.IMAGES_SCREENSHOTS_2];
-        if (screenshot2) {
-            screenshots[2] = saveFile(screenshot2);
-        }
-        childModel.set('images.screenshots', screenshots.join(","));
-        var thumbnail = postContext[mobileValidatorClass.Field.IMAGES_THUMBNAIL];
-        if (thumbnail) {
-            childModel.set('images.thumbnail', saveFile(thumbnail));
-        }
+        inspectFiles(request, postContext);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
+        var screenshots = oldVersionArtifact.attributes.images_screenshots.split(',');
+        screenshots[0] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
+        screenshots[1] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
+        screenshots[2] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots.join(","));
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
 
-        // perform validations on the model
-        var result = childModel.validate();
-
-        if(result && result.failed){
-            response.status = 422; // (Unprocessable Entity)
+        // validate model
+        var mobileValidator = new mobileValidatorModule.Validator(null);
+        var result = mobileValidator.validateModel(newVersionModel, false);
+        if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
+            response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
             response.contentType = "application/json";
-            content.status = "Validation Error";
-            content.messages.push(report);
+            content = {status: 'Validation Error', validationResults: result.validationResults};
+            response.content = stringify(content);
+            return;
+        }
+        // perform ES validations on the model
+        result = newVersionModel.validate();
+        if (result && result.failed) {
+            response.status = 422;
+            response.contentType = "application/json";
+            response.content = stringify({status: "Validation Error", message: result});
+            return;
+        }
+
+        // check new version already exists
+        var previousVersions = [];
+        try {
+            var artifactManager = rxtManager.getSystemArtifactManager(appType, session);
+            previousVersions = artifactManager.find(function (artifact) {
+                var isSameProvider = (artifact.attributes.overview_provider ==
+                                      oldVersionArtifact.attributes.overview_provider);
+                var isSameName = (artifact.attributes.overview_name ==
+                                  oldVersionArtifact.attributes.overview_name);
+                var isSameVersion = (version == artifact.attributes.overview_version);
+                return (isSameProvider && isSameName && isSameVersion);
+            }, null);
+        } catch (e) {
+            log.error("Cannot retrieve previous versions of mobile app " +
+                      oldVersionArtifact.attributes.overview_name + " by " +
+                      oldVersionArtifact.attributes.overview_provider);
+            log.error(e);
+            // continue work flow <add more details>
+        }
+        if (previousVersions.length > 1) {
+            response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
+            response.contentType = "application/json";
+            var validationResults = {};
+            validationResults[mobileValidatorModule.Field.OVERVIEW_VERSION] =
+                "Version '" + version + "' of mobile app '"
+                + oldVersionArtifact.attributes.overview_name + "' already exists.";
+            content = {status: 'Validation Error', validationResults: validationResults};
             response.content = stringify(content);
             return;
         }
 
         try {
-            childModel.save();
+            newVersionModel.save();
         } catch (e) {
-            log.error("Cannot create new version '" + postContext.overview_displayName
-                      + "' from mobile app '"
-                      + parentArtifact.attributes.overview_displayName + "'.");
+            log.error("Cannot create new version '" + version + "' of mobile app '"
+                      + oldVersionArtifact.attributes.overview_displayName + "' from its version'"
+                      + oldVersionArtifact.attributes.overview_version + "'.");
             log.error(e);
             response.status = 500;
             response.contentType = "application/json";
+            var content = {};
             content.status = "Error";
-            content.messages.push("Cannot create new version '" + postContext.overview_displayName
-                                 + "' from mobile app '"
-                                 + parentArtifact.attributes.overview_displayName + "'.");
+            content.message = "Cannot create new version '" + version + "' of mobile app '"
+                              + oldVersionArtifact.attributes.overview_displayName
+                              + "' from its version '"
+                              + oldVersionArtifact.attributes.overview_version + "'.";
             response.content = stringify(content);
             return;
         }
 
-        var asset = childModel.export('asset.exporter');
-        var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
-        var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
-        assetCacheManager.add(asset, shortName);
+        try {
+            var cachingAsset = newVersionModel.export('asset.exporter');
+            var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
+            var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
+            assetCacheManager.add(cachingAsset, appType);
+        } catch (e) {
+            log.error("Adding to cache operation failed for mobile app asset with UUID '"
+                      + newVersionModel.get('*.id') + "'.");
+            log.error(e);
+        }
 
         // everything went great
         response.status = 200;
         response.contentType = "application/json";
-        content.status = "Success";
-        response.content = stringify(content);
+        response.content = stringify({status: "Success"});
 
     }
 
