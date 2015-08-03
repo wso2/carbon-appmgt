@@ -1,24 +1,24 @@
 <ul id="newMobileAppWizard" class="nav nav-pills nav-wizard">
-    <li class="active">
-        <a href="#" id="wizard-step-1-link">
+    <li id="wizard-step-1-nav" class="active">
+        <a id="wizard-step-1-link" href="#">
             Upload application/provide URL
         </a>
         <div class="nav-arrow"></div>
     </li>
-    <li>
+    <li id="wizard-step-2-nav">
         <div class="nav-wedge"></div>
-        <a href="#" id="wizard-step-2-link">
+        <a id="wizard-step-2-link" href="#">
             Give application details
         </a>
         <div class="nav-arrow"></div>
     </li>
 </ul>
 
-<div id="file-upload-progress" style="display: none;">
-    <h4>Uploading... Please wait.</h4>
+<div id="file-upload-progress-wrapper" style="display: none;">
+    <h4>Uploading...</h4>
     <div id="file-upload-progressbar-wrapper" class="progress" style="height: 15px;">
         <div id="file-upload-progressbar" class="progress-bar" role="progressbar"
-             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%;">
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0;">
         </div>
     </div>
 </div>
@@ -35,13 +35,13 @@
         <form id="wizard-step-1-form" class="form-horizontal">
 
             <div class="form-group">
-                <label class="col-sm-2 control-label" for="txtPlatform">
+                <label class="control-label col-sm-2" for="txtPlatform">
                     Platform
                 </label>
-                <div class="col-sm-10">
+                <div class="col-sm-2">
                     {{#with artifact.attributes.overview_platform}}
-                        <select id="txtPlatform" name="overview_platform"
-                                class="btn dropdown-toggle btn-default border-ovrd col-sm-2"
+                        <select id="txtPlatform" name="overview.platform"
+                                class="form-control"
                                 disabled="disabled">
                             <option value="{{this}}" selected="selected">
                                 {{#ifCond this "==" "android"}}Android{{/ifCond}}
@@ -53,88 +53,89 @@
                 </div>
             </div>
 
-            <div id="market-type-block" class="form-group">
-                <label class="col-sm-2 control-label" for="txtStoreType">
-                    Store Type
-                </label>
-                <div class="col-sm-10">
-                    {{#with artifact.attributes.overview_type}}
-                        <select id="txtStoreType" name="overview_type"
-                                class="btn dropdown-toggle btn-default border-ovrd col-sm-2"
-                                disabled="disabled">
-                            <option value="{{this}}" selected="selected">
-                                {{#ifCond this "==" "enterprise"}}Enterprise{{/ifCond}}
-                                {{#ifCond this "==" "public"}}Public{{/ifCond}}
-                            </option>
-                        </select>
-                    {{/with}}
+            {{#ifCond artifact.attributes.overview_platform "!=" "webapp"}}
+                <!-- android, iOS -->
+                <div id="market-type-block" class="form-group">
+                    <label class="control-label col-sm-2" for="txtStoreType">
+                        Store Type
+                    </label>
+                    <div class="col-sm-2">
+                        {{#with artifact.attributes.overview_type}}
+                            <select id="txtStoreType" name="overview.type"
+                                    class="form-control"
+                                    disabled="disabled">
+                                <option value="{{this}}" selected="selected">
+                                    {{#ifCond this "==" "enterprise"}}Enterprise{{/ifCond}}
+                                    {{#ifCond this "==" "public"}}Public{{/ifCond}}
+                                </option>
+                            </select>
+                        {{/with}}
+                    </div>
                 </div>
-            </div>
+            {{/ifCond}}
 
             <div id="app-upload-block" class="form-group">
                 {{#ifCond artifact.attributes.overview_platform "==" "webapp"}}
                     <label class="control-label col-sm-2" for="txtWebapp">
                         Web App URL <span style="color:#FF0000">*</span>
                     </label>
-                    <div class="col-sm-10">
-                        <input type="text" id="txtWebappUrl" name="overview_url"
+                    <div class="col-sm-5">
+                        <input type="text" id="txtWebappUrl" name="overview.url"
                                value="{{artifact.attributes.overview_url}}"
-                               class="field col-md-6"
-                               placeholder="eg: http://mobile.com/webapp" /><br/>
-                        <div style="font-size: xx-small">Please enter a valid url</div>
+                               class="form-control"
+                               placeholder="eg: http://mobile.com/webapp" />
                     </div>
                 {{else}}
                     <!-- android, iOS -->
                     {{#ifCond artifact.attributes.overview_type "==" "enterprise"}}
-                        <label class="col-sm-2 control-label" for="file-upload-text">
+                        <label class="control-label col-sm-2" for="fileAppUpload">
                             App <span style="color:#FF0000">*</span>
                         </label>
-                        <div id="file-upload-block" class="col-sm-10">
-                            <div class="fileupload fileupload-new btn-file well"
-                                 data-provides="fileupload">
+                        <div class="col-sm-10">
+                            <div class="fileupload fileupload-new" data-provides="fileupload">
                                 {{#with artifact.attributes.overview_platform}}
-                                    <div id="file-upload-text" class="fileupload-new">
-                                        {{#ifCond this "==" "android"}}
-                                            Choose .APK File
-                                        {{/ifCond}}
-                                        {{#ifCond this "==" "ios"}}
-                                            Choose .IPA File
-                                        {{/ifCond}}
+                                    <div class="btn btn-default btn-file fileupload-app-btn">
+                                        <div class="fileupload-new">
+                                            {{#ifCond this "==" "android"}}
+                                                Choose .APK File
+                                            {{/ifCond}}
+                                            {{#ifCond this "==" "ios"}}
+                                                Choose .IPA File
+                                            {{/ifCond}}
+                                        </div>
+                                        <div class="fileupload-exists">
+                                            <span class="fileupload-preview"></span>
+                                            <i class="icon-edit" style="margin-left: 20px;"></i>
+                                        </div>
+                                        <input type="file" id="appFileUpload" name="file"
+                                               style="display: inline;" title="&nbsp;"
+                                               {{#ifCond this "==" "android"}}accept="application/vnd.android.package-archive,.apk" {{/ifCond}}
+                                            {{#ifCond this "==" "ios"}}accept="application/octet-stream ipa,.ipa"{{/ifCond}} />
                                     </div>
-                                    <div class="fileupload-exists">
-                                        <i class="icon-file "></i>
-                                        <span class="fileupload-preview"></span>&nbsp;&nbsp;
-                                        <i class="icon-edit"> </i>
-                                    </div>
-                                    <input type="file" id="fileAppUpload" name="file"
-                                           style="display: inline;"
-                                           data-url="/publisher/api/mobileapp/upload"
-                                           {{#ifCond this "==" "android"}}accept="application/vnd.android.package-archive,.apk"{{/ifCond}}
-                                        {{#ifCond this "==" "ios"}}accept="application/octet-stream ipa,.ipa"{{/ifCond}} />
                                 {{/with}}
                             </div>
                         </div>
                     {{/ifCond}}
                     {{#ifCond artifact.attributes.overview_type "==" "public"}}
                         {{#ifCond artifact.attributes.overview_platform "==" "android"}}
-                            <label class="col-sm-2 control-label" for="txtPackageName">
+                            <label class="control-label col-sm-2" for="txtPackageName">
                                 Package Name <span style="color:#FF0000">*</span>
                             </label>
 
-                            <div class="col-sm-10 inner-addon">
-                                <input type="text" id="txtPackageName" name="overview_packagename"
-                                       class="field col-md-6"
+                            <div class="col-sm-5">
+                                <input type="text" id="txtPackageName" name="overview.packagename"
+                                       class="form-control"
                                        placeholder="eg: com.companyname.applicationname" />
                             </div>
                         {{/ifCond}}
                         {{#ifCond artifact.attributes.overview_platform "==" "ios"}}
-                            <label class="col-sm-2 control-label" for="txtPackageName">
+                            <label class="control-label col-sm-2" for="txtPackageName">
                                 App Identifier <span style="color:#FF0000">*</span>
                             </label>
 
                             <div class="col-sm-10 inner-addon">
-                                <input type="text" id="txtAppIdentifier" name="overview_appid"
-                                       class="field col-md-4"
+                                <input type="text" id="txtAppIdentifier" name="overview.appid"
+                                       class="form-control"
                                        placeholder="eg: 420009108" />
                             </div>
                         {{/ifCond}}
@@ -143,14 +144,12 @@
             </div>
 
             <div class="form-group">
-                <div class="col-sm-10 col-sm-offset-2">
+                <div class="col-sm-offset-2 col-sm-2">
                     <a href="#" id="btn-next" class="btn btn-primary" aria-hidden="true">
-                        Next
+                        Continue
                     </a>
                 </div>
             </div>
-
-            <div class="empty-spacer"> </div>
 
         </form>
 
@@ -164,20 +163,34 @@
         <form id="wizard-step-2-form" action="/publisher/api/asset/version/{{op}}/{{shortName}}/{{artifact.id}}"
               method="post" enctype="multipart/form-data" class="form-horizontal">
 
-            <input type="hidden" id="appParenId" name="appParentId" value="{{artifact.id}}" />
-            <input type="hidden" id="appName" name="overview_name" value="{{artifact.attributes.overview_name}}" />
-
-            <input type="hidden" id="appPlatform" name="overview_platform" value="{{artifact.attributes.overview_platform}}" />
-            <input type="hidden" id="appStoreType" name="overview_type" value="{{artifact.attributes.overview_type}}" />
+            {{#ifCond artifact.attributes.overview_platform "==" "webapp"}}
+                <input type="hidden" id="appWebappUrl" name="overview.url" value="" />
+            {{else}}
+                <!-- iOS, Android -->
+                {{#ifCond artifact.attributes.overview_type "==" "enterprise"}}
+                    <input type="hidden" id="appFile" name="overview.file" value="" />
+                    <input type="hidden" id="appPackageName" name="overview.packagename" value="" />
+                    <input type="hidden" id="appVersion" name="overview.version" value="" />
+                {{/ifCond}}
+                {{#ifCond artifact.attributes.overview_type "==" "public"}}
+                    {{#ifCond artifact.attributes.overview_platform "==" "android"}}
+                        <input type="hidden" id="appPackageName" name="overview.packagename"
+                               value="" />
+                    {{/ifCond}}
+                    {{#ifCond artifact.attributes.overview_platform "==" "ios"}}
+                        <input type="hidden" id="appAppIdentifier" name="overview.appid" value="" />
+                    {{/ifCond}}
+                {{/ifCond}}
+            {{/ifCond}}
 
             <div class="form-group">
                 <label class="control-label col-sm-2" for="txtDisplayName">
                     Display Name <span style="color:#FF0000">*</span>
                 </label>
-                <div class="col-sm-10 inner-addon">
-                    <input type="text" id="txtDisplayName" name="overview_displayName"
+                <div class="col-sm-4">
+                    <input type="text" id="txtDisplayName" name="overview.displayName"
                            value="{{artifact.attributes.overview_displayName}}"
-                           class="field col-md-6" title="Display Name" />
+                           class="form-control" title="Display Name" />
                 </div>
             </div>
             <div class="form-group">
@@ -185,9 +198,9 @@
                     Description <span style="color:#FF0000">*</span><br>
                     <small>(Max. 1000 characters)</small>
                 </label>
-                <div class="col-sm-10">
-					<textarea id="txtDescription" name="overview_description"
-                              class="field span6" maxlength="1000" rows="12" style="width: 90%;"
+                <div class="col-sm-8">
+					<textarea id="txtDescription" name="overview.description"
+                              class="form-control" maxlength="1000" rows="10"
                               placeholder="Enter description of the app. less than 1000 characters"
                               title="Enter description of the app. less than 1000 characters."
                             >{{artifact.attributes.overview_description}}</textarea>
@@ -198,117 +211,113 @@
                     Recent Changes <br>
                     <small>(Max. 700 characters)</small>
                 </label>
-                <div class="col-sm-10">
-					<textarea id="txtRecentChanges" name="overview_recentchanges"
-                              class="field span6" maxlength="700" rows="6" style="width: 90%;"
+                <div class="col-sm-8">
+					<textarea id="txtRecentChanges" name="overview.recentchanges"
+                              class="form-control" maxlength="700" rows="8"
                               placeholder="Enter recent changes you have done to the app. less than 700 characters."
                               title="Enter recent changes you have done to the app. less than 700 characters."
                             >{{artifact.attributes.overview_recentchanges}}</textarea>
                 </div>
             </div>
             <div id="control-packagename" class="form-group">
-                <label class="control-label col-sm-2" for="txtName">
-                    Version
+                <label class="control-label col-sm-2" for="txtVersion">
+                    Version  <span style="color:#FF0000">*</span><br>
                 </label>
-                <div class="col-sm-10">
-                    <input type="text" id="txtVersion" name="overview_version"
-                           class="field col-md-3"/>
+                <div class="col-sm-2">
+                    <input type="text" id="txtVersion" name="overview.version"
+                           class="form-control" />
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-sm-2" for="txtBanner">
+                <label class="control-label col-sm-2" for="imgBanner">
                     Banner <span style="color:#FF0000">*</span><br>
                     <small>(705px * 344px, .png)</small>
                 </label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-8">
                     {{#with artifact.attributes.images_banner}}
                         <div class='fileupload fileupload-{{#ifCond this "==" ""}}new{{else}}exists{{/ifCond}}'
                              data-provides="fileupload">
-                            <div id="imgBannerPreviewWrapper"
-                                 class="fileupload-preview fileupload-preview-banner thumbnail">
-                                <img src="{{this}}" />
+                            <div class="fileupload-exists fileupload-preview-thumbnail fileupload-edit-btn col-sm-12"
+                                 data-trigger="fileupload" title="Change banner">
+                                <i class="icon-edit"></i>
                             </div>
-                            <div>
-							<span class="btn btn-file">
-								<span class="fileupload-new">
-									<i class="icon-plus-sign"></i>
-								</span>
-								<span class="fileupload-exists">
-									<i class="icon-edit"></i>
-								</span>
-								<input type="file" id="imgBanner" name="images_banner" />
-							</span>
-                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">
-                                    <i class="icon-remove"></i>
-                                </a>
+                            <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
+                                {{#if this}}<img src="{{this}}" />{{/if}}
                             </div>
+                            <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
+                                 data-trigger="fileupload" title="Add banner">
+                                <i class="icon-plus-sign"></i>
+                            </div>
+                            <span>
+                                <input type="file" id="imgBanner" name="images.banner"
+                                       accept="image/*" />
+                                <input type="hidden" name="images.banner" value="{{this}}" />
+                            </span>
                         </div>
                     {{/with}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-sm-2" for="txtScreenShot">
+                <label class="control-label col-sm-2">
                     Screen Shots <span style="color:#FF0000">*</span><br>
                     <small>(288px * 512px, .png)</small>
                 </label>
-                <div class="col-sm-10">
+                <div id="screenshots-wrapper" class="col-sm-10">
                     {{#for artifact.attributes.images_screenshots}}
-                        <div class='fileupload fileupload-{{#ifCond this "==" ""}}new{{else}}exists{{/ifCond}}'
-                             style="margin-right: 10px;" data-provides="fileupload">
-                            <div id="imgScreenshotPreviewWrapper-{{index}}"
-                                 class="fileupload-preview fileupload-preview-icon thumbnail"
-                                 style="line-height: 160px;">
-                                <img src="{{this}}"/>
+                        <div class='fileupload fileupload-{{#ifCond this "==" ""}}new{{else}}exists{{/ifCond}} col-sm-4'
+                             style="padding-left: 0;" data-provides="fileupload">
+                            <div class="fileupload-exists fileupload-remove-btn"
+                                 data-dismiss="fileupload" title="Remove screenshot">
+                                <i class="icon-remove-circle"></i>
                             </div>
-                            <div>
-								<span class="btn btn-file">
-									<span class="fileupload-new">
-										<i class="icon-plus-sign"></i>
-									</span>
-									<span class="fileupload-exists">
-										<i class="icon-edit"></i>
-									</span>
-									<input type="file" id="imgScreenshot{{index}}" name="images_screenshot{{index}}"
-                                           class="uploadAction" data-url="/publisher/api/apps/upload"/>
-								</span>
-                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">
-                                    <i class="icon-remove"></i>
-                                </a>
+                            <div class="fileupload-exists fileupload-preview-thumbnail fileupload-edit-btn col-sm-12"
+                                 data-trigger="fileupload" title="Change screenshot">
+                                <i class="icon-edit"></i>
                             </div>
+                            <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
+                                {{#if this}}<img src="{{this}}" />{{/if}}
+                            </div>
+                            <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
+                                 data-trigger="fileupload" title="Add screenshot">
+                                <i class="icon-plus-sign"></i>
+                            </div>
+                            <span>
+                                <input type="file" id="imgScreenshot{{index}}"
+                                       name="images.screenshot{{index}}" accept="image/*" />
+                                <input type="hidden" name="images.screenshot{{index}}"
+                                       value="{{this}}" />
+                            </span>
                         </div>
                     {{/for}}
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-sm-2" for="txtIconfile">
+                <label class="control-label col-sm-2" for="imgThumbnail">
                     Icon file <span style="color:#FF0000">*</span>
                 </label>
                 <div class="col-sm-10">
                     {{#with artifact.attributes.images_thumbnail}}
-                        <div class='fileupload fileupload-{{#ifCond this "==" ""}}new{{else}}exists{{/ifCond}}'
-                             data-provides="fileupload">
-                            <div id="imgThumbnailPreviewWrapper"
-                                 class="fileupload-preview fileupload-preview-icon thumbnail"
-                                 style="line-height: 160px;">
-                                <img src="{{this}}" />
+                        <div class='fileupload fileupload-{{#ifCond this "==" ""}}new{{else}}exists{{/ifCond}} col-sm-4'
+                             style="padding-left: 0;" data-provides="fileupload">
+                            <div class="fileupload-exists fileupload-preview-thumbnail fileupload-edit-btn col-sm-12"
+                                 data-trigger="fileupload" title="Change icon">
+                                <i class="icon-edit"></i>
                             </div>
-                            <div>
-							<span class="btn btn-file">
-								<span class="fileupload-new">
-									<i class="icon-plus-sign"></i>
-								</span>
-							<span class="fileupload-exists">
-								<i class="icon-edit"></i>
-							</span>
-								<input type="file" id="imgThumbnail" name="images_thumbnail" />
-							</span>
-                                <a href="#" class="btn fileupload-exists" data-dismiss="fileupload">
-                                    <i class="icon-remove"></i>
-                                </a>
+                            <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
+                                {{#if this}}<img src="{{this}}" />{{/if}}
                             </div>
+                            <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
+                                 data-trigger="fileupload" title="Add icon">
+                                <i class="icon-plus-sign"></i>
+                            </div>
+                            <span>
+                                <input type="file" id="imgThumbnail" name="images.thumbnail"
+                                       accept="image/*" />
+                                <input type="hidden" name="images.thumbnail" value="{{this}}" />
+                            </span>
                         </div>
                     {{/with}}
                 </div>
@@ -347,9 +356,3 @@
         </div>
     </div>
 </div>
-
-<style type="text/css">
-    input[type="file"] {
-        display: inline;
-    }
-</style>
