@@ -41,10 +41,6 @@
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>  
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.keymgt</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jaggeryjs</groupId>
             <artifactId>org.jaggeryjs.hostobjects.web</artifactId>  
         </dependency>
@@ -56,10 +52,6 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.usage.client</artifactId>   
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
-	</dependency>
         <dependency>
             <groupId>commons-io.wso2</groupId>
             <artifactId>commons-io</artifactId>
@@ -101,7 +93,6 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.appmgt.api.*,
-			    org.wso2.carbon.appmgt.keymgt.client.*,
                             *;resolution:=optional
                         </Import-Package>
                         <Embed-Dependency>
