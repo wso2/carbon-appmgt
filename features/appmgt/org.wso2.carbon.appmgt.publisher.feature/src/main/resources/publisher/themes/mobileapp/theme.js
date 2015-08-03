@@ -110,11 +110,11 @@ var engine = caramel.engine('handlebars', (function () {
              *
              * Optional Parameters:
              *     startIndex - First index to be iterated over in the loop.
-             *                      Should be zero or a positive integer. Default value is 0.
+             *                  Should be zero or a positive integer. Default value is 0.
              *     endIndex - Last index to be iterated over in the loop.
-             *                      Should be zero or a positive integer. Default value is (data.length - 1).
+             *                Should be zero or a positive integer. Default value is (data.length - 1).
              *     jump - Increment/decrement of each iteration.
-             *                      Should be a positive integer. Default value is 1.
+             *            Should be a positive integer. Default value is 1.
              *
              * Usage:
              *     {{#for items}}
@@ -134,7 +134,6 @@ var engine = caramel.engine('handlebars', (function () {
                     throw new Error("Handlerbars helper 'for' needs an array to iterate. But found "
                                     + toString.call(data));
                 }
-
                 var tmp;
                 var startIndex = 0;
                 tmp = options.hash['startIndex'];
@@ -189,26 +188,35 @@ var engine = caramel.engine('handlebars', (function () {
                 return buffer;
             });
 
-            /*
+            /**
              * Utility function to check given value is an object or not.
-             * @return <code>true</code> iff value is an object and
-             *          <code>false</code> if value is a string or a number or boolean or an array or a symbol or null or undefined.
+             * @param value {*} value to be checked
+             * @returns {boolean} <code>true</code> iff value is an object; <code>false</code> if
+             *     value is a string or a number or boolean or an array or a symbol or null or
+             *     undefined.
              */
             function isObject(value) {
                 return (value && ((typeof value) === 'object')
                         && (toString.call(value) === '[object Object]'));
             }
 
-            /*
-             * Helper object class for 'for' block helper
+            /**
+             * This is a helper class for the 'for' block helper. This class can hold a given value
+             * with the relevant index.
+             * @param value {Object} value to be hold
+             * @param index {number} index of the iteration
+             * @constructor
              */
             function ForLoopItem(value, index) {
                 this.value = value;
                 this.index = index;
-            }
-
-            ForLoopItem.prototype.toString = function () {
-                return String(this.value);
+                /**
+                 * @override
+                 * @returns {string} string representation of the <code>value</code> of this object
+                 */
+                this.toString = function () {
+                    return String(this.value);
+                }
             }
 
         }
