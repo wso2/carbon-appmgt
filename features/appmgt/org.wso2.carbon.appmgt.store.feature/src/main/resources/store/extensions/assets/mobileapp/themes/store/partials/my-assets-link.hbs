@@ -1,48 +1,34 @@
 {{#if user}}
 {{#if subscription}}
+
+
 <div class="row">
-	<div class="span3">
-		<h4><i class="icon-bookmark"></i> My {{title}}</h4>
-		<div id="my-assets">
-			{{#slice subscriptions count="20" size="20"}}
-			{{#each .}}
-			<div class="row-fluid recently-added type-{{attributes.overview_platform}}">
-				{{#attributes}}
-				{{#if ../isPublished}}
-				<div class="span3">
-					<a href="{{url "/assets"}}/{{../../type}}/{{../../id}}"><img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
-				</div>
-				<div class="span9">
-					<strong><a href="{{url "/assets"}}/{{../../type}}/{{../../id}}">{{overview_name}}</a></strong>
-					<small>by <a href="#">{{overview_provider}}</a></small>
-					<span class="star-rating">
-						<div class="asset-rating">
-							<div class="asset-rating-{{../../rating.average}}star">
+    <h3>My {{title}}</h3>
+    <hr>
 
-							</div>
-						</div> </span>
-				</div>
-				{{else}}
-				<div class="span3">
-					<img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}">
-				</div>
-				<div class="span9">
-					<strong><a>{{overview_displayName}}</a></strong>
-					<small>by <a>{{overview_provider}}</a></small>
-					<span class="label label-unavailable">Currently Unavailable</span>
-					
-				</div>
-				{{/if}}
-				{{/attributes}}
 
-			</div>
-			{{/each}}
-			<!--<a class="link-view-all" href="{{url "/subscriptions"}}/{{../type}}">View all</a>
-			<hr/>-->
-			{{/slice}}
-		</div>
-	</div>
+	{{#slice subscriptions count="20" size="20"}}
+		{{#each .}}
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
+                    <div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
+                    <span class="recent-app-assets-rating"> </span>
+                </div>
+                <div class="col-md-3">
+                    <img class="col-md-12" src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                </div>
+            </div>
+
+            <hr>
+		{{/each}}
+	{{/slice}}
+
+
 </div>
-<hr>
+
+
+
+
 {{/if}}
 {{/if}}

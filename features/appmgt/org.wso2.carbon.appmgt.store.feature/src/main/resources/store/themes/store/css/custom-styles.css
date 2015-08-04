@@ -91,6 +91,13 @@
   
 }
 
+.asset-reinstall-btn, .asset-unsubscribe-btn{
+    margin-left: 20%;
+    margin-right: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
 
 .recent-app-assets-name{
     font-weight: bold;
