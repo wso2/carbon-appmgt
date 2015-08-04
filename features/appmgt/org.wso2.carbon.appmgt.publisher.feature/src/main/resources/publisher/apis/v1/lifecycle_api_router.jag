@@ -261,11 +261,11 @@ require('/modules/publisher.js').exec(function (ctx) {
 				return (provider && name && (artifact.lifecycleState == 'Published'));
 			}, null);
 		} catch (e) {
-			log.error("Cannot retrieve previously published " + appType + " " +
-				currentArtifact.attributes.overview_provider + "-" +
-				currentArtifact.attributes.overview_provider);
-			log.error(e);
-			// continue work flow
+            log.error("Cannot retrieve previously published " + appType + " " +
+                      currentArtifact.attributes.overview_name + " by " +
+                      currentArtifact.attributes.overview_provider);
+            log.error(e);
+            // continue work flow
 		}
 
 		var operationResult; // {isSuccess: true/false, message: ""}
