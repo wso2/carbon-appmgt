@@ -14,7 +14,7 @@
     cursor: pointer;
 }
 .fileupload-add-btn [class^="icon-"] {
-    font-size: xx-large;
+    font-size: 3em;
 }
 
 .fileupload-edit-btn {
@@ -27,7 +27,7 @@
     background-color: rgba(255,255,255,0);
 }
 .fileupload-edit-btn [class^="icon-"] {
-    font-size: xx-large;
+    font-size: 3em;
     opacity: 0;
 }
 .fileupload-edit-btn:hover {
@@ -45,7 +45,7 @@
     z-index: 2;
 }
 .fileupload-remove-btn [class^="icon-"] {
-    font-size: large;
+    font-size: 1.3333333333333333em;
     background-color: #fff;
 }
 
@@ -66,8 +66,8 @@
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
-    padding-top: 4px
+    padding-top: 4px;
 }
 .fileupload-app-btn [class^="icon-"] {
-    font-size: large;
+    font-size: 1.3333333333333333em;
 }
