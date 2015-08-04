@@ -1598,15 +1598,18 @@ h2.first-h2{
 ul.dropdown-menu.notifications {
     width: auto;
 }
+
 .dropdown-menu>li>a{
     max-width: 736px;
     overflow: hidden !important;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
 button.btn.btn-reject-proceed {
     background-color: #ccc;
 }
+
 .load-seperator{margin-right: 20px;}
 button.btn.btn-view-app {
     font-size: 18px;
@@ -1619,4 +1622,9 @@ textarea#txtDescription, textarea#txtRecentChanges {
 
 .dropdown-menu>.active>a{
     background-color: #444;
+}
+
+.validation-error {
+    border: 1px solid #CD0A0A !important;
+    background: #FEF1EC !important;
 }
