@@ -24,7 +24,7 @@
                     <a id="btn-add-gadget" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
                     <input id="isEnterpriseInstallEnabled" type="hidden" value="true">
                 {{/if}}
-                <a href="#" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
+                <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
             </div>
         </div>
     </div>
@@ -102,9 +102,9 @@
                 </div>
                 <div class="modal-body">
 
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#ent-roles">Roles</a></li>
-                        <li><a data-toggle="tab" href="#ent-users">Users</a></li>
+                    <ul class="nav nav-tabs" id="ent-install-tabs">
+                        <li class="active"><a data-toggle="tab" data-name="roles" href="#ent-roles">Roles</a></li>
+                        <li><a data-toggle="tab" data-name="users" href="#ent-users">Users</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="ent-roles" class="tab-pane fade in active">

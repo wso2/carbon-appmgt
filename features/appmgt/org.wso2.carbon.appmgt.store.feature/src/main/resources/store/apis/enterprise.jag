@@ -35,11 +35,9 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isEnterpiseAdmin = false;
 
-
     if(user.hasRoles([mdmConfig.EnterpriseOperations_AuthorizedRole])){
         isEnterpiseAdmin = true;
     }
-
 
 
     var um = new carbon.user.UserManager(server, tenantId);
@@ -93,6 +91,8 @@ require('/modules/store.js').exec(function (ctx) {
             response.sendError(401, 'Unauthorized');
         }
 
+
+
         var elements = matcher.elements();
         var params = request.getAllParameters("UTF-8");
 
@@ -102,10 +102,12 @@ require('/modules/store.js').exec(function (ctx) {
         var data = params["data[]"];
 
 
-        log.debug("Params Received " +stringify(elements) + " & " + stringify(params))
 
+
+        log.debug("Params Received " +stringify(elements) + " & " + stringify(params));
 
         if(action && type && app && data){
+
             enterpriseInstall.performAction(action, tenantId, type, app, data);
             print('{"status" : "success"}');
             return;

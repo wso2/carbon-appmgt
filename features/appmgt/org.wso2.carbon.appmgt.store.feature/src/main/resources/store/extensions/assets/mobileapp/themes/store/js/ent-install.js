@@ -78,6 +78,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
     $("#btn-apps-ent-install").click(function () {
 
+
             if(selectedTab === "roles"){
                 installToRoles();
             }else if (selectedTab === "users"){
@@ -93,6 +94,8 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
 
     $("#btn-apps-ent-uninstall").click(function () {
+
+
 
             if(selectedTab === "roles"){
                 unInstallFromRoles();
@@ -133,6 +136,8 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
         $(".role-checkbox:checked", oTable.fnGetNodes()).each(function(){
             rolesSelected.push($(this).val());
         });
+
+
 
         if(rolesSelected.length > 0){
 
