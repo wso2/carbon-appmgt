@@ -76,8 +76,6 @@ var render = function (theme, data, meta, require) {
 
 
 
-
-
     theme('2-column-right', {
         title: data.title,
         header: [

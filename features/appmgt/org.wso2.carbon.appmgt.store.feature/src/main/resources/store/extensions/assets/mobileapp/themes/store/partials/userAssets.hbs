@@ -41,10 +41,11 @@
                                 <i class="icon-mobile-phone"></i> Reinstall
                             </a>
                         {{/if}}
-
+                        {{#if ../../selfUnsubscription}}
                         <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}" data-name="{{attributes.overview_name}}"   data-platform="{{attributes.overview_platform}}" data-aid="{{id}}" >
                             <i class="icon-remove"></i> Uninstall
                         </a>
+                        {{/if}}
 					</div>
 
 
