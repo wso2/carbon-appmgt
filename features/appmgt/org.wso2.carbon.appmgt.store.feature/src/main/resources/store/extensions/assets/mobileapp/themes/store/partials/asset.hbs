@@ -20,11 +20,30 @@
 
             <span class="app-assets-rating"> </span>
             <div class="row app-asset-buttons col-md-12">
-                {{#if isEnterpriseInstallEnabled}}
-                    <a id="btn-add-gadget" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
-                    <input id="isEnterpriseInstallEnabled" type="hidden" value="true">
-                {{/if}}
+                {{#if user}}
+                    {{#if inDashboard}}
+                        {{#if isDeviceSubscriptionEnabled}}
+                            <a id="btn-add-gadget" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Installed"}}</a>
+                        {{else}}
+                            <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" class="btn btn-primary btn-add-gadget">{{t "Installed"}}</a>
+                        {{/if}}
+                    {{else}}
+                        {{#if isDeviceSubscriptionEnabled}}
+                            <a id="btn-add-gadget" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal" data-target="#modalDevices" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
+                        {{else}}
+                            <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}" data-platform="{{asset.attributes.overview_platform}}" class="btn btn-primary btn-add-gadget">{{t "Install"}}</a>
+                        {{/if}}
+                    {{/if}}
+                {{else}}
+                    <a id="btn-add-gadget" class="btn btn-primary btn-add-gadget" href="{{url "/login"}}">{{t "Install"}}</a>
+                 {{/if}}
+
+
+
+                 {{#if isEnterpriseInstallEnabled}}
                 <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
+                         <input id="isEnterpriseInstallEnabled" type="hidden" value="true">
+                 {{/if}}
             </div>
         </div>
     </div>

@@ -82,6 +82,11 @@
     margin: 2px;
 }
 
+.btn-add-gadget-install{
+    width: 100%;
+    margin: 2px;
+}
+
 .app-asset-description-section{
     padding-top: 30px;
     padding-left: 30px;
@@ -91,7 +96,7 @@
   
 }
 
-.asset-reinstall-btn, .asset-unsubscribe-btn{
+.asset-reinstall-btn, .asset-unsubscribe-btn, .asset-reinstall-btn-direct{
     margin-left: 20%;
     margin-right: auto;
     margin-top: 5px;

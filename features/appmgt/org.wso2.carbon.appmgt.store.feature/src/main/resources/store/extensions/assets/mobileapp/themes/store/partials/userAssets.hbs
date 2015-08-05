@@ -4,8 +4,6 @@
 
 	{{#if userAssets}}
 
-		<h1>My Apps</h1>
-
 		{{#itr userAssets}}
 
 			{{#each value}}
@@ -32,11 +30,19 @@
 
 
 					<div class="my-apps-actions">
-                        <a class="btn btn-info asset-reinstall-btn" type="{{../key}}"  data-platform="{{attributes.overview_platform}}" data-aid="{{id}}" data-toggle="tooltip" title="{{t "Reinstall"}} {{../key}}">
-                            <i class="icon-mobile-phone"></i> Reinstall
-                        </a>
 
-                        <a class="btn btn-danger asset-unsubscribe-btn" type="{{../../../key}}" data-name="{{../../attributes.overview_name}}"   data-platform="{{../../attributes.overview_platform}}" data-aid="{{../../id}}" >
+
+                        {{#if isDeviceSubscriptionEnabled}}
+                            <a class="btn btn-info asset-reinstall-btn" href="#modalDevices" type="{{../key}}"  data-platform="{{attributes.overview_platform}}" data-aid="{{id}}" data-toggle="modal" title="{{t "Reinstall"}} {{../key}}">
+                                <i class="icon-mobile-phone"></i> Reinstall
+                            </a>
+                        {{else}}
+                            <a class="btn btn-info asset-reinstall-btn-direct"  type="{{../key}}"  data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"  title="{{t "Reinstall"}} {{../key}}">
+                                <i class="icon-mobile-phone"></i> Reinstall
+                            </a>
+                        {{/if}}
+
+                        <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}" data-name="{{attributes.overview_name}}"   data-platform="{{attributes.overview_platform}}" data-aid="{{id}}" >
                             <i class="icon-remove"></i> Uninstall
                         </a>
 					</div>
@@ -56,28 +62,29 @@
 
 
 
+<div class="modal fade" id="modalDevices">
+    <div class="modal-dialog-devices">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
+            </div>
+            <div class="modal-body">
 
-<div id="devicesList" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="width:700px" aria-hidden="true">
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class="carousel slide media-carousel" id="media">
+                            <div class="carousel-inner" id="devicesList">
 
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal"
-		aria-hidden="true">
-			x
-		</button>
-		<h4 id="myModalLabel">Select your device to reinstall</h4>
-	</div>
-	<div class="modal-body">
 
-		{{#devices}}
-		<div data-dismiss="modal"  class="span1 text-center device-image-block-modal" style="text-align: center; cursor: pointer"
-		data-device-id="{{id}}" data-platform="{{platform}}">
-			<img class="device-image-modal" style="height: 100px" data-device-id="{{id}}" data-platform="{{platform}}"
-			src="{{image}}">
-			<div class="text-center" style="font-size: x-small">
-				{{name}}
-			</div>
-		</div>
-		{{/devices}}
+                            </div>
+                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
+                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-	</div>
-</div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

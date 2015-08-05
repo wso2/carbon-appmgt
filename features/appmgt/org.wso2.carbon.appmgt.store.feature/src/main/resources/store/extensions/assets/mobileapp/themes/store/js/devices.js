@@ -1,4 +1,41 @@
+$('#media').carousel({
+    pause: true,
+    interval: false,
+});
 
+$.ajax({
+    url: "/store/apis/enterprise/get-devices",
+    dataType: "json"
+}).done(function(data) {
+
+    var objects = [];
+
+    var length = 6;
+    for(var i = 0; i <= parseInt(data.length / length); i++){
+        objects.push([]);
+    }
+
+    $.each(data, function(key,value) {
+        var index = parseInt(key/ length);
+        objects[index].push(value);
+    });
+
+    for(var j = 0; j < objects.length; j++){
+        var isActive = j === 0 ? "active" : "";
+        var item = $("<div>", {class: "item " + isActive });
+        var row = $("<div>", {class: "row"});
+
+        for(var k = 0 ; k < objects[j].length; k++){
+            row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id + '"  class="col-md-2 device-image-block-modal">' +
+                '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
+                '"><div>' + objects[j][k].name + '</div></a>' +
+                '</div>');
+        }
+        item.append(row);
+        $("#devicesList").append(item);
+    }
+
+});
 
 
 $(".device-image").each(function(index) {
@@ -164,15 +201,6 @@ $( document ).ready(function() {
     devicePlatform = getURLParameter("platform");
 
     //var hasdevices = false;
-    $(".device-image-block-modal").each(function(index) {
-        //hasdevices = true;
-        var platform = $(this).data("platform").toLowerCase();
-        if(id != "null" & devicePlatform != platform){
-            $(this).css("display", "none");
-        }
-
-    });
-
     if(id != "null"){
 
         $('#devicesList').modal('show');

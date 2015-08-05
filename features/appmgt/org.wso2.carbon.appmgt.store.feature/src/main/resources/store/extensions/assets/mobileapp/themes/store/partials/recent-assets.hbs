@@ -1,24 +1,26 @@
 <div class="row">
-	<h3>Recent Assets</h3>
-	<hr>
-
-
-{{#slice . count="20" size="20"}}
-	{{#each .}}
-        <div class="row">
-		<div class="col-md-9">
-			<div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
-			<div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
-            <span class="recent-app-assets-rating"> </span>
-		</div>
-        <div class="col-md-3">
-            <img class="col-md-12" src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
-        </div>
-	</div>
-
+    <h3>Recent Assets</h3>
     <hr>
-	{{/each}}
-{{/slice}}
+
+
+    {{#slice . count="20" size="20"}}
+        {{#each .}}
+            <a href="{{url "/assets"}}/{{type}}/{{id}}">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
+                        <div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
+                        <span class="recent-app-assets-rating"> </span>
+                    </div>
+                    <div class="col-md-3">
+                        <img class="col-md-12"
+                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    </div>
+                </div>
+            </a>
+            <hr>
+        {{/each}}
+    {{/slice}}
 
 
 </div>

@@ -135,7 +135,8 @@
                 }
 
                 asset = store.asset('mobileapp', app);
-                if( asset.attributes.overview_type == "enterprise" ||  asset.attributes.overview_type == "webapp"){
+                log.info(asset);
+                if( asset.attributes.overview_type == "enterprise"){
                     if(asset.attributes.overview_platform == "android"){
                         var location = serverAddress +  asset.attributes.overview_url;
                     }else if(asset.attributes.overview_platform == "ios"){
@@ -153,7 +154,7 @@
                         var location = "https://itunes.apple.com/en/app/id" + asset.attributes.overview_appid;
                     }
                 }
-
+                log.info(location);
                 print({redirect: true, location : location});
 
             }else{
