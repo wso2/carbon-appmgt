@@ -39,6 +39,27 @@ var engine = caramel.engine('handlebars', (function () {
             });
 
 
+            Handlebars.registerHelper('iconImage', function(imageName) {
+                if(imageName == 'android'){
+                    return 'fw-android fw-background-green';
+                }else if(imageName == 'ios'){
+                    return 'fw-apple fw-background-black';
+                }else if(imageName == 'webapp'){
+                    return 'fw-web-app fw-background-blue';
+                }
+            });
+
+            Handlebars.registerHelper('iconImageType', function(imageName) {
+                if(imageName == 'enterprise'){
+                    return 'fw-enterprise-app fw-background-gray';
+                }else if(imageName == 'public'){
+                    return 'fw-public-app fw-background-gray';
+                }else if(imageName == 'webapp'){
+                    return 'fw-webclip fw-background-gray';
+                }
+            });
+
+
 
             Handlebars.registerHelper('compare', function (lvalue, rvalue, options) {
 

@@ -219,3 +219,36 @@
 
 }
 /* End carousel */
+
+
+.fw-1_5x {
+    font-size: 1.2em;
+}
+
+.fw-background-gray {
+    background: #888;
+    border-radius: .3em;
+    padding: .4em .50em .45em;
+}
+
+.fw-background-green {
+    background: #A4C639;
+    border-radius: .3em;
+    padding: .4em .50em .45em;
+}
+
+.fw-background-blue {
+    background: #2196F3;
+    border-radius: .3em;
+    padding: .4em .50em .45em;
+}
+
+
+.fw-background-black {
+    background: #000000;
+    border-radius: .3em;
+    padding: .4em .50em .45em;
+}
+
+
+
