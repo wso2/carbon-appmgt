@@ -2,13 +2,15 @@
 {{#if subscription}}
 
 
-<div class="row">
+<div class="row visible-lg">
     <h3>My {{title}}</h3>
     <hr>
 
 
 	{{#slice subscriptions count="20" size="20"}}
+        
 		{{#each .}}
+        <a href="{{url "/assets"}}/{{type}}/{{id}}">
             <div class="row">
                 <div class="col-md-9">
                     <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
@@ -21,6 +23,7 @@
             </div>
 
             <hr>
+        </a>
 		{{/each}}
 	{{/slice}}
 
