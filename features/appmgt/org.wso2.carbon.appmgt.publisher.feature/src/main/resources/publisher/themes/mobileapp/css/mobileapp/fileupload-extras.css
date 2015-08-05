@@ -1,0 +1,73 @@
+/**
+* extra CSS classes for 'bootstrap-fileupload' plugin
+*/
+
+.fileupload-preview-thumbnail {
+    height: 265px;
+    line-height: 265px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0;
+}
+
+.fileupload-add-btn {
+    cursor: pointer;
+}
+.fileupload-add-btn [class^="icon-"] {
+    font-size: xx-large;
+}
+
+.fileupload-edit-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+    background-color: rgba(255,255,255,0);
+}
+.fileupload-edit-btn [class^="icon-"] {
+    font-size: xx-large;
+    opacity: 0;
+}
+.fileupload-edit-btn:hover {
+    background-color: rgba(255,255,255,0.5);
+}
+.fileupload-edit-btn:hover [class^="icon-"]{
+    opacity: 1;
+}
+
+.fileupload-remove-btn {
+    cursor: pointer;
+    position: absolute;
+    right: 11px;
+    top: -7px;
+    z-index: 2;
+}
+.fileupload-remove-btn [class^="icon-"] {
+    font-size: large;
+    background-color: #fff;
+}
+
+.fileupload-app-btn {
+    height: 34px;
+    padding: 6px 12px;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+.fileupload-app-btn div, span {
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    padding-top: 4px
+}
+.fileupload-app-btn [class^="icon-"] {
+    font-size: large;
+}

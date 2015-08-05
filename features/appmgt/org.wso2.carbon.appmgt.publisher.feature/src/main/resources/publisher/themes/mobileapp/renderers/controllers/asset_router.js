@@ -57,22 +57,13 @@ var render=function(theme,data,meta,require){
 	case 'view':
         listPartial='view-mobileapp';
         data = require('/helpers/edit-asset.js').screenshots(data);
-        if(data.artifact.attributes.overview_platform == 'android' && data.artifact.attributes.overview_type == 'public') {
-            data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_packagename;
-        }else if(data.artifact.attributes.overview_platform == 'ios' && data.artifact.attributes.overview_type == 'public'){
-            data.artifact.attributes.overview_identifier = data.artifact.attributes.overview_appid;
-        }
-         var createdDate = new Date();
+        var createdDate = new Date();
         createdDate.setTime(data.artifact.attributes.overview_createdtime);
         data.artifact.attributes['overview_createdtime'] = createdDate.toUTCString();
         heading = data.artifact.attributes.overview_displayName;
         break;
     case 'edit':
-        listPartial='edit-asset';
-        if(data.data.meta.shortName=='mobileapp'){
-			//log.info('Special rendering case for mobileapp-using edit-mobilepp.hbs');
-			listPartial='edit-mobileapp';
-		}
+        listPartial='edit-mobileapp';
         data = require('/helpers/edit-asset.js').selectCategory(data);
         data = require('/helpers/edit-asset.js').screenshots(data);
 
@@ -83,6 +74,19 @@ var render=function(theme,data,meta,require){
         }
         heading = data.newViewData.name.value;
         break;
+	case 'copyapp':
+		listPartial = 'add-mobileapp-version';
+        var editHelper = require('/helpers/edit-asset.js');
+		data = editHelper.selectCategory(data);
+		data = editHelper.screenshots(data);
+
+		data = require('/helpers/splitter.js').splitData(data);
+		if (data.artifact.lifecycleState == "Published") {
+			response.sendError(400);
+			return;
+		}
+		heading = data.artifact.attributes.overview_displayName;
+		break;
     case 'lifecycle':
         listPartial='lifecycle-asset';
         heading = "Lifecycle";
