@@ -5,8 +5,8 @@
         </div>
         <div class="col-md-3">
             <div class="row">
-                <div class="col-md-12 app-asset-icon">
-                    <img class="col-md-8 col-centered" src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}">
+                <div class="col-md-12 col-xs-12 app-asset-icon">
+                    <img class="col-md-8 col-xs-8 col-centered" src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}">
                  </div>
             </div>
             <div class="row">
@@ -19,7 +19,7 @@
             </div>
 
             <span class="app-assets-rating"> </span>
-            <div class="row app-asset-buttons col-md-12">
+            <div class="row app-asset-buttons col-md-12 col-xs-12">
                 {{#if user}}
                     {{#if inDashboard}}
                         {{#if isDeviceSubscriptionEnabled}}
@@ -37,8 +37,6 @@
                 {{else}}
                     <a id="btn-add-gadget" class="btn btn-primary btn-add-gadget" href="{{url "/login"}}">{{t "Install"}}</a>
                  {{/if}}
-
-
 
                  {{#if isEnterpriseInstallEnabled}}
                 <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal" data-target="#modalEnterpriseInstall" class="btn btn-primary btn-add-gadget">{{t "Enterprise Install"}}</a>
@@ -79,7 +77,6 @@
                 <p>Vestibulum nec erat eu nulla rhoncus fringilla ut non neque. Vivamus nibh urna, ornare id gravida ut, mollis a magna. Aliquam porttitor condimentum nisi, eu viverra ipsum porta ut. Nam hendrerit bibendum turpis, sed molestie mi fermentum id. Aenean volutpat velit sem. Sed consequat ante in rutrum convallis. Nunc facilisis leo at faucibus adipiscing.</p>
             </div>
         </div>
-
 
     </div>
 

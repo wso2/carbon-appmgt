@@ -5,7 +5,6 @@
         </div>
         <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
 
-
             <div class="wr-auth pull-right">
 
                 {{#if user}}
@@ -18,7 +17,6 @@
                             </span>
                         </div>
                     </a>
-
 
                     <a href="#" data-toggle="dropdown">
                         <div class="auth-img">
@@ -63,7 +61,6 @@
                     {{/if}}
 
 
-
                     <a href="#" data-toggle="dropdown">
                         <div class="auth-img">
                             Register
@@ -74,7 +71,6 @@
                     </a>
 
                 {{/if}}
-
 
             </div>
         </div>
@@ -92,8 +88,13 @@
                     </span>
             </a><a class="cu-btn page-title" href='{{url "/assets/mobileapp"}}'>
             <span class="fw-stack"></span>
-            Mobile Apps
-        </a>
+            {{#compare myApps true}}
+                My Mobile Apps
+             {{else}}
+                Mobile Apps
+            {{/compare}}
+            </a>
+
         </div>
     </div>
 </div>
