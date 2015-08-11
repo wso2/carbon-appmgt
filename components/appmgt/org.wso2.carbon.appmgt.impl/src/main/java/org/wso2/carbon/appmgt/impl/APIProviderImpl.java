@@ -608,24 +608,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 boolean gatewayExists = config.getApiGatewayEnvironments().size() > 0;
                 String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
                 boolean isAPIPublished = false;
-                // gatewayType check is required when WebApp Management is deployed on other servers to avoid synapse
-                if (gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE)) {
-                    isAPIPublished = isAPIPublished(api);
-                    if (gatewayExists) {
-                        if (isAPIPublished) {
-                            WebApp apiPublished = getAPI(api.getId());
-                            apiPublished.setOldInSequence(oldApi.getInSequence());
-                            apiPublished.setOldOutSequence(oldApi.getOutSequence());
 
-                            //publish to gateway if skipGateway is disabled only
-                            if (!api.getSkipGateway()) {
-                                publishToGateway(apiPublished);
-                            }
+                isAPIPublished = isAPIPublished(api);
+                if (gatewayExists) {
+                    if (isAPIPublished) {
+                        WebApp apiPublished = getAPI(api.getId());
+                        apiPublished.setOldInSequence(oldApi.getInSequence());
+                        apiPublished.setOldOutSequence(oldApi.getOutSequence());
+
+                        //publish to gateway if skipGateway is disabled only
+                        if (!api.getSkipGateway()) {
+                            publishToGateway(apiPublished);
                         }
-                    } else {
-                        log.debug("Gateway is not existed for the current WebApp Provider");
                     }
+                } else {
+                    log.debug("Gateway is not existed for the current WebApp Provider");
                 }
+
                
                 /*Boolean gatewayKeyCacheEnabled=false;
                 String gatewayKeyCacheEnabledString = config.getFirstProperty(AppMConstants.API_GATEWAY_KEY_CACHE_ENABLED);
@@ -806,7 +805,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
                 String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
 
-                if (gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE) && updateGatewayConfig) {
+                if (updateGatewayConfig) {
                     if (status.equals(APIStatus.PUBLISHED) || status.equals(APIStatus.DEPRECATED) ||
                         status.equals(APIStatus.BLOCKED)) {
 
@@ -1695,17 +1694,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 			handleException("Issue is in getting custom OutSequences from the Registry", e);
 		}
 		return sequenceList;
-	}
-
-	@Override
-	public boolean isSynapseGateway() throws AppManagementException {
-		AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-		String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
-        if (!gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE)) {
-        	return false;
-        }
-		return true;
 	}
 
     @Override

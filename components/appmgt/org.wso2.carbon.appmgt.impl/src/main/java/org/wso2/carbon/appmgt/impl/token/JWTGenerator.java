@@ -65,7 +65,7 @@ public class JWTGenerator {
 
     private String signatureAlgorithm = SHA256_WITH_RSA;
 
-    private static final String SIGNATURE_ALGORITHM = "APIConsumerAuthentication.SignatureAlgorithm";
+    private static final String SIGNATURE_ALGORITHM = "AppConsumerAuthConfiguration.SignatureAlgorithm";
 
     private boolean includeClaims = true;
 
@@ -87,7 +87,7 @@ public class JWTGenerator {
 
     /**
      * Reads the ClaimsRetrieverImplClass from app-manager.xml ->
-     * APIConsumerAuthentication -> ClaimsRetrieverImplClass.
+     * AppConsumerAuthConfiguration -> ClaimsRetrieverImplClass.
      *
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
