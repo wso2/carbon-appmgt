@@ -100,7 +100,6 @@ public class APIGatewayManager {
 						client.deleteNonVersionedWebApp(tenantDomain);
 					}
 					client.deleteVersionedWebApp(tenantDomain);
-					setSecurevaultProperty(api, tenantDomain, environment, operation);
 					undeployCustomSequences(api,tenantDomain, environment);
 				} else {
 					if (debugEnabled) {
@@ -109,7 +108,6 @@ public class APIGatewayManager {
 					}
 					operation ="update";
 					client.updateVersionedWebApp(builder, tenantDomain);
-					setSecurevaultProperty(api,tenantDomain,environment,operation);
 					updateCustomSequences(api, tenantDomain, environment);
 				}
 			} else {
@@ -138,7 +136,6 @@ public class APIGatewayManager {
 						client.addNonVersionedWebApp(builder, tenantDomain);
 					}
 					client.addVersionedWebApp(builder, tenantDomain);
-					setSecurevaultProperty(api,tenantDomain,environment,operation);
 					deployCustomSequences(api, tenantDomain, environment);
 				}
 			}
@@ -170,7 +167,6 @@ public class APIGatewayManager {
 				client.deleteNonVersionedWebApp(tenantDomain);
 				client.deleteVersionedWebApp(tenantDomain);
 				undeployCustomSequences(api, tenantDomain, environment);
-				setSecurevaultProperty(api, tenantDomain, environment, operation);
 			}
 		}
 	}
@@ -390,36 +386,5 @@ public class APIGatewayManager {
         }
         return false;
     }
-       
-    /**
-     * Store the secured endpoint username password to registry
-     * @param api
-     * @param tenantDomain
-     * @param environment
-     * @param operation -add,delete,update operations for an WebApp
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-	private void setSecurevaultProperty(WebApp api, String tenantDomain, Environment environment,String operation)
-	                                                                                          throws
-                                                                                              AppManagementException {
-		boolean isSecureVaultEnabled = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-		                                                    getAPIManagerConfiguration().getFirstProperty(AppMConstants.API_SECUREVAULT_ENABLE));
-		if (api.isEndpointSecured() && isSecureVaultEnabled) {
-			try {							
-				MediationSecurityAdminServiceClient securityAdminclient =  new MediationSecurityAdminServiceClient( environment);
-				if("add".equals(operation.toString())){                                                                                                 
-				securityAdminclient.addSecureVaultProperty(api, tenantDomain);
-				} else if("update".equals(operation.toString())){
-					securityAdminclient.updateSecureVaultProperty(api, tenantDomain);
-				} else if("delete".equals(operation.toString())){
-					securityAdminclient.deleteSecureVaultProperty(api, tenantDomain);
-				}
 
-			} catch (Exception e) {
-				String msg = "Error in setting secured password.";
-				log.error(msg +" "+ e.getLocalizedMessage(),e);
-				throw new AppManagementException(msg);
-			}
-		}
-	}
 }

@@ -51,7 +51,7 @@ public final class APIMgtDBUtil {
     private static final String DATA_SOURCE_NAME = "DataSourceName";
 
     private static volatile DataSource uiActivityPublishDataSource = null;
-    private static final String UI_ACTIVITY_PUBLISH_DATA_SOURCE_NAME = "UiActivityPublishDataSourceName";
+    private static final String UI_ACTIVITY_PUBLISH_DATA_SOURCE_NAME = "Analytics.UIActivityPublishDataSourceName";
     
     /**
      * Initializes the data source
