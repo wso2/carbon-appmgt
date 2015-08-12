@@ -12,7 +12,7 @@
 (function (factory) {
     if (typeof define === "function" && define.amd) {
         // Register as an anonymous AMD module:
-        define(["jquery"], factory);
+        define(["jquery.fileupload"], factory);
     } else {
         // Browser globals:
         factory(jQuery);
@@ -547,7 +547,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
     'use strict';
     if (typeof define === 'function' && define.amd) {
         // Register as an anonymous AMD module:
-        define(['jquery'], factory);
+        define(['jquery.fileupload'], factory);
     } else {
         // Browser globals:
         factory(window.jQuery);
@@ -754,7 +754,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
     if (typeof define === 'function' && define.amd) {
         // Register as an anonymous AMD module:
         define([
-            'jquery',
+            'jquery.fileupload',
             'jquery.ui.widget'
         ], factory);
     } else {
