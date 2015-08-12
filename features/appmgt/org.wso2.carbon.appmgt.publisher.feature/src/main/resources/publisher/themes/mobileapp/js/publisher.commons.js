@@ -29,11 +29,6 @@ $(document).ready(function() {
 		$(this).tab('show');
 	});
 
-	$('.list-asset-table').on('click', 'tbody tr', function() {
-		var link = $(this).find('.asset-listing-name a').attr('href');
-		window.location = link;
-	});
-
 	$('#search-button').on('click', search);
 
 	$('#inp_searchAsset').keypress(function(e) {
