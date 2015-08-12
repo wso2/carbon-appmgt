@@ -3463,17 +3463,6 @@ public class APIProviderHostObject extends ScriptableObject {
 
     }
 
-    public static boolean jsFunction_isSynapseGateway(Context cx, Scriptable thisObj,
-                                                      Object[] args,
-                                                      Function funObj) throws
-                                                                       AppManagementException {
-        APIProvider provider = getAPIProvider(thisObj);
-        if (!provider.isSynapseGateway()) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Retrieves TRACKING_CODE sequences from APM_APP Table
      * @param cx

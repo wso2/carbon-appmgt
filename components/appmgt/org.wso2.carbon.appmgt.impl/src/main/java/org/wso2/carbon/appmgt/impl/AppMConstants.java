@@ -362,9 +362,9 @@ public final class AppMConstants {
     public static final String SSO_CONFIGURATION_IDP_SERVICE_USER_NAME = SSO_CONFIGURATION + "UserName";
     public static final String SSO_CONFIGURATION_IDP_SERVICE_PWD = SSO_CONFIGURATION + "Password";
 
-    public static final String API_CONSUMER_AUTHENTICATION = "APIConsumerAuthentication.";
-    public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = API_CONSUMER_AUTHENTICATION + "AddSAMLResponseHeaderToOutMessage";
-    public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = API_CONSUMER_AUTHENTICATION + "AddClaimsSelectively";
+    public static final String APP_CONSUMER_AUTH_CONFIG = "AppConsumerAuthConfiguration.";
+    public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = APP_CONSUMER_AUTH_CONFIG + "AddSAMLResponseHeaderToOutMessage";
+    public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = APP_CONSUMER_AUTH_CONFIG + "AddClaimsSelectively";
     
     
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";

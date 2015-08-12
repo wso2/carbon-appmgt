@@ -1,0 +1,65 @@
+<td data-column="thumbnail">
+    <img src="{{this.attributes.images_thumbnail}}" />
+</td>
+<td data-column="displayName" class="asset-listing-name">
+    <a href='/publisher/asset/mobileapp/{{this.id}}'>
+        {{this.attributes.overview_displayName}}
+    </a>
+</td>
+{{#if this.isDownloadable}}
+    <td data-column="download">
+        <button class="btn btn-view-app"
+                data-id="{{../this.id}}"
+                data-platform="{{../this.attributes.overview_platform}}"
+                data-type="{{../this.attributes.overview_type}}"
+                data-url="{{../this.attributes.overview_url}}"
+                data-package="{{../this.attributes.overview_packagename}}"
+                title="Get download link or QR code">
+            <i class="icon-download"></i>
+        </button>
+    </td>
+{{/if}}
+<td data-column="platform">
+    <img src="/publisher/themes/mobileapp/img/mobileapps/{{this.attributes.overview_platform}}.png">
+</td>
+<td data-column="type">
+    {{this.attributes.overview_type}}
+</td>
+<td data-column="provider">
+    {{this.attributes.overview_provider}}
+</td>
+<td data-column="version">
+    {{this.attributes.overview_version}}
+</td>
+<td data-column="createdtime">
+    <small>{{this.attributes.overview_createdtime}}</small>
+</td>
+<td data-column="lifecycleState">
+    <span class="lifecycle-state">
+        <small>
+            <i class='icon-circle {{selectIf this.lifecycleState "Published:text-green,
+            Created:text-yellow, In-Review:text-yellow, Unpublished:text-yellow,
+            Approved:text-green, Rejected:text-red, Retired:text-red,
+            Deprecated:text-red"}}'></i> {{this.lifecycleState}}
+        </small>
+    </span>
+</td>
+<td data-column="lifecycleAvailableActions">
+    <span>
+        {{#each this.lifecycleAvailableActions}}
+            <button type="button" class='btn {{selectIf this "Demote:btn-blue,
+            Submit for Review:btn-blue, Publish:btn-blue, Unpublish:btn-orange,
+            Re-Publish:btn-blue, Deprecate:btn-danger, Retire:btn-danger,
+            Approve:btn-blue, Reject:btn-danger"}} btn-action'
+                    data-action="{{this}}" data-id="{{../this.id}}"
+                    data-loading-text="<i class='icon-refresh icon-spin'></i> {{this}}">
+                {{this}}
+            </button>
+        {{/each}}
+    </span>
+    <button type="button" name="app-delete-btn" class="btn btn-danger"
+            data-id="{{this.id}}"
+            data-name="{{this.attributes.overview_displayName}}">
+        Delete
+    </button>
+</td>

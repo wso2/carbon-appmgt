@@ -462,14 +462,6 @@ public interface APIProvider extends APIManager {
 
     public List<String> getCustomOutSequences()  throws AppManagementException;
 
-    /**
-     * Checks the Gateway Type
-     *
-     * @return True if gateway is Synpase
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
-     *
-     */
-    public boolean isSynapseGateway() throws AppManagementException;
 
     /**
      * Get the all web apps of tenant

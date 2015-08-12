@@ -80,7 +80,7 @@ public class AppMDAO {
 	public static Boolean removeUserNameInJWTForAppToken;
 
 	private static final String ENABLE_JWT_GENERATION =
-	                                                    "APIConsumerAuthentication.EnableTokenGeneration";
+	                                                    "AppConsumerAuthConfiguration.EnableTokenGeneration";
 	private static final String ENABLE_JWT_CACHE = "APIKeyManager.EnableJWTCache";
 
     private static final String GATEWAY_URL = "APIGateway.Environments.Environment.GatewayEndpoint";

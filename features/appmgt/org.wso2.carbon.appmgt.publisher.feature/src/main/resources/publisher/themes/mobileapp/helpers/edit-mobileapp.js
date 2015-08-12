@@ -1,9 +1,12 @@
 var resources = function (page, meta) {
     return {
-        js: ['mobileapp/bootstrap-fileupload.min.js', 'mobileapp/jquery.fileupload.js',
-             'mobileapp/edit.mobileapp.js', '/logic/asset.tag.edit.js', 'bootstrap-select.min.js',
+        js: ['lib/fileupload/bootstrap-fileupload.min.js',
+             'lib/fileupload/jquery.fileupload.js',
+             'logic/edit.mobileapp.js',
+             'bootstrap-select.min.js',
              'options.text.js'],
-        css: ['mobileapp/bootstrap-fileupload.min.css', 'mobileapp/main.css',
+        css: ['lib/fileupload/bootstrap-fileupload.min.css',
+              'mobileapp/main.css',
               'bootstrap-select.min.css']
     };
 };

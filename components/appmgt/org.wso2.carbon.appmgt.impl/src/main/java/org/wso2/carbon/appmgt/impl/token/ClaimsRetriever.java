@@ -27,13 +27,13 @@ import java.util.SortedMap;
  * in the order defined by the SortedMap.
  * Anyone trying to add custom user properties to the JWT should implement this interface
  * and mention the fully qualified class name in app-manager.xml ->
- * APIConsumerAuthentication -> ClaimsRetrieverImplClass
+ * AppConsumerAuthConfiguration -> ClaimsRetrieverImplClass
  */
 public interface ClaimsRetriever {
 
-    String CLAIMS_RETRIEVER_IMPL_CLASS = "APIConsumerAuthentication.ClaimsRetrieverImplClass";
+    String CLAIMS_RETRIEVER_IMPL_CLASS = "AppConsumerAuthConfiguration.ClaimsRetrieverImplClass";
 
-    String CONSUMER_DIALECT_URI = "APIConsumerAuthentication.ConsumerDialectURI";
+    String CONSUMER_DIALECT_URI = "AppConsumerAuthConfiguration.ConsumerDialectURI";
 
     String DEFAULT_DIALECT_URI = "http://wso2.org/claims";
 
