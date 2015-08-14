@@ -28,17 +28,17 @@ $(".btn-action").click(function (e) {
 			url: '/publisher/api/lifecycle/' + action + '/webapp/' + app,
 			type: 'PUT',
 			success: function (data, text) {
-				var msg = data.message[0];
-				for (var i = 1; i < data.message.length; i++) {
-					msg = msg + "</br>" + data.message[i];
+				var msg = data.messages[0];
+				for (var i = 1; i < data.messages.length; i++) {
+					msg = msg + "</br>" + data.messages[i];
 				}
 				showMessageModel(msg, data.status, 'webapp');
 			},
 			error: function (request, status, error) {
 				var data = jQuery.parseJSON(request.responseText);
-				var msg = data.message[0];
-				for (var i = 1; i < data.message.length; i++) {
-					msg = msg + "</br>" + data.message[i];
+				var msg = data.messages[0];
+				for (var i = 1; i < data.messages.length; i++) {
+					msg = msg + "</br>" + data.messages[i];
 				}
 				showMessageModel(msg, data.status, 'webapp');
 			}

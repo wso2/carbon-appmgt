@@ -252,8 +252,8 @@
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                             </bundles>
                             <importBundles>
-                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authentication:4.4.1</importBundleDef>
-                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.thrift.authentication:${carbon.identity.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authentication:${carbon.identity.auth.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.thrift.authentication:${carbon.identity.thrift.auth.version}</importBundleDef>
                                 <importBundleDef>libthrift.wso2:libthrift:0.8.0.wso2v1</importBundleDef>
 				<importBundleDef>org.wso2.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
                             </importBundles>

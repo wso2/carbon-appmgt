@@ -1,7 +1,8 @@
 var resources = function (page, meta) {
     return {
-        js: ['mobileapp/bootstrap-fileupload.min.js', 'mobileapp/jquery.fileupload.js',
-             'mobileapp/create.mobileapp.js'],
-        css: ['mobileapp/bootstrap-fileupload.min.css', 'mobileapp/main.css']
+        js: ['lib/fileupload/bootstrap-fileupload.min.js',
+             'lib/fileupload/jquery.fileupload.js',
+             'logic/create.mobileapp.js'],
+        css: ['lib/fileupload/bootstrap-fileupload.min.css', 'mobileapp/main.css']
     };
 };

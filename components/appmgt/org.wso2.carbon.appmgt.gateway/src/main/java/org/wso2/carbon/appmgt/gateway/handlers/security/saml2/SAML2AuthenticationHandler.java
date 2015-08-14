@@ -110,20 +110,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if (log.isDebugEnabled()) {
             log.debug("Initializing WebApp authentication handler instance");
         }
-        String authenticatorType = ServiceReferenceHolder.getInstance().getAPIManagerConfiguration().
-                getFirstProperty(APISecurityConstants.API_SECURITY_AUTHENTICATOR);
-        if (authenticatorType == null) {
-            authenticatorType = OAuthAuthenticator.class.getName();
-        } else if ("SAML2".equals(authenticatorType)) {
-            authenticatorType = SAML2Authenticator.class.getName();
-        }
+
         try {
-            authenticator = (Authenticator) Class.forName(OAuthAuthenticator.class.getName()).newInstance();
-            saml2Authenticator = (SAML2Authenticator) Class.forName(authenticatorType).newInstance();
+            authenticator = new OAuthAuthenticator();
+            saml2Authenticator = new SAML2Authenticator();
         } catch (Exception e) {
             // Just throw it here - Synapse will handle it
-            throw new SynapseException("Error while initializing authenticator of " +
-                    "type: " + authenticatorType);
+            throw new SynapseException("Error while initializing SAML or OAuth authenticator");
         }
 
         //Initialize the context cache by calling AppContextCacheUtil to pre-load cache
