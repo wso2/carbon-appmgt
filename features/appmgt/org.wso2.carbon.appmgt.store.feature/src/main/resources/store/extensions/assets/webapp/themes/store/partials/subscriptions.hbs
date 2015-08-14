@@ -8,7 +8,7 @@
 
                 <div class="col-md-2 app-assets-wrapper">
                     <div class="app-assets">
-                        <a href="{{productionURL}}">
+                        <a href="{{productionURL}}" target="_blank">
                             <img class="app-assets-icon"
                                  src="/store/storage/webapp/{{uuid}}/{{thumbnail}}">
                         </a>
@@ -37,6 +37,13 @@
 
 
         {{/each}}
+
+
+    {{else}}
+
+        <div class="well-large col-md-12 no-apps-box">
+            Sorry! You do not have any subscribed web apps.
+        </div>
 
     {{/if}}
 

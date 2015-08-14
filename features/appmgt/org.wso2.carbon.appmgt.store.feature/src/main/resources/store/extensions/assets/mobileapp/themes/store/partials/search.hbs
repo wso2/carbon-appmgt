@@ -1,0 +1,26 @@
+<div class="row">
+
+    <form class="col-md-12 searchbox">
+        <select id="searchSelect" class="input-lg search-select col-md-3">
+            <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+            <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+            <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
+            <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
+        </select>
+        <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+    </form>
+
+    <select id="category-select" class="selectpicker" data-style="btn-primary"  title='Choose a Category' data-width="100%">
+        {{#each categories}}
+            <option {{#compare ../selectedCategory this}}selected{{/compare}}>{{this}}</option>
+        {{/each}}
+    </select>
+
+    <select id="platform-select" class="selectpicker" data-style="btn-primary"  title='Choose a Platform' data-width="100%">
+        <option value="android" {{#compare selectedPlatform "android"}}selected{{/compare}}>Android</option>
+        <option value="ios" {{#compare selectedPlatform "ios"}}selected{{/compare}}>iOS</option>
+        <option value="webapp" {{#compare selectedPlatform "webapp"}}selected{{/compare}}>Web App</option>
+    </select>
+
+
+</div>

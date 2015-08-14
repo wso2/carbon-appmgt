@@ -1,0 +1,12 @@
+<div class="row">
+
+    <form class="col-md-12">
+        <select id="searchSelect" class="input-lg search-select col-md-3">
+            <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+            <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+            <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
+        </select>
+        <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+    </form>
+
+</div>

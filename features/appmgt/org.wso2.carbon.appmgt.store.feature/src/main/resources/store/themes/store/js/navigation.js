@@ -135,12 +135,16 @@ $(function() {
 
 	var register = function() {
 
+
 		if (!$("#form-register").valid())
 			return;
 
 		var username = $('#inp-username-register').val();
 		var password = $('#inp-password-register').val();
 		var confirmPassword = $('#inp-password-confirm').val();
+
+
+
 
         if(!doValidation(username,password,confirmPassword))
             return;
@@ -153,6 +157,7 @@ $(function() {
                 password : password
             }),
             success: function (data) {
+
                 if (!data.error) {
                     var messageText = null;
 
@@ -165,17 +170,16 @@ $(function() {
                             "APP store using login name '"+username+"'.";
                     }
 
-                    $('#messageModal').html($('#confirmation-data').html());
-                    $('#messageModal h3.modal-title').html(('APP Store - Notification'));
-                    $('#messageModal .messageText').html(messageText);
-                    $('#messageModal a.btn-primary').html('OK');
-                    $('#messageModal div.modal-body').html();
-                    $('#messageModal').modal();
-                    clearFields();
-                    $('#modal-register').modal('hide');
-                    $('#messageModal a.btn-primary').click(function () {
-                        $('#messageModal').modal('hide');
-                        location.href = "/store/login";
+                    $('#register-modal').modal('hide');
+                    noty({
+                        text : messageText,
+                        'layout' : 'center',
+                        'timeout': 3000,
+                        'modal': true,
+                        'onClose': function() {
+
+                            location.href = "/store/login";
+                        }
                     });
 
 
@@ -205,6 +209,8 @@ $(function() {
 
 	$('#btn-register-submit').click(register);
 
+
+
 	$('#modal-register input').keypress(function(e) {
 		if (e.keyCode === 13) {
 			register();
@@ -227,9 +233,7 @@ $(function() {
     	});
 
 
-	$('.dropdown-toggle').click(function(){
-		window.location = $(this).attr('href');
-	});
+
 
     $('#btn-register-close').click(function () {
         clearFields();

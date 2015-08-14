@@ -209,7 +209,7 @@ h2.app-title {
 
 @media (max-width: 570px) {
     h2.app-title:after {
-        content: "MDM";
+        content: "App Store";
     }
     h2.app-title span {
         display: none;

@@ -33,6 +33,7 @@ $.ajax({
         }
         item.append(row);
         $("#devicesList").append(item);
+
     }
 
 });

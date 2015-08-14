@@ -209,6 +209,7 @@ require('/modules/store.js').exec(function (ctx) {
         search: {
             mainPage: mainPage,
             subPage: subPage,
+            query:query,
             isTopAssets: false,
             searchFields: rxtAttributes
         },

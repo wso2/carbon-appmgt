@@ -2,11 +2,11 @@
     <div class="span3">
           <h4><i class="icon-star"></i>{{t "Tags"}}</h4>
 
-        <div class="store-tags">
+        <div class="tags">
             <ul>{{#each .}}
                 {{#each data}}
                     <li>
-                        <a href="{{url ../this.url}}{{name}}">{{name}}</a>
+                        <a class="tag" href="{{url ../this.url}}{{name}}">{{name}}</a>
                     </li>
                 {{/each}}
                 {{/each}}

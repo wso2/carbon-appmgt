@@ -61,7 +61,7 @@
                     {{/if}}
 
 
-                    <a href="#" data-toggle="dropdown">
+                    <a href="#"  data-toggle="modal" data-target="#register-modal">
                         <div class="auth-img">
                             Register
                             <span class="fw-stack-md fw-lg">
@@ -69,6 +69,9 @@
                             </span>
                         </div>
                     </a>
+
+
+                    {{>register}}
 
                 {{/if}}
 
@@ -86,7 +89,7 @@
                     <span class="fw-stack">
                         <i class="fw fw-tiles fw-stack-1-5x"></i>
                     </span>
-            </a><a class="cu-btn page-title" href='{{url "/assets/mobileapp"}}'>
+            </a><a class="cu-btn page-title" href='{{url "/assets/webapp"}}'>
             <span class="fw-stack"></span>
             {{#compare myApps true}}
                 My Web Apps

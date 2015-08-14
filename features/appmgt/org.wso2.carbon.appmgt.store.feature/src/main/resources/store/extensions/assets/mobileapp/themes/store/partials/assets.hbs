@@ -4,7 +4,7 @@
 
     {{#each assets}}
 
-    <div class="col-md-2 app-assets-wrapper">
+    <div class="col-md-3 col-lg-2 col-sm-12 app-assets-wrapper">
         <div class="app-assets">
             <a href="{{url "/assets"}}/{{type}}/{{id}}">
             <img class="app-assets-icon"
@@ -29,6 +29,12 @@
     </div>
 
     {{/each}}
+
+    {{else}}
+
+    <div class="well-large col-md-12 no-apps-box">
+        Sorry! There are no mobile apps to display.
+    </div>
 
 {{/if}}
 

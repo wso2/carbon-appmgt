@@ -15,6 +15,20 @@ var render = function (theme, data, meta, require) {
         hasApps = false;
     }
 
+    var searchQuery =  data.search.query;
+    if(typeof(searchQuery) != typeof({})){
+        searchQuery = {overview_name : searchQuery, searchTerm: 'overview_name', search : searchQuery};
+    }else{
+        for (var key in searchQuery) {
+            if (searchQuery.hasOwnProperty(key)) {
+                if(key.indexOf("overview_") !== -1){
+                    searchQuery.searchTerm = key;
+                    searchQuery.search = searchQuery[key];
+                }
+            }
+        }
+    }
+
 
     theme('2-column-right', {
         title: data.title,
@@ -47,6 +61,10 @@ var render = function (theme, data, meta, require) {
              } */
         ],
         right: [
+            {
+                partial: 'search',
+                context: {searchQuery: searchQuery}
+            },
             {
                 partial: 'my-assets-link',
                 context: data.myAssets
