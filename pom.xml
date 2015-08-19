@@ -597,11 +597,11 @@
     <carbon.appmgt.version>1.1.0-SNAPSHOT</carbon.appmgt.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.4.3</carbon.mediation.version>
-    <carbon.identity.version>4.5.1</carbon.identity.version>
+    <carbon.identity.version>4.5.4</carbon.identity.version>
     <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
-    <carbon.identity.thrift.auth.version>4.5.0</carbon.identity.thrift.auth.version>
-    <carbon.identity.scim.version>4.5.1</carbon.identity.scim.version>
-    <carbon.identity.oauth.version>4.5.0</carbon.identity.oauth.version>
+    <carbon.identity.thrift.auth.version>4.5.4</carbon.identity.thrift.auth.version>
+    <carbon.identity.scim.version>4.5.4</carbon.identity.scim.version>
+    <carbon.identity.oauth.version>4.5.4</carbon.identity.oauth.version>
     <carbon.deployment.version>4.4.1</carbon.deployment.version>
     <carbon.commons.version>4.4.3</carbon.commons.version>
     <carbon.registry.version>4.4.3</carbon.registry.version>
