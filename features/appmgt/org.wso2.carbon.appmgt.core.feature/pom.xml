@@ -244,23 +244,23 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.usage.client:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.stub:${carbon.sequences.stub.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:${carbon.identity.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:${bam.presentation.stub.version}</bundleDef>
-				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:${carbon.mediation.security.stub}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:${identity.entitlement.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:${identity.entitlement.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.user.registration.stub:compatible:${carbon.identity.base.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.bam.presentation.stub:compatible:${bam.presentation.stub.version}</bundleDef>
+				<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub:compatible:${carbon.mediation.security.stub}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon.identity.base.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${carbon.identity.base.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
                             </bundles>
                             <importBundles>
-                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authentication:${carbon.identity.auth.version}</importBundleDef>
-                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authenticator.thrift:${carbon.identity.thrift.auth.version}</importBundleDef>
-                                <importBundleDef>libthrift.wso2:libthrift:0.8.0.wso2v1</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authentication:compatible:${carbon.identity.auth.version}</importBundleDef>
+                                <!--<importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authenticator.thrift:compatible:${carbon.identity.thrift.auth.version}</importBundleDef>-->
+                                <!--<importBundleDef>libthrift.wso2:libthrift:0.8.0.wso2v1</importBundleDef>-->
 				<importBundleDef>org.wso2.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
                             </importBundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:${carbon.identity.oauth.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.base.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.oauth.server:compatible:${carbon.identity.base.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.um.ws.service.server:compatible:${carbon.identity.base.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
