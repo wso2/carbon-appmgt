@@ -42,6 +42,7 @@ import org.wso2.carbon.appmgt.impl.dto.*;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
+import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.*;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.core.util.CryptoException;
@@ -54,6 +55,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -76,7 +78,7 @@ public class AppMDAO {
 
 	private static final Log log = LogFactory.getLog(AppMDAO.class);
 
-	public static JWTGenerator jwtGenerator;
+	public static TokenGenerator tokenGenerator;
 	public static Boolean removeUserNameInJWTForAppToken;
 
 	private static final String ENABLE_JWT_GENERATION =
@@ -91,21 +93,41 @@ public class AppMDAO {
 	private static final String PRIMARY_LOGIN = "primary";
 	private static final String CLAIM_URI = "ClaimUri";
 
-	public AppMDAO() {
+	private static AppManagerConfiguration configuration;
+	private static boolean isEnableJWTGeneration = true;
 
-		String enableJWTGeneration =
-		                             ServiceReferenceHolder.getInstance()
-		                                                   .getAPIManagerConfigurationService()
-		                                                   .getAPIManagerConfiguration()
-		                                                   .getFirstProperty(ENABLE_JWT_GENERATION);
-		removeUserNameInJWTForAppToken =
-		                                 Boolean.parseBoolean(ServiceReferenceHolder.getInstance()
-		                                                                            .getAPIManagerConfigurationService()
-		                                                                            .getAPIManagerConfiguration()
-		                                                                            .getFirstProperty(AppMConstants.API_KEY_MANAGER_REMOVE_USERNAME_TO_JWT_FOR_APP_TOKEN));
-		if (enableJWTGeneration != null && JavaUtils.isTrueExplicitly(enableJWTGeneration)) {
-			jwtGenerator = new JWTGenerator();
+	public AppMDAO() {
+		configuration = ServiceReferenceHolder.getInstance()
+				.getAPIManagerConfigurationService().getAPIManagerConfiguration();
+		if (configuration == null) {
+			log.error("API Manager configuration is not initialized");
+		} else {
+			isEnableJWTGeneration = Boolean.parseBoolean(configuration.getFirstProperty(
+					AppMConstants.ENABLE_JWT_GENERATION));
+			removeUserNameInJWTForAppToken = Boolean.parseBoolean(configuration.getFirstProperty(
+					AppMConstants.API_KEY_MANAGER_REMOVE_USERNAME_TO_JWT_FOR_APP_TOKEN));
 		}
+	}
+
+	public static boolean isJWTEnabled() {
+		return isEnableJWTGeneration;
+	}
+
+	public static TokenGenerator getTokenGenerator() {
+		if (configuration == null) {
+			log.error("API Manager configuration is not initialized");
+		} else {
+			if (isEnableJWTGeneration) {
+				String tokenGeneratorImplClass = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
+				if (tokenGeneratorImplClass == null) {
+					tokenGenerator = new JWTGenerator();
+				} else {
+					tokenGenerator = (TokenGenerator) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+							.getOSGiService(TokenGenerator.class);
+				}
+			}
+		}
+		return tokenGenerator;
 	}
 
 	/**
@@ -452,7 +474,7 @@ public class AppMDAO {
 						keyValidationInfoDTO.setConsumerKey(AppManagerUtil.decryptToken(consumerKey));
 						keyValidationInfoDTO.setApiPublisher(apiPublisher);
 
-						if (jwtGenerator != null) {
+						if (tokenGenerator != null) {
 							String calleeToken = null;
 
 							String enableJWTCache =
@@ -708,9 +730,9 @@ public class AppMDAO {
 		String jwtToken;
 		if (removeUserNameInJWTForAppToken &&
 		    AppMConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION.equalsIgnoreCase(userType)) {
-			jwtToken = jwtGenerator.generateToken(keyValidationInfoDTO, context, version, false);
+			jwtToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, false);
 		} else {
-			jwtToken = jwtGenerator.generateToken(keyValidationInfoDTO, context, version, true);
+			jwtToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, true);
 		}
 		return jwtToken;
 	}
@@ -4799,8 +4821,8 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		keyValidationInfoDTO.setApplicationName(applicationName);
 		keyValidationInfoDTO.setTier(tier);
 		keyValidationInfoDTO.setEndUserName(endUserName);
-		if (jwtGenerator != null) {
-			calleeToken = jwtGenerator.generateToken(keyValidationInfoDTO, context, version, true);
+		if (tokenGenerator != null) {
+			calleeToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, true);
 		} else {
 			if (log.isDebugEnabled()) {
 				log.debug("JWT generator not properly initialized. JWT token will not present in validation info");

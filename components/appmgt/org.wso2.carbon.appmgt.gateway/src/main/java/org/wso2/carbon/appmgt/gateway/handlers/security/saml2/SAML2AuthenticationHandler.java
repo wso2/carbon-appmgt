@@ -720,7 +720,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return true if JWT is enabled in App Manager config.
      */
     private boolean isJWTEnabled(){
-        return AppMDAO.jwtGenerator != null;
+        return AppMDAO.isJWTEnabled();
     }
 
     /**
@@ -772,7 +772,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
         String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
 
-        String jwtToken = AppMDAO.jwtGenerator.generateToken(samlAttributes, webAppContext, webAppVersion);
+        String jwtToken = AppMDAO.getTokenGenerator().generateToken(samlAttributes, webAppContext, webAppVersion);
         jwtCache.put(jwtCacheKey, jwtToken);
 
         //Add JWT Token into transport headers.

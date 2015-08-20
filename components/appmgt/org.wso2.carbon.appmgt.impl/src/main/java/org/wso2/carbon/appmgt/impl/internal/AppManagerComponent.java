@@ -41,6 +41,8 @@ import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.RemoteAuthorizationManager;
+import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
+import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.util.GovernanceConstants;
@@ -121,7 +123,7 @@ public class AppManagerComponent {
         }
 
         apimgtSampleService = new APIMGTSampleService();
-        
+
         try {
             BundleContext bundleContext = componentContext.getBundleContext();
             bundleContext.registerService(APIMGTSampleService.class.getName(),apimgtSampleService, null);
@@ -131,7 +133,7 @@ public class AppManagerComponent {
 
             AppManagerConfiguration configuration = new AppManagerConfiguration();
             String filePath = CarbonUtils.getCarbonHome() + File.separator + "repository" +
-                    File.separator + "conf" + File.separator + "app-manager.xml";
+                              File.separator + "conf" + File.separator + "app-manager.xml";
             configuration.load(filePath);
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
@@ -145,9 +147,25 @@ public class AppManagerComponent {
                         Axis2ConfigurationContextObserver.class.getName(), listener, null);
             }
 
+            //register JWT implementation class as a OSGi service
+            String tokenGeneratorImplClazz = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
+            if (tokenGeneratorImplClazz == null) {
+                bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(), null);
+            } else {
+                try {
+                    bundleContext.registerService(TokenGenerator.class.getName(),
+                            bundleContext.getBundle().loadClass(tokenGeneratorImplClazz).newInstance(), null);
+                } catch (InstantiationException e) {
+                    log.error("Error while instantiating class " + tokenGeneratorImplClazz, e);
+                } catch (IllegalAccessException e) {
+                    log.error(e);
+                } catch (ClassNotFoundException e) {
+                    log.error("Cannot find the class " + tokenGeneratorImplClazz + e);
+                }
+            }
+
             SignupObserver signupObserver = new SignupObserver();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
-            
             AppManagerConfigurationServiceImpl configurationService =
                     new AppManagerConfigurationServiceImpl(configuration);
 
@@ -158,17 +176,17 @@ public class AppManagerComponent {
             APIStatusObserverList.getInstance().init(configuration);
 
             AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
-                                                        RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                                                                                      RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
-                                                        AppMConstants.Permissions.WEB_APP_CREATE,
-                                                        UserMgtConstants.EXECUTE_ACTION, null);
+                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
+                    AppMConstants.Permissions.WEB_APP_CREATE,
+                    UserMgtConstants.EXECUTE_ACTION, null);
 
             AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_MOBILE_CREATOR_APIMGT_EXECUTION_ID,
-                                                        RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                                                                                      RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +
-                                                                                      AppMConstants.APPMGT_MOBILE_REGISTRY_LOCATION),
-                                                        AppMConstants.Permissions.MOBILE_APP_CREATE,
-                                                        UserMgtConstants.EXECUTE_ACTION, null);
+                    RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                            RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +
+                            AppMConstants.APPMGT_MOBILE_REGISTRY_LOCATION),
+                    AppMConstants.Permissions.MOBILE_APP_CREATE,
+                    UserMgtConstants.EXECUTE_ACTION, null);
 
             //Add the creator and publisher roles
             org.wso2.carbon.user.api.UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
@@ -224,7 +242,7 @@ public class AppManagerComponent {
                 }
             }
             new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
-            
+
             //create mobileapps directory if it does not exists
             AppManagerUtil.createMobileAppsDirectory();
         } catch (AppManagementException e) {
@@ -304,7 +322,7 @@ public class AppManagerComponent {
 
     private void addRxtConfigs() throws AppManagementException {
         String rxtDir = CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator +
-                "resources" + File.separator + "rxts";
+                        "resources" + File.separator + "rxts";
         File file = new File(rxtDir);
         //create a FilenameFilter
         FilenameFilter filenameFilter = new FilenameFilter() {
@@ -324,7 +342,7 @@ public class AppManagerComponent {
 
         for (String rxtPath : rxtFilePaths) {
             String resourcePath = GovernanceConstants.RXT_CONFIGS_PATH +
-                    RegistryConstants.PATH_SEPARATOR + rxtPath;
+                                  RegistryConstants.PATH_SEPARATOR + rxtPath;
             try {
                 if (systemRegistry.resourceExists(resourcePath)) {
                     continue;
@@ -435,7 +453,7 @@ public class AppManagerComponent {
     }
 
     private void setupSelfRegistration(AppManagerConfiguration config) throws
-                                                                       AppManagementException {
+            AppManagementException {
         boolean enabled = Boolean.parseBoolean(config.getFirstProperty(AppMConstants.SELF_SIGN_UP_ENABLED));
         if (!enabled) {
             return;
@@ -445,7 +463,7 @@ public class AppManagerComponent {
         if (role == null) {
             // Required parameter missing - Throw an exception and interrupt startup
             throw new AppManagementException("Required subscriber role parameter missing " +
-                    "in the self sign up configuration");
+                                             "in the self sign up configuration");
         }
 
         boolean create = Boolean.parseBoolean(config.getFirstProperty(AppMConstants.SELF_SIGN_UP_CREATE_ROLE));
@@ -462,15 +480,18 @@ public class AppManagerComponent {
                     if (log.isDebugEnabled()) {
                         log.debug("Creating subscriber role: " + role);
                     }
-                    Permission[] subscriberPermissions = new Permission[]{new Permission("/permission/admin/login",UserMgtConstants.EXECUTE_ACTION),
-                            new Permission(AppMConstants.Permissions.WEB_APP_SUBSCRIBE, UserMgtConstants.EXECUTE_ACTION)};
-                    String superTenantName = ServiceReferenceHolder.getInstance().getRealmService().getBootstrapRealmConfiguration().getAdminUserName();
+                    Permission[] subscriberPermissions = new Permission[]{
+                            new Permission("/permission/admin/login", UserMgtConstants.EXECUTE_ACTION),
+                            new Permission(AppMConstants.Permissions.WEB_APP_SUBSCRIBE,
+                                    UserMgtConstants.EXECUTE_ACTION)};
+                    String superTenantName = ServiceReferenceHolder.getInstance().getRealmService()
+                            .getBootstrapRealmConfiguration().getAdminUserName();
                     String[] userList = new String[]{superTenantName};
                     manager.addRole(role, userList, subscriberPermissions);
                 }
             } catch (UserStoreException e) {
                 throw new AppManagementException("Error while creating subscriber role: " + role + " - " +
-                        "Self registration might not function properly.", e);
+                                                 "Self registration might not function properly.", e);
             }
         }
     }
@@ -483,7 +504,6 @@ public class AppManagerComponent {
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
         ServiceReferenceHolder.setContextService(null);
     }
-
 
     protected void setTenantRegistryLoader(TenantRegistryLoader tenantRegistryLoader) {
         this.tenantRegistryLoader = tenantRegistryLoader;
