@@ -18,12 +18,16 @@ package org.wso2.carbon.appmgt.hostobjects.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.hostobjects.HostObjectUtils;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
+import java.io.File;
 
 /**
  * @scr.component name="org.wso2.appmgt.hostobjects" immediate="true"

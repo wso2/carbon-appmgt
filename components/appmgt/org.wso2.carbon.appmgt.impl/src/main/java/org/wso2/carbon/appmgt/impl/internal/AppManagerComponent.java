@@ -32,11 +32,9 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
-import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.listners.UserAddListener;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
-import org.wso2.carbon.appmgt.impl.observers.TenantServiceCreator;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -78,7 +76,7 @@ import java.util.List;
 
 
 /**
- * @scr.component name="org.wso2.apimgt.impl.services" immediate="true"
+ * @scr.component name="org.wso2.apimgt.impl.services.appm" immediate="true"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
  * cardinality="1..1" policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
@@ -137,13 +135,6 @@ public class AppManagerComponent {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
 
-            String gatewayType = configuration.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
-            if ("Synapse".equalsIgnoreCase(gatewayType)) {
-                //Register Tenant service creator to deploy tenant specific common synapse configurations
-                TenantServiceCreator listener = new TenantServiceCreator();
-                bundleContext.registerService(
-                        Axis2ConfigurationContextObserver.class.getName(), listener, null);
-            }
 
             SignupObserver signupObserver = new SignupObserver();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
@@ -212,17 +203,7 @@ public class AppManagerComponent {
                             new UserAddListener(), null);
                 }
             }
-            //Load initially available api contexts at the server startup. This Cache is only use by the products other than the app-manager
-            /* TODO: Load Config values from apimgt.core*/
-            boolean apiManagementEnabled = AppManagerUtil.isAPIManagementEnabled();
-            boolean loadAPIContextsAtStartup = AppManagerUtil.isLoadAPIContextsAtStartup();
-            if (apiManagementEnabled && loadAPIContextsAtStartup) {
-                List<String> contextList = AppMDAO.getAllAvailableContexts();
-                Cache contextCache = AppManagerUtil.getAPIContextCache();
-                for (String context : contextList) {
-                    contextCache.put(context, true);
-                }
-            }
+
             new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
             
             //create mobileapps directory if it does not exists
