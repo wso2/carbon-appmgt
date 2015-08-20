@@ -19,6 +19,12 @@
         {{#each assets}}
 
             <div class="col-md-2 app-assets-wrapper">
+                {{#if isSubscribed}}
+                    <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
+                {{/if}}
+                {{#if indashboard}}
+                    <div class="ribbon-wrapper-green"><div class="ribbon-green">Installed</div></div>
+                {{/if}}
                 <div class="app-assets">
                     <a href="{{url "/assets"}}/{{type}}/{{id}}">
                         <img class="app-assets-icon"
