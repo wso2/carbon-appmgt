@@ -39,7 +39,7 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
 
                 if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
                     var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-                    var username = sessionObj.loggedInUser;                                   
+                    var username = sessionObj.loggedInUser;
 
                     if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
 
@@ -56,7 +56,7 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
 
                         session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                         session.put("Loged", "true");
-                        
+
                         username = username + "";
                         var userDetails={};
                         userDetails['username']=username;
@@ -77,12 +77,12 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                         	response.sendRedirect('/store');
 
 
-						
+
                         } else {
                         	log.warn('User '+sessionObj.loggedInUser+' does not have permission to access the store application. Make sure the user has the store role.');
                         	response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
-                        	                        	
-                        }                        
+
+                        }
                     }
                 }
             }

@@ -9,7 +9,7 @@ var login = function (username, password,tenantMode) {
 	if (username.indexOf("@") != -1) {
             userDomain=username.split("@")[1];
         }
-    	
+
     	if(!(tenantMode=='carbon.super' && userDomain == null) && tenantMode!=userDomain){
 	    	return {
 	            error:true,
@@ -58,12 +58,8 @@ var loginWithSAMLToken = function (username) {
             log = new Log(),
             manager = jagg.module("manager"),
             store = manager.getAPIStoreObj();
-   
-    var subscriber = store.getSubscriber(username);
-    if (!subscriber) {
-        store.addSubscriber(username);
-        subscriber = store.getSubscriber(username);
-    }
+
+
     return {
         error:false,
         username:username,

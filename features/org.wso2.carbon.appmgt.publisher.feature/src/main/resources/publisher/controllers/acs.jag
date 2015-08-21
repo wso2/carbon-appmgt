@@ -65,6 +65,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 
 				//sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
 				sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                log.info("SESS " + sessionObj.sessionIndex);
                         	username = username + "";
                         	var username = sessionObj.loggedInUser;
                        		var role = require('/modules/role.js').checkeRole(username, session);
