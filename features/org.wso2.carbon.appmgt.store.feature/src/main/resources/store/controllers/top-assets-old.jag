@@ -1,5 +1,0 @@
-<%
-
-response.sendRedirect("/store/assets/mobileapp");
-
-%>
