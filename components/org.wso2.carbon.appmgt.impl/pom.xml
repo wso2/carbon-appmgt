@@ -248,6 +248,7 @@
                             org.wso2.carbon.appmgt.impl.discovery;version="${carbon.appmgt.bundle.version}"
                         </Export-Package>
                         <Import-Package>
+                            org.wso2.carbon.utils,
                             org.wso2.carbon.governance.api.*,
                             org.wso2.carbon.registry.ws.client.*,
                             org.wso2.carbon.appmgt.api.model.*,
@@ -259,6 +260,7 @@
                             org.eclipse.equinox.http.helper,
                             org.wso2.carbon.identity.*;version="${carbon.identity.pkg.version}",
                             org.wso2.carbon.mediation.*;version="${carbon.mediation.pkg.version}";resolution:=optional,
+                            org.wso2.carbon.um.ws.api.stub.*;version="${carbon.identity.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

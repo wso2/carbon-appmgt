@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.internal;
+package org.wso2.carbon.appmgt.gateway.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +36,6 @@ import java.util.List;
 /**
  *
  * Application manager gateway component
- * TODO: The code inside was separated from AppManagerComponent as a quick hack. Move this to Gateway component itself
  *
  * @scr.component name="org.wso2.apimgt.impl.services.gateway" immediate="true"
  * @scr.reference name="api.manager.config.service"
@@ -93,7 +92,7 @@ public class AppManagerGatewayComponent {
             log.debug("Gateway manager configuration service bound to the WebApp host objects");
         }
         configuration = amcService.getAPIManagerConfiguration();
-        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
+        org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
     }
 
     protected void unsetAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
@@ -101,7 +100,7 @@ public class AppManagerGatewayComponent {
             log.debug("Gateway manager configuration service unbound from the WebApp host objects");
         }
         configuration = null;
-        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+        org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
     }
 
 }
