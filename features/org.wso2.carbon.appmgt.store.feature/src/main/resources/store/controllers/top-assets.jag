@@ -1,7 +1,7 @@
 <%
 //TODO : remove this and fix welcome page properly
 //response.sendRedirect('.' + require('/store.js').config().assetsUrlPrefix + '/gadget');
-
+response.sendRedirect("/store/assets/mobileapp");
 var caramel;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');

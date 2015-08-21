@@ -14,6 +14,6 @@ var gadgetCount = 0,
 if (server.current(session) == null) {
     response.sendRedirect('/publisher/login');
 } else {
-    response.sendRedirect('/publisher/assets/webapp/');
+    response.sendRedirect('/publisher/assets/mobileapp/');
 }
 %>
