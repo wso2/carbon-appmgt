@@ -1,4 +1,4 @@
-<div class="col-md-8">
+<div class="assets-wrapper">
 
 	{{#if assets}}
 
@@ -32,6 +32,30 @@
             </div>
 
 		{{/each}}
+
+
+        <div class="row" style="clear: both">
+            <nav>
+                <ul class="pagination">
+                {{#if leftNav}}
+                    <li>
+                        <a href="{{url "/assets/webapp?page="}}{{this.leftNav}}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo; Previous</span>
+                        </a>
+                    </li>
+                {{/if}}
+
+                {{#if rightNav}}
+                    <li>
+                        <a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}" aria-label="Next">
+                            <span aria-hidden="true">Next &raquo;</span>
+                        </a>
+                    </li>
+                {{/if}}
+                </ul>
+            </nav>
+        </div>
+
 
     {{else}}
 
