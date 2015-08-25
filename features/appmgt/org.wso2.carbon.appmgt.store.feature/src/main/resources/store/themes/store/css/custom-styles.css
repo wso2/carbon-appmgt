@@ -44,14 +44,12 @@
 }
 
 .app-assets-rating {
-    background: url('../img/store-stars.png') no-repeat top left;
     display: block;
     height: 20px;
     width: 100px;
     margin: auto;
-    padding-left: 5px;
 
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     clear: both;
 }
 
