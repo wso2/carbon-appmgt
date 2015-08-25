@@ -21,7 +21,7 @@
 
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
-        <artifactId>appmgt-feature</artifactId>
+        <artifactId>carbon-appmgt</artifactId>
         <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
@@ -99,7 +99,7 @@
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.startup.publisher.feature:1.0.0</includedFeatureDef> -->
                             </includedFeatures>
 			    <importBundles>
-                                <importBundleDef>org.wso2.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
                             </importBundles>
                         </configuration>
                     </execution>
