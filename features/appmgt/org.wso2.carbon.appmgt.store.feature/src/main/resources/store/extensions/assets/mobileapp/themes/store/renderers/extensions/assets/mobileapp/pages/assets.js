@@ -3,6 +3,7 @@ var render = function (theme, data, meta, require) {
 
     data.header.config = data.config;
 
+
     var searchQuery =  data.search.query;
     if(typeof(searchQuery) != typeof({})){
         searchQuery = {overview_name : searchQuery, searchTerm: 'overview_name', search : searchQuery};
@@ -16,6 +17,11 @@ var render = function (theme, data, meta, require) {
             }
         }
     }
+
+    data.header.categories = data.navigation.assets[data.type].categories;
+    data.header.selectedPlatform = data.selectedPlatform;
+    data.header.selectedCategory = data.selectedCategory;
+    data.header.searchQuery = searchQuery;
 		
     var assets = require('/helpers/assets.js');
     theme('2-column-right', {
@@ -49,10 +55,6 @@ var render = function (theme, data, meta, require) {
             } */
         ],
         right: [
-            {
-                partial: 'search',
-                context: {categories: data.navigation.assets[data.type].categories,  selectedPlatform : data.selectedPlatform, selectedCategory : data.selectedCategory, searchQuery: searchQuery}
-            },
         	{
                 partial: 'my-assets-link',
                 context: data.myAssets

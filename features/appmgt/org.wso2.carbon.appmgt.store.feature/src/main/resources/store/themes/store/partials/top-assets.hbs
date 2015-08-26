@@ -54,8 +54,21 @@
 
         {{/each}}
 
+
+     {{else}}
+
+
     {{/if}}
 </div>
 
 {{/each}}
+
+    {{#if noAssets}}
+
+        <div class="well-large col-md-12 no-apps-box">
+            <i class="fw fw-paste nothing-icon"></i> Sorry, We could not find any app for you
+        </div>
+
+    {{/if}}
+
 </div>

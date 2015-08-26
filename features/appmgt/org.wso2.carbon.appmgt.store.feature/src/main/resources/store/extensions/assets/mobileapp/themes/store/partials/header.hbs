@@ -1,8 +1,25 @@
 <header>
     <div class="row wr-global-header">
-        <div class="col-xs-6 col-sm-6 col-lg-8 app-logo">
-            <a href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+        <div class="col-xs-6 col-sm-6 col-lg-8">
+            <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+
+            <div class="wr-app-bar-items searchbox-wrapper hidden-md hidden-sm hidden-xs">
+
+                <form class="searchbox" >
+                    <select id="searchSelect" class="input-lg search-select col-md-3">
+                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+                        <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+                        <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
+                        <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
+                    </select>
+                    <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+                </form>
+            </div>
+
         </div>
+
+
+
         <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
 
             <div class="wr-auth pull-right">
@@ -85,13 +102,14 @@
 
 <!-- secondary header - app bar -->
 <div id="nav" class="row wr-app-bar">
-    <div class="col-md-9 wr-action-container">
+    <div class="col-md-12 wr-action-container">
         <div class="wr-action-btn-bar">
-            <a href="javascript:openCollapsedNav()" class="cu-btn wr-hidden-nav-toggle-btn">
+            <a href="javascript:openCollapsedNav()" class="cu-btn wr-hidden-nav-toggle-btn" style="float: left">
                     <span class="fw-stack">
                         <i class="fw fw-tiles fw-stack-1-5x"></i>
                     </span>
-            </a><a class="cu-btn page-title" href='{{url "/assets/mobileapp"}}'>
+            </a>
+            <a class="cu-btn page-title" style="float: left" href='{{url "/assets/mobileapp"}}'>
             <span class="fw-stack"></span>
             {{#compare myApps true}}
                 My Mobile Apps
@@ -101,6 +119,21 @@
 
             </a>
 
+            <div class="wr-app-bar-items">
+                <select id="category-select" class="selectpicker" data-style="btn-primary"  title='Choose a Category' data-width="100%">
+                    {{#each categories}}
+                        <option {{#compare ../selectedCategory this}}selected{{/compare}}>{{this}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+            <div class="wr-app-bar-items">
+                <select id="platform-select" class="selectpicker" data-style="btn-primary"  title='Choose a Platform' data-width="100%">
+                    <option value="android" {{#compare selectedPlatform "android"}}selected{{/compare}}>Android</option>
+                    <option value="ios" {{#compare selectedPlatform "ios"}}selected{{/compare}}>iOS</option>
+                    <option value="webapp" {{#compare selectedPlatform "webapp"}}selected{{/compare}}>Web App</option>
+                </select>
+            </div>
 
         </div>
     </div>

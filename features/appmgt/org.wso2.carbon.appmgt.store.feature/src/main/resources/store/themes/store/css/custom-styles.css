@@ -277,6 +277,7 @@
 .no-apps-box{
     font-size: 2em;
     text-align: center;
+    padding-top: 200px;
 }
 
 
@@ -382,3 +383,29 @@
 }
 
 
+.nothing-icon{
+    font-size: 80px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+
+.wr-app-bar-items{
+    float:left;
+}
+
+.wr-app-bar-items-right{
+    float:left;
+}
+
+.bootstrap-select .btn{
+    padding: 15px 20px;
+    margin-top: -11px;
+}
+
+.searchbox-wrapper{
+    padding-top: 1px;
+}
+
+.app-logo{
+    width: 200px;
+}
