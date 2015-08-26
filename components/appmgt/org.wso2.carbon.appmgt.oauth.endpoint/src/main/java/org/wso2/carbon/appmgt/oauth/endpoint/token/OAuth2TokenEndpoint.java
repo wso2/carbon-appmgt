@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.gateway.dto.Token;
 import org.wso2.carbon.appmgt.oauth.endpoint.OAuthRequestWrapper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.oauth.common.CarbonOAuthTokenRequest;
+import org.wso2.carbon.identity.oauth2.model.CarbonOAuthTokenRequest;
 import org.wso2.carbon.identity.oauth.common.OAuth2ErrorCodes;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.common.exception.OAuthClientException;

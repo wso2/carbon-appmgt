@@ -30,9 +30,12 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.*;
-import org.wso2.carbon.apimgt.impl.dto.xsd.APIInfoDTO;
-import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.ApplicationKeysDTO;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -43,14 +46,17 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.workflow.*;
-import org.wso2.carbon.appmgt.keymgt.client.APIAuthenticationServiceClient;
-import org.wso2.carbon.appmgt.keymgt.client.SubscriberKeyMgtClient;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
 import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUserUsageDTO;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
@@ -119,21 +125,23 @@ public class APIStoreHostObject extends ScriptableObject {
     	}
     }
 
-    public static void jsFunction_loadRegistryOfTenant(Context cx,
-                                                Scriptable thisObj, Object[] args, Function funObj){
-        if(!isStringArray(args)) {
+    public static void jsFunction_loadRegistryOfTenant(Context cx, Scriptable thisObj,
+            Object[] args, Function funObj) {
+        if (!isStringArray(args)) {
             return;
         }
 
         String tenantDomain = args[0].toString();
-        if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)){
+        if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME
+                .equals(tenantDomain)) {
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
                         getTenantManager().getTenantId(tenantDomain);
                 AppManagerUtil.loadTenantRegistry(tenantId);
-            } catch (org.wso2.carbon.user.api.UserStoreException e) {
-                log.error("Could not load tenant registry. Error while getting tenant id from tenant domain " +
-                        tenantDomain);
+            } catch (org.wso2.carbon.user.api.UserStoreException | AppManagementException e) {
+                log.error(
+                        "Could not load tenant registry. Error while getting tenant id from tenant domain "
+                                + tenantDomain);
             }
         }
 
@@ -170,29 +178,6 @@ public class APIStoreHostObject extends ScriptableObject {
     private static void handleException(String msg, Throwable t) throws AppManagementException {
         log.error(msg, t);
         throw new AppManagementException(msg, t);
-    }
-
-
-    private static APIAuthenticationServiceClient getAPIKeyManagementClient() throws
-                                                                              AppManagementException {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        String url = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_URL);
-        if (url == null) {
-            handleException("WebApp key manager URL unspecified");
-        }
-
-        String username = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_USERNAME);
-        String password = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_PASSWORD);
-        if (username == null || password == null) {
-            handleException("Authentication credentials for WebApp key manager unspecified");
-        }
-
-        try {
-            return new APIAuthenticationServiceClient(url, username, password);
-        } catch (Exception e) {
-            handleException("Error while initializing the subscriber key management client", e);
-            return null;
-        }
     }
 
     public static String jsFunction_getAuthServerURL(Context cx, Scriptable thisObj,
@@ -260,34 +245,6 @@ public class APIStoreHostObject extends ScriptableObject {
                                                Object[] args, Function funObj)
             throws AppManagementException {
         return "http://" + System.getProperty(hostName) + ":" + System.getProperty(httpPort);
-    }
-
-    /*
-	 * getting key for WebApp subscriber args[] list String subscriberID, String
-	 * api, String apiVersion, String Date
-	 */
-    public static String jsFunction_getKey(Context cx, Scriptable thisObj,
-                                           Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-
-        if(args!=null&& isStringArray(args)){
-        APIInfoDTO apiInfo = new APIInfoDTO();
-        apiInfo.setProviderId((String) args[0]);
-        apiInfo.setApiName((String) args[1]);
-        apiInfo.setVersion((String) args[2]);
-        apiInfo.setContext((String) args[3]);
-        try {
-            SubscriberKeyMgtClient keyMgtClient = HostObjectUtils.getKeyManagementClient();
-            return keyMgtClient.getAccessKey((String) args[5], apiInfo, (String) args[4], (String) args[6], (String) args[7]);
-        } catch (Exception e) {
-            String msg = "Error while obtaining access tokens";
-            handleException(msg, e);
-            return null;
-        }
-        }else{
-            handleException("Invalid input parameters.");
-            return null;
-        }
     }
 
     public static NativeObject jsFunction_login(Context cx, Scriptable thisObj,
@@ -2578,71 +2535,6 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             return apiArray;
 
-        } else {
-            handleException("Invalid types of input parameters.");
-            return null;
-        }
-    }
-
-    public static NativeObject jsFunction_refreshToken(Context cx, Scriptable thisObj,
-                                                       Object[] args,
-                                                       Function funObj)
-            throws AppManagementException, AxisFault {
-
-        NativeObject row = new NativeObject();
-        if (args!=null && args.length!=0) {
-        String userId = (String) args[0];
-        String applicationName = (String) args[1];
-        String tokenType = (String) args[2];
-        String oldAccessToken = (String) args[3];
-        NativeArray accessAllowDomainsArr = (NativeArray) args[4];
-        String[] accessAllowDomainsArray = new String[(int) accessAllowDomainsArr.getLength()];
-        String clientId = (String) args[5];
-        String clientSecret = (String) args[6];
-        String validityTime = (String) args[7];
-        
-        for (Object domain : accessAllowDomainsArr.getIds()) {
-            int index = (Integer) domain;
-            accessAllowDomainsArray[index] = (String) accessAllowDomainsArr.get(index, null);
-        }
-
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        //Check whether old access token is already available
-        if (apiConsumer.isApplicationTokenExists(oldAccessToken)) {
-            SubscriberKeyMgtClient keyMgtClient = HostObjectUtils.getKeyManagementClient();
-            ApplicationKeysDTO dto = new ApplicationKeysDTO();
-            String accessToken;
-            try {
-                //Regenerate the application access key
-                accessToken = keyMgtClient.regenerateApplicationAccessKey(tokenType, oldAccessToken,
-                        accessAllowDomainsArray, clientId, clientSecret, validityTime) ;
-                if (accessToken != null) {
-                    //If a new access token generated successfully,remove the old access token from cache.
-                    if (AppManagerUtil.isAPIGatewayKeyCacheEnabled()) {
-                        APIAuthenticationServiceClient authKeyMgtClient = getAPIKeyManagementClient();
-                        authKeyMgtClient.invalidateKey(oldAccessToken);
-                    }
-                    //Set newly generated application access token
-                    dto.setApplicationAccessToken(accessToken);
-                }
-                row.put("accessToken", row, dto.getApplicationAccessToken());
-                row.put("consumerKey", row, dto.getConsumerKey());
-                row.put("consumerSecret", row, dto.getConsumerSecret());
-                row.put("validityTime",row, validityTime);
-                boolean isRegenarateOptionEnabled = true;
-                if (getApplicationAccessTokenValidityPeriodInSeconds() < 0) {
-                    isRegenarateOptionEnabled = false;
-                }
-                row.put("enableRegenarate", row, isRegenarateOptionEnabled);
-            } catch (AppManagementException e) {
-                handleException("Error while refreshing the access token.", e);
-            } catch (Exception e) {
-                handleException(e.getMessage(), e);
-            }
-        } else {
-            handleException("Cannot regenerate a new access token. There's no access token available as : " + oldAccessToken);
-        }
-            return row;
         } else {
             handleException("Invalid types of input parameters.");
             return null;

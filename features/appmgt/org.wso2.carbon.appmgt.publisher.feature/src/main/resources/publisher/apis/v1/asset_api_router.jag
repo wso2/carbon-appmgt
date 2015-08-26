@@ -3,11 +3,11 @@
 /*
  Description: Provides CRUD support for assets
  Note: type: shortName in the Rxt templates
- GET  api/asset/{type} 	       	  : Provides the Rxt template
- GET  api/asset/{type}/{id}        : Provides artifact details on the provided type
- POST api/asset/{type}             : Creates a new asset of the given type
- PUT  api/asset/{type}/{id}	  : Updates an asset with the given type and id
- DELETE asset/{type}/{id} 	  : Deletes an asset with the provided type and id
+ GET    api/asset/{type}            Provides the Rxt template
+ GET    api/asset/{type}/{id}       Provides artifact details on the provided type
+ POST   api/asset/{type}            Creates a new asset of the given type
+ PUT    api/asset/{type}/{id}       Updates an asset with the given type and id
+ DELETE asset/{type}/{id}           Deletes an asset with the provided type and id
  Filename:asset.js
  Created Date: 29/7/2013
  */
@@ -21,23 +21,14 @@ require('/modules/publisher.js').exec(function(ctx) {
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var router = require('/modules/router-g.js').router();
     var routeManager = new router.Router();
-    var log= new Log();
-
+    var log = new Log();
     var appmgtPublisher = require('appmgtpublisher');
-
-
-
-
 
 
     /****************************MOBILE*******************************************/
 
-    var config = require('/config/publisher.json');
     var mam_config = require('/extensions/mobileapp/config/mam-config.json');
-    var caramel = require('caramel');
     var server = require('store').server;
-    var router = require('/modules/router-g.js').router();
-    var routeManager = new router.Router();
     var utility=require('/modules/utility.js').rxt_utility();
     var permissions=require('/modules/permissions.js').permissions;
 
@@ -45,10 +36,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var checkNonSpecial = function(value){
         var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
         return non_special_regex.test(value);
-    }
-
-
-
+    };
 
     var makeid= function(){
         var text = "";
@@ -58,26 +46,28 @@ require('/modules/publisher.js').exec(function(ctx) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
 
         return text;
-    }
+    };
 
     var getExtensionText = function(extension){
         var index = extension.lastIndexOf('.');
         var ext = index < extension.length ? extension.substring(index + 1) : '';
         return ext;
-    }
+    };
 
     var getExtension = function(file){
         var path = file.getName();
         var index = path.lastIndexOf('.');
         var ext = index < path.length ? path.substring(index + 1) : '';
         return ext;
-    }
+    };
+
     var getFileOnly = function(file){
         var path = file.getName();
         var index = path.lastIndexOf('.');
         var name = index < path.length ? path.substring(0,index) : '';
         return name;
-    }
+    };
+
     var saveFile = function(file){
         if(file!=undefined){
             var file_n= file.getName();
@@ -108,9 +98,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         return "";
-    }
-
-
+    };
 
     var getBundleID = function(appid){
         try{
@@ -127,7 +115,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }catch(e){
             return null;
         }
-    }
+    };
 
     var validateAppIdentifier = function(attributes, display_attribute){
         var artifactManager = rxtManager.getArtifactManager('mobileapp');
@@ -145,8 +133,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["App with identifer "+display_attribute+" and version "+attributes.overview_version+" already exists"]}})
             return true;
         }
-    }
-
+    };
 
     /**************************END_MOBILE*****************************************/
 
@@ -221,6 +208,34 @@ require('/modules/publisher.js').exec(function(ctx) {
         
     });
 
+    routeManager.register('POST', 'publisher', '/publisher/api/asset/version/copyapp/{type}/{id}', function (context){
+        var appType = context.params.type;
+        var parentAppId = context.params.id;
+        var content = {status: "", message: []};
+
+        // get artifact manager for appType
+        var artifactManager = rxtManager.getSystemArtifactManager(appType, session);
+
+        try {
+            var parentArtifact = artifactManager.get(parentAppId);
+        } catch (e) {
+            // this exception is thrown by
+            // GenericArtifactManager.getGenericArtifact(id) throws GovernanceException
+            log.error("The copying " + appType + " with UUID " + parentAppId + " could not be retrieved.");
+            log.error(e);
+            response.status = 404;
+            response.contentType = "application/json";
+            content.status = "Not Found";
+            content.message.push("The copying " + appType + " with UUID " + parentAppId
+                                 + " could not be retrieved.");
+            response.content = stringify(content);
+            return;
+        }
+
+        if (appType == 'mobileapp') {
+            copyMobileApp(parentArtifact, context);
+        }
+    });
 
     routeManager.register('POST', 'publisher', '/publisher/api/asset/delete/{type}/{id}', function (context) {
         var shortName = context.params.type;
@@ -303,7 +318,6 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(msg);
         }
     });
-
 
     routeManager.register('GET', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
 
@@ -446,7 +460,6 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         print(tagArray);
     });
-
 
     routeManager.register('POST', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
 
@@ -671,7 +684,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         apiProvider.generateEntitlementPolicies(webappId);
     }
 
-
     /*
      The function inspects the files sent with a request.If files are found
      they are added to Storage and then the generated uuids are added to
@@ -782,8 +794,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
     });
 
-
-
     routeManager.register('DELETE', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
         var shortName = context.params.type;
         var id = context.params.id;
@@ -802,22 +812,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     });
 
 
-
-
-
-
-
-
-
-
-
-
     /**************** MOBILE APP *********************************************************/
-
-
-
-
-
 
     function addNewMobileApp(context, rxtManager){
 
@@ -996,7 +991,6 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     }
 
-
     function editMobileApp(context, rxtManager){
 
         var shortName = context.params.type;
@@ -1133,40 +1127,161 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     }
 
+    function copyMobileApp(oldVersionArtifact, context){
 
+        var postContext = context.post;
+        var appType = context.params.type;
+
+        var mobileValidatorModule = require('/extensions/mobileapp/validations.js');
+        var newVersionModel = modelManager.getModel(appType);
+        newVersionModel.import('asset', oldVersionArtifact);
+        newVersionModel.set('*.id', null);
+        // these attributes do not change: provider, name, platform, type, category
+
+        if (postContext[mobileValidatorModule.Field.OVERVIEW_FILE]) {
+            newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_URL,
+                           postContext[mobileValidatorModule.Field.OVERVIEW_FILE]);
+        } else {
+            newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_URL,
+                           postContext[mobileValidatorModule.Field.OVERVIEW_URL]);
+        }
+
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_PACKAGE_NAME,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_PACKAGE_NAME]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_APP_ID,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_APP_ID]);
+
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_DISPLAY_NAME,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_DISPLAY_NAME]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_DESCRIPTION,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_DESCRIPTION]);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_RECENT_CHANGES,
+                       postContext[mobileValidatorModule.Field.OVERVIEW_RECENT_CHANGES]);
+        var version = postContext[mobileValidatorModule.Field.OVERVIEW_VERSION];
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_VERSION, version);
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_BUNDLE_VERSION, version);
+
+        // handle images
+        inspectFiles(request, postContext);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
+        var screenshots = oldVersionArtifact.attributes.images_screenshots.split(',');
+        screenshots[0] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
+        screenshots[1] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
+        screenshots[2] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots.join(","));
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
+
+        // validate model
+        var mobileValidator = new mobileValidatorModule.Validator(null);
+        var result = mobileValidator.validateModel(newVersionModel, false);
+        if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
+            response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
+            response.contentType = "application/json";
+            content = {status: 'Validation Error', validationResults: result.validationResults};
+            response.content = stringify(content);
+            return;
+        }
+        // perform ES validations on the model
+        result = newVersionModel.validate();
+        if (result && result.failed) {
+            response.status = 422;
+            response.contentType = "application/json";
+            response.content = stringify({status: "Validation Error", message: result});
+            return;
+        }
+
+        // check new version already exists
+        var previousVersions = [];
+        try {
+            var artifactManager = rxtManager.getSystemArtifactManager(appType, session);
+            previousVersions = artifactManager.find(function (artifact) {
+                var isSameProvider = (artifact.attributes.overview_provider ==
+                                      oldVersionArtifact.attributes.overview_provider);
+                var isSameName = (artifact.attributes.overview_name ==
+                                  oldVersionArtifact.attributes.overview_name);
+                var isSameVersion = (version == artifact.attributes.overview_version);
+                return (isSameProvider && isSameName && isSameVersion);
+            }, null);
+        } catch (e) {
+            log.error("Cannot retrieve previous versions of mobile app " +
+                      oldVersionArtifact.attributes.overview_name + " by " +
+                      oldVersionArtifact.attributes.overview_provider);
+            log.error(e);
+            // continue work flow <add more details>
+        }
+        if (previousVersions.length > 1) {
+            response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
+            response.contentType = "application/json";
+            var validationResults = {};
+            validationResults[mobileValidatorModule.Field.OVERVIEW_VERSION] =
+                "Version '" + version + "' of mobile app '"
+                + oldVersionArtifact.attributes.overview_name + "' already exists.";
+            content = {status: 'Validation Error', validationResults: validationResults};
+            response.content = stringify(content);
+            return;
+        }
+
+        try {
+            newVersionModel.save();
+        } catch (e) {
+            log.error("Cannot create new version '" + version + "' of mobile app '"
+                      + oldVersionArtifact.attributes.overview_displayName + "' from its version'"
+                      + oldVersionArtifact.attributes.overview_version + "'.");
+            log.error(e);
+            response.status = 500;
+            response.contentType = "application/json";
+            var content = {};
+            content.status = "Error";
+            content.message = "Cannot create new version '" + version + "' of mobile app '"
+                              + oldVersionArtifact.attributes.overview_displayName
+                              + "' from its version '"
+                              + oldVersionArtifact.attributes.overview_version + "'.";
+            response.content = stringify(content);
+            return;
+        }
+
+        try {
+            var cachingAsset = newVersionModel.export('asset.exporter');
+            var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
+            var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
+            assetCacheManager.add(cachingAsset, appType);
+        } catch (e) {
+            log.error("Adding to cache operation failed for mobile app asset with UUID '"
+                      + newVersionModel.get('*.id') + "'.");
+            log.error(e);
+        }
+
+        // everything went great
+        response.status = 200;
+        response.contentType = "application/json";
+        response.content = stringify({status: "Success"});
+
+    }
 
     /******************************END_MOBILE***************************************************/
 
 
+    var securityModule = require('/modules/security/security.manager.js').securityManagementModule();
+    var sm = securityModule.cached();
 
-
-    var securityModule=require('/modules/security/security.manager.js').securityManagementModule();
-
-    var sm=securityModule.cached();
-
-//This will short circuit the handling of the requests
-    var passed=sm.check(session,function(){
+    //This will short circuit the handling of the requests
+    var passed = sm.check(session, function () {
         response.sendError(401);
 
     });
 
-//Stop servicing the request if the check failed
-    if(passed){
-
-        var user=require('store').user;
+    //Stop servicing the request if the check failed
+    if (passed) {
+        var user = require('store').user;
         var publisher = require('/modules/publisher.js').publisher(request, session);
-
-        //var routeManager=application.get(config.app.ROUTE_MANAGER);
         var rxtManager = publisher.rxtManager;
         var modelManager = publisher.modelManager;
-        var dataInjector=publisher.dataInjector;
-        var DataInjectorModes=publisher.DataInjectorModes;
-        var filterManager=publisher.filterManager;
+        var dataInjector = publisher.dataInjector;
+        var DataInjectorModes = publisher.DataInjectorModes;
+        var filterManager = publisher.filterManager;
         var storageModule = require('/modules/data/storage.js').storageModule();
         var storageConfig = require('/config/storage.json');
         var utility = require('/modules/utility.js').rxt_utility();
-        var log=new Log();
-
         routeManager.handle(request, response);
     }
 

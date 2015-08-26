@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.store.feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - APP Store Feature</name>
     <url>http://wso2.org</url>
@@ -41,7 +41,7 @@
             <artifactId>org.wso2.carbon.registry.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
         </dependency>
         <dependency>
@@ -55,14 +55,6 @@
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>
         </dependency>
     </dependencies>
 
@@ -94,22 +86,19 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.api</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.keymgt.client</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.handlers.security.stub</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.self.registration.server:4.2.2</importFeatureDef>
-				<importFeatureDef>org.wso2.store:1.1.0</importFeatureDef>
-				<importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
-				<importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
-				<importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
-				<importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.self.registration.server:${carbon.identity.version}</importFeatureDef>
+				                <importFeatureDef>org.wso2.store:${carbon.store.version}</importFeatureDef>
+			                    <importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
+				                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
+				                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
+				                <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
                             </importFeatures>
                             <importBundles>
-                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.hostobjects.sso:4.2.0</importBundleDef>
-
+                                <importBundleDef>org.wso2.carbon.commons:org.wso2.carbon.hostobjects.sso:${carbon.commons.version}</importBundleDef>
                             </importBundles>
                         </configuration>
                     </execution>

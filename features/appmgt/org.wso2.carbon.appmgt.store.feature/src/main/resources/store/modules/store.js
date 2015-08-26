@@ -514,25 +514,37 @@ Store.prototype.assets = function (type, paging) {
     for (i = 0; i < assetz.length; i++) {
         assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
 
-        if( assetz[i].attributes.overview_visibility != "null"){
 
-            if(this.user){
-                var assetRoles = assetz[i].attributes.overview_visibility.split(",");
-                var server = require('store').server;
-                var um = server.userManager(this.tenantId);
-                var userRoles = um.getRoleListOfUser(this.user.username);
+        if(assetz[i].type == "mobileapp"){
+            if( assetz[i].attributes.overview_visibility != "null"){
 
-                commonRoles = userRoles.filter(function(n) {
-                    return assetRoles.indexOf(String(n)) != -1
-                });
-                if(commonRoles.length > 0){
-                    assetszReturn.push(assetz[i]);
+                if(this.user){
+                    var assetRoles = assetz[i].attributes.overview_visibility.split(",");
+                    var server = require('store').server;
+                    var um = server.userManager(this.tenantId);
+                    var userRoles = um.getRoleListOfUser(this.user.username);
+
+                    commonRoles = userRoles.filter(function(n) {
+                        return assetRoles.indexOf(String(n)) != -1
+                    });
+                    if(commonRoles.length > 0){
+                        assetszReturn.push(assetz[i]);
+                    }
                 }
+
+            }else{
+                assetszReturn.push(assetz[i]);
+            }
+        }else{
+            if(assetszReturn.length == 0){
+                assetszReturn = assetz;
             }
 
-        }else{
-            assetszReturn.push(assetz[i]);
         }
+
+
+
+
 
 
 
@@ -718,25 +730,34 @@ Store.prototype.recentAssets = function (type, count) {
         recent[i].indashboard = this.isuserasset(recent[i].id, type);
 
 
-        if( recent[i].attributes.overview_visibility != "null"){
+        if(recent[i].type == "mobileapp"){
+            if( recent[i].attributes.overview_visibility != "null"){
 
-            if(this.user){
-                var assetRoles = recent[i].attributes.overview_visibility.split(",");
-                var server = require('store').server;
-                var um = server.userManager(this.tenantId);
-                var userRoles = um.getRoleListOfUser(this.user.username);
+                if(this.user){
+                    var assetRoles = recent[i].attributes.overview_visibility.split(",");
+                    var server = require('store').server;
+                    var um = server.userManager(this.tenantId);
+                    var userRoles = um.getRoleListOfUser(this.user.username);
 
-                commonRoles = userRoles.filter(function(n) {
-                    return assetRoles.indexOf(String(n)) != -1
-                });
-                if(commonRoles.length > 0){
-                    recentReturn.push(recent[i]);
+                    commonRoles = userRoles.filter(function(n) {
+                        return assetRoles.indexOf(String(n)) != -1
+                    });
+                    if(commonRoles.length > 0){
+                        recentReturn.push(recent[i]);
+                    }
                 }
+
+            }else{
+                recentReturn.push(recent[i]);
+            }
+        }else{
+            if(recentReturn.length == 0){
+                recentReturn = recent;
             }
 
-        }else{
-            recentReturn.push(recent[i]);
         }
+
+
 
 
 

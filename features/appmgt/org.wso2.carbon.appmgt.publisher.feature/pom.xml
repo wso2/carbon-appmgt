@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.publisher.feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - APP Publisher Feature</name>
     <url>http://wso2.org</url>
@@ -41,7 +41,7 @@
             <artifactId>org.wso2.carbon.registry.core</artifactId>            
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.governance</groupId>
             <artifactId>org.wso2.carbon.governance.api</artifactId>
         </dependency>
         <dependency>
@@ -56,7 +56,6 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
         </dependency>
-        
     </dependencies>
 
     <build>
@@ -90,11 +89,11 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.platform.version}</importFeatureDef>
-				<importFeatureDef>org.wso2.store:1.1.0</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.kernel.version}</importFeatureDef>
+				                 <importFeatureDef>org.wso2.store:1.1.1</importFeatureDef>
                             </importFeatures>
                             <importBundles>
-                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.hostobjects.sso:4.2.0</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.commons:org.wso2.carbon.hostobjects.sso:${carbon.commons.version}</importBundleDef>
 
                             </importBundles>
                         </configuration>

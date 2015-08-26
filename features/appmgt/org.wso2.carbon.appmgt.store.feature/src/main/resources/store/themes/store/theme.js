@@ -38,6 +38,41 @@ var engine = caramel.engine('handlebars', (function () {
                 return accum;
             });
 
+            Handlebars.registerHelper('assetRating', function(n) {
+                var html = '<span class="starRating">';
+                var id = Math.random().toString(36).substring(7);
+                for(var i = 5; i >= 1; --i){
+                    var checked = (i == n) ? "checked" : "";
+                    html += '<input name= "' + id + '" id= "' + id + '" type="radio" name="rating" value="' + i + '" disabled ' + checked + '>';
+                    html += '<label for="' + id + i + '">' + i + '</label>';
+                }
+
+                html += "<span>";
+
+                return html;
+            });
+
+
+            Handlebars.registerHelper('iconImage', function(imageName) {
+                if(imageName == 'android'){
+                    return 'fw-android fw-background-green';
+                }else if(imageName == 'ios'){
+                    return 'fw-apple fw-background-black';
+                }else if(imageName == 'webapp'){
+                    return 'fw-web-app fw-background-blue';
+                }
+            });
+
+            Handlebars.registerHelper('iconImageType', function(imageName) {
+                if(imageName == 'enterprise'){
+                    return 'fw-enterprise-app fw-background-gray';
+                }else if(imageName == 'public'){
+                    return 'fw-public-app fw-background-gray';
+                }else if(imageName == 'webapp'){
+                    return 'fw-webclip fw-background-gray';
+                }
+            });
+
 
 
             Handlebars.registerHelper('compare', function (lvalue, rvalue, options) {

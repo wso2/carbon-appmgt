@@ -51,7 +51,7 @@ public final class APIMgtDBUtil {
     private static final String DATA_SOURCE_NAME = "DataSourceName";
 
     private static volatile DataSource uiActivityPublishDataSource = null;
-    private static final String UI_ACTIVITY_PUBLISH_DATA_SOURCE_NAME = "UiActivityPublishDataSourceName";
+    private static final String UI_ACTIVITY_PUBLISH_DATA_SOURCE_NAME = "Analytics.UIActivityPublishDataSourceName";
     
     /**
      * Initializes the data source
@@ -126,17 +126,18 @@ public final class APIMgtDBUtil {
 			throws AppManagementException {
 		DataSource ds = null;
 		if (dataSourceName != null) {
-			try {
-				Context ctx = new InitialContext();
-				ds = (DataSource) ctx.lookup(dataSourceName);
-			} catch (NamingException e) {
-				log.error(e.getMessage());
-				throw new AppManagementException(
-						"Error while looking up the data " + "source: "
-								+ dataSourceName);
-			}
-		}
-		return ds;
+            try {
+                Context ctx = new InitialContext();
+                ds = (DataSource) ctx.lookup(dataSourceName);
+            } catch (NamingException e) {
+                log.error("An exception occurred while initializing the DataSource "
+                                  + dataSourceName + " - " + e.getMessage(), e);
+                throw new AppManagementException(
+                        "Error while looking up the data " + "source: "
+                                + dataSourceName, e);
+            }
+        }
+        return ds;
 	}
 	
     /**

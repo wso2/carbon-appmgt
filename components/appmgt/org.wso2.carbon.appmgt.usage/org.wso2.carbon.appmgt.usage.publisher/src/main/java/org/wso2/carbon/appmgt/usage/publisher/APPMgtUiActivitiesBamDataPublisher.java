@@ -86,12 +86,6 @@ public class APPMgtUiActivitiesBamDataPublisher {
 
 	}
 
-	private static APPMgtUiActivitiesBamDataPublisher appMgtUiActivitiesBamDataPublisher = new APPMgtUiActivitiesBamDataPublisher();
-
-	public static APPMgtUiActivitiesBamDataPublisher getInstance() {
-		return appMgtUiActivitiesBamDataPublisher;
-	}
-
 	public APPMgtUiActivitiesBamDataPublisher() {
 		userActivityStream = buildBamString();
 
@@ -102,6 +96,12 @@ public class APPMgtUiActivitiesBamDataPublisher {
 		// check if the BAM is configured
 		if (enableUiActivityBamPublishing) {
 			String bamServerURL = apimgtConfigReaderService.getBamServerURL();
+
+            if ("".equals(bamServerURL)) {
+                log.error("BAM Server URL is not set");
+                throw new RuntimeException("BAM Server URL is not set");
+            }
+
 			String bamServerUserName = apimgtConfigReaderService
 					.getBamServerUser();
 			String bamServerPassword = apimgtConfigReaderService
@@ -139,15 +139,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				allReceiverGroups.add(group);
 			}
 
-			if ("".equals(bamServerURL)) {
-				log.error("BAM Server URL is not set");
-				throw new RuntimeException("BAM Server URL is not set");
-			}
-
 			loadBalancingDataPublisher = new LoadBalancingDataPublisher(
 					allReceiverGroups, agent);
 		}
-
 	}
 
 	/**
@@ -182,7 +176,7 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	}
 
 	/**
-	 * event publishing method (either to BAM or directly write to DB)
+	 * Event publishing method (either to BAM or directly write to DB)
 	 * 
 	 * @param action
 	 *            : action name
@@ -211,8 +205,6 @@ public class APPMgtUiActivitiesBamDataPublisher {
 							USER_ACTIVITY_STREAM_VERSION);
 					Event event = new Event();
 					event.setTimeStamp(System.currentTimeMillis());
-					event.setMetaData(null);
-					event.setCorrelationData(null);
 					event.setPayloadData(new Object[] { appId, userId, item,
 							action, timeStamp, tenantId });
 					loadBalancingDataPublisher.publish(USER_ACTIVITY_STREAM,
@@ -223,10 +215,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
                 AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId);
             }
 		} catch (AgentException e) {
-             // Here I'm only logging the exceptions but not throwing externally
-             // as this method is used only to store the store hit count, An
-             // exception in this method should not effect/block the users other
-             // actions
+             // Here the exception is only logged (but not thrown externally) as this method is
+             // used only just to store the store hit count, An exception in this method should
+             // not effect/block the users other actions
              log.error("Failed to publish build event : " + e.getMessage(), e);
         } catch (AppManagementException e) {
             log.error("Failed to write to table : " + e.getMessage(), e);

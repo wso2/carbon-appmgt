@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt-feature</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.gateway.feature</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Gateway Feature</name>
     <url>http://wso2.org</url>
@@ -44,14 +44,14 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>
-        </dependency>
+        <!-- APPM 1.1.0 <dependency>-->
+            <!--<groupId>org.wso2.carbon.apimgt</groupId>-->
+            <!--<artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>-->
+        <!--</dependency>-->
+        <!-- APPM 1.1.0 <dependency>-->
+            <!--<groupId>org.wso2.carbon</groupId>-->
+            <!--<artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.googlecode.json-simple.wso2</groupId>
             <artifactId>json-simple</artifactId>
@@ -114,17 +114,19 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway:1.0.0-SNAPSHOT</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl:${carbon.appmgt.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.keymgt.stub:${apimgt.keymgt.stub.version}</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.handlers.security.stub:${wso2carbon.version}</bundleDef>
+                                <!-- APPM 1.1.0 <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.keymgt.stub:${apimgt.keymgt.stub.version}</bundleDef>-->
+                                <!-- APPM 1.1.0 <bundleDef>org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.handlers.security.stub:${carbon.apimgt.version}</bundleDef>-->
                                 <bundleDef>com.googlecode.json-simple.wso2:json-simple:${json-simple.wso2.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.custom.mediators:${carbon.appmgt.version}</bundleDef>
                             </bundles>
-
+                            <importBundles>
+                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.throttle.core:${carbon.throttle.version}</importBundleDef>
+                            </importBundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer:${carbon.mediation.initializer.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

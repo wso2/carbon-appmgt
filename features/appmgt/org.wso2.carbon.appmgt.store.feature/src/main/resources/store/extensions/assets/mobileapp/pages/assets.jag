@@ -183,14 +183,26 @@ require('/modules/store.js').exec(function (ctx) {
     //devices = devicesClass.get
     //TODO Implement devices
 
-    var nextPage = store.buildNextPage(request,avaliablePages);
-    var nextAssetSet = store.assets(type, nextPage);
+    // Check whether a 'next page' navigation is needed.
+    // If the assets count in the current page is less than PAGE_SIZE, next page is not available.
+    // Else assets should be queried to decide whether there are assets available for the next page.
+
     var nextPageAvailable = false;
-    if(nextAssetSet.length > 0){
-        nextPageAvailable = true;
+
+    if(assets.length == PAGE_SIZE) {
+
+        // Get the starting index, offset etc .. of the assumed next page.
+        var nextPage = store.buildNextPage(request,avaliablePages);
+
+        // Query the assets with the assumed 'next page'
+        var nextAssetSet = store.assets(type, nextPage);
+
+        if(nextAssetSet.length > 0){
+          nextPageAvailable = true;
+        }
     }
 
-    if(nextPageAvailable && (assets.length == PAGE_SIZE)){
+    if(nextPageAvailable){
         var rightnav = currentPage+1;
     }
 
@@ -207,6 +219,7 @@ require('/modules/store.js').exec(function (ctx) {
         search: {
             mainPage: mainPage,
             subPage: subPage,
+            query:query,
             isTopAssets: false,
             searchFields: rxtAttributes
         },

@@ -28,7 +28,7 @@ public final class APIMgtUsagePublisherConstants {
     public static final String HEADER_SEGMENT_DELIMITER = " ";
     public static final String  AXIS2_MC_HTTP_METHOD = "HTTP_METHOD";
 
-    public static final String API_USAGE_TRACKING = "APIUsageTracking.";
+    public static final String API_USAGE_TRACKING = "Analytics.";
     public static final String API_USAGE_ENABLED = API_USAGE_TRACKING + "Enabled";
     public static final String API_USAGE_THRIFT_PORT = API_USAGE_TRACKING + "ThriftPort";
     public static final String API_USAGE_BAM_SERVER_URL = API_USAGE_TRACKING + "BAMServerURL";
@@ -54,29 +54,29 @@ public final class APIMgtUsagePublisherConstants {
     public static final String APPLICATION_ID = "api.ut.application.id";
     public static final String ANONYMOUS_USER = "anonymous.user";
 
-	public static final String API_MANAGER_STREAM_NAME_DEFINITION = "APIStreamNameDefinition.";
+	public static final String API_MANAGER_STREAM_NAME_DEFINITION = API_USAGE_TRACKING + "BAMEventStreams.";
 	public static final String API_MANAGER_REQUEST_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerRequestStreamName";
+			+ "RequestStreamName";
 	public static final String API_MANAGER_REQUEST_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerRequestStreamVersion";
+			+ "RequestStreamVersion";
 	public static final String API_MANAGER_RESPONSE_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerResponseStreamName";
+			+ "ResponseStreamName";
 	public static final String API_MANAGER_RESPONSE_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerResponseStreamVersion";
+			+ "ResponseStreamVersion";
 	public static final String API_MANAGER_FAULT_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerFaultStreamName";
+			+ "FaultStreamName";
 	public static final String API_MANAGER_FAULT_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerFaultStreamVersion";
+			+ "FaultStreamVersion";
 	public static final String API_MANAGER_CACHE_STAT_STREAM_NAME = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerCacheStatStreamName";
+			+ "CacheStatStreamName";
 	public static final String API_MANAGER_CACHE_STAT_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerCacheStatStreamVersion";
+			+ "CacheStatStreamVersion";
 
 	// To add UI Activity BAM publisher
 	public static final String API_BAM_UI_ACTIVITY_STREAM = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerBamUiActivityStreamName";
+			+ "UIActivityStreamName";
 	public static final String API_BAM_UI_ACTIVITY_STREAM_VERSION = API_MANAGER_STREAM_NAME_DEFINITION
-			+ "ApiManagerBamUiActivityStreamVersion";
+			+ "UIActivityStreamVersion";
 
     public static final String API_GOOGLE_ANALYTICS_TRACKING = API_USAGE_TRACKING + "GoogleAnalyticsTracking.";
     public static final String API_GOOGLE_ANALYTICS_TRACKING_ENABLED = API_GOOGLE_ANALYTICS_TRACKING + "Enabled";

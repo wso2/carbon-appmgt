@@ -110,7 +110,7 @@ var module = function () {
             }
         }
 
-        log.debug('Fields: ' + stringify(fieldArray));
+        //log.debug('Fields: ' + stringify(fieldArray));
 
         return fieldArray;
     }

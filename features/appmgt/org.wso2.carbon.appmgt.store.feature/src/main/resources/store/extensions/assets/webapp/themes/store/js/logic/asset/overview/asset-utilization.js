@@ -145,18 +145,15 @@ $(function(){
 
                     // Update UI based on the subscription type.
                     if (subscription['subscriptionType'] == "INDIVIDUAL") {
-                        $('#messageModal1').html($('#confirmation-data1').html());
-                        $('#messageModal1 h3.modal-title').html(('Subscription Successful'));
-                        $('#messageModal1 div.modal-body').html('\n\n' + ('You have successfully subscribed to the ') + '<b>"' + subscription.apiName + '</b>"');
-                        $('#messageModal1 a.btn-other').html('OK');
 
-                        $('#messageModal1').modal();
-
-                        $('#btnUnsubscribe').show();
-                        $('#btnSubscribe').hide();
-                        $('#subscribed').val(true);
-                        $("#messageModal1 a.btn-other").click(function () {
-                            // location.reload();
+                        noty({
+                            text : 'You have successfully subscribed to the <b>'  + subscription.apiName + '</b>',
+                            'layout' : 'center',
+                            'timeout': 1500,
+                            'modal': true,
+                            'onClose': function() {
+                                location.reload();
+                            }
                         });
 
                     } else if (subscription['subscriptionType'] == "ENTERPRISE") {
@@ -199,12 +196,12 @@ $(function(){
     }
     
     var showIndividualSubscriptionMessage = function(status,messageTitle, messageBody){
-  	  	
+
     	$('#messageModal1').html($('#confirmation-data1').html());
     	$('#messageModal1 h3.modal-title').html((messageTitle));
     	$('#messageModal1 div.modal-body').html('\n\n'+ (messageBody)+'.');
     	$('#messageModal1 a.btn-other').html('OK');
-    
+
     	$('#messageModal1').modal();
     	if(status){ 
     	  	$('#btnUnsubscribe').show();
@@ -251,13 +248,18 @@ $(function(){
         	   if(JSON.parse(response).error == false){
                	  	console.info('Successfully unsubscribed to web app: '+subscription.apiName);
                 	//alert('Succsessfully unsubscribed to the '+subscription.apiName+' Web App.');
-               	
-              		$('#messageModal1').html($('#confirmation-data1').html());
-    		    	$('#messageModal1 h3.modal-title').html(('Unsubscription Successful'));
-    		    	$('#messageModal1 div.modal-body').html('\n\n'+ ('You have successfully unsubscribed to the ')+'<b>"' + subscription.apiName + '</b>"');
-    		    	$('#messageModal1 a.btn-other').html('OK');
 
-    		    	$('#messageModal1').modal();
+                   noty({
+                       text : 'You have successfully unsubscribed from the <b>'  + subscription.apiName + '</b>',
+                       'layout' : 'center',
+                       'timeout': 1500,
+                       'modal': true,
+                       'onClose': function() {
+                           location.reload();
+                       }
+                   });
+
+
               
               		$('#btnUnsubscribe').hide();
               		$('#btnSubscribe').show();

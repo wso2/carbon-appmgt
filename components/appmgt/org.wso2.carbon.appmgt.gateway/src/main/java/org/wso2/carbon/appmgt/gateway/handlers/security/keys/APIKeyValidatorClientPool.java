@@ -22,6 +22,10 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.StackObjectPool;
 
+/**
+ * @Deprecated  API Key validation is a legacy code taken from API Manager. Need to remove this
+ */
+@Deprecated
 public class APIKeyValidatorClientPool {
 
     private static final Log log = LogFactory.getLog(APIKeyValidatorClientPool.class);

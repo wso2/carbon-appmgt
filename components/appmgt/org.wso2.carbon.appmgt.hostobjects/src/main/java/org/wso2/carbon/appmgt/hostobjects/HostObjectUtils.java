@@ -27,7 +27,6 @@ import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.keymgt.client.SubscriberKeyMgtClient;
 import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -72,27 +71,6 @@ public class HostObjectUtils {
             log.error(e.getMessage());
             return null;
 
-        }
-    }
-
-    protected static SubscriberKeyMgtClient getKeyManagementClient() throws AppManagementException {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        String url = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_URL);
-        if (url == null) {
-            handleException("WebApp key manager URL unspecified");
-        }
-
-        String username = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_USERNAME);
-        String password = config.getFirstProperty(AppMConstants.API_KEY_MANAGER_PASSWORD);
-        if (username == null || password == null) {
-            handleException("Authentication credentials for WebApp key manager unspecified");
-        }
-
-        try {
-            return new SubscriberKeyMgtClient(url, username, password);
-        } catch (Exception e) {
-            handleException("Error while initializing the subscriber key management client", e);
-            return null;
         }
     }
 

@@ -120,9 +120,9 @@ public class Configuration {
     }
 
     /**
-     * @return value of the APIUsageTracking.Enabled property
+     * @return value of the Analytics.Enabled property
      */
     public static String isStactsEnabled() {
-        return config.getFirstProperty("APIUsageTracking.Enabled");
+        return config.getFirstProperty("Analytics.Enabled");
     }
 }

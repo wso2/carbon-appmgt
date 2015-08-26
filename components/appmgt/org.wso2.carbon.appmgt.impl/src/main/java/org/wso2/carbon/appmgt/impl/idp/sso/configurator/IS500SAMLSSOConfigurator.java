@@ -44,13 +44,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class IS500SAMLSSOConfigurator implements SSOConfigurator {
+public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implements SSOConfigurator {
 
     private static Log log = LogFactory.getLog(IS500SAMLSSOConfigurator.class);
 
-    private static String SERVER_URL = "providerURL";
-    private static String PASSWORD = "password";
-    private static String USERNAME = "username";
     private static String APP_DESC = "WSO2 Application Manager generated service provider.";
     private static String AUTH_TYPE = "samlsso";
 
@@ -291,31 +288,6 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
         }
     }
 
-    private SAMLSSOServiceProviderDTO generateDTO(SSOProvider provider) {
-        SAMLSSOServiceProviderDTO dto = new SAMLSSOServiceProviderDTO();
-
-        dto.setIssuer(provider.getIssuerName());
-        dto.setAssertionConsumerUrl(provider.getAssertionConsumerURL());
-        dto.setCertAlias(null);
-
-
-        dto.setNameIDFormat(provider.getNameIdFormat());
-        if (dto.getNameIDFormat()!=null) {
-            dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
-        }
-
-        if(provider.getLogoutUrl() != null && !provider.getLogoutUrl().trim().isEmpty()) {
-            dto.setDoSingleLogout(true);
-        }
-        
-        dto.setEnableAttributesByDefault(true);
-
-        dto.setAttributeConsumingServiceIndex("");
-
-        dto.setIdPInitSSOEnabled(true);
-
-        return dto;
-    }
 
     private ServiceProvider generateSPCreate(SSOProvider provider) {
         ServiceProvider serviceProvider = new ServiceProvider();

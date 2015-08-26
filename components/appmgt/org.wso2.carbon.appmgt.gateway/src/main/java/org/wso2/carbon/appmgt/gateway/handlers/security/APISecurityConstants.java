@@ -16,8 +16,6 @@
 
 package org.wso2.carbon.appmgt.gateway.handlers.security;
 
-import org.netbeans.lib.cvsclient.commandLine.command.status;
-
 public class APISecurityConstants {
     public static final String API_AUTH_FAILURE_HANDLER = "_auth_failure_handler_";
     public static final int API_AUTH_GENERAL_ERROR       = 900900;
@@ -94,23 +92,23 @@ public class APISecurityConstants {
         return errorMessage;
     }
 
-    public static final String API_SECURITY_CONFIGURATION = "APIConsumerAuthentication.";
+    public static final String APP_CONSUMER_AUTH_CONFIG = "AppConsumerAuthConfiguration.";
 
     public static final String API_SECURITY_AUTHENTICATOR =
-            API_SECURITY_CONFIGURATION + "Authenticator";
+            APP_CONSUMER_AUTH_CONFIG + "Authenticator";
     public static final String API_SECURITY_OAUTH_HEADER =
-            API_SECURITY_CONFIGURATION + "OAuthHeader";
+            APP_CONSUMER_AUTH_CONFIG + "OAuthHeader";
     public static final String API_SECURITY_CONSUMER_KEY_HEADER_SEGMENT =
-            API_SECURITY_CONFIGURATION + "KeyHeaderSegment";
+            APP_CONSUMER_AUTH_CONFIG + "KeyHeaderSegment";
     public static final String API_SECURITY_CONSUMER_KEY_SEGMENT_DELIMITER =
-            API_SECURITY_CONFIGURATION + "KeySegmentDelimiter";
+            APP_CONSUMER_AUTH_CONFIG + "KeySegmentDelimiter";
     public static final String API_SECURITY_OAUTH_HEADER_SPLITTER =
-            API_SECURITY_CONFIGURATION + "OAuthHeaderSplitter";
+            APP_CONSUMER_AUTH_CONFIG + "OAuthHeaderSplitter";
     public static final String API_SECURITY_CONTEXT_HEADER =
-            API_SECURITY_CONFIGURATION + "SecurityContextHeader";
+            APP_CONSUMER_AUTH_CONFIG + "SecurityContextHeader";
 
     public static final String API_SECURITY_REMOVE_OAUTH_HEADERS_FROM_OUT_MESSAGE =
-            API_SECURITY_CONFIGURATION + "RemoveOAuthHeadersFromOutMessage";
+            APP_CONSUMER_AUTH_CONFIG + "RemoveOAuthHeadersFromOutMessage";
     public static final String API_SECURITY_NS = "http://wso2.org/apimanager/security";
 
     public static final String API_SECURITY_NS_PREFIX = "ams";

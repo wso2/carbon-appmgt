@@ -26,70 +26,86 @@ var config = require('/config/publisher.json');
 
 var log = new Log();
 
-breadcrumbItems = deploymentManager.getAssetData()
+breadcrumbItems = deploymentManager.getAssetData();
 
 var generateLeftNavJson = function (data, listPartial) {
 
-	var leftNavItems = {leftNavLinks: []};
+    var leftNavItems = {leftNavLinks: []};
 
-	if (listPartial != 'view-mobileapp') {
-		return leftNavItems;
-	}
+    if (listPartial != 'view-mobileapp') {
+        return leftNavItems;
+    }
 
-	if (data.artifact == null) {
-		return leftNavItems;
-	}
+    if (data.artifact == null) {
+        return leftNavItems;
+    }
 
-	var user = server.current(session);
-	var um = server.userManager(user.tenantId);
-	var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
-	if (!createActionAuthorized) {
-		return leftNavItems;
-	}
+    var user = server.current(session);
+    var um = server.userManager(user.tenantId);
+    var createActionAuthorized = permissions.isAuthorized(user.username,
+                                                          config.permissions.webapp_create, um);
+    if (!createActionAuthorized) {
+        return leftNavItems;
+    }
 
-	var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
-	if (user.hasRoles(["admin"])) {
-		editEnabled = true;
-	}
-	if (data.artifact.lifecycleState == "Published") {
-		editEnabled = false;
-	}
+    var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
+    if (user.hasRoles(["admin"])) {
+        editEnabled = true;
+    }
+    if (data.artifact.lifecycleState == "Published") {
+        editEnabled = false;
+    }
 
-	if (editEnabled) {
-		leftNavItems = {
-			leftNavLinks: [
-				{
-					name: "Edit",
-					iconClass: "icon-edit",
-					additionalClasses: (listPartial == "edit-asset" ) ? "active" : null,
-					url: "/publisher/asset/operations/edit/" + data.shortName + "/" + data.artifact.id,
-					isEditable: editEnabled
-				}
-			]
-		};
-	} else {
-		leftNavItems = {
-			leftNavLinks: [
-				{
-					name: "Edit",
-					iconClass: "icon-edit",
-					additionalClasses: (listPartial == "edit-asset" ) ? "active" : false,
-					url: "#",
-					title: "Edit action not permitted.",
-					isEditable: editEnabled
-				}
-			]
-		};
-	}
-	return leftNavItems;
+    if (editEnabled) {
+        leftNavItems = {
+            leftNavLinks: [
+                {
+                    name: "Edit",
+                    iconClass: "icon-edit",
+                    additionalClasses: (listPartial == "edit-asset" ) ? "active" : null,
+                    url: "/publisher/asset/operations/edit/" + data.shortName + "/"
+                         + data.artifact.id,
+                    isEditable: editEnabled
+                },
+                {
+                    name: "Create New Version",
+                    iconClass: "icon-file",
+                    additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
+                    url: "/publisher/asset/operations/copyapp/" + data.shortName + "/"
+                         + data.artifact.id
+                }
+            ]
+        };
+    } else {
+        leftNavItems = {
+            leftNavLinks: [
+                {
+                    name: "Edit",
+                    iconClass: "icon-edit",
+                    additionalClasses: (listPartial == "edit-asset" ) ? "active" : false,
+                    url: "#",
+                    title: "Edit action not permitted.",
+                    isEditable: editEnabled
+                },
+                {
+                    name: "Create New Version",
+                    iconClass: "icon-file",
+                    additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
+                    url: "/publisher/asset/operations/copyapp/" + data.shortName + "/"
+                         + data.artifact.id
+                }
+            ]
+        };
+    }
+    return leftNavItems;
 
 };
 
 getTypeObj = function (type) {
-	for (item in breadcrumbItems) {
-		var obj = breadcrumbItems[item]
-		if (obj.assetType == type) {
-			return obj;
-		}
-	}
+    for (item in breadcrumbItems) {
+        var obj = breadcrumbItems[item];
+        if (obj.assetType == type) {
+            return obj;
+        }
+    }
 };

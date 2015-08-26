@@ -21,14 +21,14 @@
      <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.gateway</artifactId>
     <packaging>bundle</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 	<name>WSO2 Carbon - APP Gateway</name>
     <url>http://wso2.org</url>
 
@@ -38,7 +38,7 @@
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
         </dependency>
         <dependency>
@@ -59,10 +59,10 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>
-        </dependency>
+        <!-- APPM 1.1.0 <dependency>-->
+            <!--<groupId>org.wso2.carbon</groupId>-->
+            <!--<artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>   
@@ -79,11 +79,11 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-nhttp-transport</artifactId>       
          </dependency>
-	 <dependency>
-            <groupId>org.wso2.carbon</groupId>
+	     <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.sso.saml</artifactId>
          </dependency>
-         
+
     </dependencies>
 
     <build>
@@ -93,8 +93,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
 	        <plugin>
@@ -128,7 +128,7 @@
                             org.apache.axis2.description; version="${axis2.osgi.version.range}",
                             org.apache.axis2.engine; version="${axis2.osgi.version.range}",
                             org.apache.axis2.context; version="${axis2.osgi.version.range}",
-                            org.apache.commons.logging,
+                            org.apache.commons.logging; version="${commons.logging.imp.pkg.version}",
                             org.apache.synapse,
                             org.apache.synapse.config,
                             org.apache.synapse.config.xml,
@@ -144,7 +144,6 @@
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>

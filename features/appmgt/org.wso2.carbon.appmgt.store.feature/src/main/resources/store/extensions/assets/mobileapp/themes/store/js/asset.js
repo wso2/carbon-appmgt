@@ -1,6 +1,13 @@
 appToInstall = null;
 
-$(function () {
+
+
+
+
+jQuery(function ($) {
+
+
+    var isSocial = false;
     if (isSocial) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -104,7 +111,7 @@ $(function () {
 
             });
 
-        $('#tab-review-box').find('.btn-primary').live('click', function (e) {
+        $('#tab-review-box').find('.btn-primary').on('click', function (e) {
             if (!$("#form-review").valid()) return;
             caramel.post('/apis/comment', {
                 asset: $('#assetp-tabs').data('aid'),
@@ -114,7 +121,7 @@ $(function () {
             }, 'json');
         });
 
-        $('.text-review-box').live('keyup focus', function (e) {
+        $('.text-review-box').on('keyup focus', function (e) {
             if ($('#comment-content').hasClass('user-review')) {
                 $(".btn-review").removeClass("btn-primary");
                 $(".btn-review").addClass("disabled");
@@ -159,6 +166,9 @@ $(function () {
          }
          })*/
     }
+
+
+
     $('#btn-add-gadget').click(function () {
        /* var elem = $(this);
         if (store.user) {
@@ -170,8 +180,9 @@ $(function () {
        var device = getURLParameter("device");	
 		appToInstall = $(this).data("app");
 	   devicePlatform = $(this).data("platform").toLowerCase();
-	
-		
+
+
+
 		var showDevices = false;
 		
 		$(".device-image-block-modal").each(function(index) {	
@@ -220,7 +231,7 @@ $(function () {
         rating = el.data('rating');
     $($('input', el)[rating - 1]).attr('checked', 'checked');
 
-    $('.auto-submit-star').rating({
+   /* $('.auto-submit-star').rating({
         callback: function (value, link) {
             if (value == undefined) {
                 value = 0;
@@ -233,6 +244,10 @@ $(function () {
 
             });
         }
-    });
+    }); */
+
+
+
+
 
 });

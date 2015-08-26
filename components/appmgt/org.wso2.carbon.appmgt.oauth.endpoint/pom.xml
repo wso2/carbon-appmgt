@@ -5,14 +5,14 @@
      <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.1.0-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>org.wso2.carbon.appmgt.oauth.endpoint</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>WSO2 Carbon - AppM OAuth 2.0 Endpoints</name>
     <description>Endpoints for OAuth 2.0</description>
@@ -40,17 +40,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.provider</artifactId>
             <scope>provided</scope>
         </dependency>
-	<dependency>
-            <groupId>org.wso2.carbon</groupId>
+	    <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.oauth.common</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.oauth</artifactId>
             <scope>provided</scope>
         </dependency>

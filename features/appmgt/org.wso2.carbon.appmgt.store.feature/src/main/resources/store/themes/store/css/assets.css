@@ -40,8 +40,8 @@
     height: 122px;
     overflow: hidden;
     position: absolute;
-    top: 0px;
-    right: -3px;
+    top: 30px;
+    right: 16px;
     z-index: 99;
 }
 
