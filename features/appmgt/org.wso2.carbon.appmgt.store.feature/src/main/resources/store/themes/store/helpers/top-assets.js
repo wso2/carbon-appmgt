@@ -7,8 +7,15 @@ var resources = function (page, meta) {
 };
 
 var currentPage = function (items,sso,user,config) {
+    var noAssets = true;
+    for (var i = 0; i < items.assets.length; i++){
+        if(items.assets[0].assets.length > 0){
+            noAssets = false;
+        }
+    }
     var out  = {
         'assets':items.assets,
+        'noAssets':noAssets,
         'popularAssets': items.popularAssets,
         'sso': sso,
         'user': user,

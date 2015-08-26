@@ -18,7 +18,9 @@
                 <i title="{{asset.attributes.overview_type}}" class="fw {{iconImageType asset.attributes.overview_type}} fw-1_5x fw-inverse"></i>
             </div>
 
-            <span class="app-assets-rating"> </span>
+            <div class="app-assets-rating">
+                {{#assetRating asset.rating}}{{/assetRating}}
+            </div>
             <div class="row app-asset-buttons col-md-12 col-xs-12">
                 {{#if user}}
                     {{#if inDashboard}}
@@ -67,14 +69,13 @@
                     {{#asset.attributes.images_screenshots}}
                         {{#if this}}
                             <img class="col-md-3 app-asset-screenshot" src="{{this}}">
-
                         {{/if}}
                     {{/asset.attributes.images_screenshots}}
                 </div>
             </div>
             <div id="comments" class="tab-pane fade">
-                <h3>Section B</h3>
-                <p>Vestibulum nec erat eu nulla rhoncus fringilla ut non neque. Vivamus nibh urna, ornare id gravida ut, mollis a magna. Aliquam porttitor condimentum nisi, eu viverra ipsum porta ut. Nam hendrerit bibendum turpis, sed molestie mi fermentum id. Aenean volutpat velit sem. Sed consequat ante in rutrum convallis. Nunc facilisis leo at faucibus adipiscing.</p>
+                <h3>Comments</h3>
+                Comments are here
             </div>
         </div>
 
