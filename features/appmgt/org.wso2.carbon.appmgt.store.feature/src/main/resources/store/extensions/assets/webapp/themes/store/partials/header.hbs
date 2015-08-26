@@ -1,8 +1,23 @@
 <header>
     <div class="row wr-global-header">
-        <div class="col-xs-6 col-sm-6 col-lg-8 app-logo">
-            <a href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+        <div class="col-xs-6 col-sm-6 col-lg-8">
+            <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+
+            <div class="wr-app-bar-items searchbox-wrapper hidden-md hidden-sm hidden-xs">
+
+                <form class="searchbox" >
+                    <select id="searchSelect" class="input-lg search-select col-md-3">
+                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+                        <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+                        <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
+                        <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
+                    </select>
+                    <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+                </form>
+            </div>
+
         </div>
+
         <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
 
             <div class="wr-auth pull-right">

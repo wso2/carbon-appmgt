@@ -388,3 +388,24 @@
     padding-right: 20px;
     padding-bottom: 20px;
 }
+
+.wr-app-bar-items{
+    float:left;
+}
+
+.wr-app-bar-items-right{
+    float:left;
+}
+
+.bootstrap-select .btn{
+    padding: 15px 20px;
+    margin-top: -11px;
+}
+
+.searchbox-wrapper{
+    padding-top: 1px;
+}
+
+.app-logo{
+    width: 200px;
+}

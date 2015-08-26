@@ -30,6 +30,9 @@ var render = function (theme, data, meta, require) {
     }
 
 
+    data.header.searchQuery = searchQuery;
+
+
     theme('2-column-right', {
         title: data.title,
         header: [
@@ -61,10 +64,6 @@ var render = function (theme, data, meta, require) {
              } */
         ],
         right: [
-            {
-                partial: 'search',
-                context: {searchQuery: searchQuery}
-            },
             {
                 partial: 'my-assets-link',
                 context: data.myAssets
