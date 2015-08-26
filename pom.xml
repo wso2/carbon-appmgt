@@ -597,13 +597,11 @@
     <carbon.appmgt.version>1.1.0-SNAPSHOT</carbon.appmgt.version>
     <carbon.appmgt.bundle.version>1.1.0</carbon.appmgt.bundle.version>
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
-    <appmgt.feature.version>1.1.0-SNAPSHOT</appmgt.feature.version>
 
 	<!-- Carbon kernel version -->
     <carbon.kernel.version>4.4.1</carbon.kernel.version>
     <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
     <carbon.platform.version>4.4.1</carbon.platform.version>
-    <carbon.appmgt.version>1.1.0-SNAPSHOT</carbon.appmgt.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.4.3</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.4.0,4.5.0)</carbon.mediation.pkg.version>
