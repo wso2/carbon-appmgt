@@ -99,7 +99,7 @@
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.startup.publisher.feature:1.0.0</includedFeatureDef> -->
                             </includedFeatures>
 			    <importBundles>
-                                <importBundleDef>org.wso2.carbon.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.store:jaggery-scxml-executors:${carbon.store.version}</importBundleDef>
                             </importBundles>
                         </configuration>
                     </execution>

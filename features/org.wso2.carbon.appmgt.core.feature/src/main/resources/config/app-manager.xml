@@ -388,7 +388,10 @@
 
         <!-- The properties of the MDMs you need to connect with WSO2 AppM. For information on defining a MDM to integrate it with WSO2 AppM -->
         <MDMProperties>
-
+            <!--
+                MDM running on separate JVM. Calls MDM methods via secured REST API. Use this when run Store/Publisher/MDM
+                in deployed in separate JVMs. This will be the most suitable active MDM when deployed on production environment.
+            -->
             <MDM name="WSO2MDM" bundle="org.wso2.carbon.appmgt.mdm.wso2mdm">
                 <Property name="ServerURL">https://localhost:9450</Property>
                 <Property name="TokenApiURL">https://localhost:9448/oauth2/token</Property>
@@ -398,11 +401,20 @@
                 <Property name="AuthPass">admin</Property>
             </MDM>
 
+            <!-- Old EMM, Calls EMM using REST API -->
             <MDM name="WSO2EMM" bundle="org.wso2.carbon.appmgt.mdm.wso2emm">
                 <Property name="ServerURL">https://localhost:9451</Property>
                 <Property name="ImageURL">https://localhost:9451/emm/assets/wso2mobile/img/models/%s.png</Property>
                 <Property name="AuthUser">admin</Property>
                 <Property name="AuthPass">admin</Property>
+            </MDM>
+
+            <!--
+                Internal MDM which dispatches the MDM calls as Java/OSGI calls. Use this when run Store/Publisher/MDM
+                in on single JVM.
+            -->
+            <MDM name="WSO2MDM_INTERNAL" bundle="org.wso2.carbon.appmgt.mdm.wso2mdm.osgi">
+                <Property name="ImageURL">/store/extensions/assets/mobileapp/resources/models/%s.png</Property>
             </MDM>
 
             <!-- Please uncommnent the following block and define the name in ActiveMDM to activate this MDM -->
