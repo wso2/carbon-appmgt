@@ -25,13 +25,8 @@ import org.testng.annotations.Test;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
 import org.wso2.carbon.appmgt.impl.dao.test.TestRealmService;
-import org.wso2.carbon.appmgt.impl.discovery.ApplicationDiscoveryContext;
-import org.wso2.carbon.appmgt.impl.discovery.DiscoverySearchCriteria;
-import org.wso2.carbon.appmgt.impl.discovery.UserNamePasswordCredentials;
-import org.wso2.carbon.appmgt.impl.discovery.Wso2AppServerDiscoveryHandler;
 import org.wso2.carbon.appmgt.impl.dto.DiscoveredApplicationListDTO;
-import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 
 import java.util.Locale;
 

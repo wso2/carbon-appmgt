@@ -27,6 +27,7 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.observers.TenantServiceCreator;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
@@ -92,7 +93,7 @@ public class AppManagerGatewayComponent {
             log.debug("Gateway manager configuration service bound to the WebApp host objects");
         }
         configuration = amcService.getAPIManagerConfiguration();
-        org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
+        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
     }
 
     protected void unsetAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
@@ -100,7 +101,7 @@ public class AppManagerGatewayComponent {
             log.debug("Gateway manager configuration service unbound from the WebApp host objects");
         }
         configuration = null;
-        org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
     }
 
 }

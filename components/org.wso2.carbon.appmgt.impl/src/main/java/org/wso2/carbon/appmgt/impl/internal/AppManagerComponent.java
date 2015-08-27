@@ -36,6 +36,7 @@ import org.wso2.carbon.appmgt.impl.listners.UserAddListener;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.RemoteAuthorizationManager;
@@ -67,13 +68,10 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.FileUtil;
 
-import javax.cache.Cache;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-
 
 /**
  * @scr.component name="org.wso2.apimgt.impl.services.appm" immediate="true"
