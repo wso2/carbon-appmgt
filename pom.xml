@@ -32,6 +32,7 @@
     <module>components/org.wso2.carbon.appmgt.mobile</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2emm</module>
+    <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm.osgi</module>
     <module>components/org.wso2.carbon.appmgt.services.api</module>
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
@@ -389,7 +390,7 @@
       <dependency>
         <groupId>org.wso2.carbon.store</groupId>
         <artifactId>jaggery-scxml-executors</artifactId>
-        <version>${jaggery.scxml.executors.version}</version>
+        <version>${carbon.store.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
@@ -588,6 +589,16 @@
         <artifactId>org.wso2.carbon.ganalytics.publisher</artifactId>
         <version>${carbon.commons.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.device.mgt.common</artifactId>
+        <version>${carbon.devide.mgt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
+        <version>${carbon.devide.mgt.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -601,6 +612,7 @@
 	<!-- Carbon kernel version -->
     <carbon.kernel.version>4.4.1</carbon.kernel.version>
     <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
+    <carbon.kernel.pkg.version>[4.4.0,4.5.0)</carbon.kernel.pkg.version>
     <carbon.platform.version>4.4.1</carbon.platform.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.4.3</carbon.mediation.version>
@@ -621,6 +633,7 @@
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
     <carbon.store.version>1.4.0</carbon.store.version>
+    <carbon.devide.mgt.version>0.9.1</carbon.devide.mgt.version>
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
     <carbon.governance.pkg.version>[4.4.0, 4.6.0)</carbon.governance.pkg.version>
