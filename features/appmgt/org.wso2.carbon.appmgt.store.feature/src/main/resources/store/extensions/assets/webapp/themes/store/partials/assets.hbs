@@ -1,3 +1,4 @@
+
 <div class="assets-wrapper">
 
 	{{#if assets}}
@@ -32,30 +33,6 @@
 
 		{{/each}}
 
-
-        <div class="row" style="clear: both">
-            <nav>
-                <ul class="pagination">
-                {{#if leftNav}}
-                    <li>
-                        <a href="{{url "/assets/webapp?page="}}{{this.leftNav}}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo; Previous</span>
-                        </a>
-                    </li>
-                {{/if}}
-
-                {{#if rightNav}}
-                    <li>
-                        <a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}" aria-label="Next">
-                            <span aria-hidden="true">Next &raquo;</span>
-                        </a>
-                    </li>
-                {{/if}}
-                </ul>
-            </nav>
-        </div>
-
-
     {{else}}
 
         <div class="well-large col-md-12 no-apps-box">
@@ -66,3 +43,16 @@
 
 </div>
 
+
+{{#if assets}}
+    <div class="row">
+    <ul class="pager col-md-12">
+        {{#if leftNav}}
+            <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}">Previous</a></li>
+        {{/if}}
+        {{#if rightNav}}
+            <li><a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}">Next</a></li>
+        </ul>
+        {{/if}}
+    </div>
+{{/if}}

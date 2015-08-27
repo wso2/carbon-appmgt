@@ -43,3 +43,16 @@
 {{/if}}
 
 </div>
+
+{{#if assets}}
+    <div class="row">
+    <ul class="pager col-md-12">
+        {{#if leftNav}}
+            <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}">Previous</a></li>
+        {{/if}}
+        {{#if rightNav}}
+            <li><a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}">Next</a></li>
+        </ul>
+        {{/if}}
+    </div>
+{{/if}}
