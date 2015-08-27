@@ -5,7 +5,7 @@
 }
 
 .app-assets-wrapper{
-    padding-top: 30px;
+    padding-top: 5px;
 }
 
 .app-assets-icon{
@@ -410,4 +410,12 @@
 
 .app-logo{
     width: 200px;
+}
+
+.pager{
+    padding-top: 75px;
+}
+
+.sort-bar{
+    padding-top: 10px;
 }
