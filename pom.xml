@@ -32,7 +32,6 @@
     <module>components/org.wso2.carbon.appmgt.mobile</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2emm</module>
-    <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm.osgi</module>
     <module>components/org.wso2.carbon.appmgt.services.api</module>
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
@@ -628,7 +627,6 @@
     <carbon.commons.version>4.4.3</carbon.commons.version>
     <carbon.registry.version>4.4.3</carbon.registry.version>
     <carbon.governance.version>4.5.1</carbon.governance.version>
-    <carbon.social.version>2.2.0-SNAPSHOT</carbon.social.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>

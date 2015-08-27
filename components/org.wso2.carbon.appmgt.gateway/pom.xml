@@ -110,12 +110,12 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Private-Package>
-                            org.wso2.carbon.appmgt.gateway.internal
+                            org.wso2.carbon.appmgt.gateway.internal.*
                         </Private-Package>
                         <Export-Package>
                             !javax.servlet,
                             !javax.servlet.http,
-                            !org.wso2.carbon.appmgt.gateway.internal,
+                            !org.wso2.carbon.appmgt.gateway.internal.*,
                             org.wso2.carbon.appmgt.gateway.*,
                             org.wso2.throttle.*
                         </Export-Package>

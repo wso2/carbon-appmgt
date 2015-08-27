@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.internal;
+package org.wso2.carbon.appmgt.impl.service;
 
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppMgtXACMLPolicyTemplateReader;

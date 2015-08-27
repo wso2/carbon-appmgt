@@ -19,7 +19,7 @@ package org.wso2.carbon.appmgt.impl.template;
 import org.apache.velocity.VelocityContext;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 /**
  * Set the parameters for secured endpoints
  */
