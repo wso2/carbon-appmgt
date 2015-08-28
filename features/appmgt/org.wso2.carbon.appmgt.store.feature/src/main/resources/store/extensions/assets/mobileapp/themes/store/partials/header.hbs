@@ -119,6 +119,9 @@
 
             </a>
 
+
+            {{#if assetsPage}}
+
             <div class="wr-app-bar-items">
                 <select id="category-select" class="selectpicker" data-style="btn-primary"  title='Choose a Category' data-width="100%">
                     {{#each categories}}
@@ -134,6 +137,8 @@
                     <option value="webapp" {{#compare selectedPlatform "webapp"}}selected{{/compare}}>Web App</option>
                 </select>
             </div>
+
+            {{/if}}
 
         </div>
     </div>

@@ -22,6 +22,7 @@ var render = function (theme, data, meta, require) {
     data.header.selectedPlatform = data.selectedPlatform;
     data.header.selectedCategory = data.selectedCategory;
     data.header.searchQuery = searchQuery;
+    data.header.assetsPage = true;
 		
     var assets = require('/helpers/assets.js');
     theme('2-column-right', {
