@@ -89,9 +89,7 @@ $(".btn-deploySample").click(function (e) {
 });
 
 $(".tab-button").click(function () {
-
 	var status = $(this).data("status");
-
 	$(".app-row").each(function (index) {
 		$(this).css("display", "none");
 		var appRowStatus = $(this).data("status");
@@ -101,16 +99,10 @@ $(".tab-button").click(function () {
 			$(this).css("display", "table-row");
 		}
 	});
-
-
 });
 
 $(".btn-view-app").click(function (e) {
-
-
-	// alert($(this).data("id"));
-	//alert($(this).data("category") );
-	if ($(this).data("category") === "webapp") {
+    if ($(this).data("category") === "webapp") {
 		var url = $(this).data("url");
 	} else {
 		if ($(this).data("url") == 'undefined') {
@@ -120,9 +112,7 @@ $(".btn-view-app").click(function (e) {
 				{
 					var url = "https://itunes.apple.com/en/app/id" + $(this).data("appid");
 				}
-
 			}
-
 		} else {
 			var url = window.location.protocol + "//" + window.location.host + $(this).data("url");
 		}
@@ -133,8 +123,6 @@ $(".btn-view-app").click(function (e) {
 
 	$("#appModal").modal('show');
 	e.stopPropagation();
-
-
 });
 
 var showMessageModel = function (msg, head, type) {
@@ -170,5 +158,4 @@ function updateQRCode(text) {
 		element.replaceChild(showQRCode(text), element.lastChild);
 	else
 		element.appendChild(showQRCode(text));
-
 }
