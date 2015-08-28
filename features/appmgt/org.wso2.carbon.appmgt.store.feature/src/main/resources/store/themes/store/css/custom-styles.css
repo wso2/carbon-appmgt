@@ -414,6 +414,7 @@
 
 .pager{
     padding-top: 75px;
+    clear: both;
 }
 
 .sort-bar{
