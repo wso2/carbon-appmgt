@@ -30,18 +30,16 @@
 	<name>WSO2 Carbon - App Manager WSO2 MDM Feature</name>
 	<url>http://wso2.org</url>
 
-	<dependencyManagement>
-		<dependencies>
+	<dependencies>
 			<dependency>
 				<groupId>org.wso2.carbon.appmgt</groupId>
 				<artifactId>org.wso2.carbon.appmgt.mdm.wso2mdm</artifactId>
 			</dependency>
 			<dependency>
-            			<groupId>com.googlecode.plist</groupId>
-            			<artifactId>dd-plist</artifactId>
-        		</dependency>
-		</dependencies>
-	</dependencyManagement>
+				<groupId>com.googlecode.plist</groupId>
+				<artifactId>dd-plist</artifactId>
+  		</dependency>
+	</dependencies>
 
 	<build>
         <plugins>

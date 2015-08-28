@@ -509,6 +509,16 @@
         <type>war</type>
       </dependency>
       <dependency>
+				<groupId>org.wso2.carbon.appmgt</groupId>
+				<artifactId>org.wso2.carbon.appmgt.mdm.wso2mdm</artifactId>
+        <version>${carbon.appmgt.version}</version>
+			</dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.appmgt</groupId>
+  			<artifactId>org.wso2.carbon.appmgt.mdm.wso2emm</artifactId>
+        <version>${carbon.appmgt.version}</version>
+			</dependency>
+      <dependency>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
         <version>${carbon.mediation.version}</version>
@@ -544,11 +554,6 @@
         <version>${carbon.identity.user.profile.stub}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
-        <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
-        <version>${carbon.kernel.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpmime</artifactId>
         <version>${httpmime.version}</version>
@@ -557,11 +562,6 @@
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${jsoup.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.thetransactioncompany.wso2</groupId>
-        <artifactId>cors-filter</artifactId>
-        <version>1.7.0.wso2v1</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jackson</groupId>
