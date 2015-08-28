@@ -400,8 +400,13 @@
 }
 
 .bootstrap-select .btn{
-    padding: 15px 20px;
-    margin-top: -11px;
+    padding: 8px 20px 8px 20px;
+    margin-top: -7px;
+
+}
+
+.btn-group>.btn:first-child {
+    margin-left: 5px;
 }
 
 .searchbox-wrapper{
