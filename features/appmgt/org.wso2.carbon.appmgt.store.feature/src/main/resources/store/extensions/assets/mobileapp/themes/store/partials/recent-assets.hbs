@@ -7,7 +7,7 @@
 
     {{#slice . count="20" size="20"}}
         {{#each .}}
-            <a href="{{url "/assets"}}/{{type}}/{{id}}">
+            <a href="{{url "/assets"}}/{{type}}/{{id}}" class="type-{{attributes.overview_platform}}">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
@@ -19,8 +19,9 @@
                              src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
                     </div>
                 </div>
+                <hr>
             </a>
-            <hr>
+
         {{/each}}
     {{/slice}}
 
