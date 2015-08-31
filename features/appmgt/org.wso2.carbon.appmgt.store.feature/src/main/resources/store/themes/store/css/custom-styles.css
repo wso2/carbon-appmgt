@@ -357,12 +357,14 @@
 }
 
 .search-text{
-   max-width: none;
-   min-width: 300px;
-   width: 75%;
+    float: left;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
+    width: 300px;
 }
+
+
+
 
 .searchbox{
     padding-bottom: 10px;
@@ -415,6 +417,7 @@
 
 .app-logo{
     width: 200px;
+    float: left;
 }
 
 .pager{
@@ -424,4 +427,11 @@
 
 .sort-bar{
     padding-top: 10px;
+}
+
+
+.navbar {
+    border: none;
+    border-radius : 0;
+    min-height: 53px;
 }

@@ -1,78 +1,96 @@
 <header>
-    <div class="row wr-global-header">
-        <div class="col-xs-6 col-sm-6 col-lg-8">
-            <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+    <nav class="navbar navbar-default row wr-global-header">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                
+                <ul class="nav navbar-nav navbar-right">
+                    {{#if user}}
 
 
-
-        </div>
-        <div class="col-xs-6 col-sm-6 col-lg-4 wr-auth-container">
-
-
-            <div class="wr-auth pull-right">
-
-                {{#if user}}
-
-                    <a href="#" data-toggle="dropdown">
-                        <div class="auth-img">
-                            {{user.username}}
-                            <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-user fw-stack-1-5x"></i>
-                            </span>
-                        </div>
-                    </a>
-
-                    <div class="dropdown-menu">
-                        <div class="cu-arrow"></div>
-                        <div class="dropdown-menu-content">
-                            <a class="filter-item" href="{{url "/logout"}}">Logout</a>
-                        </div>
-                    </div>
-
-                {{else}}
-
-                    {{#if sso}}
-
-                        <a href="{{url "/login"}}">
+                        <a href="{{url "/extensions/assets/mobileapp/subscriptions"}}">
                             <div class="auth-img">
-                                {{t "Sign In"}}
+                                {{t "My Apps"}}
                                 <span class="fw-stack-md fw-lg">
                                 <i class="fw fw-login"></i>
                             </span>
                             </div>
                         </a>
+
+                        <a href="#" data-toggle="dropdown">
+                            <div class="auth-img">
+                                {{user.username}}
+                                <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-user fw-stack-1-5x"></i>
+                            </span>
+                            </div>
+                        </a>
+
+                        <div class="dropdown-menu">
+                            <div class="cu-arrow"></div>
+                            <div class="dropdown-menu-content">
+                                <a class="filter-item" href="{{url "/logout"}}">Logout</a>
+                            </div>
+                        </div>
 
                     {{else}}
 
-                        <a data-toggle="modal" data-target="#modal-login">
+                        {{#if sso}}
+
+                            <a href="{{url "/login"}}">
+                                <div class="auth-img">
+                                    {{t "Sign In"}}
+                                    <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                                </div>
+                            </a>
+
+                        {{else}}
+
+                            <a data-toggle="modal" data-target="#modal-login">
+                                <div class="auth-img">
+                                    {{t "Sign In"}}
+                                    <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                                </div>
+                            </a>
+
+                        {{/if}}
+
+
+                        <a href="#"  data-toggle="modal" data-target="#register-modal">
                             <div class="auth-img">
-                                {{t "Sign In"}}
-                                <span class="fw-stack-md fw-lg">
+                                Register
+                            <span class="fw-stack-md fw-lg">
                                 <i class="fw fw-login"></i>
                             </span>
                             </div>
                         </a>
 
+
+                        {{>register}}
+
+
+
                     {{/if}}
 
-                    <a href="#"  data-toggle="modal" data-target="#register-modal">
-                        <div class="auth-img">
-                            Register
-                            <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-login"></i>
-                            </span>
-                        </div>
-                    </a>
 
-
-                    {{>register}}
-
-                {{/if}}
-
-
-            </div>
-        </div>
-    </div>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
 </header>
 
 
