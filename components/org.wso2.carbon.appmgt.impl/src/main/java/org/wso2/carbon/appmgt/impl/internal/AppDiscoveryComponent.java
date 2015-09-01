@@ -34,7 +34,7 @@ import java.util.Map;
  * Application discovery service component. This will allow discover api to be exposed via factory
  * so that many kind of back-ends could be adopted.
  *
- * @scr.component name="org.wso2.appmgt.impl.services" immediate="true"
+ * @scr.component name="org.wso2.appmgt.impl.services.discovery" immediate="true"
  */
 public class AppDiscoveryComponent {
 

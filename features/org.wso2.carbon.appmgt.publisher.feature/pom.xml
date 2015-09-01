@@ -15,20 +15,18 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
-        <artifactId>appmgt-feature</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
-	<relativePath>../pom.xml</relativePath>
+        <artifactId>carbon-appmgt</artifactId>
+        <version>1.1.1-SNAPSHOT</version>
+	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.publisher.feature</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - APP Publisher Feature</name>
     <url>http://wso2.org</url>
@@ -73,7 +71,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.appmgt.publisher</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server
@@ -88,8 +86,8 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.hostobjects</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.registry.core:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.base.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.registry.core:compatible:${carbon.kernel.version}</importFeatureDef>
 				                 <importFeatureDef>org.wso2.carbon.store:${carbon.store.version}</importFeatureDef>
                             </importFeatures>
                             <importBundles>

@@ -19,7 +19,7 @@ package org.wso2.carbon.appmgt.impl.token;
 
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.ClaimCacheKey;
 import org.wso2.carbon.appmgt.impl.utils.UserClaims;

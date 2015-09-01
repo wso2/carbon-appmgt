@@ -232,7 +232,7 @@ target/
 #############
 ## Appmgt
 #############
-features/appmgt/org.wso2.carbon.appmgt.services.api.feature/src/main/resources/api.war
-features/appmgt/org.wso2.carbon.appmgt.core.feature/src/main/resources/appmoauth2.war
-features/appmgt/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.h2.db
+features/org.wso2.carbon.appmgt.services.api.feature/src/main/resources/api.war
+features/org.wso2.carbon.appmgt.core.feature/src/main/resources/appmoauth2.war
+features/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.h2.db
 
