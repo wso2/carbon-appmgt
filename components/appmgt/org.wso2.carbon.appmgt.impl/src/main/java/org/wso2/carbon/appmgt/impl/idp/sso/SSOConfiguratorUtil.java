@@ -48,21 +48,13 @@ public class SSOConfiguratorUtil {
      * @param update isToUpdate
      */
     public static void createSSOProvider(WebApp app, boolean update) {
-        SSOProvider ssoProvider = app.getSsoProviderDetails();
-        if(ssoProvider == null) {
-            log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
-        }
 
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
-
-        //ssoProvider.setIssuerName(app.getId().getApiName());
-        ssoProvider.setAssertionConsumerURL(getGatewayUrl(app));
-
-        SSOEnvironment ssoEnvironment = findProviderEnvironment(ssoProvider.getProviderName(), ssoProvider.getProviderVersion(), config);
+        SSOEnvironment ssoEnvironment = findProviderEnvironment(app.getSsoProviderDetails().getProviderName(), app.getSsoProviderDetails().getProviderVersion(), config);
 
         if(ssoEnvironment == null) {
-            log.error("Could not find SSO Configurator details for " + ssoProvider.toString());
+            log.error("Could not find SSO Configurator details for " + app.getSsoProviderDetails().toString());
             return;
         }
 
@@ -71,18 +63,18 @@ public class SSOConfiguratorUtil {
             configurator.init(ssoEnvironment.getParameters());
 
             if (update) {
-                if (configurator.updateProvider(ssoProvider)) {
+                if(configurator.updateProvider(app)) {
                     //Log to impose that the SSO Provider is updated for a particular webapp
-                    log.info("SSO Provider " + ssoProvider.toString() + " updated for " + app.getId().getApiName());
-                } else {
-                    log.error("Failed to update SSO provider " + ssoProvider.toString() + " for " +
+                    log.info("SSO Provider  updated for " + app.getId().getApiName());
+                }else {
+                    log.error("Failed to update SSO provider for " +
                             app.getId().getApiName());
                 }
             } else {
-                if(configurator.createProvider(ssoProvider)) {
-                    log.info("SSO Provider " + ssoProvider.toString() + " configured for " + app.getId().getApiName());
-                } else {
-                    log.error("Failed to setup SSO provider " + ssoProvider.toString() + " for " + app.getId().getApiName());
+                if(configurator.createProvider(app)) {
+                    log.info("SSO Provider configured for " + app.getId().getApiName());
+                }else {
+                    log.error("Failed to setup SSO provider for " + app.getId().getApiName());
                 }
             }
 
@@ -288,7 +280,7 @@ public class SSOConfiguratorUtil {
         return null;
     }
 
-    private static String getGatewayUrl(WebApp app) {
+    public static String getGatewayUrl(WebApp app) {
         APIIdentifier identifier = app.getId();
         String url;
         if(app.getTransports().equals("http")) {
