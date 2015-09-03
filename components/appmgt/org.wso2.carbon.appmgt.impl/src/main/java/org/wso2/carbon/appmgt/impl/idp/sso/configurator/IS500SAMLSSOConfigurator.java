@@ -198,10 +198,6 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         }
 
-        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-
-        //ssoProvider.setIssuerName(app.getId().getApiName());
         ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
