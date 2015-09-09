@@ -2328,7 +2328,7 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 		try {
 			connection = APIMgtDBUtil.getConnection();
             String sqlQuery =
-                    "SELECT DISTINCT SB.USER_ID, SB.DATE_SUBSCRIBED "
+                    "SELECT DISTINCT SB.USER_ID, SB.TENANT_ID, SB.EMAIL_ADDRESS, SB.DATE_SUBSCRIBED "
                             + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP, "
                             + "APM_APPLICATION APP, APM_APP API "
                             + "WHERE API.APP_PROVIDER = ? AND API.APP_NAME = ? "
@@ -2345,14 +2345,20 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 			if (result == null) {
 				return subscribers;
 			}
-			while (result.next()) {
-				Subscriber subscriber =
-				                        new Subscriber(
-				                                       result.getString(AppMConstants.SUBSCRIBER_FIELD_USER_ID));
-				subscriber.setSubscribedDate(result.getTimestamp(AppMConstants.SUBSCRIBER_FIELD_DATE_SUBSCRIBED));
-				subscribers.add(subscriber);
-			}
 
+            while (result.next()) {
+                String username = result.getString(AppMConstants.SUBSCRIBER_FIELD_USER_ID);
+                int tenantId = result.getInt(AppMConstants.SUBSCRIBER_FIELD_TENANT_ID);
+                String emailAddress = result.getString(
+                AppMConstants.SUBSCRIBER_FIELD_EMAIL_ADDRESS);
+                java.util.Date subscribedDate = result.getTimestamp(
+                AppMConstants.SUBSCRIBER_FIELD_DATE_SUBSCRIBED);
+                Subscriber subscriber = new Subscriber(username);
+                subscriber.setTenantId(tenantId);
+                subscriber.setEmail(emailAddress);
+                subscriber.setSubscribedDate(subscribedDate);
+                subscribers.add(subscriber);
+              }
 		} catch (SQLException e) {
 			handleException("Failed to get subscribers for :" + identifier.getApiName(), e);
 		} finally {
