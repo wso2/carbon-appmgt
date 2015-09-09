@@ -172,8 +172,10 @@ public final class AppMConstants {
     public static final String SSO_CONFIG_FIELD_SAML2_SSO_ISSUER = "SAML2_SSO_ISSUER";
 
     //database columns for Subscriber
-    public static final String SUBSCRIBER_FIELD_EMAIL_ADDRESS = "EMAIL_ADDRESS";
+    public static final String SUBSCRIBER_FIELD_SUBSCRIBER_ID = "SUBSCRIBER_ID";
     public static final String SUBSCRIBER_FIELD_USER_ID = "USER_ID";
+    public static final String SUBSCRIBER_FIELD_TENANT_ID = "TENANT_ID";
+    public static final String SUBSCRIBER_FIELD_EMAIL_ADDRESS = "EMAIL_ADDRESS";
     public static final String SUBSCRIBER_FIELD_DATE_SUBSCRIBED = "DATE_SUBSCRIBED";
 
     //tables columns for subscription

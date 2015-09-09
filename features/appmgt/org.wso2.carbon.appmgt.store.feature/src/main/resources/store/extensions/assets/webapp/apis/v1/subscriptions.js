@@ -1,30 +1,36 @@
-var serviceModule=(function(){
+var resource = (function () {
 
-    var SubscriptionService;
-    var subsApi;
-
-    var log = new Log('subscription-api');
-
-    SubscriptionService = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
-    subsApi = new SubscriptionService.SubscriptionService();
-
-    subsApi.init(jagg, session);
-
-    AuthService = require('/extensions/assets/webapp/services/authentication.js').serviceModule;
-    authenticator = new AuthService.Authenticator();
+    var log = new Log('subscriptions-api');
+    var AuthService = require('/extensions/assets/webapp/services/authentication.js').serviceModule;
+    var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg, session);
 
-    var getAppsWithSubs=function(){
-
-        var username = authenticator.getLoggedInUser().username;
-
-        var apps=subsApi.getAppsWithSubs({user:username});
-
-          return apps;
+    var getAPIProviderObj = function (username) {
+        return new (require('appmgtpublisher')).APIProvider(String(username));
     };
 
-    return{
-        get:getAppsWithSubs
+    var getAppsWithSubs = function () {
+        var user = authenticator.getLoggedInUser();
+         if (user == null) {
+             response.status = 401;
+             response.contentType = 'application/json';
+             return {message: "You do not have permission to access this API"};
+         }
+
+            var URI = '/{context}/resources/{asset}/{version}/subscriptions/{appProvider}/{appName}/{appVersion}';
+            var uriMatcher = new URIMatcher(request.getRequestURI());
+            if (!uriMatcher.match(URI)) {
+                response.status = 404;
+                response.contentType = 'application/json';
+                return {message: "API endpoint not found"};
+            }
+            var params = uriMatcher.elements();
+            var apiProvider = getAPIProviderObj(user.username);
+            return apiProvider.getSubscribersOfAPI(params.appProvider, params.appName, params.appVersion);
+    };
+
+    return {
+        get: getAppsWithSubs
     }
 
 })();
