@@ -365,7 +365,9 @@ public final class AppMConstants {
     public static final String APP_CONSUMER_AUTH_CONFIG = "AppConsumerAuthConfiguration.";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_SAML_RESPONSE_HEADER_TO_OUT_MSG = APP_CONSUMER_AUTH_CONFIG + "AddSAMLResponseHeaderToOutMessage";
     public static final String API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY = APP_CONSUMER_AUTH_CONFIG + "AddClaimsSelectively";
-    
+    public static final String TOKEN_GENERATOR_IMPL = APP_CONSUMER_AUTH_CONFIG + "TokenGeneratorImpl";
+    public static final String ENABLE_JWT_GENERATION = APP_CONSUMER_AUTH_CONFIG + "EnableTokenGeneration";
+    public static final String SIGNATURE_ALGORITHM = APP_CONSUMER_AUTH_CONFIG + "SignatureAlgorithm";
     
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
     public static final String API_KEY_TYPE_PRODUCTION = "PRODUCTION";
