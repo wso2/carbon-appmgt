@@ -2304,13 +2304,13 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
             String sqlQuery =  "SELECT DISTINCT "
                                + "SB.USER_ID, SB.TENANT_ID, SB.EMAIL_ADDRESS, SB.DATE_SUBSCRIBED "
-                               + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP,APM_APPLICATION APP,APM_APP API"
-                               + " WHERE API.APP_PROVIDER=? "
+                               + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP,APM_APPLICATION APP,APM_APP API "
+                               + "WHERE API.APP_PROVIDER=? "
                                + "AND API.APP_NAME=? "
                                + "AND API.APP_VERSION=? "
-                               + "AND SP.APPLICATION_ID=APP.APPLICATION_ID"
-                               + " AND APP.SUBSCRIBER_ID=SB.SUBSCRIBER_ID "
-                               + " AND API.APP_ID = SP.APP_ID";
+                               + "AND SP.APPLICATION_ID=APP.APPLICATION_ID "
+                               + "AND APP.SUBSCRIBER_ID=SB.SUBSCRIBER_ID "
+                               + "AND API.APP_ID = SP.APP_ID";
             ps = connection.prepareStatement(sqlQuery);
             ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
             ps.setString(2, identifier.getApiName());
