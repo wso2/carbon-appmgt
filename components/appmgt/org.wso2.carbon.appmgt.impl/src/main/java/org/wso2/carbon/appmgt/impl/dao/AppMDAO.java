@@ -2292,7 +2292,6 @@ public class AppMDAO {
 		}
 		return subscribers;
 	}
-	
 
     public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                                                                             throws
@@ -2306,12 +2305,12 @@ public class AppMDAO {
             String sqlQuery =  "SELECT DISTINCT "
                                + "SB.USER_ID, SB.TENANT_ID, SB.EMAIL_ADDRESS, SB.DATE_SUBSCRIBED "
                                + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP,APM_APPLICATION APP,APM_APP API"
-                               + " WHERE API.APP_PROVIDER=? " + "AND API.APP_NAME=? "
+                               + " WHERE API.APP_PROVIDER=? "
+                               + "AND API.APP_NAME=? "
                                + "AND API.APP_VERSION=? "
                                + "AND SP.APPLICATION_ID=APP.APPLICATION_ID"
                                + " AND APP.SUBSCRIBER_ID=SB.SUBSCRIBER_ID "
                                + " AND API.APP_ID = SP.APP_ID";
-
             ps = connection.prepareStatement(sqlQuery);
             ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
             ps.setString(2, identifier.getApiName());
@@ -2332,7 +2331,6 @@ public class AppMDAO {
                 subscriber.setSubscribedDate(subscribedDate);
                 subscribers.add(subscriber);
             }
-
         } catch (SQLException e) {
             handleException("Failed to get subscribers for :" + identifier.getApiName(), e);
         } finally {
@@ -2340,8 +2338,6 @@ public class AppMDAO {
         }
         return subscribers;
     }
-
-
 
     public long getAPISubscriptionCountByAPI(APIIdentifier identifier)
             throws AppManagementException {
