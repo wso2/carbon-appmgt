@@ -2291,7 +2291,7 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(ps, connection, result);
 		}
 		return subscribers;
-	}
+    }
 
     public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                                                                             throws
