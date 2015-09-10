@@ -2313,61 +2313,54 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(ps, connection, result);
 		}
 		return subscribers;
-	}
-	
+    }
 
-public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
+    public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	                                                                    throws
                                                                         AppManagementException {
+        Set<Subscriber> subscribers = new HashSet<Subscriber>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
 
-		Set<Subscriber> subscribers = new HashSet<Subscriber>();
-		Connection connection = null;
-		PreparedStatement ps = null;
-		ResultSet result = null;
-
-		try {
-			connection = APIMgtDBUtil.getConnection();
-            String sqlQuery =
-                    "SELECT DISTINCT SB.USER_ID, SB.TENANT_ID, SB.EMAIL_ADDRESS, SB.DATE_SUBSCRIBED "
-                            + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP, "
-                            + "APM_APPLICATION APP, APM_APP API "
-                            + "WHERE API.APP_PROVIDER = ? AND API.APP_NAME = ? "
-                            + "AND API.APP_VERSION = ? "
-                            + "AND SP.APPLICATION_ID = APP.APPLICATION_ID "
-                            + "AND APP.SUBSCRIBER_ID = SB.SUBSCRIBER_ID "
-                            + "AND API.APP_ID = SP.APP_ID";
-
-			ps = connection.prepareStatement(sqlQuery);
-			ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
-			ps.setString(2, identifier.getApiName());
-			ps.setString(3, identifier.getVersion());
-			result = ps.executeQuery();
-			if (result == null) {
-				return subscribers;
-			}
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            String sqlQuery = "SELECT DISTINCT "
+                              + "SB.USER_ID, SB.TENANT_ID, SB.EMAIL_ADDRESS, SB.DATE_SUBSCRIBED "
+                              + "FROM APM_SUBSCRIBER SB, APM_SUBSCRIPTION SP, "
+                              + "APM_APPLICATION APP, APM_APP API "
+                              + "WHERE API.APP_PROVIDER = ? AND API.APP_NAME = ? "
+                              + "AND API.APP_VERSION = ? "
+                              + "AND SP.APPLICATION_ID = APP.APPLICATION_ID "
+                              + "AND APP.SUBSCRIBER_ID = SB.SUBSCRIBER_ID "
+                              + "AND API.APP_ID = SP.APP_ID";
+            ps = connection.prepareStatement(sqlQuery);
+            ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            ps.setString(2, identifier.getApiName());
+            ps.setString(3, identifier.getVersion());
+            result = ps.executeQuery();
+            if (result == null) {
+                return subscribers;
+            }
 
             while (result.next()) {
                 String username = result.getString(AppMConstants.SUBSCRIBER_FIELD_USER_ID);
                 int tenantId = result.getInt(AppMConstants.SUBSCRIBER_FIELD_TENANT_ID);
-                String emailAddress = result.getString(
-                AppMConstants.SUBSCRIBER_FIELD_EMAIL_ADDRESS);
-                java.util.Date subscribedDate = result.getTimestamp(
-                AppMConstants.SUBSCRIBER_FIELD_DATE_SUBSCRIBED);
+                String emailAddress = result.getString(AppMConstants.SUBSCRIBER_FIELD_EMAIL_ADDRESS);
+                java.util.Date subscribedDate = result.getTimestamp(AppMConstants.SUBSCRIBER_FIELD_DATE_SUBSCRIBED);
                 Subscriber subscriber = new Subscriber(username);
                 subscriber.setTenantId(tenantId);
                 subscriber.setEmail(emailAddress);
                 subscriber.setSubscribedDate(subscribedDate);
                 subscribers.add(subscriber);
-              }
-		} catch (SQLException e) {
-			handleException("Failed to get subscribers for :" + identifier.getApiName(), e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, connection, result);
-		}
+            }
+        } catch (SQLException e) {
+            handleException("Failed to get subscribers for :" + identifier.getApiName(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, result);
+        }
 		return subscribers;
-	}
-
-
+    }
 
     public long getAPISubscriptionCountByAPI(APIIdentifier identifier)
             throws AppManagementException {
