@@ -80,6 +80,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var appId = new APIIdentifier(params.sso_idpProviderUrl, params.app_name, params.app_verison);
         var webApp = new WebAppModel(appId);
+        webApp.setAcsURL(params.app_acsURL);
         var ssoProvider = new SSOProvider();
 
         var app_provider = params.app_provider;
