@@ -115,12 +115,21 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
 
     @Override
     public boolean createProvider(WebApp webApp) {
+        String acsUrl = webApp.getAcsURL().trim();
         SSOProvider ssoProvider = webApp.getSsoProviderDetails();
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         }
 
-        ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+        if(acsUrl != null) {
+            if (acsUrl.length() > 0) {
+                ssoProvider.setAssertionConsumerURL(acsUrl);
+            } else {
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+            }
+        } else {
+            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+        }
 
         ServiceProvider serviceProvider = null;
         SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
@@ -188,13 +197,22 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
 
     @Override
     public boolean updateProvider(WebApp application) {
+        String acsUrl = application.getAcsURL().trim();
         SSOProvider ssoProvider = application.getSsoProviderDetails();
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
         }
 
         //ssoProvider.setIssuerName(app.getId().getApiName());
-        ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+        if(acsUrl != null) {
+            if (acsUrl.length() > 0) {
+                ssoProvider.setAssertionConsumerURL(acsUrl);
+            } else {
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+            }
+        } else {
+            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+        }
 
         SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
         ServiceProvider serviceProvider = null;
