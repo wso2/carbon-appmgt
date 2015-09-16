@@ -1,5 +1,6 @@
 WSO2 Application Manager (Carbon Components)
 ============================================
+[![Build Status](https://wso2.org/jenkins/job/carbon-appmgt/badge/icon)](https://wso2.org/jenkins/job/carbon-appmgt)
 
 WSO2 Application Manager (AppM) is a powerful platform for creating, managing,
 consuming and monitoring web Applications. It combines tried and tested SOA best practices
