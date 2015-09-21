@@ -20,7 +20,6 @@ package org.wso2.carbon.appmgt.impl.dao;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axis2.util.JavaUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
@@ -61,8 +60,6 @@ import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
-import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -70,7 +67,6 @@ import org.wso2.carbon.appmgt.impl.utils.LRUCache;
 import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
 import org.wso2.carbon.appmgt.impl.utils.URLMapping;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
@@ -82,8 +78,6 @@ import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import javax.cache.Cache;
-import javax.cache.Caching;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -123,9 +117,6 @@ public class AppMDAO {
 
 	private static final Log log = LogFactory.getLog(AppMDAO.class);
 
-	public static TokenGenerator tokenGenerator;
-	public static Boolean removeUserNameInJWTForAppToken;
-
 	private static final String ENABLE_JWT_GENERATION =
 	                                                    "AppConsumerAuthConfiguration.EnableTokenGeneration";
 	private static final String ENABLE_JWT_CACHE = "APIKeyManager.EnableJWTCache";
@@ -138,43 +129,9 @@ public class AppMDAO {
 	private static final String PRIMARY_LOGIN = "primary";
 	private static final String CLAIM_URI = "ClaimUri";
 
-	private static AppManagerConfiguration configuration;
-	private static boolean isEnableJWTGeneration = true;
-
 	public AppMDAO() {
-		configuration = ServiceReferenceHolder.getInstance()
-				.getAPIManagerConfigurationService().getAPIManagerConfiguration();
-		if (configuration == null) {
-			log.error("API Manager configuration is not initialized");
-		} else {
-			isEnableJWTGeneration = Boolean.parseBoolean(configuration.getFirstProperty(
-					AppMConstants.ENABLE_JWT_GENERATION));
-			removeUserNameInJWTForAppToken = Boolean.parseBoolean(configuration.getFirstProperty(
-					AppMConstants.API_KEY_MANAGER_REMOVE_USERNAME_TO_JWT_FOR_APP_TOKEN));
-		}
 	}
 
-	public static boolean isJWTEnabled() {
-		return isEnableJWTGeneration;
-	}
-
-	public static TokenGenerator getTokenGenerator() {
-		if (configuration == null) {
-			log.error("API Manager configuration is not initialized");
-		} else {
-			if (isEnableJWTGeneration) {
-				String tokenGeneratorImplClass = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
-				if (tokenGeneratorImplClass == null) {
-					tokenGenerator = new JWTGenerator();
-				} else {
-					tokenGenerator = (TokenGenerator) PrivilegedCarbonContext
-							.getThreadLocalCarbonContext()
-							.getOSGiService(TokenGenerator.class);
-				}
-			}
-		}
-		return tokenGenerator;
-	}
 	/**
 	 * Get Subscribed APIs for given userId
 	 *
@@ -518,43 +475,6 @@ public class AppMDAO {
 						keyValidationInfoDTO.setApiName(apiName);
 						keyValidationInfoDTO.setConsumerKey(AppManagerUtil.decryptToken(consumerKey));
 						keyValidationInfoDTO.setApiPublisher(apiPublisher);
-
-						if (tokenGenerator != null) {
-							String calleeToken = null;
-
-							String enableJWTCache =
-							                        ServiceReferenceHolder.getInstance()
-							                                              .getAPIManagerConfigurationService()
-							                                              .getAPIManagerConfiguration()
-							                                              .getFirstProperty(ENABLE_JWT_CACHE);
-
-							Cache jwtCache =
-							                 Caching.getCacheManager(AppMConstants.APP_MANAGER_CACHE_MANAGER)
-							                        .getCache(AppMConstants.JWT_CACHE_NAME);
-
-							// If JWT Caching is enabled.
-							if (enableJWTCache != null &&
-							    JavaUtils.isTrueExplicitly(enableJWTCache)) {
-								String cacheKey =
-								                  accessToken + ":" + context + ":" + version +
-								                          ":" + requiredAuthenticationLevel;
-								calleeToken = (String) jwtCache.get(cacheKey);
-								// On a Cache miss
-								if (calleeToken == null) {
-									// Generate Token and update Cache.
-									calleeToken =
-									              generateJWTToken(userType, keyValidationInfoDTO,
-									                               context, version);
-									jwtCache.put(cacheKey, calleeToken);
-								}
-							} else {
-								calleeToken =
-								              generateJWTToken(userType, keyValidationInfoDTO,
-								                               context, version);
-							}
-
-							keyValidationInfoDTO.setEndUserToken(calleeToken);
-						}
 					}
 				} else {
 					keyValidationInfoDTO.setValidationStatus(AppMConstants.KeyValidationStatus.API_AUTH_ACCESS_TOKEN_INACTIVE);
@@ -767,19 +687,6 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
 		return verbInfoDTO;
-	}
-
-	private String generateJWTToken(String userType, APIKeyValidationInfoDTO keyValidationInfoDTO,
-	                                String context, String version) throws AppManagementException {
-
-		String jwtToken;
-		if (removeUserNameInJWTForAppToken &&
-		    AppMConstants.ACCESS_TOKEN_USER_TYPE_APPLICATION.equalsIgnoreCase(userType)) {
-			jwtToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, false);
-		} else {
-			jwtToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, true);
-		}
-		return jwtToken;
 	}
 
 	public long getApplicationAccessTokenRemainingValidityPeriod(String accessToken)
@@ -4835,45 +4742,6 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
 	private static void handleException(String msg, Throwable t) throws AppManagementException {
 		log.error(msg, t);
 		throw new AppManagementException(msg, t);
-	}
-
-	/**
-	 * Generates fresh JWT token for given information of validation information
-	 *
-	 * @param context
-	 *            String context for API
-	 * @param version
-	 *            version of API
-	 * @param subscriberName
-	 *            subscribed user name
-	 * @param applicationName
-	 *            application name api belongs
-	 * @param tier
-	 *            tier name
-	 * @param endUserName
-	 *            name of end user
-	 * @return signed JWT token string
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 *             error in generating token
-	 */
-	public String createJWTTokenString(String context, String version, String subscriberName,
-	                                   String applicationName, String tier, String endUserName)
-	                                                                                           throws
-                                                                                               AppManagementException {
-		String calleeToken = null;
-		APIKeyValidationInfoDTO keyValidationInfoDTO = new APIKeyValidationInfoDTO();
-		keyValidationInfoDTO.setSubscriber(subscriberName);
-		keyValidationInfoDTO.setApplicationName(applicationName);
-		keyValidationInfoDTO.setTier(tier);
-		keyValidationInfoDTO.setEndUserName(endUserName);
-		if (tokenGenerator != null) {
-			calleeToken = tokenGenerator.generateToken(keyValidationInfoDTO, context, version, true);
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("JWT generator not properly initialized. JWT token will not present in validation info");
-			}
-		}
-		return calleeToken;
 	}
 
     public static List<URLMapping> getURITemplatesPerAPIAsString(APIIdentifier identifier)

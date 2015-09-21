@@ -61,7 +61,7 @@ public class JWTGenerator extends AbstractJWTGenerator{
         if (claimsRetriever != null) {
             String userName = (String) saml2Assertions.get("Subject");
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String tenantAwareUserName = userName + "@" + tenantDomain;
+            String tenantAwareUserName = userName.contains("@") ? userName : userName + "@" + tenantDomain;
 
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService()
@@ -71,7 +71,7 @@ public class JWTGenerator extends AbstractJWTGenerator{
                     tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
                 }
 
-                claims.put("Subject", userName);
+                claims.put("sub", userName);
                 claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
 
                 return claims;

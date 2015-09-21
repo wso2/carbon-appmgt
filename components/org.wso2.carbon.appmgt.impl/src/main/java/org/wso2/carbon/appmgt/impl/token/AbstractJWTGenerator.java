@@ -21,10 +21,12 @@ package org.wso2.carbon.appmgt.impl.token;
 import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
+import org.wso2.carbon.appmgt.impl.SAMLConstants;
+import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -44,11 +46,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -63,13 +61,15 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     private static final Log log = LogFactory.getLog(AbstractJWTGenerator.class);
 
-    protected static final String APP_GATEWAY_ID = "wso2.org/products/am";
+    protected static final String APP_GATEWAY_ID = "wso2.org/products/appm";
 
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
 
     private static final String NONE = "NONE";
 
     private static volatile long ttl = -1L;
+
+    private static long DEFAULT_TTL = 15L;
 
     private ClaimsRetriever claimsRetriever;
 
@@ -85,8 +85,15 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     private boolean addClaimsSelectively = false;
 
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
     private static ConcurrentHashMap<Integer, Key> privateKeys = new ConcurrentHashMap<Integer, Key>();
-    private static ConcurrentHashMap<Integer, Certificate> publicCerts = new ConcurrentHashMap<Integer, Certificate>();
+    private static ConcurrentHashMap<Integer, Certificate> publicCertificate
+            = new ConcurrentHashMap<Integer, Certificate>();
+    private static ConcurrentHashMap<Integer, String> base64EncodedThumbPrintMap
+            = new ConcurrentHashMap<Integer, String>();
+    private static ConcurrentHashMap<String, Integer> tenantMap
+            = new ConcurrentHashMap<String, Integer>();
 
     //constructor for testing purposes
     public AbstractJWTGenerator(boolean includeClaims, boolean enableSigning) {
@@ -103,9 +110,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      */
     public AbstractJWTGenerator() {
 
-        String claimsRetrieverImplClass =
-                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                        getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CLAIMS_RETRIEVER_IMPL_CLASS);
+        String claimsRetrieverImplClass = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CLAIMS_RETRIEVER_IMPL_CLASS);
         dialectURI = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
                 getAPIManagerConfiguration().getFirstProperty(ClaimsRetriever.CONSUMER_DIALECT_URI);
         if (dialectURI == null) {
@@ -128,210 +134,45 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         signatureAlgorithm = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
                 getAPIManagerConfiguration().getFirstProperty(AppMConstants.SIGNATURE_ALGORITHM);
-        if (signatureAlgorithm == null || !(signatureAlgorithm.equals(NONE) || signatureAlgorithm.equals(SHA256_WITH_RSA))) {
+        if (signatureAlgorithm == null || !(signatureAlgorithm.equals(NONE) || signatureAlgorithm.equals(
+                SHA256_WITH_RSA))) {
             signatureAlgorithm = SHA256_WITH_RSA;
         }
 
-        addClaimsSelectively = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
-                getAPIManagerConfiguration().getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY));
+        addClaimsSelectively = Boolean.parseBoolean(ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.API_CONSUMER_AUTHENTICATION_ADD_CLAIMS_SELECTIVELY));
     }
-
-    /**
-     * Method that generates the JWT.
-     *
-     * @param keyValidationInfoDTO
-     * @param apiContext
-     * @param version
-     * @param includeEndUserName
-     * @return signed JWT token
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-    public String generateToken(APIKeyValidationInfoDTO keyValidationInfoDTO, String apiContext,
-                     String version, boolean includeEndUserName) throws AppManagementException {
-
-        //generating expiring timestamp
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        long expireIn = currentTime + 1000 * 60 * getTTL();
-
-        String jwtBody;
-        String dialect;
-        if(claimsRetriever != null){
-            dialect = claimsRetriever.getDialectURI(keyValidationInfoDTO.getEndUserName());
-        }else{
-            dialect = dialectURI;
-        }
-
-        String subscriber = keyValidationInfoDTO.getSubscriber();
-        String applicationName = keyValidationInfoDTO.getApplicationName();
-        String applicationId = keyValidationInfoDTO.getApplicationId();
-        String tier = keyValidationInfoDTO.getTier();
-        String endUserName = includeEndUserName ? keyValidationInfoDTO.getEndUserName() : null;
-        String keyType = keyValidationInfoDTO.getType();
-        String userType = keyValidationInfoDTO.getUserType();
-        String applicationTier = keyValidationInfoDTO.getApplicationTier();
-        String enduserTenantId = includeEndUserName ? String.valueOf(getTenantId(endUserName)) : null;
-
-
-        //Sample JWT body
-        //{"iss":"wso2.org/products/am","exp":1349267862304,"http://wso2.org/claims/subscriber":"nirodhasub",
-        // "http://wso2.org/claims/applicationname":"App1","http://wso2.org/claims/apicontext":"/echo",
-        // "http://wso2.org/claims/version":"1.2.0","http://wso2.org/claims/tier":"Gold",
-        // "http://wso2.org/claims/enduser":"null"}
-
-        StringBuilder jwtBuilder = new StringBuilder();
-        jwtBuilder.append("{");
-        jwtBuilder.append("\"iss\":\"");
-        jwtBuilder.append(APP_GATEWAY_ID);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"exp\":");
-        jwtBuilder.append(String.valueOf(expireIn));
-        jwtBuilder.append(",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/subscriber\":\"");
-        jwtBuilder.append(subscriber);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/applicationid\":\"");
-        jwtBuilder.append(applicationId);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/applicationname\":\"");
-        jwtBuilder.append(applicationName);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/applicationtier\":\"");
-        jwtBuilder.append(applicationTier);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/apicontext\":\"");
-        jwtBuilder.append(apiContext);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/version\":\"");
-        jwtBuilder.append(version);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/tier\":\"");
-        jwtBuilder.append(tier);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/keytype\":\"");
-        jwtBuilder.append(keyType);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/usertype\":\"");
-        jwtBuilder.append(userType);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/enduser\":\"");
-        jwtBuilder.append(endUserName);
-        jwtBuilder.append("\",");
-
-        jwtBuilder.append("\"");
-        jwtBuilder.append(dialect);
-        jwtBuilder.append("/enduserTenantId\":\"");
-        jwtBuilder.append(enduserTenantId);
-        jwtBuilder.append("\"");
-
-        if(claimsRetriever != null){
-            SortedMap<String,String> claimValues = claimsRetriever.getClaims(endUserName);
-            Iterator<String> it = new TreeSet(claimValues.keySet()).iterator();
-            while(it.hasNext()){
-                String claimURI = it.next();
-                jwtBuilder.append(", \"");
-                jwtBuilder.append(claimURI);
-                jwtBuilder.append("\":\"");
-                jwtBuilder.append(claimValues.get(claimURI));
-                jwtBuilder.append("\"");
-            }
-        }
-
-        jwtBuilder.append("}");
-        jwtBody = jwtBuilder.toString();
-
-      String jwtHeader = null;
-
-      //if signature algo==NONE, header without cert
-      if(signatureAlgorithm.equals(NONE)){
-          jwtHeader = "{\"typ\":\"JWT\"}";
-      } else if (signatureAlgorithm.equals(SHA256_WITH_RSA)){
-          jwtHeader = addCertToHeader(endUserName);
-      }
-
-      /*//add cert thumbprint to header
-      String headerWithCertThumb = addCertToHeader(endUserName);*/
-
-      String base64EncodedHeader = Base64Utils.encode(jwtHeader.getBytes());
-      String base64EncodedBody = Base64Utils.encode(jwtBody.getBytes());
-      if(signatureAlgorithm.equals(SHA256_WITH_RSA)){
-          String assertion = base64EncodedHeader + "." + base64EncodedBody;
-
-            //get the assertion signed
-            byte[] signedAssertion = signJWT(assertion, endUserName);
-
-            if (log.isDebugEnabled()) {
-                log.debug("signed assertion value : " + new String(signedAssertion));
-            }
-            String base64EncodedAssertion = Base64Utils.encode(signedAssertion);
-
-            return base64EncodedHeader + "." + base64EncodedBody + "." + base64EncodedAssertion;
-        } else {
-            return base64EncodedHeader + "." + base64EncodedBody + ".";
-        }
-    }
-
 
     /**
      * Method that generates the JWT token from SAML2 response
      *
      * @param saml2Assertions
-     * @param apiContext
-     * @param version
-     * @return
+     * @param webAppInfoDTO
+     * @param messageContext
+     * @return jwt token
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public String generateToken(Map<String, Object> saml2Assertions, String apiContext, String version) throws
-            AppManagementException {
+    public String generateToken(Map<String, Object> saml2Assertions, WebAppInfoDTO webAppInfoDTO,
+                                MessageContext messageContext) throws AppManagementException {
+
+        String endUserName = (String) saml2Assertions.get(SAMLConstants.SAML2_ASSERTION_SUBJECT);
+        String jwtHeader = buildHeader(endUserName);
 
         String jwtBody = buildBody(saml2Assertions);
 
-        String endUserName = (String) saml2Assertions.get("Subject");
-        String jwtHeader = buildHeader(endUserName);
-
         String base64EncodedHeader = Base64Utils.encode(jwtHeader.getBytes());
         String base64EncodedBody = Base64Utils.encode(jwtBody.getBytes());
+
         if (signatureAlgorithm.equals(SHA256_WITH_RSA)) {
             String assertion = base64EncodedHeader + "." + base64EncodedBody;
-
-            //get the assertion signed
+            /* Get the assertion signed */
             byte[] signedAssertion = signJWT(assertion, endUserName);
 
             if (log.isDebugEnabled()) {
                 log.debug("signed assertion value : " + new String(signedAssertion));
             }
             String base64EncodedAssertion = Base64Utils.encode(signedAssertion);
-
             return base64EncodedHeader + "." + base64EncodedBody + "." + base64EncodedAssertion;
         } else {
             return base64EncodedHeader + "." + base64EncodedBody + ".";
@@ -341,7 +182,13 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     public String buildHeader(String endUserName) throws AppManagementException {
         String jwtHeader = null;
         if (NONE.equals(signatureAlgorithm)) {
-            jwtHeader = "{\"typ\":\"JWT\"}";
+            StringBuilder jwtHeaderBuilder = new StringBuilder();
+            jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
+            jwtHeaderBuilder.append("\"alg\":\"");
+            jwtHeaderBuilder.append(JWTSignatureAlgorithm.NONE.getJwsCompliantCode());
+            jwtHeaderBuilder.append("\"");
+            jwtHeaderBuilder.append("}");
+            jwtHeader = jwtHeaderBuilder.toString();
         } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
             jwtHeader = addCertToHeader(endUserName);
         }
@@ -374,16 +221,14 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         StringBuilder jwtBuilder = new StringBuilder();
         jwtBuilder.append("{");
         if (claims != null) {
-            Iterator<Map.Entry<String, String>> entryIterator = claims.entrySet().iterator();
-            while (entryIterator.hasNext()) {
-                Map.Entry<String, String> entry = entryIterator.next();
+            for (Map.Entry<String, String> entry : claims.entrySet()) {
                 String key = entry.getKey();
-                if("exp".equals(key) || "nbf".equals(key) || "iat".equals(key)) {
-                    //These values should be numbers.
-                    jwtBuilder.append("\"" + key + "\":" + entry.getValue() + ",");
-                }
-                else {
-                    jwtBuilder.append("\"" + key + "\":\"" + entry.getValue() + "\",");
+                String value = entry.getValue();
+                /* These values should be numbers. */
+                if ("exp".equals(key) || "nbf".equals(key) || "iat".equals(key)) {
+                    jwtBuilder.append("\"").append(key).append("\":").append(value).append(",");
+                } else {
+                    jwtBuilder.append("\"").append(key).append("\":\"").append(value).append("\",");
                 }
             }
         }
@@ -397,10 +242,11 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     }
 
     public abstract Map<String, String> populateStandardClaims(Map<String, Object> saml2Assertions)
-            throws AppManagementException ;
+            throws AppManagementException;
+
     public abstract Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
-            throws AppManagementException ;
-    
+            throws AppManagementException;
+
 
     public ClaimsRetriever getClaimsRetriever() {
         return claimsRetriever;
@@ -414,150 +260,223 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @return signed assertion
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private byte[] signJWT(String assertion, String endUserName)
-            throws AppManagementException {
+    private byte[] signJWT(String assertion, String endUserName) throws AppManagementException {
 
+        int tenantId = getTenantId(endUserName);
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
-            int tenantId = getTenantId(endUserName);
+            Key privateKey = getPrivateKey(endUserName);
+            if (privateKey == null) {
+                throw new AppManagementException("Private key is null for tenant " + tenantId);
+            }
+            /* Initialize signature with private key and algorithm */
+            Signature signature = Signature.getInstance(signatureAlgorithm);
+            signature.initSign((PrivateKey) privateKey);
 
-            Key privateKey = null;
+            /* Update signature with data to be signed */
+            byte[] dataInBytes = assertion.getBytes();
+            signature.update(dataInBytes);
 
-            if (!(privateKeys.containsKey(tenantId))) {
-                AppManagerUtil.loadTenantRegistry(tenantId);
-                //get tenant's key store manager
-                KeyStoreManager tenantKSM = KeyStoreManager.getInstance(tenantId);
+            /* Sign the assertion and return the signature */
+            byte[] signedInfo = signature.sign();
+            return signedInfo;
 
-                if(!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)){
-                    //derive key store name
-                    String ksName = tenantDomain.trim().replace(".", "-");
-                    String jksName = ksName + ".jks";
-                    //obtain private key
-                    //TODO: maintain a hash map with tenants' private keys after first initialization
+        } catch (NoSuchAlgorithmException e) {
+            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
+            //do not log
+            throw new AppManagementException(error);
+        } catch (InvalidKeyException e) {
+            String error = "Invalid private key provided for the signature for tenant " +  tenantId;
+            //do not log
+            throw new AppManagementException(error);
+        } catch (SignatureException e) {
+            String error = "Error in signature algorithm " + signatureAlgorithm;
+            //do not log
+            throw new AppManagementException(error, e);
+        } catch (AppManagementException e) {
+            //do not log
+            throw new AppManagementException("Error in obtaining tenant's" + tenantId + "private key", e);
+        }
+    }
+
+    /**
+     * Helper method to get private key for specific tenant.
+     *
+     * @param endUserName
+     * @return private key
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    private Key getPrivateKey(String endUserName) throws AppManagementException {
+
+        String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
+        int tenantId = getTenantId(endUserName);
+        try {
+            Key privateKey = privateKeys.get(tenantId);
+
+            if (privateKey == null) {
+                KeyStoreManager tenantKSM = getKeyStoreManager(tenantId);
+
+                if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+                    /* Derive key store name */
+                    String keyStoreName = tenantDomain.trim().replace(".", "-");
+                    String jksName = keyStoreName + ".jks";
+                    /* Obtain private key */
                     privateKey = tenantKSM.getPrivateKey(jksName, tenantDomain);
-                }else{
-                    try{
+                } else {
+                    try {
                         privateKey = tenantKSM.getDefaultPrivateKey();
-                    }catch (Exception e){
-                        log.error("Error while obtaining private key for super tenant",e);
+                    } catch (Exception e) {
+                        String error = "Error while obtaining private key for super tenant";
+                        log.error(error, e);
+                        throw new AppManagementException(error);
                     }
                 }
                 if (privateKey != null) {
                     privateKeys.put(tenantId, privateKey);
                 }
-            } else {
-                privateKey = privateKeys.get(tenantId);
             }
-
-            //initialize signature with private key and algorithm
-            Signature signature = Signature.getInstance(signatureAlgorithm);
-            signature.initSign((PrivateKey) privateKey);
-
-            //update signature with data to be signed
-            byte[] dataInBytes = assertion.getBytes();
-            signature.update(dataInBytes);
-
-            //sign the assertion and return the signature
-            byte[] signedInfo = signature.sign();
-            return signedInfo;
-
-        } catch (NoSuchAlgorithmException e) {
-            String error = "Signature algorithm not found.";
-            //do not log
-            throw new AppManagementException(error);
-        } catch (InvalidKeyException e) {
-            String error = "Invalid private key provided for the signature";
-            //do not log
-            throw new AppManagementException(error);
-        } catch (SignatureException e) {
-            String error = "Error in signature";
-            //do not log
-            throw new AppManagementException(error);
+            return privateKey;
         } catch (AppManagementException e) {
             //do not log
-            throw new AppManagementException(e.getMessage());
+            throw new AppManagementException("Error in obtaining tenant's" + tenantId + "private key", e);
         }
     }
 
-  /**
+    private KeyStoreManager getKeyStoreManager(int tenantId) throws AppManagementException {
+        try {
+            AppManagerUtil.loadTenantRegistry(tenantId);
+            return KeyStoreManager.getInstance(tenantId);
+        } catch (AppManagementException e) {
+            //do not log
+            throw new AppManagementException("Error in obtaining  key store manager for tenant " + tenantId);
+        }
+    }
+
+    /**
      * Helper method to add public certificate to JWT_HEADER to signature verification.
      *
      * @param endUserName
+     * @return jwt header as a string
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     private String addCertToHeader(String endUserName) throws AppManagementException {
 
+        int tenantId = getTenantId(endUserName);
         try {
-            //get tenant domain
-            String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
-            //get tenantId
-            int tenantId = getTenantId(endUserName);
-            Certificate publicCert = null;
 
-            if (!(publicCerts.containsKey(tenantId))) {
-                //get tenant's key store manager
-                AppManagerUtil.loadTenantRegistry(tenantId);
-                KeyStoreManager tenantKSM = KeyStoreManager.getInstance(tenantId);
+            String base64EncodedThumbPrint = getBase64EncodedThumbPrint(endUserName);
+            if (base64EncodedThumbPrint == null) {
+                log.error("Base64 encoded thumb print is null for tenant : " + tenantId);
+            }
+            StringBuilder jwtHeader = new StringBuilder();
+            jwtHeader.append("{\"typ\":\"JWT\",");
+            jwtHeader.append("\"alg\":\"");
+            jwtHeader.append(SHA256_WITH_RSA.equals(signatureAlgorithm) ?
+                                     JWTSignatureAlgorithm.SHA256_WITH_RSA.getJwsCompliantCode() :
+                                     signatureAlgorithm);
+            jwtHeader.append("\",");
+            jwtHeader.append("\"x5t\":\"");
+            jwtHeader.append(base64EncodedThumbPrint);
+            jwtHeader.append("\"");
+            jwtHeader.append("}");
+            return jwtHeader.toString();
+
+        } catch (Exception e) {
+            String error = "Error in adding tenant's" + tenantId + "public certificate";
+            throw new AppManagementException(error, e);
+        }
+    }
+
+    /**
+     * Helper method to get base 64 encoded thumb print for specific tenant.
+     *
+     * @param endUserName
+     * @return base 64 encoded thumb print
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    private String getBase64EncodedThumbPrint(String endUserName) throws AppManagementException {
+
+        int tenantId = getTenantId(endUserName);
+        try {
+            String base64EncodedThumbPrint =  base64EncodedThumbPrintMap.get(tenantId);
+
+            if (base64EncodedThumbPrint == null) {
+
+                Certificate publicCert = getPublicCertificate(endUserName);
+                if (publicCert == null) {
+                    throw new AppManagementException("Public certificate is null for tenant " + tenantId);
+                }
+                MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
+                byte[] der = publicCert.getEncoded();
+                digestValue.update(der);
+                byte[] digestInBytes = digestValue.digest();
+
+                String publicCertThumbprint = bytesToHex(digestInBytes);
+                base64EncodedThumbPrint = Base64Utils.encode(publicCertThumbprint.getBytes());
+                if (base64EncodedThumbPrint != null) {
+                    base64EncodedThumbPrintMap.put(tenantId, base64EncodedThumbPrint);
+                }
+            }
+            return base64EncodedThumbPrint;
+
+        } catch (CertificateEncodingException e) {
+            String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
+            throw new AppManagementException(error);
+        } catch (NoSuchAlgorithmException e) {
+            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
+            throw new AppManagementException(error);
+        } catch (Exception e) {
+            String error = "Error in obtaining tenant's" + tenantId + "keystore";
+            throw new AppManagementException(error, e);
+        }
+    }
+
+    /**
+     * Helper method to get public certificate for specific tenant.
+     *
+     * @param endUserName
+     * @return public certificate
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    private Certificate getPublicCertificate(String endUserName) throws AppManagementException {
+
+        String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
+        int tenantId = getTenantId(endUserName);
+        try {
+            Certificate publicCert = publicCertificate.get(tenantId);
+
+            if (publicCert == null) {
+                /* Get tenant's key store manager */
+                KeyStoreManager tenantKSM = getKeyStoreManager(tenantId);
 
                 KeyStore keyStore = null;
-                if(!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)){
-                    //derive key store name
+                if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+                    /* Derive key store name */
                     String ksName = tenantDomain.trim().replace(".", "-");
                     String jksName = ksName + ".jks";
                     keyStore = tenantKSM.getKeyStore(jksName);
                     publicCert = keyStore.getCertificate(tenantDomain);
-                }else{
+                } else {
                     keyStore = tenantKSM.getPrimaryKeyStore();
                     publicCert = tenantKSM.getDefaultPrimaryCertificate();
                 }
                 if (publicCert != null) {
-                    publicCerts.put(tenantId, publicCert);
+                    publicCertificate.put(tenantId, publicCert);
                 }
-            } else {
-                publicCert = publicCerts.get(tenantId);
             }
-
-            //generate the SHA-1 thumbprint of the certificate
-            //TODO: maintain a hashmap with tenants' pubkey thumbprints after first initialization
-            MessageDigest digestValue = MessageDigest.getInstance("SHA-1");
-            byte[] der = publicCert.getEncoded();
-            digestValue.update(der);
-            byte[] digestInBytes = digestValue.digest();
-
-            String publicCertThumbprint = hexify(digestInBytes);
-            String base64EncodedThumbPrint = Base64Utils.encode(publicCertThumbprint.getBytes());
-            //String headerWithCertThumb = JWT_HEADER.replaceAll("\\[1\\]", base64EncodedThumbPrint);
-            //headerWithCertThumb = headerWithCertThumb.replaceAll("\\[2\\]", signatureAlgorithm);
-            //return headerWithCertThumb;
-
-            StringBuilder jwtHeader = new StringBuilder();
-            //Sample header
-            //{"typ":"JWT", "alg":"SHA256withRSA", "x5t":"NmJmOGUxMzZlYjM2ZDRhNTZlYTA1YzdhZTRiOWE0NWI2M2JmOTc1ZA=="}
-            //{"typ":"JWT", "alg":"[2]", "x5t":"[1]"}
-            jwtHeader.append("{\"typ\":\"JWT\",");
-            jwtHeader.append("\"alg\":\"");
-            jwtHeader.append(signatureAlgorithm);
-            jwtHeader.append("\",");
-
-            jwtHeader.append("\"x5t\":\"");
-            jwtHeader.append(base64EncodedThumbPrint);
-            jwtHeader.append("\"");
-
-            jwtHeader.append("}");
-            return jwtHeader.toString();
+            return publicCert;
 
         } catch (KeyStoreException e) {
-            String error = "Error in obtaining tenant's keystore";
+            String error = "Error in obtaining tenant's " + tenantId + " keystore";
             throw new AppManagementException(error);
         } catch (CertificateEncodingException e) {
-            String error = "Error in generating public cert thumbprint";
+            String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
             throw new AppManagementException(error);
         } catch (NoSuchAlgorithmException e) {
-            String error = "Error in generating public cert thumbprint";
+            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
             throw new AppManagementException(error);
         } catch (Exception e) {
-            String error = "Error in obtaining tenant's keystore";
-            throw new AppManagementException(error);
+            String error = "Error in obtaining tenant's" + tenantId + "keystore";
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -576,13 +495,13 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             if (ttlValue != null) {
                 ttl = Long.parseLong(ttlValue);
             } else {
-                ttl = 15L;
+                ttl = DEFAULT_TTL;
             }
             return ttl;
         }
     }
 
-  /**
+    /**
      * Helper method to get tenantId from userName
      *
      * @param userName
@@ -590,44 +509,44 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     static int getTenantId(String userName) throws AppManagementException {
-        //get tenant domain from user name
-        String tenantDomain = MultitenantUtils.getTenantDomain(userName);
-        RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+        int tenantId;
+        if (tenantMap.containsKey(userName)) {
+            tenantId = tenantMap.get(userName);
+        } else {
+            String tenantDomain = MultitenantUtils.getTenantDomain(userName);
+            RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
 
-        if(realmService == null){
-            return MultitenantConstants.SUPER_TENANT_ID;
+            if (realmService == null) {
+                tenantId = MultitenantConstants.SUPER_TENANT_ID;
+            } else {
+                try {
+                    tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
+                } catch (UserStoreException e) {
+                    String error = "Error in obtaining tenantId from Domain " + tenantDomain;
+                    //do not log
+                    throw new AppManagementException(error);
+                }
+            }
+            tenantMap.put(userName, tenantId);
         }
-
-        try {
-            int tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
-            return tenantId;
-        } catch (UserStoreException e) {
-            String error = "Error in obtaining tenantId from Domain";
-            //do not log
-            throw new AppManagementException(error);
-        }
+        return tenantId;
     }
 
-  /**
+    /**
      * Helper method to hexify a byte array.
-     * TODO:need to verify the logic
      *
      * @param bytes
-     * @return  hexadecimal representation
+     * @return hexadecimal representation
      */
-    private String hexify(byte bytes[]) {
 
-        char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7',
-                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-        StringBuffer buf = new StringBuffer(bytes.length * 2);
-
-        for (int i = 0; i < bytes.length; ++i) {
-            buf.append(hexDigits[(bytes[i] & 0xf0) >> 4]);
-            buf.append(hexDigits[bytes[i] & 0x0f]);
+    private String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
-
-        return buf.toString();
+        return new String(hexChars);
     }
 
 }

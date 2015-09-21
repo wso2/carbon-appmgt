@@ -37,8 +37,6 @@ import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
-import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.RemoteAuthorizationManager;
@@ -134,27 +132,6 @@ public class AppManagerComponent {
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
-
-            //register JWT implementation class as a OSGi service
-            String tokenGeneratorImplClazz = configuration.getFirstProperty(
-                    AppMConstants.TOKEN_GENERATOR_IMPL);
-            if (tokenGeneratorImplClazz == null) {
-                bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(),
-                                              null);
-            } else {
-                try {
-                    bundleContext.registerService(TokenGenerator.class.getName(),
-                                                  bundleContext.getBundle().loadClass(
-                                                          tokenGeneratorImplClazz).newInstance(),
-                                                  null);
-                } catch (InstantiationException e) {
-                    log.error("Error while instantiating class " + tokenGeneratorImplClazz, e);
-                } catch (IllegalAccessException e) {
-                    log.error(e);
-                } catch (ClassNotFoundException e) {
-                    log.error("Cannot find the class " + tokenGeneratorImplClazz + e);
-                }
-            }
 
             SignupObserver signupObserver = new SignupObserver();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);

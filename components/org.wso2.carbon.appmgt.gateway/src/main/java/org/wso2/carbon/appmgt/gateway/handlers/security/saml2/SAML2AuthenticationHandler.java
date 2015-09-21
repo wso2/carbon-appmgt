@@ -64,12 +64,16 @@ import org.wso2.carbon.appmgt.gateway.handlers.security.Authenticator;
 import org.wso2.carbon.appmgt.gateway.handlers.security.oauth.OAuthAuthenticator;
 import org.wso2.carbon.appmgt.gateway.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.SAMLTokenInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
+import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
+import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.AppContextCacheUtil;
 import org.wso2.carbon.appmgt.impl.utils.NamedMatchList;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
@@ -105,6 +109,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private volatile Authenticator authenticator;
     private volatile SAML2Authenticator saml2Authenticator;
     private volatile WebAppInfoDTO webAppInfoDTO;
+    private static TokenGenerator tokenGenerator = null;
 
     public void init(SynapseEnvironment synapseEnvironment) {
         if (log.isDebugEnabled()) {
@@ -114,6 +119,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         try {
             authenticator = new OAuthAuthenticator();
             saml2Authenticator = new SAML2Authenticator();
+            tokenGenerator = this.getTokenGenerator();
         } catch (Exception e) {
             // Just throw it here - Synapse will handle it
             throw new SynapseException("Error while initializing SAML or OAuth authenticator");
@@ -271,6 +277,26 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
+    public static TokenGenerator getTokenGenerator() {
+        if (tokenGenerator == null) {
+            AppManagerConfiguration configuration= org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            if (configuration == null) {
+                log.error("API Manager configuration is not initialized");
+            } else {
+                if (AppManagerConfiguration.isJWTEnabled()) {
+                    String tokenGeneratorImplClass = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
+                    if (tokenGeneratorImplClass == null) {
+                        tokenGenerator = new JWTGenerator();
+                    } else {
+                        tokenGenerator = (TokenGenerator) PrivilegedCarbonContext.getThreadLocalCarbonContext()
+                                .getOSGiService(TokenGenerator.class);
+                    }
+                }
+            }
+        }
+        return tokenGenerator;
+    }
 
 	/**
      * Check if the Anonymous Access is allowed for the overall app
@@ -649,7 +675,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * @return true if JWT is enabled in App Manager config.
      */
     private boolean isJWTEnabled(){
-        return AppMDAO.isJWTEnabled();
+        return AppManagerConfiguration.isJWTEnabled();
     }
 
     /**
@@ -690,18 +716,16 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * using the passed message context, It's better to pass already extracted SAML attributes for performance's sake.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException when there is an error in generating JWT.
      */
-    private void generateJWTAndAddToTransportHeaders(MessageContext messageContext, Map<String, Object> samlAttributes) throws
-                                                                                                                        AppManagementException {
+    private void generateJWTAndAddToTransportHeaders(MessageContext messageContext, Map<String, Object> samlAttributes,
+                                                     WebAppInfoDTO webAppInfoDTO) throws
+                                                                                  AppManagementException {
 
         String jwtCacheKey = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
 
         // Generate Token and update Cache.
         Cache jwtCache = Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER).getCache(AppMConstants.JWT_CACHE_NAME);
 
-        String webAppContext = (String) messageContext.getProperty(RESTConstants.REST_API_CONTEXT);
-        String webAppVersion = (String) messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
-
-        String jwtToken = AppMDAO.getTokenGenerator().generateToken(samlAttributes, webAppContext, webAppVersion);
+        String jwtToken = this.getTokenGenerator().generateToken(samlAttributes, webAppInfoDTO, messageContext);
         jwtCache.put(jwtCacheKey, jwtToken);
 
         //Add JWT Token into transport headers.
@@ -986,7 +1010,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     return true;
                 } else if (isSubscribed(messageContext)) {  //check for subscription
                     if (isJWTEnabled()) {
-                        generateJWTAndAddToTransportHeaders(messageContext, samlAttributes);
+                        generateJWTAndAddToTransportHeaders(messageContext, samlAttributes, webAppInfoDTO);
 
                     }
                     if (shouldAddSAMLResponseAsTransportHeader()) {

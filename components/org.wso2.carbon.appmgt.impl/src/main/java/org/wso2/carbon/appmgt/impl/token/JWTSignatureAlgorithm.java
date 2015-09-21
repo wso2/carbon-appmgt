@@ -18,17 +18,17 @@
 
 package org.wso2.carbon.appmgt.impl.token;
 
-import org.apache.synapse.MessageContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
+public enum JWTSignatureAlgorithm {
 
-import java.util.Map;
+    SHA256_WITH_RSA("RS256"), NONE("none");
 
-/**
- * This interface can be used to Generate a Token with the invoking user's details.
- */
-public interface TokenGenerator {
-    public String generateToken(Map<String, Object> saml2Assertions, WebAppInfoDTO webAppInfoDTO,
-                                MessageContext messageContext)
-            throws AppManagementException;
+    private String jwsCompliantCode;
+
+    private JWTSignatureAlgorithm(String s){
+        jwsCompliantCode = s;
+    }
+
+    public String getJwsCompliantCode() {
+        return jwsCompliantCode;
+    }
 }

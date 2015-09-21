@@ -16,19 +16,12 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.impl.token;
-
-import org.apache.synapse.MessageContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
-
-import java.util.Map;
+package org.wso2.carbon.appmgt.impl;
 
 /**
- * This interface can be used to Generate a Token with the invoking user's details.
+ * Created by apple on 9/16/15.
  */
-public interface TokenGenerator {
-    public String generateToken(Map<String, Object> saml2Assertions, WebAppInfoDTO webAppInfoDTO,
-                                MessageContext messageContext)
-            throws AppManagementException;
+public class SAMLConstants {
+
+    public static final String SAML2_ASSERTION_SUBJECT = "Subject";
 }

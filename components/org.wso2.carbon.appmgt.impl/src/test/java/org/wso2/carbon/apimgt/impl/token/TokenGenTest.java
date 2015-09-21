@@ -17,12 +17,10 @@
 package org.wso2.carbon.appmgt.impl.token;
 
 import junit.framework.TestCase;
-import org.apache.axiom.util.base64.Base64Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
-import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 //import org.wso2.carbon.appmgt.impl.utils.TokenGenUtil;
 
@@ -37,41 +35,5 @@ public class TokenGenTest extends TestCase {
         config.load(dbConfigPath);
         ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(
                 new AppManagerConfigurationServiceImpl(config));
-    }
-
-    //    TODO: Have to convert to work with new JWT generation and signing
-    public void testJWTGeneration() throws Exception {
-        JWTGenerator jwtGen = new JWTGenerator(false, false);
-        APIKeyValidationInfoDTO dto=new APIKeyValidationInfoDTO();
-        dto.setSubscriber("sastry");
-        dto.setApplicationName("hubapp");
-        dto.setApplicationId("1");
-        dto.setApplicationTier("UNLIMITED");
-        dto.setEndUserName("denis");
-        String token = jwtGen.generateToken(dto, "cricScore", "1.9.0", true);
-        System.out.println("Generated Token: " + token);
-        String header = token.split("\\.")[0];
-        String decodedHeader = new String(Base64Utils.decode(header));
-        System.out.println("Header: "+decodedHeader);
-        String body = token.split("\\.")[1];
-        String decodedBody = new String(Base64Utils.decode(body));
-        System.out.println("Body: " + decodedBody);
-
-        //we can not do assert eaquals because body includes expiration time.
-        
-        /*String expectedHeader = "{\"typ\":\"JWT\"}";
-        String expectedBody = "{\"iss\":\"wso2.org/products/am\", \"exp\":1349270811075, " +
-                              "\"http://wso2.org/claims/subscriber\":\"sastry\", " +
-                              "\"http://wso2.org/claims/applicationname\":\"hubapp\", " +
-                              "\"http://wso2.org/claims/apicontext\":\"cricScore\", " +
-                              "\"http://wso2.org/claims/version\":\"1.9.0\", " +
-                              "\"http://wso2.org/claims/tier\":\"Bronze\", " +
-                              "\"http://wso2.org/claims/enduser\":\"denis\"}";
-
-        Assert.assertEquals(expectedHeader, decodedHeader);
-        Assert.assertEquals(expectedBody, decodedBody);*/
-        //String decodedToken = new String(Base64Utils.decode(token));
-        //log.info(decodedToken);
-        //assertNotNull(decodedToken);
     }
 }
