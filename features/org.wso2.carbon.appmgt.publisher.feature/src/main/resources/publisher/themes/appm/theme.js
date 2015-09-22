@@ -191,7 +191,17 @@ var engine = caramel.engine('handlebars', (function () {
                 }
             });
 
-
+            Handlebars.registerHelper('concatQueryParams', function(separtor, options) {
+                var attributes = [];
+                var queryParamsConcaternator = "";
+                for (var attributeName in options.hash) {
+                    if(options.hash[attributeName] != null) {
+                        queryParamsConcaternator += separtor.concat(attributeName).concat('=')
+                            .concat(options.hash[attributeName]);
+                    }
+                }
+                return queryParamsConcaternator;
+            });
         }
     }
 }()));
