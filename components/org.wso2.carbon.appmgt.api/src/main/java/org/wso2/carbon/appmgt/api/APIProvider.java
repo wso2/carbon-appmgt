@@ -231,16 +231,6 @@ public interface APIProvider extends APIManager {
      */
     public boolean deleteEntitlementPolicyPartial(int policyPartialId, String author) throws
                                                                                      AppManagementException;
-
-    /**
-     * Get the list of policy partials of an given application
-     * @param applicationId
-     * @return list of application policy partials
-     * @throws AppManagementException
-     */
-    public List<EntitlementPolicyPartial> getApplicationPolicyPartialList(int applicationId) throws
-                                                                                             AppManagementException;
-
     /**
      * Get the list of shared policy partials
      *

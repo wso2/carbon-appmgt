@@ -42,11 +42,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         print(response);
     });
 
-    routeManager.register('GET', 'publisher', '/publisher/api/entitlement/policy/partialList/{applicationId}', function (context) {
-        var partialList = getApplicationPolicyPartialList(context.params.applicationId);
-        print(partialList);
-    });
-
     routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/shared/policy/partial/list', function (context) {
         var partialList = getSharedPolicyPartialList();
         print(partialList);
@@ -71,10 +66,6 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('DELETE', 'publisher', '/publisher/api/entitlement/policy/partial/{policyPartial}', function (context) {
         var isSuccess = deleteEntitlementPolicyPartial(context.params.policyPartial);
         print(isSuccess);
-    });
-
-    routeManager.register('DELETE', 'publisher', '/publisher/api/entitlement/policy/app/partial/{applicationId}/{partialId}', function (context) {
-        deleteApplicationPolicyPartialMapping(context.params.applicationId, context.params.partialId);
     });
 
      routeManager.register('POST', 'publisher', '/publisher/api/entitlement/partials', function (context) {
@@ -151,14 +142,6 @@ require('/modules/publisher.js').exec(function(ctx) {
        return apiProvider.getWebAppId(uuid);
     }
 
-
-    /**
-    * Get the list of policy partials of a given application
-    */
-    function getApplicationPolicyPartialList(applicationId){
-        return apiProvider.getApplicationPolicyPartialList(applicationId);
-    }
-
     /**
      * Get the list of Policy Groups for a given application Id
      * @param applicationId : Application Id
@@ -188,13 +171,6 @@ require('/modules/publisher.js').exec(function(ctx) {
     function saveApplicationPolicyPartialMapping(applicationId,partialIdList){
         apiProvider.saveApplicationPolicyPartialMapping(applicationId,partialIdList);
 
-    }
-
-    /**
-    * Delete the application-policy partial mapping
-    */
-    function deleteApplicationPolicyPartialMapping(applicationId,policyPartialId){
-       apiProvider.deleteApplicationPolicyPartialMapping(applicationId,policyPartialId);
     }
 
     /**

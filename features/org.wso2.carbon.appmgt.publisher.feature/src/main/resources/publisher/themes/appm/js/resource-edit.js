@@ -306,30 +306,6 @@ function loadPolicyGroupData(uuid) {
         async: false,
         contentType: 'application/json',
         success: function (id) {
-            //get partials of web app
-            $.ajax({
-                url: '/publisher/api/entitlement/policy/partialList/' + id,
-                type: 'GET',
-                contentType: 'application/json',
-                dataType: 'json',
-                async: false,
-                success: function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var obj = {
-                            id: data[i].partialId,
-                            policyPartialName: data[i].partialName,
-                            policyPartial: data[i].partialContent,
-                            isShared: data[i].isShared,
-                            author: data[i].author
-                        };
-                        // avoid duplicating shared partials
-                        if (!obj.isShared) {
-                            policyPartialsArray.push(obj);
-                        }
-                    }
-                }
-            });
-
             // get the entitlement policy groups
             $.ajax({
                 url: '/publisher/api/entitlement/get/policy/Group/by/appId/' + id,
@@ -352,7 +328,6 @@ function loadPolicyGroupData(uuid) {
                     updatePolicyGroupPartial(policyGroupsArray);
                 }
             });
-
         }
     });
 }

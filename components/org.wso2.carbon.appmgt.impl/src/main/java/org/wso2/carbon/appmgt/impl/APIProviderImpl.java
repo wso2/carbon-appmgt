@@ -508,12 +508,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public List<EntitlementPolicyPartial> getApplicationPolicyPartialList(int applicationId) throws
-                                                                                             AppManagementException {
-        return appMDAO.getApplicationsEntitlementPolicyPartialsList(applicationId);
-    }
-
-    @Override
     public List<EntitlementPolicyPartial> getSharedPolicyPartialsList() throws
                                                                         AppManagementException {
         return appMDAO.getSharedEntitlementPolicyPartialsList(tenantId);
