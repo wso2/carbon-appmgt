@@ -63,7 +63,7 @@ var type;
             }
 
 
-            if(type === "mobileapp"){
+            if((type === "webapp") || (type === "mobileapp")) {
                 path = pages + 'subscriptions.jag';
 
                 if (suffix === 'process') {
