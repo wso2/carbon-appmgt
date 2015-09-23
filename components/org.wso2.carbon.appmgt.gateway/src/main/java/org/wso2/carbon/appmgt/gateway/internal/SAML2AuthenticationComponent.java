@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @scr.component name="org.wso2.appmgt.impl.services.gateway.saml.authentication.component" immediate="true"
  * @scr.reference name="app.manager.jwt.token,generator"
- * interface="org.wso2.carbon.appmgt.impl.token.TokenGenerator" cardinality="1..1"
+ * interface="org.wso2.carbon.appmgt.impl.token.TokenGenerator" cardinality="1..n"
  * policy="dynamic" bind="setTokenGenerator" unbind="unsetTokenGenerator"
  * @scr.reference name="app.manager.config.service"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
