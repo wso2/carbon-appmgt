@@ -23,10 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.SAMLConstants;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -145,15 +145,15 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     }
 
     /**
-     * Method that generates the JWT token from SAML2 response
+     * Method that generates the JWT token from SAML2 response.
      *
      * @param saml2Assertions
-     * @param webAppInfoDTO
+     * @param webApp
      * @param messageContext
      * @return jwt token
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public String generateToken(Map<String, Object> saml2Assertions, WebAppInfoDTO webAppInfoDTO,
+    public String generateToken(Map<String, Object> saml2Assertions, WebApp webApp,
                                 MessageContext messageContext) throws AppManagementException {
 
         String endUserName = (String) saml2Assertions.get(SAMLConstants.SAML2_ASSERTION_SUBJECT);
@@ -180,25 +180,26 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
     }
 
     public String buildHeader(String endUserName) throws AppManagementException {
-        String jwtHeader = null;
+        //TODO: https://wso2.org/jira/browse/APPM-1060
+        StringBuilder jwtHeaderBuilder = new StringBuilder();
+        jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
+        jwtHeaderBuilder.append("\"alg\":\"");
+
         if (NONE.equals(signatureAlgorithm)) {
-            StringBuilder jwtHeaderBuilder = new StringBuilder();
-            jwtHeaderBuilder.append("{\"typ\":\"JWT\",");
-            jwtHeaderBuilder.append("\"alg\":\"");
             jwtHeaderBuilder.append(JWTSignatureAlgorithm.NONE.getJwsCompliantCode());
             jwtHeaderBuilder.append("\"");
-            jwtHeaderBuilder.append("}");
-            jwtHeader = jwtHeaderBuilder.toString();
         } else if (SHA256_WITH_RSA.equals(signatureAlgorithm)) {
-            jwtHeader = addCertToHeader(endUserName);
+            jwtHeaderBuilder.append(JWTSignatureAlgorithm.SHA256_WITH_RSA.getJwsCompliantCode());
+            jwtHeaderBuilder.append("\",");
+            jwtHeaderBuilder.append(addThumbPrintToHeader(endUserName));
         }
-        return jwtHeader;
+
+        jwtHeaderBuilder.append("}");
+        return jwtHeaderBuilder.toString();
     }
 
     public String buildBody(Map<String, Object> saml2Assertions) throws AppManagementException {
-
         StringBuilder jwtBuilder = new StringBuilder();
-
         /* Populate claims from SAML Assertion if "AddClaimsSelectively" property is set to true,
          else add all claims values available in user profile */
         if (addClaimsSelectively) {
@@ -212,12 +213,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 jwtBuilder.append(buildJWTBody(customClaims));
             }
         }
-
         return jwtBuilder.toString();
     }
 
     private String buildJWTBody(Map<String, String> claims) {
-
         StringBuilder jwtBuilder = new StringBuilder();
         jwtBuilder.append("{");
         if (claims != null) {
@@ -261,10 +260,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     private byte[] signJWT(String assertion, String endUserName) throws AppManagementException {
-
         int tenantId = getTenantId(endUserName);
         try {
-            Key privateKey = getPrivateKey(endUserName);
+            Key privateKey = getPrivateKey(endUserName, tenantId);
             if (privateKey == null) {
                 throw new AppManagementException("Private key is null for tenant " + tenantId);
             }
@@ -279,22 +277,22 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             /* Sign the assertion and return the signature */
             byte[] signedInfo = signature.sign();
             return signedInfo;
-
         } catch (NoSuchAlgorithmException e) {
             String error = "Signature algorithm " + signatureAlgorithm + "not found.";
-            //do not log
+            log.error(error);
             throw new AppManagementException(error);
         } catch (InvalidKeyException e) {
             String error = "Invalid private key provided for the signature for tenant " +  tenantId;
-            //do not log
+            log.error(error);
             throw new AppManagementException(error);
         } catch (SignatureException e) {
             String error = "Error in signature algorithm " + signatureAlgorithm;
-            //do not log
-            throw new AppManagementException(error, e);
+            log.error(error);
+            throw new AppManagementException(error);
         } catch (AppManagementException e) {
-            //do not log
-            throw new AppManagementException("Error in obtaining tenant's" + tenantId + "private key", e);
+            String error = "Error in obtaining tenant's" + tenantId + "private key";
+            log.error(error);
+            throw new AppManagementException(error);
         }
     }
 
@@ -302,16 +300,15 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Helper method to get private key for specific tenant.
      *
      * @param endUserName
+     * @param tenantId
      * @return private key
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private Key getPrivateKey(String endUserName) throws AppManagementException {
+    private Key getPrivateKey(String endUserName, int tenantId) throws AppManagementException {
 
         String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
-        int tenantId = getTenantId(endUserName);
         try {
             Key privateKey = privateKeys.get(tenantId);
-
             if (privateKey == null) {
                 KeyStoreManager tenantKSM = getKeyStoreManager(tenantId);
 
@@ -336,8 +333,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             }
             return privateKey;
         } catch (AppManagementException e) {
-            //do not log
-            throw new AppManagementException("Error in obtaining tenant's" + tenantId + "private key", e);
+            String error = "Error in obtaining tenant's" + tenantId + "private key";
+            log.error(error);
+            throw new AppManagementException(error);
         }
     }
 
@@ -346,8 +344,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             AppManagerUtil.loadTenantRegistry(tenantId);
             return KeyStoreManager.getInstance(tenantId);
         } catch (AppManagementException e) {
-            //do not log
-            throw new AppManagementException("Error in obtaining  key store manager for tenant " + tenantId);
+            String error = "Error in obtaining  key store manager for tenant " + tenantId;
+            log.error(error);
+            throw new AppManagementException(error);
         }
     }
 
@@ -358,31 +357,21 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @return jwt header as a string
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private String addCertToHeader(String endUserName) throws AppManagementException {
-
+    private String addThumbPrintToHeader(String endUserName) throws AppManagementException {
         int tenantId = getTenantId(endUserName);
         try {
-
-            String base64EncodedThumbPrint = getBase64EncodedThumbPrint(endUserName);
+            StringBuilder jwtHeader = new StringBuilder();
+            String base64EncodedThumbPrint = getBase64EncodedThumbPrint(endUserName, tenantId);
             if (base64EncodedThumbPrint == null) {
                 log.error("Base64 encoded thumb print is null for tenant : " + tenantId);
             }
-            StringBuilder jwtHeader = new StringBuilder();
-            jwtHeader.append("{\"typ\":\"JWT\",");
-            jwtHeader.append("\"alg\":\"");
-            jwtHeader.append(SHA256_WITH_RSA.equals(signatureAlgorithm) ?
-                                     JWTSignatureAlgorithm.SHA256_WITH_RSA.getJwsCompliantCode() :
-                                     signatureAlgorithm);
-            jwtHeader.append("\",");
             jwtHeader.append("\"x5t\":\"");
             jwtHeader.append(base64EncodedThumbPrint);
             jwtHeader.append("\"");
-            jwtHeader.append("}");
             return jwtHeader.toString();
-
         } catch (Exception e) {
             String error = "Error in adding tenant's" + tenantId + "public certificate";
-            throw new AppManagementException(error, e);
+            throw new AppManagementException(error);
         }
     }
 
@@ -390,18 +379,16 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Helper method to get base 64 encoded thumb print for specific tenant.
      *
      * @param endUserName
+     * @param tenantId
      * @return base 64 encoded thumb print
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private String getBase64EncodedThumbPrint(String endUserName) throws AppManagementException {
-
-        int tenantId = getTenantId(endUserName);
+    private String getBase64EncodedThumbPrint(String endUserName, int tenantId) throws AppManagementException {
         try {
             String base64EncodedThumbPrint =  base64EncodedThumbPrintMap.get(tenantId);
-
             if (base64EncodedThumbPrint == null) {
-
-                Certificate publicCert = getPublicCertificate(endUserName);
+                //TODO: https://wso2.org/jira/browse/APPM-1061
+                Certificate publicCert = getPublicCertificate(endUserName, tenantId);
                 if (publicCert == null) {
                     throw new AppManagementException("Public certificate is null for tenant " + tenantId);
                 }
@@ -417,7 +404,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 }
             }
             return base64EncodedThumbPrint;
-
         } catch (CertificateEncodingException e) {
             String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
             throw new AppManagementException(error);
@@ -434,20 +420,18 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * Helper method to get public certificate for specific tenant.
      *
      * @param endUserName
+     * @param tenantId
      * @return public certificate
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private Certificate getPublicCertificate(String endUserName) throws AppManagementException {
-
+    private Certificate getPublicCertificate(String endUserName, int tenantId) throws AppManagementException {
         String tenantDomain = MultitenantUtils.getTenantDomain(endUserName);
-        int tenantId = getTenantId(endUserName);
         try {
             Certificate publicCert = publicCertificate.get(tenantId);
 
             if (publicCert == null) {
                 /* Get tenant's key store manager */
                 KeyStoreManager tenantKSM = getKeyStoreManager(tenantId);
-
                 KeyStore keyStore = null;
                 if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
                     /* Derive key store name */
@@ -456,7 +440,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     keyStore = tenantKSM.getKeyStore(jksName);
                     publicCert = keyStore.getCertificate(tenantDomain);
                 } else {
-                    keyStore = tenantKSM.getPrimaryKeyStore();
                     publicCert = tenantKSM.getDefaultPrimaryCertificate();
                 }
                 if (publicCert != null) {
@@ -464,7 +447,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 }
             }
             return publicCert;
-
         } catch (KeyStoreException e) {
             String error = "Error in obtaining tenant's " + tenantId + " keystore";
             throw new AppManagementException(error);
@@ -508,7 +490,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @return tenantId
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    static int getTenantId(String userName) throws AppManagementException {
+    protected int getTenantId(String userName) throws AppManagementException {
         int tenantId;
         if (tenantMap.containsKey(userName)) {
             tenantId = tenantMap.get(userName);
@@ -523,7 +505,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
                 } catch (UserStoreException e) {
                     String error = "Error in obtaining tenantId from Domain " + tenantDomain;
-                    //do not log
+                    log.error(error);
                     throw new AppManagementException(error);
                 }
             }
@@ -538,7 +520,6 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
      * @param bytes
      * @return hexadecimal representation
      */
-
     private String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {

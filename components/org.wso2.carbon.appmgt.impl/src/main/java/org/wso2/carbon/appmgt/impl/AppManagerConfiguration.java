@@ -27,7 +27,6 @@ import org.wso2.carbon.appmgt.api.model.APIStore;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorConstants;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.securevault.SecretResolver;
 import org.wso2.securevault.SecretResolverFactory;
 
@@ -112,16 +111,8 @@ public class AppManagerConfiguration {
      * Checks whether JWT is enabled in App Manager config.
      * @return true if JWT is enabled in App Manager config.
      */
-    public static boolean isJWTEnabled(){
-        AppManagerConfiguration configuration= ServiceReferenceHolder.getInstance()
-                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        if (configuration == null) {
-            log.error("API Manager configuration is not initialized");
-        } else {
-            return Boolean.parseBoolean(configuration.getFirstProperty(
-                    AppMConstants.ENABLE_JWT_GENERATION));
-        }
-        return false;
+    public boolean isJWTEnabled() {
+        return Boolean.parseBoolean(getFirstProperty(AppMConstants.ENABLE_JWT_GENERATION));
     }
 
     public String getFirstProperty(String key) {

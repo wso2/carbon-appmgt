@@ -20,7 +20,7 @@ package org.wso2.carbon.appmgt.impl.token;
 
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 
 import java.util.Map;
 
@@ -28,7 +28,6 @@ import java.util.Map;
  * This interface can be used to Generate a Token with the invoking user's details.
  */
 public interface TokenGenerator {
-    public String generateToken(Map<String, Object> saml2Assertions, WebAppInfoDTO webAppInfoDTO,
-                                MessageContext messageContext)
+    public String generateToken(Map<String, Object> saml2Assertions, WebApp webApp, MessageContext messageContext)
             throws AppManagementException;
 }

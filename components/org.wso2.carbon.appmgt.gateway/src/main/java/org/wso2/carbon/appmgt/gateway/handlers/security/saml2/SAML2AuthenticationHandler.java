@@ -31,7 +31,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.apache.synapse.*;
+import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.Mediator;
+import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
@@ -46,8 +50,29 @@ import org.json.simple.JSONValue;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.*;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
+import org.opensaml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;
+import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.Issuer;
+import org.opensaml.saml2.core.LogoutRequest;
+import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml2.core.NameIDPolicy;
+import org.opensaml.saml2.core.RequestAbstractType;
+import org.opensaml.saml2.core.RequestedAuthnContext;
+import org.opensaml.saml2.core.Response;
+import org.opensaml.saml2.core.SessionIndex;
+import org.opensaml.saml2.core.impl.AuthnContextClassRefBuilder;
+import org.opensaml.saml2.core.impl.AuthnRequestBuilder;
+import org.opensaml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.saml2.core.impl.LogoutRequestBuilder;
+import org.opensaml.saml2.core.impl.NameIDBuilder;
+import org.opensaml.saml2.core.impl.NameIDPolicyBuilder;
+import org.opensaml.saml2.core.impl.RequestedAuthnContextBuilder;
+import org.opensaml.saml2.core.impl.SessionIndexBuilder;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Marshaller;
@@ -57,6 +82,7 @@ import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Element;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityConstants;
 import org.wso2.carbon.appmgt.gateway.handlers.security.APISecurityException;
@@ -73,7 +99,6 @@ import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
 import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.AppContextCacheUtil;
 import org.wso2.carbon.appmgt.impl.utils.NamedMatchList;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
 
@@ -86,7 +111,13 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -106,10 +137,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     // Names of the attributes which IDP sends back containing the relay state
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
 
-    private volatile Authenticator authenticator;
-    private volatile SAML2Authenticator saml2Authenticator;
-    private volatile WebAppInfoDTO webAppInfoDTO;
-    private static TokenGenerator tokenGenerator = null;
+    private Authenticator authenticator;
+    private SAML2Authenticator saml2Authenticator;
+    private WebAppInfoDTO webAppInfoDTO;
+    private WebApp webApp;
+    private boolean isJWTEnabled = false;
+    private TokenGenerator defaultTokenGenerator;
 
     public void init(SynapseEnvironment synapseEnvironment) {
         if (log.isDebugEnabled()) {
@@ -119,7 +152,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         try {
             authenticator = new OAuthAuthenticator();
             saml2Authenticator = new SAML2Authenticator();
-            tokenGenerator = this.getTokenGenerator();
+            webApp = new WebApp();
+            initJWTCapabilities();
         } catch (Exception e) {
             // Just throw it here - Synapse will handle it
             throw new SynapseException("Error while initializing SAML or OAuth authenticator");
@@ -130,6 +164,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
         authenticator.init(synapseEnvironment);
         saml2Authenticator.init(synapseEnvironment);
+        defaultTokenGenerator = new JWTGenerator();
     }
 
 
@@ -163,6 +198,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 WebAppInfoDTO webAppInfoDTO = getSSOInfoForApp(webAppContext, webAppVersion);
                 constructAndSetFullyQualifiedSamlIssuerId(messageContext, webAppInfoDTO);
                 this.webAppInfoDTO = webAppInfoDTO;
+                populateWebAppFromWebAppInfoDTO();
             }
 
             // If this is an SLO request we need to respond to the client (IDP) without continuing the flow. 
@@ -258,7 +294,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 		setAppmSamlSsoCookie(messageContext);
                 	}else{
                 		handleAuthFailure(messageContext,
-                				new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to this Resource"));
+                				new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN, "You have no access to" +
+                                        " this Resource"));
                 		return false;
                 	}
                     
@@ -277,25 +314,25 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
-    public static TokenGenerator getTokenGenerator() {
-        if (tokenGenerator == null) {
-            AppManagerConfiguration configuration= org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
-                    .getAPIManagerConfigurationService().getAPIManagerConfiguration();
-            if (configuration == null) {
-                log.error("API Manager configuration is not initialized");
-            } else {
-                if (AppManagerConfiguration.isJWTEnabled()) {
-                    String tokenGeneratorImplClass = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
-                    if (tokenGeneratorImplClass == null) {
-                        tokenGenerator = new JWTGenerator();
-                    } else {
-                        tokenGenerator = (TokenGenerator) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-                                .getOSGiService(TokenGenerator.class);
-                    }
-                }
-            }
+    private void populateWebAppFromWebAppInfoDTO(){
+        if (webAppInfoDTO != null) {
+            webApp.setContext(webAppInfoDTO.getContext());
+            webApp.setAllowAnonymous(webAppInfoDTO.getAllowAnonymous());
+            webApp.setSaml2SsoIssuer(webAppInfoDTO.getSaml2SsoIssuer());
+            webApp.setIdpProviderURL(webAppInfoDTO.getIdpProviderUrl());
+            webApp.setLogoutURL(webAppInfoDTO.getLogoutUrl());
+            //TODO: Set all the properties in WebApp object.
         }
-        return tokenGenerator;
+    }
+
+    private void initJWTCapabilities() {
+        AppManagerConfiguration configuration = org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.
+                getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        if (configuration == null) {
+            log.error("App Manager configuration is not initialized");
+        } else {
+            isJWTEnabled = configuration.isJWTEnabled();
+        }
     }
 
 	/**
@@ -671,14 +708,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     }
 
     /**
-     * Checks whether JWT is enabled in App Manager config.
-     * @return true if JWT is enabled in App Manager config.
-     */
-    private boolean isJWTEnabled(){
-        return AppManagerConfiguration.isJWTEnabled();
-    }
-
-    /**
      * Checks whether the signed in user is subscribed to the requested app.
      * @param messageContext
      * @return true if the signed in user is subscribed to the requested app.
@@ -713,19 +742,20 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
      * Generate, caches and add the JWT to transport headers.
      * @param messageContext
      * @param samlAttributes SAML attributes extracted from the SAML response. Even though it can be extracted again
-     * using the passed message context, It's better to pass already extracted SAML attributes for performance's sake.
+     *                       using the passed message context, It's better to pass already extracted SAML attributes
+     *                       for performance's sake.
      * @throws org.wso2.carbon.appmgt.api.AppManagementException when there is an error in generating JWT.
      */
     private void generateJWTAndAddToTransportHeaders(MessageContext messageContext, Map<String, Object> samlAttributes,
-                                                     WebAppInfoDTO webAppInfoDTO) throws
-                                                                                  AppManagementException {
+                                                     WebApp webApp) throws AppManagementException {
 
         String jwtCacheKey = (String) messageContext.getProperty(AppMConstants.APPM_SAML2_COOKIE);
 
         // Generate Token and update Cache.
-        Cache jwtCache = Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER).getCache(AppMConstants.JWT_CACHE_NAME);
+        Cache jwtCache = Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER).getCache(
+                AppMConstants.JWT_CACHE_NAME);
 
-        String jwtToken = this.getTokenGenerator().generateToken(samlAttributes, webAppInfoDTO, messageContext);
+        String jwtToken = getTokenGenerator().generateToken(samlAttributes, webApp, messageContext);
         jwtCache.put(jwtCacheKey, jwtToken);
 
         //Add JWT Token into transport headers.
@@ -771,7 +801,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     //TODO: check the expiration time
 
                     //TODO: Handle if JWT Cache expires while saml2Cookie active
-                    if (isJWTEnabled()) { //JWT has enabled
+                    if (isJWTEnabled) { //JWT has enabled
                         addCachedJWTToTransportHeaders(messageContext);
                     }
 
@@ -1009,9 +1039,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     handleLogoutRequest(messageContext);
                     return true;
                 } else if (isSubscribed(messageContext)) {  //check for subscription
-                    if (isJWTEnabled()) {
-                        generateJWTAndAddToTransportHeaders(messageContext, samlAttributes, webAppInfoDTO);
-
+                    if (isJWTEnabled) {
+                        generateJWTAndAddToTransportHeaders(messageContext, samlAttributes, webApp);
                     }
                     if (shouldAddSAMLResponseAsTransportHeader()) {
                         headers.put("AppMgtSAML2Response", samlResponse);
@@ -1660,4 +1689,15 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         messageContext.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
     }
 
+    /**
+     * Returns the registered Token Generator. Returns the default one if not registered with ServiceReferenceHolder
+     * @return an instance of TokenGenerator
+     */
+    private TokenGenerator getTokenGenerator() {
+        TokenGenerator tokenGeneratorFromService = ServiceReferenceHolder.getInstance().getTokenGenerator();
+        if(tokenGeneratorFromService != null) {
+            return tokenGeneratorFromService;
+        }
+        return defaultTokenGenerator;
+    }
 }

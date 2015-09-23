@@ -22,8 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
@@ -31,44 +29,26 @@ import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 
 /**
  *
- * Application manager gateway component
+ * Registers the default token generator. This is the internal JWT generator.
  *
  * @scr.component name="org.wso2.appmgt.impl.services.gateway.tokenGenerator" immediate="true"
- * @scr.reference name="api.manager.config.service"
- * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
- * policy="dynamic" bind="setAPIManagerConfigurationService" unbind="unsetAPIManagerConfigurationService"
+ * @scr.reference name="app.manager.config.service"
+ * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService"
+ * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
  */
-public class TokenGeneratorRegisterGatewayComponent {
+public class TokenGeneratorRegistrationComponent {
 
-    private static final Log log = LogFactory.getLog(TokenGeneratorRegisterGatewayComponent.class);
+    private static final Log log = LogFactory.getLog(TokenGeneratorRegistrationComponent.class);
 
     private static AppManagerConfiguration configuration = null;
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Gateway token generator register component activated");
+            log.debug("Gateway token generator registration component activated");
         }
-
         BundleContext bundleContext = componentContext.getBundleContext();
-
         //register JWT implementation class as a OSGi service
-        String tokenGeneratorImplClazz = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
-        if (tokenGeneratorImplClazz == null) {
-            bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(),null);
-        } else {
-            try {
-                bundleContext.registerService(TokenGenerator.class.getName(),
-                                              bundleContext.getBundle().loadClass(tokenGeneratorImplClazz).newInstance(),
-                                              null);
-            } catch (InstantiationException e) {
-                log.error("Error while instantiating class " + tokenGeneratorImplClazz, e);
-            } catch (IllegalAccessException e) {
-                log.error(e);
-            } catch (ClassNotFoundException e) {
-                log.error("Cannot find the class " + tokenGeneratorImplClazz + e);
-                throw new AppManagementException("Cannot find the class " + tokenGeneratorImplClazz);
-            }
-        }
+        bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(),null);
     }
 
     protected void deactivate(ComponentContext componentContext) {
@@ -77,19 +57,22 @@ public class TokenGeneratorRegisterGatewayComponent {
         }
     }
 
-    protected void setAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
+    protected void setAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
             log.debug("Gateway manager configuration service bound to the WebApp host objects");
         }
         configuration = amcService.getAPIManagerConfiguration();
-        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
+        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
+                .setAPIManagerConfigurationService(amcService);
     }
 
-    protected void unsetAPIManagerConfigurationService(AppManagerConfigurationService amcService) {
+    protected void unsetAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
             log.debug("Gateway manager configuration service unbound from the WebApp host objects");
         }
         configuration = null;
-        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+        org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder.getInstance()
+                .setAPIManagerConfigurationService(null);
     }
+
 }

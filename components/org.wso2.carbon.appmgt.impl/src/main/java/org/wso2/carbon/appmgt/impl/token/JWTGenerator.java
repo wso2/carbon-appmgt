@@ -56,7 +56,8 @@ public class JWTGenerator extends AbstractJWTGenerator{
     public Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = setJWTIssAndExp();
+        Map<String, String> claims = new LinkedHashMap<String, String> ();
+        populateIssuerAndExpiry(claims);
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
             String userName = (String) saml2Assertions.get("Subject");
@@ -66,46 +67,42 @@ public class JWTGenerator extends AbstractJWTGenerator{
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService()
                         .getTenantManager().getTenantId(tenantDomain);
-
                 if (MultitenantConstants.SUPER_TENANT_ID == tenantId) {
                     tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
                 }
-
                 claims.put("sub", userName);
                 claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
-
                 return claims;
             } catch (UserStoreException e) {
                 log.error("Error while getting tenant id to populate claims ", e);
                 throw new AppManagementException("Error while getting tenant id to populate claims ", e);
             }
         }
-
         return null;
     }
 
     public Map<String, String> populateStandardClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = setJWTIssAndExp();
-        Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
-        while (it.hasNext()) {
-            String assertionAttribute = it.next();
-            claims.put(assertionAttribute, saml2Assertions.get(assertionAttribute).toString());
-        }
-
+        Map<String, String> claims = new LinkedHashMap<String, String> ();
+        populateIssuerAndExpiry(claims);
+        populateSaml2Assertions(claims, saml2Assertions);
         return claims;
     }
 
-    private Map<String, String> setJWTIssAndExp() {
-        Map<String, String> claims = new LinkedHashMap<String, String> ();
-
+    private void populateIssuerAndExpiry(Map<String, String> claims) {
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long expireIn = currentTime + 1000 * 60 * getTTL();
 
         claims.put("iss", APP_GATEWAY_ID);
         claims.put("exp", String.valueOf(expireIn));
+    }
 
-        return claims;
+    private void populateSaml2Assertions(Map<String, String> claims, Map<String, Object> saml2Assertions) {
+        Iterator<String> it = new TreeSet(saml2Assertions.keySet()).iterator();
+        while (it.hasNext()) {
+            String assertionAttribute = it.next();
+            claims.put(assertionAttribute, saml2Assertions.get(assertionAttribute).toString());
+        }
     }
 }
