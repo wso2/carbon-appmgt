@@ -35,6 +35,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -46,6 +47,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,26 +83,14 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
     private boolean enableSigning = true;
 
-    private boolean saml2Enabled = true;
-
     private boolean addClaimsSelectively = false;
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    private static ConcurrentHashMap<Integer, Key> privateKeys = new ConcurrentHashMap<Integer, Key>();
-    private static ConcurrentHashMap<Integer, Certificate> publicCertificate
-            = new ConcurrentHashMap<Integer, Certificate>();
-    private static ConcurrentHashMap<Integer, String> base64EncodedThumbPrintMap
-            = new ConcurrentHashMap<Integer, String>();
-    private static ConcurrentHashMap<String, Integer> tenantMap
-            = new ConcurrentHashMap<String, Integer>();
-
-    //constructor for testing purposes
-    public AbstractJWTGenerator(boolean includeClaims, boolean enableSigning) {
-        this.includeClaims = includeClaims;
-        this.enableSigning = enableSigning;
-        signatureAlgorithm = NONE;
-    }
+    private Map<Integer, Key> privateKeys = new HashMap<Integer, Key>();
+    private Map<Integer, Certificate> publicCertificate = new HashMap<Integer, Certificate>();
+    private Map<Integer, String> base64EncodedThumbPrintMap = new HashMap<Integer, String>();
+    private Map<String, Integer> tenantMap = new ConcurrentHashMap<String, Integer>();
 
     /**
      * Reads the ClaimsRetrieverImplClass from app-manager.xml ->
@@ -119,6 +109,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
         }
         if (claimsRetrieverImplClass != null) {
             try {
+                //TODO: Remove Class.forName
                 claimsRetriever = (ClaimsRetriever) Class.forName(claimsRetrieverImplClass).newInstance();
                 claimsRetriever.init();
             } catch (ClassNotFoundException e) {
@@ -161,8 +152,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
 
         String jwtBody = buildBody(saml2Assertions);
 
-        String base64EncodedHeader = Base64Utils.encode(jwtHeader.getBytes());
-        String base64EncodedBody = Base64Utils.encode(jwtBody.getBytes());
+        String base64EncodedHeader = Base64Utils.encode(jwtHeader.getBytes(StandardCharsets.UTF_8));
+        String base64EncodedBody = Base64Utils.encode(jwtBody.getBytes(StandardCharsets.UTF_8));
 
         if (signatureAlgorithm.equals(SHA256_WITH_RSA)) {
             String assertion = base64EncodedHeader + "." + base64EncodedBody;
@@ -170,7 +161,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             byte[] signedAssertion = signJWT(assertion, endUserName);
 
             if (log.isDebugEnabled()) {
-                log.debug("signed assertion value : " + new String(signedAssertion));
+                log.debug("signed assertion value : " + new String(signedAssertion, StandardCharsets.UTF_8));
             }
             String base64EncodedAssertion = Base64Utils.encode(signedAssertion);
             return base64EncodedHeader + "." + base64EncodedBody + "." + base64EncodedAssertion;
@@ -271,7 +262,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             signature.initSign((PrivateKey) privateKey);
 
             /* Update signature with data to be signed */
-            byte[] dataInBytes = assertion.getBytes();
+            byte[] dataInBytes = assertion.getBytes(StandardCharsets.UTF_8);
             signature.update(dataInBytes);
 
             /* Sign the assertion and return the signature */
@@ -279,20 +270,20 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             return signedInfo;
         } catch (NoSuchAlgorithmException e) {
             String error = "Signature algorithm " + signatureAlgorithm + "not found.";
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         } catch (InvalidKeyException e) {
             String error = "Invalid private key provided for the signature for tenant " +  tenantId;
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         } catch (SignatureException e) {
             String error = "Error in signature algorithm " + signatureAlgorithm;
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         } catch (AppManagementException e) {
             String error = "Error in obtaining tenant's" + tenantId + "private key";
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -334,8 +325,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             return privateKey;
         } catch (AppManagementException e) {
             String error = "Error in obtaining tenant's" + tenantId + "private key";
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -345,8 +336,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             return KeyStoreManager.getInstance(tenantId);
         } catch (AppManagementException e) {
             String error = "Error in obtaining  key store manager for tenant " + tenantId;
-            log.error(error);
-            throw new AppManagementException(error);
+            log.error(error, e);
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -398,7 +389,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                 byte[] digestInBytes = digestValue.digest();
 
                 String publicCertThumbprint = bytesToHex(digestInBytes);
-                base64EncodedThumbPrint = Base64Utils.encode(publicCertThumbprint.getBytes());
+                base64EncodedThumbPrint = Base64Utils.encode(publicCertThumbprint.getBytes(StandardCharsets.UTF_8));
                 if (base64EncodedThumbPrint != null) {
                     base64EncodedThumbPrintMap.put(tenantId, base64EncodedThumbPrint);
                 }
@@ -505,8 +496,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     tenantId = realmService.getTenantManager().getTenantId(tenantDomain);
                 } catch (UserStoreException e) {
                     String error = "Error in obtaining tenantId from Domain " + tenantDomain;
-                    log.error(error);
-                    throw new AppManagementException(error);
+                    log.error(error, e);
+                    throw new AppManagementException(error, e);
                 }
             }
             tenantMap.put(userName, tenantId);

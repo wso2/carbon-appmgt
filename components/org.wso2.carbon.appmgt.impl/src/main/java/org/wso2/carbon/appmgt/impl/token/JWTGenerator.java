@@ -40,23 +40,14 @@ import java.util.TreeSet;
  * The JWT header and body are base64 encoded separately and concatenated with a dot.
  * Finally the token is signed using SHA256 with RSA algorithm.
  */
-public class JWTGenerator extends AbstractJWTGenerator{
+public class JWTGenerator extends AbstractJWTGenerator {
 
     private static final Log log = LogFactory.getLog(JWTGenerator.class);
-
-    //constructor for testing purposes
-    public JWTGenerator(boolean includeClaims, boolean enableSigning) {
-        super(includeClaims, enableSigning);
-    }
-
-    public JWTGenerator() {
-        super();
-    }
 
     public Map<String, String> populateCustomClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = new LinkedHashMap<String, String> ();
+        Map<String, String> claims = new LinkedHashMap<String, String>();
         populateIssuerAndExpiry(claims);
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
@@ -84,7 +75,7 @@ public class JWTGenerator extends AbstractJWTGenerator{
     public Map<String, String> populateStandardClaims(Map<String, Object> saml2Assertions)
             throws AppManagementException {
 
-        Map<String, String> claims = new LinkedHashMap<String, String> ();
+        Map<String, String> claims = new LinkedHashMap<String, String>();
         populateIssuerAndExpiry(claims);
         populateSaml2Assertions(claims, saml2Assertions);
         return claims;

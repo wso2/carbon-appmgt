@@ -40,6 +40,7 @@ public class TokenGeneratorRegistrationComponent {
 
     private static final Log log = LogFactory.getLog(TokenGeneratorRegistrationComponent.class);
 
+    //This configuration will be used for the TokenGenerator init.
     private static AppManagerConfiguration configuration = null;
 
     protected void activate(ComponentContext componentContext) throws Exception {

@@ -57,10 +57,14 @@ public class SAML2AuthenticationComponent {
         }
         if (configuration == null) {
             throw new AppManagementException(
-                    "The AppManagerConfiguration is not yet set. Delaying the component activation");
+                    "AppManager configuration is not yet set. Delaying the component activation");
         }
         //Find the token generator which is proffered in the configuration
         tokenGeneratorImplClazz = configuration.getFirstProperty(AppMConstants.TOKEN_GENERATOR_IMPL);
+        doRegisterTokenGenerator();
+    }
+
+    private void doRegisterTokenGenerator() {
         for (TokenGenerator tempTokenGenerator : tokenGenerators) {
             if (tempTokenGenerator.getClass().getName().equals(tokenGeneratorImplClazz)) {
                 tokenGenerator = tempTokenGenerator;
@@ -77,6 +81,7 @@ public class SAML2AuthenticationComponent {
 
     public void setTokenGenerator(TokenGenerator tokenGenerator) {
         tokenGenerators.add(tokenGenerator);
+        doRegisterTokenGenerator();
     }
 
     public void unsetTokenGenerator(TokenGenerator tokenGenerator) {
