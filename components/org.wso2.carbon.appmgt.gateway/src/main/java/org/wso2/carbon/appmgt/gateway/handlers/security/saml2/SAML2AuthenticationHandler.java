@@ -758,6 +758,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
                     return true;
                 }else{ // Not subscribed.
+                    handleAuthFailure(messageContext, new APISecurityException(APISecurityConstants.API_AUTH_FORBIDDEN,
+                                                        "You have not subscribed to this Application"));
+
                     return false;
                 }
             } catch (APISecurityException e) {
