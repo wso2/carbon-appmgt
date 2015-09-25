@@ -53,6 +53,12 @@
         <EnableTokenGeneration>true</EnableTokenGeneration>
 
         <!--
+        This parameter specifies which implementation should be used for generating the Token.
+        JWTGenerator is the default implementation provided.
+        -->
+        <TokenGeneratorImpl>org.wso2.carbon.appmgt.impl.token.JWTGenerator</TokenGeneratorImpl>
+
+        <!--
         Name of the HTTP header which contains the JWT to be sent to the web app, from the gateway.
         -->
         <SecurityContextHeader>X-JWT-Assertion</SecurityContextHeader>

@@ -19,6 +19,7 @@ package org.wso2.carbon.appmgt.gateway.internal;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
+import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ServiceReferenceHolder {
@@ -27,6 +28,7 @@ public class ServiceReferenceHolder {
 
     private ConfigurationContextService cfgCtxService;
     private AppManagerConfigurationService amConfigService;
+    private TokenGenerator tokenGenerator;
 
     private ServiceReferenceHolder() {
 
@@ -54,5 +56,13 @@ public class ServiceReferenceHolder {
 
     public void setAPIManagerConfigurationService(AppManagerConfigurationService amConfigService) {
         this.amConfigService = amConfigService;
+    }
+
+    public TokenGenerator getTokenGenerator() {
+        return tokenGenerator;
+    }
+
+    public void setTokenGenerator(TokenGenerator tokenGenerator) {
+        this.tokenGenerator = tokenGenerator;
     }
 }
