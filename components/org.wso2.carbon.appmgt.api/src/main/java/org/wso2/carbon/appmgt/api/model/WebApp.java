@@ -117,6 +117,13 @@ public class WebApp {
     //TODO: missing - total user count, up time statistics,tier
 
 
+    public WebApp() {
+    }
+
+    public WebApp(APIIdentifier id) {
+        this.id = id;
+    }
+
     public String getLogoutURL() {
         return logoutURL;
     }
@@ -147,10 +154,6 @@ public class WebApp {
 
     public void setRedirectURL(String redirectURL) {
         this.redirectURL = redirectURL;
-    }
-
-    public WebApp(APIIdentifier id) {
-        this.id = id;
     }
 
     public APIIdentifier getId() {

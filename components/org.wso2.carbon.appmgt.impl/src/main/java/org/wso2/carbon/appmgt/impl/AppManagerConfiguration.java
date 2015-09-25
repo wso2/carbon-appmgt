@@ -35,7 +35,14 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -98,6 +105,14 @@ public class AppManagerConfiguration {
         } finally {
             IOUtils.closeQuietly(in);
         }
+    }
+
+    /**
+     * Checks whether JWT is enabled in App Manager config.
+     * @return true if JWT is enabled in App Manager config.
+     */
+    public boolean isJWTEnabled() {
+        return Boolean.parseBoolean(getFirstProperty(AppMConstants.ENABLE_JWT_GENERATION));
     }
 
     public String getFirstProperty(String key) {

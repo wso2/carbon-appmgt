@@ -17,7 +17,7 @@
 package org.wso2.carbon.appmgt.impl.template;
 
 import org.apache.velocity.VelocityContext;
-import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 
 /**
  * Set if jwt enabled or not
@@ -30,13 +30,8 @@ public class JwtConfigContext extends ConfigContextDecorator {
 
     public VelocityContext getContext() {
         VelocityContext context = super.getContext();
-
-        if (AppMDAO.jwtGenerator != null) {
-            context.put("jwtIsEnable", true);
-        } else {
-            context.put("jwtIsEnable", false);
-        }
-
+        context.put("jwtIsEnable", ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
+                getAPIManagerConfiguration().isJWTEnabled());
         return context;
     }
 
