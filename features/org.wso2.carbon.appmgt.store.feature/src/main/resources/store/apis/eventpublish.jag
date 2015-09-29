@@ -28,7 +28,7 @@
         return;
     }
 
-    //events contains the object[] passed from the JS which contains UI activity changes.
+    //events : Contains the object[] passed from the JS which contains UI activity changes.
     var events = [];
     events = request.getParameter("events");
 
