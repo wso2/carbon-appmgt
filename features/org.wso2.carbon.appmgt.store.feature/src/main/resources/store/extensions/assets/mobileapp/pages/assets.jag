@@ -147,11 +147,13 @@ require('/modules/store.js').exec(function (ctx) {
                         log.debug("Object initialized successfully : org.wso2.carbon.appmgt.impl.dao.AppMDAO ");
                     }
 
-                    var result = bamServiceObj.getAppsByHitCount(userName, (paging.start + index), 12, config.uiActivityPublishDataSource);
+                    var result = bamServiceObj.getAppsByHitCount(userName, (paging.start + index),
+                                                                 PAGE_SIZE,
+                                                                 config.uiActivityPublishDataSource);
                     if (log.isDebugEnabled()) {
                         log.debug("query executed successfully to get the assets hit count");
                     }
-                    index += store.getPageSize();
+                    index += PAGE_SIZE;
                     return JSON.parse(result);
                 };
 
