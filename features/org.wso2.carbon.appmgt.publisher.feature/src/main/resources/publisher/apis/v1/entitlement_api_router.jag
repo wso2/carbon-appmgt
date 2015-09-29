@@ -13,7 +13,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
 
-    routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/Tiers', function (context) {
+    routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/tiers', function (context) {
         var tiers = getTiers();
         print(tiers);
     });

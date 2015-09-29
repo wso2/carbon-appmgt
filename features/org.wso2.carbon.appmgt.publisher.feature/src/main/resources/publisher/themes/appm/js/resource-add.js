@@ -18,7 +18,7 @@ $( document ).ready(function() {
 
     //get Tier details from tier.xml
     $.ajax({
-        url: '/publisher/api/entitlement/get/Tiers',
+        url: '/publisher/api/entitlement/get/tiers',
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
