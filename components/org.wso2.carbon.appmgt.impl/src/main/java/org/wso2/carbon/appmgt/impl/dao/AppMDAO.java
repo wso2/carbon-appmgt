@@ -6694,10 +6694,8 @@ public class AppMDAO {
 				policyGroupId = Integer.parseInt(rs.getString(1));
 			}
             // save partials mapped to policy group
-            if (objPartialMappings != null) {
-                if (objPartialMappings.length > 0) {
-                    savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
-                }
+            if (objPartialMappings != null && objPartialMappings.length > 0) {
+                savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
             }
 
 			conn.commit();
@@ -6776,10 +6774,8 @@ public class AppMDAO {
 			deletePolicyPartialMappings(policyGroupId, conn);
 
             //insert new partial mappings
-            if (objPartialMappings != null) {
-                if (objPartialMappings.length > 0) {
-                    savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
-                }
+            if (objPartialMappings != null && objPartialMappings.length > 0) {
+                savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
             }
 
 			conn.commit();
