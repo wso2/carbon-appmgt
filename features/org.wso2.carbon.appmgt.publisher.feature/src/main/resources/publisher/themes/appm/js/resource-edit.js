@@ -1,4 +1,4 @@
-var tiers ={}; //contains Throttling tier details
+var tiers = {}; //contains Throttling tier details
 var throttlingTierControlBlock; //html formatted block for throttling tiers list
 
 
@@ -20,6 +20,7 @@ $( document ).ready(function() {
             throttlingTierControlBlock = drawThrottlingTiersDynamically();
         },
         error: function () {
+            console.log("Error while retrieving tiers");
         }
     });
 
@@ -228,7 +229,8 @@ $( document ).ready(function() {
         $('#overview_acsUrl').hide();
     }
 
-    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
+    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save
+    // operation
     $(".skip_gateway_checkbox").click(function () {
         var output = [];
         if ($('.skip_gateway_checkbox').is(':checked')) {
