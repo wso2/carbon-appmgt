@@ -7088,10 +7088,10 @@ public class AppMDAO {
 	/**
 	 * Get policy group related polices for the given application UUID
 	 *
-	 * @param AppUUID application UUID
+	 * @param appUUID application UUID
 	 * @return an array of policy details objects
 	 */
-	public static JSONArray getPolicyGroupXACMLPoliciesByApplication(String AppUUID)
+	public static JSONArray getPolicyGroupXACMLPoliciesByApplication(String appUUID)
 			throws AppManagementException {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -7110,7 +7110,7 @@ public class AppMDAO {
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
-			ps.setString(1, AppUUID);
+			ps.setString(1, appUUID);
 			rs = ps.executeQuery();
 			while (rs.next()) {
                 JSONObject objPartial = new JSONObject();
@@ -7125,7 +7125,7 @@ public class AppMDAO {
 			}
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get policies under each policy group mapped " +
-					"with the application : " + query + " : (Application UUID:" + AppUUID + ")", e);
+					"with the application : " + query + " : (Application UUID:" + appUUID + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
