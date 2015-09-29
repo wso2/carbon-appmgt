@@ -170,8 +170,8 @@ require('/modules/store.js').exec(function (ctx) {
                                 assets.push(asset);
                             }
                         } catch (e) {
-                            log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                            assetId);
+                            log.warn("Error retrieving asset from store ,information might be "
+                                     + "stale in table. id=" + assetId);
                         }
                     }
                 }
