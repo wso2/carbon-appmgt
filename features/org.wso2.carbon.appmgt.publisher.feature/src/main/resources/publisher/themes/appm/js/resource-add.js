@@ -1,4 +1,4 @@
-var tiers ={}; //contains Throttling tier details
+var tiers = {}; //contains Throttling tier details
 
 var throttlingTierControlBlock; //html formatted block for throttling tiers list
 
