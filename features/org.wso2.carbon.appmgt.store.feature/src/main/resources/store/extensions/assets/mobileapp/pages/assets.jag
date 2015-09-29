@@ -139,7 +139,7 @@ require('/modules/store.js').exec(function (ctx) {
             server.privileged(function () {
                 var config = require('/config/store.json');
                 var userName = user ? user.username : "";
-                var index = 0, maxTry = 0;
+                var index = 0, currentTry = 0, maxTry = 10;
                 var getNextassetSet = function () {
                     var bamService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var bamServiceObj = new bamService();
@@ -158,8 +158,8 @@ require('/modules/store.js').exec(function (ctx) {
                 };
 
                 assets = [];
-                while (assets.length < PAGE_SIZE && maxTry < 10) {
-                    maxTry++;
+                while (assets.length < PAGE_SIZE && currentTry < maxTry) {
+                    currentTry++;
                     var result = getNextassetSet();
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         var assetId = String(result[n].UUID);
