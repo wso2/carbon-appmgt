@@ -32,9 +32,9 @@
     var events = [];
     events = request.getParameter("events");
 
-    var parseJSON = JSON.parse(events);
+    var parsedJSON = JSON.parse(events);
 
-    if (!parseJSON) {
+    if (!parsedJSON) {
         return;
     }
 
@@ -42,7 +42,7 @@
     var appMgtBAMPublishObj = new appMgtBAMPublishService();
 
     //Pass data to java class to save
-    appMgtBAMPublishObj.processUiActivityObject(parseJSON);
+    appMgtBAMPublishObj.processUiActivityObject(parsedJSON);
     if (log.isDebugEnabled()) {
         log.debug("UI Activity change data sent to process");
     }
