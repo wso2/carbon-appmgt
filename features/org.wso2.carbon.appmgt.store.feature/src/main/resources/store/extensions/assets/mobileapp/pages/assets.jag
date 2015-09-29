@@ -135,6 +135,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         }
         else if (paging.sort == 'usage') {
+            //search by usage icon functionality implemented here. It will sort the assets by usage
             server.privileged(function () {
                 var config = require('/config/store.json');
                 var userName = user ? user.username : "";
