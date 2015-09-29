@@ -224,7 +224,8 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
     /**
-     * delete policy group related to given Policy Group Id (from both master table and application wise mapping table)
+     * delete policy group related to given Policy Group Id (from both master table and application
+     * wise mapping table)
      * @param applicationId : Application Id
      * @param policyGroupId : PolicyGroup Id
      */
@@ -235,7 +236,8 @@ require('/modules/publisher.js').exec(function(ctx) {
     /**
      * Get the list of all available Java Policies
      * @param applicationUUID
-     * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
+     * @param isGlobalPolicy :if application level policy - true else if resource level policy -
+     *     false
      * @returns list of available java policies with the mapping AppId
      */
     function getAvailableJavaPolicyList(applicationUUID, isGlobalPolicy) {
@@ -264,11 +266,9 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
 
-
     //Get Tier details
-    function getTiers()
-    {
-        return  apiProvider.getTiers();
+    function getTiers() {
+        return apiProvider.getTiers();
     }
 
     var securityModule=require('/modules/security/security.manager.js').securityManagementModule();
