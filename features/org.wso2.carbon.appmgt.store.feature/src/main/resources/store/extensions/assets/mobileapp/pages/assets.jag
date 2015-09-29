@@ -162,16 +162,16 @@ require('/modules/store.js').exec(function (ctx) {
                     maxTry++;
                     var result = getNextassetSet();
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
-                        var aid = String(result[n].UUID);
+                        var assetId = String(result[n].UUID);
                         try {
-                            var asset = store.asset(type, aid);
-                            asset.indashboard = store.isuserasset(aid, type);
+                            var asset = store.asset(type, assetId);
+                            asset.indashboard = store.isuserasset(assetId, type);
                             if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
                                 assets.push(asset);
                             }
                         } catch (e) {
                             log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                            aid);
+                            assetId);
                         }
                     }
                 }
