@@ -28,6 +28,7 @@ $( document ).ready(function() {
             throttlingTierControlBlock = drawThrottlingTiersDynamically();
         },
         error: function () {
+            console.log("Error while retrieving tiers");
         }
     });
 
