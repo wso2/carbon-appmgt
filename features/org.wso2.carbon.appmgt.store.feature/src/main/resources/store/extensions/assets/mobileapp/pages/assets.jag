@@ -161,7 +161,7 @@ require('/modules/store.js').exec(function (ctx) {
                 while (assets.length < PAGE_SIZE && currentTry < maxTry) {
                     currentTry++;
                     var result = getNextassetSet();
-                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                    for (var n = 0; n < result.length; n++) {
                         var assetId = String(result[n].UUID);
                         try {
                             var asset = store.asset(type, assetId);
