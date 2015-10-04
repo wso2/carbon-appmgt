@@ -318,23 +318,26 @@ function savePolicyPartial() {
                     // construct and show the  the warning message with app names which use this
                     // partial before update
                     for (var i = 0; i < response.length; i++) {
-                        var j = i + 1;
-                        apps = apps + j + ". " + response[i].appName + "\n";
+                        apps = apps + (i + 1) + ". " + response[i].appName + "\n";
                     }
 
                     var msg = "policy " + policyPartialName + " is used in following apps " +
-                        apps +
-                        "Are you sure you want to modify the policy " + policyPartialName + "?";
+                              apps +
+                              "Are you sure you want to modify the policy " + policyPartialName
+                              + "?";
 
                     var conf = confirm(msg);
                     if (conf == true) {
-                        updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
+                        updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName,
+                                                    generatedRule, ruleCondition, ruleEffect,
+                                                    isSharedPartial, policyPartialDesc);
                     }
                 }
                 else {
-                    updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
+                    updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName,
+                                                generatedRule, ruleCondition, ruleEffect,
+                                                isSharedPartial, policyPartialDesc);
                 }
-
 
             },
             error: function (response) {
