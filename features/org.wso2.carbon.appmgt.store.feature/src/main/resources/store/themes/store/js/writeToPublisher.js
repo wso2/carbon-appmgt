@@ -132,12 +132,12 @@ function publishEvents(pageUnload) {
 };
 
 var addClickEvents = function (e) {
-    var inputTypes = [];
+    var inputTypes = {};
     for (var prop in jsonObj.appControls) {
-        inputTypes.push(jsonObj.appControls[prop]);
+        inputTypes[prop] = (jsonObj.appControls[prop]);
     }
     var target = $(e.target);
-    for (var i = 0; i < inputTypes.length; i++) {
+    for (var i = 0; i < Object.keys(inputTypes).length; i++) {
         if (target.is(inputTypes[i])) {
             var item = target.attr("name") ? target.attr("name") : target
                 .attr("id");
