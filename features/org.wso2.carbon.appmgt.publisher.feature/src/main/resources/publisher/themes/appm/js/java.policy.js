@@ -66,6 +66,8 @@ function updateJavaPolicyPartial() {
                 checkedStatus = "checked";
                 //push the id's of saved policies to array
                 javaPolicyIndexArray.push(obj.javaPolicyId);
+            } else {
+                checkedStatus = "";
             }
 
             //draw div's to each policy
