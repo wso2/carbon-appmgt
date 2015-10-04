@@ -4305,23 +4305,23 @@ public class AppMDAO {
 			prepStmt.setString(2, version);
 			rs = prepStmt.executeQuery();
 
-			while (rs.next()) {
+            while (rs.next()) {
                 URITemplate uriTemplate = new URITemplate();
-				uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
-				uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
-				uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
-				uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
-				uriTemplate.setSkipThrottling(rs.getBoolean("SKIP_THROTTLING"));
-				uriTemplate.setUserRoles(rs.getString("USER_ROLES"));
-				uriTemplates.add(uriTemplate);
-			}
-		} catch (SQLException e) {
+                uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
+                uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
+                uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
+                uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                uriTemplate.setSkipThrottling(rs.getBoolean("SKIP_THROTTLING"));
+                uriTemplate.setUserRoles(rs.getString("USER_ROLES"));
+                uriTemplates.add(uriTemplate);
+            }
+        } catch (SQLException e) {
             handleException("Error while fetching URL Templates. Api Context - "
-                    + apiContext + ", Version - " + version, e);
+                                    + apiContext + ", Version - " + version, e);
         } finally {
-			APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
-		}
-		return uriTemplates;
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return uriTemplates;
 	}
 
 	/**
@@ -4370,15 +4370,15 @@ public class AppMDAO {
 
 			resultSet = preparedStatement.executeQuery();
 
-			while (resultSet.next()) {
+            while (resultSet.next()) {
                 XACMLPolicyTemplateContext context = new XACMLPolicyTemplateContext();
-				context.setAppId(resultSet.getInt("APP_ID"));
-				context.setAppUuid(resultSet.getString("APP_UUID"));
-				context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
-				context.setRuleId(resultSet.getInt("RULE_ID"));
-				context.setRuleContent(resultSet.getString("RULE_CONTENT"));
-				contexts.add(context);
-			}
+                context.setAppId(resultSet.getInt("APP_ID"));
+                context.setAppUuid(resultSet.getString("APP_UUID"));
+                context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
+                context.setRuleId(resultSet.getInt("RULE_ID"));
+                context.setRuleContent(resultSet.getString("RULE_CONTENT"));
+                contexts.add(context);
+            }
 
 		} catch (SQLException e) {
 			handleException("Error while fetching entitlement policy template contexts for webapp : " +
@@ -4746,10 +4746,10 @@ public class AppMDAO {
     public static List<URLMapping> getURITemplatesPerAPIAsString(APIIdentifier identifier)
             throws AppManagementException {
         Connection conn = null;
-		ResultSet resultSet = null;
-		PreparedStatement ps = null;
-		List<URLMapping> urlMappings = new ArrayList<URLMapping>();
-		try {
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        List<URLMapping> urlMappings = new ArrayList<URLMapping>();
+        try {
 			conn = APIMgtDBUtil.getConnection();
 
             String sqlQuery = "SELECT URL_PATTERN, HTTP_METHOD, AUTH_SCHEME, THROTTLING_TIER, USER_ROLES "
@@ -4947,14 +4947,16 @@ public class AppMDAO {
 				commentList.add(comment);
 			}
 		} catch (SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-                log.error("Failed to retrieve comments for Application - " + identifier.getApiName(), e);
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                log.error(
+                        "Failed to retrieve comments for Application - " + identifier.getApiName(),
+                        e);
             }
-			handleException("Failed to retrieve comments for  " + identifier.getApiName() + "-" +
-					identifier.getVersion(), e);
-		} finally {
+            handleException("Failed to retrieve comments for  " + identifier.getApiName() + "-" +
+                                    identifier.getVersion(), e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(prepStmt, connection, resultSet);
 		}
 		return commentList.toArray(new Comment[commentList.size()]);
@@ -5841,8 +5843,9 @@ public class AppMDAO {
 				}
 			}
 
-			// If there is no either an individual subscription or an enterprise subscription, don't authorize;
-			APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
+            // If there is no either an individual subscription or an enterprise subscription,
+            // don't authorize;
+            APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
 
             if (!hasValidSubscription) {
                 info.setValidationStatus(AppMConstants.API_AUTH_FORBIDDEN);
