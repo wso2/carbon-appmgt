@@ -61,17 +61,21 @@ require('/modules/store.js').exec(function (ctx) {
         var defaultApplicationName = "DefaultApplication";
 
         var enterpriseSubscription;
-        if (authenticator.getLoggedInUser()) {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
-        } else {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
-        }
-
         var individualSubscription;
         if (authenticator.getLoggedInUser()) {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                                                authenticator.getLoggedInUser().username).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                authenticator.getLoggedInUser().username).subscription;
         } else {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                                                null).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                null).subscription;
         }
 
         var subscriptionInfo = {};
