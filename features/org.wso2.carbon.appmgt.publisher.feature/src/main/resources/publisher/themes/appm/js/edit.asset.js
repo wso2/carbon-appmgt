@@ -247,16 +247,17 @@ $(function() {
 
 	$('#editAssetButton').on('click', function() {
 
-		//check if there are any url which doesn't have a policy group
+		//Check if there are any url which doesn't have a policy group
 		var countResourcePolicies = 0;
-		var result = true;
+        //Check if a policy group is selected to each url pattern
+		var isPolicyGroupSelected = true;
 		$('.policy_groups').each(function () {
 			if ($("#uritemplate_policyGroupId" + countResourcePolicies + " option:selected").text() == "") {
-				result = false;
+				isPolicyGroupSelected = false;
 			}
 			countResourcePolicies++;
 		});
-		if (result == false) {
+		if (isPolicyGroupSelected == false) {
 			alert('Failed to add asset. Need to assign a Resource Policy for each URL Pattern.');
 			return;
 		}
