@@ -6674,7 +6674,7 @@ public class AppMDAO {
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
-    public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
+    public static int savePolicyGroup(String policyGroupName, String throttlingTier,
                                           String userRoles, String isAnonymousAllowed,
                                           Object[] objPartialMappings, String policyGroupDesc)
             throws AppManagementException {
