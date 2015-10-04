@@ -169,8 +169,8 @@ require('/modules/store.js').exec(function (ctx) {
                 var index = 0, maxTry = 0;
 
                 var ratingApi = require('/modules/rating-api.js').api;
-                registry = storeServer.systemRegistry(tenantId),
-                        am = store.assetManager(type, registry);
+                registry = storeServer.systemRegistry(tenantId), am =
+                                                                 store.assetManager(type, registry);
 
                 var getNextassetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
