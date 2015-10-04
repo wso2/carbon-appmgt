@@ -5019,8 +5019,10 @@ public class AppMDAO {
      * @return policy partial id
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-											String policyAuthor,String policyPartialDesc,int tenantId) throws AppManagementException {
+    public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial,
+                                            boolean isSharedPartial,
+                                            String policyAuthor, String policyPartialDesc,
+                                            int tenantId) throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement statementToInsertRecord = null;
