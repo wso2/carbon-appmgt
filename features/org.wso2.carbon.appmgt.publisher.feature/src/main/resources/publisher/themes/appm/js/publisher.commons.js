@@ -259,7 +259,7 @@ $(document).ready(function() {
 		var searchPrefix = $('#search-prefix').val();
 		if (checkNonSpecial(searchAssetString)) {
 
-			//set default when empty
+			//Set default when empty
 			if (searchPrefix.trim() == "") {
 				searchPrefix = "webapp";
 			}
