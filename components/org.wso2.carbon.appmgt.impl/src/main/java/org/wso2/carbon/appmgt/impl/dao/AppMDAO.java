@@ -615,17 +615,17 @@ public class AppMDAO {
 			ps.setString(1, context);
 			ps.setString(2, version);
 			rs = ps.executeQuery();
-			if (rs.next()) {
+            if (rs.next()) {
                 //use the web-app name as the Issuer
-				saml2SsoIssuer = rs.getString("APP_NAME");
+                saml2SsoIssuer = rs.getString("APP_NAME");
                 webAppInfoDTO.setSaml2SsoIssuer(saml2SsoIssuer);
                 webAppInfoDTO.setLogoutUrl(rs.getString("LOG_OUT_URL"));
                 webAppInfoDTO.setContext(context);
-				webAppInfoDTO.setVersion(version);
+                webAppInfoDTO.setVersion(version);
                 webAppInfoDTO.setAppID(rs.getInt("APP_ID"));
-				webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
-			}
-		} catch (SQLException e) {
+                webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
+            }
+        } catch (SQLException e) {
 			handleException("Error when executing the SQL: " + ssoInfoSqlQuery + " (Context:" +
 					context + " ,Version:" + version + ")", e);
 		} finally {
