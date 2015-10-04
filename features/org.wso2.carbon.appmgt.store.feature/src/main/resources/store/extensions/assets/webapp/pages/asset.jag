@@ -76,7 +76,8 @@ require('/modules/store.js').exec(function (ctx) {
 
     var ATTR_PROVIDER = 'overview_provider';
     var LIFECYCLE_STATE_PROPERTY = 'lcState';
-    var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
+    var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always
+                                                // visible when Published
     var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
 
     // Init subscription service.
@@ -85,8 +86,9 @@ require('/modules/store.js').exec(function (ctx) {
     subscriptionService.init(jagg, session);
 
     var username = null;
-    if (authenticator.getLoggedInUser()) {
-        username = authenticator.getLoggedInUser().username;
+    var loggedUser = authenticator.getLoggedInUser();
+    if (loggedUser != null) {
+        username = loggedUser.username;
     }
 
     /*
@@ -135,7 +137,8 @@ require('/modules/store.js').exec(function (ctx) {
 
     var getSubscriptionInfo = function(asset){
 
-        // Get the enterprise subscription the individual subscription for this user for this app.    
+        // Get the enterprise subscription the individual subscription for this user for this app.
+        //
         var appInfo = {};
         appInfo["name"] = asset.attributes.overview_name;
         appInfo["version"] = asset.attributes.overview_version;
