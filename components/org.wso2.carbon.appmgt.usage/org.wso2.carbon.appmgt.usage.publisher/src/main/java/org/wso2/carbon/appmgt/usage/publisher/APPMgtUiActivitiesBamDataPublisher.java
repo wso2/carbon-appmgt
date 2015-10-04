@@ -156,7 +156,7 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 */
 	public void processUiActivityObject(Object[] parseJSON) {
 		String action, item, timestamp, appId, userId;
-		Integer tenantId;
+		int tenantId;
 		for (int i = 0; i < parseJSON.length; i++) {
 			NativeObject obj = (NativeObject) parseJSON[i];
 			action = obj.get("action", obj).toString();
@@ -192,7 +192,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 *            : Tenant Id
 	 */
     public void publishUserActivityEvents(String action, String item,
-                                          String timestampStr, String appId, String userId, Integer tenantId) {
+                                          String timestampStr, String appId, String userId,
+                                          int tenantId) {
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
              // if BAM is configured

@@ -6475,13 +6475,13 @@ public class AppMDAO {
      * @param userId     User Id
      */
     public static void saveStoreHits(String webAppUUID, String userId,
-                                     Integer tenantId) throws SQLException, AppManagementException {
+                                     int tenantId) throws SQLException, AppManagementException {
         Connection conn = null;
 		try {
 			// get the connection for the specific UI Activity Publish data
 			// source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-            Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
+            int maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
             insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn);
             conn.commit();
 		} finally {
@@ -6498,7 +6498,7 @@ public class AppMDAO {
      * @param conn       DB connection
      */
     private static void insertUpdateStoreHits(String webAppUUID, String userId,
-                                             Integer maxCount, Integer tenantId, Connection conn)
+                                              int maxCount, int tenantId, Connection conn)
             throws AppManagementException {
         ResultSet rs = null;
 		PreparedStatement ps = null;
