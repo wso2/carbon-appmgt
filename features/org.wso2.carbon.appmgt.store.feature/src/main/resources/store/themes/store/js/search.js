@@ -45,10 +45,10 @@ $(function () {
                     pagination: "#top-asset-slideshow-pag-ebook"
 
                 });
-                mouseStop();
+                mouseStopLeave();
                 /*el.append(result.paging);
                  caramel.js($('body'), data.body['assets'].resources.js, 'assets', function () {
-                 mouseStop();
+                 mouseStopLeave();
                  });
                  caramel.js($('body'), data.header['sort-assets'].resources.js, 'sort-assets', function () {
                  updateSortUI();

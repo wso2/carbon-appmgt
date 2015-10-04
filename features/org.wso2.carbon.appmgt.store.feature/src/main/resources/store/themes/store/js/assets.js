@@ -86,7 +86,7 @@ $(function() {
 		var thiz = $(this);
 		thiz.addClass('selected-type');
 		loadAssets(thiz.attr('href'));
-		mouseStop();
+		mouseStopLeave();
 		e.preventDefault();
 	});
 
@@ -131,13 +131,13 @@ $(function() {
 	});
 
     //show App details in mouse hover event
-    mouseStop();
+    mouseStopLeave();
 
 	caramel.loaded('js', 'assets');
 	caramel.loaded('js', 'sort-assets');
 });
 
-var mouseStop = function() {
+var mouseStopLeave = function() {
 	$('.asset').bind('mousestop', 300, function() {
 		//console.log("In");
 		bookmark = $(this).find('.store-bookmark-icon');

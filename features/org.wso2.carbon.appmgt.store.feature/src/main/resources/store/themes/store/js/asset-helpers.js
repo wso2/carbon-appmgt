@@ -103,7 +103,7 @@ var renderAssets, mouseStop, renderAssetsScroll;
         $('#assets-container').html(render);
 
         caramel.js($('body'), data.body['assets'].resources.js, 'assets', function () {
-//                mouseStop();
+//                mouseStopLeave();
         });
 
     };
@@ -190,12 +190,12 @@ var renderAssets, mouseStop, renderAssetsScroll;
       $('#assets-container').append(render);
       
        caramel.js($('body'), data.body['assets'].resources.js, 'assets', function () {
-//                mouseStop();
+//                mouseStopLeave();
             });
     	
     };
 
-//    mouseStop = function () {
+//    mouseStopLeave = function () {
 //    	var windowWidth = $(window).width();
 //    	var offsetTop = windowWidth < 980 ? 167 : 200;
 //        var id;
