@@ -138,7 +138,6 @@ require('/modules/store.js').exec(function (ctx) {
     var getSubscriptionInfo = function(asset){
 
         // Get the enterprise subscription the individual subscription for this user for this app.
-        //
         var appInfo = {};
         appInfo["name"] = asset.attributes.overview_name;
         appInfo["version"] = asset.attributes.overview_version;
