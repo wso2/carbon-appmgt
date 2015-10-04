@@ -303,9 +303,9 @@ require('/modules/store.js').exec(function (ctx) {
 
 
     var process = require('process');
-    //set local ip
+    //Set local ip
     asset.attributes.localIP = "https://" + process.getProperty('server.host');
-    //set http port
+    //Set http port
     asset.attributes.httpsPort = process.getProperty('https.port');
 
     for(var i = 0; i < assetsByProvider.assets.length; i++){
