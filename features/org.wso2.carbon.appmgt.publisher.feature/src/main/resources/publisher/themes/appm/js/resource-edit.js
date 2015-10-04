@@ -75,7 +75,7 @@ $( document ).ready(function() {
         }
     });
 
-    //load global (application level) dynamic optional java policies
+    //Load global (application level) dynamic optional java policies
     loadAvailableJavaPolicies(uuid, true);
 
    //fixed chrome issue with file paths
