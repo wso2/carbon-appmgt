@@ -151,7 +151,7 @@ require('/modules/store.js').exec(function (ctx) {
                                                                  PAGE_SIZE,
                                                                  config.uiActivityPublishDataSource);
                     if (log.isDebugEnabled()) {
-                        log.debug("query executed successfully to get the assets hit count");
+                        log.debug("Query executed successfully to get the assets hit count.");
                     }
                     index += PAGE_SIZE;
                     return JSON.parse(result);
