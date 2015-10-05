@@ -344,7 +344,8 @@ function updatePolicyGroupPartial(policyGroupsArray) {
         }
     });
 
-    //store the list of policy group id's (will be used in save operation to map the application wise created policy groups)
+    //store the list of policy group id's (will be used in save operation to map the application
+    // wise created policy groups)
     $('#uritemplate_policyGroupIds').val(JSON.stringify(policyGroupIndexArray));
 
     //formatted policy group option list block
@@ -391,7 +392,8 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
         success: function (response) {
             var urlPattern = "";
             if (response.length != 0) {
-                // construct and show the  the warning message with app names which use this partial before delete
+                //Construct and show the  the warning message with app names which use this partial
+                // before delete
                 for (var i = 0; i < response.length; i++) {
                     var j = i + 1;
                     urlPattern = urlPattern + j + ". URL Pattern: " + response[i].urlPattern + " , HTTP Verb: "
