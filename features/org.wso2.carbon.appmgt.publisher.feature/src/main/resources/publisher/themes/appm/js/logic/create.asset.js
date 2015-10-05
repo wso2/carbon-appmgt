@@ -168,16 +168,17 @@ $(function() {
 			return;
 		}
 
-		//check if there are any url which doesn't have a policy group
+		//Check if there are any url which doesn't have a policy group
 		var countResourcePolicies = 0;
-		var result = true;
+        //Check if any policy group associated for the resource
+        var ifPolicyGroupMapped = true;
 		$('.policy_groups').each(function () {
 			if ($("#uritemplate_policyGroupId" + countResourcePolicies + " option:selected").text() == "") {
-				result = false;
+				ifPolicyGroupMapped = false;
 			}
 			countResourcePolicies++;
 		});
-		if (result == false) {
+		if (ifPolicyGroupMapped == false) {
             showAlert('Failed to add asset. Need to assign a Resource Policy for each URL Pattern.');
 			return;
 		}
