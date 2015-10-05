@@ -129,6 +129,8 @@ public class AppMDAO {
 	private static final String PRIMARY_LOGIN = "primary";
 	private static final String CLAIM_URI = "ClaimUri";
 
+    private static final String DB_TYPE_ORACLE = "Oracle";
+
 	public AppMDAO() {
 	}
 
@@ -4123,7 +4125,7 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
 
             //oracle specific query
-            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+            if (connection.getMetaData().getDriverName().contains(DB_TYPE_ORACLE)) {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
                         "FROM APM_WORKFLOWS " +
@@ -6601,7 +6603,7 @@ public class AppMDAO {
             conn = APIMgtDBUtil.getUiActivityDBConnection();
 
             //oracle specific query
-            if (conn.getMetaData().getDriverName().contains("Oracle")) {
+            if (conn.getMetaData().getDriverName().contains(DB_TYPE_ORACLE)) {
                 // Set 1: Selects all applications in APM_APP_HIT_TOTAL relevant to
                 // the logged user. Set 2: Select all applications in the store
                 // excluding set 1 Then Merge the result and sort descending order by
