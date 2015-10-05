@@ -384,7 +384,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
     var conf = false;
 
     $.ajax({
-        async: true,
+        async: false,
         url: '/publisher/api/entitlement/policyGroup/associate/url/pattern/list/to/avoid/delete/' + policyGroupId,
         type: 'GET',
         contentType: 'application/json',
