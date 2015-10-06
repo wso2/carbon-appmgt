@@ -123,7 +123,7 @@ var module = function () {
             var name = model.getField('overview.name').value;
             var version = model.getField('overview.version').value;
             var contextname = model.getField('overview.context').value;
-            var allowAnonymous=model.getField('overview.allowAnonymous').value;
+            var allowAnonymous = model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;
 
             if(contextname.charAt(0)!='/'){
