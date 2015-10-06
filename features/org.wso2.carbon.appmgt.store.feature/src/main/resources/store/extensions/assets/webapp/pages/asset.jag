@@ -229,7 +229,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     function isStoreAdmin() {
         if (authenticator.getLoggedInUser()) {
-            return hasUserRole("Internal/store-admin");
+            return hasUserRole(configs.roles.internal_store_admin);
         }
         return false;
     }
