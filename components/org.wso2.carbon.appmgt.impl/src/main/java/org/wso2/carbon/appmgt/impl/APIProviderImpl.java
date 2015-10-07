@@ -933,19 +933,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             Collections.EMPTY_MAP);
                 } else {
                     //contains properties related to all the policies
-                    JSONObject objPolicyProperties;
-                    properties = new HashMap<String, String>();
-
-                    //get property JSON object related to current policy in the loop
-                    objPolicyProperties = policies.get(counterPolicies).getProperties();
-
-                    //if policy contains any properties, run a loop and assign them
-                    Set<String> keys = objPolicyProperties.keySet();
-                    for (String key : keys) {
-                        properties.put(key, objPolicyProperties.get(key).toString());
-                    }
+                    properties = policies.get(counterPolicies).getProperties();
                     //add policy as a handler and also the relevant properties
-                    velocityTemplateBuilder.addHandler(policies.get(counterPolicies).getFullQualifiName(), properties);
+                    velocityTemplateBuilder.addHandler(policies.get(counterPolicies)
+                                                               .getFullQualifiName(), properties);
                 }
             }
 

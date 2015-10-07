@@ -7306,6 +7306,9 @@ public class AppMDAO {
 		List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
 		String strJavaPolicyProperty = "";
         boolean isMandatory = true;
+        JSONParser parser = new JSONParser();
+        //Contains Policy Properties
+        Map<String, String> policyPropertyMap = new HashMap<>();
 
         String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID, DISPLAY_NAME, " +
                 "DISPLAY_ORDER_SEQ_NO, APP.APP_ID AS APP_ID, FULL_QUALIFI_NAME, POLICY_PROPERTIES " +
@@ -7322,20 +7325,26 @@ public class AppMDAO {
 			ps.setBoolean(2, isMandatory);
             ps.setBoolean(3, isGlobalPolicy);
             rs = ps.executeQuery();
-			JSONParser parser = new JSONParser();
-			while (rs.next()) {
-				JavaPolicy policy = new JavaPolicy();
-
-				policy.setPolicyID(rs.getInt("JAVA_POLICY_ID"));
-				policy.setPolicyName(rs.getString("DISPLAY_NAME"));
-				policy.setFullQualifiName(rs.getString("FULL_QUALIFI_NAME"));
-				policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
-				strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
-				if (strJavaPolicyProperty != null) {
-					policy.setProperties((JSONObject) parser.parse(strJavaPolicyProperty));
-				}
-				policies.add(policy);
-			}
+            while (rs.next()) {
+                JavaPolicy policy = new JavaPolicy();
+                policy.setPolicyID(rs.getInt("JAVA_POLICY_ID"));
+                policy.setPolicyName(rs.getString("DISPLAY_NAME"));
+                policy.setFullQualifiName(rs.getString("FULL_QUALIFI_NAME"));
+                policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+                strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
+                if (strJavaPolicyProperty != null) {
+                    JSONObject objPolicyProperties = ((JSONObject) parser.parse(
+                            strJavaPolicyProperty));
+                    //If policy contains any properties, run a loop and assign them
+                    Set<String> keys = objPolicyProperties.keySet();
+                    for (String key : keys) {
+                        policyPropertyMap.put(key.toString(), objPolicyProperties.get(key)
+                                .toString());
+                    }
+                    policy.setProperties(policyPropertyMap);
+                }
+                policies.add(policy);
+            }
 
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get mapped Java Policies : "
