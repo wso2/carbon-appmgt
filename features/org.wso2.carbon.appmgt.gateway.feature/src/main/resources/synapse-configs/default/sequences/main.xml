@@ -65,19 +65,6 @@
                 <header name="Location" expression="$trp:referer" scope="transport"/>
                 <property name="HTTP_SC" value="303" scope="axis2"/>                
                 <respond/>
-                <!--payloadFactory>
-                    <format>
-                        <am:fault xmlns:am="http://wso2.org/apimanager">
-                            <am:code>404</am:code>
-                            <am:type>Status report</am:type>
-                            <am:message>Not Found</am:message>
-                            <am:description>The requested resource (/$1) is not available.</am:description>
-                        </am:fault>
-                    </format>
-                    <args>
-                        <arg expression="$axis2:REST_URL_POSTFIX"/>
-                    </args>
-                </payloadFactory-->
             </else>
         </filter>
         <filter source="$axis2:HTTP_METHOD" regex="^(?!.*(POST|PUT)).*$">

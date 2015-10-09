@@ -28,6 +28,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+/**
+ * Custom mediator class which uses to set the referer header. We can use this class to
+ * add the referer to the axis2 MessageContext via transport headers.
+ */
 public class RefererRewriteMediator extends AbstractMediator {
 
     /**
