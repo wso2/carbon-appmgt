@@ -192,8 +192,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             for (String row : collection.getChildren()) {
                 String uuid = row.substring(row.indexOf(";") + 1, row.length());
                 GenericArtifact genericArtifact = artifactManager.getGenericArtifact(uuid);
-                if (genericArtifact != null && genericArtifact.getAttribute(AppMConstants.API_OVERVIEW_STATUS).equals(AppMConstants.PUBLISHED)) {
-                apiSet.add(AppManagerUtil.getAPI(genericArtifact));
+                if (genericArtifact != null && genericArtifact.getLifecycleState().equals(AppMConstants.APP_LC_PUBLISHED)) {
+                    apiSet.add(AppManagerUtil.getAPI(genericArtifact));
                 }
             }
 

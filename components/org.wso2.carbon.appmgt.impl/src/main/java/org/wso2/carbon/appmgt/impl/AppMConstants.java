@@ -231,7 +231,7 @@ public final class AppMConstants {
     public static final String DEPRECATED = "DEPRECATED";
     public static final String DOCUMENTATION_INLINE_CONTENT_TYPE = "text/plain";
     public static final String APP_LIFE_CYCLE="AppLifeCycle";
-
+    public static final String APP_LC_PUBLISHED = "Published";
 
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
