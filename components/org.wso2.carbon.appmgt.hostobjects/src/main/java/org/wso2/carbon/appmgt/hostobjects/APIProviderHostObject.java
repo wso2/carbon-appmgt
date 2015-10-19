@@ -753,45 +753,6 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Retrieve the policy partial id list defined for a given application
-     *
-     * @param context Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return list of policy partial ids
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
-     */
-    public static NativeArray jsFunction_getApplicationPolicyPartialList(Context context, Scriptable thisObj,
-                                                                         Object[] args,
-                                                                         Function funObj) throws
-                                                                                          AppManagementException {
-        if (args == null || args.length != 1) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null) {
-            handleException("Error while retrieving application's policy partial list. The application id is null");
-        }
-        NativeArray myn = new NativeArray(0);
-        int applicationId = Integer.parseInt(args[0].toString());
-
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        List<EntitlementPolicyPartial> policyPartialList = apiProvider.getApplicationPolicyPartialList(applicationId);
-        int count = 0;
-        for (EntitlementPolicyPartial entitlementPolicyPartial : policyPartialList) {
-            NativeObject row = new NativeObject();
-            row.put("partialId", row, entitlementPolicyPartial.getPolicyPartialId());
-            row.put("partialName", row, entitlementPolicyPartial.getPolicyPartialName());
-            row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
-            row.put("isShared", row, entitlementPolicyPartial.isShared());
-            row.put("author", row, entitlementPolicyPartial.getAuthor());
-            count++;
-            myn.put(count, myn, row);
-        }
-        return myn;
-    }
-
-    /**
      * Retrieve the shared policy partials
      *
      * @param cx      Rhino context

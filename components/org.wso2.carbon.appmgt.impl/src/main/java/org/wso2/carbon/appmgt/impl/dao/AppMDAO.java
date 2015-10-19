@@ -4431,9 +4431,6 @@ public class AppMDAO {
 
 				//Remove existing updated entitlement policies from IDP
 				removeApplicationsEntitlementPolicies(webAppId,connection);
-
-				//Update and persist application-policy partial mapping info
-				updateApplicationPolicyPartialMappings(webAppId, policyPartialIdList.toArray(),connection);
 			}
 
             if (api.getPolicyGroups() != null && !api.getPolicyGroups().isEmpty()) {
@@ -5240,59 +5237,6 @@ public class AppMDAO {
 	}
 
 	/**
-	 * Get Application's entitlement policy partials list
-	 *
-	 * @param applicationId application id
-	 * @return List of policy partials of an given application
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
-	 */
-	public List<EntitlementPolicyPartial> getApplicationsEntitlementPolicyPartialsList(int applicationId) throws
-			AppManagementException {
-
-		Connection connection = null;
-		PreparedStatement statementToGetPolicyPartialList = null;
-		List<EntitlementPolicyPartial> entitlementPolicyPartialList = new ArrayList<EntitlementPolicyPartial>();
-		ResultSet rs = null;
-		String queryToGetPolicyPartial =
-				"SELECT ENTITLEMENT_POLICY_PARTIAL_ID,NAME,CONTENT,SHARED,AUTHOR  FROM APM_APP_XACML_PARTIAL_MAPPINGS " +
-						"join " +
-						"APM_ENTITLEMENT_POLICY_PARTIAL " +
-						"On " +
-						"APM_APP_XACML_PARTIAL_MAPPINGS.PARTIAL_ID = APM_ENTITLEMENT_POLICY_PARTIAL.ENTITLEMENT_POLICY_PARTIAL_ID " +
-						"AND APM_APP_XACML_PARTIAL_MAPPINGS.APP_ID =?";
-
-		try {
-
-			if (log.isDebugEnabled()) {
-				log.debug("Retrieving entitlement policy partial list of the webapp with id : " + applicationId);
-			}
-
-			connection = APIMgtDBUtil.getConnection();
-			statementToGetPolicyPartialList = connection.prepareStatement(queryToGetPolicyPartial);
-			statementToGetPolicyPartialList.setInt(1, applicationId);
-
-			rs = statementToGetPolicyPartialList.executeQuery();
-
-			while (rs.next()) {
-				EntitlementPolicyPartial policyPartial = new EntitlementPolicyPartial();
-				policyPartial.setPolicyPartialId(rs.getInt("ENTITLEMENT_POLICY_PARTIAL_ID"));
-				policyPartial.setPolicyPartialName(rs.getString("NAME"));
-				policyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
-				policyPartial.setShared(rs.getBoolean("SHARED"));
-				policyPartial.setAuthor(rs.getString("AUTHOR"));
-				entitlementPolicyPartialList.add(policyPartial);
-			}
-
-		} catch (SQLException e) {
-			handleException("Failed to retrieve entitlement policy partials of the application with id : " +
-					applicationId, e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(statementToGetPolicyPartialList, connection, null);
-		}
-		return entitlementPolicyPartialList;
-	}
-
-	/**
 	 * Get the apps which use the given policy partial
 	 *
 	 * @param policyPartialId Policy Partial Id
@@ -5452,41 +5396,6 @@ public class AppMDAO {
 		return isSuccess;
 	}
 
-
-    /**
-     * Update application-policy partial mapping info
-     *
-     * @param applicationId     - applicatoin id
-     * @param policyPartialList list of policy partial ids defeined for the application
-     * @param connection        DB Connection
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-    public void updateApplicationPolicyPartialMappings(int applicationId, Object[] policyPartialList,
-                                                       Connection connection) throws
-                                                                              AppManagementException {
-
-        PreparedStatement statementToDeletePartialMappings = null;
-        String queryToDeletePolicyPartialMappings = "DELETE FROM APM_APP_XACML_PARTIAL_MAPPINGS WHERE APP_ID=?";
-
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Updating policy partial mappings with webapp id : " + applicationId);
-            }
-            statementToDeletePartialMappings = connection.prepareStatement(queryToDeletePolicyPartialMappings);
-            statementToDeletePartialMappings.setInt(1, applicationId);
-            statementToDeletePartialMappings.executeUpdate();
-
-            //Save application's policy partial mapping data
-            saveApplicationPolicyPartialsMappings(connection, applicationId, policyPartialList);
-
-        } catch (SQLException e) {
-            handleException("Error while deleting XACML policy partial mappings for webapp : " +
-                    applicationId, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(statementToDeletePartialMappings, null, null);
-        }
-    }
-
     private String exctractConditionFromPolicyPartialContent(String policyPartialContent){
     	
     	try {
@@ -5558,47 +5467,6 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(statementToRetrievePolicyIds, null, null);
 		}
 	}
-
-    /**
-     * Delete Application's policy partial mapping
-     *
-     * @param applicationId   application id
-     * @param policyPartialId policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-    public void deleteApplicationPolicyPartialMapping(int applicationId, int policyPartialId)
-            throws AppManagementException {
-
-        Connection connection = null;
-        PreparedStatement statementToDeleteAppPartialMapping = null;
-        String queryToDeleteAppPolicyPartialMapping =
-                "DELETE FROM APM_APP_XACML_PARTIAL_MAPPINGS  WHERE APP_ID= ? AND PARTIAL_ID=?";
-
-        try {
-            connection = APIMgtDBUtil.getConnection();
-            statementToDeleteAppPartialMapping = connection.prepareStatement(queryToDeleteAppPolicyPartialMapping);
-            statementToDeleteAppPartialMapping.setInt(1, applicationId);
-            statementToDeleteAppPartialMapping.setInt(2, policyPartialId);
-            statementToDeleteAppPartialMapping.execute();
-
-            // Finally commit transaction.
-            connection.commit();
-
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException e1) {
-                    log.error("Failed to rollback the deletion of entitlement policy partial mapping with policy id : " +
-                            policyPartialId + " in application with id : " + applicationId, e1);
-                }
-            }
-            handleException("Failed to delete entitlement policy partial Mapping with policy id : " +
-                    policyPartialId + " in applicatioon with id : " + applicationId, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(statementToDeleteAppPartialMapping, connection, null);
-        }
-    }
 
     /**
      * Persists the application's entitlement policy partials in database
