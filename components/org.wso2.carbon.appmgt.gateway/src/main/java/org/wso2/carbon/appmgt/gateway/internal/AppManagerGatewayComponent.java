@@ -53,15 +53,11 @@ public class AppManagerGatewayComponent {
         if (log.isDebugEnabled()) {
             log.debug("Gateway manager component activated");
         }
-
         BundleContext bundleContext = componentContext.getBundleContext();
 
-        String gatewayType = configuration.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
-        if ("Synapse".equalsIgnoreCase(gatewayType)) {
-            //Register Tenant service creator to deploy tenant specific common synapse configurations
-            TenantServiceCreator listener = new TenantServiceCreator();
-            bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
-        }
+        //Register Tenant service creator to deploy tenant specific common synapse configurations
+        TenantServiceCreator listener = new TenantServiceCreator();
+        bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
 
         //Load initially available api contexts at the server startup. This Cache is only use by the products other than the app-manager
         /* TODO: Load Config values from apimgt.core*/
