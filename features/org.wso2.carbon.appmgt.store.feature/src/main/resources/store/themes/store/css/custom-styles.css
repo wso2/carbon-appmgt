@@ -353,17 +353,22 @@
     border-radius: 0px;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
     font-size: small;
+    height: 34px;
 }
 
 .search-text{
     float: left;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
-    width: 300px;
+    width: 245px;
 }
 
 
+.search-box{
+    padding-top: 5px;
+}
 
 
 .searchbox{

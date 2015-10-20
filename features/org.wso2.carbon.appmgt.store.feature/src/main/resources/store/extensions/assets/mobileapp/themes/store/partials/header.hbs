@@ -13,14 +13,14 @@
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <form class="nav navbar-left" role="search">
-                    <select id="searchSelect" class="input-lg search-select col-md-3">
+                <form class="nav navbar-left search-box" role="search">
+                    <select id="searchSelect" class="search-select col-md-3">
                         <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
                         <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
                         <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
                         <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
                     </select>
-                    <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+                    <input value="{{searchQuery.search}}" type="text" class="form-control col-md-4 search-text" id="searchTxt" placeholder="Search">
                 </form>
                 {{#if assetsPage}}
                     <form class="nav navbar-left" role="search">
