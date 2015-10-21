@@ -60,7 +60,10 @@ public final class AppMConstants {
 
     //registry location of providers
     public static final String PROVIDERS_PATH = "/providers";
-    
+
+    //
+    public static final String SYNAPSE_CONFIG_RESOURCES_PATH = "/repository/resources/appm-synapse-config/";
+
     public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
     //registry location of WebApp
