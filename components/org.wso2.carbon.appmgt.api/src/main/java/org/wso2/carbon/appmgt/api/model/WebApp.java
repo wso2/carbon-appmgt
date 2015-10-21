@@ -32,6 +32,7 @@ public class WebApp {
 
     private String description;
     private String url;
+    private String displayName;
     private String sandboxUrl;
     private String wsdlUrl;
     private String wadlUrl;
@@ -243,6 +244,14 @@ public class WebApp {
 
     public String getContext() {
         return context;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public void setWsdlUrl(String wsdlUrl) {

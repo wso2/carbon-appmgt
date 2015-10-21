@@ -26,8 +26,8 @@ var serviceModule = (function () {
      @options.appName: The name of the application
      @options.user:
      */
+
     Subscriber.prototype.addSubscription = function (options) {
-        
         var apiData = {};
         apiData['name'] = options.apiName;
         apiData['version'] = options.apiVersion;
@@ -61,7 +61,6 @@ var serviceModule = (function () {
     };
     
     Subscriber.prototype.checkSubscriptionWorkflow = function () {
-
         var result = this.instance.checkSubscriptionWorkflow();
         return result;
     };
@@ -70,28 +69,26 @@ var serviceModule = (function () {
      The function returns all applications that have subscriptions
      options.user: The name of the user whose apps must be returned
      */
+
     Subscriber.prototype.getAppsWithSubs = function (options) {
         var result = this.instance.getAllSubscriptions(options.user);
         return (result)?result.applications:[];
     };
-
 
     Subscriber.prototype.getSubsForApp=function(options){
         var result= this.instance.getAPISubscriptionsForApplication(options.user,"DefaultApplication");
         return (result)?result.subscriptions:[];
     };
 
-
     Subscriber.prototype.getSubscription = function(appInfo, appName, subscriptionType, user){
-
-        var result = this.instance.getAPISubscription(appInfo, appName, subscriptionType, user); 
-
+        var result = this.instance.getAPISubscription(appInfo, appName, subscriptionType, user);
         return result;
     }
 
     /*
      Returns all available enterprises for the app.
     */
+
     Subscriber.prototype.getEnterprisesForApplication = function(options){
         var result= this.instance.getEnterprisesForApplication(options.appName, options.ssoProviderName, options.ssoProviderVersion);
         return result;

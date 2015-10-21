@@ -43,9 +43,6 @@ require('/modules/store.js').exec(function (ctx) {
 	var apps = subsApi.getAppsWithSubs({user: userData.username});
 
 
-
-
-
     if(apps.length >0){
         subscriptions = apps[0].subscriptions;
 
@@ -59,7 +56,6 @@ require('/modules/store.js').exec(function (ctx) {
 
 
         var displayApps = [];
-
 
         for(i=0;i< apps[0].subscriptions.length;i++){
             var api=apiInfoManager.getAPIDescription( apps[0].subscriptions[i].provider, apps[0].subscriptions[i].name, apps[0].subscriptions[i].version);
@@ -75,7 +71,6 @@ require('/modules/store.js').exec(function (ctx) {
         apps[0].subscriptions = displayApps;
 
     }
-
 
 
 	caramel.render({
@@ -101,10 +96,9 @@ require('/modules/store.js').exec(function (ctx) {
 
 }, request, response, session);
 
-
 function getServiceDir(serviceName) {
 	return '../services/' + serviceName;
 }
 
-	%>
+%>
 

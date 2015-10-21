@@ -114,6 +114,7 @@ public final class AppMConstants {
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
+    public static final String API_OVERVIEW_DISPLAY_NAME = "overview_displayName";
     public static final String API_OVERVIEW_VERSION = "overview_version";
     public static final String API_OVERVIEW_CONTEXT = "overview_context";
     public static final String API_OVERVIEW_DESCRIPTION = "overview_description";

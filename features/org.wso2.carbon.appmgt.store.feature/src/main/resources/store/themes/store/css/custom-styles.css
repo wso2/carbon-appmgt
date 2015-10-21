@@ -453,3 +453,12 @@
 .paging_two_button a{
     padding-right: 20px;
 }
+
+.paginate_disabled_previous, .paginate_disabled_previous:hover{
+    color: #efefef;
+}
+
+
+.paginate_disabled_next, .paginate_disabled_next:hover{
+    color: #efefef;
+}

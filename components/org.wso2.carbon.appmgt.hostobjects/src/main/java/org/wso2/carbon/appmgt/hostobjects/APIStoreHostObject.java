@@ -1979,6 +1979,7 @@ public class APIStoreHostObject extends ScriptableObject {
         		PrivilegedCarbonContext.endTenantFlow();
         	}
         }
+
         return appsObj;
     }
 
@@ -1990,6 +1991,7 @@ public class APIStoreHostObject extends ScriptableObject {
         try {
             WebApp api = apiConsumer.getAPI(subscribedAPI.getApiId());
             apiObj.put("name", apiObj, subscribedAPI.getApiId().getApiName());
+            apiObj.put("displayName", apiObj, api.getDisplayName());
             apiObj.put("provider", apiObj, AppManagerUtil.replaceEmailDomainBack(subscribedAPI.getApiId().getProviderName()));
             apiObj.put("version", apiObj, subscribedAPI.getApiId().getVersion());
             apiObj.put("status", apiObj, api.getStatus().toString());
