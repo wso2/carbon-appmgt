@@ -1,4 +1,4 @@
-var tiers ={}; //contains Throttling tier details
+var tiers = {}; //contains Throttling tier details
 var throttlingTierControlBlock; //html formatted block for throttling tiers list
 
 
@@ -10,7 +10,7 @@ $( document ).ready(function() {
 
     //get Tier details from tier.xml
     $.ajax({
-        url: '/publisher/api/entitlement/get/Tiers',
+        url: '/publisher/api/entitlement/get/tiers',
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
@@ -20,6 +20,7 @@ $( document ).ready(function() {
             throttlingTierControlBlock = drawThrottlingTiersDynamically();
         },
         error: function () {
+            console.log("Error while retrieving tiers");
         }
     });
 
@@ -74,7 +75,7 @@ $( document ).ready(function() {
         }
     });
 
-    //load global (application level) dynamic optional java policies
+    //Load global (application level) dynamic optional java policies
     loadAvailableJavaPolicies(uuid, true);
 
    //fixed chrome issue with file paths
@@ -228,7 +229,8 @@ $( document ).ready(function() {
         $('#overview_acsUrl').hide();
     }
 
-    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
+    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save
+    // operation
     $(".skip_gateway_checkbox").click(function () {
         var output = [];
         if ($('.skip_gateway_checkbox').is(':checked')) {

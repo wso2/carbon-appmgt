@@ -251,16 +251,16 @@ function savePolicyPartial() {
     if (editedpolicyPartialId == 0) { //add
 
         //check if the name is already saved
-        if (policyPartialsArray.length > 0) {
-            for (var i = 0; i < policyPartialsArray.length; i++) {
-                if (policyPartialsArray[i].policyPartialName == policyPartialName) {
-                    //if policy group name is already saved show an warning and return
-                    Showalert("Cannot save Policy Group Name " + policyPartialName + " as it is already been saved. " +
-                    "Please select a different name", "alert-error", "statusError");
-                    return;
-                }
+        for (var i = 0; i < policyPartialsArray.length; i++) {
+            if (policyPartialsArray[i].policyPartialName == policyPartialName) {
+                //if policy group name is already saved show an warning and return
+                Showalert("Cannot save Policy Group Name " + policyPartialName
+                          + " as it is already been saved. " +
+                          "Please select a different name", "alert-error", "statusError");
+                return;
             }
         }
+
 
         $.ajax({
             url: context + '/apis/xacmlpolicies/save',

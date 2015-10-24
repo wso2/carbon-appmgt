@@ -42,10 +42,8 @@
             include(API_LOCATIONS+resource+'.jag');
         }
         else{
-            if (log.isDebugEnabled()) {
-                log.debug('Failed to locate resource');
-            }
-            response.sendError(404,'Resource does not exist');
+            log.error('Failed to locate resource');
+            response.sendError(404, 'Resource does not exist');
         }
     }
     else{

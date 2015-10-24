@@ -252,14 +252,13 @@ function savePolicyPartial() {
     if (editedpolicyPartialId == 0) { //add
 
         //check if the name is already saved
-        if (policyPartialsArray.length > 0) {
-            for (var i = 0; i < policyPartialsArray.length; i++) {
-                if (policyPartialsArray[i].policyPartialName == policyPartialName) {
-                    //if policy group name is already saved show an warning and return
-                    Showalert("Cannot save Policy Group Name " + policyPartialName + " as it is already been saved. " +
-                    "Please select a different name", "alert-error", "statusError");
-                    return;
-                }
+        for (var i = 0; i < policyPartialsArray.length; i++) {
+            if (policyPartialsArray[i].policyPartialName == policyPartialName) {
+                //if policy group name is already saved show an warning and return
+                Showalert("Cannot save Policy Group Name " + policyPartialName
+                          + " as it is already been saved. " +
+                          "Please select a different name", "alert-error", "statusError");
+                return;
             }
         }
 
@@ -316,25 +315,29 @@ function savePolicyPartial() {
 
                 var apps = "";
                 if (response.length != 0) {
-                    // construct and show the  the warning message with app names which use this partial before update
+                    // construct and show the  the warning message with app names which use this
+                    // partial before update
                     for (var i = 0; i < response.length; i++) {
-                        var j = i + 1;
-                        apps = apps + j + ". " + response[i].appName + "\n";
+                        apps = apps + (i + 1) + ". " + response[i].appName + "\n";
                     }
 
                     var msg = "policy " + policyPartialName + " is used in following apps " +
-                        apps +
-                        "Are you sure you want to modify the policy " + policyPartialName + "?";
+                              apps +
+                              "Are you sure you want to modify the policy " + policyPartialName
+                              + "?";
 
                     var conf = confirm(msg);
                     if (conf == true) {
-                        updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
+                        updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName,
+                                                    generatedRule, ruleCondition, ruleEffect,
+                                                    isSharedPartial, policyPartialDesc);
                     }
                 }
                 else {
-                    updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
+                    updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName,
+                                                generatedRule, ruleCondition, ruleEffect,
+                                                isSharedPartial, policyPartialDesc);
                 }
-
 
             },
             error: function (response) {
@@ -487,7 +490,8 @@ $(document).on("click", ".policy-delete-button", function () {
             success: function (response) {
                 var apps = "";
                 if (response.length != 0) {
-                    // construct and show the  the warning message with app names which use this partial before delete
+                    // construct and show the  the warning message with app names which use this
+                    // partial before delete
                     for (var i = 0; i < response.length; i++) {
                         var j = i + 1;
                         apps = apps + j + ". " + response[i].appName + "\n";

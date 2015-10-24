@@ -82,8 +82,8 @@ $(function() {
 		location.href = link;
 	});
 
-	//mouseStop();
 
+	mouseStopLeave();
 	History.Adapter.bind(window, 'statechange', function() {
 		var state = History.getState();
 		if (state.data.id === 'assets') {
@@ -148,7 +148,7 @@ $(function() {
 		var thiz = $(this);
 		thiz.addClass('selected-type');
 		loadAssets(thiz.attr('href'));
-		mouseStop();
+		mouseStopLeave();
 		e.preventDefault();
 	});
 

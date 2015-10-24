@@ -31,5 +31,8 @@
   "permissions": {
     "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
     "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
+  },
+  "roles": {
+    "internal_store_admin": "Internal/store-admin"
   }
 }

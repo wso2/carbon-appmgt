@@ -477,3 +477,8 @@ function populateVisibleRoles() {
 
 }
 
+$('.btn-cancel').click(function () {
+    history.go(-1);
+    return false;
+});
+

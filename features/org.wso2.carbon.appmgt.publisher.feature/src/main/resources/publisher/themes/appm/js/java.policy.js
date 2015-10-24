@@ -16,8 +16,8 @@
  * under the License.
  */
 
-var javaPolicyArray = new Array(); //contains Java Polices list
-var javaPolicyIndexArray = []; //used to maintain the selected Java Policy ID's list
+var javaPolicyArray = new Array(); //Contains Java Polices list
+var javaPolicyIndexArray = []; //Used to maintain the selected Java Policy ID's list
 
 /**
  * Load all the available Java Policies List and the Mapping for given Application Id
@@ -57,7 +57,7 @@ function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy) {
  * draw java policies list
  */
 function updateJavaPolicyPartial() {
-    var checkedStatus = "";
+    var checkedStatus;
     $.each(javaPolicyArray, function (index, obj) {
         if (obj != null) {
 
@@ -66,6 +66,8 @@ function updateJavaPolicyPartial() {
                 checkedStatus = "checked";
                 //push the id's of saved policies to array
                 javaPolicyIndexArray.push(obj.javaPolicyId);
+            } else {
+                checkedStatus = "";
             }
 
             //draw div's to each policy
@@ -80,7 +82,8 @@ function updateJavaPolicyPartial() {
         }
     });
 
-    //store the list of Java Policy id's (used in save operation to map the application wise assigned java policies)
+    //store the list of Java Policy id's (used in save operation to map the application wise
+    // assigned java policies)
     $('#uritemplate_javaPolicyIds').val(JSON.stringify(javaPolicyIndexArray));
 
     //draw java policy items
@@ -90,7 +93,8 @@ function updateJavaPolicyPartial() {
 }
 
 
-//this event triggers when an dynamic optional java policy get clicked. Need to maintain the selected policy id list
+//This event triggers when an dynamic optional java policy get clicked. Need to maintain the
+// selected policy id list
 $(document).on("click", ".javaPolicy-opt-val", function () {
     var javaPolicyId = parseInt($(this).attr("data-javaPolicy-id"));
     var itemIndex = javaPolicyIndexArray.indexOf(javaPolicyId); //index of clicked (current) item

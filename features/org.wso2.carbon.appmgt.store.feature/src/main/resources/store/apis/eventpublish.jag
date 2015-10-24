@@ -23,18 +23,18 @@
     if (!user) {
         //Capturing the UI activity change only if user is logged in
         if (log.isDebugEnabled()) {
-            log.debug("user is not logged in");
+            log.debug("User is not logged in");
         }
         return;
     }
 
-    //events contains the object[] passed from the JS which contains UI activity changes.
+    //events : Contains the object[] passed from the JS which contains UI activity changes.
     var events = [];
     events = request.getParameter("events");
 
-    var parseJSON = JSON.parse(events);
+    var parsedJSON = JSON.parse(events);
 
-    if (!parseJSON) {
+    if (!parsedJSON) {
         return;
     }
 
@@ -42,7 +42,7 @@
     var appMgtBAMPublishObj = new appMgtBAMPublishService();
 
     //Pass data to java class to save
-    appMgtBAMPublishObj.processUiActivityObject(parseJSON);
+    appMgtBAMPublishObj.processUiActivityObject(parsedJSON);
     if (log.isDebugEnabled()) {
         log.debug("UI Activity change data sent to process");
     }

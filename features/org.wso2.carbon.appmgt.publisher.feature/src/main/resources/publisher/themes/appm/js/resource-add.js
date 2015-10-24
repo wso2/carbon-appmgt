@@ -1,4 +1,4 @@
-var tiers ={}; //contains Throttling tier details
+var tiers = {}; //contains Throttling tier details
 
 var throttlingTierControlBlock; //html formatted block for throttling tiers list
 
@@ -18,7 +18,7 @@ $( document ).ready(function() {
 
     //get Tier details from tier.xml
     $.ajax({
-        url: '/publisher/api/entitlement/get/Tiers',
+        url: '/publisher/api/entitlement/get/tiers',
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
@@ -28,6 +28,7 @@ $( document ).ready(function() {
             throttlingTierControlBlock = drawThrottlingTiersDynamically();
         },
         error: function () {
+            console.log("Error while retrieving tiers");
         }
     });
 

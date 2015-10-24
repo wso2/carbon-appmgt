@@ -129,6 +129,8 @@ public class AppMDAO {
 	private static final String PRIMARY_LOGIN = "primary";
 	private static final String CLAIM_URI = "ClaimUri";
 
+    private static final String DB_TYPE_ORACLE = "Oracle";
+
 	public AppMDAO() {
 	}
 
@@ -615,17 +617,17 @@ public class AppMDAO {
 			ps.setString(1, context);
 			ps.setString(2, version);
 			rs = ps.executeQuery();
-			if (rs.next()) {
+            if (rs.next()) {
                 //use the web-app name as the Issuer
-				saml2SsoIssuer = rs.getString("APP_NAME");
+                saml2SsoIssuer = rs.getString("APP_NAME");
                 webAppInfoDTO.setSaml2SsoIssuer(saml2SsoIssuer);
                 webAppInfoDTO.setLogoutUrl(rs.getString("LOG_OUT_URL"));
                 webAppInfoDTO.setContext(context);
-				webAppInfoDTO.setVersion(version);
+                webAppInfoDTO.setVersion(version);
                 webAppInfoDTO.setAppID(rs.getInt("APP_ID"));
-				webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
-			}
-		} catch (SQLException e) {
+                webAppInfoDTO.setAllowAnonymous(rs.getBoolean("APP_ALLOW_ANONYMOUS"));
+            }
+        } catch (SQLException e) {
 			handleException("Error when executing the SQL: " + ssoInfoSqlQuery + " (Context:" +
 					context + " ,Version:" + version + ")", e);
 		} finally {
@@ -4123,7 +4125,7 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
 
             //oracle specific query
-            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+            if (connection.getMetaData().getDriverName().contains(DB_TYPE_ORACLE)) {
                 query = "SELECT WF_STATUS, WF_EXTERNAL_REFERENCE, WF_CREATED_TIME, WF_REFERENCE, TENANT_DOMAIN, " +
                         "TENANT_ID, WF_TYPE, WF_STATUS_DESC " +
                         "FROM APM_WORKFLOWS " +
@@ -4305,23 +4307,23 @@ public class AppMDAO {
 			prepStmt.setString(2, version);
 			rs = prepStmt.executeQuery();
 
-			while (rs.next()) {
+            while (rs.next()) {
                 URITemplate uriTemplate = new URITemplate();
-				uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
-				uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
-				uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
-				uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
-				uriTemplate.setSkipThrottling(rs.getBoolean("SKIP_THROTTLING"));
-				uriTemplate.setUserRoles(rs.getString("USER_ROLES"));
-				uriTemplates.add(uriTemplate);
-			}
-		} catch (SQLException e) {
+                uriTemplate.setHTTPVerb(rs.getString("HTTP_METHOD"));
+                uriTemplate.setAuthType(rs.getString("AUTH_SCHEME"));
+                uriTemplate.setUriTemplate(rs.getString("URL_PATTERN"));
+                uriTemplate.setThrottlingTier(rs.getString("THROTTLING_TIER"));
+                uriTemplate.setSkipThrottling(rs.getBoolean("SKIP_THROTTLING"));
+                uriTemplate.setUserRoles(rs.getString("USER_ROLES"));
+                uriTemplates.add(uriTemplate);
+            }
+        } catch (SQLException e) {
             handleException("Error while fetching URL Templates. Api Context - "
-                    + apiContext + ", Version - " + version, e);
+                                    + apiContext + ", Version - " + version, e);
         } finally {
-			APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
-		}
-		return uriTemplates;
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, rs);
+        }
+        return uriTemplates;
 	}
 
 	/**
@@ -4370,15 +4372,15 @@ public class AppMDAO {
 
 			resultSet = preparedStatement.executeQuery();
 
-			while (resultSet.next()) {
+            while (resultSet.next()) {
                 XACMLPolicyTemplateContext context = new XACMLPolicyTemplateContext();
-				context.setAppId(resultSet.getInt("APP_ID"));
-				context.setAppUuid(resultSet.getString("APP_UUID"));
-				context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
-				context.setRuleId(resultSet.getInt("RULE_ID"));
-				context.setRuleContent(resultSet.getString("RULE_CONTENT"));
-				contexts.add(context);
-			}
+                context.setAppId(resultSet.getInt("APP_ID"));
+                context.setAppUuid(resultSet.getString("APP_UUID"));
+                context.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
+                context.setRuleId(resultSet.getInt("RULE_ID"));
+                context.setRuleContent(resultSet.getString("RULE_CONTENT"));
+                contexts.add(context);
+            }
 
 		} catch (SQLException e) {
 			handleException("Error while fetching entitlement policy template contexts for webapp : " +
@@ -4743,10 +4745,10 @@ public class AppMDAO {
     public static List<URLMapping> getURITemplatesPerAPIAsString(APIIdentifier identifier)
             throws AppManagementException {
         Connection conn = null;
-		ResultSet resultSet = null;
-		PreparedStatement ps = null;
-		List<URLMapping> urlMappings = new ArrayList<URLMapping>();
-		try {
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        List<URLMapping> urlMappings = new ArrayList<URLMapping>();
+        try {
 			conn = APIMgtDBUtil.getConnection();
 
             String sqlQuery = "SELECT URL_PATTERN, HTTP_METHOD, AUTH_SCHEME, THROTTLING_TIER, USER_ROLES "
@@ -4944,14 +4946,16 @@ public class AppMDAO {
 				commentList.add(comment);
 			}
 		} catch (SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-                log.error("Failed to retrieve comments for Application - " + identifier.getApiName(), e);
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                log.error(
+                        "Failed to retrieve comments for Application - " + identifier.getApiName(),
+                        e);
             }
-			handleException("Failed to retrieve comments for  " + identifier.getApiName() + "-" +
-					identifier.getVersion(), e);
-		} finally {
+            handleException("Failed to retrieve comments for  " + identifier.getApiName() + "-" +
+                                    identifier.getVersion(), e);
+        } finally {
 			APIMgtDBUtil.closeAllConnections(prepStmt, connection, resultSet);
 		}
 		return commentList.toArray(new Comment[commentList.size()]);
@@ -5016,8 +5020,10 @@ public class AppMDAO {
      * @return policy partial id
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
-											String policyAuthor,String policyPartialDesc,int tenantId) throws AppManagementException {
+    public int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial,
+                                            boolean isSharedPartial,
+                                            String policyAuthor, String policyPartialDesc,
+                                            int tenantId) throws AppManagementException {
 
 		Connection connection = null;
 		PreparedStatement statementToInsertRecord = null;
@@ -5707,8 +5713,9 @@ public class AppMDAO {
 				}
 			}
 
-			// If there is no either an individual subscription or an enterprise subscription, don't authorize;
-			APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
+            // If there is no either an individual subscription or an enterprise subscription,
+            // don't authorize;
+            APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
 
             if (!hasValidSubscription) {
                 info.setValidationStatus(AppMConstants.API_AUTH_FORBIDDEN);
@@ -6338,13 +6345,13 @@ public class AppMDAO {
      * @param userId     User Id
      */
     public static void saveStoreHits(String webAppUUID, String userId,
-                                     Integer tenantId) throws SQLException, AppManagementException {
+                                     int tenantId) throws SQLException, AppManagementException {
         Connection conn = null;
 		try {
 			// get the connection for the specific UI Activity Publish data
 			// source
 			conn = APIMgtDBUtil.getUiActivityDBConnection();
-            Integer maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
+            int maxId = getMaxStoreHitCount(webAppUUID, userId, conn);
             insertUpdateStoreHits(webAppUUID, userId, maxId, tenantId, conn);
             conn.commit();
 		} finally {
@@ -6361,7 +6368,7 @@ public class AppMDAO {
      * @param conn       DB connection
      */
     private static void insertUpdateStoreHits(String webAppUUID, String userId,
-                                             Integer maxCount, Integer tenantId, Connection conn)
+                                              int maxCount, int tenantId, Connection conn)
             throws AppManagementException {
         ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -6464,7 +6471,7 @@ public class AppMDAO {
             conn = APIMgtDBUtil.getUiActivityDBConnection();
 
             //oracle specific query
-            if (conn.getMetaData().getDriverName().contains("Oracle")) {
+            if (conn.getMetaData().getDriverName().contains(DB_TYPE_ORACLE)) {
                 // Set 1: Selects all applications in APM_APP_HIT_TOTAL relevant to
                 // the logged user. Set 2: Select all applications in the store
                 // excluding set 1 Then Merge the result and sort descending order by
@@ -6537,7 +6544,7 @@ public class AppMDAO {
 	 * @return : last saved policy group id
 	 * @throws AppManagementException if any an error found while saving data to DB
 	 */
-    public static Integer savePolicyGroup(String policyGroupName, String throttlingTier,
+    public static int savePolicyGroup(String policyGroupName, String throttlingTier,
                                           String userRoles, String isAnonymousAllowed,
                                           Object[] objPartialMappings, String policyGroupDesc)
             throws AppManagementException {
@@ -6562,10 +6569,8 @@ public class AppMDAO {
 				policyGroupId = Integer.parseInt(rs.getString(1));
 			}
             // save partials mapped to policy group
-            if (objPartialMappings != null) {
-                if (objPartialMappings.length > 0) {
-                    savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
-                }
+            if (objPartialMappings != null && objPartialMappings.length > 0) {
+                savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
             }
 
 			conn.commit();
@@ -6644,10 +6649,8 @@ public class AppMDAO {
 			deletePolicyPartialMappings(policyGroupId, conn);
 
             //insert new partial mappings
-            if (objPartialMappings != null) {
-                if (objPartialMappings.length > 0) {
-                    savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
-                }
+            if (objPartialMappings != null && objPartialMappings.length > 0) {
+                savePolicyPartialMappings(policyGroupId, objPartialMappings, conn);
             }
 
 			conn.commit();
@@ -6960,10 +6963,10 @@ public class AppMDAO {
 	/**
 	 * Get policy group related polices for the given application UUID
 	 *
-	 * @param AppUUID application UUID
+	 * @param appUUID application UUID
 	 * @return an array of policy details objects
 	 */
-	public static JSONArray getPolicyGroupXACMLPoliciesByApplication(String AppUUID)
+	public static JSONArray getPolicyGroupXACMLPoliciesByApplication(String appUUID)
 			throws AppManagementException {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -6982,7 +6985,7 @@ public class AppMDAO {
 		try {
 			conn = APIMgtDBUtil.getConnection();
 			ps = conn.prepareStatement(query);
-			ps.setString(1, AppUUID);
+			ps.setString(1, appUUID);
 			rs = ps.executeQuery();
 			while (rs.next()) {
                 JSONObject objPartial = new JSONObject();
@@ -6997,7 +7000,7 @@ public class AppMDAO {
 			}
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get policies under each policy group mapped " +
-					"with the application : " + query + " : (Application UUID:" + AppUUID + ")", e);
+					"with the application : " + query + " : (Application UUID:" + appUUID + ")", e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
@@ -7171,6 +7174,9 @@ public class AppMDAO {
 		List<JavaPolicy> policies = new ArrayList<JavaPolicy>();
 		String strJavaPolicyProperty = "";
         boolean isMandatory = true;
+        JSONParser parser = new JSONParser();
+        //Contains Policy Properties
+        Map<String, String> policyPropertyMap = new HashMap<>();
 
         String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID, DISPLAY_NAME, " +
                 "DISPLAY_ORDER_SEQ_NO, APP.APP_ID AS APP_ID, FULL_QUALIFI_NAME, POLICY_PROPERTIES " +
@@ -7187,20 +7193,26 @@ public class AppMDAO {
 			ps.setBoolean(2, isMandatory);
             ps.setBoolean(3, isGlobalPolicy);
             rs = ps.executeQuery();
-			JSONParser parser = new JSONParser();
-			while (rs.next()) {
-				JavaPolicy policy = new JavaPolicy();
-
-				policy.setPolicyID(rs.getInt("JAVA_POLICY_ID"));
-				policy.setPolicyName(rs.getString("DISPLAY_NAME"));
-				policy.setFullQualifiName(rs.getString("FULL_QUALIFI_NAME"));
-				policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
-				strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
-				if (strJavaPolicyProperty != null) {
-					policy.setProperties((JSONObject) parser.parse(strJavaPolicyProperty));
-				}
-				policies.add(policy);
-			}
+            while (rs.next()) {
+                JavaPolicy policy = new JavaPolicy();
+                policy.setPolicyID(rs.getInt("JAVA_POLICY_ID"));
+                policy.setPolicyName(rs.getString("DISPLAY_NAME"));
+                policy.setFullQualifiName(rs.getString("FULL_QUALIFI_NAME"));
+                policy.setOrder(rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+                strJavaPolicyProperty = rs.getString("POLICY_PROPERTIES");
+                if (strJavaPolicyProperty != null) {
+                    JSONObject objPolicyProperties = ((JSONObject) parser.parse(
+                            strJavaPolicyProperty));
+                    //If policy contains any properties, run a loop and assign them
+                    Set<String> keys = objPolicyProperties.keySet();
+                    for (String key : keys) {
+                        policyPropertyMap.put(key.toString(), objPolicyProperties.get(key)
+                                .toString());
+                    }
+                    policy.setProperties(policyPropertyMap);
+                }
+                policies.add(policy);
+            }
 
 		} catch (SQLException e) {
 			handleException("SQL Error while executing the query to get mapped Java Policies : "

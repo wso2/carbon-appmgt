@@ -5,7 +5,6 @@ $(function() {
 			  var allowAnonymous = $(this).find("input").val();
 			  if (allowAnonymous.toUpperCase() != "TRUE") {
 				  var ssoEnabled = $('#sso').val();
-				  console.log(ssoEnabled);
 				  if (ssoEnabled == 'true') {
 					  location.href = "/store/login";
 				  } else {

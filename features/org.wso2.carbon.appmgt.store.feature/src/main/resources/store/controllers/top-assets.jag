@@ -8,28 +8,29 @@ include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 
 require('/modules/store.js').exec(function (ctx) {
     var paging, count, current, loggedUser, manager, assets, length, recentDiff,
-            popularDiff, recent, popular, type, process,
-            log = ctx.log,
-            query = ctx.params.query,
-            tag = ctx.params.tag,
-            sso = ctx.sso,
-            store = ctx.store,
-            user = ctx.user,
-            tenantId = ctx.tenantId,
-            configs = ctx.configs,
-            site = ctx.site,
-            matcher = ctx.matcher,
-            first = true,
-            recentCount = 10,
-            popularCount = 10,
-            items = [],
-            popularItems = [],
-            recentItems = [],
-            options = {},
-            types = store.assetTypes(),
-            search = require('/modules/search.js'),
-            utility = require('/modules/util.js'),isSubscribed,
-            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+        popularDiff, recent, popular, type, process,
+        log = ctx.log,
+        query = ctx.params.query,
+        tag = ctx.params.tag,
+        sso = ctx.sso,
+        store = ctx.store,
+        user = ctx.user,
+        tenantId = ctx.tenantId,
+        configs = ctx.configs,
+        site = ctx.site,
+        matcher = ctx.matcher,
+        first = true,
+        recentCount = 10,
+        popularCount = 10,
+        items = [],
+        popularItems = [],
+        recentItems = [],
+        options = {},
+        types = store.assetTypes(),
+        search = require('/modules/search.js'),
+        utility = require('/modules/util.js'),
+        isSubscribed,
+        social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
     process = require('process'),
@@ -60,17 +61,21 @@ require('/modules/store.js').exec(function (ctx) {
         var defaultApplicationName = "DefaultApplication";
 
         var enterpriseSubscription;
-        if (authenticator.getLoggedInUser()) {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
-        } else {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
-        }
-
         var individualSubscription;
         if (authenticator.getLoggedInUser()) {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                                                authenticator.getLoggedInUser().username).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                authenticator.getLoggedInUser().username).subscription;
         } else {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                                                null).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                null).subscription;
         }
 
         var subscriptionInfo = {};

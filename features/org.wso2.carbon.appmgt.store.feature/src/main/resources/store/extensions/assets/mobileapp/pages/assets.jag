@@ -135,10 +135,11 @@ require('/modules/store.js').exec(function (ctx) {
 
         }
         else if (paging.sort == 'usage') {
+            //search by usage icon functionality implemented here. It will sort the assets by usage
             server.privileged(function () {
                 var config = require('/config/store.json');
                 var userName = user ? user.username : "";
-                var index = 0, maxTry = 0;
+                var index = 0, currentTry = 0, maxTry = 10;
                 var getNextassetSet = function () {
                     var bamService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var bamServiceObj = new bamService();
@@ -146,29 +147,31 @@ require('/modules/store.js').exec(function (ctx) {
                         log.debug("Object initialized successfully : org.wso2.carbon.appmgt.impl.dao.AppMDAO ");
                     }
 
-                    var result = bamServiceObj.getAppsByHitCount(userName, (paging.start + index), 12, config.uiActivityPublishDataSource);
+                    var result = bamServiceObj.getAppsByHitCount(userName, (paging.start + index),
+                                                                 PAGE_SIZE,
+                                                                 config.uiActivityPublishDataSource);
                     if (log.isDebugEnabled()) {
-                        log.debug("query executed successfully to get the assets hit count");
+                        log.debug("Query executed successfully to get the assets hit count.");
                     }
-                    index += store.getPageSize();
+                    index += PAGE_SIZE;
                     return JSON.parse(result);
                 };
 
                 assets = [];
-                while (assets.length < PAGE_SIZE && maxTry < 10) {
-                    maxTry++;
+                while (assets.length < PAGE_SIZE && currentTry < maxTry) {
+                    currentTry++;
                     var result = getNextassetSet();
-                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
-                        var aid = String(result[n].UUID);
+                    for (var n = 0; n < result.length; n++) {
+                        var assetId = String(result[n].UUID);
                         try {
-                            var asset = store.asset(type, aid);
-                            asset.indashboard = store.isuserasset(aid, type);
+                            var asset = store.asset(type, assetId);
+                            asset.indashboard = store.isuserasset(assetId, type);
                             if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
                                 assets.push(asset);
                             }
                         } catch (e) {
-                            log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                            aid);
+                            log.warn("Error retrieving asset from store ,information might be "
+                                     + "stale in table. id=" + assetId);
                         }
                     }
                 }

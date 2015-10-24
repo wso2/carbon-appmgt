@@ -62,19 +62,20 @@ var extractVisibleRoles = function(data){
 		// Or else check against the exclude list.
 		var config = require("/config/publisher.json");
 		var excludedRolesList = config.excludedRolesList;
-	
-		for(var i = 0; i < excludedRolesList.length; i++){
-			if(role == excludedRolesList[i]){
-				log.debug("Excluding role '" + role + "' from visible roles list. Reason : Role is in the exclude list ==> " + JSON.stringify(excludedRolesList))
-				return true;
-			}
-		}
 
-		return false;
-
+        for (var i = 0; i < excludedRolesList.length; i++) {
+            if (role == excludedRolesList[i]) {
+                log.debug("Excluding role '" + role
+                          + "' from visible roles list. Reason : Role is in the exclude list ==> "
+                          + JSON.stringify(excludedRolesList))
+                return true;
+            }
+        }
+        return false;
 	}
 
-	// Function :: Checks whether the given permissions array has GET permission. We only deal with GET permission.
+	// Function :: Checks whether the given permissions array has GET permission. We only deal with
+    // GET permission.
 	var hasGetPermission = function(permissions){
 
 		for(var i = 0; i < permissions.length; i++){
@@ -118,6 +119,7 @@ var selectCategories = function(fields) {
 		}
 	}
 }
+
 
 
 
