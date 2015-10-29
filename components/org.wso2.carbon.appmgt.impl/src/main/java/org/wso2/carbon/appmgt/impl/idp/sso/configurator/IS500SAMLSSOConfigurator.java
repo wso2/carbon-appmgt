@@ -185,7 +185,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             SAMLSSOServiceProviderDTO samlSPDTO = getIssuer(issuerName);
             ssoProvider.setAssertionConsumerURL(samlSPDTO.getAssertionConsumerUrl());
             ssoProvider.setNameIdFormat(samlSPDTO.getNameIDFormat());
-            ssoProvider.setLogoutUrl(samlSPDTO.getLogoutURL());
+            ssoProvider.setLogoutUrl(samlSPDTO.getSloResponseURL());
             ssoProvider.setIssuerName(samlSPDTO.getIssuer());
 
             return ssoProvider;
