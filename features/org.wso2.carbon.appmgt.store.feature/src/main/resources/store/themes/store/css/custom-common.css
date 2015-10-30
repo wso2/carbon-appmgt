@@ -146,7 +146,7 @@ html {
 
 body {
 	font-family:'Open Sans';
-	background:#fff;
+	background:#eeeeee;
     font-weight: 100;
     color: #444444;
     font-size: 14px;
@@ -218,7 +218,8 @@ h2.app-title {
 
 .wr-app-bar {
 	background:#14212E;
-	height:53px;    
+	height:53px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
 header {

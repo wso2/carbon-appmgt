@@ -1,11 +1,19 @@
 .app-assets{
 
-    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    background: #fff;
+    margin: 5px;
+    padding-bottom: 2px;
+    position: relative;
+
 }
+
 
 .app-assets-wrapper{
     padding-top: 5px;
+    padding-right: 2px;
+    padding-left: 2px;
+    padding-bottom: 5px;
 }
 
 .app-assets-icon{
@@ -18,7 +26,7 @@
 }
 
 .app-assets-icon:hover{
-    background: #f1f1f1;
+    background: #dedede;
 }
 
 .app-assets-icon-info-platform{
@@ -30,8 +38,15 @@
 }
 
 .app-assets-icon-info{
-    text-align: center;
     padding-bottom: 5px;
+    position: absolute;
+    overflow: hidden;
+    bottom:92px;
+    left: 7px;
+}
+
+.app-asset-icon-info{
+    text-align: center;
 }
 
 .app-assets-name{
@@ -185,10 +200,6 @@
 }
 
 
-
-
-
-
 /* carousel */
 .media-carousel
 {
@@ -279,11 +290,6 @@
     text-align: center;
     padding-top: 200px;
 }
-
-
-
-
-
 
 
 .tags {
@@ -377,8 +383,11 @@
 
 
 .asset-wrapper{
-    padding-top: 30px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    padding-top: 20px;
     padding-right: 30px;
+    background: white;
+    padding-bottom: 20px;
 }
 
 .assets-wrapper{
@@ -387,9 +396,17 @@
 }
 
 .right-sidebar{
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     padding-top: 10px;
     padding-left: 30px;
+    background: #ffffff;
+    margin-top: 10px;
 }
+
+@media (min-width: 1200px){
+    .col-lg-2 {
+        width: 12.5%;
+    }
 
 
 .nothing-icon{
