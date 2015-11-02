@@ -1,6 +1,6 @@
 .app-assets{
 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     background: #fff;
     margin: 5px;
     padding-bottom: 2px;
@@ -383,7 +383,7 @@
 
 
 .asset-wrapper{
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     padding-top: 20px;
     padding-right: 30px;
     background: white;
@@ -396,7 +396,7 @@
 }
 
 .right-sidebar{
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding-top: 10px;
     padding-left: 30px;
     background: #ffffff;
@@ -404,7 +404,7 @@
 }
 
 @media (min-width: 1200px){
-    .col-lg-2 {
+    .col-lg-1-5 {
         width: 12.5%;
     }
 
