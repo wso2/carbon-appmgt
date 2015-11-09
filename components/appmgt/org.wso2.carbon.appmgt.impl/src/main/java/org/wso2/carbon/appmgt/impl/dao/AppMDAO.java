@@ -6673,7 +6673,7 @@ public class AppMDAO {
 						+ "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
 						+ "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
 						+ "GROUP BY HIT.UUID "
-						+ "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?"
+						+ "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 				}
 
 				ps = uiConn.prepareStatement(query);
