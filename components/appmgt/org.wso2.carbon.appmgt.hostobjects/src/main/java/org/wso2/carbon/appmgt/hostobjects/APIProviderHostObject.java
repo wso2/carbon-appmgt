@@ -2180,7 +2180,9 @@ public class APIProviderHostObject extends ScriptableObject {
                 NativeObject row = new NativeObject();
                 Object subscriberObject = it.next();
                 Subscriber user = (Subscriber) subscriberObject;
-                row.put("userName", row, user.getName());
+                row.put("username", row, user.getName());
+                row.put("tenantID", row, user.getTenantId());
+                row.put("emailAddress", row, user.getEmail());
                 row.put("subscribedDate", row, checkValue(Long.valueOf(user.getSubscribedDate().getTime()).toString()));
                 myn.put(i, myn, row);
                 i++;

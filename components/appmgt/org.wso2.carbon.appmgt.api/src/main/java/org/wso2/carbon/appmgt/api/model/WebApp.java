@@ -113,6 +113,8 @@ public class WebApp {
 
     private boolean skipGateway;
 
+    private String acsURL;
+    
     //TODO: missing - total user count, up time statistics,tier
 
 
@@ -647,5 +649,13 @@ public class WebApp {
 
     public void setSkipGateway(boolean skipGateway) {
         this.skipGateway = skipGateway;
+    }
+
+    public String getAcsURL() {
+        return acsURL;
+    }
+
+    public void setAcsURL(String acsURL) {
+        this.acsURL = acsURL;
     }
 }

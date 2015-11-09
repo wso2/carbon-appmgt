@@ -86,7 +86,6 @@ public class SAML2Authenticator implements Authenticator{
             APISecurityUtils.setAuthenticationContext(synCtx, authContext, "X-JWT-Assertion");
             return true;
         } else {
-            log.warn("Access failure for WebApp: " + apiContext + ", version: " + apiVersion + ", samlssoTokenId: " + authCookie);
             return false;
         }
     }
@@ -137,10 +136,6 @@ public class SAML2Authenticator implements Authenticator{
         authContext.setApiVersion(info.getApiVersion());
         authContext.setApiPublisher(info.getApiPublisher());
         authContext.setLogoutURL(info.getLogoutURL());
-
-        if (authContext.getAccessToken() != null) {
-            getKeyCache().put(authContext.getAccessToken(), subscriber);
-        }
 
         return authContext;
 

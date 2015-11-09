@@ -51,11 +51,13 @@ public class JWTGenerator {
 
     private static final Log log = LogFactory.getLog(JWTGenerator.class);
 
-    private static final String API_GATEWAY_ID = "wso2.org/products/am";
+    private static final String ISSUER = "wso2.org/products/appm";
 
     private static final String SHA256_WITH_RSA = "SHA256withRSA";
 
     private static final String NONE = "NONE";
+
+    public static final String JWT_ALGORITHM_NAME_FOR_SHA256_WITH_RSA = "RS256";
 
     private static volatile long ttl = -1L;
 
@@ -173,7 +175,7 @@ public class JWTGenerator {
         StringBuilder jwtBuilder = new StringBuilder();
         jwtBuilder.append("{");
         jwtBuilder.append("\"iss\":\"");
-        jwtBuilder.append(API_GATEWAY_ID);
+        jwtBuilder.append(ISSUER);
         jwtBuilder.append("\",");
 
         jwtBuilder.append("\"exp\":");
@@ -314,7 +316,7 @@ public class JWTGenerator {
         StringBuilder jwtBuilder = new StringBuilder();
         jwtBuilder.append("{");
         jwtBuilder.append("\"iss\":\"");
-        jwtBuilder.append(API_GATEWAY_ID);
+        jwtBuilder.append(ISSUER);
         jwtBuilder.append("\",");
 
         jwtBuilder.append("\"exp\":");
@@ -402,7 +404,7 @@ public class JWTGenerator {
                     tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
                 }
 
-                claims.put("Subject", userName);
+                claims.put("sub", userName);
                 claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
 
                 return claims;
@@ -552,7 +554,7 @@ public class JWTGenerator {
             //{"typ":"JWT", "alg":"[2]", "x5t":"[1]"}
             jwtHeader.append("{\"typ\":\"JWT\",");
             jwtHeader.append("\"alg\":\"");
-            jwtHeader.append(signatureAlgorithm);
+            jwtHeader.append(JWT_ALGORITHM_NAME_FOR_SHA256_WITH_RSA);
             jwtHeader.append("\",");
 
             jwtHeader.append("\"x5t\":\"");
