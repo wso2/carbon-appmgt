@@ -2792,6 +2792,12 @@ public final class AppManagerUtil {
         return -1;
     }
 
-
+    public static boolean isUIActivityBAMPublishEnabled() {
+        AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isEnabled = configuration
+                .getFirstProperty(AppMConstants.API_USAGE_BAM_UI_ACTIVITY_ENABLED);
+        return isEnabled != null && Boolean.parseBoolean(isEnabled);
+    }
 
 }

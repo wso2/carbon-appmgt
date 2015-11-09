@@ -393,12 +393,10 @@ public class APIUsageStatisticsClient {
      * @throws APIMgtUsageQueryServiceClientException
      * @throws SQLException
      */
-    public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, String tenantName)
-            throws APIMgtUsageQueryServiceClientException, SQLException, UserStoreException {
+    public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, int tenantId)
+            throws APIMgtUsageQueryServiceClientException, SQLException {
 
         List<AppHitsStatsDTO> appHitsStatsList = null;
-        TenantManager tenantManager = TenantMgtCoreServiceComponent.getTenantManager();
-        int tenantId = tenantManager.getTenantId(tenantName);
         Map<String, AppHitsStatsDTO> appHitsStatsMap = this.queryForAppHitsOverTime(fromDate, toDate, tenantId);
         if (appHitsStatsMap != null) {
             appHitsStatsList = new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
