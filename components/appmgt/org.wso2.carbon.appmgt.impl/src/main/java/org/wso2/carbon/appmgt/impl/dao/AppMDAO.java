@@ -6616,7 +6616,7 @@ public class AppMDAO {
      */
     public static JSONArray getAppsByHitCount(String userId,
                                               Integer startIndex, Integer pageSize) {
-        Connection uiConn;
+        Connection dataConn;
         String strResult;
 
         // build the final result format string
@@ -6633,13 +6633,13 @@ public class AppMDAO {
                 .append(", pageSize:").append(pageSize).append(")");
 
         try {
-            //get the connection for the UI Activity Publish data source
-            uiConn = APIMgtDBUtil.getUiActivityDBConnection();
+            //get the connection for the AM data source
+            dataConn = APIMgtDBUtil.getConnection();
 
             if (AppManagerUtil.isUIActivityBAMPublishEnabled()) {
-                getAppHitStatsFromBamAndAppm(uiConn, userId, startIndex, pageSize, builderResult);
+                getAppHitStatsFromBamAndAppm(dataConn, userId, startIndex, pageSize, builderResult);
             } else {
-                getAppHitStatsFromAppmOnly(uiConn, userId, startIndex, pageSize, builderResult);
+                getAppHitStatsFromAppmOnly(dataConn, userId, startIndex, pageSize, builderResult);
             }
             strResult = "[" + builderResult.toString() + "]";
             if (log.isDebugEnabled()) {
@@ -6659,13 +6659,13 @@ public class AppMDAO {
         return jsonResultArr;
     }
 
-    private static void getAppHitStatsFromAppmOnly(Connection uiConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
+    private static void getAppHitStatsFromAppmOnly(Connection dataConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
             throws SQLException {
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
             String query;
-            if (uiConn.getMetaData().getDriverName().contains("Oracle")) {
+            if (dataConn.getMetaData().getDriverName().contains("Oracle")) {
                 query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME)AS APP_NAME "
                         + "FROM APM_APP_HITS HIT "
                         + "LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
@@ -6686,7 +6686,7 @@ public class AppMDAO {
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
             }
 
-            ps = uiConn.prepareStatement(query);
+            ps = dataConn.prepareStatement(query);
             ps.setString(1, userId);
             ps.setString(2, userId);
             ps.setInt(3, startIndex);
@@ -6699,21 +6699,21 @@ public class AppMDAO {
                 builderResult.append("{\"UUID\":\"").append(rs.getString("UUID")).append("\"}");
             }
         } finally {
-            APIMgtDBUtil.closeAllConnections(ps, uiConn, rs);
+            APIMgtDBUtil.closeAllConnections(ps, dataConn, rs);
         }
     }
 
-    private static void getAppHitStatsFromBamAndAppm(Connection uiConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
+    private static void getAppHitStatsFromBamAndAppm(Connection dataConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
             throws SQLException {
         List<String> uuidList = new ArrayList<String>();
         ResultSet rs = null;
         PreparedStatement ps = null;
         ResultSet appmUuidResultSet = null;
         PreparedStatement appmUuidPs = null;
-        Connection dataConn = null;
+        Connection uiConn = null;
         try {
-            //get the connection for the AM data source
-            dataConn = APIMgtDBUtil.getConnection();
+            //get the connection for the UI Activity Publish data source
+            uiConn = APIMgtDBUtil.getUiActivityDBConnection();
 
             String query;
             if (uiConn.getMetaData().getDriverName().contains("Oracle")) {
@@ -6748,7 +6748,7 @@ public class AppMDAO {
                     queryForGetAppmUuid += ",";
                 }
             }
-            if (uiConn.getMetaData().getDriverName().contains("Oracle")) {
+            if (dataConn.getMetaData().getDriverName().contains("Oracle")) {
                 queryForGetAppmUuid += ")  WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "ORDER BY APP_NAME ASC";
             } else {
