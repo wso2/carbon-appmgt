@@ -45,6 +45,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.usage.publisher.dto.RequestPublisherDTO;
@@ -102,10 +103,13 @@ public class APIMgtUsageHandler extends AbstractHandler {
             String referer = headers.get("Referer");
             String contextAndVersion[] = getContextWithVersion(referer);
             String context = "/" + contextAndVersion[0];
-            String version = contextAndVersion[1];
+            String trackingCode = headers.get("trackingCode");
+            WebAppInfoDTO webAppInfoDTO = AppMDAO.getWebAppByTrackingCode(trackingCode);
+            String version = webAppInfoDTO.getVersion();
+            referer = referer + version;
             String tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
             if (context.contains("/t/")) {
-            	tenantDomain = contextAndVersion[2];
+            	tenantDomain = contextAndVersion[1];
             }
 
             WebApp webApp = getWebApp(context, version);
@@ -293,24 +297,22 @@ public class APIMgtUsageHandler extends AbstractHandler {
         if (refer != null && refer.length() > 0) {
            
         	if (refer.contains("/t/")) {
-        		// e.g URL pattern : "http://localhost:8281/t/lakmali.com/united-airline/1.0.0/";
+        		// e.g URL pattern : "http://localhost:8281/t/lakmali.com/united-airline/";
         		String s[] = refer.split("/t/");
         		if (s.length >= 2) {
         			String stringAfterSlashT = s[1];
         			String result[] = stringAfterSlashT.split("/");
-        			if (result.length >= 3) {
+        			if (result.length >= 2) {
         				webapp[0] = "t/" + result[0] + "/" + result[1];
-        				webapp[1] = result[2];
-        				webapp[2] = result[0];
+        				webapp[1] = result[0];
         			}
         		}
         		
         	} else {
-        		// e.g URL pattern : "http://localhost:8281/united-airline/1.0.0/";
+        		// e.g URL pattern : "http://localhost:8281/united-airline/";
                 String s[]=refer.split("/");
-                if (s.length >= 5) {
+                if (s.length >= 4) {
 	                webapp[0] = s[3];
-	                webapp[1] = s[4];
                 }
         	}
              return webapp;

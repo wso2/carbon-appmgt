@@ -37,6 +37,7 @@ import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClie
 import org.wso2.carbon.appmgt.usage.client.internal.AppMUsageClientServiceComponent;
 import org.wso2.carbon.bam.presentation.stub.QueryServiceStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.naming.Context;
@@ -107,7 +108,7 @@ public class APIUsageStatisticsClient {
             element = buildOMElement(new FileInputStream(filePath));
             paymentPlan = new PaymentPlan(element);
             }
-            String targetEndpoint = config.getFirstProperty("APIUsageTracking.BAMServerURL");
+            String targetEndpoint = config.getFirstProperty("Analytics.BAMServerURL");
             if (targetEndpoint == null || targetEndpoint.equals(""))
                 throw new APIMgtUsageQueryServiceClientException("Required BAM server URL parameter unspecified");
             apiProviderImpl = APIManagerFactory.getInstance().getAPIProvider(username);
@@ -380,6 +381,26 @@ public class APIUsageStatisticsClient {
         }
         return usageByName;
     }
+
+     /**
+     * Get no of app hits over time.
+     * @param fromDate String.
+     * @param toDate String.
+     * @param tenantName String.
+     * @return App hits stats list.
+     * @throws org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException
+     * @throws java.sql.SQLException
+     */
+     public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, String tenantName)
+                throws APIMgtUsageQueryServiceClientException, SQLException, UserStoreException {
+         List<AppHitsStatsDTO> appHitsStatsList = null;
+         int tenantId = -1234;
+         Map<String, AppHitsStatsDTO> appHitsStatsMap = this.queryForAppHitsOverTime(fromDate, toDate, tenantId);
+         if (appHitsStatsMap != null) {
+             appHitsStatsList = new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
+         }
+         return appHitsStatsList;
+     }
 
     //cacheHitsummary
 
@@ -856,7 +877,8 @@ public class APIUsageStatisticsClient {
                     for (int i = 1; i <= columnCount; i++) {
                         String columnName = rs.getMetaData().getColumnName(i);
                         String columnValue = rs.getString(columnName);
-                        returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                        String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                        returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                                 "</" + columnName.toLowerCase() + ">");
                     }
                     returnStringBuilder.append("</row>");
@@ -942,7 +964,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1020,7 +1043,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1098,7 +1122,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1177,10 +1202,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    if(columnName.equalsIgnoreCase("REFERER")){
-                        columnValue = StringEscapeUtils.escapeXml(columnValue);
-                    }
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1273,7 +1296,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1357,7 +1381,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -1393,7 +1418,106 @@ public class APIUsageStatisticsClient {
         }
     }
 
-    //cashe stat page quary
+    private Map<String, AppHitsStatsDTO> queryForAppHitsOverTime(String fromDate, String toDate, int tenantId)
+            throws APIMgtUsageQueryServiceClientException, SQLException {
+        if (dataSource == null) {
+            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
+                                 "that the data source is properly configured in the APIUsageTracker configuration.");
+        }
+
+        Map<String, AppHitsStatsDTO> appHitsStatsMap = new HashMap<String, AppHitsStatsDTO>();
+        Connection connection = null;
+        Statement statement = null;
+        PreparedStatement getAppHitsStatement = null;
+        ResultSet appInfoResult = null;
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+            String queryToGetAppsHits = "SELECT UUID, APP_NAME, VERSION, COUNT(*) AS TOTAL_HITS_COUNT  " +
+                                        "FROM APM_APP_HITS WHERE TENANT_ID =  " + tenantId + " " +
+                                        "AND HIT_TIME BETWEEN '" + fromDate + "' AND '" + toDate + "'" +
+                                        "GROUP BY APP_NAME, VERSION ORDER BY TOTAL_HITS_COUNT";
+
+            getAppHitsStatement = connection.prepareStatement(queryToGetAppsHits);
+            appInfoResult = getAppHitsStatement.executeQuery();
+
+            if(appInfoResult.isBeforeFirst()) {
+                String queryToGetUserHits = "SELECT UUID, USER_ID, COUNT(*) AS USER_HITS_COUNT " +
+                                           "FROM APM_APP_HITS WHERE UUID IN ( ";
+                while (appInfoResult.next()) {
+                    AppHitsStatsDTO appHitsStats = new AppHitsStatsDTO();
+                    String uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
+                    appHitsStats.setUuid(uuid);
+                    queryToGetUserHits += "'" + uuid + "'";
+                    if (!appInfoResult.isLast()) {
+                        queryToGetUserHits += ",";
+                    }
+                    appHitsStats.setAppName(appInfoResult.getString(APIUsageStatisticsClientConstants.APP_NAME));
+                    appHitsStats.setVersion(appInfoResult.getString(APIUsageStatisticsClientConstants.VERSION));
+                    appHitsStats.setTotalHitCount(appInfoResult.getInt(APIUsageStatisticsClientConstants.TOTAL_HITS_COUNT));
+                    appHitsStatsMap.put(uuid, appHitsStats);
+                }
+                queryToGetUserHits += ") GROUP BY USER_ID,UUID ORDER BY UUID";
+
+                return getUserHitsStats(appHitsStatsMap, queryToGetUserHits);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Error when executing the SQL", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
+        }
+    }
+
+    private Map<String, AppHitsStatsDTO> getUserHitsStats(Map<String, AppHitsStatsDTO> appHitsStatsMap, String queryToGetUserHits)
+                throws APIMgtUsageQueryServiceClientException, SQLException {
+
+        if (dataSource == null) {
+                    throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
+                           "that the data source is properly configured in the APIUsageTracker configuration.");
+        }
+        Connection connection = null;
+        Statement statement = null;
+        PreparedStatement getAppHitsStatement = null;
+        ResultSet appInfoResult = null;
+        AppHitsStatsDTO appHitsStats;
+        String uuid;
+        List<UserHitsPerAppDTO> userHitsStatsList;
+
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.createStatement();
+
+
+            getAppHitsStatement = connection.prepareStatement(queryToGetUserHits);
+
+            appInfoResult = getAppHitsStatement.executeQuery();
+            //  StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
+            //int columnCount = rs.getMetaData().getColumnCount();
+            while (appInfoResult.next()) {
+               UserHitsPerAppDTO userHitsPerApp = new UserHitsPerAppDTO();
+               userHitsPerApp.setUserName(appInfoResult.getString("USER_ID"));
+               userHitsPerApp.setUserHitsCount(appInfoResult.getInt(APIUsageStatisticsClientConstants.USER_HITS_COUNT));
+
+                uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
+                appHitsStats = appHitsStatsMap.get(uuid);
+
+                userHitsStatsList = appHitsStats.getUserHitsList();
+                userHitsStatsList.add(userHitsPerApp);
+
+             }
+
+            return appHitsStatsMap;
+
+        } catch (SQLException e) {
+            throw new SQLException("Error when executing the SQL", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
+        }
+    }
+
+    //cache stat page query
 
     private OMElement queryForCacheHitCount(String fromDate, String toDate, Integer limit)
             throws APIMgtUsageQueryServiceClientException, SQLException, XMLStreamException {
@@ -1443,7 +1567,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
@@ -2060,7 +2185,8 @@ public class APIUsageStatisticsClient {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = rs.getMetaData().getColumnName(i);
                     String columnValue = rs.getString(columnName);
-                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + columnValue +
+                    String xmlEscapedValue = StringEscapeUtils.escapeXml(columnValue);
+                    returnStringBuilder.append("<" + columnName.toLowerCase() + ">" + xmlEscapedValue +
                             "</" + columnName.toLowerCase() + ">");
                 }
                 returnStringBuilder.append("</row>");
