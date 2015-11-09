@@ -164,4 +164,11 @@ public class HostObjectUtils {
         String enabledStr = configuration.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_ENABLED);
         return enabledStr != null && Boolean.parseBoolean(enabledStr);
     }
+
+    protected static boolean checkUIActivityBAMPublishEnabled() {
+        AppManagerConfiguration configuration =
+                ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String enabledStr = configuration.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_UI_ACTIVITY_ENABLED);
+        return enabledStr != null && Boolean.parseBoolean(enabledStr);
+    }
 }
