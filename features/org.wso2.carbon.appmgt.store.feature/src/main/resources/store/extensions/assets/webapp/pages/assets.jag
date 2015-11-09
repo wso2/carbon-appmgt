@@ -292,7 +292,7 @@ require('/modules/store.js').exec(function (ctx) {
     AuthService=require(getServiceDir('authentication.js')).serviceModule;
     authenticator=new AuthService.Authenticator();
     authenticator.init(jagg,session);
-    user=authenticator.getLoggedInUser();
+    //user=authenticator.getLoggedInUser();
 
     if(currentPage-1 > 0){
         var leftnav = currentPage-1;
