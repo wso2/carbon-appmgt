@@ -19,7 +19,8 @@
 (function () {
     var log = new Log();
     var server = require('store').server;
-    var user = server.current(session);if (!user) {
+    var user = server.current(session);
+    if (!user) {
         //Capturing the UI activity change only if user is logged in
         if (log.isDebugEnabled()) {
             log.debug("user is not logged in");
