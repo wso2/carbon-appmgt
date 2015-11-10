@@ -218,7 +218,6 @@ require('/modules/store.js').exec(function (ctx) {
                     var appMgtDaoObj = new appMgtDaoService();
 
                     var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
-                    log.info(result);
                     if (log.isDebugEnabled()) {
                         var recordCount = 0;
                         if (result != null) {
