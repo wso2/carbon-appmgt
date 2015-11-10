@@ -11,9 +11,6 @@ function drawGraphs() {
     var action = 'getAppsPopularity';
     var dateRange = $('#date-range').val();
 
-    alert(dateRange);
-    alert(dateRange.split('to')[0].trim());
-    alert(dateRange.split('to')[1].trim());
     var from = dateRange.split('to')[0].trim() + ":00";
     var to = dateRange.split('to')[1].trim() + ":00";
 
@@ -454,3 +451,4 @@ function drawPopupChart(parsedResponse, appName, holderId) {
         chart.draw(0, true);
     };
 }
+

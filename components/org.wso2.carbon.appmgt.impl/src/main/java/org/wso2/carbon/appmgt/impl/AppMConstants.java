@@ -589,4 +589,8 @@ public final class AppMConstants {
     public static final String PAGE_LOAD_EVENT = "page-load";
 
     public static final int API_AUTH_FORBIDDEN = 900908;
+
+    public static final String API_USAGE_TRACKING = "Analytics.";
+    public static final String API_USAGE_BAM_UI_ACTIVITY_ENABLED = API_USAGE_TRACKING
+            + "UIActivityBAMPublishEnabled";
 }

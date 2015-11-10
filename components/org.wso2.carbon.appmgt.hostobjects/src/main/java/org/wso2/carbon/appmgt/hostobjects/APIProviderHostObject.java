@@ -3487,43 +3487,40 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
-    public static NativeArray jsFunction_getAppsByPopularity(Context cx, Scriptable thisObj,
-                                                             Object[] args, Function funObj)
-            throws AppManagementException {
-        List<AppHitsStatsDTO> list = null;
-        NativeArray myn = new NativeArray(0);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-
-        if(!HostObjectUtils.checkUIActivityBAMPublishEnabled()){
-            return myn;
+    public static NativeArray jsFunction_getAppsByPopularity(Context ctx, Scriptable hostObj, Object[] args,
+                                                             Function funObj) throws AppManagementException {
+        List<AppHitsStatsDTO> appStatsList = null;
+        NativeArray popularApps = new NativeArray(0);
+        APIProvider apiProvider = getAPIProvider(hostObj);
+        if (!HostObjectUtils.isUIActivityBAMPublishEnabled()) {
+            return popularApps;
         }
-        if (args.length == 0) {
+        if (args.length < 3) {
             handleException("Invalid number of parameters!");
         }
         String providerName = (String) args[0];
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
-
         try {
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) thisObj).getUsername());
-            list = client.getAppHitsOverTime(fromDate,toDate,tenantDomain);
-
-        } catch (Exception e) {
-            log.error("Error while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
+            appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
+        } catch (SQLException e) {
+            log.error("Error occurred while reading data from database", e);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            log.error("Error occurred while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
         }
 
-        Iterator it = null;
-
-        if (list != null) {
-            it = list.iterator();
+        Iterator itr = null;
+        if (appStatsList != null) {
+            itr = appStatsList.iterator();
         }
         int i = 0;
-        if (it != null) {
-            while (it.hasNext()) {
+        if (itr != null) {
+            while (itr.hasNext()) {
                 NativeObject row = new NativeObject();
                 Iterator hitsMapIterator = null;
-                Object usageObject = it.next();
+                Object usageObject = itr.next();
                 AppHitsStatsDTO usage = (AppHitsStatsDTO) usageObject;
                 row.put("AppName", row, usage.getAppName());
                 row.put("AppVersion", row, usage.getVersion());
@@ -3543,13 +3540,12 @@ public class APIProviderHostObject extends ScriptableObject {
                     }
                     row.put("UserHits", row, userHitsArray);
                 }
-                myn.put(i, myn, row);
+                popularApps.put(i, popularApps, row);
                 i++;
             }
         }
-        return myn;
+        return popularApps;
     }
-
 }
 
 

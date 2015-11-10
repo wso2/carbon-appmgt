@@ -81,8 +81,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				.append("    {'name':'action',  'type':'string' },")
 				.append("    {'name':'timestamp', 'type':'long'},")
 				.append("    {'name':'tenantId', 'type':'int'},")
-                .append("    {'name':'appName', 'type':'string'},")
-                .append("    {'name':'appVersion', 'type':'string'}")
+				.append("    {'name':'appName', 'type':'string'},")
+				.append("    {'name':'appVersion', 'type':'string'}")
 				.append("    ]    }");
 		return builder.toString();
 
@@ -156,9 +156,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 *            },{"appId":"111-3434-343"},{"userId":
 	 *            "admin"},{"tenantId":"-1234"}]
 	 */
-	public void processUiActivityObject(Object[] parseJSON) {
+    public void processUiActivityObject(Object[] parseJSON) {
         String action, item, timestamp, appId, userId, appName, appVersion;
-		Integer tenantId;
+        Integer tenantId;
 		for (int i = 0; i < parseJSON.length; i++) {
 			NativeObject obj = (NativeObject) parseJSON[i];
 			action = obj.get("action", obj).toString();
@@ -167,17 +167,16 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			appId = obj.get("appId", obj).toString();
 			userId = obj.get("userId", obj).toString();
 			tenantId = Integer.parseInt(obj.get("tenantId", obj).toString());
-            appName = obj.get("appName", obj).toString();
-            appVersion = obj.get("appVersion", obj).toString();
+			appName = obj.get("appName", obj).toString();
+			appVersion = obj.get("appVersion", obj).toString();
+			obj = null;
 
-            obj = null;
-
-            // consider only form load event
-            if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
-                publishUserActivityEvents(action, item, timestamp, appId,
-                        userId, tenantId, appName, appVersion);
-            }
-        }
+			// consider only form load event
+			if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
+				publishUserActivityEvents(action, item, timestamp, appId,
+					userId, tenantId, appName, appVersion);
+			}
+		}
 	}
 
 	/**
@@ -217,7 +216,6 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				}
 			} else {
 				// Write directly to DB
-               // AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId);
                 AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(), appVersion);
             }
 		} catch (AgentException e) {

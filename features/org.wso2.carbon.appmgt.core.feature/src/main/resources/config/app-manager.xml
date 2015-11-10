@@ -211,7 +211,7 @@
 
             <!-- Used when publishing AppManager UI activities to BAM   -->
             <UIActivityStreamName>org.wso2.appmgt.bam.uiactivitypublish</UIActivityStreamName>
-            <UIActivityStreamVersion>1.0.0</UIActivityStreamVersion>
+            <UIActivityStreamVersion>1.1.0</UIActivityStreamVersion>
 
         </BAMEventStreams>
 

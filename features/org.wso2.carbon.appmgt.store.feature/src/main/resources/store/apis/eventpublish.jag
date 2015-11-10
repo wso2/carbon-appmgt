@@ -20,7 +20,6 @@
     var log = new Log();
     var server = require('store').server;
     var user = server.current(session);
-    log.info('lakkk');
     log.info(user);
     if (!user) {
         //Capturing the UI activity change only if user is logged in
@@ -34,8 +33,6 @@
     //events contains the object[] passed from the JS which contains UI activity changes.
     var events = [];
     events = request.getParameter("events");
-    log.info('eee');
-    log.info(events);
 
 
     var parseJSON = JSON.parse(events);
@@ -44,16 +41,11 @@
         return;
     }
 
-    log.info('dd');
-    log.info(parseJSON);
-    log.info('hurrty');
-
     var appMgtBAMPublishService = Packages.org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
     var appMgtBAMPublishObj = new appMgtBAMPublishService();
 
     //Pass data to java class to save
     appMgtBAMPublishObj.processUiActivityObject(parseJSON);
-    log.info('hhhhh');
     if (log.isDebugEnabled()) {
         log.debug("UI Activity change data sent to process");
     }

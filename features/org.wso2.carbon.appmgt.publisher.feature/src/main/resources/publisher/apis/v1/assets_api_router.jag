@@ -722,7 +722,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                     print(webapps);
 
          		}
-                        else if (action == "getAppsPopularity") { 
+                        else if (action == "getAppsPopularity") {
                             var output  = {};
                             usage = appMgtProviderObj.getAppsByPopularity("__all_providers__",startDate,endDate);
                             usage = parse(stringify(usage));

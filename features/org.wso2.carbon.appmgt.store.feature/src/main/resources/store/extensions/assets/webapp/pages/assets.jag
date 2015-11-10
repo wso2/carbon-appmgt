@@ -216,7 +216,6 @@ require('/modules/store.js').exec(function (ctx) {
                 var getNextassetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
-                    log.info('jjjoooo');
 
                     var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
                     log.info(result);
@@ -228,16 +227,11 @@ require('/modules/store.js').exec(function (ctx) {
                         log.debug("Query executed successfully to get the assets hit count. " + recordCount
                         + " records found");
                     }
-                    log.info('xoxoxox');
                     index += 12;
-                    log.info('hoo');
                     return JSON.parse(result);
                 };
 
-                log.info('js');
-
                 assets = [];
-                log.info('ree');
                 while (assets.length < PAGE_SIZE && maxTry < 10) {
                     maxTry++;
                     var result = getNextassetSet();
@@ -254,8 +248,6 @@ require('/modules/store.js').exec(function (ctx) {
                             aid);
                         }
                     }
-                    log.info('koo');
-                    log.info(result);
                 }
             });
         }
