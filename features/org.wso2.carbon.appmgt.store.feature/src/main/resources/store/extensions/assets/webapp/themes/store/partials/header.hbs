@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <form class="nav navbar-left" role="search">
                     <select id="searchSelect" class="input-lg search-select col-md-3">
-                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="Name">Name</option>
                         <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
                         <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
                         <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
@@ -131,6 +131,7 @@
     <ul>
         <li><a href="{{url "/assets/webapp"}}"><i class="fw fw-globe"></i>Web Apps</a></li>
         <li><a href="{{url "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
+        <li><a href="{{url "/assets/site"}}"><i class="fw fw-globe"></i>Sites</a></li>
     </ul>
 </div>
 <!-- /common navigation -->

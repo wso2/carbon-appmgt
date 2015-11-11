@@ -1,0 +1,130 @@
+<div class="col-md-12 asset-wrapper">
+    <div class="row">
+        <div class="col-md-8">
+            <img class="col-md-12 hidden-xs hidden-sm" src="{{#if asset.attributes.images_banner}}{{ asset.attributes.images_banner}}{{/if}}">
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-12 col-xs-12 app-asset-icon">
+                    <img class="col-md-8 col-xs-8 col-centered" src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="app-asset-title">{{#if asset.attributes.overview_displayName}}{{ asset.attributes.overview_displayName}}{{/if}}</div>
+                <div class="app-asset-provider">by: {{#if asset.attributes.overview_provider}}{{ asset.attributes.overview_provider}}{{/if}}, version: {{#if asset.attributes.overview_version}}{{ asset.attributes.overview_version}}{{/if}}</div>
+            </div>
+            <div class="app-assets-icon-info">
+                <i title="{{asset.attributes.overview_platform}}" class="fw {{iconImage asset.attributes.overview_platform}} fw-1_5x fw-inverse"></i>
+                <i title="{{asset.attributes.overview_type}}" class="fw {{iconImageType asset.attributes.overview_type}} fw-1_5x fw-inverse"></i>
+            </div>
+
+            <div class="app-assets-rating">
+                {{#assetRating asset.rating}}{{/assetRating}}
+            </div>
+
+
+
+
+            <div class="row app-asset-buttons col-md-12 col-xs-12">
+                {{#if user}}
+
+                    <input type="hidden" value="Unlimited" id="subsAppTier" name="subsAppTier">
+
+                    <div id="subscriptionActions">
+                        {{#if isSubscribed}}
+                            <a href="#" class="btn btn-primary" id='btnUnsubscribe'>{{t "Unsubscribe Me"}}</a>
+                            <a href="#" class="btn btn-primary" id='btnSubscribe' style="display:none">{{t "Subscribe Me"}}</a>
+                        {{else}}
+                            {{#if subscriptionInfo.individualSubscription.OnHold}}
+                                <a href="#" class="btn btn-disabled" id='btnSubscribe' disabled='disabled'>{{t "Subscribe Me"}}</a>
+                                <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                            {{else}}
+                                <a href="#" class="btn btn-primary" id='btnSubscribe'>{{t "Subscribe Me"}}</a>
+                                <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                            {{/if}}
+
+                        {{/if}}
+
+                        {{#if isEnterpriseSubscriptionAllowed}}
+                            <div id="enterpriseSubscriptions">
+                                <a id="btnEnterpriseSubscriptions" href="#" class="btn btn-primary" rel="popover">Enterprise Subscriptions</a>
+                                {{>subscriptions/enterprise-subscriptions}}
+                            </div>
+                        {{/if}}
+
+                    </div>
+
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row app-asset-description-section">
+
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-overview" data-toggle="tab" data-type="basic">{{t "Overview"}}</a></li>
+            <li><a href="#tab-docs" data-toggle="tab" data-type="docs">{{t "Documentation"}}</a></li>
+            <li><a href="#tab-reviews" data-toggle="tab" data-type="comments">{{t "User Reviews"}}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab-overview" class="tab-pane fade in active">
+                {{>overview .}}
+            </div>
+            <div id="tab-docs" class="tab-pane fade">
+                {{#if tabs.documentation.data.availability}}
+                    {{> documentation .}}
+                {{else}}
+                    <div class="row">
+                        <h4 class="text-center">No Documentation available for this site</h4>
+                    </div>
+
+                {{/if}}
+            </div>
+            <div id="tab-reviews" class="tab-pane fade">
+                    {{#with asset}}
+                        {{#attributes}}
+                            <iframe name="socialIfr" id="socialIfr"
+                                    src="../../../social/?target={{../../type}}:{{../id}}&user={{../../user.username}}"
+                                    width="100%" height="100%" style="height: 300px;"></iframe>
+                            <input value="{{../id}}" id="hdnAssetId" name="hdnAssetId" type="hidden">
+                            <input value="{{../../user.username}}" id="hdnUsertId" name="hdnAssetId" type="hidden">
+                            <input value="{{../../tenantId}}" id="hdnTenantId" name="hdnTenantId" type="hidden">
+
+                            {{#if ../../inDashboard}}
+                                <div id="comment-content" class="content"></div>
+                            {{else}}
+                                <div id="comment-content" class="content user-review"></div>
+                            {{/if}}
+                        {{/attributes}}
+                    {{/with}}
+
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="modal fade" id="messageModal1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title">Modal header</h3>
+            </div>
+            <div class="modal-body">
+                <p>One fine body&hellip;</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+

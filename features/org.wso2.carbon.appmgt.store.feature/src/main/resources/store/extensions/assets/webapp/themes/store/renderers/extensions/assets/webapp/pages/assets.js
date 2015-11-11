@@ -1,7 +1,9 @@
 var render = function (theme, data, meta, require) {
+    var log = new Log("WebApp=========> " );
+
     var assets = require('/helpers/assets.js');
     var bodyPartial = "assets";
-    var bodyContext =  assets.currentPage(data.assets,data.sso,data.user, data.paging,data.config, data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
+    var bodyContext =  assets.currentPage(data.assets,data.sso,data.user, data.paging,data.config, data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav, data.myAssets.urlQuery);
 
     if(request.getHeader("User-Agent").indexOf("Mobile") != -1){  //mobile devices
         bodyPartial = "assets-for-mobiles";
@@ -22,8 +24,10 @@ var render = function (theme, data, meta, require) {
         for (var key in searchQuery) {
             if (searchQuery.hasOwnProperty(key)) {
                 if(key.indexOf("overview_") !== -1){
-                    searchQuery.searchTerm = key;
-                    searchQuery.search = searchQuery[key];
+                    if(key.indexOf("overview_treatAsASite") == -1) {
+                        searchQuery.searchTerm = key;
+                        searchQuery.search = searchQuery[key];
+                    }
                 }
             }
         }
@@ -32,6 +36,9 @@ var render = function (theme, data, meta, require) {
 
     data.header.searchQuery = searchQuery;
 
+    //log.info(data.sorting);
+    //log.info(require('/helpers/sort-assets.js').format(data.sorting, data.paging, data.navigation, data.type, data.selectedCategory, data.header, hasApps));
+    log.info(data.tags);
 
     theme('2-column-right', {
         title: data.title,

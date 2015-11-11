@@ -153,6 +153,28 @@ var engine = caramel.engine('handlebars', (function () {
                 partials(new File(resolve('partials')));
                 return options.fn(this);
             });
+
+            Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+
+                switch (operator) {
+                    case '==':
+                        return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                    case '!=':
+                        return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                    case '===':
+                        return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                    case '<':
+                        return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                    case '<=':
+                        return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                    case '>':
+                        return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                    case '>=':
+                        return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                    default:
+                        return options.inverse(this);
+                }
+            });
         },
         render: function (data, meta) {
             if (request.getParameter('debug') == '1') {

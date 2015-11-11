@@ -94,6 +94,7 @@ require('/modules/store.js').exec(function (ctx) {
      */
     var getAssetsFromProvider = function (asset, store) {
         var assetsFromProvider = {};
+        var assetsFromProviderStore = {};
         var provider = asset.attributes[ATTR_PROVIDER];
         var searchOptions = {};
         var paging;
@@ -104,13 +105,26 @@ require('/modules/store.js').exec(function (ctx) {
         paging = {start: 0, count: 10, sort: 'recent'};
         assetsFromProvider['overview_provider'] = provider;
         assetsFromProvider['type'] = type;
-        assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+        assetsFromProvider['assets'] = [];
+        assetsFromProviderStore['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+        log.info(assetsFromProviderStore.assets);
         //remove the selected asset from the assets list
-        for (var i = 0; i < assetsFromProvider.assets.length; i++) {
-            if (assetsFromProvider.assets[i].id === asset.id) {
-                assetsFromProvider.assets.splice(i, 1);
+        for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
+            if (assetsFromProviderStore.assets[i].id === asset.id) {
+                assetsFromProviderStore.assets.splice(i, 1);
                 break;
+            }
+        }
+        for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
+            log.info(assetsFromProviderStore.assets.length);
+            var currentAsset = assetsFromProviderStore.assets[i];
+            var treatAsASite = currentAsset.attributes.overview_treatAsASite;
+            if(treatAsASite) {
+                if (treatAsASite.toLowerCase() == "false") {
+                    log.info("====->" + currentAsset.attributes.overview_name);
+                    assetsFromProvider.assets.push(currentAsset);
+                }
             }
         }
 
@@ -317,12 +331,19 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     var recentAssets = store.recentAssets(type);
+    var webappRecentAssets = [];
 
     for(var i = 0; i < recentAssets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-            recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
-        }else{
-            recentAssets[i].rating = 0;
+        var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
+        if(treatAsASite) {
+            if (treatAsASite.toLowerCase() == "false") {
+                if (JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
+                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
+                } else {
+                    recentAssets[i].rating = 0;
+                }
+                webappRecentAssets.push(recentAssets[i]);
+            }
         }
     }
 
@@ -357,11 +378,11 @@ require('/modules/store.js').exec(function (ctx) {
         tags: [
             {
                 url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
+                data: store.tags(type, customType)
             }
         ],
         myAssets: { user: user, type: type, title: title },
-        recentAssets: recentAssets,
+        recentAssets: webappRecentAssets,
         assetsByProvider: assetsByProvider,
         documentation: docs,
         apiData:apiData ,

@@ -112,6 +112,11 @@ public final class AppMConstants {
     public static final String ACCESS_TOKEN_STORE_TABLE = "IDN_OAUTH2_ACCESS_TOKEN";
 
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
+
+    public static final String WEBAPP_ASSET_TYPE = "webapp";
+
+    public static final String SITE_ASSET_TYPE = "site";
+
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
     public static final String API_OVERVIEW_VERSION = "overview_version";
@@ -164,6 +169,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_ENABLE_SSO = "overview_enableSso";
     public static final String API_OVERVIEW_IDP_PROVIDER_URL = "overview_idpProviderUrl";
     public static final String API_OVERVIEW_SAML2_SSO_ISSUER = "overview_saml2SsoIssuer";
+    public static final String API_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
     

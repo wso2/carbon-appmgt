@@ -1,7 +1,7 @@
 var Manager,
     ASSETS_NS = 'http://www.wso2.org/governance/metadata';
 
-var log = new Log();
+var log = new Log('Module asset ==> ');
 
 var ASSET_LCSTATE_PROP = 'lifecycleState';
 var DEFAULT_ASSET_VIEW_STATE = 'published';

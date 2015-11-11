@@ -1,0 +1,135 @@
+<%
+/*
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+var caramel;
+var SubscriptionService;
+var subsApi;
+var AuthService;
+var authenticator;
+var log = new Log('subscriptions :- ');
+
+include('../modules/jagg/jagg.jag');
+
+require('/modules/store.js').exec(function (ctx) {
+	var store = ctx.store;
+	var sso = ctx.sso;
+	tenantId = ctx.tenantId;
+	site = ctx.site;
+	var recentAssets = store.recentAssets('webapp');
+	caramel = require('caramel');
+	search = require('/modules/search.js');
+
+	SubscriptionService = require(getServiceDir('subscription.js')).serviceModule;
+	subsApi = new SubscriptionService.SubscriptionService();
+	subsApi.init(jagg, session);
+	AuthService = require(getServiceDir('authentication.js')).serviceModule;
+	authenticator = new AuthService.Authenticator();
+	authenticator.init(jagg, session);
+
+	var AppInformationService=require('../services/app-information.js').serviceModule;
+	var apiInfoManager=new AppInformationService.AppInformationService();
+	apiInfoManager.init(jagg,session);
+	var subscriptions = [];
+	var userData = authenticator.getLoggedInUser();
+	var apps = subsApi.getAppsWithSubs({user: userData.username});
+
+	//If the user is not logged in, redirect to the login page
+	if (userData == null) {
+		response.sendRedirect('/store');
+		return;
+	}
+
+    if(apps.length >0){
+
+        subscriptions = apps[0].subscriptions;
+        var PAGE_SIZE = store.getPageSize();
+        var appsCount = subscriptions.length;
+        var pages = Math.ceil(appsCount / PAGE_SIZE);
+        var page = request.getParameter('page');
+        if(!page) page = 1;
+        var limit = page * PAGE_SIZE;
+        var offset = limit - PAGE_SIZE - 1;
+        var displayApps = [];
+		var siteAssets = [];
+
+		//Remove none site assets form the asset[].
+		for(i = 0; i < apps[0].subscriptions.length; i++) {
+			var asset = store.asset(type, apps[0].subscriptions[i].uuid);
+			var treatAsASite = asset.attributes.overview_treatAsASite;
+			if(treatAsASite) {
+				if (treatAsASite.toLowerCase() == "true") {
+					log.info(apps[0].subscriptions[i].name);
+					siteAssets.push(apps[0].subscriptions[i]);
+				}
+			}
+		}
+
+        for(i = 0; i < siteAssets.length; i++) {
+			var api = apiInfoManager.getAppDescription(siteAssets[i].provider, siteAssets[i].name, siteAssets[i].version);
+			siteAssets[i].productionURL = api.serverURL.productionURL;
+
+			if((i > offset && i < limit)){
+				displayApps.push(siteAssets[i]);
+			}
+        }
+
+        apps[0].subscriptions = displayApps;
+    }
+
+	//Construct recent asset - Use only site asset type
+	var siteRecentAssets = [];
+	for(var i = 0; i < recentAssets.length; i++) {
+		var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
+		if(treatAsASite) {
+			if (treatAsASite.toLowerCase() == "true") {
+				siteRecentAssets.push(recentAssets[i]);
+			}
+		}
+	}
+
+	caramel.render({
+		header: {
+			user: userData,
+			sso: sso
+		},
+		navigation: site.navigation(tenantId),
+		search: {
+		            search: {title: type},
+		            isTopAssets: false,
+		            searchFields: search.fields()
+		},
+		sso: sso,
+		appsWithSubs: apps,
+        pages: pages,
+        page: page,
+		metadata: {
+			appsWithSubs: apps
+		},
+		recentAssets:siteRecentAssets
+	}, request, response, session);
+
+}, request, response, session);
+
+
+function getServiceDir(serviceName) {
+	return '../services/' + serviceName;
+}
+
+%>
+

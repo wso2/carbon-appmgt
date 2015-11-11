@@ -18,7 +18,7 @@
  */
 var api = {};
 (function(api) {
-    var log = new Log('rating-api');
+    var log = new Log('rating-api :- ');
     api.rate = function(session, options) {
         var success = false; //Assume the rating will fail
         if (!options.type) {
@@ -86,24 +86,24 @@ var api = {};
     };
 
 
-    api.getPopularAssets = function(type, tenantId, am, start){
+    api.getPopularAssets = function(type, tenantId, am, start, pageSize, siteFlag){
         var carbon = require('carbon');
         var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
-        var index = 0, maxTry = 0; limit = 12;
+        var index = 0, maxTry = 0; limit = pageSize;
 
         var getNextAssetSet = function () {
             var offset = Number(start)+ Number(index);
             var result = JSON.parse(String(social.getPopularAssets(type, tenantId, limit, offset)));
-            index += 12;
+            index += pageSize;
             return result.assets || [];
         };
 
         assets = [];
         var pos, aid, asset;
-        while (assets.length < 12 && maxTry < 10) {
+        while (assets.length < pageSize && maxTry < 10) {
             maxTry++;
             var result = getNextAssetSet();
-            for (var n = 0; n < result.length && assets.length < 12; n++) {
+            for (var n = 0; n < result.length && assets.length < pageSize; n++) {
                 var combinedAid = String(result[n]);
                 pos = combinedAid.indexOf(':');
                 aid = combinedAid.substring(pos + 1);
@@ -111,7 +111,9 @@ var api = {};
                     /*asset = store.asset(type, aid);
                      asset.indashboard = store.isuserasset(aid, type);*/
                     asset = am.get(aid);
-                    if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
+                    var treatAsASite = asset.attributes.overview_treatAsASite.toLocaleLowerCase();
+                    if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0 &&
+                            treatAsASite == siteFlag) {
                         assets.push(asset);
                     }
                 } catch (e) {

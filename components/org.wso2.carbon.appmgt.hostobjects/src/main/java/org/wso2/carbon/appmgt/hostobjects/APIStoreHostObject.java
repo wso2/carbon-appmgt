@@ -856,12 +856,20 @@ public class APIStoreHostObject extends ScriptableObject {
         NativeArray tagArray = new NativeArray(0);
         Set<Tag> tags;
         String tenantDomain = null;
+        String assetType =  null;
+        String assetFlag =  null;
         if (args!=null && isStringArray(args)) {
             tenantDomain = args[0].toString();
+            if (args.length >= 2) {
+                assetType = args[1].toString();
+            }
+            if (args.length >= 3) {
+                assetFlag = args[2].toString();
+            }
         }
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
         try {
-            tags = apiConsumer.getAllTags(tenantDomain);
+            tags = apiConsumer.getAllTags(tenantDomain, assetType, assetFlag);
         } catch (AppManagementException e) {
             log.error("Error from registry while getting WebApp tags.", e);
             return tagArray;

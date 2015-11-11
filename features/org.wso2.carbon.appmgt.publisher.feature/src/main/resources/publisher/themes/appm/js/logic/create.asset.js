@@ -501,6 +501,7 @@ $(function() {
 	    var app_name = $('#overview_name').val();
 	    var app_version = $('#overview_version').val();
 	    var app_transport = $('#overview_transports').val();
+	    var app_treatAsASite = $('#overview_treatAsASite').val();
 	    var app_context = $('#overview_context').val();
 	    var app_provider = $('#overview_provider').val();
 	    var app_allowAnonymous=$('#overview_allowAnonymous').val();
@@ -523,6 +524,7 @@ $(function() {
 	    sso_config.app_name = app_name;
 	    sso_config.app_verison = app_version;
 	    sso_config.app_transport = app_transport;
+	    sso_config.app_treatAsASite = app_treatAsASite;
 	    sso_config.app_context = app_context;
 	    sso_config.app_provider = app_provider;
 	    sso_config.app_allowAnonymous=app_allowAnonymous;

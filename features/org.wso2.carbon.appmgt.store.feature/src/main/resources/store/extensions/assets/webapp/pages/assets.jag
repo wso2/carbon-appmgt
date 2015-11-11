@@ -51,31 +51,25 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(tag == 'undefined' ){tag = null;}
 
+    var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
+    var SITE_OPTIONS = {
+        type: type,
+        attributes: SITE_QUERY
+    };
     caramel = require('caramel');
     process = require('process'),
             localIP = "https://" + process.getProperty('server.host'),
             httpsPort = process.getProperty('https.port');
 
-
-    url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
+    url = '/assets/' + customType + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
 
     mainPage = type;
     title = store.assetLinks(type).title;
-
-    //var allRoles = realm.getUserStoreManager().getRoleNames();
-
     //Disabling showing of page numbers as getting the count is sometimes tricky
     var skipIndices = true;
 
-    //for (var i = 0; i < criticalRoles.length; i++) {
-    //    for(var j=0; j < allRoles.length ; j++){
-    //        if(allRoles[j] == criticalRoles[i]){
-    //            skipIndices = true;
-    //        }
-    //    }
-    //}
 
     var indices = [];
 
@@ -92,7 +86,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var currentPage = store.getCurrentPage(currIndex);
     //currentPage = parseInt(currentPage, 10);
-
 
     if (user) {
         subscriptions = store.subscriptions(type);
@@ -147,10 +140,20 @@ require('/modules/store.js').exec(function (ctx) {
 
 
     if (tag) {
-        subPage = '/ Tag: "' + tag + '"';
-        assets = store.tagged(type, tag, paging);
+        var urlQuery = 'tag=' + tag + '&';
+        log.info('webapp 143----');
+        options = {
+            attributes: SITE_QUERY
+        };
+        options.tag = tag;
+        options.type = type;
+        options.lifecycleState = ["published"];
+        assets = store.taggeds(type, options, paging);
     } else if (query) {
+        var urlQuery = 'query=' + query + '&';
+        log.info("=======================157==>");
         query = require('/modules/search.js').build(query);
+        query.overview_treatAsASite = 'FALSE';
         options = {
             type: type,
             attributes: query
@@ -163,7 +166,9 @@ require('/modules/store.js').exec(function (ctx) {
         subPage = '/ Search: "' + query + '"';
         assets = store.search(options, paging);
     } else {
+        log.info("=======================171==>");
         if (paging.sort == 'popular') {
+            var urlQuery = 'sort=' + paging.sort + '&';
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
@@ -176,11 +181,11 @@ require('/modules/store.js').exec(function (ctx) {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
 
-                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index);
+                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE, 'false');
                     if (log.isDebugEnabled()) {
                         log.debug("Query executed successfully to get the assets hit count");
                     }
-                    index += 12;
+                    index += PAGE_SIZE;
                     return result;
                 };
 
@@ -188,11 +193,11 @@ require('/modules/store.js').exec(function (ctx) {
 
                 assets = [];
                 var aid, asset;
-                while (assets.length < 12 && maxTry < 10) {
+                while (assets.length < PAGE_SIZE && maxTry < 10) {
                     maxTry++;
                     var result = getNextassetSet();
 
-                    for (var n = 0; n < result.length && assets.length < 12; n++) {
+                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         aid = String(result[n].id);
                         try {
                             asset = store.asset(type, aid);
@@ -210,6 +215,8 @@ require('/modules/store.js').exec(function (ctx) {
 
         }
         else if (paging.sort == 'usage') {
+            log.info("=======================219==>");
+            var urlQuery = 'sort=' + paging.sort + '&';
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
@@ -226,8 +233,12 @@ require('/modules/store.js').exec(function (ctx) {
                         log.debug("Query executed successfully to get the assets hit count. " + recordCount
                         + " records found");
                     }
-                    index += 12;
-                    return JSON.parse(result);
+                    index += PAGE_SIZE;
+                    if (result.length > 0) {
+                        return JSON.parse(result);
+                    } else {
+                        return {};
+                    }
                 };
 
                 assets = [];
@@ -251,7 +262,9 @@ require('/modules/store.js').exec(function (ctx) {
             });
         }
         else {
-            assets = store.assets(type, paging);
+            log.info('webapp 245');
+            var urlQuery = 'sort=' + paging.sort + '&';
+            assets = store.search(SITE_OPTIONS, paging);
         }
     }
 
@@ -267,8 +280,7 @@ require('/modules/store.js').exec(function (ctx) {
         var nextPage = store.buildNextPage(request,avaliablePages);
 
         // Query the assets with the assumed 'next page'
-        var nextAssetSet = store.assets(type, nextPage);
-
+        var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
         if(nextAssetSet.length > 0){
           nextPageAvailable = true;
         }
@@ -329,12 +341,19 @@ require('/modules/store.js').exec(function (ctx) {
     });
 
     var recentAssets = store.recentAssets(type);
+    var webAppRecentAssets = [];
 
-    for(var i = 0; i < recentAssets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-            recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
-        }else{
-            recentAssets[i].rating = 0;
+    for(var i = 0; i < recentAssets.length; i++) {
+        var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
+        if(treatAsASite) {
+            if (treatAsASite.toLowerCase() == "false") {
+                if (JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
+                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
+                } else {
+                    recentAssets[i].rating = 0;
+                }
+                webAppRecentAssets.push(recentAssets[i]);
+            }
         }
     }
 
@@ -360,7 +379,7 @@ require('/modules/store.js').exec(function (ctx) {
             return [
                 {
                     url: '/assets/' + type + '/?tag=',
-                    data: store.tags(type)
+                    data: store.tags(type, customType)
                 }
             ];
         },
@@ -379,8 +398,18 @@ require('/modules/store.js').exec(function (ctx) {
             url: url + 'sort='
         },
 
-        myAssets : { user:user, type: type, title: title, subscriptions: subscriptions[type], subscription : subscription, pageIndices : pageIndices, leftNav:leftnav, rightNav:rightnav},
-        recentAssets: recentAssets
+        myAssets : {
+            user:user,
+            type: type,
+            title: title,
+            subscriptions: subscriptions[type],
+            subscription : subscription,
+            pageIndices : pageIndices,
+            leftNav:leftnav,
+            rightNav:rightnav,
+            urlQuery: urlQuery
+        },
+        recentAssets: webAppRecentAssets
 
     });
 }, request, response, session);

@@ -56,27 +56,45 @@ require('/modules/store.js').exec(function (ctx) {
         if(!page) page = 1;
         var limit = page * PAGE_SIZE;
         var offset = limit - PAGE_SIZE - 1;
+		var displayApps = [];
+		var webAppAssets = [];
 
+		//Remove none site assets form the asset[].
+		for(i = 0; i < apps[0].subscriptions.length; i++) {
+			var asset = store.asset(type, apps[0].subscriptions[i].uuid);
+			var treatAsASite = asset.attributes.overview_treatAsASite;
+			if(treatAsASite) {
+				if (treatAsASite.toLowerCase() == "false") {
+					log.info(apps[0].subscriptions[i].name);
+					webAppAssets.push(apps[0].subscriptions[i]);
+				}
+			}
+		}
 
-        var displayApps = [];
+		for(i = 0; i < webAppAssets.length; i++) {
+			var api = apiInfoManager.getAPIDescription(webAppAssets[i].provider, webAppAssets[i].name, webAppAssets[i].version);
+			webAppAssets[i].productionURL = api.serverURL.productionURL;
 
+			if((i > offset && i < limit)){
+				displayApps.push(webAppAssets[i]);
+			}
+		}
 
-        for(i=0;i< apps[0].subscriptions.length;i++){
-            var api=apiInfoManager.getAPIDescription( apps[0].subscriptions[i].provider, apps[0].subscriptions[i].name, apps[0].subscriptions[i].version);
-            apps[0].subscriptions[i].productionURL = api.serverURL.productionURL;
-
-            if((i > offset && i < limit)){
-                displayApps.push(apps[0].subscriptions[i]);
-            }
-
-        }
-
-
-        apps[0].subscriptions = displayApps;
+		apps[0].subscriptions = displayApps;
 
     }
 
+	//Construct recent asset - Use only webapp asset type
+	var webappRecentAssets = [];
 
+	for(var i = 0; i < recentAssets.length; i++) {
+		var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
+		if(treatAsASite) {
+			if (treatAsASite.toLowerCase() == "false") {
+				webappRecentAssets.push(recentAssets[i]);
+			}
+		}
+	}
 
 	caramel.render({
 		header: {
@@ -96,7 +114,7 @@ require('/modules/store.js').exec(function (ctx) {
 		metadata: {
 			appsWithSubs: apps
 		},
-		recentAssets:recentAssets
+		recentAssets:webappRecentAssets
 	}, request, response, session);
 
 }, request, response, session);

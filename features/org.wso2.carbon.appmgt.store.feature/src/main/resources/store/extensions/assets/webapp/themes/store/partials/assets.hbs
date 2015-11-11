@@ -48,10 +48,10 @@
     <div class="row">
     <ul class="pager">
         {{#if leftNav}}
-            <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}">Previous</a></li>
+            <li><a href="{{url "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
         {{/if}}
         {{#if rightNav}}
-            <li><a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}">Next</a></li>
+            <li><a  href="{{url "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a></li>
         </ul>
         {{/if}}
     </div>

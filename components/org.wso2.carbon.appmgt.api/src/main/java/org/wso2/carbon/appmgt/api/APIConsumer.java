@@ -105,6 +105,15 @@ public interface APIConsumer extends APIManager {
      */
     public Set<Tag> getAllTags(String tenantDomain) throws AppManagementException;
 
+
+    /**
+     * Get all tags of published APIs
+     *
+     * @return a list of all Tags applied to all APIs published.
+     * @throws AppManagementException if failed to get All the tags
+     */
+    public Set<Tag> getAllTags(String tenantDomain, String assetType, String assetFlag) throws AppManagementException;
+
     /**
      * Rate a particular WebApp. This will be called when subscribers rate an WebApp
      *

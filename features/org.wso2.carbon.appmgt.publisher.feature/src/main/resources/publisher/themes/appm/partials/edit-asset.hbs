@@ -47,6 +47,20 @@
                class="col-lg-6 col-sm-12 col-xs-12" name="overview_transports"
                id="overview_transports">
 
+        <div class="form-group">
+            <label class="control-label col-sm-2">Treat as a Site: </label>
+
+            <div class="col-sm-10">
+                <label>
+                    <input type="checkbox" class="treatAsASite_checkbox"
+                    value="{{{snoop "fields(name=overview_treatAsASite).value" data}}}">
+                </label>
+            </div>
+        </div>
+        <input type="hidden" required=""
+               value="{{snoop "fields(name=overview_treatAsASite).value" data}}"
+               class="col-lg-6 col-sm-12 col-xs-12" name="overview_treatAsASite"
+               id="overview_treatAsASite">
 
         {{{ form_render "overview_webAppUrl" data.fields }}}
         {{{ form_render "overview_description" data.fields }}}

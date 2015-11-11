@@ -3,6 +3,7 @@
 //response.sendRedirect('.' + require('/store.js').config().assetsUrlPrefix + '/gadget');
 
 var caramel;
+var customType;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 
@@ -35,7 +36,7 @@ require('/modules/store.js').exec(function (ctx) {
     process = require('process'),
     localIP = "https://" + process.getProperty('server.host'),
     httpsPort = process.getProperty('https.port');
-    
+
     length = types.length;
     recent = Math.floor(recentCount / length);
     recentDiff = recentCount - recent * length;
@@ -43,6 +44,10 @@ require('/modules/store.js').exec(function (ctx) {
     popularDiff = popularCount - popular * length;
     paging = store.assetsPaging(request);
     query = query ? search.build(String(query)) : null;
+
+    var SITE_TYPE = 'site';
+    var WEBAPP_TYPE = 'webapp';
+    var MOBILEAPP_TYPE = 'mobileapp';
 
     // Init subscription service.
     var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
@@ -98,7 +103,12 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     types.forEach(function (type) {
-        manager = store.rxtManager(type, session);
+        log.info(type);
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
+        manager = store.rxtManager(customType, session);
         if (query) {
             assets = store.search({
                 attributes: query,
@@ -108,13 +118,27 @@ require('/modules/store.js').exec(function (ctx) {
         } else if (tag) {
             assets = store.tagged(type, tag, paging);
         } else {
-            assets = store.assets(type, paging);
+            if (customType == MOBILEAPP_TYPE) {
+                assets = store.assets(customType, paging);
+            } else {
+                var siteAttribute;
+                if (customType == SITE_TYPE) {
+                    siteAttribute = {"overview_treatAsASite": "TRUE"};
+                } else if (customType == WEBAPP_TYPE) {
+                    siteAttribute = {"overview_treatAsASite": "FALSE"};
+                }
+                var siteOption = {
+                    type: type,
+                    attributes: siteAttribute
+                };
+                assets = store.search(siteOption, paging);
+            }
         }
 
 
         var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
 
-        if(type == "webapp") {
+        if(type == WEBAPP_TYPE) {
 
             var subscriptionInfo;
             assets.forEach(function (asset) {
@@ -153,7 +177,6 @@ require('/modules/store.js').exec(function (ctx) {
 
             });
         }
-
         items.push({
             assets: assets,
             plural: manager.pluralLabel,

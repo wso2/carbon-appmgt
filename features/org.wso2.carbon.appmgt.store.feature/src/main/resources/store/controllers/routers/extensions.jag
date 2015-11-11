@@ -1,5 +1,6 @@
 <%
 var type;
+var customType;
 (function () {
     var path, elements, theme, mapper, suffix, pages, links, length, link, i, mod,
             log = new Log(),
@@ -42,8 +43,12 @@ var type;
         mod = require('/modules/store.js');
         elements = matcher.elements();
         type = elements.type;
+        customType = type;
+        if (type == 'site') {
+            type = 'webapp';
+        }
+        pages = store.ASSETS_EXT_PATH + customType + '/pages/';
         suffix = elements.suffix;
-        pages = store.ASSETS_EXT_PATH + type + '/pages/';
 
         if (suffix) {
             links = mod.store(request, session).assetLinks(type).links;
@@ -62,8 +67,7 @@ var type;
                 path = new File(path).isExists() ? path : '/controllers/process.jag';
             }
 
-
-            if((type === "webapp") || (type === "mobileapp")) {
+            if ((type === "webapp") || (type === "mobileapp")) {
                 path = pages + 'subscriptions.jag';
 
                 if (suffix === 'process') {
@@ -72,9 +76,7 @@ var type;
                 }
             }
 
-
             request.getMappedPath = mapper(path);
-
             include(path);
             return;
         }
