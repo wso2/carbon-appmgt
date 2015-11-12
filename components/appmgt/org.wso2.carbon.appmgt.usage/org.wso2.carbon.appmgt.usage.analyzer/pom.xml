@@ -20,7 +20,7 @@
     <parent>
         <artifactId>org.wso2.carbon.appmgt.usage</artifactId>
         <groupId>org.wso2.carbon.appmgt</groupId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
 <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,14 +28,14 @@
 
     <artifactId>org.wso2.carbon.appmgt.usage.analyzer</artifactId>
     <name>WSO2 Carbon - APP Management Usage Analyzer</name>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId> 
-			<version>1.0.0</version>
+			<version>1.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

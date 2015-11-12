@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.appmgt.mobile</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - App Manager Mobile Component</name>
@@ -65,7 +65,6 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Version>1.0.0</Bundle-Version>
                         <Private-Package>org.wso2.carbon.appmgt.mobile.internal</Private-Package>
                         <Import-Package>
                             org.xml.sax.*,

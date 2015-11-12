@@ -22,13 +22,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt-feature</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.feature</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - App management Feature</name>
     <url>http://wso2.org</url>
@@ -48,7 +48,6 @@
 	<dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.gateway</artifactId>
-	    <version>1.0.0</version>
         </dependency>
         <!--dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -91,7 +90,7 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.core.feature:${appmgt.feature.version}</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.feature:1.0.0</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.feature:${appmgt.feature.version}</includedFeatureDef>
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.publisher.feature</includedFeatureDef>
                                 <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.store.feature</includedFeatureDef> -->
                                 <!--<includedFeatureDef>org.wso2.carbon:org.wso2.carbon.appmgt.startup.publisher.feature:1.0.0</includedFeatureDef> -->
