@@ -82,7 +82,7 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				.append("    {'name':'tenantId', 'type':'int'},")
 				.append("    {'name':'appName', 'type':'string'},")
 				.append("    {'name':'appVersion', 'type':'string'},")
-                .append("    {'name':'context', 'type':'string'}")
+				.append("    {'name':'context', 'type':'string'}")
 				.append("    ]    }");
 		return builder.toString();
 
@@ -207,8 +207,17 @@ public class APPMgtUiActivitiesBamDataPublisher {
 		StringBuilder builder = new StringBuilder();
 
 		// Create a string with input parameters for logging purposes
+		String strDataContext = "";
 		try {
 			Long timeStamp = new BigDecimal(timestampStr).longValue();
+			strDataContext = builder.append("(StreamName:")
+				.append(USER_ACTIVITY_STREAM).append(", StreamVersion:")
+				.append(USER_ACTIVITY_STREAM_VERSION).append(", Action:")
+				.append(action).append(", Item:").append(item)
+				.append(", Timestamp:").append(timeStamp)
+				.append(", AppId:").append(appId).append(" ,UserId:")
+				.append(userId).append(", tenantId:").append(tenantId)
+				.append(")").toString();
 
 			// if BAM is configured
 			if (enableUiActivityBamPublishing) {
@@ -237,11 +246,10 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			// as this method is used only to store the store hit count, An
 			// exception in this method should not effect/block the users other
 			// actions
-			log.error("Failed to publish build event : " + e.getMessage(), e);
+			log.error("Failed to publish build event : " + strDataContext
+                              + " : " + e.getMessage(), e);
 		} catch (AppManagementException e) {
 			log.error("Failed to write to table : " + e.getMessage(), e);
-		} catch (SQLException e) {
-			log.error("SQL exception found : " + e.getMessage(), e);
 		}
 	}
 }

@@ -2792,6 +2792,10 @@ public final class AppManagerUtil {
         return -1;
     }
 
+    /**
+     * Check whether UIActivityBAMPublish enabled or not.
+     * @return isEnabled boolean.
+     */
     public static boolean isUIActivityBAMPublishEnabled() {
         AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();

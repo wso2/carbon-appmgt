@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -17,22 +17,58 @@
 */
 package org.wso2.carbon.appmgt.usage.client.dto;
 
+/**
+ * Store user name and no of hits per an app.
+ */
 public class UserHitsPerAppDTO {
+    private String uuid;
     private String userName;
     private int userHitsCount;
 
+    /**
+     * Get UUID.
+     * @return uuid String.
+     */
+    public String getUuid() {
+        return uuid;
+    }
+
+    /**
+     * Set UUID.
+     * @param uuid String.
+     */
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    /**
+     * Get User Name.
+     * @return userName String.
+     */
     public String getUserName() {
         return userName;
     }
 
+    /**
+     * Set User Name.
+     * @param userName String.
+     */
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
+    /**
+     * Get User Hits count per app.
+     * @return no of user hits int.
+     */
     public int getUserHitsCount() {
         return userHitsCount;
     }
 
+    /**
+     * Set User Hits count per app.
+     * @param userHitsCount int.
+     */
     public void setUserHitsCount(int userHitsCount) {
         this.userHitsCount = userHitsCount;
     }

@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -20,6 +20,9 @@ package org.wso2.carbon.appmgt.usage.client.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Total App Hits with user app stats list.
+ */
 public class AppHitsStatsDTO {
     private String appName;
     private String version;
@@ -31,42 +34,82 @@ public class AppHitsStatsDTO {
         userHitsList = new ArrayList<UserHitsPerAppDTO>();
     }
 
+    /**
+     * Get Uuid
+     * @return UUID String.
+     */
     public String getUuid() {
         return uuid;
     }
 
+    /**
+     * Set Uuid.
+     * @param uuid String.
+     */
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
+    /**
+     * Get User Hits List.
+     * @return List with user hits.
+     */
     public List<UserHitsPerAppDTO> getUserHitsList() {
         return userHitsList;
     }
 
+    /**
+     * Set User Hits List.
+     * @param userHitsList List<UserHitsPerAppDTO>.
+     */
     public void setUserHitsList(List<UserHitsPerAppDTO> userHitsList) {
         this.userHitsList = userHitsList;
     }
 
+    /**
+     * Get Total Hit Count.
+     * @return totalHitCount int.
+     */
     public int getTotalHitCount() {
         return totalHitCount;
     }
 
+    /**
+     * Set Total hit count.
+     * @param totalHitCount int.
+     */
     public void setTotalHitCount(int totalHitCount) {
         this.totalHitCount = totalHitCount;
     }
 
+    /**
+     * Get app version.
+     * @return version String.
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * Set app Version.
+     * @param version String.
+     */
     public void setVersion(String version) {
         this.version = version;
     }
 
+    /**
+     * Get App Name.
+     * @return appName String.
+     */
     public String getAppName() {
         return appName;
     }
 
+    /**
+     * Get App Name.
+     * @param appName String.
+     */
     public void setAppName(String appName) {
         this.appName = appName;
     }

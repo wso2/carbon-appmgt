@@ -386,7 +386,7 @@ public class APIUsageStatisticsClient {
 
     /**
      * Get no of app hits over time.
-     * @param fromDate Strig.
+     * @param fromDate String.
      * @param toDate String.
      * @param tenantId int.
      * @return App hits stats list.
@@ -395,11 +395,60 @@ public class APIUsageStatisticsClient {
     public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, int tenantId)
             throws APIMgtUsageQueryServiceClientException {
 
+        if (dataSource == null) {
+            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been " +
+                  "initialized. Ensure that the data source is properly configured in the " +
+                  "APIUsageTracker configuration.");
+        }
+
+        Map<String, AppHitsStatsDTO> appHitsStatsMap = new HashMap<String, AppHitsStatsDTO>();
+        Connection connection = null;
+        PreparedStatement getAppHitsStatement = null;
+        ResultSet appInfoResult = null;
         List<AppHitsStatsDTO> appHitsStatsList = null;
-        Map<String, AppHitsStatsDTO> appHitsStatsMap = this.queryForAppHitsOverTime(fromDate, toDate, tenantId);
-            if (appHitsStatsMap != null) {
-                appHitsStatsList = new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
+        try {
+            connection = dataSource.getConnection();
+            String queryToGetAppsHits = "SELECT UUID, APP_NAME, VERSION, COUNT(*) " +
+                    "AS TOTAL_HITS_COUNT FROM APM_APP_HITS WHERE TENANT_ID = ? AND HIT_TIME " +
+                    "BETWEEN ? AND ? GROUP BY APP_NAME, VERSION,UUID ORDER BY TOTAL_HITS_COUNT";
+            getAppHitsStatement = connection.prepareStatement(queryToGetAppsHits);
+            getAppHitsStatement.setInt(1, tenantId);
+            getAppHitsStatement.setString(2, fromDate);
+            getAppHitsStatement.setString(3, toDate);
+            appInfoResult = getAppHitsStatement.executeQuery();
+
+
+            boolean noData = true;
+            String queryToGetUserHits = "SELECT UUID, USER_ID, COUNT(*) AS USER_HITS_COUNT " +
+                    "FROM APM_APP_HITS WHERE UUID IN ( ";
+
+            while (appInfoResult.next()) {
+                noData = false;
+                AppHitsStatsDTO appHitsStats = new AppHitsStatsDTO();
+                String uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
+                appHitsStats.setUuid(uuid);
+                queryToGetUserHits += "'" + uuid + "'";
+                if (!appInfoResult.isLast()) {
+                    queryToGetUserHits += ",";
+                }
+                appHitsStats.setAppName(appInfoResult.getString(
+                        APIUsageStatisticsClientConstants.APP_NAME));
+                appHitsStats.setVersion(appInfoResult.getString(
+                        APIUsageStatisticsClientConstants.VERSION));
+                appHitsStats.setTotalHitCount(appInfoResult.getInt(
+                        APIUsageStatisticsClientConstants.TOTAL_HITS_COUNT));
+                appHitsStatsMap.put(uuid, appHitsStats);
             }
+            queryToGetUserHits += ") GROUP BY USER_ID,UUID ORDER BY UUID";
+            if (!noData) {
+                appHitsStatsList = getUserHitsStats(connection, appHitsStatsMap, queryToGetUserHits);
+            }
+        } catch (SQLException e) {
+            throw new APIMgtUsageQueryServiceClientException("SQL Exception is occurred when " +
+                                            "reading apps hits from SQL table" + e.getMessage() , e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(getAppHitsStatement, connection, appInfoResult);
+        }
         return appHitsStatsList;
     }
 
@@ -1419,91 +1468,40 @@ public class APIUsageStatisticsClient {
         }
     }
 
-    private Map<String, AppHitsStatsDTO> queryForAppHitsOverTime(String fromDate, String toDate, int tenantId)
-            throws APIMgtUsageQueryServiceClientException {
-        if (dataSource == null) {
-            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
-                    "that the data source is properly configured in the APIUsageTracker configuration.");
-        }
-
-        Map<String, AppHitsStatsDTO> appHitsStatsMap = new HashMap<String, AppHitsStatsDTO>();
-        Connection connection = null;
-        Statement statement = null;
-        PreparedStatement getAppHitsStatement = null;
-        ResultSet appInfoResult = null;
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
-            String queryToGetAppsHits = "SELECT UUID, APP_NAME, VERSION, COUNT(*) AS TOTAL_HITS_COUNT  " +
-                    "FROM APM_APP_HITS WHERE TENANT_ID =  " + tenantId + " " +
-                    "AND HIT_TIME BETWEEN '" + fromDate + "' AND '" + toDate + "'" +
-                    "GROUP BY APP_NAME, VERSION,UUID ORDER BY TOTAL_HITS_COUNT";
-            getAppHitsStatement = connection.prepareStatement(queryToGetAppsHits);
-            appInfoResult = getAppHitsStatement.executeQuery();
-
-            if(appInfoResult.isBeforeFirst()) {
-                String queryToGetUserHits = "SELECT UUID, USER_ID, COUNT(*) AS USER_HITS_COUNT " +
-                        "FROM APM_APP_HITS WHERE UUID IN ( ";
-                while (appInfoResult.next()) {
-                    AppHitsStatsDTO appHitsStats = new AppHitsStatsDTO();
-                    String uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
-                    appHitsStats.setUuid(uuid);
-                    queryToGetUserHits += "'" + uuid + "'";
-                    if (!appInfoResult.isLast()) {
-                        queryToGetUserHits += ",";
-                    }
-                    appHitsStats.setAppName(appInfoResult.getString(APIUsageStatisticsClientConstants.APP_NAME));
-                    appHitsStats.setVersion(appInfoResult.getString(APIUsageStatisticsClientConstants.VERSION));
-                    appHitsStats.setTotalHitCount(appInfoResult.getInt(APIUsageStatisticsClientConstants.TOTAL_HITS_COUNT));
-                    appHitsStatsMap.put(uuid, appHitsStats);
-                }
-                queryToGetUserHits += ") GROUP BY USER_ID,UUID ORDER BY UUID";
-                return getUserHitsStats(appHitsStatsMap, queryToGetUserHits);
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
-        }
-    }
-
-    private Map<String, AppHitsStatsDTO> getUserHitsStats(Map<String, AppHitsStatsDTO> appHitsStatsMap, String queryToGetUserHits)
+    private List<AppHitsStatsDTO> getUserHitsStats(Connection connection,
+                           Map<String, AppHitsStatsDTO> appHitsStatsMap, String queryToGetUserHits)
             throws APIMgtUsageQueryServiceClientException {
 
         if (dataSource == null) {
-            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
-                    "that the data source is properly configured in the APIUsageTracker configuration.");
+            throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been " +
+                     "initialized. Ensure that the data source is properly configured in the " +
+                     "APIUsageTracker configuration.");
         }
-        Connection connection = null;
-        Statement statement = null;
         PreparedStatement getAppHitsStatement = null;
         ResultSet appInfoResult = null;
-        AppHitsStatsDTO appHitsStats;
-        String uuid;
-        List<UserHitsPerAppDTO> userHitsStatsList;
 
         try {
-            connection = dataSource.getConnection();
-            statement = connection.createStatement();
             getAppHitsStatement = connection.prepareStatement(queryToGetUserHits);
-
             appInfoResult = getAppHitsStatement.executeQuery();
             while (appInfoResult.next()) {
                 UserHitsPerAppDTO userHitsPerApp = new UserHitsPerAppDTO();
                 userHitsPerApp.setUserName(appInfoResult.getString("USER_ID"));
-                userHitsPerApp.setUserHitsCount(appInfoResult.getInt(APIUsageStatisticsClientConstants.USER_HITS_COUNT));
-                uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
-                appHitsStats = appHitsStatsMap.get(uuid);
-                userHitsStatsList = appHitsStats.getUserHitsList();
+                userHitsPerApp.setUserHitsCount(
+                        appInfoResult.getInt(APIUsageStatisticsClientConstants.USER_HITS_COUNT));
+                String uuid = appInfoResult.getString(APIUsageStatisticsClientConstants.UUID);
+                userHitsPerApp.setUuid(uuid);
+                AppHitsStatsDTO appHitsStats = appHitsStatsMap.get(uuid);
+                List<UserHitsPerAppDTO> userHitsStatsList = appHitsStats.getUserHitsList();
                 userHitsStatsList.add(userHitsPerApp);
             }
-            return appHitsStatsMap;
+            List<AppHitsStatsDTO> appHitsStatsList =
+                    new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
+            return appHitsStatsList;
         } catch (SQLException e) {
-            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
+            throw new APIMgtUsageQueryServiceClientException("SQL Exception is occurred when " +
+                                 "reading user hits from SQL table" + e.getMessage(), e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
+            APIMgtDBUtil.closeAllConnections(getAppHitsStatement, null, appInfoResult);
         }
     }
 
