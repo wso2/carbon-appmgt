@@ -574,7 +574,7 @@ public final class AppMConstants {
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
 
-    public static final String API_USAGE_TRACKING = "APIUsageTracking.";
-    public static final String API_USAGE_BAM_UI_ACTIVITY_ENABLED = API_USAGE_TRACKING
+    public static final String APP_USAGE_TRACKING = "APIUsageTracking.";
+    public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = APP_USAGE_TRACKING
             + "UIActivityBAMPublishEnabled";
 }

@@ -6559,13 +6559,14 @@ public class AppMDAO {
      * @param tenantId   Tenant Id.
      * @param appName    App Name.
      * @param appVersion App Version.
+     * @param context Context.
      */
     public static void saveStoreHits(String webAppUUID, String userId, Integer tenantId, String appName,
-                                     String appVersion) throws SQLException, AppManagementException {
+                                     String appVersion, String context) throws SQLException, AppManagementException {
         Connection conn = null;
         try {
             conn = APIMgtDBUtil.getUiActivityDBConnection();
-            insertStoreHits(webAppUUID, userId, tenantId, appName, appVersion, conn);
+            insertStoreHits(webAppUUID, userId, tenantId, appName, appVersion, context, conn);
             conn.commit();
         } finally {
             APIMgtDBUtil.closeAllConnections(null, conn, null);
@@ -6580,21 +6581,23 @@ public class AppMDAO {
      * @param tenantId   Tenant Id.
      * @param appName    App Name.
      * @param appVersion App Version.
+     * @param context Context.
      */
     public static void insertStoreHits(String webAppUUID, String userId, Integer tenantId, String appName,
-                                       String appVersion, Connection conn) throws AppManagementException {
+                                       String appVersion, String context, Connection conn) throws AppManagementException {
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
-            String query = " INSERT INTO APM_APP_HITS (UUID,APP_NAME,VERSION,USER_ID,TENANT_ID,HIT_TIME) "
-                    + "VALUES(?,?,?,?,?,?) ";
+            String query = " INSERT INTO APM_APP_HITS (UUID,APP_NAME,VERSION,CONTEXT,USER_ID,TENANT_ID,HIT_TIME) "
+                    + "VALUES(?,?,?,?,?,?,?) ";
             ps = conn.prepareStatement(query);
             ps.setString(1, webAppUUID);
             ps.setString(2, appName);
             ps.setString(3, appVersion);
-            ps.setString(4, userId);
-            ps.setInt(5, tenantId);
-            ps.setString(6, String.valueOf(new Timestamp(new java.util.Date().getTime())));
+            ps.setString(4,context);
+            ps.setString(5, userId);
+            ps.setInt(6, tenantId);
+            ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
             ps.executeUpdate();
             if (log.isDebugEnabled()) {
                 log.debug("Record relevant to webapp id '" + webAppUUID + "' saved successfully");
@@ -6615,12 +6618,9 @@ public class AppMDAO {
      * @return JSONArray with sorted UUIDs
      */
     public static JSONArray getAppsByHitCount(String userId,
-                                              Integer startIndex, Integer pageSize) {
+                                              Integer startIndex, Integer pageSize) throws AppManagementException{
         Connection dataConn;
-        String strResult;
-
-        // build the final result format string
-        StringBuilder builderResult = new StringBuilder();
+        List<String> uuidsList;
 
         // Contains the casted final result to be returned
         JSONArray jsonResultArr = null;
@@ -6637,32 +6637,28 @@ public class AppMDAO {
             dataConn = APIMgtDBUtil.getConnection();
 
             if (AppManagerUtil.isUIActivityBAMPublishEnabled()) {
-                getAppHitStatsFromBamAndAppm(dataConn, userId, startIndex, pageSize, builderResult);
+                uuidsList = getAppHitStatsFromBamAndAppm(dataConn, userId, startIndex, pageSize);
             } else {
-                getAppHitStatsFromAppmOnly(dataConn, userId, startIndex, pageSize, builderResult);
+                uuidsList =getAppHitStatsFromAppmOnly(dataConn, userId, startIndex, pageSize);
             }
-            strResult = "[" + builderResult.toString() + "]";
-            if (log.isDebugEnabled()) {
-                log.debug("Output String : " + strResult + " : "
-                        + builderDataContext.toString());
-            }
-
-            jsonResultArr = (JSONArray) parser.parse(strResult);
-        } catch (SQLException e) {
-            log.error("SQL Exception while fetching the store hit sorted data : "
+           jsonResultArr = new JSONArray();
+            for (int i=0;i<uuidsList.size();i++) {
+                JSONObject uuidObject = new JSONObject();
+                uuidObject.put("UUID", uuidsList.get(i));
+                jsonResultArr.add(uuidObject);
+            }        } catch (SQLException e) {
+            throw new AppManagementException("SQL Exception is occurred while fetching the store hit sorted data : "
                     + builderDataContext.toString() + " : "
                     + e.getMessage(), e);
-        } catch (org.json.simple.parser.ParseException e) {
-            log.error("Json parsing error : " + builderDataContext.toString()
-                    + " : " + e.getMessage(), e);
         }
         return jsonResultArr;
     }
 
-    private static void getAppHitStatsFromAppmOnly(Connection dataConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
-            throws SQLException {
+    private static List<String> getAppHitStatsFromAppmOnly(Connection dataConn, String userId, int startIndex,
+                                                           int pageSize) throws AppManagementException {
         ResultSet rs = null;
         PreparedStatement ps = null;
+        List<String> uuidsList = new ArrayList<String>();
         try {
             String query;
             if (dataConn.getMetaData().getDriverName().contains("Oracle")) {
@@ -6671,17 +6667,17 @@ public class AppMDAO {
                         + "LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
                         + "UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ))  "
+                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? ))  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "GROUP BY HIT.UUID "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
             } else {
                 query = "SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME)AS APP_NAME "
-                        + "FROM APM_APP_HIT_TOTAL HIT "
+                        + "FROM APM_APP_HITS  HIT "
                         + "LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
                         + "UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HIT_TOTAL WHERE USER_ID=? ) "
+                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS  WHERE USER_ID=? ) "
                         + "GROUP BY HIT.UUID "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
             }
@@ -6692,20 +6688,24 @@ public class AppMDAO {
             ps.setInt(3, startIndex);
             ps.setInt(4, pageSize);
             rs = ps.executeQuery();
-            while (rs.next()) {
-                if (!rs.isFirst()) {
-                    builderResult.append(",");
-                }
-                builderResult.append("{\"UUID\":\"").append(rs.getString("UUID")).append("\"}");
+            if (rs.isFirst()) {
+                uuidsList = new ArrayList<String>();
             }
+            while (rs.next()) {
+                uuidsList.add(rs.getString("UUID"));
+            }
+        } catch (SQLException ex) {
+            throw new AppManagementException("Error occurred while data reading.", ex);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, dataConn, rs);
         }
+        return uuidsList;
     }
 
-    private static void getAppHitStatsFromBamAndAppm(Connection dataConn, String userId, int startIndex, int pageSize, StringBuilder builderResult)
-            throws SQLException {
-        List<String> uuidList = new ArrayList<String>();
+    private static List<String> getAppHitStatsFromBamAndAppm(Connection dataConn, String userId, int startIndex,
+                                                             int pageSize) throws AppManagementException {
+        List<String> uuidListFromBAM = new ArrayList<String>();
+        List<String> uuidsList = new ArrayList<String>();
         ResultSet rs = null;
         PreparedStatement ps = null;
         ResultSet appmUuidResultSet = null;
@@ -6715,63 +6715,80 @@ public class AppMDAO {
             //get the connection for the UI Activity Publish data source
             uiConn = APIMgtDBUtil.getUiActivityDBConnection();
 
-            String query;
-            if (uiConn.getMetaData().getDriverName().contains("Oracle")) {
-                query = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME)AS APP_NAME "
-                        + "FROM APM_APP_HITS WHERE USER_ID= "
-                        + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "GROUP BY UUID "
-                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC";
-            } else {
-                query = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME)AS APP_NAME "
-                        + "FROM APM_APP_HITS WHERE USER_ID= ? GROUP BY UUID "
-                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
-            }
-            ps = uiConn.prepareStatement(query);
+            String uuidRetrivealBamQuery = getAppUuidsFromBAM(uiConn);
+            ps = uiConn.prepareStatement(uuidRetrivealBamQuery);
             ps.setString(1, userId);
             ps.setInt(2, startIndex);
             ps.setInt(3, pageSize);
             rs = ps.executeQuery();
             while (rs.next()) {
-                if (!rs.isFirst()) {
-                    builderResult.append(",");
-                }
                 String uuid = rs.getString("UUID");
-                uuidList.add(uuid);
-                builderResult.append("{\"UUID\":\"").append(uuid).append("\"}");
+                uuidListFromBAM.add(uuid);
+                uuidsList.add(uuid);
             }
-            String queryForGetAppmUuid = "SELECT UUID, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                    + "WHERE UUID NOT IN (";
-            for (int i = 0; i < uuidList.size(); i++) {
-                queryForGetAppmUuid += "?";
-                if (i < uuidList.size() - 1) {
-                    queryForGetAppmUuid += ",";
-                }
+            String uuidRetrivealAppmQuery = getAppUuidsFromAppm(uuidListFromBAM, dataConn);
+            appmUuidPs = dataConn.prepareStatement(uuidRetrivealAppmQuery);
+            for (int j = 0; j < uuidListFromBAM.size(); j++) {
+                appmUuidPs.setString(j + 1, uuidListFromBAM.get(j));
             }
-            if (dataConn.getMetaData().getDriverName().contains("Oracle")) {
-                queryForGetAppmUuid += ")  WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "ORDER BY APP_NAME ASC";
-            } else {
-                queryForGetAppmUuid += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
-            }
-            appmUuidPs = dataConn.prepareStatement(queryForGetAppmUuid);
-            for (int j = 0; j < uuidList.size(); j++) {
-                appmUuidPs.setString(j + 1, uuidList.get(j));
-            }
-            appmUuidPs.setInt(uuidList.size() + 1, startIndex);
-            appmUuidPs.setInt(uuidList.size() + 2, pageSize);
+            appmUuidPs.setInt(uuidListFromBAM.size() + 1, startIndex);
+            appmUuidPs.setInt(uuidListFromBAM.size() + 2, pageSize);
             appmUuidResultSet = appmUuidPs.executeQuery();
             while (appmUuidResultSet.next()) {
-                if (!(rs.isFirst() && uuidList.size() < 1)) {
-                    builderResult.append(",");
-                }
-                String uuid = appmUuidResultSet.getString("UUID");
-                builderResult.append("{\"UUID\":\"").append(uuid).append("\"}");
+                uuidsList.add(rs.getString("UUID"));
             }
+        } catch (SQLException ex) {
+            throw new AppManagementException("Error occurred while data reading.", ex);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, uiConn, rs);
             APIMgtDBUtil.closeAllConnections(appmUuidPs, dataConn, appmUuidResultSet);
         }
+        return uuidListFromBAM;
+    }
+
+    private static String getAppUuidsFromBAM(Connection uiConn)
+            throws  AppManagementException {
+        String uuidRetrivealBamQuery;
+        try {
+            if (uiConn.getMetaData().getDriverName().contains("Oracle")) {
+                uuidRetrivealBamQuery = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME)AS APP_NAME "
+                        + "FROM APM_APP_HITS WHERE USER_ID= "
+                        + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
+                        + "GROUP BY UUID "
+                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC";
+            } else {
+                uuidRetrivealBamQuery = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME)AS APP_NAME "
+                        + "FROM APM_APP_HITS WHERE USER_ID= ? GROUP BY UUID "
+                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
+            }
+        } catch (SQLException ex) {
+            throw new AppManagementException("Error occurred while data reading.", ex);
+        }
+        return uuidRetrivealBamQuery;
+    }
+
+    private static String getAppUuidsFromAppm(List<String> uuidList, Connection dataConn)
+                    throws AppManagementException {
+        String uuidRetrivealAppmQuery;
+        try {
+            uuidRetrivealAppmQuery = "SELECT UUID, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
+                    + "WHERE UUID NOT IN (";
+            for (int i = 0; i < uuidList.size(); i++) {
+                uuidRetrivealAppmQuery += "?";
+                if (i < uuidList.size() - 1) {
+                    uuidRetrivealAppmQuery += ",";
+                }
+            }
+            if (dataConn.getMetaData().getDriverName().contains("Oracle")) {
+                uuidRetrivealAppmQuery += ")  WHERE ROWNUM >= ? AND ROWNUM <= ? "
+                        + "ORDER BY APP_NAME ASC";
+            } else {
+                uuidRetrivealAppmQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
+            }
+        } catch (SQLException ex) {
+            throw new AppManagementException("Error occurred while data reading.", ex);
+        }
+        return uuidRetrivealAppmQuery;
     }
 
 	/**

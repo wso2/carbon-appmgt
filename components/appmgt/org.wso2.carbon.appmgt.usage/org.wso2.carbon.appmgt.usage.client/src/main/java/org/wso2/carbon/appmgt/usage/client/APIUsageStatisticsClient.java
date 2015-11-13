@@ -386,21 +386,20 @@ public class APIUsageStatisticsClient {
 
     /**
      * Get no of app hits over time.
-     * @param fromDate String.
+     * @param fromDate Strig.
      * @param toDate String.
-     * @param tenantName String.
+     * @param tenantId int.
      * @return App hits stats list.
      * @throws APIMgtUsageQueryServiceClientException
-     * @throws SQLException
      */
     public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, int tenantId)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
 
         List<AppHitsStatsDTO> appHitsStatsList = null;
         Map<String, AppHitsStatsDTO> appHitsStatsMap = this.queryForAppHitsOverTime(fromDate, toDate, tenantId);
-        if (appHitsStatsMap != null) {
-            appHitsStatsList = new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
-        }
+            if (appHitsStatsMap != null) {
+                appHitsStatsList = new ArrayList<AppHitsStatsDTO>(appHitsStatsMap.values());
+            }
         return appHitsStatsList;
     }
 
@@ -1421,7 +1420,7 @@ public class APIUsageStatisticsClient {
     }
 
     private Map<String, AppHitsStatsDTO> queryForAppHitsOverTime(String fromDate, String toDate, int tenantId)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
         if (dataSource == null) {
             throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
                     "that the data source is properly configured in the APIUsageTracker configuration.");
@@ -1464,14 +1463,14 @@ public class APIUsageStatisticsClient {
                 return null;
             }
         } catch (SQLException e) {
-            throw new SQLException("Error when executing the SQL", e);
+            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
         }
     }
 
     private Map<String, AppHitsStatsDTO> getUserHitsStats(Map<String, AppHitsStatsDTO> appHitsStatsMap, String queryToGetUserHits)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
 
         if (dataSource == null) {
             throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
@@ -1502,7 +1501,7 @@ public class APIUsageStatisticsClient {
             }
             return appHitsStatsMap;
         } catch (SQLException e) {
-            throw new SQLException("Error when executing the SQL", e);
+            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
         }
