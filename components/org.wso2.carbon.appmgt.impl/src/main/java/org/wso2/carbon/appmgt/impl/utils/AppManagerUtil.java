@@ -2790,7 +2790,7 @@ public final class AppManagerUtil {
         AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String isEnabled = configuration
-                .getFirstProperty(AppMConstants.API_USAGE_BAM_UI_ACTIVITY_ENABLED);
+                .getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
         return isEnabled != null && Boolean.parseBoolean(isEnabled);
     }
 

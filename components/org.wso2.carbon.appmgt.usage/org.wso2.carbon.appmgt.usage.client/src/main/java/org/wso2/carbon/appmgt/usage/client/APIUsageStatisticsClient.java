@@ -389,10 +389,9 @@ public class APIUsageStatisticsClient {
      * @param tenantId int.
      * @return App hits stats list.
      * @throws APIMgtUsageQueryServiceClientException
-     * @throws SQLException
      */
     public List<AppHitsStatsDTO> getAppHitsOverTime (String fromDate, String toDate, int tenantId)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
 
         List<AppHitsStatsDTO> appHitsStatsList = null;
         Map<String, AppHitsStatsDTO> appHitsStatsMap = this.queryForAppHitsOverTime(fromDate, toDate, tenantId);
@@ -1419,7 +1418,7 @@ public class APIUsageStatisticsClient {
     }
 
     private Map<String, AppHitsStatsDTO> queryForAppHitsOverTime(String fromDate, String toDate, int tenantId)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
         if (dataSource == null) {
             throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
                     "that the data source is properly configured in the APIUsageTracker configuration.");
@@ -1433,10 +1432,10 @@ public class APIUsageStatisticsClient {
         try {
             connection = dataSource.getConnection();
             statement = connection.createStatement();
-            String queryToGetAppsHits = "SELECT UUID, APP_NAME, VERSION, COUNT(*) AS TOTAL_HITS_COUNT  " +
+            String queryToGetAppsHits = "SELECT UUID, APP_NAME, COUNT(*) AS TOTAL_HITS_COUNT  " +
                     "FROM APM_APP_HITS WHERE TENANT_ID =  " + tenantId + " " +
                     "AND HIT_TIME BETWEEN '" + fromDate + "' AND '" + toDate + "'" +
-                    "GROUP BY APP_NAME, VERSION,UUID ORDER BY TOTAL_HITS_COUNT";
+                    "GROUP BY CONTEXT ORDER BY TOTAL_HITS_COUNT";
             getAppHitsStatement = connection.prepareStatement(queryToGetAppsHits);
             appInfoResult = getAppHitsStatement.executeQuery();
 
@@ -1452,24 +1451,23 @@ public class APIUsageStatisticsClient {
                         queryToGetUserHits += ",";
                     }
                     appHitsStats.setAppName(appInfoResult.getString(APIUsageStatisticsClientConstants.APP_NAME));
-                    appHitsStats.setVersion(appInfoResult.getString(APIUsageStatisticsClientConstants.VERSION));
                     appHitsStats.setTotalHitCount(appInfoResult.getInt(APIUsageStatisticsClientConstants.TOTAL_HITS_COUNT));
                     appHitsStatsMap.put(uuid, appHitsStats);
                 }
-                queryToGetUserHits += ") GROUP BY USER_ID,UUID ORDER BY UUID";
+                queryToGetUserHits += ") GROUP BY USER_ID,CONTEXT ORDER BY UUID";
                 return getUserHitsStats(appHitsStatsMap, queryToGetUserHits);
             } else {
                 return null;
             }
         } catch (SQLException e) {
-            throw new SQLException("Error when executing the SQL", e);
+            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
         }
     }
 
     private Map<String, AppHitsStatsDTO> getUserHitsStats(Map<String, AppHitsStatsDTO> appHitsStatsMap, String queryToGetUserHits)
-            throws APIMgtUsageQueryServiceClientException, SQLException {
+            throws APIMgtUsageQueryServiceClientException {
 
         if (dataSource == null) {
             throw new APIMgtUsageQueryServiceClientException("BAM data source hasn't been initialized. Ensure " +
@@ -1500,12 +1498,11 @@ public class APIUsageStatisticsClient {
             }
             return appHitsStatsMap;
         } catch (SQLException e) {
-            throw new SQLException("Error when executing the SQL", e);
+            throw new APIMgtUsageQueryServiceClientException("Error when executing the SQL", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, appInfoResult);
         }
     }
-
 
     //cache stat page query
 

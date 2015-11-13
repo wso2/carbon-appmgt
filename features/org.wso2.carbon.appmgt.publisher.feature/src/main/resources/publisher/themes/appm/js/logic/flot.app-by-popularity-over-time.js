@@ -51,9 +51,8 @@ var drawPopularityOverTime = function (parsedResponse) {
     $("#tooltipTable").find("tr:gt(0)").remove();
     for (var p = 0; p < parsedResponse.length; p++) {
         var appName = parsedResponse[p].AppName.replace(/\s+/g, '');
-        var appNameWithVersion = appName + "_v" + parsedResponse[p].AppVersion;
         data.push({
-            App: appNameWithVersion,
+            App: appName,
             Hits: parsedResponse[p].TotalHits
         });
     }
@@ -76,9 +75,8 @@ var drawPopularityOverTime = function (parsedResponse) {
     $("#tooltipTable").find("tr:gt(0)").remove();
     for (var p = 0; p < parsedResponse.length; p++) {
         var appName = parsedResponse[p].AppName.replace(/\s+/g, '');
-        var appNameWithVersion = appName + "_v" + parsedResponse[p].AppVersion;
         data.push({
-            App: appNameWithVersion,
+            App: appName,
             Hits: parsedResponse[p].TotalHits
         });
     }
@@ -271,8 +269,7 @@ function drawPopupChart(parsedResponse, appName, holderId) {
 
     for (var x = 0; x < parsedResponse.length; x++) {
         var responsedAppName = parsedResponse[x].AppName.replace(/\s+/g, '');
-        var appNameWithVersion = responsedAppName + "_v" + parsedResponse[x].AppVersion;
-        if (appName == appNameWithVersion) {
+        if (appName == responsedAppName) {
             var userHitsResponse = parsedResponse[x].UserHits;
             for (var y = 0; y < userHitsResponse.length; y++) {
                 userHitsStats.push({

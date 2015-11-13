@@ -35,8 +35,6 @@ public final class APIMgtUsagePublisherConstants {
     public static final String API_USAGE_BAM_SERVER_USER = API_USAGE_TRACKING + "BAMUsername";
     public static final String API_USAGE_BAM_SERVER_PASSWORD = API_USAGE_TRACKING + "BAMPassword";
     public static final String API_USAGE_PUBLISHER_CLASS = API_USAGE_TRACKING + "PublisherClass";
-	public static final String API_USAGE_BAM_UI_ACTIVITY_ENABLED = API_USAGE_TRACKING
-			+ "UIActivityBAMPublishEnabled"; 
 	public static final String API_USAGE_CACHE_STATS_ENABLED = API_USAGE_TRACKING + "CacheStatsEnabled";
 
     public static final String CONSUMER_KEY = "api.ut.consumerKey";

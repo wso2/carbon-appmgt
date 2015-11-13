@@ -82,7 +82,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				.append("    {'name':'timestamp', 'type':'long'},")
 				.append("    {'name':'tenantId', 'type':'int'},")
 				.append("    {'name':'appName', 'type':'string'},")
-				.append("    {'name':'appVersion', 'type':'string'}")
+				.append("    {'name':'appVersion', 'type':'string'},")
+                .append("    {'name':'context', 'type':'string'}")
 				.append("    ]    }");
 		return builder.toString();
 
@@ -157,7 +158,7 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 *            "admin"},{"tenantId":"-1234"}]
 	 */
     public void processUiActivityObject(Object[] parseJSON) {
-        String action, item, timestamp, appId, userId, appName, appVersion;
+        String action, item, timestamp, appId, userId, appName, appVersion, context;
         Integer tenantId;
 		for (int i = 0; i < parseJSON.length; i++) {
 			NativeObject obj = (NativeObject) parseJSON[i];
@@ -169,12 +170,13 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			tenantId = Integer.parseInt(obj.get("tenantId", obj).toString());
 			appName = obj.get("appName", obj).toString();
 			appVersion = obj.get("appVersion", obj).toString();
+            context = obj.get("context", obj).toString();
 			obj = null;
 
 			// consider only form load event
 			if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
 				publishUserActivityEvents(action, item, timestamp, appId,
-					userId, tenantId, appName, appVersion);
+					userId, tenantId, appName, appVersion, context);
 			}
 		}
 	}
@@ -195,8 +197,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 * @param tenantId
 	 *            : Tenant Id
 	 */
-    public void publishUserActivityEvents(String action, String item,
-                                          String timestampStr, String appId, String userId, Integer tenantId, String appName, String appVersion) {
+    public void publishUserActivityEvents(String action, String item, String timestampStr, String appId, String userId,
+                                          Integer tenantId, String appName, String appVersion, String context){
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
              // if BAM is configured
@@ -210,13 +212,13 @@ public class APPMgtUiActivitiesBamDataPublisher {
 					Event event = new Event();
 					event.setTimeStamp(System.currentTimeMillis());
 					event.setPayloadData(new Object[] { appId, userId, item,
-							action, timeStamp, tenantId,appName,appVersion });
+							action, timeStamp, tenantId,appName,appVersion,context});
 					loadBalancingDataPublisher.publish(USER_ACTIVITY_STREAM,
 							USER_ACTIVITY_STREAM_VERSION, event);
 				}
 			} else {
 				// Write directly to DB
-                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(), appVersion);
+                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(), appVersion, context);
             }
 		} catch (AgentException e) {
              // Here the exception is only logged (but not thrown externally) as this method is

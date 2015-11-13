@@ -3492,56 +3492,53 @@ public class APIProviderHostObject extends ScriptableObject {
         List<AppHitsStatsDTO> appStatsList = null;
         NativeArray popularApps = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(hostObj);
-        if (!HostObjectUtils.isUIActivityBAMPublishEnabled()) {
+        if (!AppManagerUtil.isUIActivityBAMPublishEnabled()) {
             return popularApps;
         }
-        if (args.length < 3) {
+        if (args.length != 3) {
             handleException("Invalid number of parameters!");
         }
         String providerName = (String) args[0];
         String fromDate = (String) args[1];
         String toDate = (String) args[2];
+
+        boolean isTenantFlowStarted = false;
+
         try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
+            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
             APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
             appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
-        } catch (SQLException e) {
-            log.error("Error occurred while reading data from database", e);
         } catch (APIMgtUsageQueryServiceClientException e) {
-            log.error("Error occurred while invoking APIUsageStatisticsClient for ProviderAPIUsage", e);
+            handleException("Error occurred while invoking APPUsageStatisticsClient for ProviderAPPUsage", e);
         }
 
-        Iterator itr = null;
         if (appStatsList != null) {
-            itr = appStatsList.iterator();
-        }
-        int i = 0;
-        if (itr != null) {
-            while (itr.hasNext()) {
+            for (int i = 0; i < appStatsList.size(); i++) {
                 NativeObject row = new NativeObject();
-                Iterator hitsMapIterator = null;
-                Object usageObject = itr.next();
+                Object usageObject = appStatsList.get(i);
                 AppHitsStatsDTO usage = (AppHitsStatsDTO) usageObject;
                 row.put("AppName", row, usage.getAppName());
-                row.put("AppVersion", row, usage.getVersion());
                 row.put("TotalHits", row, usage.getTotalHitCount());
-                if (usage.getUserHitsList() != null) {
-                    hitsMapIterator = usage.getUserHitsList().iterator();
-                    NativeArray userHitsArray = new NativeArray(1);
-                    int j = 0;
-                    while (hitsMapIterator.hasNext()) {
+                List<UserHitsPerAppDTO> userHits = usage.getUserHitsList();
+                if (userHits != null) {
+                    NativeArray userHitsArray = new NativeArray(userHits.size());
+                    for (int j = 0; j < userHits.size(); j++) {
                         NativeObject userHitRow = new NativeObject();
-                        Object userHitsObject = hitsMapIterator.next();
+                        Object userHitsObject = userHits.get(j);
                         UserHitsPerAppDTO userHitsPerAppDTO = (UserHitsPerAppDTO) userHitsObject;
                         userHitRow.put("UserName", userHitRow, userHitsPerAppDTO.getUserName());
                         userHitRow.put("Hits", userHitRow, userHitsPerAppDTO.getUserHitsCount());
                         userHitsArray.put(j, userHitsArray, userHitRow);
-                        j++;
                     }
                     row.put("UserHits", row, userHitsArray);
                 }
                 popularApps.put(i, popularApps, row);
-                i++;
             }
         }
         return popularApps;
