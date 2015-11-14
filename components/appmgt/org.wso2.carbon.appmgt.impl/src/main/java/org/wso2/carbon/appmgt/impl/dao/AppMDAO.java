@@ -7726,9 +7726,6 @@ public class AppMDAO {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				status= true;
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				status= true;
 			}else {
 				status= false;
 			}
