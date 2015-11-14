@@ -17,7 +17,8 @@
 */
 package org.wso2.carbon.appmgt.usage.publisher.service;
 
-import org.apache.axis2.util.JavaUtils;  
+import org.apache.axis2.util.JavaUtils;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class APIMGTConfigReaderService {
 		apiManagerBamUiActivityStreamVersion = config
 				.getFirstProperty(APIMgtUsagePublisherConstants.API_BAM_UI_ACTIVITY_STREAM_VERSION);   
 		String uiActivityBAMPublishEnabledStr = config
-				.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_BAM_UI_ACTIVITY_ENABLED);
+				.getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
 		uiActivityBamPublishEnabled = uiActivityBAMPublishEnabledStr != null
 				&& JavaUtils.isTrueExplicitly(uiActivityBAMPublishEnabledStr);
 		String cacheStatsEnabledString = config.

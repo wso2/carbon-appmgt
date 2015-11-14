@@ -573,4 +573,8 @@ public final class AppMConstants {
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
+
+    public static final String APP_USAGE_TRACKING = "APIUsageTracking.";
+    public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = APP_USAGE_TRACKING
+            + "UIActivityBAMPublishEnabled";
 }
