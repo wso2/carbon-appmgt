@@ -6681,23 +6681,21 @@ public class AppMDAO {
         PreparedStatement ps = null;
         List<String> uuidsList = new ArrayList<String>();
         try {
-            String query  = "SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP.APP_NAME) AS APP_NAME "
-                    + "FROM APM_APP_HITS  HIT "
-                    + "LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
+            String query  = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME) "
+                    + "AS APP_NAME FROM APM_APP_HITS  HIT "
+                    + "WHERE HIT.USER_ID=? GROUP BY HIT.UUID "
                     + "UNION ALL "
                     + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                    + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS  WHERE USER_ID=? ) "
-                    + "GROUP BY UUID "
+                    + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS  WHERE USER_ID=? )) "
                     + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
                 query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP.APP_NAME) "
                         + "AS APP_NAME FROM APM_APP_HITS HIT "
-                        + "LEFT JOIN APM_APP APP ON APP.UUID=HIT.UUID WHERE HIT.USER_ID=? "
-                        + "UNION ALL "
+                        + "WHERE HIT.USER_ID=? "
+                        + "GROUP BY HIT.UUID UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
                         + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? ))  "
-                        + "GROUP BY UUID "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
             }
