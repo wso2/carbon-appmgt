@@ -15,23 +15,22 @@ function drawGraphs() {
     var to = dateRange.split('to')[1].trim() + ":00";
 
     $.ajax({
-        async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type + '/' + action
-            + '/',
-        type: 'POST',
-        data: {
-            'startDate': from,
-            'endDate': to
-        },
-        success: function (response) {
-            parsedResponse = JSON.parse(response);
-            drawPopularityOverTime(parsedResponse);
-            $('#spinner').hide();
-        },
-        error: function (response) {
-            alert('Error occured at statistics graph rendering');
-        }
-    });
+               async: false,
+               url: '/publisher/api/assets/' + operation + '/' + type + '/' + action + '/',
+               type: 'POST',
+               data: {
+                   'startDate': from,
+                   'endDate': to
+               },
+               success: function (response) {
+                   parsedResponse = JSON.parse(response);
+                   drawPopularityOverTime(parsedResponse);
+                   $('#spinner').hide();
+               },
+               error: function (response) {
+                   alert('Error occurred at statistics graph rendering');
+               }
+           });
 
     $('.btn-remove').on('click', function () {
         $(this).parents('.graph-maximized').removeClass('graph-maximized');
@@ -52,9 +51,9 @@ var drawPopularityOverTime = function (parsedResponse) {
     for (var p = 0; p < parsedResponse.length; p++) {
         var appName = parsedResponse[p].AppName.replace(/\s+/g, '');
         data.push({
-            App: appName,
-            Hits: parsedResponse[p].TotalHits
-        });
+                      App: appName,
+                      Hits: parsedResponse[p].TotalHits
+                  });
     }
 
     $('.graph-container').html('');
@@ -66,7 +65,8 @@ var drawPopularityOverTime = function (parsedResponse) {
     x = chart.addCategoryAxis("x", "App");
 
     y = chart.addMeasureAxis("y", "Hits");
-    y.title = "Hit Count";    var data = [];
+    y.title = "Hit Count";
+    var data = [];
     var length = parsedResponse.length;
 
     var dataStructure = [];
@@ -76,9 +76,9 @@ var drawPopularityOverTime = function (parsedResponse) {
     for (var p = 0; p < parsedResponse.length; p++) {
         var appName = parsedResponse[p].AppName.replace(/\s+/g, '');
         data.push({
-            App: appName,
-            Hits: parsedResponse[p].TotalHits
-        });
+                      App: appName,
+                      Hits: parsedResponse[p].TotalHits
+                  });
     }
 
     $('.graph-container').html('');
@@ -105,10 +105,10 @@ var drawPopularityOverTime = function (parsedResponse) {
 
     var $dataTable = $('<table class="display" width="100%" cellspacing="0" id="apiSelectTable"></table>');
     $dataTable.append($('<thead class="tableHead"><tr>' +
-        '<th width="10%"></th>' +
-        '<th>App Name</th>' +
-        '<th style="text-align:right" width="20%" >Hits Count</th>'+
-        '</tr></thead>'));
+                        '<th width="10%"></th>' +
+                        '<th>App Name</th>' +
+                        '<th style="text-align:right" width="20%" >Hits Count</th>'+
+                        '</tr></thead>'));
 
     sortData = dimple.filterData(data, "App", filterValues);
     sortData.sort(function (obj1, obj2) {
@@ -118,22 +118,22 @@ var drawPopularityOverTime = function (parsedResponse) {
     for (var n = 0; n < sortData.length; n++) {
         if (n < 20) {
             $dataTable.append($('<tr><td >'
-                + '<input name="item_checkbox' + n + '"  checked   id=' + n +
-                '  type="checkbox"  data-item=' + sortData[n].App  + ' class="inputCheckbox"/>'
-                + '</td>'
-                + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].App +' </label></td>'
-                +'<td style="text-align:right;"><label for='+n+'>'+sortData[n].Hits +'</label></td>'
-                +'</tr>'));
+                                    + '<input name="item_checkbox' + n + '"  checked   id=' + n +
+                                '  type="checkbox"  data-item=' + sortData[n].App  + ' class="inputCheckbox"/>'
+                                    + '</td>'
+                                    + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].App +' </label></td>'
+                                    +'<td style="text-align:right;"><label for='+n+'>'+sortData[n].Hits +'</label></td>'
+                                    +'</tr>'));
             state_array.push(true);
             defaultFilterValues.push(sortData[n].App);
             chartData.push(sortData[n].App);
         } else {
             $dataTable.append($('<tr><td >'
-                +'<input name="item_checkbox'+n+'"  id='+n+'  type="checkbox"  data-item='+sortData[n].App +' class="inputCheckbox"/>'
-                +'</td>'
-                +'<td style="text-align:left;"><label id ="label" for='+n+'>'+sortData[n].App +' </label></td>'
-                +'<td style="text-align:right;"><label for='+n+'>'+sortData[n].Hits +'</label></td>'
-                +'</tr>'));
+                                    +'<input name="item_checkbox'+n+'"  id='+n+'  type="checkbox"  data-item='+sortData[n].App +' class="inputCheckbox"/>'
+                                    +'</td>'
+                                    +'<td style="text-align:left;"><label id ="label" for='+n+'>'+sortData[n].App +' </label></td>'
+                                    +'<td style="text-align:right;"><label for='+n+'>'+sortData[n].Hits +'</label></td>'
+                                    +'</tr>'));
             state_array.push(false);
             chartData.push(sortData[n].App);
         }
@@ -146,23 +146,23 @@ var drawPopularityOverTime = function (parsedResponse) {
         $('#tableContainer').append($dataTable);
         $('#tableContainer').show();
         var table= $('#apiSelectTable').DataTable({
-            retrieve: true,
-            "order": [
-                [ 1, "desc" ]
-            ],
-            "fnDrawCallback": function(){
-                if(this.fnSettings().fnRecordsDisplay()<=$("#apiSelectTable_length option:selected" ).val()
-                    || $("#apiSelectTable_length option:selected" ).val()==-1)
-                    $('#apiSelectTable_paginate').hide();
-                else
-                    $('#apiSelectTable_paginate').show();
-            },
-            "aoColumns": [
-                { "bSortable": false },
-                null,
-                null
-            ]
-        });
+                                                      retrieve: true,
+                                                      "order": [
+                                                          [ 1, "desc" ]
+                                                      ],
+                                                      "fnDrawCallback": function(){
+                                                          if(this.fnSettings().fnRecordsDisplay()<=$("#apiSelectTable_length option:selected" ).val()
+                                                              || $("#apiSelectTable_length option:selected" ).val()==-1)
+                                                              $('#apiSelectTable_paginate').hide();
+                                                          else
+                                                              $('#apiSelectTable_paginate').show();
+                                                      },
+                                                      "aoColumns": [
+                                                          { "bSortable": false },
+                                                          null,
+                                                          null
+                                                      ]
+                                                  });
 
         $('.details-control').removeClass('sorting');
         var detailRows = [];
@@ -273,9 +273,9 @@ function drawPopupChart(parsedResponse, appName, holderId) {
             var userHitsResponse = parsedResponse[x].UserHits;
             for (var y = 0; y < userHitsResponse.length; y++) {
                 userHitsStats.push({
-                    "User": userHitsResponse[y].UserName,
-                    "Hits": userHitsResponse[y].Hits
-                });
+                                       "User": userHitsResponse[y].UserName,
+                                       "Hits": userHitsResponse[y].Hits
+                                   });
             }
         }
     }
@@ -307,10 +307,10 @@ function drawPopupChart(parsedResponse, appName, holderId) {
     var $dataTable = $('<table class="display" width="90%" cellspacing="0" id="apiSelectTable"></table>');
 
     $dataTable.append($('<thead class="tableHead"><tr>' +
-        '<th width="10%"></th>' +
-        '<th>User</th>' +
-        '<th style="text-align:right" width="20%" >User Hits Count</th>' +
-        '</tr></thead>'));
+                        '<th width="10%"></th>' +
+                        '<th>User</th>' +
+                        '<th style="text-align:right" width="20%" >User Hits Count</th>' +
+                        '</tr></thead>'));
 
 
     sortData = dimple.filterData(userHitsStats, "User", filterValues);
@@ -322,22 +322,22 @@ function drawPopupChart(parsedResponse, appName, holderId) {
 
         if (n < 20) {
             $dataTable.append($('<tr><td >'
-                + '<input name="item_checkbox' + n + '"  checked   id=' + n +
-                '  type="checkbox"  data-item=' + sortData[n].User + ' class="inputCheckbox"/>'
-                + '</td>'
-                + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].User + ' </label></td>'
-                + '<td style="text-align:right;"><label for=' + n + '>' + sortData[n].Hits + '</label></td>'
-                + '</tr>'));
+                                    + '<input name="item_checkbox' + n + '"  checked   id=' + n +
+                                '  type="checkbox"  data-item=' + sortData[n].User + ' class="inputCheckbox"/>'
+                                    + '</td>'
+                                    + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].User + ' </label></td>'
+                                    + '<td style="text-align:right;"><label for=' + n + '>' + sortData[n].Hits + '</label></td>'
+                                    + '</tr>'));
             state_array.push(true);
             defaultFilterValues.push(sortData[n].User);
             chartData.push(sortData[n].User);
         } else {
             $dataTable.append($('<tr><td >'
-                + '<input name="item_checkbox' + n + '"  id=' + n + '  type="checkbox"  data-item=' + sortData[n].User + ' class="inputCheckbox"/>'
-                + '</td>'
-                + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].User + ' </label></td>'
-                + '<td style="text-align:right;"><label for=' + n + '>' + sortData[n].Hits + '</label></td>'
-                + '</tr>'));
+                                    + '<input name="item_checkbox' + n + '"  id=' + n + '  type="checkbox"  data-item=' + sortData[n].User + ' class="inputCheckbox"/>'
+                                    + '</td>'
+                                    + '<td style="text-align:left;"><label id ="label" for=' + n + '>' + sortData[n].User + ' </label></td>'
+                                    + '<td style="text-align:right;"><label for=' + n + '>' + sortData[n].Hits + '</label></td>'
+                                    + '</tr>'));
             state_array.push(false);
             chartData.push(sortData[n].App);
         }
@@ -348,24 +348,24 @@ function drawPopupChart(parsedResponse, appName, holderId) {
     $('#tableContainer').show();
 
     var table = $('#apiSelectTable').DataTable({
-        retrieve: true,
-        "order": [
-            [ 1, "desc" ]
-        ],
-        "fnDrawCallback": function () {
-            if (this.fnSettings().fnRecordsDisplay() <= $("#apiSelectTable_length option:selected").val()
-                || $("#apiSelectTable_length option:selected").val() == -1)
-                $('#apiSelectTable_paginate').hide();
-            else
-                $('#apiSelectTable_paginate').show();
-        },
-        "aoColumns": [
-            { "bSortable": false },
-            null,
-            null
-        ]
+                                                   retrieve: true,
+                                                   "order": [
+                                                       [ 2, "desc" ]
+                                                   ],
+                                                   "fnDrawCallback": function () {
+                                                       if (this.fnSettings().fnRecordsDisplay() <= $("#apiSelectTable_length option:selected").val()
+                                                           || $("#apiSelectTable_length option:selected").val() == -1)
+                                                           $('#apiSelectTable_paginate').hide();
+                                                       else
+                                                           $('#apiSelectTable_paginate').show();
+                                                   },
+                                                   "aoColumns": [
+                                                       { "bSortable": false },
+                                                       null,
+                                                       null
+                                                   ]
 
-    });
+                                               });
 
     $('.details-control').removeClass('sorting');
 
@@ -387,8 +387,7 @@ function drawPopupChart(parsedResponse, appName, holderId) {
                 row.child.hide();
                 tr.removeClass('shown');
             });
-        }
-        else {
+        } else {
             row.child(format(row.data()), 'no-padding').show();
             tr.addClass('shown');
             $('div.slider', row.child()).slideDown();
@@ -448,4 +447,3 @@ function drawPopupChart(parsedResponse, appName, holderId) {
         chart.draw(0, true);
     };
 }
-

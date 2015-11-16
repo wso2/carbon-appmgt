@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -20,53 +20,79 @@ package org.wso2.carbon.appmgt.usage.client.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Total App Hits with user app stats list.
+ */
 public class AppHitsStatsDTO {
     private String appName;
-    private String version;
     private int totalHitCount;
-    private String uuid;
+    private String context;
     private List<UserHitsPerAppDTO> userHitsList;
 
     public AppHitsStatsDTO() {
         userHitsList = new ArrayList<UserHitsPerAppDTO>();
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
+     /**
+     * Get User Hits List.
+     * @return List with user hits.
+     */
     public List<UserHitsPerAppDTO> getUserHitsList() {
         return userHitsList;
     }
 
+    /**
+     * Set User Hits List.
+     * @param userHitsList List<UserHitsPerAppDTO>.
+     */
     public void setUserHitsList(List<UserHitsPerAppDTO> userHitsList) {
         this.userHitsList = userHitsList;
     }
 
+    /**
+     * Get Total Hit Count.
+     * @return totalHitCount int.
+     */
     public int getTotalHitCount() {
         return totalHitCount;
     }
 
+    /**
+     * Set Total hit count.
+     * @param totalHitCount int.
+     */
     public void setTotalHitCount(int totalHitCount) {
         this.totalHitCount = totalHitCount;
     }
 
-    public String getVersion() {
-        return version;
+    /**
+     * Get Context
+     * @return context String.
+     */
+    public String getContext() {
+        return context;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    /**
+     * Set Context.
+     * @param context String.
+     */
+    public void setContext(String context) {
+        this.context = context;
     }
 
+    /**
+     * Get App Name.
+     * @return appName String.
+     */
     public String getAppName() {
         return appName;
     }
 
+    /**
+     * Get App Name.
+     * @param appName String.
+     */
     public void setAppName(String appName) {
         this.appName = appName;
     }

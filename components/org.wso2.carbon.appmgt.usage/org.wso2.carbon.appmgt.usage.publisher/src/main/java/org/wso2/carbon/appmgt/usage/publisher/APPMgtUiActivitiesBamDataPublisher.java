@@ -197,8 +197,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 * @param tenantId
 	 *            : Tenant Id
 	 */
-    public void publishUserActivityEvents(String action, String item, String timestampStr, String appId, String userId,
-                                          Integer tenantId, String appName, String appVersion, String context){
+    public void publishUserActivityEvents(String action, String item, String timestampStr, String appId,
+                                          String userId, Integer tenantId, String appName,
+                                          String appVersion, String context){
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
              // if BAM is configured
@@ -218,7 +219,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				}
 			} else {
 				// Write directly to DB
-                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(), appVersion, context);
+                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(),
+                                      appVersion, context);
             }
 		} catch (AgentException e) {
              // Here the exception is only logged (but not thrown externally) as this method is
@@ -227,8 +229,6 @@ public class APPMgtUiActivitiesBamDataPublisher {
              log.error("Failed to publish build event : " + e.getMessage(), e);
         } catch (AppManagementException e) {
             log.error("Failed to write to table : " + e.getMessage(), e);
-        } catch (SQLException e) {
-            log.error("SQL exception found : " + e.getMessage(), e);
         }
     }
 }

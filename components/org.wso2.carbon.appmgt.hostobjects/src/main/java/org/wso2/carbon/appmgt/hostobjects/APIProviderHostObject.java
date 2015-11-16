@@ -3505,17 +3505,22 @@ public class APIProviderHostObject extends ScriptableObject {
         boolean isTenantFlowStarted = false;
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
-            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            String tenantDomain = MultitenantUtils.getTenantDomain(
+                    AppManagerUtil.replaceEmailDomainBack(providerName));
+            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(
+                        tenantDomain, true);
             }
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
+            APIUsageStatisticsClient client =
+                    new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
             appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
         } catch (APIMgtUsageQueryServiceClientException e) {
-            handleException("Error occurred while invoking APPUsageStatisticsClient for ProviderAPPUsage", e);
+            handleException("Error occurred while invoking APPUsageStatisticsClient " +
+                        "for ProviderAPPUsage", e);
         }
 
         if (appStatsList != null) {
@@ -3524,6 +3529,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 Object usageObject = appStatsList.get(i);
                 AppHitsStatsDTO usage = (AppHitsStatsDTO) usageObject;
                 row.put("AppName", row, usage.getAppName());
+                row.put("Context", row, usage.getContext());
                 row.put("TotalHits", row, usage.getTotalHitCount());
                 List<UserHitsPerAppDTO> userHits = usage.getUserHitsList();
                 if (userHits != null) {
