@@ -155,6 +155,7 @@ $(document).ready(
         /*
          * check if the parameters are not null
          */
+
         if (jsonObj["isActive"] != null && jsonObj["path"] != null
             && jsonObj["appData"] != null
             && jsonObj["appControls"] != null

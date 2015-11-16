@@ -231,9 +231,13 @@ require('/modules/store.js').exec(function (ctx) {
                 };
 
                 assets = [];
-                while (assets.length < PAGE_SIZE && maxTry < 10) {
+               var done = false;
+               while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                     maxTry++;
                     var result = getNextassetSet();
+                    if (result.length < 12){
+                        done = true;
+                    }
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         var aid = String(result[n].UUID);
                         try {
