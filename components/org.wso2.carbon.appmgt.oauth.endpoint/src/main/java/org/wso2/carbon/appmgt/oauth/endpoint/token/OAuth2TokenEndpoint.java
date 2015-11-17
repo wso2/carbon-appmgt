@@ -1,13 +1,13 @@
 package org.wso2.carbon.appmgt.oauth.endpoint.token;
 
 
-import org.apache.amber.oauth2.as.response.OAuthASResponse;
-import org.apache.amber.oauth2.as.response.OAuthASResponse.OAuthTokenResponseBuilder;
-import org.apache.amber.oauth2.common.OAuth;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.amber.oauth2.common.message.OAuthResponse;
-import org.apache.amber.oauth2.common.message.types.GrantType;
+import org.apache.oltu.oauth2.as.response.OAuthASResponse;
+import org.apache.oltu.oauth2.as.response.OAuthASResponse.OAuthTokenResponseBuilder;
+import org.apache.oltu.oauth2.common.OAuth;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.gateway.dto.Token;

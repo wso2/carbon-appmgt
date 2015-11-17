@@ -50,9 +50,8 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                         	session.put("Loged", "true");
 
                         	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
-
-                        	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityUtil;
-				            var tenantId = identityUtil.getTenantIdOFUser(sessionObj.loggedInUser);
+                        	var identityTenantUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+				            var tenantId = identityTenantUtil.getTenantIdOfUser(sessionObj.loggedInUser);
 
 				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
 				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
