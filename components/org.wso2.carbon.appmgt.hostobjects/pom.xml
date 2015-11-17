@@ -91,8 +91,8 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.appmgt.api.*,
-                            org.wso2.carbon.identity.*;version="${carbon.identity.version}",
-                            org.wso2.carbon.user.mgt.*;version="${carbon.identity.version}",
+                            org.wso2.carbon.identity.*;version="${carbon.identity.pkg.version}",
+                            org.wso2.carbon.user.mgt.*;version="${carbon.identity.pkg.version}",
                             org.mozilla.javascript.*;version="${rhino.js.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
