@@ -877,7 +877,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                     return;
                 }
                 meta = parse(unescape(meta));
-                var version = ctx.version;
+
+                var version;
+                if(Array.isArray(ctx.version)) {
+                    version = ctx.version[1];
+                } else {
+                    version = ctx.version;
+                }
+
                 model.set('overview.bundleversion', version);
                 model.set('overview.packagename', meta.package);
                 if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
