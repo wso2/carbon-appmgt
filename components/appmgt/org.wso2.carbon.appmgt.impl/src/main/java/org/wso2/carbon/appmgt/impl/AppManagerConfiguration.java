@@ -23,7 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIStore;
+import org.wso2.carbon.appmgt.api.model.APPStore;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorConstants;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -63,7 +63,7 @@ public class AppManagerConfiguration {
     private boolean initialized;
 
     private List<Environment> apiGatewayEnvironments = new ArrayList<Environment>();
-    private Set<APIStore> externalAPIStores = new HashSet<APIStore>();
+    private Set<APPStore> externalAPIStores = new HashSet<APPStore>();
     private List<SSOEnvironment> ssoEnvironments = new ArrayList<SSOEnvironment>();
 
     public Map<String, Map<String, String>> getLoginConfiguration() {
@@ -170,15 +170,15 @@ public class AppManagerConfiguration {
                                                             AppMConstants.API_GATEWAY_ENDPOINT)).getText()));
                     apiGatewayEnvironments.add(environment);
                 }
-            }else if(AppMConstants.EXTERNAL_API_STORES.equals(localName)){  //Initialize 'externalAPIStores' config elements
+            }else if(AppMConstants.EXTERNAL_APP_STORES.equals(localName)){  //Initialize 'externalAPIStores' config elements
                 Iterator apistoreIterator = element.getChildrenWithLocalName("ExternalAPIStore");
-                externalAPIStores = new HashSet<APIStore>();
+                externalAPIStores = new HashSet<APPStore>();
                 while(apistoreIterator.hasNext()){
-                    APIStore store=new APIStore();
+                    APPStore store=new APPStore();
                     OMElement storeElem = (OMElement)apistoreIterator.next();
-                    String type=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_API_STORE_TYPE));
+                    String type=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
                     store.setType(type); //Set Store type [eg:wso2]
-                    String name=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_API_STORE_ID));
+                    String name=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_ID));
                     if(name==null){
                         try {
                             throw new AppManagementException("The ExternalAPIStore name attribute is not defined in app-manager.xml.");
@@ -187,19 +187,19 @@ public class AppManagerConfiguration {
                         }
                     }
                     store.setName(name); //Set store name
-                    OMElement configDisplayName=storeElem.getFirstChildWithName(new QName(AppMConstants.EXTERNAL_API_STORE_DISPLAY_NAME));
+                    OMElement configDisplayName=storeElem.getFirstChildWithName(new QName(AppMConstants.EXTERNAL_APP_STORE_DISPLAY_NAME));
                     String displayName=(configDisplayName!=null)?replaceSystemProperty(
                             configDisplayName.getText()):name;
                     store.setDisplayName(displayName);//Set store display name
                     store.setEndpoint(replaceSystemProperty(
                             storeElem.getFirstChildWithName(new QName(
-                                    AppMConstants.EXTERNAL_API_STORE_ENDPOINT)).getText())); //Set store endpoint,which is used to publish APIs
+                                    AppMConstants.EXTERNAL_APP_STORE_ENDPOINT)).getText())); //Set store endpoint,which is used to publish APIs
                     store.setPublished(false);
-                    if(AppMConstants.WSO2_API_STORE_TYPE.equals(type)){
+                    if(AppMConstants.WSO2_APP_STORE_TYPE.equals(type)){
                     OMElement password=storeElem.getFirstChildWithName(new QName(
-                                AppMConstants.EXTERNAL_API_STORE_PASSWORD));
+                                AppMConstants.EXTERNAL_APP_STORE_PASSWORD));
                     if(password!=null){
-                    String key = AppMConstants.EXTERNAL_API_STORES+"."+ AppMConstants.EXTERNAL_API_STORE+"."+ AppMConstants.EXTERNAL_API_STORE_PASSWORD+'_'+name;//Set store login password [optional]
+                    String key = AppMConstants.EXTERNAL_APP_STORES +"."+ AppMConstants.EXTERNAL_APP_STORE +"."+ AppMConstants.EXTERNAL_APP_STORE_PASSWORD +'_'+name;//Set store login password [optional]
                     String value;
                     if (secretResolver.isInitialized() && secretResolver.isTokenProtected(key)) {
                         value = secretResolver.resolve(key);
@@ -211,7 +211,7 @@ public class AppManagerConfiguration {
                     store.setPassword(replaceSystemProperty(value));
                     store.setUsername(replaceSystemProperty(
                             storeElem.getFirstChildWithName(new QName(
-                                    AppMConstants.EXTERNAL_API_STORE_USERNAME)).getText())); //Set store login username [optional]
+                                    AppMConstants.EXTERNAL_APP_STORE_USERNAME)).getText())); //Set store login username [optional]
                     }else{
                         try {
                             throw new AppManagementException("The user-credentials of WebApp Publisher is not defined in the <ExternalAPIStore> config of app-manager.xml.");
@@ -354,7 +354,7 @@ public class AppManagerConfiguration {
         return apiGatewayEnvironments;
     }
 
-    public Set<APIStore> getExternalAPIStores() {  //Return set of APIStores
+    public Set<APPStore> getExternalAPIStores() {  //Return set of APIStores
         return externalAPIStores;
     }
 
@@ -362,8 +362,8 @@ public class AppManagerConfiguration {
         return ssoEnvironments;
     }
 
-    public APIStore getExternalAPIStore(String storeName) { //Return APIStore object,based on store name/Here we assume store name is unique.
-        for (APIStore apiStore : externalAPIStores) {
+    public APPStore getExternalAPIStore(String storeName) { //Return APIStore object,based on store name/Here we assume store name is unique.
+        for (APPStore apiStore : externalAPIStores) {
             if (apiStore.getName().equals(storeName)) {
                 return apiStore;
             }

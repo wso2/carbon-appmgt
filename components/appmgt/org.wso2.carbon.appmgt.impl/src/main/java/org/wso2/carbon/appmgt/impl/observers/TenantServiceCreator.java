@@ -155,6 +155,12 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         }
 
         try {
+            AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
+        } catch (Exception e) {
+            log.error("Failed to load external-stores.xml to tenant " + tenantDomain + "'s registry");
+        }
+
+        try {
             //Add the creator & publisher roles if not exists
             //Apply permissons to appmgt collection for creator role
             UserRealm realm = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();

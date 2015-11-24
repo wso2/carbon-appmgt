@@ -508,4 +508,43 @@ public interface APIProvider extends APIManager {
      *@throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     public String getTrackingID(String uuid)throws AppManagementException;
+
+
+    /**
+     *
+     * @param webApp
+     * @param appStores
+     * @return
+     * @throws AppManagementException
+     */
+    public boolean updateAPPsInExternalAPIStores(WebApp webApp, Set<APPStore> appStores)
+            throws AppManagementException;
+
+    /**
+     * Get the external app stores , where apps should be published.
+     * @param apiId
+     * @return
+     * @throws AppManagementException
+     */
+    public Set<APPStore> getExternalAPPStores(APIIdentifier apiId) throws AppManagementException;
+
+
+    /**
+     * Get the stores where given app is already published
+     * @param apiId
+     * @return
+     * @throws AppManagementException
+     */
+    public Set<APPStore> getPublishedExternalAPPStores(APIIdentifier apiId) throws AppManagementException;
+
+
+    /**
+     * When enabled publishing to external APPStores support,publish the APP to external APPStores
+     * @param webApp The API which need to published
+     * @param appStores The APIStores set to which need to publish API
+     * @throws AppManagementException
+     *          If failed to update subscription status
+     */
+    public void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
+            throws AppManagementException;
 }

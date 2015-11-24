@@ -136,6 +136,7 @@ public class AppManagerComponent {
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
+            AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
 
             String gatewayType = configuration.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
             if ("Synapse".equalsIgnoreCase(gatewayType)) {

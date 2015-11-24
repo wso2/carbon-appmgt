@@ -42,7 +42,6 @@ import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIProvider;
-import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -51,6 +50,7 @@ import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -454,7 +454,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setSandboxUrl(sandboxUrl);
         api.addTags(tag);
         api.setTransports(transport);
-        api.setApiOwner(apiOwner);
+        api.setAppOwner(apiOwner);
         api.setAdvertiseOnly(advertiseOnly);
         api.setRedirectURL(redirectURL);
         api.setSubscriptionAvailability(subscriptionAvailability);
@@ -2923,8 +2923,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
         APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
-        NativeJavaObject usernameNativeJavaObject = (NativeJavaObject) args[1];
-        String username = (String) usernameNativeJavaObject.unwrap();
+        String username = (String) args[1];
         username = AppManagerUtil.replaceEmailDomain(username);
         NativeJavaObject ssoProviderNativeJavaObject = (NativeJavaObject) args[2];
         SSOProvider ssoProvider = (SSOProvider) ssoProviderNativeJavaObject.unwrap();
@@ -3368,7 +3367,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                               Scriptable thisObj, Object[] args,
                                                               Function funObj)
             throws AppManagementException {
-        Set<APIStore> apistoresList = AppManagerUtil.getExternalAPIStores();
+        Set<APPStore> apistoresList = AppManagerUtil.getExternalAPIStores();
         NativeArray myn = new NativeArray(0);
         if (apistoresList == null) {
             return null;
@@ -3378,7 +3377,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object apistoreObject = it.next();
-                APIStore apiStore = (APIStore) apistoreObject;
+                APPStore apiStore = (APPStore) apistoreObject;
                 row.put("displayName", row, apiStore.getDisplayName());
                 row.put("name", row, apiStore.getName());
                 row.put("endpoint", row, apiStore.getEndpoint());
@@ -3516,6 +3515,95 @@ public class APIProviderHostObject extends ScriptableObject {
             handleException("Error occurred while getting the APIs", e);
         }
         return myn;
+    }
+
+
+    public static boolean jsFunction_updateExternalAPPStores(Context cx, Scriptable thisObj, Object[] args,
+                                                             Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 4) {
+            handleException("Invalid input parameters to the updateExternalAPPStores method");
+        }
+
+        boolean updated = false;
+        boolean isTenantFlowStarted = false;
+
+        String provider = (String) args[0];
+        if (provider != null) {
+            provider = AppManagerUtil.replaceEmailDomain(provider);
+        }
+        String name = (String) args[1];
+        String version = (String) args[2];
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(provider));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            APIProvider apiProvider = getAPIProvider(thisObj);
+
+            APIIdentifier apiId = new APIIdentifier(provider, name, version);
+            WebApp webApp = apiProvider.getAPI(apiId);
+            //Getting selected external API stores from UI and publish API to them.
+            NativeArray externalAPIStores = (NativeArray) args[3];
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantManager().getTenantId(tenantDomain);
+            //Check if no external APIStore selected from UI
+            if (externalAPIStores != null) {
+                Set<APPStore> inputStores = new HashSet<APPStore>();
+                for (Object store : externalAPIStores) {
+                    inputStores.add(AppManagerUtil.getExternalAPPStore((String) store, tenantId));
+                }
+
+                updated = apiProvider.updateAPPsInExternalAPIStores(webApp, inputStores);
+
+            }
+            return updated;
+        } catch (UserStoreException e) {
+            handleException("Error while updating external api stores", e);
+            return false;
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+
+    public static NativeArray jsFunction_getExternalAPPStoresList(Context cx, Scriptable thisObj, Object[] args,
+                                                                  Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 3 || !isStringValues(args)) {
+            handleException("Invalid input parameters to the getExternalAPPStoresList method");
+        }
+
+        String provider = (String) args[0];
+        String appName = (String) args[1];
+        String appVersion = (String) args[2];
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        APIIdentifier identifier = new APIIdentifier(provider, appName, appVersion);
+        Set<APPStore> storesSet = apiProvider.getExternalAPPStores(identifier);
+        NativeArray appStoresArray = new NativeArray(0);
+
+        if (storesSet != null && storesSet.size() != 0) {
+            int i = 0;
+            for (APPStore store : storesSet) {
+                NativeObject storeObject = new NativeObject();
+                storeObject.put("name", storeObject, store.getName());
+                storeObject.put("displayName", storeObject, store.getDisplayName());
+                storeObject.put("published", storeObject, store.isPublished());
+                appStoresArray.put(i, appStoresArray, storeObject);
+                i++;
+            }
+
+        }
+        return appStoresArray;
     }
 
 }
