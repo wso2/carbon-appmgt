@@ -511,40 +511,24 @@ public interface APIProvider extends APIManager {
 
 
     /**
-     *
-     * @param webApp
-     * @param appStores
-     * @return
+     * update (add/delete) the the app in external stores
+     * @param webApp Web App
+     * @param appStores External App Stores
+     * @return true if success else false
      * @throws AppManagementException
      */
     public boolean updateAPPsInExternalAPIStores(WebApp webApp, Set<APPStore> appStores)
             throws AppManagementException;
 
     /**
-     * Get the external app stores , where apps should be published.
-     * @param apiId
-     * @return
+     * Get the external app stores for given identifier.
+     * if app is already published to a store then attribute "published" will have value set to "true"
+     *
+     * @param apiId WebApp Identifier
+     * @return Set of App Store
      * @throws AppManagementException
      */
     public Set<APPStore> getExternalAPPStores(APIIdentifier apiId) throws AppManagementException;
 
 
-    /**
-     * Get the stores where given app is already published
-     * @param apiId
-     * @return
-     * @throws AppManagementException
-     */
-    public Set<APPStore> getPublishedExternalAPPStores(APIIdentifier apiId) throws AppManagementException;
-
-
-    /**
-     * When enabled publishing to external APPStores support,publish the APP to external APPStores
-     * @param webApp The API which need to published
-     * @param appStores The APIStores set to which need to publish API
-     * @throws AppManagementException
-     *          If failed to update subscription status
-     */
-    public void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
-            throws AppManagementException;
 }

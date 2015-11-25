@@ -2784,7 +2784,6 @@ public final class AppManagerUtil {
     }
 
 
-
     /**
      * Returns a set of External APP Stores as defined in the underlying governance
      * registry.
@@ -2804,17 +2803,17 @@ public final class AppManagerUtil {
                 OMElement element = AXIOMUtil.stringToOM(content);
                 Iterator appStoreIterator = element.getChildrenWithLocalName(AppMConstants.EXTERNAL_APP_STORE);
 
-                while(appStoreIterator.hasNext()){
-                    APPStore store=new APPStore();
-                    OMElement storeElem = (OMElement)appStoreIterator.next();
-                    String type=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
+                while (appStoreIterator.hasNext()) {
+                    APPStore store = new APPStore();
+                    OMElement storeElem = (OMElement) appStoreIterator.next();
+                    String type = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
                     String className =
                             storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_API_STORE_CLASS_NAME));
                     store.setPublisher((APPPublisher) Class.forName(className).newInstance());
 
                     type = (type != null) ? type : "";
                     store.setType(type); //Set Store type [eg:wso2]
-                    String name=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_ID));
+                    String name = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_ID));
                     if (name == null) {
                         name = "";
                         log.error("The ExternalAPPStore name attribute is not defined in external-app-stores.xml " +
@@ -2823,7 +2822,7 @@ public final class AppManagerUtil {
                     store.setName(name); //Set store name
                     OMElement configDisplayName = storeElem.getFirstChildWithName
                             (new QName(AppMConstants.EXTERNAL_APP_STORE_DISPLAY_NAME));
-                    String displayName =  (configDisplayName!=null) ? configDisplayName.getText(): name ;
+                    String displayName = (configDisplayName != null) ? configDisplayName.getText() : name;
                     store.setDisplayName(displayName);//Set store display name
 
                     OMElement endPoint = storeElem.getFirstChildWithName(
@@ -2843,7 +2842,7 @@ public final class AppManagerUtil {
                             AppMConstants.EXTERNAL_APP_STORE_PASSWORD));
                     OMElement username = storeElem.getFirstChildWithName(
                             new QName(AppMConstants.EXTERNAL_APP_STORE_USERNAME));
-                    if (password != null || username !=null) {
+                    if (password != null || username != null) {
                         store.setPassword(password.getText());
                         store.setUsername(username.getText());
                     } else {
@@ -2881,9 +2880,9 @@ public final class AppManagerUtil {
     }
 
 
-
     /**
      * Get the APP store from registry configuration for given store name
+     *
      * @param appStoreName App Store Name
      * @return App Store
      * @throws AppManagementException
@@ -2899,58 +2898,9 @@ public final class AppManagerUtil {
         return apiStore;
     }
 
-
-    /**
-     * This method get all the app stores from the configuration and returns
-     * the app stores where app is not already published
-     * @param alreadyPublishedStores apps stores where app is already published
-     * @param tenantId tenant id
-     * @return app stores
-     * @throws AppManagementException
-     */
-    public static Set<APPStore> getExternalAPPStores(Set<APPStore> alreadyPublishedStores, int tenantId)
-            throws AppManagementException {
-        SortedSet<APPStore> apiStores = new TreeSet<APPStore>(new APPStoreNameComparator());
-        apiStores.addAll(getExternalStores(tenantId));
-        //Retains only the stores that contained in configuration
-        alreadyPublishedStores.retainAll(apiStores);
-        boolean exists = false;
-        if (apiStores.size() != 0) {
-            for (APPStore store : apiStores) {
-                for (APPStore inputStore : alreadyPublishedStores) {
-                    if (inputStore.getName().equals(store.getName())) { //If the configured appstore
-                    // already stored in db,ignore adding it again
-                        exists = true;
-                    }
-                }
-                if (!exists) {
-                    alreadyPublishedStores.add(store);
-                }
-                exists=false;
-            }
-
-        }
-        return alreadyPublishedStores;
-
-
-    }
-
-    /**
-     * check whether any external store is configured in registry configuration
-     * @param tenantId
-     * @return
-     * @throws AppManagementException
-     */
-    public static boolean isExternalAPPStoresExists(int tenantId)
-            throws AppManagementException {
-
-        return getExternalStores(tenantId).size() != 0;
-
-
-    }
-
     /**
      * Load the External APP Store Configuration  to the super user registry, in the server startup
+     *
      * @param tenantID
      * @throws AppManagementException
      */
@@ -2999,10 +2949,8 @@ public final class AppManagerUtil {
      * This method will return mounted path of the path if the path
      * is mounted. Else path will be returned.
      *
-     * @param registryContext
-     *            Registry Context instance which holds path mappings
-     * @param path
-     *            default path of the registry
+     * @param registryContext Registry Context instance which holds path mappings
+     * @param path            default path of the registry
      * @return mounted path or path
      */
     public static String getMountedPath(RegistryContext registryContext, String path) {

@@ -3363,33 +3363,7 @@ public class APIProviderHostObject extends ScriptableObject {
         return valid;
     }
 
-    public static NativeArray jsFunction_getExternalAPIStores(Context cx,
-                                                              Scriptable thisObj, Object[] args,
-                                                              Function funObj)
-            throws AppManagementException {
-        Set<APPStore> apistoresList = AppManagerUtil.getExternalAPIStores();
-        NativeArray myn = new NativeArray(0);
-        if (apistoresList == null) {
-            return null;
-        } else {
-            Iterator it = apistoresList.iterator();
-            int i = 0;
-            while (it.hasNext()) {
-                NativeObject row = new NativeObject();
-                Object apistoreObject = it.next();
-                APPStore apiStore = (APPStore) apistoreObject;
-                row.put("displayName", row, apiStore.getDisplayName());
-                row.put("name", row, apiStore.getName());
-                row.put("endpoint", row, apiStore.getEndpoint());
 
-                myn.put(i, myn, row);
-                i++;
-
-            }
-            return myn;
-        }
-
-    }
 
     /**
      * Retrieves custom sequences from registry

@@ -1735,15 +1735,43 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public Set<APPStore> getExternalAPPStores(APIIdentifier apiId)
             throws AppManagementException {
-        if (AppManagerUtil.isExternalAPPStoresExists(tenantId)) {
-            SortedSet<APPStore> sortedApiStores = new TreeSet<APPStore>(new APPStoreNameComparator());
-            //already published appstores
+        // get all stores from configuration
+        Set<APPStore> storesFromConfig = AppManagerUtil.getExternalStores(tenantId);
+        Set<APPStore> modifiedPublishedStore = new HashSet<APPStore>();
+        if (storesFromConfig != null && storesFromConfig.size() > 0) {
+            //get already published stores from db
             Set<APPStore> publishedStores = appMDAO.getExternalAPPStoresDetails(apiId);
-            sortedApiStores.addAll(publishedStores);
-            return AppManagerUtil.getExternalAPPStores(sortedApiStores, tenantId);
-        } else {
-            return null;
+            if (publishedStores != null && publishedStores.size() > 0) {
+                //Retains only the stores that contained in configuration
+                publishedStores.retainAll(storesFromConfig);
+
+                for (APPStore publishedStore : publishedStores) {
+                    for (APPStore configuredStore : storesFromConfig) {
+                        if (publishedStore.getName().equals(configuredStore.getName())) { //If the configured appstore
+                            // already stored in db, change the published state to true
+                            configuredStore.setPublished(true);
+
+                            //if configuration of already published store is changed
+                            if (!publishedStore.getEndpoint().equals(configuredStore.getEndpoint()) ||
+                                    !publishedStore.getType().equals((configuredStore.getType())) ||
+                                    !publishedStore.getDisplayName().equals(configuredStore.getDisplayName())) {
+                                //Include the store definition to update the db for modification
+                                modifiedPublishedStore.add(configuredStore);
+                            }
+                        }
+                    }
+                }
+            }
         }
+        //update the db for configuration changes
+        if (modifiedPublishedStore.size() > 0) {
+            updateConfigChanges(apiId, modifiedPublishedStore);
+        }
+        return storesFromConfig;
+    }
+
+    private void updateConfigChanges(APIIdentifier apiId, Set<APPStore> stores) throws AppManagementException {
+        appMDAO.updateExternalAPPStoresDetails(apiId, stores);
     }
 
     @Override
@@ -1753,25 +1781,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Set<APPStore> publishedStores = getPublishedExternalAPPStores(webApp.getId());
         Set<APPStore> notPublishedAPPStores = new HashSet<APPStore>();
         Set<APPStore> removedAppStores = new HashSet<APPStore>();
-        StringBuilder errorStatus = new StringBuilder("Failed to update External Stores : ");
 
         if (publishedStores != null) {
             removedAppStores.addAll(publishedStores);
             removedAppStores.removeAll(appStores);
-        }
-        for (APPStore appStore : appStores) {
-            boolean publishedToStore = false;
-            for (APPStore store : publishedStores) {
-                if (store.equals(appStore)) {
-                    publishedToStore = true; //Already the webapp has published to external APPStore
-                }
 
-            }
-            if (!publishedToStore) {  //If the API has not yet published to selected external APIStore
-                notPublishedAPPStores.add(appStore);
-            }
-
+            notPublishedAPPStores.addAll(appStores);
+            notPublishedAPPStores.removeAll(publishedStores);
         }
+
         //Publish API to external APIStore which are not yet published
         try {
             publishToExternalAPPStores(webApp, notPublishedAPPStores);
@@ -1789,8 +1807,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    @Override
-    public Set<APPStore> getPublishedExternalAPPStores(APIIdentifier apiId)
+    /**
+     * Get the stores where given app is already published
+     *
+     * @param apiId
+     * @return
+     * @throws AppManagementException
+     */
+    private Set<APPStore> getPublishedExternalAPPStores(APIIdentifier apiId)
             throws AppManagementException {
         SortedSet<APPStore> configuredAPIStores = new TreeSet<APPStore>(new APPStoreNameComparator());
         configuredAPIStores.addAll(AppManagerUtil.getExternalStores(tenantId));
@@ -1806,8 +1830,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    @Override
-    public void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
+    /**
+     * publish the APP to external APPStores
+     *
+     * @param webApp    The API which need to published
+     * @param appStores The APPStores set, to which need to publish APP
+     * @throws AppManagementException If failed to update subscription status
+     */
+    private void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
             throws AppManagementException {
 
         Set<APPStore> publishedStores = new HashSet<APPStore>();

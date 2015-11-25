@@ -7901,4 +7901,73 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         return state;
     }
 
+
+    /**
+     * Update external APPStores details to which APP is published
+     * @param apiIdentifier API Identifier
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to add Application
+     */
+    public void updateExternalAPPStoresDetails(APIIdentifier apiIdentifier,
+                                               Set<APPStore> appStores)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        Connection conn = null;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            //This query to add external APIStores to database table
+            String sqlQuery = "UPDATE " +
+                    "APM_EXTERNAL_STORES "  +
+                    "SET " +
+                    "STORE_ENDPOINT = ? " +
+                    ",STORE_TYPE = ? " +
+                    ",STORE_DISPLAY_NAME = ? " +
+                    "WHERE " +
+                    "APP_ID = ? AND STORE_ID=?";
+
+
+
+            ps = conn.prepareStatement(sqlQuery);
+            //Get API Id
+            int apiId;
+            apiId = getAPIID(apiIdentifier, conn);
+            if (apiId==-1) {
+                String msg = "Could not load APP record for: " + apiIdentifier.getApiName();
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            Iterator it = appStores.iterator();
+            while (it.hasNext()) {
+                APPStore store = (APPStore) it.next();
+                ps.setString(1, store.getEndpoint());
+                ps.setString(2, store.getType());
+                ps.setString(3, store.getDisplayName());
+                ps.setInt(4, apiId);
+                ps.setString(5, store.getName());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback updating external app store details ", e1);
+                }
+            }
+            handleException("Failed to update external app store details", e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+
+    }
+
 }
