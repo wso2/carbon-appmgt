@@ -26,7 +26,10 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
+import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
 import org.wso2.carbon.identity.application.common.model.xsd.*;
@@ -53,6 +56,9 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
     private static String USERNAME = "username";
     private static String APP_DESC = "WSO2 Application Manager generated service provider.";
     private static String AUTH_TYPE = "samlsso";
+    private static String IDP_NAME = "idpName";
+    private static String AUTHENTICATION_STEP = "authenticationStep";
+
 
     private IdentityApplicationManagementServiceStub appMgtStub;
     private IdentitySAMLSSOConfigServiceStub ssoStub;
@@ -61,6 +67,8 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
     private String user;
     private String pass;
     private String cookie;
+    private String idpName;
+    private String authenticationStep;
 
     @Override
     public void init(Map<String, String> configuration) {
@@ -68,6 +76,9 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
         this.backendServerURL = configuration.get(SERVER_URL);
         this.user = configuration.get(USERNAME);
         this.pass = configuration.get(PASSWORD);
+        this.idpName = configuration.get(IDP_NAME);
+        this.authenticationStep = configuration.get(AUTHENTICATION_STEP);
+
         try {
             cookie = login();
             String serviceURL = backendServerURL + "/services/IdentitySAMLSSOConfigService";
@@ -105,6 +116,43 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
         }
         return status;
     }
+
+
+    @Override
+    public boolean createProvider(WebApp webApp) {
+        String acsUrl = webApp.getAcsURL().trim();
+        SSOProvider ssoProvider = webApp.getSsoProviderDetails();
+        if (ssoProvider == null) {
+            log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
+        }
+
+        if(acsUrl != null) {
+            if (acsUrl.length() > 0) {
+                ssoProvider.setAssertionConsumerURL(acsUrl);
+            } else {
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+            }
+        } else {
+            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
+        }
+
+        ServiceProvider serviceProvider = null;
+        SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
+        boolean status = false;
+        try {
+            status = ssoStub.addRPServiceProvider(serviceProviderDTO);
+            String attributeConsumingServiceIndex = getServiceProvider(ssoProvider.getIssuerName()).getAttributeConsumingServiceIndex();
+            serviceProvider = generateSPCreate(ssoProvider);
+            int appId = appMgtStub.createApplication(serviceProvider);
+            serviceProvider.setApplicationID(appId);
+            serviceProvider = generateSPUpdate(serviceProvider, attributeConsumingServiceIndex);
+            appMgtStub.updateApplication(serviceProvider);
+        } catch (Exception e) {
+            log.error("Error adding a new Service Provider", e);
+        }
+        return status;
+    }
+
 
     @Override
     public boolean removeProvider(SSOProvider provider) {
@@ -145,8 +193,57 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
             log.error("Error in invoking IdentityApplicationManagementService while updating the provider : " +
                     provider.getProviderName(), e);
         } catch (IdentitySAMLSSOConfigServiceIdentityException e) {
-            log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : "+
-            provider.getIssuerName(), e);
+            log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : " +
+                    provider.getIssuerName(), e);
+        }
+        return isUpdated;
+    }
+
+
+    @Override
+    public boolean updateProvider(WebApp application) {
+        String acsUrl = application.getAcsURL().trim();
+        SSOProvider ssoProvider = application.getSsoProviderDetails();
+        if (ssoProvider == null) {
+            log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
+        }
+
+        if(acsUrl != null) {
+            if (acsUrl.length() > 0) {
+                ssoProvider.setAssertionConsumerURL(acsUrl);
+            } else {
+                ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+            }
+        } else {
+            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
+        }
+
+        SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
+        ServiceProvider serviceProvider = null;
+        boolean isUpdated = false;
+
+        try {
+            serviceProvider = appMgtStub.getApplication(ssoProvider.getIssuerName());
+            if (serviceProvider != null) {
+                ssoStub.removeServiceProvider(ssoProvider.getIssuerName());
+                ssoStub.addRPServiceProvider(serviceProviderDTO);
+                updateServiceProvider(ssoProvider, serviceProvider);
+                appMgtStub.updateApplication(serviceProvider);
+                isUpdated = true;
+            } else {
+                createProvider(ssoProvider);
+            }
+        } catch (RemoteException e) {
+            //An exception is not thrown here in the purpose of continuing in rest of webapp update
+            log.error("Error occurred in invoking remote service while updating service provider : " +
+                    ssoProvider.getProviderName(), e);
+        } catch (IdentityApplicationManagementServiceIdentityApplicationManagementException e) {
+            //An exception is not thrown here in the purpose of continuing in rest of webapp update
+            log.error("Error in invoking IdentityApplicationManagementService while updating the provider : " +
+                    ssoProvider.getProviderName(), e);
+        } catch (IdentitySAMLSSOConfigServiceIdentityException e) {
+            log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : " +
+                    ssoProvider.getIssuerName(), e);
         }
         return isUpdated;
     }
@@ -300,7 +397,7 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
 
 
         dto.setNameIDFormat(provider.getNameIdFormat());
-        if (dto.getNameIDFormat()!=null) {
+        if (dto.getNameIDFormat() != null) {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
@@ -341,7 +438,7 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
         }
 
         claimConfig.setLocalClaimDialect(true);
-        claimConfig.setClaimMappings(claimMappings.toArray(new ClaimMapping[claimMappings.size()]));;
+        claimConfig.setClaimMappings(claimMappings.toArray(new ClaimMapping[claimMappings.size()]));
         serviceProvider.setClaimConfig(claimConfig);
 
         return serviceProvider;
@@ -392,19 +489,54 @@ public class IS500SAMLSSOConfigurator implements SSOConfigurator {
         iac.addInboundAuthenticationRequestConfigs(iarc);
         serviceProvider.setInboundAuthenticationConfig(iac);
 
+        setLocalAndOutBoundAuthentication(serviceProvider);
+        return serviceProvider;
+    }
+
+    private void setLocalAndOutBoundAuthentication(ServiceProvider serviceProvider) {
+
+        // Available authentication types => default, local, federated or advanced.
         serviceProvider.setLocalAndOutBoundAuthenticationConfig(new LocalAndOutboundAuthenticationConfig());
-        // authentication type : default, local, federated or advanced.
+
+        // Start with setting the authentication type as default.
+        // And override it if the configurations instructions are there to set another authentication type.
         serviceProvider.getLocalAndOutBoundAuthenticationConfig().setAuthenticationType("default");
 
-        InboundProvisioningConfig inBoundProConfig = new InboundProvisioningConfig();
-        inBoundProConfig.setProvisioningUserStore("");
-        serviceProvider.setInboundProvisioningConfig(inBoundProConfig);
-        serviceProvider.setOutboundProvisioningConfig(new OutboundProvisioningConfig());
-        serviceProvider.setRequestPathAuthenticatorConfigs(null);
-        serviceProvider.getLocalAndOutBoundAuthenticationConfig().setAuthenticationSteps(null);
-        serviceProvider.setPermissionAndRoleConfig(new PermissionsAndRoleConfig());
+        // Set federated authentication type if the relevant configurations are available.
+        if (idpName != null && authenticationStep != null && authenticationStep.equalsIgnoreCase("federated")) {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding federated authentication step. Added IDP named: " + idpName);
+            }
 
-        return serviceProvider;
+            //Following code will set external IDP as authentication EP
+            serviceProvider.getLocalAndOutBoundAuthenticationConfig().setAuthenticationType("federated");
+            InboundProvisioningConfig inBoundProConfig = new InboundProvisioningConfig();
+            inBoundProConfig.setProvisioningUserStore("");
+            serviceProvider.setInboundProvisioningConfig(inBoundProConfig);
+            serviceProvider.setOutboundProvisioningConfig(new OutboundProvisioningConfig());
+            serviceProvider.setRequestPathAuthenticatorConfigs(null);
+            AuthenticationStep step = new AuthenticationStep();
+            AuthenticationStep[] steps = new AuthenticationStep[1];
+            IdentityProvider idp = new IdentityProvider();
+            idp.setDisplayName(idpName);
+            idp.setIdentityProviderName(idpName);
+            step.addFederatedIdentityProviders(idp);
+            steps[0] = step;
+            serviceProvider.setPermissionAndRoleConfig(new PermissionsAndRoleConfig());
+            serviceProvider.getLocalAndOutBoundAuthenticationConfig().setAuthenticationSteps(steps);
+
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Adding default authentication step to SP");
+            }
+            InboundProvisioningConfig inBoundProConfig = new InboundProvisioningConfig();
+            inBoundProConfig.setProvisioningUserStore("");
+            serviceProvider.setInboundProvisioningConfig(inBoundProConfig);
+            serviceProvider.setOutboundProvisioningConfig(new OutboundProvisioningConfig());
+            serviceProvider.setRequestPathAuthenticatorConfigs(null);
+            serviceProvider.getLocalAndOutBoundAuthenticationConfig().setAuthenticationSteps(null);
+            serviceProvider.setPermissionAndRoleConfig(new PermissionsAndRoleConfig());
+        }
     }
 
     private SAMLSSOServiceProviderDTO getServiceProvider(String issuer) throws AxisFault {

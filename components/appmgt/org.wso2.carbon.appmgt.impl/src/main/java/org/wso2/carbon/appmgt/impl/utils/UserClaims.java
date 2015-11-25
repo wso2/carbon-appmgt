@@ -22,8 +22,9 @@ package org.wso2.carbon.appmgt.impl.utils;
 
 import javax.cache.Cache;
 import java.util.SortedMap;
+import java.io.Serializable;
 
-public class UserClaims{
+public class UserClaims implements Serializable {
     //TODO refactor caching implementation
     private static final long serialVersionUID = -8123522530178387354L;
 

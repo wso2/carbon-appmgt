@@ -47,7 +47,6 @@ public class APIMgtFaultHandler extends AbstractMediator{
             if (!enabled) {
                 return true;
             }
-            long requestTime = ((Long) messageContext.getProperty(APIMgtUsagePublisherConstants.REQUEST_TIME)).longValue();
 
             FaultPublisherDTO faultPublisherDTO = new FaultPublisherDTO();
             //faultPublisherDTO.setConsumerKey((String) messageContext.getProperty(APIMgtUsagePublisherConstants.CONSUMER_KEY));
@@ -59,7 +58,11 @@ public class APIMgtFaultHandler extends AbstractMediator{
             faultPublisherDTO.setVersion((String) messageContext.getProperty(APIMgtUsagePublisherConstants.VERSION));
             faultPublisherDTO.setErrorCode(String.valueOf(messageContext.getProperty(SynapseConstants.ERROR_CODE)));
             faultPublisherDTO.setErrorMessage((String) messageContext.getProperty(SynapseConstants.ERROR_MESSAGE));
-            faultPublisherDTO.setRequestTime(requestTime);
+            Object requestTimeObject = messageContext.getProperty(APIMgtUsagePublisherConstants.REQUEST_TIME);
+            if(requestTimeObject != null) {
+                long requestTime = ((Long)requestTimeObject).longValue();
+                faultPublisherDTO.setRequestTime(requestTime);
+            }
             faultPublisherDTO.setUsername((String) messageContext.getProperty(APIMgtUsagePublisherConstants.USER_ID));
             faultPublisherDTO.setTenantDomain(MultitenantUtils.getTenantDomain(faultPublisherDTO.getUsername()));
             faultPublisherDTO.setHostName((String) messageContext.getProperty(APIMgtUsagePublisherConstants.HOST_NAME));
