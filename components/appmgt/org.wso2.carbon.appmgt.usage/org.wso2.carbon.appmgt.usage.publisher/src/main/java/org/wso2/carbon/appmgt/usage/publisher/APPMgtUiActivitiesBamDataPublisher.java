@@ -79,7 +79,10 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				.append("    {'name':'item','type':'string'},")
 				.append("    {'name':'action',  'type':'string' },")
 				.append("    {'name':'timestamp', 'type':'long'},")
-				.append("    {'name':'tenantId', 'type':'int'}")
+				.append("    {'name':'tenantId', 'type':'int'},")
+				.append("    {'name':'appName', 'type':'string'},")
+				.append("    {'name':'appVersion', 'type':'string'},")
+				.append("    {'name':'context', 'type':'string'}")
 				.append("    ]    }");
 		return builder.toString();
 
@@ -160,7 +163,7 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 *            "admin"},{"tenantId":"-1234"}]
 	 */
 	public void processUiActivityObject(Object[] parseJSON) {
-		String action, item, timestamp, appId, userId;
+		String action, item, timestamp, appId, userId, appName, appVersion, context;
 		Integer tenantId;
 		for (int i = 0; i < parseJSON.length; i++) {
 			NativeObject obj = (NativeObject) parseJSON[i];
@@ -170,12 +173,15 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			appId = obj.get("appId", obj).toString();
 			userId = obj.get("userId", obj).toString();
 			tenantId = Integer.parseInt(obj.get("tenantId", obj).toString());
+			appName = obj.get("appName", obj).toString();
+			appVersion = obj.get("appVersion", obj).toString();
+                        context = obj.get("context", obj).toString();
 			obj = null;
 
 			// consider only form load event
 			if ("page-load".equals(action)) {
 				publishUserActivityEvents(action, item, timestamp, appId,
-						userId, tenantId);
+						userId, tenantId, appName, appVersion, context);
 			}
 		}
 	}
@@ -196,8 +202,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 * @param tenantId
 	 *            : Tenant Id
 	 */
-	public void publishUserActivityEvents(String action, String item,
-			String timestampStr, String appId, String userId, Integer tenantId) {
+	public void publishUserActivityEvents(String action, String item, String timestampStr, String appId, String userId,
+                                          Integer tenantId, String appName, String appVersion, String context) {
 		StringBuilder builder = new StringBuilder();
 
 		// Create a string with input parameters for logging purposes
@@ -205,13 +211,13 @@ public class APPMgtUiActivitiesBamDataPublisher {
 		try {
 			Long timeStamp = new BigDecimal(timestampStr).longValue();
 			strDataContext = builder.append("(StreamName:")
-					.append(USER_ACTIVITY_STREAM).append(", StreamVersion:")
-					.append(USER_ACTIVITY_STREAM_VERSION).append(", Action:")
-					.append(action).append(", Item:").append(item)
-					.append(", Timestamp:").append(timeStamp)
-					.append(", AppId:").append(appId).append(" ,UserId:")
-					.append(userId).append(", tenantId:").append(tenantId)
-					.append(")").toString();
+				.append(USER_ACTIVITY_STREAM).append(", StreamVersion:")
+				.append(USER_ACTIVITY_STREAM_VERSION).append(", Action:")
+				.append(action).append(", Item:").append(item)
+				.append(", Timestamp:").append(timeStamp)
+				.append(", AppId:").append(appId).append(" ,UserId:")
+				.append(userId).append(", tenantId:").append(tenantId)
+				.append(")").toString();
 
 			// if BAM is configured
 			if (enableUiActivityBamPublishing) {
@@ -226,14 +232,14 @@ public class APPMgtUiActivitiesBamDataPublisher {
 					event.setMetaData(null);
 					event.setCorrelationData(null);
 					event.setPayloadData(new Object[] { appId, userId, item,
-							action, timeStamp, tenantId });
+							action, timeStamp, tenantId, appName, appVersion, context });
 					loadBalancingDataPublisher.publish(USER_ACTIVITY_STREAM,
 							USER_ACTIVITY_STREAM_VERSION, event);
 				}
 			} else {
 				// Write directly to DB
 				AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId,
-						strDataContext);
+						appName.trim(), appVersion, context);
 			}
 		} catch (AgentException e) {
 			// Here I'm only logging the exceptions but not throwing externally
@@ -241,11 +247,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			// exception in this method should not effect/block the users other
 			// actions
 			log.error("Failed to publish build event : " + strDataContext
-					+ " : " + e.getMessage(), e);
+                              + " : " + e.getMessage(), e);
 		} catch (AppManagementException e) {
 			log.error("Failed to write to table : " + e.getMessage(), e);
-		} catch (SQLException e) {
-			log.error("SQL exception found : " + e.getMessage(), e);
 		}
 	}
 }

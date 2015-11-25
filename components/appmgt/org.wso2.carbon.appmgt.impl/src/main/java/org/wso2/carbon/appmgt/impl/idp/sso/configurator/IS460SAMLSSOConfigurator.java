@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.authenticator.stub.LoginAuthenticationExceptionException;
@@ -244,5 +245,15 @@ public class IS460SAMLSSOConfigurator implements SSOConfigurator {
             log.error("Error when removing the service provider", e);
             throw new AxisFault(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public boolean updateProvider(WebApp application) {
+        return false;
+    }
+
+    @Override
+    public boolean createProvider(WebApp webApp) {
+        return false;
     }
 }

@@ -2967,5 +2967,16 @@ public final class AppManagerUtil {
         return path;
     }
 
+    /**
+     * Check whether UIActivityBAMPublish enabled or not.
+     * @return isEnabled boolean.
+     */
+    public static boolean isUIActivityBAMPublishEnabled() {
+        AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isEnabled = configuration
+                .getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
+        return isEnabled != null && Boolean.parseBoolean(isEnabled);
+    }
 
 }

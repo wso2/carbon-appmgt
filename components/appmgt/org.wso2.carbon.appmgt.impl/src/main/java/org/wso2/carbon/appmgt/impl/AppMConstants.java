@@ -174,8 +174,10 @@ public final class AppMConstants {
     public static final String SSO_CONFIG_FIELD_SAML2_SSO_ISSUER = "SAML2_SSO_ISSUER";
 
     //database columns for Subscriber
-    public static final String SUBSCRIBER_FIELD_EMAIL_ADDRESS = "EMAIL_ADDRESS";
+    public static final String SUBSCRIBER_FIELD_SUBSCRIBER_ID = "SUBSCRIBER_ID";
     public static final String SUBSCRIBER_FIELD_USER_ID = "USER_ID";
+    public static final String SUBSCRIBER_FIELD_TENANT_ID = "TENANT_ID";
+    public static final String SUBSCRIBER_FIELD_EMAIL_ADDRESS = "EMAIL_ADDRESS";
     public static final String SUBSCRIBER_FIELD_DATE_SUBSCRIBED = "DATE_SUBSCRIBED";
 
     //tables columns for subscription
@@ -224,7 +226,7 @@ public final class AppMConstants {
     public static final String CREATED = "CREATED";
     public static final String DEPRECATED = "DEPRECATED";
     public static final String DOCUMENTATION_INLINE_CONTENT_TYPE = "text/plain";
-
+    public static final String APP_LC_PUBLISHED="Published";
 
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
@@ -595,4 +597,8 @@ public final class AppMConstants {
     public static final String APISTORE_GET_UUID_URL="/api/asset/get/uuid/webapp/";
 
 
+
+    public static final String APP_USAGE_TRACKING = "APIUsageTracking.";
+    public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = APP_USAGE_TRACKING
+            + "UIActivityBAMPublishEnabled";
 }

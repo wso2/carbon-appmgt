@@ -108,4 +108,12 @@ public final class APIUsageStatisticsClientConstants {
 
     public static final String CACHEHIT ="cachehit";
 
+    public static final String TOTAL_HITS_COUNT = "total_hits_count";
+
+    public static final String USER_HITS_COUNT = "user_hits_count";
+
+    public static final String UUID = "uuid";
+
+    public static final String APP_NAME = "app_name";
+
 }

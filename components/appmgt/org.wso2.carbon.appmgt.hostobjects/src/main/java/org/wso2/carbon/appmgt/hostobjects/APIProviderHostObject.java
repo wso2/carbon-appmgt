@@ -2180,7 +2180,9 @@ public class APIProviderHostObject extends ScriptableObject {
                 NativeObject row = new NativeObject();
                 Object subscriberObject = it.next();
                 Subscriber user = (Subscriber) subscriberObject;
-                row.put("userName", row, user.getName());
+                row.put("username", row, user.getName());
+                row.put("tenantID", row, user.getTenantId());
+                row.put("emailAddress", row, user.getEmail());
                 row.put("subscribedDate", row, checkValue(Long.valueOf(user.getSubscribedDate().getTime()).toString()));
                 myn.put(i, myn, row);
                 i++;
@@ -3580,6 +3582,63 @@ public class APIProviderHostObject extends ScriptableObject {
         return appStoresArray;
     }
 
+    public static NativeArray jsFunction_getAppsByPopularity(Context ctx, Scriptable hostObj, Object[] args,
+                                                             Function funObj) throws AppManagementException {
+        List<AppHitsStatsDTO> appStatsList = null;
+        NativeArray popularApps = new NativeArray(0);
+        APIProvider apiProvider = getAPIProvider(hostObj);
+        if (!AppManagerUtil.isUIActivityBAMPublishEnabled()) {
+            return popularApps;
+        }
+        if (args.length != 3) {
+            handleException("Invalid number of parameters!");
+        }
+        String providerName = (String) args[0];
+        String fromDate = (String) args[1];
+        String toDate = (String) args[2];
+
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
+            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
+            appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            handleException("Error occurred while invoking APPUsageStatisticsClient for ProviderAPPUsage", e);
+        }
+
+        if (appStatsList != null) {
+            for (int i = 0; i < appStatsList.size(); i++) {
+                NativeObject row = new NativeObject();
+                Object usageObject = appStatsList.get(i);
+                AppHitsStatsDTO usage = (AppHitsStatsDTO) usageObject;
+                row.put("AppName", row, usage.getAppName());
+                row.put("AppVersion", row, usage.getVersion());
+                row.put("TotalHits", row, usage.getTotalHitCount());
+                List<UserHitsPerAppDTO> userHits = usage.getUserHitsList();
+                if (userHits != null) {
+                    NativeArray userHitsArray = new NativeArray(userHits.size());
+                    for (int j = 0; j < userHits.size(); j++) {
+                        NativeObject userHitRow = new NativeObject();
+                        Object userHitsObject = userHits.get(j);
+                        UserHitsPerAppDTO userHitsPerAppDTO = (UserHitsPerAppDTO) userHitsObject;
+                        userHitRow.put("UserName", userHitRow, userHitsPerAppDTO.getUserName());
+                        userHitRow.put("Hits", userHitRow, userHitsPerAppDTO.getUserHitsCount());
+                        userHitsArray.put(j, userHitsArray, userHitRow);
+                    }
+                    row.put("UserHits", row, userHitsArray);
+                }
+                popularApps.put(i, popularApps, row);
+            }
+        }
+        return popularApps;
+    }
 }
 
 
