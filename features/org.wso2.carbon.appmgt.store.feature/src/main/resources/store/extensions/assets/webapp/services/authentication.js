@@ -37,8 +37,7 @@ var serviceModule = (function () {
 			var userData = {};
 			var isSuperTenant = result.isSuperTenant;
 			if (isSuperTenant) {
-				var superTenant = "carbon.super"
-				userData['username'] = options.username + "@" + superTenant;
+				userData['username'] = options.username + "@carbon.super";
 			} else {
 				userData['username'] = options.username;
 			}
