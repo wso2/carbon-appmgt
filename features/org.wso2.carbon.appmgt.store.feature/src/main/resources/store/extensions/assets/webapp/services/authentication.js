@@ -34,9 +34,14 @@ var serviceModule = (function () {
             	if (result.error) {
 			throw result.message;
             	}else {
-                	var userData = {};
-                	userData['username'] = options.username;
-                	userData['isSuperTenant'] = result.isSuperTenant;
+			var userData = {};
+			var isSuperTenant = result.isSuperTenant;
+			if (isSuperTenant) {
+				userData['username'] = options.username + "@carbon.super";
+			} else {
+				userData['username'] = options.username;
+			}
+			userData['isSuperTenant'] = isSuperTenant;
                 	userData['cookie'] = result.cookie;
                 	this.context.setUser(userData);
 
