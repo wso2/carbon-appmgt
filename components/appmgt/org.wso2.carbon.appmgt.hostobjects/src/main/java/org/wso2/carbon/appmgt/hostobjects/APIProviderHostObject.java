@@ -3512,6 +3512,13 @@ public class APIProviderHostObject extends ScriptableObject {
         String name = (String) args[1];
         String version = (String) args[2];
 
+        if (log.isDebugEnabled()) {
+            String text = String.format("Update external stores  for web app ->" +
+                    " app provider : %s, app name :%s, app version : %s", provider, name, version);
+            log.debug(text);
+        }
+
+
         try {
             String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(provider));
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3549,7 +3556,16 @@ public class APIProviderHostObject extends ScriptableObject {
         }
     }
 
-
+    /**
+     * This method returns the published and unpublished external stores.
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
     public static NativeArray jsFunction_getExternalAPPStoresList(Context cx, Scriptable thisObj, Object[] args,
                                                                   Function funObj)
             throws AppManagementException {
@@ -3561,6 +3577,12 @@ public class APIProviderHostObject extends ScriptableObject {
         String provider = (String) args[0];
         String appName = (String) args[1];
         String appVersion = (String) args[2];
+
+        if (log.isDebugEnabled()) {
+            String text = String.format("Getting external store details for web app ->" +
+                    " app provider : %s, app name :%s, app version : %s", provider, appName, appVersion);
+            log.debug(text);
+        }
 
         APIProvider apiProvider = getAPIProvider(thisObj);
         APIIdentifier identifier = new APIIdentifier(provider, appName, appVersion);

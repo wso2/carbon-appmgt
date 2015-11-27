@@ -567,8 +567,8 @@ public final class AppMConstants {
     public static final String EXTERNAL_APP_STORES_LOCATION = APPMGT_REGISTRY_LOCATION +
             "/externalstores/external-app-stores.xml";
 
-    public static final String EXTERNAL_API_STORES_STORE_URL = "StoreURL";
-    public static final String EXTERNAL_API_STORE_CLASS_NAME = "className";
+    public static final String EXTERNAL_APP_STORES_STORE_URL = "StoreURL";
+    public static final String EXTERNAL_APP_STORE_CLASS_NAME = "className";
     public static final String APP_STORE_LIST_URL ="/site/blocks/listing/ajax/item-list.jag";
     public static final String APP_GET_ACTION ="getAPI";
     public static final String VERSION_PLACEHOLDER = "{version}";

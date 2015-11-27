@@ -7765,13 +7765,13 @@ public class AppMDAO {
 
 
     /**
-     * Get external APP Stores details which are stored in database
+     * Get external published APP Stores details which are stored in database
      *
      * @param apiIdentifier API Identifier
      * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get external APPStores
      */
-    public Set<APPStore> getExternalAPPStoresDetails(APIIdentifier apiIdentifier
-    ) throws AppManagementException {
+    public Set<APPStore> getExternalAPPStoresDetails(APIIdentifier apiIdentifier) throws AppManagementException {
+
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -7791,6 +7791,11 @@ public class AppMDAO {
 
 
             ps = conn.prepareStatement(sqlQuery);
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting webapp Id for provider:%s ,name :%s, version :%s"
+                        , apiIdentifier.getProviderName(), apiIdentifier.getApiName(), apiIdentifier.getVersion());
+                log.debug(text);
+            }
             //Get API Id
             int apiId;
             apiId = getAPIID(apiIdentifier, conn);
@@ -7798,6 +7803,11 @@ public class AppMDAO {
                 String msg = "Could not load API record for: " + apiIdentifier.getApiName();
                 log.error(msg);
                 throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "Getting published external app store details for app id : " + apiId;
+                log.debug(text);
             }
             ps.setInt(1, apiId);
             rs = ps.executeQuery();
@@ -7845,6 +7855,12 @@ public class AppMDAO {
                     " INTO APM_EXTERNAL_STORES (APP_ID, STORE_ID,STORE_DISPLAY_NAME, STORE_ENDPOINT,STORE_TYPE)" +
                     " VALUES (?,?,?,?,?)";
 
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting web app Id for provider:%s ,name :%s, version :%s"
+                        , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+                log.debug(text);
+            }
+
             //Get API Id
             int appId;
             appId = getAPIID(apiId, conn);
@@ -7852,6 +7868,11 @@ public class AppMDAO {
                 String msg = "Could not load APP record for: " + apiId.getApiName();
                 log.error(msg);
                 throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "add published external app store details for app id : " + apiId;
+                log.debug(text);
             }
             ps = conn.prepareStatement(sqlQuery);
             Iterator it = appStores.iterator();
@@ -7904,6 +7925,11 @@ public class AppMDAO {
             String sqlQuery = "DELETE" +
                     " FROM APM_EXTERNAL_STORES WHERE APP_ID=? AND STORE_ID=? AND STORE_TYPE=?";
 
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting web app Id for provider:%s ,name :%s, version :%s"
+                        , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+                log.debug(text);
+            }
             //Get API Id
             int appId;
             appId = getAPIID(apiId, conn);
@@ -7911,6 +7937,11 @@ public class AppMDAO {
                 String msg = "Could not load APP record for: " + apiId.getApiName();
                 log.error(msg);
                 throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "Delete external app store details for app id : " + apiId;
+                log.debug(text);
             }
 
             ps = conn.prepareStatement(sqlQuery);
@@ -7972,6 +8003,13 @@ public class AppMDAO {
 
 
             ps = conn.prepareStatement(sqlQuery);
+
+            if (log.isDebugEnabled()) {
+                String text = String.format("Update external stores for provider:%s ,name :%s, version :%s"
+                        , apiIdentifier.getProviderName(), apiIdentifier.getApiName(), apiIdentifier.getVersion());
+                log.debug(text);
+            }
+
             //Get API Id
             int apiId;
             apiId = getAPIID(apiIdentifier, conn);

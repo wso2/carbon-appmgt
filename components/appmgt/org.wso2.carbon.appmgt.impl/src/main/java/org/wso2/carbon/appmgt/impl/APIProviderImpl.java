@@ -1771,6 +1771,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     private void updateConfigChanges(APIIdentifier apiId, Set<APPStore> stores) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Update configuration changes of external stores to DB ," +
+                    "for provider:%s ,name :%s, version :%s"
+                    , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+            log.debug(text);
+        }
         appMDAO.updateExternalAPPStoresDetails(apiId, stores);
     }
 
@@ -1831,7 +1837,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
 
     /**
-     * publish the APP to external APPStores
+     * publish the APP to external APPStores and store the published
+     * external store details to DB
      *
      * @param webApp    The API which need to published
      * @param appStores The APPStores set, to which need to publish APP
@@ -1839,7 +1846,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     private void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
             throws AppManagementException {
-
+        if (log.isDebugEnabled()) {
+            String text = String.format("Publish the web app -> %s to external stores ", webApp.getApiName());
+            log.debug(text);
+        }
         Set<APPStore> publishedStores = new HashSet<APPStore>();
         StringBuilder errorStatus = new StringBuilder("Failure to publish to External Stores : ");
         boolean failure = false;
@@ -1871,7 +1881,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
-
+    /**
+     * Delete the given web app from given external stores and remove the related
+     * records from DB
+     *
+     * @param webApp           Web App
+     * @param removedApiStores stores
+     * @throws AppManagementException
+     */
     private void deleteFromExternalAPPStores(WebApp webApp, Set<APPStore> removedApiStores) throws AppManagementException {
         Set<APPStore> removalCompletedStores = new HashSet<APPStore>();
         StringBuilder errorStatus = new StringBuilder("Failed to delete from External Stores : ");
@@ -1908,10 +1925,31 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    private boolean addExternalAPPStoresDetails(APIIdentifier apiId, Set<APPStore> apiStoreSet) throws AppManagementException {
+    /**
+     * Store the published external store details in DB
+     *
+     * @param apiId       WebApp Identifier
+     * @param apiStoreSet stores
+     * @return
+     * @throws AppManagementException
+     */
+    private boolean addExternalAPPStoresDetails(APIIdentifier apiId, Set<APPStore> apiStoreSet)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Save published external app store details to DB " +
+                    "for web app %s ", apiId.getApiName());
+            log.debug(text);
+        }
         return appMDAO.addExternalAPPStoresDetails(apiId, apiStoreSet);
     }
 
+    /**
+     * remove the records of unpublished external store details from DB
+     *
+     * @param id                     WebApp Identifier
+     * @param removalCompletedStores stores
+     * @throws AppManagementException
+     */
     private void removeExternalAPPStoreDetails(APIIdentifier id, Set<APPStore> removalCompletedStores)
             throws AppManagementException {
         appMDAO.deleteExternalAPPStoresDetails(id, removalCompletedStores);

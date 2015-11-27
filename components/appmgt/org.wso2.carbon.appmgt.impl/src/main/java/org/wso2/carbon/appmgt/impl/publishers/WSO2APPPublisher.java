@@ -1,17 +1,19 @@
 /*
-*  Copyright WSO2 Inc.
+*  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
-*  Licensed under the Apache License, Version 2.0 (the "License");
-*  you may not use this file except in compliance with the License.
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the "License"); you may not use this file except
+*  in compliance with the License.
 *  You may obtain a copy of the License at
 *
-*      http://www.apache.org/licenses/LICENSE-2.0
+*    http://www.apache.org/licenses/LICENSE-2.0
 *
-*  Unless required by applicable law or agreed to in writing, software
-*  distributed under the License is distributed on an "AS IS" BASIS,
-*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  See the License for the specific language governing permissions and
-*  limitations under the License.
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
 */
 package org.wso2.carbon.appmgt.impl.publishers;
 
@@ -60,12 +62,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This class has the methods to create, publish, delete a webapp
+ * to given external store.
+ */
 public class WSO2APPPublisher implements APPPublisher {
     private static Log log = LogFactory.getLog(WSO2APPPublisher.class);
 
 
     /**
-     * The method to publish API to external WSO2 Store
+     * The method to publish Webapp to external WSO2 Store
      *
      * @param webApp Web App
      * @param store  Store
@@ -73,8 +79,13 @@ public class WSO2APPPublisher implements APPPublisher {
      */
     @Override
     public boolean publishToStore(WebApp webApp, APPStore store) throws AppManagementException {
-        boolean published = false;
+        if (log.isDebugEnabled()) {
+            String text = String.format("Start publishing web app : %s to external store : %s "
+                    , webApp.getApiName(), store.getName());
+            log.debug(text);
+        }
 
+        boolean published = false;
         if (store.getEndpoint() == null || store.getUsername() == null || store.getPassword() == null) {
             String msg = "External APPStore endpoint URL or credentials are not defined.Cannot proceed with " +
                     "publishing API to the APIStore - " + store.getDisplayName();
@@ -88,17 +99,29 @@ public class WSO2APPPublisher implements APPPublisher {
                 String storeEndpoint = store.getEndpoint();
                 String provider = AppManagerUtil.replaceEmailDomain(store.getUsername());
                 String assetId = addAPPToStore(webApp, storeEndpoint, provider,
-                        httpContext, store.getDisplayName());
+                        httpContext);
                 //If API creation success,then try publishing the API
-                published = pulishAppToStore(assetId, storeEndpoint, httpContext);
+                published = publishAppToStore(assetId, storeEndpoint, httpContext);
                 logoutFromExternalStore(store, httpContext);
             }
         }
         return published;
     }
 
+    /**
+     * Delete web app from given external store
+     * @param webApp      APIIdentifier
+     * @param store    Store
+     * @return
+     * @throws AppManagementException
+     */
     @Override
     public boolean deleteFromStore(WebApp webApp, APPStore store) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Deleting web app : %s from external store : %s "
+                    , webApp.getApiName(), store.getName());
+            log.debug(text);
+        }
         boolean deleted = false;
         if (store.getEndpoint() == null || store.getUsername() == null || store.getPassword() == null) {
             String msg = "External APIStore endpoint URL or credentials are not defined.Cannot proceed " +
@@ -111,15 +134,25 @@ public class WSO2APPPublisher implements APPPublisher {
             httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
             boolean authenticated = loginToExternalStore(store, httpContext);
             if (authenticated) {
-                deleted = deleteWSO2Store(webApp, store.getUsername(), store.getEndpoint(), httpContext, store.getDisplayName());
+                deleted = deleteFromWSO2Store(webApp, store.getUsername(), store.getEndpoint(), httpContext);
                 logoutFromExternalStore(store, httpContext);
             }
             return deleted;
         }
     }
 
+    /**
+     * get the UUID of the given web app from external store
+     *
+     * @param webApp            webapp
+     * @param externalPublisher webapp provider
+     * @param storeEndpoint     store publisher endpoint
+     * @param httpContext
+     * @return uuid
+     * @throws AppManagementException
+     */
     private String getUUID(WebApp webApp, String externalPublisher, String storeEndpoint,
-                           HttpContext httpContext, String displayName) throws AppManagementException {
+                           HttpContext httpContext) throws AppManagementException {
         String provider = AppManagerUtil.replaceEmailDomain(externalPublisher);
         String appName = webApp.getId().getApiName();
         String appVersion = webApp.getId().getVersion();
@@ -148,29 +181,42 @@ public class WSO2APPPublisher implements APPPublisher {
 
             } else {
                 throw new AppManagementException("Error while getting UUID of APP - " + appName + "" +
-                        " from the external WSO2 APIStore - " + displayName + ".Reason -" + responseString);
+                        " from the external WSO2 APPStore - for provider " + externalPublisher +
+                        ".Reason -" + responseString);
             }
         } catch (UnsupportedEncodingException e) {
             throw new AppManagementException("Error while getting UUID of APP - " + appName + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APPStore - for provider " + externalPublisher +
+                    "--" + e.getMessage(), e);
 
         } catch (ClientProtocolException e) {
             throw new AppManagementException("Error while getting UUID of APP - " + appName + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APPStore - for provider  " + externalPublisher + "--" +
+                    e.getMessage(), e);
 
         } catch (IOException e) {
             throw new AppManagementException("Error while getting UUID of APP - " + appName + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APPStore - " + externalPublisher + "--" + e.getMessage(), e);
 
         }
 
     }
 
-    private boolean deleteWSO2Store(WebApp webApp, String externalPublisher, String storeEndpoint,
-                                    HttpContext httpContext, String displayName) throws AppManagementException {
+    /**
+     * delete the given web app from external api store
+     *
+     * @param webApp            Web App
+     * @param externalPublisher Web App provider
+     * @param storeEndpoint     publisher url of external store
+     * @param httpContext
+     * @return
+     * @throws AppManagementException
+     */
+    private boolean deleteFromWSO2Store(WebApp webApp, String externalPublisher, String storeEndpoint,
+                                        HttpContext httpContext) throws AppManagementException {
 
         HttpClient httpclient = new DefaultHttpClient();
-        String uuid = getUUID(webApp, externalPublisher, storeEndpoint, httpContext, displayName);
+        String uuid = getUUID(webApp, externalPublisher, storeEndpoint, httpContext);
 
         storeEndpoint = storeEndpoint + AppMConstants.APPSTORE_DELETE_URL + uuid;
         HttpDelete httpDelete = new HttpDelete(storeEndpoint);
@@ -194,19 +240,19 @@ public class WSO2APPPublisher implements APPPublisher {
 
             } else {
                 throw new AppManagementException("Error while deleting the APP with asset id - " + webApp + "" +
-                        " from the external WSO2 APIStore - " + displayName + ".Reason -" + responseString);
+                        " from the external WSO2 APPStore - for provider " + externalPublisher + ".Reason -" + responseString);
             }
         } catch (UnsupportedEncodingException e) {
             throw new AppManagementException("Error while deleting the APP with asset id - " + webApp + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APIStore - for provider " + externalPublisher + "--" + e.getMessage(), e);
 
         } catch (ClientProtocolException e) {
             throw new AppManagementException("Error while deleting the APP with asset id - " + webApp + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APPStore - for provider" + externalPublisher + "--" + e.getMessage(), e);
 
         } catch (IOException e) {
             throw new AppManagementException("Error while deleting the APP with asset id - " + webApp + " " +
-                    "from the external WSO2 APIStore - " + displayName + "--" + e.getMessage(), e);
+                    "from the external WSO2 APPStore - for provider" + externalPublisher + "--" + e.getMessage(), e);
 
         }
     }
@@ -217,6 +263,11 @@ public class WSO2APPPublisher implements APPPublisher {
      * @param httpContext HTTPContext
      */
     private boolean loginToExternalStore(APPStore store, HttpContext httpContext) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Log in to external store : %s "
+                    , store.getDisplayName());
+            log.debug(text);
+        }
         try {
             // create a post request to addAPP.
             HttpClient httpclient = new DefaultHttpClient();
@@ -257,6 +308,11 @@ public class WSO2APPPublisher implements APPPublisher {
      * @param httpContext HTTPContext
      */
     private boolean logoutFromExternalStore(APPStore store, HttpContext httpContext) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Logout form external store : %s"
+                    , store.getDisplayName());
+            log.debug(text);
+        }
         try {
             // create a post request to addAPI.
             HttpClient httpclient = new DefaultHttpClient();
@@ -293,9 +349,13 @@ public class WSO2APPPublisher implements APPPublisher {
         return input != null ? input : "";
     }
 
-    private boolean changeLifeCycleState(String assetId, String nextState, String storeEndpoint, HttpContext httpContext)
-            throws AppManagementException {
-
+    private boolean changeLifeCycleState(String assetId, String nextState, String storeEndpoint,
+                                         HttpContext httpContext) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Change the life cycle status of  web app with asset id :%s  to %s"
+                    , assetId, nextState);
+            log.debug(text);
+        }
         HttpClient httpclient = new DefaultHttpClient();
         storeEndpoint = storeEndpoint + AppMConstants.APPSTORE_STATE_CHANGE;
 
@@ -329,7 +389,20 @@ public class WSO2APPPublisher implements APPPublisher {
 
     }
 
-    private boolean pulishAppToStore(String assetId, String storeEndpoint, HttpContext httpContext) throws AppManagementException {
+    /**
+     * Bring the created web app status to publish state in external store
+     *
+     * @param assetId       webapp uuid
+     * @param storeEndpoint publisher url of external store
+     * @param httpContext
+     * @return
+     * @throws AppManagementException
+     */
+    private boolean publishAppToStore(String assetId, String storeEndpoint, HttpContext httpContext) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Publish the created web app in external stores, asset id :%s",assetId);
+            log.debug(text);
+        }
         // submit for review -> approve ->publish
         boolean status = changeLifeCycleState(assetId, AppMConstants.STATE_SUMIT_FOR_REVIEW, storeEndpoint, httpContext);
         if (status) {
@@ -341,10 +414,24 @@ public class WSO2APPPublisher implements APPPublisher {
         return status;
     }
 
+    /**
+     * Create webapp in the external store
+     *
+     * @param webApp            Web App
+     * @param storeEndpoint     publisher url of external store
+     * @param externalPublisher webapp provider
+     * @param httpContext
+     * @return
+     * @throws AppManagementException
+     */
     private String addAPPToStore(WebApp webApp, String storeEndpoint, String externalPublisher,
-                                 HttpContext httpContext, String displayName)
+                                 HttpContext httpContext)
             throws AppManagementException {
-
+        if (log.isDebugEnabled()) {
+            String text = String.format("Creating web app : %s in external store ,using user %s"
+                    , webApp.getApiName(), externalPublisher);
+            log.debug(text);
+        }
         HttpClient httpclient = new DefaultHttpClient();
         storeEndpoint = storeEndpoint + AppMConstants.APPSTORE_ADD_URL;
         HttpPost httppost = new HttpPost(storeEndpoint);
@@ -370,29 +457,40 @@ public class WSO2APPPublisher implements APPPublisher {
                 String assetId = responseJson.get("id").toString().trim();
                 return assetId;
             } else {
-                throw new AppManagementException("Error while adding the API-" + webApp.getId().getApiName() + " " +
-                        "to the external WSO2 APIStore-" + displayName + ".Reason -" + responseString);
+                throw new AppManagementException("Error while adding the web app-" + webApp.getId().getApiName() + " " +
+                        "to the external WSO2 APPStore for user :" + externalPublisher + ".Reason -" + responseString);
             }
         } catch (UnsupportedEncodingException e) {
-            throw new AppManagementException("Error while adding the API-" + webApp.getId().getApiName() + " " +
-                    "to the external WSO2 APIStore-" + displayName + "--" + e.getMessage(), e);
+            throw new AppManagementException("Error while adding the web app-" + webApp.getId().getApiName() + " " +
+                    "to the external WSO2 APPStore for user :" + externalPublisher + "--" + e.getMessage(), e);
 
         } catch (ClientProtocolException e) {
-            throw new AppManagementException("Error while adding the API-" + webApp.getId().getApiName() + " " +
-                    "to the external WSO2 APIStore-" + displayName + "--" + e.getMessage(), e);
+            throw new AppManagementException("Error while adding the web app-" + webApp.getId().getApiName() + " " +
+                    "to the external WSO2 APPStore for user :" + externalPublisher + "--" + e.getMessage(), e);
 
         } catch (IOException e) {
-            throw new AppManagementException("Error while adding the API:" + webApp.getId().getApiName() + " " +
-                    "to the external WSO2 APIStore:" + displayName + "--" + e.getMessage(), e);
+            throw new AppManagementException("Error while adding the web app:" + webApp.getId().getApiName() + " " +
+                    "to the external WSO2 APPStore for user :" + externalPublisher + "--" + e.getMessage(), e);
 
         } catch (UserStoreException e) {
-            throw new AppManagementException("Error while adding the API:" + webApp.getId().getApiName() + " " +
-                    "to the external WSO2 APIStore:" + displayName + "--" + e.getMessage(), e);
+            throw new AppManagementException("Error while adding the web app:" + webApp.getId().getApiName() + " " +
+                    "to the external WSO2 APPStore for user :" + externalPublisher + "--" + e.getMessage(), e);
         }
     }
 
 
+    /**
+     * Get the redirect url of external store form registry configuration
+     *
+     * @param tenantId
+     * @return
+     * @throws AppManagementException
+     */
     private String getExternalStoreRedirectURL(int tenantId) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = "Getting external store redirect url for tenantId " + tenantId;
+            log.debug(text);
+        }
         UserRegistry registry;
         String redirectURL = "";
 
@@ -403,7 +501,7 @@ public class WSO2APPPublisher implements APPPublisher {
                 Resource resource = registry.get(AppMConstants.EXTERNAL_APP_STORES_LOCATION);
                 String content = new String((byte[]) resource.getContent());
                 OMElement element = AXIOMUtil.stringToOM(content);
-                OMElement storeURL = element.getFirstChildWithName(new QName(AppMConstants.EXTERNAL_API_STORES_STORE_URL));
+                OMElement storeURL = element.getFirstChildWithName(new QName(AppMConstants.EXTERNAL_APP_STORES_STORE_URL));
                 if (storeURL != null) {
                     redirectURL = storeURL.getText();
                 } else {

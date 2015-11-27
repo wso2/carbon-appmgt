@@ -2792,6 +2792,9 @@ public final class AppManagerUtil {
      * @throws AppManagementException if an error occurs when loading app stores from the registry
      */
     public static Set<APPStore> getExternalStores(int tenantId) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting configured external store details from registry for tenant :" + tenantId);
+        }
 
         Set<APPStore> externalAPIStores = new HashSet<APPStore>();
         try {
@@ -2808,7 +2811,7 @@ public final class AppManagerUtil {
                     OMElement storeElem = (OMElement) appStoreIterator.next();
                     String type = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
                     String className =
-                            storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_API_STORE_CLASS_NAME));
+                            storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_CLASS_NAME));
                     store.setPublisher((APPPublisher) Class.forName(className).newInstance());
 
                     type = (type != null) ? type : "";
@@ -2864,15 +2867,15 @@ public final class AppManagerUtil {
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (ClassNotFoundException e) {
-            String msg = "One or more classes defined in AppMConstants.EXTERNAL_API_STORE_CLASS_NAME cannot be found";
+            String msg = "External store publisher cannot be found";
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (InstantiationException e) {
-            String msg = "One or more classes defined in AppMConstants.EXTERNAL_API_STORE_CLASS_NAME cannot be load";
+            String msg = "External store publisher be load";
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (IllegalAccessException e) {
-            String msg = "One or more classes defined in AppMConstants.EXTERNAL_API_STORE_CLASS_NAME cannot be access";
+            String msg = "External store publisher be load cannot be access";
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         }
