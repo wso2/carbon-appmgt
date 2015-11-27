@@ -108,6 +108,7 @@ public final class AppMConstants {
     public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
+    public static final String API_OVERVIEW_DISPLAY_NAME = "overview_displayName";
     public static final String API_OVERVIEW_VERSION = "overview_version";
     public static final String API_OVERVIEW_CONTEXT = "overview_context";
     public static final String API_OVERVIEW_DESCRIPTION = "overview_description";
@@ -146,8 +147,9 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_RESPONSE_CACHING = "overview_responseCaching";
     public static final String API_OVERVIEW_CACHE_TIMEOUT = "overview_cacheTimeout";
 
-    public static final String API_OVERVIEW_REDIRECT_URL = "overview_redirectURL";
-    public static final String API_OVERVIEW_OWNER = "overview_apiOwner";
+    public static final String API_OVERVIEW_REDIRECT_URL = "overview_redirectUrl";
+    public static final String API_OVERVIEW_OWNER = "overview_appOwner";
+    public static final String API_OVERVIEW_TENANT = "overview_appTenant";
     public static final String API_OVERVIEW_ADVERTISE_ONLY = "overview_advertiseOnly";
     public static final String API_OVERVIEW_ENDPOINT_CONFIG = "overview_endpointConfig";
     
@@ -314,18 +316,18 @@ public final class AppMConstants {
 	public static final String API_STORE_DISPLAY_RATINGS = API_STORE + "DisplayRatings";
     public static final String API_STORE_TAG_CACHE_DURATION = API_STORE + "TagCacheDuration";
 
-    public static final String WSO2_API_STORE_TYPE = "wso2";
+    public static final String WSO2_APP_STORE_TYPE = "wso2";
 
-    public static final String EXTERNAL_API_STORES = "ExternalAPIStores";
+    public static final String EXTERNAL_APP_STORES = "ExternalAPPStores";
     public static final String LOGIN_CONFIGS = "LoginConfig";
-    public static final String EXTERNAL_API_STORES_STORE_URL = EXTERNAL_API_STORES + ".StoreURL";
-    public static final String EXTERNAL_API_STORE = "ExternalAPIStore";
-    public static final String EXTERNAL_API_STORE_ID = "id";
-    public static final String EXTERNAL_API_STORE_TYPE = "type";
-    public static final String EXTERNAL_API_STORE_DISPLAY_NAME = "DisplayName";
-    public static final String EXTERNAL_API_STORE_ENDPOINT = "Endpoint";
-    public static final String EXTERNAL_API_STORE_USERNAME = "Username";
-    public static final String EXTERNAL_API_STORE_PASSWORD ="Password";
+    //public static final String EXTERNAL_API_STORES_STORE_URL = EXTERNAL_APP_STORES + ".StoreURL";
+    public static final String EXTERNAL_APP_STORE = "ExternalAPPStore";
+    public static final String EXTERNAL_APP_STORE_ID = "id";
+    public static final String EXTERNAL_APP_STORE_TYPE = "type";
+    public static final String EXTERNAL_APP_STORE_DISPLAY_NAME = "DisplayName";
+    public static final String EXTERNAL_APP_STORE_ENDPOINT = "Endpoint";
+    public static final String EXTERNAL_APP_STORE_USERNAME = "Username";
+    public static final String EXTERNAL_APP_STORE_PASSWORD ="Password";
 
 
  
@@ -415,7 +417,7 @@ public final class AppMConstants {
     
     public static final String SUBSCRIPTION_TO_CURRENT_TENANT = "current_tenant";
     public static final String SUBSCRIPTION_TO_ALL_TENANTS = "all_tenants";
-    public static final String SUBSCRIPTION_TO_SPECIFIC_TENANTS = "specific_tennats";
+    public static final String SUBSCRIPTION_TO_SPECIFIC_TENANTS = "specific_tenants";
 
     //TODO: move this to a common place (& Enum) to be accessible by all components
     public static class KeyValidationStatus {
@@ -489,19 +491,7 @@ public final class AppMConstants {
     public static final String PERMISSION_ENABLED = "1";
     public static final String PERMISSION_DISABLED = "0";
 
-    public static final String API_ACTION="action";
-    public static final String API_ADD_ACTION="addAPI";
-    public static final String API_UPDATE_ACTION="updateAPI";
-    public static final String API_CHANGE_STATUS_ACTION="updateStatus";
-    public static final String API_REMOVE_ACTION="removeAPI";
-    public static final String API_LOGIN_ACTION="login";
-    public static final String API_LOGOUT_ACTION="logout";
-    public static final String APISTORE_LOGIN_USERNAME="username";
-    public static final String APISTORE_LOGIN_PASSWORD="password";
-    public static final String APISTORE_LOGIN_URL="/site/blocks/user/login/ajax/login.jag";
-    public static final String APISTORE_PUBLISH_URL="/site/blocks/life-cycles/ajax/life-cycles.jag";
-    public static final String APISTORE_ADD_URL="/site/blocks/item-add/ajax/add.jag";
-    public static final String APISTORE_DELETE_URL="/site/blocks/item-add/ajax/remove.jag";
+
 
     public static final String SWAGGER_VERSION = "1.1";
 
@@ -573,6 +563,40 @@ public final class AppMConstants {
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
+
+    public static final String EXTERNAL_APP_STORES_LOCATION = APPMGT_REGISTRY_LOCATION +
+            "/externalstores/external-app-stores.xml";
+
+    public static final String EXTERNAL_APP_STORES_STORE_URL = "StoreURL";
+    public static final String EXTERNAL_APP_STORE_CLASS_NAME = "className";
+    public static final String APP_STORE_LIST_URL ="/site/blocks/listing/ajax/item-list.jag";
+    public static final String APP_GET_ACTION ="getAPI";
+    public static final String VERSION_PLACEHOLDER = "{version}";
+    public static final String APP_STORE_COPY_URL ="/site/blocks/overview/ajax/overview.jag";
+    public static final String APP_COPY_ACTION ="createNewAPI";
+
+    public static final String API_ACTION="action";
+    public static final String API_ADD_ACTION="addAPI";
+    public static final String API_UPDATE_ACTION="updateAPI";
+    public static final String API_CHANGE_STATUS_ACTION="updateStatus";
+    public static final String API_REMOVE_ACTION="removeAPI";
+    public static final String API_LOGIN_ACTION="login";
+    public static final String API_LOGOUT_ACTION="logout";
+    public static final String APISTORE_LOGIN_USERNAME="username";
+    public static final String APISTORE_LOGIN_PASSWORD="password";
+    public static final String APISTORE_LOGIN_URL="/api/authenticate";
+    public static final String APISTORE_PUBLISH_URL="/site/blocks/life-cycles/ajax/life-cycles.jag";
+    public static final String APPSTORE_ADD_URL ="/api/asset/webapp";
+    public static final String APPSTORE_DELETE_URL ="/api/asset/webapp/";
+
+    public static final String APISTORE_ADD_POLICY_URL="/api/entitlement/policy/partial/policyGroup/save";
+    public static final String APPSTORE_STATE_CHANGE ="/api/lifecycle/";
+    public static final String STATE_SUMIT_FOR_REVIEW ="Submit%20for%20Review";
+    public static final String STATE_APPROVE ="Approve";
+    public static final String STATE_PUBLISH ="Publish";
+    public static final String APISTORE_GET_UUID_URL="/api/asset/get/uuid/webapp/";
+
+
 
     public static final String APP_USAGE_TRACKING = "APIUsageTracking.";
     public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = APP_USAGE_TRACKING

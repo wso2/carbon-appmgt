@@ -23,7 +23,6 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -48,7 +47,6 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.registry.app.APPConstants;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -59,6 +57,7 @@ import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.appmgt.impl.utils.*;
 
 import javax.cache.Cache;
 import javax.xml.namespace.QName;
@@ -807,19 +806,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
                 String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
+                if(!api.isAdvertiseOnly()) { // no need to publish to gateway if webb is only for advertising
+                    if (gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE) && updateGatewayConfig) {
+                        if (status.equals(APIStatus.PUBLISHED) || status.equals(APIStatus.DEPRECATED) ||
+                                status.equals(APIStatus.BLOCKED)) {
 
-                if (gatewayType.equalsIgnoreCase(AppMConstants.API_GATEWAY_TYPE_SYNAPSE) && updateGatewayConfig) {
-                    if (status.equals(APIStatus.PUBLISHED) || status.equals(APIStatus.DEPRECATED) ||
-                        status.equals(APIStatus.BLOCKED)) {
-
-                        //publish to gateway if skipGateway is disabled only
-                        if (!api.getSkipGateway()) {
-                            publishToGateway(api);
+                            //publish to gateway if skipGateway is disabled only
+                            if (!api.getSkipGateway()) {
+                                publishToGateway(api);
+                            }
+                        } else {
+                            removeFromGateway(api);
                         }
-                    } else {
-                        removeFromGateway(api);
                     }
                 }
+
                
             } catch (AppManagementException e) {
             	handleException("Error occured in the status change : " + api.getId().getApiName() , e);
@@ -1509,6 +1510,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     log.debug("Gateway is not existed for the current applications Provider");
                 }
             }
+            //Check if there are already published external APIStores.If yes,removing APIs from them.
+            Set<APPStore> apiStoreSet = getPublishedExternalAPPStores(webapp.getId());
+            if (apiStoreSet != null && apiStoreSet.size() != 0) {
+                for (APPStore store : apiStoreSet) {
+                    APPPublisher appPublisher = (APPPublisher)store.getPublisher();
+                    appPublisher.deleteFromStore(webapp, store);
+                }
+            }
             appMDAO.deleteAPI(identifier);
 
             /*remove empty directories*/
@@ -1722,4 +1731,227 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appSortedList;
     }
 
+
+    @Override
+    public Set<APPStore> getExternalAPPStores(APIIdentifier apiId)
+            throws AppManagementException {
+        // get all stores from configuration
+        Set<APPStore> storesFromConfig = AppManagerUtil.getExternalStores(tenantId);
+        Set<APPStore> modifiedPublishedStore = new HashSet<APPStore>();
+        if (storesFromConfig != null && storesFromConfig.size() > 0) {
+            //get already published stores from db
+            Set<APPStore> publishedStores = appMDAO.getExternalAPPStoresDetails(apiId);
+            if (publishedStores != null && publishedStores.size() > 0) {
+                //Retains only the stores that contained in configuration
+                publishedStores.retainAll(storesFromConfig);
+
+                for (APPStore publishedStore : publishedStores) {
+                    for (APPStore configuredStore : storesFromConfig) {
+                        if (publishedStore.getName().equals(configuredStore.getName())) { //If the configured appstore
+                            // already stored in db, change the published state to true
+                            configuredStore.setPublished(true);
+
+                            //if configuration of already published store is changed
+                            if (!publishedStore.getEndpoint().equals(configuredStore.getEndpoint()) ||
+                                    !publishedStore.getType().equals((configuredStore.getType())) ||
+                                    !publishedStore.getDisplayName().equals(configuredStore.getDisplayName())) {
+                                //Include the store definition to update the db for modification
+                                modifiedPublishedStore.add(configuredStore);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        //update the db for configuration changes
+        if (modifiedPublishedStore.size() > 0) {
+            updateConfigChanges(apiId, modifiedPublishedStore);
+        }
+        return storesFromConfig;
+    }
+
+    private void updateConfigChanges(APIIdentifier apiId, Set<APPStore> stores) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Update configuration changes of external stores to DB ," +
+                    "for provider:%s ,name :%s, version :%s"
+                    , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+            log.debug(text);
+        }
+        appMDAO.updateExternalAPPStoresDetails(apiId, stores);
+    }
+
+    @Override
+    public boolean updateAPPsInExternalAPIStores(WebApp webApp, Set<APPStore> appStores)
+            throws AppManagementException {
+        // get the stores where given app is already published
+        Set<APPStore> publishedStores = getPublishedExternalAPPStores(webApp.getId());
+        Set<APPStore> notPublishedAPPStores = new HashSet<APPStore>();
+        Set<APPStore> removedAppStores = new HashSet<APPStore>();
+
+        if (publishedStores != null) {
+            removedAppStores.addAll(publishedStores);
+            removedAppStores.removeAll(appStores);
+
+            notPublishedAPPStores.addAll(appStores);
+            notPublishedAPPStores.removeAll(publishedStores);
+        }
+
+        //Publish API to external APIStore which are not yet published
+        try {
+            publishToExternalAPPStores(webApp, notPublishedAPPStores);
+        } catch (AppManagementException e) {
+            handleException("Failed to publish App to external Store. ", e);
+        }
+
+        try {
+            deleteFromExternalAPPStores(webApp, removedAppStores);
+
+        } catch (AppManagementException e) {
+            handleException("Failed to delete App from external Store. ", e);
+        }
+        return true;
+    }
+
+
+    /**
+     * Get the stores where given app is already published
+     *
+     * @param apiId
+     * @return
+     * @throws AppManagementException
+     */
+    private Set<APPStore> getPublishedExternalAPPStores(APIIdentifier apiId)
+            throws AppManagementException {
+        SortedSet<APPStore> configuredAPIStores = new TreeSet<APPStore>(new APPStoreNameComparator());
+        configuredAPIStores.addAll(AppManagerUtil.getExternalStores(tenantId));
+        if (configuredAPIStores.size() != 0) {
+            Set<APPStore> storesSet = appMDAO.getExternalAPPStoresDetails(apiId);
+            //Retains only the stores that contained in configuration
+            configuredAPIStores.retainAll(storesSet);
+            return configuredAPIStores;
+
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * publish the APP to external APPStores and store the published
+     * external store details to DB
+     *
+     * @param webApp    The API which need to published
+     * @param appStores The APPStores set, to which need to publish APP
+     * @throws AppManagementException If failed to update subscription status
+     */
+    private void publishToExternalAPPStores(WebApp webApp, Set<APPStore> appStores)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Publish the web app -> %s to external stores ", webApp.getApiName());
+            log.debug(text);
+        }
+        Set<APPStore> publishedStores = new HashSet<APPStore>();
+        StringBuilder errorStatus = new StringBuilder("Failure to publish to External Stores : ");
+        boolean failure = false;
+        if (appStores.size() > 0) {
+            for (APPStore store : appStores) {
+                APPPublisher publisher = store.getPublisher();
+
+                try {
+                    // First trying to publish the API to external APIStore
+                    boolean published;
+                    published = publisher.publishToStore(webApp, store);
+                    if (published) { // If published,then save to database.
+                        publishedStores.add(store);
+                    }
+                } catch (AppManagementException e) {
+                    failure = true;
+                    log.error(e);
+                    errorStatus.append(store.getDisplayName() + ", ");
+                }
+            }
+            if (publishedStores.size() != 0) {
+                addExternalAPPStoresDetails(webApp.getId(), publishedStores);
+            }
+        }
+
+        if (failure) {
+            throw new AppManagementException(errorStatus.substring(0, errorStatus.length() - 2));
+        }
+
+    }
+
+    /**
+     * Delete the given web app from given external stores and remove the related
+     * records from DB
+     *
+     * @param webApp           Web App
+     * @param removedApiStores stores
+     * @throws AppManagementException
+     */
+    private void deleteFromExternalAPPStores(WebApp webApp, Set<APPStore> removedApiStores) throws AppManagementException {
+        Set<APPStore> removalCompletedStores = new HashSet<APPStore>();
+        StringBuilder errorStatus = new StringBuilder("Failed to delete from External Stores : ");
+        boolean failure = false;
+        if (removedApiStores.size() > 0) {
+            for (APPStore store : removedApiStores) {
+
+                APPPublisher publisher = store.getPublisher();
+                try {
+                    //delete from external store
+                    boolean deleted =
+                            publisher.deleteFromStore(webApp, store);
+                    if (deleted) {
+                        // If the attempt is successful, database will be
+                        // changed deleting the External store mappings.
+                        removalCompletedStores.add(store);
+                    }
+                } catch (AppManagementException e) {
+                    failure = true;
+                    log.error(e);
+                    errorStatus.append(store.getDisplayName() + ", ");
+                }
+
+            }
+            if (removalCompletedStores.size() != 0) {
+                //remove records from database
+                removeExternalAPPStoreDetails(webApp.getId(), removalCompletedStores);
+            }
+
+            if (failure) {
+                throw new AppManagementException(errorStatus.substring(0, errorStatus.length() - 2));
+            }
+        }
+    }
+
+
+    /**
+     * Store the published external store details in DB
+     *
+     * @param apiId       WebApp Identifier
+     * @param apiStoreSet stores
+     * @return
+     * @throws AppManagementException
+     */
+    private boolean addExternalAPPStoresDetails(APIIdentifier apiId, Set<APPStore> apiStoreSet)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            String text = String.format("Save published external app store details to DB " +
+                    "for web app %s ", apiId.getApiName());
+            log.debug(text);
+        }
+        return appMDAO.addExternalAPPStoresDetails(apiId, apiStoreSet);
+    }
+
+    /**
+     * remove the records of unpublished external store details from DB
+     *
+     * @param id                     WebApp Identifier
+     * @param removalCompletedStores stores
+     * @throws AppManagementException
+     */
+    private void removeExternalAPPStoreDetails(APIIdentifier id, Set<APPStore> removalCompletedStores)
+            throws AppManagementException {
+        appMDAO.deleteExternalAPPStoresDetails(id, removalCompletedStores);
+    }
 }

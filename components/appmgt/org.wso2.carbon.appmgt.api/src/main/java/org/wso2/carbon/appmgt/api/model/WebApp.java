@@ -17,10 +17,6 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import java.util.*;
 
 /**
@@ -86,7 +82,9 @@ public class WebApp {
     private String oldOutSequence;
 
     private boolean advertiseOnly;
-    private String apiOwner;
+    private String appOwner;
+    private String appTenant;
+    private String displayName;
     private String redirectURL;
     private String logoutURL;
     
@@ -134,12 +132,12 @@ public class WebApp {
         this.advertiseOnly = advertiseOnly;
     }
 
-    public String getApiOwner() {
-        return apiOwner;
+    public String getAppOwner() {
+        return appOwner;
     }
 
-    public void setApiOwner(String apiOwner) {
-        this.apiOwner = apiOwner;
+    public void setAppOwner(String appOwner) {
+        this.appOwner = appOwner;
     }
     
     public String getRedirectURL() {
@@ -649,6 +647,22 @@ public class WebApp {
 
     public void setSkipGateway(boolean skipGateway) {
         this.skipGateway = skipGateway;
+    }
+
+    public String getAppTenant() {
+        return appTenant;
+    }
+
+    public void setAppTenant(String appTenant) {
+        this.appTenant = appTenant;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getAcsURL() {

@@ -26,7 +26,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,15 +67,8 @@ import org.wso2.carbon.appmgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.appmgt.api.doc.model.APIResource;
 import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.APIStore;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APPPublisher;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -106,6 +98,7 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.Tag;
+import org.wso2.carbon.registry.core.config.Mount;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
@@ -113,12 +106,9 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
-import org.wso2.carbon.user.api.AuthorizationManager;
-import org.wso2.carbon.user.api.Permission;
-import org.wso2.carbon.user.api.Tenant;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.api.*;
 import org.wso2.carbon.user.core.UserRealm;
+import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.mgt.UserMgtConstants;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -215,9 +205,10 @@ public final class AppManagerUtil {
 			api.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
 
 			api.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
-			api.setApiOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
+			api.setAppOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
 			api.setAdvertiseOnly(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ADVERTISE_ONLY)));
-
+            api.setAppTenant(artifact.getAttribute(AppMConstants.API_OVERVIEW_TENANT));
+            api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
 			api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
 			api.setSubscriptionAvailableTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
 
@@ -352,7 +343,7 @@ public final class AppManagerUtil {
 			api.setCacheTimeout(cacheTimeout);
 
 			api.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
-			api.setApiOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
+			api.setAppOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
 			api.setAdvertiseOnly(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ADVERTISE_ONLY)));
 
 			api.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
@@ -399,7 +390,7 @@ public final class AppManagerUtil {
 	 * @param api
 	 *            WebApp object with the attributes value
 	 * @return GenericArtifact
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws AppManagementException
 	 *             if failed to create WebApp
 	 */
 	public static GenericArtifact createAPIArtifactContent(GenericArtifact artifact, WebApp api)
@@ -447,7 +438,7 @@ public final class AppManagerUtil {
 			                      api.isSsoEnabled());
 
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL, api.getRedirectURL());
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_OWNER, api.getApiOwner());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_OWNER, api.getAppOwner());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_ADVERTISE_ONLY,
 			                      Boolean.toString(api.isAdvertiseOnly()));
 
@@ -1491,7 +1482,7 @@ public final class AppManagerUtil {
 			api.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
 
 			api.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
-			api.setApiOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
+			api.setAppOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
 			api.setAdvertiseOnly(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ADVERTISE_ONLY)));
 
 			api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
@@ -2235,8 +2226,8 @@ public final class AppManagerUtil {
 		                                       .getFirstProperty("APIManagement.LoadAPIContextsInServerStartup"));
 	}
 
-	public static Set<APIStore> getExternalAPIStores() throws AppManagementException {
-		SortedSet<APIStore> apistoreSet = new TreeSet<APIStore>(new APIStoreNameComparator());
+	public static Set<APPStore> getExternalAPIStores() throws AppManagementException {
+		SortedSet<APPStore> apistoreSet = new TreeSet<APPStore>(new APPStoreNameComparator());
 		AppManagerConfiguration config =
 		                                 ServiceReferenceHolder.getInstance()
 		                                                       .getAPIManagerConfigurationService()
@@ -2250,10 +2241,10 @@ public final class AppManagerUtil {
 
 	}
 
-	public static Set<APIStore> getExternalAPIStores(Set<APIStore> inputStores)
+	public static Set<APPStore> getExternalAPIStores(Set<APPStore> inputStores)
 	                                                                           throws
                                                                                AppManagementException {
-		SortedSet<APIStore> apiStores = new TreeSet<APIStore>(new APIStoreNameComparator());
+		SortedSet<APPStore> apiStores = new TreeSet<APPStore>(new APPStoreNameComparator());
 		AppManagerConfiguration config =
 		                                 ServiceReferenceHolder.getInstance()
 		                                                       .getAPIManagerConfigurationService()
@@ -2261,8 +2252,8 @@ public final class AppManagerUtil {
 		apiStores.addAll(config.getExternalAPIStores());
 		boolean exists = false;
 		if (apiStores.size() != 0) {
-			for (APIStore store : apiStores) {
-				for (APIStore inputStore : inputStores) {
+			for (APPStore store : apiStores) {
+				for (APPStore inputStore : inputStores) {
 					if (inputStore.getName().equals(store.getName())) { // If
 						                                                // the
 						                                                // configured
@@ -2398,7 +2389,7 @@ public final class AppManagerUtil {
 	 * 
 	 * @param api
 	 *            WebApp
-	 * @throws org.wso2.carbon.apimgt.api.APIManagementException
+	 * @throws AppManagementException
 	 *             if failed to generate the content and save
 	 */
 	public static String createSwaggerJSONContent(WebApp api) throws AppManagementException {
@@ -2790,6 +2781,193 @@ public final class AppManagerUtil {
         }
 
         return -1;
+    }
+
+
+    /**
+     * Returns a set of External APP Stores as defined in the underlying governance
+     * registry.
+     *
+     * @return APP Store set
+     * @throws AppManagementException if an error occurs when loading app stores from the registry
+     */
+    public static Set<APPStore> getExternalStores(int tenantId) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Getting configured external store details from registry for tenant :" + tenantId);
+        }
+
+        Set<APPStore> externalAPIStores = new HashSet<APPStore>();
+        try {
+            UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
+                    .getGovernanceSystemRegistry(tenantId);
+            if (registry.resourceExists(AppMConstants.EXTERNAL_APP_STORES_LOCATION)) {
+                Resource resource = registry.get(AppMConstants.EXTERNAL_APP_STORES_LOCATION);
+                String content = new String((byte[]) resource.getContent());
+                OMElement element = AXIOMUtil.stringToOM(content);
+                Iterator appStoreIterator = element.getChildrenWithLocalName(AppMConstants.EXTERNAL_APP_STORE);
+
+                while (appStoreIterator.hasNext()) {
+                    APPStore store = new APPStore();
+                    OMElement storeElem = (OMElement) appStoreIterator.next();
+                    String type = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
+                    String className =
+                            storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_CLASS_NAME));
+                    store.setPublisher((APPPublisher) Class.forName(className).newInstance());
+
+                    type = (type != null) ? type : "";
+                    store.setType(type); //Set Store type [eg:wso2]
+                    String name = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_ID));
+                    if (name == null) {
+                        name = "";
+                        log.error("The ExternalAPPStore name attribute is not defined in external-app-stores.xml " +
+                                "in registry.");
+                    }
+                    store.setName(name); //Set store name
+                    OMElement configDisplayName = storeElem.getFirstChildWithName
+                            (new QName(AppMConstants.EXTERNAL_APP_STORE_DISPLAY_NAME));
+                    String displayName = (configDisplayName != null) ? configDisplayName.getText() : name;
+                    store.setDisplayName(displayName);//Set store display name
+
+                    OMElement endPoint = storeElem.getFirstChildWithName(
+                            new QName(AppMConstants.EXTERNAL_APP_STORE_ENDPOINT));
+                    String storeEndpoint = "";
+                    if (endPoint == null) {
+                        log.error("The ExternalAPPStore endpoint is not defined in external-app-stores.xml " +
+                                "in registry.");
+                    } else {
+                        storeEndpoint = endPoint.getText();
+                    }
+                    store.setEndpoint(storeEndpoint);
+                    //Set store endpoint, which is used to publish APIs
+                    store.setPublished(false);
+
+                    OMElement password = storeElem.getFirstChildWithName(new QName(
+                            AppMConstants.EXTERNAL_APP_STORE_PASSWORD));
+                    OMElement username = storeElem.getFirstChildWithName(
+                            new QName(AppMConstants.EXTERNAL_APP_STORE_USERNAME));
+                    if (password != null || username != null) {
+                        store.setPassword(password.getText());
+                        store.setUsername(username.getText());
+                    } else {
+                        store.setPassword("");
+                        store.setUsername("");
+                        log.error("The user-credentials of APP Publisher is not defined in the <ExternalAPPStore> " +
+                                "config of external-app-stores.xml in registry.");
+                    }
+                    externalAPIStores.add(store);
+                }
+
+            }
+        } catch (RegistryException e) {
+            String msg = "Error while retrieving External Stores Configuration from registry";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (XMLStreamException e) {
+            String msg = "Malformed XML found in the External Stores Configuration resource";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (ClassNotFoundException e) {
+            String msg = "External store publisher cannot be found";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (InstantiationException e) {
+            String msg = "External store publisher be load";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (IllegalAccessException e) {
+            String msg = "External store publisher be load cannot be access";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
+        return externalAPIStores;
+    }
+
+
+    /**
+     * Get the APP store from registry configuration for given store name
+     *
+     * @param appStoreName App Store Name
+     * @return App Store
+     * @throws AppManagementException
+     */
+    public static APPStore getExternalAPPStore(String appStoreName, int tenantId) throws AppManagementException {
+        Set<APPStore> externalAPIStoresConfig = AppManagerUtil.getExternalStores(tenantId);
+        APPStore apiStore = null;
+        for (APPStore apiStoreConfig : externalAPIStoresConfig) {
+            if (apiStoreConfig.getName().equals(appStoreName)) {
+                apiStore = apiStoreConfig;
+            }
+        }
+        return apiStore;
+    }
+
+    /**
+     * Load the External APP Store Configuration  to the super user registry, in the server startup
+     *
+     * @param tenantID
+     * @throws AppManagementException
+     */
+
+    public static void loadTenantExternalStoreConfig(int tenantID)
+            throws AppManagementException {
+        try {
+            RegistryService registryService =
+                    ServiceReferenceHolder.getInstance()
+                            .getRegistryService();
+            UserRegistry govRegistry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            if (govRegistry.resourceExists(AppMConstants.EXTERNAL_APP_STORES_LOCATION)) {
+                log.debug("External Stores configuration already uploaded to the registry");
+                return;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Adding External Stores configuration to the tenant's registry");
+            }
+            InputStream inputStream =
+                    AppManagerComponent.class.getResourceAsStream("/externalstores/default-external-app-stores.xml");
+            byte[] data = IOUtils.toByteArray(inputStream);
+            Resource resource = govRegistry.newResource();
+            resource.setContent(data);
+            govRegistry.put(AppMConstants.EXTERNAL_APP_STORES_LOCATION, resource);
+
+			/*set resource permission*/
+            AuthorizationManager authManager = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantUserRealm(tenantID).getAuthorizationManager();
+            String resourcePath = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                    AppManagerUtil.getMountedPath(RegistryContext.getBaseInstance(), RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH)
+                            + AppMConstants.EXTERNAL_APP_STORES_LOCATION);
+            authManager.denyRole(AppMConstants.EVERYONE_ROLE, resourcePath, ActionConstants.GET);
+
+        } catch (RegistryException e) {
+            throw new AppManagementException("Error while saving External Stores configuration information to the registry", e);
+        } catch (IOException e) {
+            throw new AppManagementException("Error while reading External Stores configuration file content", e);
+        } catch (UserStoreException e) {
+            throw new AppManagementException("Error while setting permission to External Stores configuration file", e);
+        }
+    }
+
+
+    /**
+     * This method will return mounted path of the path if the path
+     * is mounted. Else path will be returned.
+     *
+     * @param registryContext Registry Context instance which holds path mappings
+     * @param path            default path of the registry
+     * @return mounted path or path
+     */
+    public static String getMountedPath(RegistryContext registryContext, String path) {
+        if (registryContext != null && path != null) {
+            List<Mount> mounts = registryContext.getMounts();
+            if (mounts != null) {
+                for (Mount mount : mounts) {
+                    if (path.equals(mount.getPath())) {
+                        return mount.getTargetPath();
+                    }
+                }
+            }
+        }
+        return path;
     }
 
     /**

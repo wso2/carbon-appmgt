@@ -7762,4 +7762,292 @@ public class AppMDAO {
 		}
 		return  seqNo;
 	}
+
+
+    /**
+     * Get external published APP Stores details which are stored in database
+     *
+     * @param apiIdentifier API Identifier
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get external APPStores
+     */
+    public Set<APPStore> getExternalAPPStoresDetails(APIIdentifier apiIdentifier) throws AppManagementException {
+
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        Set<APPStore> storesSet = new HashSet<APPStore>();
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            //This query to add external APIStores to database table
+            String sqlQuery = "SELECT " +
+                    "   ES.STORE_ID, " +
+                    "   ES.STORE_DISPLAY_NAME, " +
+                    "   ES.STORE_ENDPOINT, " +
+                    "   ES.STORE_TYPE " +
+                    "FROM " +
+                    "   APM_EXTERNAL_STORES ES " +
+                    "WHERE " +
+                    "   ES.APP_ID = ? ";
+
+
+            ps = conn.prepareStatement(sqlQuery);
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting webapp Id for provider:%s ,name :%s, version :%s"
+                        , apiIdentifier.getProviderName(), apiIdentifier.getApiName(), apiIdentifier.getVersion());
+                log.debug(text);
+            }
+            //Get API Id
+            int apiId;
+            apiId = getAPIID(apiIdentifier, conn);
+            if (apiId == -1) {
+                String msg = "Could not load API record for: " + apiIdentifier.getApiName();
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "Getting published external app store details for app id : " + apiId;
+                log.debug(text);
+            }
+            ps.setInt(1, apiId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                APPStore store = new APPStore();
+                store.setName(rs.getString("STORE_ID"));
+                store.setDisplayName(rs.getString("STORE_DISPLAY_NAME"));
+                store.setEndpoint(rs.getString("STORE_ENDPOINT"));
+                store.setType(rs.getString("STORE_TYPE"));
+                store.setPublished(true);
+                storesSet.add(store);
+            }
+
+
+        } catch (SQLException e) {
+            handleException("Error while getting External APIStore details from the database for  the API" +
+                    " : " + apiIdentifier.getApiName() + "-" + apiIdentifier.getVersion(), e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return storesSet;
+    }
+
+
+    /**
+     * Store external APPStore details to which APP successfully published
+     *
+     * @param apiId     APIIdentifier
+     * @param appStores APPStores set
+     * @return added/failed
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public boolean addExternalAPPStoresDetails(APIIdentifier apiId, Set<APPStore> appStores)
+            throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean state = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            //This query to add external APPStores to database table
+            String sqlQuery = "INSERT" +
+                    " INTO APM_EXTERNAL_STORES (APP_ID, STORE_ID,STORE_DISPLAY_NAME, STORE_ENDPOINT,STORE_TYPE)" +
+                    " VALUES (?,?,?,?,?)";
+
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting web app Id for provider:%s ,name :%s, version :%s"
+                        , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+                log.debug(text);
+            }
+
+            //Get API Id
+            int appId;
+            appId = getAPIID(apiId, conn);
+            if (appId == -1) {
+                String msg = "Could not load APP record for: " + apiId.getApiName();
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "add published external app store details for app id : " + apiId;
+                log.debug(text);
+            }
+            ps = conn.prepareStatement(sqlQuery);
+            Iterator it = appStores.iterator();
+            while (it.hasNext()) {
+                APPStore store = (APPStore) it.next();
+                ps.setInt(1, appId);
+                ps.setString(2, store.getName());
+                ps.setString(3, store.getDisplayName());
+                ps.setString(4, store.getEndpoint());
+                ps.setString(5, store.getType());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+            conn.commit();
+            state = true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback storing external app store details ", e1);
+                }
+            }
+            handleException("Failed to store external app store details", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+        return state;
+    }
+
+    /**
+     * Delete the records of external APP Store details.
+     *
+     * @param apiId     APIIdentifier
+     * @param appStores APPStores set
+     * @return added/failed
+     * @throws AppManagementException
+     */
+    public boolean deleteExternalAPPStoresDetails(APIIdentifier apiId, Set<APPStore> appStores)
+            throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean state = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlQuery = "DELETE" +
+                    " FROM APM_EXTERNAL_STORES WHERE APP_ID=? AND STORE_ID=? AND STORE_TYPE=?";
+
+            if (log.isDebugEnabled()) {
+                String text = String.format("Getting web app Id for provider:%s ,name :%s, version :%s"
+                        , apiId.getProviderName(), apiId.getApiName(), apiId.getVersion());
+                log.debug(text);
+            }
+            //Get API Id
+            int appId;
+            appId = getAPIID(apiId, conn);
+            if (appId == -1) {
+                String msg = "Could not load APP record for: " + apiId.getApiName();
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                String text = "Delete external app store details for app id : " + apiId;
+                log.debug(text);
+            }
+
+            ps = conn.prepareStatement(sqlQuery);
+            Iterator it = appStores.iterator();
+            while (it.hasNext()) {
+                Object storeObject = it.next();
+                APPStore store = (APPStore) storeObject;
+                ps.setInt(1, appId);
+                ps.setString(2, store.getName());
+                ps.setString(3, store.getType());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+            conn.commit();
+            state = true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback deleting external app store details ", e1);
+                }
+            }
+            handleException("Failed to delete external app store details", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+        return state;
+    }
+
+
+    /**
+     * Update external APPStores details to which APP is published
+     * @param apiIdentifier API Identifier
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to add Application
+     */
+    public void updateExternalAPPStoresDetails(APIIdentifier apiIdentifier,
+                                               Set<APPStore> appStores)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        Connection conn = null;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            //This query to add external APIStores to database table
+            String sqlQuery = "UPDATE " +
+                    "APM_EXTERNAL_STORES "  +
+                    "SET " +
+                    "STORE_ENDPOINT = ? " +
+                    ",STORE_TYPE = ? " +
+                    ",STORE_DISPLAY_NAME = ? " +
+                    "WHERE " +
+                    "APP_ID = ? AND STORE_ID=?";
+
+
+
+            ps = conn.prepareStatement(sqlQuery);
+
+            if (log.isDebugEnabled()) {
+                String text = String.format("Update external stores for provider:%s ,name :%s, version :%s"
+                        , apiIdentifier.getProviderName(), apiIdentifier.getApiName(), apiIdentifier.getVersion());
+                log.debug(text);
+            }
+
+            //Get API Id
+            int apiId;
+            apiId = getAPIID(apiIdentifier, conn);
+            if (apiId==-1) {
+                String msg = "Could not load APP record for: " + apiIdentifier.getApiName();
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            Iterator it = appStores.iterator();
+            while (it.hasNext()) {
+                APPStore store = (APPStore) it.next();
+                ps.setString(1, store.getEndpoint());
+                ps.setString(2, store.getType());
+                ps.setString(3, store.getDisplayName());
+                ps.setInt(4, apiId);
+                ps.setString(5, store.getName());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback updating external app store details ", e1);
+                }
+            }
+            handleException("Failed to update external app store details", e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+
+    }
+
 }
