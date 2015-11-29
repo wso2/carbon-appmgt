@@ -35,6 +35,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -61,7 +62,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 /**
  * This class has the methods to create, publish, delete a webapp
  * to given external store.
@@ -156,14 +156,13 @@ public class WSO2APPPublisher implements APPPublisher {
         String provider = AppManagerUtil.replaceEmailDomain(externalPublisher);
         String appName = webApp.getId().getApiName();
         String appVersion = webApp.getId().getVersion();
-        String urlSuffix = provider + "/" + appName + "/" + appVersion;
-
-        HttpClient httpclient = new DefaultHttpClient();
-        storeEndpoint = storeEndpoint + AppMConstants.APISTORE_GET_UUID_URL + urlSuffix;
-
-        HttpGet httpGet = new HttpGet(storeEndpoint);
 
         try {
+            HttpClient httpclient = new DefaultHttpClient();
+            String urlSuffix = provider + "/" + appName + "/" + appVersion;
+            urlSuffix = URIUtil.encodePath(urlSuffix,"UTF-8");
+            storeEndpoint = storeEndpoint + AppMConstants.APISTORE_GET_UUID_URL + urlSuffix;
+            HttpGet httpGet = new HttpGet(storeEndpoint);
             //Execute and get the response.
             HttpResponse response = httpclient.execute(httpGet, httpContext);
             HttpEntity entity = response.getEntity();
