@@ -163,14 +163,15 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
 
     /**
-     * Returns the set of APIs with the given tag, retrieved from registry
+     * Returns the set of apps with the given tag, retrieved from registry.
      *
-     * @param registry - Current registry; tenant/SuperTenant
+     * @param registry Current registry; tenant/SuperTenant.
      * @param tag
+     * @param attributeMap
      * @return
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private Set<WebApp> getAPIsWithTag(Registry registry, String tag, String assetFlag)
+    private Set<WebApp> getAppsWithTag(Registry registry, String tag, Map<String, String> attributeMap)
             throws AppManagementException {
         Set<WebApp> apiSet = new TreeSet<WebApp>(new APINameComparator());
         boolean isTenantFlowStarted = false;
@@ -190,28 +191,23 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                     AppMConstants.API_KEY);
 
             for (String row : collection.getChildren()) {
+                boolean isTagRetrievable = false;
                 String uuid = row.substring(row.indexOf(";") + 1, row.length());
                 GenericArtifact genericArtifact = artifactManager.getGenericArtifact(uuid);
-
-                boolean conditionForSite = false;
-                if (AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(assetFlag)) {
-                    if ("true".equals(genericArtifact.getAttribute(AppMConstants.API_OVERVIEW_TREAT_AS_A_SITE).
-                            toLowerCase())) {
-                        conditionForSite = true;
-                    } else {
-                        conditionForSite = false;
-                    }
-                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(assetFlag)) {
-                    if ("false".equals(genericArtifact.getAttribute(AppMConstants.API_OVERVIEW_TREAT_AS_A_SITE).
-                            toLowerCase())) {
-                        conditionForSite = true;
-                    } else {
-                        conditionForSite = false;
+                if(attributeMap == null) {
+                    isTagRetrievable = true;
+                } else {
+                    String artifactTreatAsASiteValue = genericArtifact.getAttribute(
+                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toLowerCase();
+                    String attributeMapTreatAsASiteValue = attributeMap.get(
+                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toString().toLowerCase();
+                    if (attributeMapTreatAsASiteValue.equals(artifactTreatAsASiteValue)) {
+                        isTagRetrievable = true;
                     }
                 }
 
                 if (genericArtifact != null && genericArtifact.getLifecycleState().equals(AppMConstants.APP_LC_PUBLISHED)
-                        && conditionForSite) {
+                        && isTagRetrievable) {
                     apiSet.add(AppManagerUtil.getAPI(genericArtifact));
                 }
             }
@@ -727,12 +723,12 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     /**
      * @param requestedTenantDomain
-     * @param assetType - Currently we don't use asset type. This is for future implementations.
-     * @param assetFlag
-     * @return
+     * @param assetType Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset type.
+     * @param attributeMap Attribute map for the give assetType.
+     * @return matching tag set which qualified the conditions of assetTye and attributeMap.
      * @throws AppManagementException
      */
-    public Set<Tag> getAllTags(String requestedTenantDomain, String assetType, String assetFlag) throws AppManagementException {
+    public Set<Tag> getAllTags(String requestedTenantDomain, String assetType, Map<String, String> attributeMap) throws AppManagementException {
 
         this.isTenantModeStoreView = (requestedTenantDomain != null);
 
@@ -776,7 +772,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 //remove hardcoded path value
                 String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
 
-                Set<WebApp> apisWithTag = getAPIsWithTag(userRegistry, tagName, assetFlag);
+                Set<WebApp> apisWithTag = getAppsWithTag(userRegistry, tagName, attributeMap);
                     /* Add the APIs against the tag name */
                     if (apisWithTag.size() != 0) {
                         if (tempTaggedAPIs.containsKey(tagName)) {

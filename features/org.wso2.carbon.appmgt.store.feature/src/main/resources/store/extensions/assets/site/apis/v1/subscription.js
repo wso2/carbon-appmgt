@@ -14,7 +14,7 @@ var resource = (function () {
     authenticator.init(jagg, session);
 
     /*
-     Subscribes the given application to an API with the provided details
+     Subscribes the given application to an app with the provided details
      */
     var addSubscription = function (context) {
 
@@ -48,7 +48,7 @@ var resource = (function () {
     };
 
     /*
-     Returns all of the apis to which the provided app is subscribed to
+     Returns all of the webapps to which the provided app is subscribed to
      */
     var getSubscription = function (context) {
 

@@ -47,18 +47,6 @@ $( document ).ready(function() {
 
     });
 
-    $(".treatAsASite_checkbox").click(function () {
-        var output = [];
-        $(".treatAsASite_checkbox").each(function (index) {
-            if ($(this).is(':checked')) {
-                output.push("TRUE");
-            } else {
-                output.push("FALSE");
-            }
-        });
-        $('#overview_treatAsASite').val(output);
-    });
-
     var siteValue = $('#overview_treatAsASite').val();
     $(".treatAsASite_checkbox").each(function (index) {
         if (siteValue == "TRUE") {

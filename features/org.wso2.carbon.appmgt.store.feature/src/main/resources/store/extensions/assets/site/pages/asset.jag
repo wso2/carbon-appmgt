@@ -44,6 +44,7 @@ var carbon = require('carbon');
 var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
 var WEBAPP_TYPE = 'webapp';
+var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
     var asset, applicationId, title,
@@ -339,6 +340,13 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
+    var isSite;
+    if (customType == WEBAPP_TYPE) {
+        isSite = 'false';
+    } else if (customType == SITE_TYPE) {
+        isSite = 'true';
+    }
+
     caramel.render({
         title: 'Store | ' + type,
         user: user,
@@ -370,7 +378,7 @@ require('/modules/store.js').exec(function (ctx) {
         tags: [
             {
                 url: '/assets/' + customType + '/?page=1&tag=',
-                data: store.tags(type, customType)
+                data: store.tags(type, isSite)
             }
         ],
         myAssets: {user: user, type: type, title: title},

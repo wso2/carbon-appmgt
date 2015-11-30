@@ -38,7 +38,20 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIKey;
+import org.wso2.carbon.appmgt.api.model.APIRating;
+import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.Comment;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.DocumentationType;
+import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Subscription;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
@@ -46,7 +59,6 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-import org.wso2.carbon.appmgt.impl.dto.APIInfoDTO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
@@ -86,7 +98,16 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 
 
 public class APIStoreHostObject extends ScriptableObject {
@@ -854,20 +875,22 @@ public class APIStoreHostObject extends ScriptableObject {
                                                     Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException, AppManagementException {
         NativeArray tagArray = new NativeArray(0);
+        Map<String, String> attributeMap = new HashMap<>();
         Set<Tag> tags;
         String tenantDomain = null;
         String assetType =  null;
-        String assetFlag =  null;
         if (args!=null && isStringArray(args)) {
-            tenantDomain = args[0].toString();
-            if (args.length >= 3) {
+            //There will be separate two calls for this method with one argument and with three arguments.
+            if (args.length == 1) {
+                tenantDomain = args[0].toString();
+            } else if (args.length >= 3) {
                 assetType = args[1].toString();
-                assetFlag = args[2].toString();
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, args[2].toString());
             }
         }
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
         try {
-            tags = apiConsumer.getAllTags(tenantDomain, assetType, assetFlag);
+            tags = apiConsumer.getAllTags(tenantDomain, assetType, attributeMap);
         } catch (AppManagementException e) {
             log.error("Error from registry while getting WebApp tags.", e);
             return tagArray;

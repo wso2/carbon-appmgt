@@ -432,7 +432,7 @@ Store.prototype.tags = function (type) {
  * Returns all tags which relevant to type and flag
  * @param type Asset type
  */
-Store.prototype.tags = function (type, flag) {
+Store.prototype.tags = function (type, isSite) {
     var tag, tags, assetType, i, length, count, queryParameters,
         registry = this.registry || this.servmod.anonRegistry(this.tenantId),
         tagz = [],
@@ -445,7 +445,7 @@ Store.prototype.tags = function (type, flag) {
         var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
         var tenantdomain = carbonContext.getTenantDomain();
         var storeObj = jagg.module("manager").getAPIStoreObj();
-        tagz = storeObj.getAllTags(String(tenantdomain), type, flag);
+        tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
         return tagz;
     }else if (type == RESOURCE_TYPE_MOBILEAPP){
         return tagz;

@@ -3,8 +3,9 @@ var resource = (function () {
     var log = new Log('application-api');
 
     var addApplication = function (context) {
-
-        log.info('Adding an application');
+        if (log.isDebugEnabeld()) {
+            log.debug('Adding an application');
+        }
         var parameters = context.request.getAllParameters();
         var AppService = require('/extensions/assets/site/services/app.js').serviceModule;
 
@@ -26,8 +27,9 @@ var resource = (function () {
     };
 
     var deleteApplication = function (context) {
-
-        log.info('Application delete');
+        if (log.isDebugEnabeld()) {
+            log.debug('Application delete');
+        }
         var AppService = require('/extensions/assets/site/services/app.js').serviceModule;
 
         appApi = new AppService.AppService();
@@ -54,8 +56,9 @@ var resource = (function () {
     };
 
     var updateApplication = function (context) {
-
-        log.info('Entered update application');
+        if (log.isDebugEnabeld()) {
+            log.info('Entered update application');
+        }
         var parameters = request.getContent();
         var AppService = require('/extensions/assets/site/services/app.js').serviceModule;
 

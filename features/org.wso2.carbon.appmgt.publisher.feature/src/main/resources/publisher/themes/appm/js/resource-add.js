@@ -112,22 +112,6 @@ $( document ).ready(function() {
     });
 
     /**
-     * This will collect treat as a site values and push into hidden input filed.
-     */
-    $(".treatAsASite_checkbox").click(function () {
-        var output = [];
-        $(".treatAsASite_checkbox").each(function (index) {
-            if ($(this).is(':checked')) {
-                output.push("TRUE");
-            }
-            else {
-                output.push("TRUE");
-            }
-        });
-        $('#overview_treatAsASite').val(output);
-    });
-
-    /**
      * This enable/disable role based authorization adhere with anonymous access property value
      */
     $('#anonymousAccessToUrlPattern').change(function(){

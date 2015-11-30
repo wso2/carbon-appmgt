@@ -169,7 +169,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_ENABLE_SSO = "overview_enableSso";
     public static final String API_OVERVIEW_IDP_PROVIDER_URL = "overview_idpProviderUrl";
     public static final String API_OVERVIEW_SAML2_SSO_ISSUER = "overview_saml2SsoIssuer";
-    public static final String API_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
+    public static final String APP_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
     

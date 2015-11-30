@@ -32,6 +32,7 @@ if (user) {
     um = storeServer.userManager(-1234);
 }
 var WEBAPP_TYPE = 'webapp';
+var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
@@ -360,6 +361,13 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
+    var isSite;
+    if (customType == WEBAPP_TYPE) {
+        isSite = 'false';
+    } else if (customType == SITE_TYPE) {
+        isSite = 'true';
+    }
+
     caramel.render({
         title: 'Store | Assets',
         user: user,
@@ -382,7 +390,7 @@ require('/modules/store.js').exec(function (ctx) {
             return [
                 {
                     url: '/assets/' + customType + '/?tag=',
-                    data: store.tags(type, customType)
+                    data: store.tags(type, isSite)
                 }
             ];
         },

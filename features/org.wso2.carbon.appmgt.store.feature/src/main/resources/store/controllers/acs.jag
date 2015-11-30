@@ -98,7 +98,7 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
     if (samlRequest != null) {
         var index = sso.client.decodeSAMLLogoutRequest(sso.client.getSamlObject(samlRequest));
         if (log.isDebugEnabeld()) {
-            log.debug('BACKEND LOGOUT RECIEVED FROM STORE THE INDEX IS - ' + index);
+            log.debug('Backend logout recieved from store the index is - ' + index);
         }
         var jSessionId = application.get('sso_sessions')[index];
         delete application.get('sso_sessions')[index];

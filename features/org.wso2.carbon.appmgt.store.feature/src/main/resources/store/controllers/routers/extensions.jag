@@ -1,6 +1,9 @@
 <%
 var type;
 var customType;
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
+var MOBILEAPP_TYPE = 'mobileapp';
 (function () {
     var path, elements, theme, mapper, suffix, pages, links, length, link, i, mod,
             log = new Log(),
@@ -44,8 +47,8 @@ var customType;
         elements = matcher.elements();
         type = elements.type;
         customType = type;
-        if (type == 'site') {
-            type = 'webapp';
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
         }
         pages = store.ASSETS_EXT_PATH + customType + '/pages/';
         suffix = elements.suffix;
@@ -67,7 +70,7 @@ var customType;
                 path = new File(path).isExists() ? path : '/controllers/process.jag';
             }
 
-            if ((type === "webapp") || (type === "mobileapp")) {
+            if ((type === WEBAPP_TYPE) || (type === MOBILEAPP_TYPE)) {
                 path = pages + 'subscriptions.jag';
 
                 if (suffix === 'process') {

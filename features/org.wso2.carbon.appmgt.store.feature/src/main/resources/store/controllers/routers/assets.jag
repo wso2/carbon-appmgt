@@ -1,6 +1,8 @@
 <%
 var type;
 var customType;
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
 (function () {
     var prefix, pages, path, suffix, theme, links, link, i, length, elements, mapper,
             store = require('/modules/store.js'),
@@ -36,9 +38,12 @@ var customType;
             path = '/controllers/assets.jag';
         }
         request.getMappedPath = mapper(path);
+
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
         customType = type;
-        if (type == 'site') {
-            type = 'webapp';
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
         }
         include(path);
         return;
@@ -56,8 +61,8 @@ var customType;
         }
         request.getMappedPath = mapper(path);
         customType = type;
-        if (type == 'site') {
-            type = 'webapp';
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
         }
         include(path);
         return;
