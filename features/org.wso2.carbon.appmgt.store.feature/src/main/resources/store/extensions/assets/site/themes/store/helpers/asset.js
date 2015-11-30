@@ -20,12 +20,10 @@ var resources = function (page, meta) {
     var o = fn(page, meta);
 
     o.js.push('libs/jquery.slideto.min.js');
-
     o.js.push('logic/asset/tabs/apiconsole.js');
     o.js.push('logic/asset/overview/asset-utilization.js');
     o.js.push('logic/asset/overview/overview.js');
     o.code.push('asset/asset-metadata.hbs');
-    
     o.css.push('cstyles.css');
     return o;
 };

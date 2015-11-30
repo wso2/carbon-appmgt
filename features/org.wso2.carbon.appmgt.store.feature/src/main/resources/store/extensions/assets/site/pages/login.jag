@@ -20,7 +20,6 @@
 /*
  Description: The script is used to handle the basic login with the username and the password
  Filename: login.jag
- Created Date: 11/1/2014
  */
 
 include('../modules/jagg/jagg.jag');

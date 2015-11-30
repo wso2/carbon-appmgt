@@ -16,7 +16,6 @@ var resources = function (page, meta) {
     var o = fn(page, meta);
     o.js.push('logic/assets/lazy-load.js');
     o.js.push('logic/assets/assets.js');
-
     o.css.push('cstyles.css');
     return o;
 };

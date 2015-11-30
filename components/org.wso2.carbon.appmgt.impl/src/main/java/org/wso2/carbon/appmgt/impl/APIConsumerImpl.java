@@ -725,6 +725,13 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return getAllTags(requestedTenantDomain, null, null);
     }
 
+    /**
+     * @param requestedTenantDomain
+     * @param assetType - Currently we don't use asset type. This is for future implementations.
+     * @param assetFlag
+     * @return
+     * @throws AppManagementException
+     */
     public Set<Tag> getAllTags(String requestedTenantDomain, String assetType, String assetFlag) throws AppManagementException {
 
         this.isTenantModeStoreView = (requestedTenantDomain != null);

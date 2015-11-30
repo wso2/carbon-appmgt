@@ -1,7 +1,6 @@
 /*
  Description: The module is used to obtain data on applications
  Filename: app-information.js
- Created Date: 7/1/2013
  */
 var serviceModule = (function () {
 

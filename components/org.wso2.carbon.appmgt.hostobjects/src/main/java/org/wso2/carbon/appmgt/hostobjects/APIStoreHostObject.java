@@ -860,10 +860,8 @@ public class APIStoreHostObject extends ScriptableObject {
         String assetFlag =  null;
         if (args!=null && isStringArray(args)) {
             tenantDomain = args[0].toString();
-            if (args.length >= 2) {
-                assetType = args[1].toString();
-            }
             if (args.length >= 3) {
+                assetType = args[1].toString();
                 assetFlag = args[2].toString();
             }
         }

@@ -2,29 +2,29 @@
 
 var API_FOLDER = 'apis/';
 var MANIFEST_FILE = 'manifest.json';
-var INIT_FILE='init.jag';
+var INIT_FILE = 'init.jag';
 var URL_PATTERN = "/{context}/resources/{asset}/{version}/{resource}/{+any}";
 var EXTENSION_DIR = '/extensions/assets/';
 var requestMethod;
 var matcher;
-var log=new Log('restfulapis');
+var log = new Log('restfulapis');
 
-var executeMethod=function(methodType,script,request,response,session){
-    var context={request:request,response:response,session:session};
-    var output={};
-    switch(methodType){
+var executeMethod = function (methodType, script, request, response, session) {
+    var context = {request: request, response: response, session: session};
+    var output = {};
+    switch (methodType) {
         case 'GET':
-            output=script.get(context);
+            output = script.get(context);
             break;
         case 'POST':
             log.info('calling post method');
-            output=script.post(context);
+            output = script.post(context);
             break;
         case 'PUT':
-            output=script.put(context);
+            output = script.put(context);
             break;
         case 'DELETE':
-            output=script.delete(context);
+            output = script.delete(context);
             break;
         default:
             break;
@@ -66,11 +66,11 @@ else {
         var resourceScript = new File(resourcePath);
 
         //Check if a init jag file exists
-        var initJAGFilePath=apiPathToCheck+ INIT_FILE;
+        var initJAGFilePath = apiPathToCheck + INIT_FILE;
 
-        var initFile=new File(initJAGFilePath);
+        var initFile = new File(initJAGFilePath);
 
-        if(initFile.isExists()){
+        if (initFile.isExists()) {
             include(initJAGFilePath);
         }
 
@@ -78,9 +78,9 @@ else {
         if (resourceScript.isExists()) {
 
             //Load the resource module
-            var script=require(resourcePath);
+            var script = require(resourcePath);
 
-            executeMethod(requestMethod,script.resource,request,response,session);
+            executeMethod(requestMethod, script.resource, request, response, session);
         }
     }
 }

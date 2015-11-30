@@ -98,19 +98,19 @@ public interface APIConsumer extends APIManager {
                                                                            AppManagementException;
 
     /**
-     * Get all tags of published APIs
+     * Get all tags of published Apps
      *
-     * @return a list of all Tags applied to all APIs published.
-     * @throws AppManagementException if failed to get All the tags
+     * @return a list of all tags applied to all apps published.
+     * @throws AppManagementException if failed to get all the tags
      */
     public Set<Tag> getAllTags(String tenantDomain) throws AppManagementException;
 
 
     /**
-     * Get all tags of published APIs
+     * Get all tags of published Apps
      *
-     * @return a list of all Tags applied to all APIs published.
-     * @throws AppManagementException if failed to get All the tags
+     * @return a list of all tags applied to all apps published.
+     * @throws AppManagementException if failed to get all the tags
      */
     public Set<Tag> getAllTags(String tenantDomain, String assetType, String assetFlag) throws AppManagementException;
 

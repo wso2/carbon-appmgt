@@ -31,6 +31,7 @@ if (user) {
 } else {
     um = storeServer.userManager(-1234);
 }
+var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
@@ -115,18 +116,22 @@ require('/modules/store.js').exec(function (ctx) {
 
         var enterpriseSubscription;
         if (authenticator.getLoggedInUser()) {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
+            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                    authenticator.getLoggedInUser().username).subscription;
         }
         else {
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
+            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                    null).subscription;
         }
 
         var individualSubscription;
         if (authenticator.getLoggedInUser()) {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
+            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                    authenticator.getLoggedInUser().username).subscription;
         }
         else {
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
+            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                    null).subscription;
         }
 
         var subscriptionInfo = {};
@@ -136,7 +141,6 @@ require('/modules/store.js').exec(function (ctx) {
     }
     if (tag) {
         var urlQuery = 'tag=' + tag + '&';
-        log.info('143----');
         options = {
             attributes: SITE_QUERY
         };
@@ -146,7 +150,6 @@ require('/modules/store.js').exec(function (ctx) {
         assets = store.taggeds(type, options, paging);
     } else if (query) {
         var urlQuery = 'query=' + query + '&';
-        log.info('143');
         query = require('/modules/search.js').build(query);
         query.overview_treatAsASite = 'TRUE';
 
@@ -164,7 +167,6 @@ require('/modules/store.js').exec(function (ctx) {
     } else {
         if (paging.sort == 'popular') {
             var urlQuery = 'sort=' + paging.sort + '&';
-            log.info('158');
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
@@ -205,7 +207,6 @@ require('/modules/store.js').exec(function (ctx) {
                 }
             });
         } else if (paging.sort == 'usage') {
-            log.info('200');
             var urlQuery = 'sort=' + paging.sort + '&';
             server.privileged(function () {
                 var userName = user ? user.username : "";
@@ -251,7 +252,6 @@ require('/modules/store.js').exec(function (ctx) {
                 }
             });
         } else {
-            log.info('245');
             var urlQuery = 'sort=' + paging.sort + '&';
             assets = store.search(SITE_OPTIONS, paging);
         }
@@ -310,8 +310,8 @@ require('/modules/store.js').exec(function (ctx) {
     assets.forEach(function (asset) {
 
         //set rating
-        if (JSON.parse(social.getRating("webapp:" + asset.id))) {
-            asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + asset.id)).rating);
+        if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id))) {
+            asset.rating = Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id)).rating);
         } else {
             asset.rating = 0;
         }
@@ -347,8 +347,11 @@ require('/modules/store.js').exec(function (ctx) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
         if (treatAsASite) {
             if (treatAsASite.toLowerCase() == "true") {
-                if (JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
+                if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id))) {
+                    recentAssets[i].rating = {
+                        average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' +
+                                recentAssets[i].id)).rating)
+                    };
                 } else {
                     recentAssets[i].rating = 0;
                 }

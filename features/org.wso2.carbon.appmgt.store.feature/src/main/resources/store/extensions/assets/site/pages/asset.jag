@@ -43,6 +43,8 @@ authenticator.init(jagg, session);
 var carbon = require('carbon');
 var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
+var WEBAPP_TYPE = 'webapp';
+
 require('/modules/store.js').exec(function (ctx) {
     var asset, applicationId, title,
             log = ctx.log,
@@ -72,8 +74,8 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
-    if (JSON.parse(social.getRating("webapp:" + applicationId))) {
-        asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + applicationId)).rating);
+    if (JSON.parse(social.getRating(WEBAPP_TYPE + ":" + applicationId))) {
+        asset.rating = Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + applicationId)).rating);
     } else {
         asset.rating = 0.0;
     }
@@ -164,10 +166,12 @@ require('/modules/store.js').exec(function (ctx) {
 
         var defaultApplicationName = "DefaultApplication";
         var enterpriseSubscription;
-        enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", username).subscription;
+        enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                username).subscription;
 
         var individualSubscription;
-        individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", username).subscription;
+        individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                username).subscription;
 
         // Get all available IDPs (enterprises)
         var enterprises = getEnterprises();
@@ -311,8 +315,8 @@ require('/modules/store.js').exec(function (ctx) {
     asset.attributes.httpsPort = process.getProperty('https.port');
 
     for (var i = 0; i < assetsByProvider.assets.length; i++) {
-        if (JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id))) {
-            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id)).rating)};
+        if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id))) {
+            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id)).rating)};
         } else {
             assetsByProvider.assets[i].rating = 0;
         }
@@ -325,8 +329,8 @@ require('/modules/store.js').exec(function (ctx) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
         if (treatAsASite) {
             if (treatAsASite.toLowerCase() == "true") {
-                if (JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
+                if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id))) {
+                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id)).rating)};
                 } else {
                     recentAssets[i].rating = 0;
                 }

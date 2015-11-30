@@ -50,7 +50,8 @@ var serviceModule = (function () {
         appData['name'] = options.apiName;
         appData['version'] = options.apiVersion;
         appData['provider'] = options.apiProvider;
-        var result = this.instance.addAPISubscription(appData, options.subscriptionType, options.apiTier, options.appName, options.user, options.enterprises);
+        var result = this.instance.addAPISubscription(appData, options.subscriptionType, options.apiTier, options.appName,
+            options.user, options.enterprises);
         return result;
     };
 
@@ -110,7 +111,8 @@ var serviceModule = (function () {
      Returns all available enterprises for the app.
      */
     Subscriber.prototype.getEnterprisesForApplication = function (options) {
-        var result = this.instance.getEnterprisesForApplication(options.appName, options.ssoProviderName, options.ssoProviderVersion);
+        var result = this.instance.getEnterprisesForApplication(options.appName, options.ssoProviderName,
+            options.ssoProviderVersion);
         return result;
     }
 

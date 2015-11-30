@@ -103,7 +103,6 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     types.forEach(function (type) {
-        log.info(type);
         customType = type;
         if (type == SITE_TYPE) {
             type = WEBAPP_TYPE;
