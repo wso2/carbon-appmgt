@@ -26,7 +26,7 @@ include('../modules/jagg/jagg.jag');
 
 var userDetails = {};
 var authResult;
-var log = new Log('api-login');
+var log = new Log('app-login');
 var parameters;
 var AuthService = require('/extensions/assets/site/services/authentication.js').serviceModule;
 var authenticator = new AuthService.Authenticator();
@@ -35,7 +35,7 @@ authenticator.init(jagg, session);
 
 parameters = request.getAllParameters();
 
-//Obtain the user details from the request object
+//Obtain the user details from the request object.
 userDetails['username'] = parameters.username;
 userDetails['password'] = parameters.password;
 userDetails['tenant'] = null;

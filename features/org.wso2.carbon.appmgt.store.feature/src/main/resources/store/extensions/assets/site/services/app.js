@@ -1,6 +1,6 @@
 /*
  Description: The module is used to obtain data on applications
- Filename: app-information.js
+ Filename: app.js
  */
 var serviceModule = (function () {
 
@@ -68,7 +68,7 @@ var serviceModule = (function () {
     };
 
     /*
-     Used to process the applications array
+     Used to process the applications array.
      */
     var processAppsList = function (apps) {
         var app;

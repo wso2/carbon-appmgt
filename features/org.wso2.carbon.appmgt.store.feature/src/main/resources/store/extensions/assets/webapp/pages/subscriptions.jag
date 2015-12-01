@@ -59,21 +59,20 @@ require('/modules/store.js').exec(function (ctx) {
 		var displayApps = [];
 		var webAppAssets = [];
 
-		//Remove none site assets form the asset[].
+		//Remove site assets form the asset[].
 		for(i = 0; i < apps[0].subscriptions.length; i++) {
 			var asset = store.asset(type, apps[0].subscriptions[i].uuid);
 			var treatAsASite = asset.attributes.overview_treatAsASite;
 			if(treatAsASite) {
 				if (treatAsASite.toLowerCase() == "false") {
-					log.info(apps[0].subscriptions[i].name);
 					webAppAssets.push(apps[0].subscriptions[i]);
 				}
 			}
 		}
 
 		for(i = 0; i < webAppAssets.length; i++) {
-			var api = apiInfoManager.getAPIDescription(webAppAssets[i].provider, webAppAssets[i].name, webAppAssets[i].version);
-			webAppAssets[i].productionURL = api.serverURL.productionURL;
+			var app = apiInfoManager.getAPIDescription(webAppAssets[i].provider, webAppAssets[i].name, webAppAssets[i].version);
+			webAppAssets[i].productionURL = app.serverURL.productionURL;
 
 			if((i > offset && i < limit)){
 				displayApps.push(webAppAssets[i]);
@@ -84,7 +83,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     }
 
-	//Construct recent asset - Use only webapp asset type
+	//Construct recent asset - Use only webapp asset type.
 	var webappRecentAssets = [];
 
 	for(var i = 0; i < recentAssets.length; i++) {
@@ -124,5 +123,5 @@ function getServiceDir(serviceName) {
 	return '../services/' + serviceName;
 }
 
-	%>
+%>
 

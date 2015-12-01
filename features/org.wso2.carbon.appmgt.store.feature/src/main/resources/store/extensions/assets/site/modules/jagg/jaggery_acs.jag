@@ -9,17 +9,17 @@
             var samlResponse = request.getParameter("SAMLResponse");
             var sessionId = session.getId();
             var samlRequest = request.getParameter("SAMLRequest");
-            // create a sso relying party js object
+            // Create a sso relying party js object.
             var security = require("sso");
             var ssoRelyingParty = new security.SSORelyingParty(site.ssoConfiguration.issuer);
             var isLogoutResponse = false;
             var isLogoutRequest = false;
 
-            // if saml response is not a log out response
+            // If SAML response is not a log out response.
             if (samlResponse != null) {
                 isLogoutResponse = ssoRelyingParty.isLogoutResponse(samlResponse);
                 if (!Boolean(isLogoutResponse)) {
-                    // relay state value should be a valid value, this value is mapped with request uri.
+                    // Relay state value should be a valid value, this value is mapped with request URI.
                     var relayState = request.getParameter("RelayState");
 
                     var requestedURI = ssoRelyingParty.getRelayStateProperty(relayState);
@@ -29,7 +29,7 @@
                         return;
                     }
 
-                    // validating the signature
+                    // Validating the signature.
                     if (site.ssoConfiguration.responseSigningEnabled === 'true') {
                         var fullUserName = ssoRelyingParty.getSAMLResponseNameId(samlResponse);
                         if (fullUserName != null && fullUserName.indexOf("@") != -1) {
@@ -50,7 +50,7 @@
                     var isUserPermitted = api.hasUserPermissions(ssoRelyingParty.getLoggedInUser(sessionId));
                     jagg.setUser({username: ssoRelyingParty.getLoggedInUser(sessionId), cookie: null});
                     session.put("LOGGED_IN_USER", ssoRelyingParty.getLoggedInUser(sessionId));
-                    //First check whether user is having sufficent permissions [create/publish]
+                    //First check whether user is having sufficent permissions [create/publish].
                     if (!isUserPermitted.permitted) {
                         response.sendRedirect("../site/pages/logout.jag");
                     } else {
@@ -67,7 +67,7 @@
                         response.sendRedirect(requestedURI);
                     }
                 } else {
-                    // if the saml response is log out request from IDP, we log out from web app.
+                    // If the SAML response is log out request from IDP, we log out from web app.
                     ssoRelyingParty.invalidateSessionBySessionId(sessionId);
                     jagg.setUser(null);
                     session.invalidate();
@@ -77,7 +77,7 @@
 
             }
 
-            // if saml request is a log out request, then invalidate session.
+            // If saml request is a log out request, then invalidate session.
             if (samlRequest != null) {
                 isLogoutRequest = ssoRelyingParty.isLogoutRequest(samlRequest);
                 if (Boolean(isLogoutRequest)) {
@@ -86,7 +86,6 @@
                     session.invalidate();
                 }
             }
-
 
         }());
 %>

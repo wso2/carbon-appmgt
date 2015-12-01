@@ -258,18 +258,6 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
-    //Filter treatAsASite = true asset
-    var siteAssets = [];
-
-    for (var i = 0; i < assets.length; i++) {
-        var treatAsASite = assets[i].attributes.overview_treatAsASite;
-        if (treatAsASite) {
-            if (treatAsASite.toLowerCase() == "true") {
-                siteAssets.push(assets[i]);
-            }
-        }
-    }
-
     // Check whether a 'next page' navigation is needed.
     // If the assets count in the current page is less than PAGE_SIZE, next page is not available.
     // Else assets should be queried to decide whether there are assets available for the next page.
@@ -310,15 +298,15 @@ require('/modules/store.js').exec(function (ctx) {
     var subscriptionInfo;
     assets.forEach(function (asset) {
 
-        //set rating
-        if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id))) {
-            asset.rating = Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id)).rating);
+        var appRating = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id));
+        if (appRating) {
+            asset.rating = Math.floor(appRating.rating);
         } else {
             asset.rating = 0;
         }
 
         isSubscribed = false;
-        //set subscription details for each asset
+        // Set subscription details for each asset.
         subscriptionInfo = getSubscriptionInfo(asset)
         if (subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
@@ -332,7 +320,7 @@ require('/modules/store.js').exec(function (ctx) {
         }
         asset.isSubscribed = isSubscribed;
 
-        //to support skip gateway label visibility
+        // To support skip gateway label visibility.
         if (asset.overview_skipGateway == "true") {
             asset.overview_skipGateway = true;
         }
@@ -348,10 +336,10 @@ require('/modules/store.js').exec(function (ctx) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
         if (treatAsASite) {
             if (treatAsASite.toLowerCase() == "true") {
-                if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id))) {
+                var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+                if (appRatingRecentAssets) {
                     recentAssets[i].rating = {
-                        average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' +
-                                recentAssets[i].id)).rating)
+                        average: Math.floor(appRatingRecentAssets.rating)
                     };
                 } else {
                     recentAssets[i].rating = 0;

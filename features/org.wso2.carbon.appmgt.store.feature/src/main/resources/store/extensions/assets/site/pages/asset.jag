@@ -75,8 +75,9 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
-    if (JSON.parse(social.getRating(WEBAPP_TYPE + ":" + applicationId))) {
-        asset.rating = Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + applicationId)).rating);
+    var appRatingJson = JSON.parse(social.getRating(WEBAPP_TYPE + ":" + applicationId));
+    if (appRatingJson) {
+        asset.rating = Math.floor(appRatingJson.rating);
     } else {
         asset.rating = 0.0;
     }
@@ -89,7 +90,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var ATTR_PROVIDER = 'overview_provider';
     var LIFECYCLE_STATE_PROPERTY = 'lcState';
-    var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
+    var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published.
     var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
 
     // Init subscription service.
@@ -103,7 +104,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     /*
-     The function obtains the assets published by the given provider
+     The function obtains the assets published by the given provider.
      */
     var getAssetsFromProvider = function (asset, store) {
         var assetsFromProvider = {};
@@ -121,7 +122,7 @@ require('/modules/store.js').exec(function (ctx) {
         assetsFromProvider['assets'] = [];
         assetsFromProviderStore['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
-        //remove the selected asset from the assets list
+        //Remove the selected asset from the assets list.
         for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
             if (assetsFromProviderStore.assets[i].id === asset.id) {
                 assetsFromProviderStore.assets.splice(i, 1);
@@ -129,7 +130,6 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
-            log.info(assetsFromProviderStore.assets.length);
             var currentAsset = assetsFromProviderStore.assets[i];
             var treatAsASite = currentAsset.attributes.overview_treatAsASite;
             if (treatAsASite) {
@@ -143,7 +143,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     /*
-     The function obtains the query used to search for assets
+     The function obtains the query used to search for assets.
      */
     var obtainViewQuery = function (options) {
 
@@ -151,7 +151,7 @@ require('/modules/store.js').exec(function (ctx) {
         var visibleStates = storeConfig.visibleIn || DEFAULT_ASSET_VIEW_STATE;
         var attributeName = storeConfig.lcAttributeName || DEFAULT_LC_ATTRIBUTE_NAME;
 
-        //Changed the query to check for overview_status as opposed to lifecycle state
+        //Changed the query to check for overview_status as opposed to lifecycle state.
         options[attributeName] = visibleStates;
 
         return options;
@@ -174,7 +174,7 @@ require('/modules/store.js').exec(function (ctx) {
         individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
                 username).subscription;
 
-        // Get all available IDPs (enterprises)
+        // Get all available IDPs (enterprises).
         var enterprises = getEnterprises();
 
         var subscriptionInfo = {};
@@ -196,7 +196,7 @@ require('/modules/store.js').exec(function (ctx) {
         var issuerName = null;
         var isEmailLoginEnabled = store.isEnableEmailUsername();
 
-        //Check whether application author is a tenant
+        //Check whether application author is a tenant.
         if (!isEmailLoginEnabled && appProvider != null && appProvider.indexOf("-AT-") != -1) {
             result = appProvider.split("-AT-");
         }
@@ -215,7 +215,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     }
 
-    // Returns HBS friendly subscription info.
+    // Returns hbs friendly subscription info.
     var getSubscriptionViewData = function (enterpriseSubscription, enterprises) {
 
         var viewData = new Array();
@@ -316,8 +316,9 @@ require('/modules/store.js').exec(function (ctx) {
     asset.attributes.httpsPort = process.getProperty('https.port');
 
     for (var i = 0; i < assetsByProvider.assets.length; i++) {
-        if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id))) {
-            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id)).rating)};
+        var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id));
+        if (appRatingByProviderJson) {
+            assetsByProvider.assets[i].rating = {average: Math.floor(appRatingByProviderJson.rating)};
         } else {
             assetsByProvider.assets[i].rating = 0;
         }
@@ -330,8 +331,9 @@ require('/modules/store.js').exec(function (ctx) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
         if (treatAsASite) {
             if (treatAsASite.toLowerCase() == "true") {
-                if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id))) {
-                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id)).rating)};
+                var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+                if (appRatingRecentAssetsJson) {
+                    recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
                 } else {
                     recentAssets[i].rating = 0;
                 }

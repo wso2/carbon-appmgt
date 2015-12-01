@@ -110,7 +110,6 @@ require('/modules/store.js').exec(function (ctx) {
         assetsFromProvider['assets'] = [];
         assetsFromProviderStore['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
-        log.info(assetsFromProviderStore.assets);
         //remove the selected asset from the assets list
         for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
             if (assetsFromProviderStore.assets[i].id === asset.id) {
@@ -119,12 +118,10 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
-            log.info(assetsFromProviderStore.assets.length);
             var currentAsset = assetsFromProviderStore.assets[i];
             var treatAsASite = currentAsset.attributes.overview_treatAsASite;
             if(treatAsASite) {
                 if (treatAsASite.toLowerCase() == "false") {
-                    log.info("====->" + currentAsset.attributes.overview_name);
                     assetsFromProvider.assets.push(currentAsset);
                 }
             }
@@ -325,8 +322,9 @@ require('/modules/store.js').exec(function (ctx) {
     asset.attributes.httpsPort = process.getProperty('https.port');
 
     for(var i = 0; i < assetsByProvider.assets.length; i++){
-        if(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + + assetsByProvider.assets[i].id))) {
-            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id)).rating)};
+        var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + + assetsByProvider.assets[i].id));
+        if(appRatingByProviderJson) {
+            assetsByProvider.assets[i].rating = {average: Math.floor(appRatingByProviderJson.rating)};
         }else{
             assetsByProvider.assets[i].rating = 0;
         }
@@ -339,8 +337,9 @@ require('/modules/store.js').exec(function (ctx) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
         if(treatAsASite) {
             if (treatAsASite.toLowerCase() == "false") {
-                if (JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id))) {
-                    recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id)).rating)};
+                var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+                if (appRatingRecentAssetsJson) {
+                    recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
                 } else {
                     recentAssets[i].rating = 0;
                 }

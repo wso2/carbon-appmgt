@@ -256,8 +256,7 @@ $(function () {
             if(searchSelect !== "App"){
                 searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
             }
-            //location.href="/store/assets/" + store.asset.type + "?query=" + searchTerm;
-            location.href="/store/assets/" + "webapp" + "?query=" + searchTerm;
+            location.href="/store/assets/webapp?query=" + searchTerm;
         }
     });
 

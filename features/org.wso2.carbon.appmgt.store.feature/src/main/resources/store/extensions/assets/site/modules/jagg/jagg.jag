@@ -131,7 +131,6 @@ var jagg = jagg || (function () {
     };
 
     var renderBlock = function (name, inputs, outputs, populate) {
-        //initializeTemplate({name:name, params:null}, jagg);
 
         var init, fn, blok, log = new Log();
 
@@ -220,8 +219,6 @@ var jagg = jagg || (function () {
         }
     };
 
-    // [ "foo", "bar", "mar"]
-    // [{ "name" : "foo/bar", params : {}}]
     var initializeBlocks = function (keys, inputs) {
         if (!inputs) {
             return;

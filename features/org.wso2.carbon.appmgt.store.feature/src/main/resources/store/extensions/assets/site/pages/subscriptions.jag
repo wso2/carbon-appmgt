@@ -43,8 +43,8 @@ require('/modules/store.js').exec(function (ctx) {
     authenticator.init(jagg, session);
 
     var AppInformationService = require('../services/app-information.js').serviceModule;
-    var apiInfoManager = new AppInformationService.AppInformationService();
-    apiInfoManager.init(jagg, session);
+    var appInfoManager = new AppInformationService.AppInformationService();
+    appInfoManager.init(jagg, session);
     var subscriptions = [];
     var userData = authenticator.getLoggedInUser();
     var apps = subsApi.getAppsWithSubs({user: userData.username});
@@ -74,15 +74,14 @@ require('/modules/store.js').exec(function (ctx) {
             var treatAsASite = asset.attributes.overview_treatAsASite;
             if (treatAsASite) {
                 if (treatAsASite.toLowerCase() == "true") {
-                    log.info(apps[0].subscriptions[i].name);
                     siteAssets.push(apps[0].subscriptions[i]);
                 }
             }
         }
 
         for (i = 0; i < siteAssets.length; i++) {
-            var api = apiInfoManager.getAppDescription(siteAssets[i].provider, siteAssets[i].name, siteAssets[i].version);
-            siteAssets[i].productionURL = api.serverURL.productionURL;
+            var app = appInfoManager.getAppDescription(siteAssets[i].provider, siteAssets[i].name, siteAssets[i].version);
+            siteAssets[i].productionURL = app.serverURL.productionURL;
 
             if ((i > offset && i < limit)) {
                 displayApps.push(siteAssets[i]);
@@ -92,7 +91,7 @@ require('/modules/store.js').exec(function (ctx) {
         apps[0].subscriptions = displayApps;
     }
 
-    //Construct recent asset - Use only site asset type
+    //Construct recent asset - Use only site asset type.
     var siteRecentAssets = [];
     for (var i = 0; i < recentAssets.length; i++) {
         var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;

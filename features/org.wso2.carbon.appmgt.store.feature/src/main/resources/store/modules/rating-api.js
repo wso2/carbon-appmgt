@@ -18,7 +18,7 @@
  */
 var api = {};
 (function(api) {
-    var log = new Log('rating-api :- ');
+    var log = new Log('rating-api : ');
     api.rate = function(session, options) {
         var success = false; //Assume the rating will fail
         if (!options.type) {

@@ -430,7 +430,6 @@ Store.prototype.tags = function (type) {
 
 /**
  * Returns all tags which relevant to type and flag
- * @param type Asset type
  */
 Store.prototype.tags = function (type, isSite) {
     var tag, tags, assetType, i, length, count, queryParameters,
@@ -438,19 +437,19 @@ Store.prototype.tags = function (type, isSite) {
         tagz = [],
         tz = {};
 
-    // NOTE : Supports only 'webapp' type as of now.
+    //Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
 
-    if(type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE){
+    if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
         var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
         var tenantdomain = carbonContext.getTenantDomain();
         var storeObj = jagg.module("manager").getAPIStoreObj();
         tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
         return tagz;
-    }else if (type == RESOURCE_TYPE_MOBILEAPP){
+    } else if (type == RESOURCE_TYPE_MOBILEAPP) {
         return tagz;
-    }else if(type){
-        log.warn("Retrieving tags : Type " + type +  " is not supported.");
+    } else if (type) {
+        log.warn("Retrieving tags : Type " + type + " is not supported.");
         return tagz;
     }
 
@@ -603,15 +602,10 @@ Store.prototype.tagged = function (type, tag, paging) {
     //TODO move this LCState to config
     options = {"tag": tag, "lifecycleState": ["published"], "overview_treatAsASite" : "TRUE"};
     options = obtainViewQuery(options);
-    log.info("===========================");
-    log.info(options);
-    log.info(paging);
     var builtPaging = PaginationFormBuilder(paging);
-    log.info(builtPaging);
     assets = this.assetManager(type).search(options, builtPaging);
 
     length = assets.length;
-    log.info('tagged length -> ' + length);
     for (i = 0; i < length; i++) {
         assets[i].rating = this.rating(assets[i].path);
         assets[i].indashboard = this.isuserasset(assets[i].id, type);
@@ -622,26 +616,6 @@ Store.prototype.tagged = function (type, tag, paging) {
 
 Store.prototype.taggeds = function (type, options, paging) {
 
-    //var i;
-    //var options = {};
-    //var assets;
-    //var length;
-    //
-    ////TODO move this LCState to config
-    //options = {"tag": tag, "lifecycleState": ["published"], "overview_treatAsASite" : "TRUE"};
-    //options = obtainViewQuery(options);
-    //log.info(options);
-    //var builtPaging = PaginationFormBuilder(paging);
-    //assets = this.assetManager(type).search(options, builtPaging);
-    //
-    //length = assets.length;
-    //
-    //for (i = 0; i < length; i++) {
-    //    assets[i].rating = this.rating(assets[i].path);
-    //    assets[i].indashboard = this.isuserasset(assets[i].id, type);
-    //}
-    //return assets;
- //=====================================
     var i, length, types, assets;
     log.info(options);
 
@@ -649,7 +623,6 @@ Store.prototype.taggeds = function (type, options, paging) {
     var builtPaging = PaginationFormBuilder(paging);
     if (type) {
         var assetz = this.assetManager(type).search(options, builtPaging);
-        log.info('tagged length -> ' + assetz.length);
         for (i = 0; i < assetz.length; i++) {
             assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
         }
@@ -663,9 +636,8 @@ Store.prototype.taggeds = function (type, options, paging) {
         assets[type] = this.assetManager(types[i]).search(options, builtPaging);
     }
     return assets;
-
-
 };
+
 /**
  * Returns asset data for the current user
  * @param type Asset type
