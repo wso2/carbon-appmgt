@@ -587,6 +587,7 @@ public final class AppMConstants {
     public static final String APISTORE_LOGIN_URL="/api/authenticate";
     public static final String APISTORE_PUBLISH_URL="/site/blocks/life-cycles/ajax/life-cycles.jag";
     public static final String APPSTORE_ADD_URL ="/api/asset/webapp";
+    public static final String APPSTORE_ADD_TAGS_URL ="/api/tag/webapp/";
     public static final String APPSTORE_DELETE_URL ="/api/asset/webapp/";
 
     public static final String APISTORE_ADD_POLICY_URL="/api/entitlement/policy/partial/policyGroup/save";
