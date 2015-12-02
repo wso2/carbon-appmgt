@@ -106,18 +106,11 @@ public class SAML2Authenticator implements Authenticator{
     }
 
     private AuthenticationContext getAuthenticationContext(String appContext, String appVersion,
-                                                          String subscriber, AuthenticatedIDP[] authenticatedIDPs, String accessToken) throws APISecurityException {
+                                                          String subscriber, AuthenticatedIDP[] authenticatedIDPs,
+                                                          String accessToken) throws APISecurityException {
 
-		APIKeyValidationInfoDTO info = null;
 
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-
-        if(!tenantDomain.equalsIgnoreCase("carbon.super")){
-            String tenantedSubscriber = subscriber+'@'+tenantDomain;
-            info = dataStore.getAPPData(appContext, appVersion, tenantedSubscriber, authenticatedIDPs);
-        }else{
-            info = dataStore.getAPPData(appContext, appVersion, subscriber, authenticatedIDPs);
-        }
+        APIKeyValidationInfoDTO info = dataStore.getAPPData(appContext, appVersion, subscriber, authenticatedIDPs);
 
 		if (info == null) {
 			log.warn("cannot load application data for the provided context and version");
