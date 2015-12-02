@@ -261,10 +261,6 @@ public class APPResourceManager {
 	                                                      String user, String accessToken)
 	                                                                                      throws APISecurityException {
 
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        if (!tenantDomain.equalsIgnoreCase("carbon.super")) {
-            user = user + '@' + tenantDomain;
-        }
 
         APIKeyValidationInfoDTO info = dataStore.getAPPData(appContext, appVersion, user, null);
 		if (info == null) {
