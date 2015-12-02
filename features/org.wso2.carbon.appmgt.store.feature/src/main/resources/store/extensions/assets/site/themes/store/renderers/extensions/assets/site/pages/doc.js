@@ -1,27 +1,25 @@
-
 var render = function (theme, data, meta, require) {
-	
-	var log = new Log();
+
+    var log = new Log();
 
     theme('2-column-right', {
         title: 'InlineDocument',
         header: [
             {
-              partial:'header',
-              context:data.header
+                partial: 'header',
+                context: data.header
             },
             {
                 partial: 'navigation',
                 context: {}
             }
-        ] ,
-        body:[
+        ],
+        body: [
             {
-                partial:'doc',
-                context:data
+                partial: 'doc',
+                context: data
             }
         ]
-        
     });
 
 };

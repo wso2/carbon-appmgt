@@ -879,18 +879,20 @@ public class APIStoreHostObject extends ScriptableObject {
         Set<Tag> tags;
         String tenantDomain = null;
         String assetType =  null;
-        if (args!=null && isStringArray(args)) {
+        if (args != null && isStringArray(args)) {
             //There will be separate two calls for this method with one argument and with three arguments.
             if (args.length == 1) {
                 tenantDomain = args[0].toString();
-            } else if (args.length >= 3) {
+            }
+            if (args.length == 3) {
+                tenantDomain = args[0].toString();
                 assetType = args[1].toString();
                 attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, args[2].toString());
             }
         }
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        APIConsumer appConsumer = getAPIConsumer(thisObj);
         try {
-            tags = apiConsumer.getAllTags(tenantDomain, assetType, attributeMap);
+            tags = appConsumer.getAllTags(tenantDomain, assetType, attributeMap);
         } catch (AppManagementException e) {
             log.error("Error from registry while getting WebApp tags.", e);
             return tagArray;

@@ -1,6 +1,6 @@
 var assetLinks = function (user) {
 
-    return{
+    return {
         title: 'Sites',
         links: [
             {
@@ -18,14 +18,14 @@ var assetLinks = function (user) {
                 path: 'logout.jag'
             },
             {
-                title:'Subscriptions',
-                url:'subscriptions',
-                path:'subscriptions.jag'
+                title: 'Subscriptions',
+                url: 'subscriptions',
+                path: 'subscriptions.jag'
             },
             {
-                title:'Documentations',
-                url:'doc',
-                path:'doc.jag'
+                title: 'Documentations',
+                url: 'doc',
+                path: 'doc.jag'
             }
         ]
     }

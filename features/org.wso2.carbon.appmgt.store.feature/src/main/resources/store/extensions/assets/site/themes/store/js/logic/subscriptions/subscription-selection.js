@@ -1,14 +1,14 @@
 $(function () {
 
     /*
-     The location of the templates used in the rendering
+     The location of the templates used in the rendering.
      */
     var API_SUBS_URL = '/store/resources/webapp/v1/subscription/';
     var API_TOKEN_URL = '/store/resources/webapp/v1/apptoken/a';
     var API_DOMAIN_URL = '/store/resources/webapp/v1/domain/a';
 
     /*
-     The containers in which the UI components will be rendered
+     The containers in which the UI components will be rendered.
      */
     var CONTROL_CONTAINER = '#subscription-control-panel';
     var SUBS_LIST_CONTAINER = '#subscription-list';
@@ -26,13 +26,13 @@ $(function () {
     var EV_UPDATE_DOMAIN = 'eventUpdateDomain';
     var EV_GENERATE_PROD_TOKEN = 'eventGenerateProductionToken';
     var EV_GENERATE_SAND_TOKEN = 'eventGenerateSandboxToken';
-    var EV_RGEN_PROD_TOKEN='eventRegenerateProductionToken';
-    var EV_RGEN_SAND_TOKEN='eventRegenerateSandboxToken';
+    var EV_RGEN_PROD_TOKEN = 'eventRegenerateProductionToken';
+    var EV_RGEN_SAND_TOKEN = 'eventRegenerateSandboxToken';
 
     var APP_STORE = {};
 
     /*
-     The function returns the subscriptions of the given application
+     The function returns the subscriptions of the given application.
      */
     var findSubscriptionDetails = function (appName) {
         var apps = metadata.appsWithSubs;
@@ -47,9 +47,6 @@ $(function () {
         return [];
     };
 
-    /*
-
-     */
     var findAppDetails = function (appName) {
         var apps = metadata.appsWithSubs;
         var app;
@@ -60,15 +57,12 @@ $(function () {
                 return app;
             }
         }
-
         return null;
     };
 
-
     var attachGenerateProdToken = function () {
-        ///We need to prevent the afterRender function from been inherited by child views
-        //otherwise this method will be invoked by child views
-        //console.info('Attaching generate button');
+        //We need to prevent the afterRender function from been inherited by child views
+        //otherwise this method will be invoked by child views.
         $('#btn-generate-Production-token').on('click', function () {
             var appName = $('#subscription-selection').val();
             var appDetails = findAppDetails(appName);
@@ -118,7 +112,7 @@ $(function () {
 
     /*
      The function sets up the production domain update button to
-     send an update request to the remote api
+     send an update request to the remote api.
      */
     var attachUpdateProductionDomains = function () {
 
@@ -168,7 +162,7 @@ $(function () {
 
     /*
      The function listens for the user to check and uncheck the show keys checkbox
-     and then broadcasts the appropriate event
+     and then broadcasts the appropriate event.
      */
     var attachShowCheckbox = function () {
 
@@ -186,14 +180,13 @@ $(function () {
     };
 
     /*
-    The function is used to attach the logic which will regenerate the token
+     The function is used to attach the logic which will regenerate the token
      */
-    var attachRegenerateProductionToken=function(){
-         $('#btn-refresh-Production-token').on('click',function(){
-                 console.info('The user wants to regenerate the token');
-         });
+    var attachRegenerateProductionToken = function () {
+        $('#btn-refresh-Production-token').on('click', function () {
+            console.info('The user wants to regenerate the token');
+        });
     };
-
 
     events.register(EV_APP_SELECT);
     events.register(EV_SHOW_KEYS);
@@ -207,10 +200,10 @@ $(function () {
 
     /*
      Keys View
-     The default view which prompts the user to generate a key
+     The default view which prompts the user to generate a key.
      */
 
-    //Production view
+    //Production view.
     Views.extend('view', {
         id: 'defaultProductionKeyView',
         container: PROD_KEYS_CONTAINER,
@@ -228,20 +221,17 @@ $(function () {
         subscriptions: [EV_SHOW_KEYS, EV_GENERATE_PROD_TOKEN],
         resolveRender: function (data) {
 
-            if(!APP_STORE.showKeys){
+            if (!APP_STORE.showKeys) {
                 return false;
             }
 
-            if(!APP_STORE.productionKeys){
+            if (!APP_STORE.productionKeys) {
                 return false;
             }
 
-            //Determine if the keys need to be visible
-            //if (APP_STORE.showKeys) {
-                Views.mirror(APP_STORE.productionKeys, data);
-                return true;
-            //}
-            //return false;
+            //Determine if the keys need to be visible.
+            Views.mirror(APP_STORE.productionKeys, data);
+            return true;
         },
         afterRender: attachRegenerateProductionToken
     });
@@ -251,12 +241,12 @@ $(function () {
         subscriptions: [EV_SHOW_KEYS, EV_HIDE_KEYS, EV_GENERATE_PROD_TOKEN],
         partial: 'subscriptions/sub-keys-hidden',
         resolveRender: function (data) {
-            //Determine if the keys need to be visible
+            //Determine if the keys need to be visible.
             if (APP_STORE.showKeys) {
                 return false;
             }
 
-            if(!APP_STORE.productionKeys){
+            if (!APP_STORE.productionKeys) {
                 return false;
             }
 
@@ -266,7 +256,7 @@ $(function () {
         afterRender: attachRegenerateProductionToken
     });
 
-    //Sandbox view
+    //Sandbox view.
     Views.extend('defaultProductionKeyView', {
         id: 'defaultSandboxKeyView',
         container: SAND_KEYS_CONTAINER,
@@ -281,17 +271,15 @@ $(function () {
         partial: 'subscriptions/sub-keys-visible',
         resolveRender: function (data) {
 
-            if(!APP_STORE.sandboxKeys){
-                 return false;
+            if (!APP_STORE.sandboxKeys) {
+                return false;
             }
-            if(!APP_STORE.showKeys){
+            if (!APP_STORE.showKeys) {
                 return false;
             }
             //Only render the view if sandbox keys are present
-           // if ((APP_STORE.sandboxKeys) && (APP_STORE.showKeys)) {
-                Views.mirror(APP_STORE.sandboxKeys, data);
-                return true;
-            //}
+            Views.mirror(APP_STORE.sandboxKeys, data);
+            return true;
         },
         afterRender: function () {
         },
@@ -305,11 +293,11 @@ $(function () {
         resolveRender: function (data) {
             console.info(APP_STORE.sandboxKeys);
 
-            if(APP_STORE.showKeys){
+            if (APP_STORE.showKeys) {
                 return false;
             }
 
-            if(!APP_STORE.sandboxKeys){
+            if (!APP_STORE.sandboxKeys) {
                 return false;
             }
 
@@ -322,10 +310,10 @@ $(function () {
     });
 
     /*
-     Domain View
+     Domain View.
      */
 
-    //Production view
+    //Production view.
     Views.extend('view', {
         id: 'defaultProductionDomainView',
         container: PROD_DOMAIN_CONTAINER,
@@ -345,7 +333,7 @@ $(function () {
         afterRender: attachUpdateProductionDomains
     });
 
-    //Sandbox view
+    //Sandbox view.
     Views.extend('defaultProductionDomainView', {
         id: 'defaultSandboxDomainView',
         container: SAND_DOMAIN_CONTAINER,
@@ -364,7 +352,7 @@ $(function () {
     });
 
     /*
-     API Subscription listing view
+     API Subscription listing view.
      */
     Views.extend('view', {
         id: 'defaultAPISubscriptionsView',
@@ -381,8 +369,8 @@ $(function () {
 
 
     /*
-     Control panel containing the Show Keys checkbox
-     -Rendered when the user selects an application
+     Control panel containing the Show Keys checkbox.
+     -Rendered when the user selects an application.
      */
 
     Views.extend('view', {
@@ -397,7 +385,7 @@ $(function () {
     var defaultAppName = $('#subscription-selection').val();
     events.publish(EV_APP_SELECT, {appName: defaultAppName});
 
-    //Connect the events
+    //Connect the events.
     $('#subscription-selection').on('change', function () {
         var appName = $('#subscription-selection').val();
         APP_STORE = {};
@@ -408,6 +396,5 @@ $(function () {
         APP_STORE['showKeys'] = false;
         events.publish(EV_APP_SELECT, {appName: appName});
     });
-
 
 });

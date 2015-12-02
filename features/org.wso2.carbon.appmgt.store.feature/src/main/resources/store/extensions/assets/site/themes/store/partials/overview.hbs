@@ -8,12 +8,12 @@
 
     {{#if skipGateway}}
 
-    		<legend>URLs:</legend>
-	    	<p><b>Web App Endpoint</b></p>
-	    	<ul>
-			<li><a class='icon-globe' id="gatewayURL" href="{{asset.attributes.overview_webAppUrl}}" target="_blank" >&nbsp;{{asset.attributes.overview_webAppUrl}}</a></li>
-	    	</ul>
-            <input type="hidden" id="skipGateway" value="true">
+        <legend>URLs:</legend>
+        <p><b>Web App Endpoint</b></p>
+        <ul>
+        <li><a class='icon-globe' id="gatewayURL" href="{{asset.attributes.overview_webAppUrl}}" target="_blank" >&nbsp;{{asset.attributes.overview_webAppUrl}}</a></li>
+        </ul>
+        <input type="hidden" id="skipGateway" value="true">
     {{else}}
         {{#with apiData.serverURL}}
     		<legend>URLs:</legend>

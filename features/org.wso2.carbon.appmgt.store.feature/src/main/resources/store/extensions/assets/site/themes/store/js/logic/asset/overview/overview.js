@@ -18,29 +18,17 @@
 
 $(function () {
 
-    //if user directly access the overview page, check the anonymous condition.
-    //if anonymous mode is not allowed and user is not authenticated, prompt the login page
+    //If user directly access the overview page, check the anonymous condition.
+    //If anonymous mode is not allowed and user is not authenticated, prompt the login page
     var loggedUser = $("#hdnUsertId").val();
     var allowAnonymous = $("#allowAnonymous").val();
     var skipGateway = $("#skipGateway").val();
 
-    //hide html body when loading
+    //Hide html body when loading.
     $('#wrap').css('visibility', 'hidden');
 
-    if (loggedUser == "" || loggedUser == null) {
-//        if (allowAnonymous.toUpperCase() != "TRUE") {
-//            var localIP = $("#assetsLocalIP").val();
-//            var port = $("#assetshttpsPort").val()
-//            location.href = localIP + ":" + port + "/store/login";
-//        }
-//        e.preventDefault();
-//        e.stopPropagation();
-    }
-
-    //show html body after loading
+    //Show html body after loading.
     $('#wrap').css('visibility', 'visible');
-
-
 
     var jsonObj = {
         "isActive": "1",
@@ -57,7 +45,7 @@ $(function () {
     initializeUserActivity("page-load", jsonObj);
 
     $("#gatewayURL").on('click', function (e) {
-        //check if subscribed only if skip gateway disabled
+        //Check if subscribed only if skip gateway disabled.
         if ((skipGateway == "false")) {
             if ($('#hdnUsertId').val() != "" && (allowAnonymous != "TRUE")) {
                 var isSubscribed = $('#subscribed').val();
@@ -67,7 +55,6 @@ $(function () {
                         'layout' : 'center',
                         'timeout': 1500,
                         'modal' : true
-
                     });
                     e.preventDefault();
                     e.stopPropagation();

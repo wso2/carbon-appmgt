@@ -15,7 +15,7 @@
     };
 
     var checkConsoleObject = function () {
-        if (typeof console==undefined) {
+        if (typeof console == undefined) {
             return false;
         }
         return true;
@@ -37,7 +37,7 @@
     }
 
     var initEmptyLogger = function (console) {
-        console={};
+        console = {};
         console.info = function (msg) {
 
         };

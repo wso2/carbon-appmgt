@@ -12,7 +12,7 @@ $(function () {
     var init = function (tableContainer) {
 
         var id;
-        //Go through each row
+        //Go through each row.
         $(tableContainer + ' tr').each(function () {
 
             id = $(this).data('id');
@@ -27,7 +27,6 @@ $(function () {
                     else if (action == 'edit') {
                         $(this).html('<button class="btn" onClick="' + resolveScript + '">Edit</button>');
                     }
-
                 }
             });
         });
@@ -39,7 +38,7 @@ $(function () {
     Edtable['resolve'] = function (id, action) {
         var tr = $('#row-' + id);
         if (action == 'delete') {
-            deleteRow(id,tr);
+            deleteRow(id, tr);
         }
         else if (action == 'edit') {
             populateRow(id, tr);
@@ -74,7 +73,7 @@ $(function () {
     };
 
     var populateTextbox = function (td) {
-        //Save the existing value
+        //Save the existing value.
         var existingValue = $(td).data('value');
         $(td).html('<input class="input-small" type="text" value="' + existingValue + '"/>');
     };
@@ -102,7 +101,6 @@ $(function () {
         });
     };
 
-
     var saveRow = function (id, tr) {
         var data = createDataObject(id, tr);
         callSaveAPI(data, id, tr);
@@ -111,32 +109,27 @@ $(function () {
     var createDataObject = function (id, tr) {
         var data = {};
 
-        //Go through each data cell
+        //Go through each data cell.
         $(tr).find('td').each(function () {
             //Obtain the field name
             var fieldName = $(this).data('fieldName');
             var fieldType = $(this).data('field');
 
             if (fieldName) {
-                //Obtain the old value
+                //Obtain the old value.
                 var oldValue = $(this).data('value');
                 data[fieldName] = oldValue;
 
                 if (fieldType) {
                     var newValue = $(this).find('input').val();
-
                     var newFieldName = getNewFieldName(fieldName);
 
-                    //Obtain the new value
+                    //Obtain the new value.
                     data[newFieldName] = newValue;
                 }
-
             }
-
         });
-
         return data;
-
     };
 
     var callSaveAPI = function (data, id, tr) {
@@ -146,11 +139,11 @@ $(function () {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function () {
-                //Save the new values to the data fields
+                //Save the new values to the data fields.
                 $(tr).find('td').each(function () {
                     var fieldType = $(this).data('field');
 
-                    //Only write data if it was a editable field type
+                    //Only write data if it was a editable field type.
                     if (fieldType) {
                         var oldValue = $(this).data('value');
                         var fieldName = $(this).data('fieldName');
@@ -159,13 +152,11 @@ $(function () {
                             $(this).data('value', data[newFieldName]);
                         }
                     }
-
                 });
 
                 resetRow(id, tr);
             }
         });
-
     };
 
     var getNewFieldName = function (oldFieldName) {
@@ -176,19 +167,17 @@ $(function () {
     };
 
     /*
-    The function invokes the api to delete an application
+     The function invokes the api to delete an application.
      */
-    var deleteRow=function(id,tr){
-        var dataObject=createDataObject(id,tr);
+    var deleteRow = function (id, tr) {
+        var dataObject = createDataObject(id, tr);
         $.ajax({
-            type:'DELETE',
-            url:DELETE_API+dataObject.appName,
-            success:function(){
+            type: 'DELETE',
+            url: DELETE_API + dataObject.appName,
+            success: function () {
                 alert('Asset deleted successfully!');
                 $('#row-' + id).remove();
             }
         })
     };
-
-
 });

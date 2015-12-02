@@ -23,10 +23,8 @@
                     <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
                 </form>
 
-
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}
-
 
                         <a href="{{url "/extensions/assets/site/subscriptions"}}">
                             <div class="auth-img">
@@ -79,7 +77,6 @@
 
                         {{/if}}
 
-
                         <a href="#"  data-toggle="modal" data-target="#register-modal">
                             <div class="auth-img">
                                 Register
@@ -89,20 +86,15 @@
                             </div>
                         </a>
 
-
                         {{>register}}
 
-
-
                     {{/if}}
-
 
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
 </header>
-
 
 <!-- secondary header - app bar -->
 <div id="nav" class="row wr-app-bar">

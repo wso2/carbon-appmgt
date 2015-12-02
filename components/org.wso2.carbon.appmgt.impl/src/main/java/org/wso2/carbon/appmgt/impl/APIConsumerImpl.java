@@ -728,7 +728,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      * @return matching tag set which qualified the conditions of assetTye and attributeMap.
      * @throws AppManagementException
      */
-    public Set<Tag> getAllTags(String requestedTenantDomain, String assetType, Map<String, String> attributeMap) throws AppManagementException {
+    public Set<Tag> getAllTags(String requestedTenantDomain, String assetType, Map<String, String> attributeMap) throws
+            AppManagementException {
 
         this.isTenantModeStoreView = (requestedTenantDomain != null);
 

@@ -1,20 +1,19 @@
 var metastore;
 
-$(function(){
+$(function () {
 
     metastore = (function () {
         console.log('searching for metadata');
 
-        //Check if metadata is present in the page
+        //Check if metadata is present in the page.
         if (metadata) {
             console.log('metadata present in the page');
         }
 
         var getMetaData = function (key) {
-            if(metadata.hasOwnProperty(key)){
+            if (metadata.hasOwnProperty(key)) {
                 return metadata[key];
             }
-
             return {};
         };
 
@@ -22,11 +21,9 @@ $(function(){
             metadata[key] = data;
         }
 
-        return{
+        return {
             get: getMetaData,
             put: putMetaData
         };
-
     })();
-
 })();

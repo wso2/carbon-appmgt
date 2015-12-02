@@ -1,23 +1,23 @@
 var render = function (theme, data, meta, require) {
-    theme('2-column-right',{
-        title:'My Applications',
-        header:[
+    theme('2-column-right', {
+        title: 'My Applications',
+        header: [
             {
-                partial:'header',
-                context:data.header
+                partial: 'header',
+                context: data.header
             },
             {
-                partial:'navigation',
-                context:{}
+                partial: 'navigation',
+                context: {}
             }
         ],
-        body:[
+        body: [
             {
-                partial:'myapps',
-                context:data
+                partial: 'myapps',
+                context: data
             }
         ],
-        right:[
+        right: [
             {
                 partial: 'recent-assets',
                 context: require('/helpers/asset.js').formatRatings(data.recentAssets)
