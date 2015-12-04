@@ -23,7 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APPStore;
+import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorConstants;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
@@ -63,7 +63,7 @@ public class AppManagerConfiguration {
     private boolean initialized;
 
     private List<Environment> apiGatewayEnvironments = new ArrayList<Environment>();
-    private Set<APPStore> externalAPIStores = new HashSet<APPStore>();
+    private Set<AppStore> externalAPIStores = new HashSet<AppStore>();
     private List<SSOEnvironment> ssoEnvironments = new ArrayList<SSOEnvironment>();
 
     public Map<String, Map<String, String>> getLoginConfiguration() {
@@ -172,9 +172,9 @@ public class AppManagerConfiguration {
                 }
             }else if(AppMConstants.EXTERNAL_APP_STORES.equals(localName)){  //Initialize 'externalAPIStores' config elements
                 Iterator apistoreIterator = element.getChildrenWithLocalName("ExternalAPIStore");
-                externalAPIStores = new HashSet<APPStore>();
+                externalAPIStores = new HashSet<AppStore>();
                 while(apistoreIterator.hasNext()){
-                    APPStore store=new APPStore();
+                    AppStore store=new AppStore();
                     OMElement storeElem = (OMElement)apistoreIterator.next();
                     String type=storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
                     store.setType(type); //Set Store type [eg:wso2]
@@ -354,7 +354,7 @@ public class AppManagerConfiguration {
         return apiGatewayEnvironments;
     }
 
-    public Set<APPStore> getExternalAPIStores() {  //Return set of APIStores
+    public Set<AppStore> getExternalAPIStores() {  //Return set of APIStores
         return externalAPIStores;
     }
 
@@ -362,8 +362,8 @@ public class AppManagerConfiguration {
         return ssoEnvironments;
     }
 
-    public APPStore getExternalAPIStore(String storeName) { //Return APIStore object,based on store name/Here we assume store name is unique.
-        for (APPStore apiStore : externalAPIStores) {
+    public AppStore getExternalAPIStore(String storeName) { //Return APIStore object,based on store name/Here we assume store name is unique.
+        for (AppStore apiStore : externalAPIStores) {
             if (apiStore.getName().equals(storeName)) {
                 return apiStore;
             }
