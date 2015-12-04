@@ -17,7 +17,7 @@
 package org.wso2.carbon.appmgt.api.model;
 
 
-public class APPStore {
+public class AppStore {
 
     private String type = "wso2";
     private String name;
@@ -26,15 +26,22 @@ public class APPStore {
     private String username;
     private String password;
     private boolean published;
-    private APPPublisher publisher;
+    private String publisherClassName;
 
-    public APPPublisher getPublisher() {
+    private ExternalAppStorePublisher publisher;
+
+    public String getPublisherClassName() {
+        return publisherClassName;
+    }
+
+    public void setPublisherClassName(String publisherClassName) {
+        this.publisherClassName = publisherClassName;
+    }
+
+    public ExternalAppStorePublisher getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(APPPublisher publisher) {
-        this.publisher = publisher;
-    }
 
 
 
@@ -101,7 +108,7 @@ public class APPStore {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        APPStore store = (APPStore) o;
+        AppStore store = (AppStore) o;
         return !(this.getName() != null ? !this.getName().equals(store.getName()) : store.getName() != null);
 
     }
