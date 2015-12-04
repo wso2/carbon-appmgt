@@ -1830,6 +1830,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             for (AppStore store : appStores) {
                 try {
                     String publisherClassName = store.getPublisherClassName();
+                    if (publisherClassName == null) {
+                        throw new AppManagementException("Publisher class name is not defined in the external " +
+                                "store configuration for store with id" + store.getName());
+                    }
                     ExternalAppStorePublisher publisher = AppManagerUtil.getExternalStorePublisher(publisherClassName);
                     // First  publish the APP to external APP Store
                     publisher.publishToStore(webApp, store);
