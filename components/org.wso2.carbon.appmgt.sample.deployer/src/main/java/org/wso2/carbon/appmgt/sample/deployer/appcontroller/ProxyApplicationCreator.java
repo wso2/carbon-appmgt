@@ -213,6 +213,7 @@ public class ProxyApplicationCreator {
         configJson.put("app_context", webAppDetail.getContext());
         configJson.put("app_provider", webAppDetail.getUserName());
         configJson.put("app_allowAnonymous", "false");
+        configJson.put("app_acsURL", "");
         httpHandler.doPostHttps(httpsBackEndUrl + "/publisher/api/sso/addConfig", configJson.toJSONString(),
                 creatorSession, "application/json; charset=UTF-8");
         String appPath = "/_system/governance/appmgt/applicationdata/provider/"
