@@ -65,6 +65,13 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
     caramel = require('caramel');
 
+    var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
+    var SITE_OPTIONS = {
+        type: type,
+        attributes: SITE_QUERY
+    };
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetPage;
+
     matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
     applicationId = matcher.elements().aid;
     title = store.assetLinks(type).title;
@@ -88,6 +95,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
+    var ATTR_TREAT_AS_A_SITE = 'overview_treatAsASite';
     var ATTR_PROVIDER = 'overview_provider';
     var LIFECYCLE_STATE_PROPERTY = 'lcState';
     var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published.
@@ -108,7 +116,6 @@ require('/modules/store.js').exec(function (ctx) {
      */
     var getAssetsFromProvider = function (asset, store) {
         var assetsFromProvider = {};
-        var assetsFromProviderStore = {};
         var provider = asset.attributes[ATTR_PROVIDER];
         var searchOptions = {};
         var paging;
@@ -116,26 +123,17 @@ require('/modules/store.js').exec(function (ctx) {
         searchOptions['attributes'] = {};
         searchOptions = obtainViewQuery(searchOptions);
         searchOptions['attributes'][ATTR_PROVIDER] = provider;
-        paging = {start: 0, count: 10, sort: 'recent'};
+        searchOptions['attributes'][ATTR_TREAT_AS_A_SITE] = 'TRUE';
+        paging = {start: 0, count: store.getRecentAppCount().fromProvider, sort: 'recent'};
         assetsFromProvider['overview_provider'] = provider;
         assetsFromProvider['type'] = type;
-        assetsFromProvider['assets'] = [];
-        assetsFromProviderStore['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+        assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
-        //Remove the selected asset from the assets list.
-        for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
-            if (assetsFromProviderStore.assets[i].id === asset.id) {
-                assetsFromProviderStore.assets.splice(i, 1);
+        //Remove the current asset from the assets list.
+        for (var i = 0; i < assetsFromProvider.assets.length; i++) {
+            if (assetsFromProvider.assets[i].id === asset.id) {
+                assetsFromProvider.assets.splice(i, 1);
                 break;
-            }
-        }
-        for (var i = 0; i < assetsFromProviderStore.assets.length; i++) {
-            var currentAsset = assetsFromProviderStore.assets[i];
-            var treatAsASite = currentAsset.attributes.overview_treatAsASite;
-            if (treatAsASite) {
-                if (treatAsASite.toLowerCase() == "true") {
-                    assetsFromProvider.assets.push(currentAsset);
-                }
             }
         }
 
@@ -324,21 +322,16 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
-    var recentAssets = store.recentAssets(type);
-    var siteRecentAssets = [];
+    var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
 
     for (var i = 0; i < recentAssets.length; i++) {
-        var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
-        if (treatAsASite) {
-            if (treatAsASite.toLowerCase() == "true") {
-                var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
-                if (appRatingRecentAssetsJson) {
-                    recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
-                } else {
-                    recentAssets[i].rating = 0;
-                }
-                siteRecentAssets.push(recentAssets[i]);
-            }
+        var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+        if (appRatingRecentAssets) {
+            recentAssets[i].rating = {
+                average: Math.floor(appRatingRecentAssets.rating)
+            };
+        } else {
+            recentAssets[i].rating = 0;
         }
     }
 
@@ -384,7 +377,7 @@ require('/modules/store.js').exec(function (ctx) {
             }
         ],
         myAssets: {user: user, type: type, title: title},
-        recentAssets: siteRecentAssets,
+        recentAssets: recentAssets,
         assetsByProvider: assetsByProvider,
         documentation: docs,
         apiData: apiData,

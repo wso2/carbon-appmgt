@@ -63,3 +63,16 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+{{#if subscriptions}}
+    <div class="row">
+    <ul class="pager">
+        {{#if leftNav}}
+            <li><a href="{{url "/extensions/assets/site/subscriptions?"}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
+        {{/if}}
+        {{#if rightNav}}
+            <li><a  href="{{url "/extensions/assets/site/subscriptions?"}}{{t "page="}}{{this.rightNav}}">Next</a></li>
+        </ul>
+        {{/if}}
+    </div>
+{{/if}}

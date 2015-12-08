@@ -48,6 +48,8 @@ require('/modules/store.js').exec(function (ctx) {
     var SITE_TYPE = 'site';
     var WEBAPP_TYPE = 'webapp';
     var MOBILEAPP_TYPE = 'mobileapp';
+    var siteAttribute;
+    var RECENT_APP_COUNT =  Math.floor(store.getRecentAppCount().topAssetPage / length);
 
     // Init subscription service.
     var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
@@ -122,7 +124,6 @@ require('/modules/store.js').exec(function (ctx) {
             if (customType == MOBILEAPP_TYPE) {
                 assets = store.assets(customType, paging);
             } else {
-                var siteAttribute;
                 if (customType == SITE_TYPE) {
                     siteAttribute = {"overview_treatAsASite": "TRUE"};
                 } else if (customType == WEBAPP_TYPE) {
@@ -184,8 +185,25 @@ require('/modules/store.js').exec(function (ctx) {
             singular: manager.singularLabel,
             type: manager.shortName
         });
-        popularItems = popularItems.concat(store.popularAssets(type, first ? (popular + popularDiff) : popular));
-        recentItems = recentItems.concat(store.recentAssets(type, first ? (recent + recentDiff) : recent));
+
+        //Top asset recent app populating logic.
+        if (customType == MOBILEAPP_TYPE) {
+            popularItems = popularItems.concat(store.popularAssets(type, RECENT_APP_COUNT));
+            recentItems = recentItems.concat(store.recentAssets(type, RECENT_APP_COUNT));
+        } else {
+            popularItems = popularItems.concat(store.popularAssets(type, RECENT_APP_COUNT, siteAttribute));
+            recentItems = recentItems.concat(store.recentAssets(type, RECENT_APP_COUNT, siteAttribute));
+        }
+
+        for (var i = 0; i < recentItems.length; i++) {
+            var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentItems[i].id));
+            if (appRatingRecentAssets) {
+                recentItems[i].rating = Math.floor(appRatingRecentAssets.rating);
+            } else {
+                recentItems[i].rating = 0;
+            }
+        }
+
         first = false;
     });
 

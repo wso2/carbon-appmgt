@@ -249,6 +249,11 @@ Store.prototype.getPageSize = function () {
     return config.pagination.PAGE_SIZE;
 };
 
+Store.prototype.getRecentAppCount = function () {
+    var config  = require('/config/store.js').config();
+    return config.recentAppCount;
+};
+
 Store.prototype.commentsPageSize = function () {
     return configs()[COMMENTS_PAGE_SIZE];
 };
@@ -617,7 +622,6 @@ Store.prototype.tagged = function (type, tag, paging) {
 Store.prototype.taggeds = function (type, options, paging) {
 
     var i, length, types, assets;
-    log.info(options);
 
     options = obtainViewQuery(options);
     var builtPaging = PaginationFormBuilder(paging);
@@ -718,7 +722,7 @@ Store.prototype.popularAssets = function (type, count) {
     return assets;
 };
 
-Store.prototype.recentAssets = function (type, count) {
+Store.prototype.recentAssets = function (type, count, options) {
 
     //var type=(type=='null')?null:type;
 
@@ -735,7 +739,9 @@ Store.prototype.recentAssets = function (type, count) {
         sortBy: 'overview_createdtime',
         sort: 'older'
     };
-    var options = {};
+    if (!options) {
+        options = {};
+    }
     options = obtainViewQuery(options);
     options = {"attributes": options};
 

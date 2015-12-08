@@ -27,7 +27,9 @@ var render = function (theme, data, meta, require) {
                     appsWithSubs: data.appsWithSubs,
                     subscriptions: subscriptions,
                     pages: data.pages,
-                    page: data.page
+                    page: data.page,
+                    leftNav: data.leftNav,
+                    rightNav: data.rightNav,
                 }
             }
         ],

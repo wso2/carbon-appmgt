@@ -58,6 +58,7 @@ require('/modules/store.js').exec(function (ctx) {
         type: type,
         attributes: SITE_QUERY
     };
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
     caramel = require('caramel');
     process = require('process'),
             localIP = "https://" + process.getProperty('server.host'),
@@ -337,22 +338,17 @@ require('/modules/store.js').exec(function (ctx) {
         }
     });
 
-    var recentAssets = store.recentAssets(type);
+    var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
     var webAppRecentAssets = [];
 
     for(var i = 0; i < recentAssets.length; i++) {
-        var treatAsASite = recentAssets[i].attributes.overview_treatAsASite;
-        if(treatAsASite) {
-            if (treatAsASite.toLowerCase() == "false") {
-                var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
-                if (appRatingRecentAssetsJson) {
-                    recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
-                } else {
-                    recentAssets[i].rating = 0;
-                }
-                webAppRecentAssets.push(recentAssets[i]);
-            }
+        var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+        if (appRatingRecentAssetsJson) {
+            recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
+        } else {
+            recentAssets[i].rating = 0;
         }
+        webAppRecentAssets.push(recentAssets[i]);
     }
 
     var isSite;
