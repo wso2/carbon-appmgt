@@ -5,7 +5,7 @@
 	
 	<!-- <StoreURL>http://localhost:9763/store</StoreURL>
 
-        <ExternalAPPStore id="Store1" type="wso2" className="org.wso2.carbon.appmgt.impl.publishers.WSO2APPPublisher">
+        <ExternalAPPStore id="Store1" type="wso2" className="org.wso2.carbon.appmgt.impl.publishers.WSO2ExternalAppStorePublisher">
             <DisplayName>Store1</DisplayName>
             <Endpoint>http://localhost:9763/publisher</Endpoint>
             <Username>xxxx</Username>

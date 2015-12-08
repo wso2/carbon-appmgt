@@ -33,9 +33,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import javax.cache.Cache;
@@ -72,7 +70,7 @@ import org.wso2.carbon.appmgt.api.doc.model.APIResource;
 import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.api.model.APPPublisher;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -113,7 +111,6 @@ import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.*;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
-import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.mgt.UserMgtConstants;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -2273,69 +2270,6 @@ public final class AppManagerUtil {
 		                                       .getFirstProperty("APIManagement.LoadAPIContextsInServerStartup"));
 	}
 
-	public static Set<APPStore> getExternalAPIStores() throws AppManagementException {
-		SortedSet<APPStore> apistoreSet = new TreeSet<APPStore>(new APPStoreNameComparator());
-		AppManagerConfiguration config =
-		                                 ServiceReferenceHolder.getInstance()
-		                                                       .getAPIManagerConfigurationService()
-		                                                       .getAPIManagerConfiguration();
-		apistoreSet.addAll(config.getExternalAPIStores());
-		if (apistoreSet.size() != 0) {
-			return apistoreSet;
-		} else {
-			return null;
-		}
-
-	}
-
-	public static Set<APPStore> getExternalAPIStores(Set<APPStore> inputStores)
-	                                                                           throws
-                                                                               AppManagementException {
-		SortedSet<APPStore> apiStores = new TreeSet<APPStore>(new APPStoreNameComparator());
-		AppManagerConfiguration config =
-		                                 ServiceReferenceHolder.getInstance()
-		                                                       .getAPIManagerConfigurationService()
-		                                                       .getAPIManagerConfiguration();
-		apiStores.addAll(config.getExternalAPIStores());
-		boolean exists = false;
-		if (apiStores.size() != 0) {
-			for (APPStore store : apiStores) {
-				for (APPStore inputStore : inputStores) {
-					if (inputStore.getName().equals(store.getName())) { // If
-						                                                // the
-						                                                // configured
-						                                                // apistore
-						                                                // already
-						                                                // stored
-						                                                // in
-						                                                // db,ignore
-						                                                // adding
-						                                                // it
-						                                                // again
-						exists = true;
-					}
-				}
-				if (!exists) {
-					inputStores.add(store);
-				}
-				exists = false;
-			}
-
-		}
-		return inputStores;
-
-	}
-
-	public static boolean isAPIsPublishToExternalAPIStores() throws AppManagementException {
-
-		AppManagerConfiguration config =
-		                                 ServiceReferenceHolder.getInstance()
-		                                                       .getAPIManagerConfigurationService()
-		                                                       .getAPIManagerConfiguration();
-		return config.getExternalAPIStores().size() != 0;
-
-	}
-
 	public static boolean isAPIGatewayKeyCacheEnabled() {
 		try {
 			AppManagerConfiguration config =
@@ -2838,12 +2772,12 @@ public final class AppManagerUtil {
      * @return APP Store set
      * @throws AppManagementException if an error occurs when loading app stores from the registry
      */
-    public static Set<APPStore> getExternalStores(int tenantId) throws AppManagementException {
+    public static Set<AppStore> getExternalStores(int tenantId) throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Getting configured external store details from registry for tenant :" + tenantId);
         }
 
-        Set<APPStore> externalAPIStores = new HashSet<APPStore>();
+        Set<AppStore> externalAPIStores = new HashSet<AppStore>();
         try {
             UserRegistry registry = ServiceReferenceHolder.getInstance().getRegistryService()
                     .getGovernanceSystemRegistry(tenantId);
@@ -2854,75 +2788,40 @@ public final class AppManagerUtil {
                 Iterator appStoreIterator = element.getChildrenWithLocalName(AppMConstants.EXTERNAL_APP_STORE);
 
                 while (appStoreIterator.hasNext()) {
-                    APPStore store = new APPStore();
+                    AppStore store = new AppStore();
                     OMElement storeElem = (OMElement) appStoreIterator.next();
+
                     String type = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_TYPE));
                     String className =
                             storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_CLASS_NAME));
-                    store.setPublisher((APPPublisher) Class.forName(className).newInstance());
-
-                    type = (type != null) ? type : "";
-                    store.setType(type); //Set Store type [eg:wso2]
                     String name = storeElem.getAttributeValue(new QName(AppMConstants.EXTERNAL_APP_STORE_ID));
-                    if (name == null) {
-                        name = "";
-                        log.error("The ExternalAPPStore name attribute is not defined in external-app-stores.xml " +
-                                "in registry.");
-                    }
-                    store.setName(name); //Set store name
                     OMElement configDisplayName = storeElem.getFirstChildWithName
                             (new QName(AppMConstants.EXTERNAL_APP_STORE_DISPLAY_NAME));
-                    String displayName = (configDisplayName != null) ? configDisplayName.getText() : name;
-                    store.setDisplayName(displayName);//Set store display name
-
                     OMElement endPoint = storeElem.getFirstChildWithName(
                             new QName(AppMConstants.EXTERNAL_APP_STORE_ENDPOINT));
-                    String storeEndpoint = "";
-                    if (endPoint == null) {
-                        log.error("The ExternalAPPStore endpoint is not defined in external-app-stores.xml " +
-                                "in registry.");
-                    } else {
-                        storeEndpoint = endPoint.getText();
-                    }
-                    store.setEndpoint(storeEndpoint);
-                    //Set store endpoint, which is used to publish APIs
-                    store.setPublished(false);
-
                     OMElement password = storeElem.getFirstChildWithName(new QName(
                             AppMConstants.EXTERNAL_APP_STORE_PASSWORD));
                     OMElement username = storeElem.getFirstChildWithName(
                             new QName(AppMConstants.EXTERNAL_APP_STORE_USERNAME));
-                    if (password != null || username != null) {
-                        store.setPassword(password.getText());
-                        store.setUsername(username.getText());
-                    } else {
-                        store.setPassword("");
-                        store.setUsername("");
-                        log.error("The user-credentials of APP Publisher is not defined in the <ExternalAPPStore> " +
-                                "config of external-app-stores.xml in registry.");
-                    }
-                    externalAPIStores.add(store);
-                }
 
+                    store.setType(type); //Set Store type [eg:wso2]
+                    store.setPublisherClassName(className);
+                    store.setName(name); //Set store name
+                    store.setDisplayName(configDisplayName.getText());//Set store display name
+                    store.setEndpoint(endPoint.getText());
+                    store.setPassword(password.getText());
+                    store.setUsername(username.getText());
+                    externalAPIStores.add(store);
+                    store.setPublished(false);
+                }
             }
         } catch (RegistryException e) {
-            String msg = "Error while retrieving External Stores Configuration from registry";
+            String msg = "Error while retrieving External Stores Configuration from registry : "
+                    + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (XMLStreamException e) {
             String msg = "Malformed XML found in the External Stores Configuration resource";
-            log.error(msg, e);
-            throw new AppManagementException(msg, e);
-        } catch (ClassNotFoundException e) {
-            String msg = "External store publisher cannot be found";
-            log.error(msg, e);
-            throw new AppManagementException(msg, e);
-        } catch (InstantiationException e) {
-            String msg = "External store publisher be load";
-            log.error(msg, e);
-            throw new AppManagementException(msg, e);
-        } catch (IllegalAccessException e) {
-            String msg = "External store publisher be load cannot be access";
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         }
@@ -2937,15 +2836,64 @@ public final class AppManagerUtil {
      * @return App Store
      * @throws AppManagementException
      */
-    public static APPStore getExternalAPPStore(String appStoreName, int tenantId) throws AppManagementException {
-        Set<APPStore> externalAPIStoresConfig = AppManagerUtil.getExternalStores(tenantId);
-        APPStore apiStore = null;
-        for (APPStore apiStoreConfig : externalAPIStoresConfig) {
-            if (apiStoreConfig.getName().equals(appStoreName)) {
-                apiStore = apiStoreConfig;
+    public static AppStore getExternalAppStore(String appStoreName, int tenantId) throws AppManagementException {
+        AppStore appStore = null;
+        Set<AppStore> externalAppStoresConfig = AppManagerUtil.getExternalStores(tenantId);
+        if (externalAppStoresConfig != null && externalAppStoresConfig.size() > 0) {
+            validateStoreName(externalAppStoresConfig);
+            for (AppStore appStoreConfig : externalAppStoresConfig) {
+                if (appStoreConfig.getName().equals(appStoreName)) {
+                    appStore = appStoreConfig;
+                }
             }
         }
-        return apiStore;
+        return appStore;
+    }
+
+    /**
+     * Check whether given app stores have store name(id) and display name.
+     *
+     * @param appStores App Stores
+     * @throws AppManagementException if name or display name is null for any appstore
+     */
+    public static void validateStoreName(Set<AppStore> appStores) throws AppManagementException {
+        for (AppStore appStore : appStores) {
+            String name = appStore.getName();
+            String displayName = appStore.getDisplayName();
+            if (name == null) {
+                String msg = "Store id is not defined for one of the App Store  in configuration file :"
+                        + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            if (displayName == null) {
+                String msg = "Store display name is not defined for the App Store with id : " + name + " " +
+                        "in configuration file :"
+                        + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+        }
+
+    }
+
+    public static ExternalAppStorePublisher getExternalStorePublisher(String className) throws AppManagementException{
+        try{
+            return (ExternalAppStorePublisher) Class.forName(className).newInstance();
+        }catch (ClassNotFoundException e) {
+            String msg = "External store publisher cannot be found, class :" + className;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (InstantiationException e) {
+            String msg = className + " class object cannot be instantiated";
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (IllegalAccessException e) {
+            String msg = "External store publisher  cannot be access, class :" + className;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
     }
 
     /**

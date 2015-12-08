@@ -18,25 +18,23 @@ package org.wso2.carbon.appmgt.api.model;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 
 /**
- * One or more implementations of this interface can be used to publish APIs to APIStores .
+ * One or more implementations of this interface can be used to publish Apps to External App Stores.
  */
-public interface APPPublisher {
+public interface ExternalAppStorePublisher {
     /**
-     * The method to publish WebApp to external Store
-     * @param webApp      WebApp
-     * @param store    Store
-     * @return   published/not
+     * Publish WebApp to external store.
+     *
+     * @param webApp Web App
+     * @param store  Store
      */
-    public boolean publishToStore(WebApp webApp,APPStore store) throws AppManagementException;
-
+    public void publishToStore(WebApp webApp, AppStore store) throws AppManagementException;
 
     /**
-     * The method to publish WebApp to external Store
-     * @param webApp      APIIdentifier
-     * @param store    Store
-     * @return   deleted/not
+     * Delete WebApp from external store.
+     *
+     * @param webApp Web App
+     * @param store  Store
      */
-    public boolean deleteFromStore(WebApp webApp,APPStore store) throws
-                                                                       AppManagementException;
+    public void deleteFromStore(WebApp webApp, AppStore store) throws AppManagementException;
 
 }

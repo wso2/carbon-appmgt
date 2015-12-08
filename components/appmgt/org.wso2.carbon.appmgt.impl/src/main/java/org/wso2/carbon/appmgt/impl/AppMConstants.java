@@ -585,33 +585,23 @@ public final class AppMConstants {
 
     public static final String EXTERNAL_APP_STORES_STORE_URL = "StoreURL";
     public static final String EXTERNAL_APP_STORE_CLASS_NAME = "className";
-    public static final String APP_STORE_LIST_URL ="/site/blocks/listing/ajax/item-list.jag";
-    public static final String APP_GET_ACTION ="getAPI";
-    public static final String VERSION_PLACEHOLDER = "{version}";
-    public static final String APP_STORE_COPY_URL ="/site/blocks/overview/ajax/overview.jag";
-    public static final String APP_COPY_ACTION ="createNewAPI";
 
-    public static final String API_ACTION="action";
-    public static final String API_ADD_ACTION="addAPI";
-    public static final String API_UPDATE_ACTION="updateAPI";
-    public static final String API_CHANGE_STATUS_ACTION="updateStatus";
-    public static final String API_REMOVE_ACTION="removeAPI";
-    public static final String API_LOGIN_ACTION="login";
-    public static final String API_LOGOUT_ACTION="logout";
-    public static final String APISTORE_LOGIN_USERNAME="username";
-    public static final String APISTORE_LOGIN_PASSWORD="password";
-    public static final String APISTORE_LOGIN_URL="/api/authenticate";
-    public static final String APISTORE_PUBLISH_URL="/site/blocks/life-cycles/ajax/life-cycles.jag";
-    public static final String APPSTORE_ADD_URL ="/api/asset/webapp";
-    public static final String APPSTORE_ADD_TAGS_URL ="/api/tag/webapp/";
-    public static final String APPSTORE_DELETE_URL ="/api/asset/webapp/";
+    public static final String APP_ACTION ="action";
+    public static final String APP_LOGIN_ACTION ="login";
+    public static final String APP_LOGOUT_ACTION ="logout";
+    public static final String APP_STORE_LOGIN_USERNAME ="username";
+    public static final String APP_STORE_LOGIN_PASSWORD ="password";
+    public static final String APP_STORE_AUTHENTICATE_URL ="/api/authenticate";
+    public static final String APP_STORE_ADD_URL ="/api/asset/webapp";
+    public static final String APP_STORE_ADD_TAGS_URL ="/api/tag/webapp/";
+    public static final String APP_STORE_DELETE_URL ="/api/asset/webapp/";
 
-    public static final String APISTORE_ADD_POLICY_URL="/api/entitlement/policy/partial/policyGroup/save";
-    public static final String APPSTORE_STATE_CHANGE ="/api/lifecycle/";
+    public static final String APP_STORE_STATE_CHANGE ="/api/lifecycle/";
+    public static final String APP_TYPE ="webapp";
     public static final String STATE_SUMIT_FOR_REVIEW ="Submit%20for%20Review";
     public static final String STATE_APPROVE ="Approve";
     public static final String STATE_PUBLISH ="Publish";
-    public static final String APISTORE_GET_UUID_URL="/api/asset/get/uuid/webapp/";
+    public static final String APP_STORE_GET_UUID_URL ="/api/asset/get/uuid/webapp/";
 
 
 
