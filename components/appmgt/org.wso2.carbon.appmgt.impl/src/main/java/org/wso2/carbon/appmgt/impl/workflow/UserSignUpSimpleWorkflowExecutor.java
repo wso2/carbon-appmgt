@@ -20,10 +20,14 @@ package org.wso2.carbon.appmgt.impl.workflow;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.SelfSignUpUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.List;
 
@@ -38,40 +42,57 @@ public class UserSignUpSimpleWorkflowExecutor extends UserSignUpWorkflowExecutor
 
     @Override
     public void execute(WorkflowDTO workflowDTO) throws WorkflowException {
-        log.info("Executing User SignUp Workflow");
+        if (log.isDebugEnabled()) {
+            log.debug("Executing User SignUp Workflow for " +
+                    workflowDTO.getWorkflowReference());
+        }
         complete(workflowDTO);
+       // super.publishEvents(workflowDTO);
     }
 
     @Override
     public void complete(WorkflowDTO workflowDTO) throws WorkflowException {
-        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
+
+        if (log.isDebugEnabled()) {
+            log.debug("User Sign Up [Complete] Workflow Invoked. Workflow ID : " +
+                    workflowDTO.getExternalWorkflowReference() + "Workflow State : " +
+                    workflowDTO.getStatus());
+        }
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService()
+                .getAPIManagerConfiguration();
+
         String serverURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
-        String adminUsername = config.getFirstProperty(AppMConstants.AUTH_MANAGER_USERNAME);
-        String adminPassword = config.getFirstProperty(AppMConstants.AUTH_MANAGER_PASSWORD);
-        if (serverURL == null || adminUsername == null || adminPassword == null) {
-            throw new WorkflowException("Required parameter missing to connect to the" +
-                    " authentication manager");
-        }
 
-        String role = config.getFirstProperty(AppMConstants.SELF_SIGN_UP_ROLE);
-        if (role == null) {
-            throw new WorkflowException("Subscriber role undefined for self registration");
-        }
+        String tenantDomain = workflowDTO.getTenantDomain();
 
-        try{
-            /* update users role list with SELF_SIGN_UP_ROLE role */
-            updateRolesOfUser(serverURL, adminUsername, adminPassword, workflowDTO.getWorkflowReference(), role);
-        }catch(Exception e){
+        try {
+
+            UserRegistrationConfigDTO signupConfig =
+                    SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+
+            if (serverURL == null || signupConfig.getAdminUserName() == null ||
+                    signupConfig.getAdminPassword() == null) {
+                throw new WorkflowException("Required parameter missing to connect to the"
+                        + " authentication manager");
+            }
+
+            String tenantAwareUserName =
+                    MultitenantUtils.getTenantAwareUsername(workflowDTO.getWorkflowReference());
+            updateRolesOfUser(serverURL, signupConfig.getAdminUserName(),
+                    signupConfig.getAdminPassword(), tenantAwareUserName,
+                    SelfSignUpUtil.getRoleNames(signupConfig), tenantDomain);
+        } catch (AppManagementException e) {
+            throw new WorkflowException("Error while accessing signup configuration", e);
+        } catch (Exception e) {
             throw new WorkflowException("Error while assigning role to user", e);
-
         }
-
     }
-
 
     @Override
-    public List<WorkflowDTO> getWorkflowDetails(String workflowStatus) throws WorkflowException{
+    public List<WorkflowDTO> getWorkflowDetails(String workflowStatus) throws WorkflowException {
         return null;
     }
+
 
 }

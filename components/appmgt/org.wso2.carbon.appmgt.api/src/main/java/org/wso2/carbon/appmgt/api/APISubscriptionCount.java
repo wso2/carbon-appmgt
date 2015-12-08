@@ -32,6 +32,7 @@ public class APISubscriptionCount {
         this.subscriptions = subscriptions;
     }
 
+
     public APIIdentifier getApiId() {
         return apiId;
     }

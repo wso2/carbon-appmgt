@@ -20,6 +20,11 @@ package org.wso2.carbon.appmgt.impl.workflow;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.UserRealm;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.user.mgt.stub.types.carbon.FlaggedName;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -33,6 +38,7 @@ public abstract class UserSignUpWorkflowExecutor extends WorkflowExecutor {
 
     /**
      * Method updates Roles users with subscriber role
+     *
      * @param serverURL
      * @param adminUsername
      * @param adminPassword
@@ -41,10 +47,20 @@ public abstract class UserSignUpWorkflowExecutor extends WorkflowExecutor {
      * @throws Exception
      */
     protected static void updateRolesOfUser(String serverURL, String adminUsername,
-                                            String adminPassword, String userName, String role) throws Exception {
+                                            String adminPassword, String userName, String role)
+            throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("Adding Subscriber role to " + userName);
+        }
 
-        log.info("Adding Subscriber role to user");
         String url = serverURL + "UserAdmin";
+        RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+        UserRealm realm = realmService.getBootstrapRealm();
+        UserStoreManager manager = realm.getUserStoreManager();
+        if (!manager.isExistingRole(role)) {
+            log.error("Could not find role " + role + " in the user store");
+            throw new Exception("Could not find role " + role + " in the user store");
+        }
 
         UserAdminStub userAdminStub = new UserAdminStub(url);
         CarbonUtils.setBasicAccessSecurityHeaders(adminUsername, adminPassword,
@@ -52,13 +68,102 @@ public abstract class UserSignUpWorkflowExecutor extends WorkflowExecutor {
         FlaggedName[] flaggedNames = userAdminStub.getRolesOfUser(userName, "*", -1);
         List<String> roles = new ArrayList<String>();
         if (flaggedNames != null) {
-            for (int i = 0; i < flaggedNames.length; i++) {
-                if (flaggedNames[i].getSelected()) {
-                    roles.add(flaggedNames[i].getItemName());
+            for (FlaggedName flaggedName : flaggedNames) {
+                if (flaggedName.getSelected()) {
+                    roles.add(flaggedName.getItemName());
                 }
             }
         }
         roles.add(role);
         userAdminStub.updateRolesOfUser(userName, roles.toArray(new String[roles.size()]));
+    }
+
+    /**
+     * Update the roles with the users
+     * @param serverURL
+     * @param adminUsername
+     * @param adminPassword
+     * @param userName
+     * @param roleList
+     * @param tenantDomain
+     * @throws Exception
+     */
+
+    protected static void updateRolesOfUser(String serverURL, String adminUsername,
+                                            String adminPassword, String userName,
+                                            List<String> roleList, String tenantDomain)
+            throws Exception {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Adding roles to " + userName + "in " + tenantDomain + " Domain");
+        }
+        String url = serverURL + "UserAdmin";
+        RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+        int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                .getTenantId(tenantDomain);
+        UserRealm realm = (UserRealm) realmService.getTenantUserRealm(tenantId);
+        UserStoreManager manager = realm.getUserStoreManager();
+
+        if(manager.isExistingUser(userName)) {
+            // check whether given roles exist
+            for (String role : roleList) {
+                if (!manager.isExistingRole(role)) {
+                    log.error("Could not find role " + role + " in the user store");
+                    throw new Exception("Could not find role " + role + " in the user store");
+                }
+            }
+
+            UserAdminStub userAdminStub = new UserAdminStub(url);
+            CarbonUtils.setBasicAccessSecurityHeaders(adminUsername, adminPassword, true,
+                    userAdminStub._getServiceClient());
+
+            FlaggedName[] flaggedNames = userAdminStub.getRolesOfUser(userName, "*", -1);
+            List<String> roles = new ArrayList<String>();
+            if (flaggedNames != null) {
+                for (FlaggedName flaggedName : flaggedNames) {
+                    if (flaggedName.getSelected()) {
+                        roles.add(flaggedName.getItemName());
+                    }
+                }
+            }
+            for (String role : roleList) {
+                roles.add(role);
+            }
+            userAdminStub.updateRolesOfUser(userName, roles.toArray(new String[roles.size()]));
+        } else {
+            log.error("User does not exist. Unable to approve user " + userName);
+        }
+
+    }
+
+    /**
+     * Method to delete a user
+     * @param serverURL
+     * @param adminUsername
+     * @param adminPassword
+     * @param userName
+     * @throws Exception
+     */
+    protected static void deleteUser(String serverURL, String adminUsername,
+                                     String adminPassword, String userName) throws Exception {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Remove the rejected user :" + userName);
+        }
+        String url = serverURL + "UserAdmin";
+
+        int index = userName.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
+        //remove the PRIMARY part from the user name
+        if (index > 0) {
+            if(userName.substring(0, index).equalsIgnoreCase(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME)){
+                userName = userName.substring(index + 1);
+            }
+        }
+
+        UserAdminStub userAdminStub = new UserAdminStub(url);
+        CarbonUtils.setBasicAccessSecurityHeaders(adminUsername, adminPassword,
+                true, userAdminStub._getServiceClient());
+        userAdminStub.deleteUser(userName);
+
     }
 }

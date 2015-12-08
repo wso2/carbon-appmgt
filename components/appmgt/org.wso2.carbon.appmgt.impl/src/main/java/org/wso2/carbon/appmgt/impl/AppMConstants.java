@@ -228,6 +228,21 @@ public final class AppMConstants {
     public static final String DOCUMENTATION_INLINE_CONTENT_TYPE = "text/plain";
     public static final String APP_LC_PUBLISHED="Published";
 
+    //registry resource containing the self signup user config
+    public static final String SELF_SIGN_UP_CONFIG_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/sign-up-config.xml";
+    public static final String SELF_SIGN_UP_CONFIG_MEDIA_TYPE =  "signup-config";
+
+    //elements in the configuration file in the registry related to self signup
+    public static final String SELF_SIGN_UP_REG_ROOT = "SelfSignUp";
+    public static final String SELF_SIGN_UP_REG_DOMAIN_ELEM = "SignUpDomain";
+    public static final String SELF_SIGN_UP_REG_ROLES_ELEM = "SignUpRoles";
+    public static final String SELF_SIGN_UP_REG_ROLE_ELEM = "SignUpRole";
+    public static final String SELF_SIGN_UP_REG_USERNAME = "AdminUserName";
+    public static final String SELF_SIGN_UP_REG_PASSWORD = "AdminPassword";
+    public static final String SELF_SIGN_UP_REG_ENABLED = "EnableSignup";
+    public static final String SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT = "RoleName";
+    public static final String SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL = "IsExternalRole";
+
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
         public static final String BLOCKED = "BLOCKED";
@@ -462,6 +477,7 @@ public final class AppMConstants {
     public static final String APP_CONTEXT_VERSION_CACHE_MANAGER = "APP_CONTEXT_VERSION_CACHE_MANAGER";
     public static final String APP_CONTEXT_VERSION_CONFIG_CACHE = "APP_CONTEXT_VERSION_CONFIG_CACHE";
     public static final String APP_CONTEXT_VERSION_CACHE_KEY = "APP_CONTEXT_VERSION_CACHE_KEY";
+    public static final String SELF_SIGN_UP_CONFIG_CACHE = "selfSignupCache";
 
     public static final String SAML2_COOKIE = "appmanager_sso";
     public static final String SAML_SSO_TOKENID = "samlssoTokenId";

@@ -43,6 +43,9 @@ import javax.cache.CacheConfiguration;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -61,6 +64,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.Document;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.doc.model.APIDefinition;
@@ -107,6 +111,7 @@ import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.*;
+import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.config.RealmConfigXMLProcessor;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -117,6 +122,7 @@ import org.wso2.carbon.utils.FileUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import com.google.gson.Gson;
+import org.xml.sax.SAXException;
 
 /**
  * This class contains the utility methods used by the implementations of
@@ -1868,6 +1874,47 @@ public final class AppManagerUtil {
 		}
 	}
 
+	/**
+	 *
+	 * @param tenantId
+	 * @throws AppManagementException
+	 */
+	public static void loadTenantSelfSignUpConfigurations(int tenantId)
+			throws AppManagementException {
+		try {
+			RegistryService registryService =
+					ServiceReferenceHolder.getInstance()
+							.getRegistryService();
+			UserRegistry govRegistry = registryService.getGovernanceSystemRegistry(tenantId);
+
+			if (govRegistry.resourceExists(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION)) {
+				log.debug("Self signup configuration already uploaded to the registry");
+				return;
+			}
+			if (log.isDebugEnabled()) {
+				log.debug("Adding Self signup configuration to the tenant's registry");
+			}
+			InputStream inputStream;
+			if(tenantId==org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_ID){
+				inputStream=
+						AppManagerComponent.class.getResourceAsStream("/signupconfigurations/default-sign-up-config.xml");
+			}else{
+				inputStream=
+						AppManagerComponent.class.getResourceAsStream("/signupconfigurations/tenant-sign-up-config.xml");
+			}
+			byte[] data = IOUtils.toByteArray(inputStream);
+			Resource resource = govRegistry.newResource();
+			resource.setContent(data);
+			resource.setMediaType(AppMConstants.SELF_SIGN_UP_CONFIG_MEDIA_TYPE);
+			govRegistry.put(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION, resource);
+
+		} catch (RegistryException e) {
+			throw new AppManagementException("Error while saving Self signup configuration information to the registry", e);
+		} catch (IOException e) {
+			throw new AppManagementException("Error while reading Self signup configuration file content", e);
+		}
+	}
+
     /**
      * Load Workflow Configurations
      * @param tenantID
@@ -2981,5 +3028,99 @@ public final class AppManagerUtil {
                 .getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
         return isEnabled != null && Boolean.parseBoolean(isEnabled);
     }
+
+	/**
+	 *
+	 * @param tenantId
+	 * @throws AppManagementException
+	 */
+	public static void createSelfSignUpRoles(int tenantId)
+			throws AppManagementException {
+		try {
+			RegistryService registryService =
+					ServiceReferenceHolder.getInstance()
+							.getRegistryService();
+			UserRegistry govRegistry = registryService.getGovernanceSystemRegistry(tenantId);
+			if (govRegistry.resourceExists(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION)) {
+				Resource resource = govRegistry.get(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION);
+				InputStream content=resource.getContentStream();
+				DocumentBuilderFactory factory
+						= DocumentBuilderFactory.newInstance();
+				DocumentBuilder parser = factory.newDocumentBuilder();
+				Document dc= parser.parse(content);
+				boolean enableSignup=Boolean.parseBoolean(dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ENABLED).item(0).getFirstChild().getNodeValue());
+				String signUpDomain=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_DOMAIN_ELEM).item(0).getFirstChild().getNodeValue();
+				if(enableSignup){
+					int roleLength=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).getLength();
+					for(int i=0;i<roleLength;i++){
+						String roleName=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).item(i).getFirstChild().getNodeValue();
+						boolean isExternalRole=Boolean.parseBoolean(dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL).item(i).getFirstChild().getNodeValue());
+						if(roleName!=null){
+							// If isExternalRole==false ;create the subscriber role as an internal role
+							if(isExternalRole && signUpDomain!=null){
+								roleName=signUpDomain.toUpperCase()+CarbonConstants.DOMAIN_SEPARATOR+roleName;
+							}else{
+								roleName= UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR+roleName;
+							}
+							createSubscriberRole(roleName,tenantId);
+						}
+					}
+				}
+			}
+			if (log.isDebugEnabled()) {
+				log.debug("Adding Self signup configuration to the tenant's registry");
+			}
+
+
+
+		} catch (RegistryException e) {
+			throw new AppManagementException("Error while getting Self signup role information from the registry", e);
+		} catch (ParserConfigurationException e) {
+			throw new AppManagementException("Error while getting Self signup role information from the registry", e);
+		} catch (SAXException e) {
+			throw new AppManagementException("Error while getting Self signup role information from the registry", e);
+		} catch (IOException e) {
+			throw new AppManagementException("Error while getting Self signup role information from the registry", e);
+		}
+	}
+
+
+	public static void createSubscriberRole(String roleName,int tenantId) throws AppManagementException {
+
+		String[] permissions = new String[]{
+				"/permission/admin/login",
+				AppMConstants.Permissions.WEB_APP_SUBSCRIBE
+		};
+		try {
+			RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
+			UserRealm realm;
+			org.wso2.carbon.user.api.UserRealm tenantRealm;
+			UserStoreManager manager;
+
+			if (tenantId < 0) {
+				realm = realmService.getBootstrapRealm();
+				manager = realm.getUserStoreManager();
+			} else {
+				tenantRealm = realmService.getTenantUserRealm(tenantId);
+				manager = tenantRealm.getUserStoreManager();
+			}
+			if (!manager.isExistingRole(roleName)) {
+				if (log.isDebugEnabled()) {
+					log.debug("Creating subscriber role: " + roleName);
+				}
+				Permission[] subscriberPermissions = new Permission[]{new Permission("/permission/admin/login", UserMgtConstants.EXECUTE_ACTION),
+						new Permission(AppMConstants.Permissions.WEB_APP_SUBSCRIBE, UserMgtConstants.EXECUTE_ACTION)};
+				String tenantAdminName = ServiceReferenceHolder.getInstance()
+						.getRealmService().getTenantUserRealm(tenantId).
+								getRealmConfiguration().getAdminUserName();
+				String[] userList = new String[]{tenantAdminName};
+				manager.addRole(roleName, userList, subscriberPermissions);
+			}
+		} catch (UserStoreException e) {
+			throw new AppManagementException("Error while creating subscriber role: " + roleName+ " - " +
+					"Self registration might not function properly.", e);
+		}
+	}
+
 
 }

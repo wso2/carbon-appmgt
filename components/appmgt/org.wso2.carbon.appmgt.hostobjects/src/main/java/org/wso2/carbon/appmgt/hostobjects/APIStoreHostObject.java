@@ -65,10 +65,12 @@ import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
+import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.TrustedIdP;
 import org.wso2.carbon.appmgt.impl.idp.WebAppIdPFactory;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.utils.SelfSignUpUtil;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
@@ -84,11 +86,13 @@ import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.base.IdentityConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
+import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceException;
 import org.wso2.carbon.identity.user.registration.stub.UserRegistrationAdminServiceStub;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserDTO;
 import org.wso2.carbon.identity.user.registration.stub.dto.UserFieldDTO;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.RegistryConstants;
+import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.UserStoreManager;
@@ -2372,103 +2376,134 @@ public class APIStoreHostObject extends ScriptableObject {
         return false;
     }
 
-    public static void jsFunction_addUser(Context cx, Scriptable thisObj,
-                                          Object[] args,
-	                                      Function funObj) throws AppManagementException {
 
-		if (args != null && isStringArray(args)) {
-			String username = args[0].toString();
-			String password = args[1].toString();
+    public static void jsFunction_addUser(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        String customErrorMsg = null;
 
-			AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-			boolean workFlowEnabled =
-			                          Boolean.parseBoolean(config.getFirstProperty(AppMConstants.SELF_SIGN_UP_ENABLED));
-			if (!workFlowEnabled) {
-				handleException("Self sign up has been disabled on this server");
-			}
-			String serverURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
-			String tenantDomain =
-			                      MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
+        if (args != null && isStringArray(args)) {
+            String username = args[0].toString();
+            String password = args[1].toString();
 
-			UserDTO userDTO = new UserDTO();
 
-			if (args.length > 2) {
-				String fields = args[2].toString();
+            AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+            /*
+             * boolean workFlowEnabled =
+             * Boolean.parseBoolean(config.getFirstProperty
+             * (APIConstants.SELF_SIGN_UP_ENABLED));
+             * if (!workFlowEnabled) {
+             * handleException("Self sign up has been disabled on this server");
+             * }
+             */
+            String serverURL = config.getFirstProperty(AppMConstants.AUTH_MANAGER_URL);
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
 
-				/* fieldValues will contain values up to last field user entered */
-				String fieldValues[] = fields.split("\\|");
-				UserFieldDTO[] userFields = getOrderedUserFieldDTO();
-				for (int i = 0; i < fieldValues.length; i++) {
-					if (fieldValues[i] != null) {
-						userFields[i].setFieldValue(fieldValues[i]);
-					}
-				}
-				/* assign empty string for rest of the user fields */
-				for (int i = fieldValues.length; i < userFields.length; i++) {
-					userFields[i].setFieldValue("");
-				}
-				userDTO.setUserFields(userFields);
+            boolean isTenantFlowStarted = false;
 
-			}
+            try {
 
-			userDTO.setUserName(username);
-			userDTO.setPassword(password);
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                // get the signup configuration
+                UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+                // set tenant specific sign up user storage
+                if (signupConfig != null && signupConfig.getSignUpDomain() != "") {
+                    if (!signupConfig.isSignUpEnabled()) {
+                        handleException("Self sign up has been disabled for this tenant domain");
+                    }
+                    int index = username.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
+                    /*
+                     * if there is a different domain provided by the user other than one given in the configuration,
+                     * add the correct signup domain. Here signup domain refers to the user storage
+                     */
 
-			try {
+                    if (index > 0) {
+                        username =
+                                signupConfig.getSignUpDomain().toUpperCase() + UserCoreConstants.DOMAIN_SEPARATOR +
+                                        username.substring(index + 1);
+                    } else {
+                        username =
+                                signupConfig.getSignUpDomain().toUpperCase() + UserCoreConstants.DOMAIN_SEPARATOR +
+                                        username;
+                    }
+                }
 
-				UserRegistrationAdminServiceStub stub =
-				                                        new UserRegistrationAdminServiceStub(
-				                                                                             null,
-				                                                                             serverURL +
-				                                                                                     "UserRegistrationAdminService");
-				ServiceClient client = stub._getServiceClient();
-				Options option = client.getOptions();
-				option.setManageSession(true);
+                // check whether admin credentials are correct.
+                boolean validCredentials =
+                        checkCredentialsForAuthServer(signupConfig.getAdminUserName(),
+                                signupConfig.getAdminPassword(), serverURL);
 
-				stub.addUser(userDTO);
+                if (validCredentials) {
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setUserName(username);
+                    userDTO.setPassword(password);
 
-				WorkflowExecutor userSignUpWFExecutor =
-				                                        WorkflowExecutorFactory.getInstance()
-				                                                               .getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_USER_SIGNUP);
+                    UserRegistrationAdminServiceStub stub = new UserRegistrationAdminServiceStub(null, serverURL +
+                            "UserRegistrationAdminService");
+                    ServiceClient client = stub._getServiceClient();
+                    Options option = client.getOptions();
+                    option.setManageSession(true);
 
-				WorkflowDTO signUpWFDto = new WorkflowDTO();
-				signUpWFDto.setWorkflowReference(username);
-				signUpWFDto.setStatus(WorkflowStatus.CREATED);
-				signUpWFDto.setCreatedTime(System.currentTimeMillis());
-				signUpWFDto.setTenantDomain(tenantDomain);
+                    stub.addUser(userDTO);
 
-				try {
-					int tenantId =
-					               ServiceReferenceHolder.getInstance().getRealmService()
-					                                     .getTenantManager()
-					                                     .getTenantId(tenantDomain);
-					signUpWFDto.setTenantId(tenantId);
-				} catch (org.wso2.carbon.user.api.UserStoreException e) {
-					log.error("Error while loading Tenant ID for given tenant domain :" +
-					          tenantDomain);
-				}
+                    WorkflowExecutor userSignUpWFExecutor = WorkflowExecutorFactory.getInstance()
+                            .getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_USER_SIGNUP);
 
-				signUpWFDto.setExternalWorkflowReference(userSignUpWFExecutor.generateUUID());
-				signUpWFDto.setWorkflowType(WorkflowConstants.WF_TYPE_AM_USER_SIGNUP);
-				signUpWFDto.setCallbackUrl(userSignUpWFExecutor.getCallbackURL());
+                    WorkflowDTO signUpWFDto = new WorkflowDTO();
+                    signUpWFDto.setWorkflowReference(username);
+                    signUpWFDto.setStatus(WorkflowStatus.CREATED);
+                    signUpWFDto.setCreatedTime(System.currentTimeMillis());
+                    signUpWFDto.setTenantDomain(tenantDomain);
 
-				try {
-					userSignUpWFExecutor.execute(signUpWFDto);
-				} catch (WorkflowException e) {
-					log.error("Unable to execute User SignUp Workflow", e);
-					removeUser(username, config, serverURL);
-					handleException("Unable to execute User SignUp Workflow", e);
-				}
+                    try {
+                        int tenantId =
+                                ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                        .getTenantId(tenantDomain);
+                        signUpWFDto.setTenantId(tenantId);
+                    } catch (org.wso2.carbon.user.api.UserStoreException e) {
+                        log.error("Error while loading Tenant ID for given tenant domain :" + tenantDomain);
+                    }
 
-			} catch (RemoteException e) {
-				handleException(e.getMessage(), e);
-			} catch (Exception e) {
-				handleException("Error while adding the user: " + username, e);
-			}
-		} else {
-			handleException("Invalid input parameters.");
-		}
-	}
+                    signUpWFDto.setExternalWorkflowReference(userSignUpWFExecutor.generateUUID());
+                    signUpWFDto.setWorkflowType(WorkflowConstants.WF_TYPE_AM_USER_SIGNUP);
+                    signUpWFDto.setCallbackUrl(userSignUpWFExecutor.getCallbackURL());
+
+                    try {
+                        userSignUpWFExecutor.execute(signUpWFDto);
+                    } catch (WorkflowException e) {
+                        log.error("Unable to execute User SignUp Workflow", e);
+                        // removeUser(username, config, serverURL);
+                        removeTenantUser(username, signupConfig, serverURL);
+
+                        handleException("Unable to execute User SignUp Workflow", e);
+                    }
+                } else {
+                    customErrorMsg =
+                            "Unable to add a user. Please check credentials in "
+                                    + "the signup-config.xml in the registry";
+                    handleException(customErrorMsg);
+                }
+
+            } catch (RemoteException e) {
+                handleException(e.getMessage(), e);
+            } catch (UserRegistrationAdminServiceException e) {
+                handleException("Error while adding the user: " + username + ". " + e.getMessage(), e);
+            } catch (WorkflowException e) {
+                handleException("Error while adding the user: " + username + ". " + e.getMessage(), e);
+            } catch (UserAdminUserAdminException e) {
+                handleException("Error while adding the user: " + username + ". " + e.getMessage(), e);
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+            }
+        } else {
+            handleException("Invalid input parameters.");
+        }
+    }
 
     private static void removeUser(String username, AppManagerConfiguration config, String serverURL) throws RemoteException, UserAdminUserAdminException {
         UserAdminStub userAdminStub = new UserAdminStub(null, serverURL
@@ -2481,21 +2516,89 @@ public class APIStoreHostObject extends ScriptableObject {
         userAdminStub.deleteUser(username);
     }
 
+    /**
+     * check whether UserAdmin service can be accessed using the admin credentials in the
+     * @param userName
+     * @param password
+     * @param serverURL
+     * @return
+     */
+    private static boolean checkCredentialsForAuthServer(String userName, String password, String serverURL) {
+
+        boolean status = false;
+        try {
+            UserAdminStub userAdminStub = new UserAdminStub(null, serverURL + "UserAdmin");
+            CarbonUtils.setBasicAccessSecurityHeaders(userName, password, true,
+                    userAdminStub._getServiceClient());
+            //send a request. if exception occurs, then the credentials are not correct.
+            FlaggedName[] roles = userAdminStub.getRolesOfCurrentUser();
+            status = true;
+        } catch (RemoteException e) {
+            log.error(e);
+            status = false;
+        } catch (UserAdminUserAdminException e) {
+            log.error("Error in checking admin credentials. Please check credentials in "
+                    + "the signup-config.xml in the registry. ");
+            status = false;
+        }
+        return status;
+    }
+
+    /**
+     * remove user
+     *
+     * @param username
+     * @param signupConfig
+     *            tenant based configuration
+     * @param serverURL
+     * @throws RemoteException
+     * @throws UserAdminUserAdminException
+     */
+    private static void removeTenantUser(String username, UserRegistrationConfigDTO signupConfig,
+                                         String serverURL) throws RemoteException,
+            UserAdminUserAdminException {
+        UserAdminStub userAdminStub = new UserAdminStub(null, serverURL + "UserAdmin");
+        String adminUsername = signupConfig.getAdminUserName();
+        String adminPassword = signupConfig.getAdminPassword();
+
+        CarbonUtils.setBasicAccessSecurityHeaders(adminUsername, adminPassword, true,
+                userAdminStub._getServiceClient());
+        String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
+        int index = tenantAwareUserName.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
+        //remove the 'PRIMARY' part from the user name
+        if (index > 0) {
+            if(tenantAwareUserName.substring(0, index)
+                    .equalsIgnoreCase(UserCoreConstants.PRIMARY_DEFAULT_DOMAIN_NAME)){
+                tenantAwareUserName = tenantAwareUserName.substring(index + 1);
+            }
+        }
+
+        userAdminStub.deleteUser(tenantAwareUserName);
+    }
+
     public static boolean jsFunction_isUserExists(Context cx, Scriptable thisObj,
                                                   Object[] args, Function funObj)
             throws ScriptException,
-                   AppManagementException {
-        if (args==null || args.length == 0) {
+            AppManagementException, org.wso2.carbon.user.api.UserStoreException {
+        if (args == null || args.length == 0) {
             handleException("Invalid input parameters to the isUserExists method");
         }
 
         String username = (String) args[0];
+        String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
+        UserRegistrationConfigDTO signupConfig = SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+        //add user storage info
+        username = SelfSignUpUtil.getDomainSpecificUserName(username, signupConfig );
+        String tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(username);
         boolean exists = false;
         try {
             RealmService realmService = ServiceReferenceHolder.getInstance().getRealmService();
-            UserRealm realm = realmService.getBootstrapRealm();
+            //UserRealm realm = realmService.getBootstrapRealm();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                    .getTenantId(tenantDomain);
+            UserRealm realm = (UserRealm) realmService.getTenantUserRealm(tenantId);
             UserStoreManager manager = realm.getUserStoreManager();
-            if (manager.isExistingUser(username)) {
+            if (manager.isExistingUser(tenantAwareUserName)) {
                 exists = true;
             }
         } catch (UserStoreException e) {
@@ -2503,6 +2606,7 @@ public class APIStoreHostObject extends ScriptableObject {
         }
         return exists;
     }
+
 
     public static boolean jsFunction_removeSubscription(Context cx, Scriptable thisObj,
                                                         Object[] args,
@@ -2738,6 +2842,28 @@ public class APIStoreHostObject extends ScriptableObject {
         }
     }
 
+    public static boolean jsFunction_isSelfSignupEnabledForTenant(Context cx,
+                                                                  Scriptable thisObj, Object[] args, Function funObj) {
+
+        boolean status = false;
+        if (!isStringArray(args)) {
+            return status;
+        }
+
+        String tenantDomain = args[0].toString();
+        try {
+            UserRegistrationConfigDTO signupConfig =
+                    SelfSignUpUtil.getSignupConfiguration(tenantDomain);
+            if (signupConfig != null) {
+                status = signupConfig.isSignUpEnabled();
+            }
+        } catch (AppManagementException e) {
+            log.error("error while loading configuration from registry", e);
+        }
+
+        return status;
+
+    }
 
 
     public static NativeArray jsFunction_getAPIUsageforSubscriber(Context cx, Scriptable thisObj,

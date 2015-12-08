@@ -201,6 +201,13 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
         }catch(Exception e){
             log.error("Failed to write defined sequences to tenant " + tenantDomain + "'s registry");
         }
+
+        try {
+            //load self signup configurations to the registry
+            AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
+        } catch (Exception e) {
+            log.error("Failed to load sign-up-config.xml to tenant " + tenantDomain + "'s registry");
+        }
     }
 
     public void terminatingConfigurationContext(ConfigurationContext configurationContext) {
