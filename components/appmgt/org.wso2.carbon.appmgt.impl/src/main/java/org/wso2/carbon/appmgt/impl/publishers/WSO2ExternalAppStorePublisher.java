@@ -168,6 +168,7 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
             HttpResponse response = httpclient.execute(httpGet, httpContext);
             HttpEntity entity = response.getEntity();
             //{"error" : false, "uuid" : "bbfa1766-e36a-4676-bb61-fdf2ba1f5327"}
+            // or {"error" : false, "uuid" : null, "message" : "Could not find UUID for given webapp"}
             String responseString = EntityUtils.toString(entity, "UTF-8");
             JSONObject responseJson = (JSONObject) JSONValue.parse(responseString);
             boolean isError = true;
@@ -178,9 +179,11 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
             }
 
             if (!isError) {
-                String assetId = responseJson.get("uuid").toString().trim();
-                return assetId;
-
+                Object assetId = responseJson.get("uuid");
+                if(assetId != null) {
+                    return assetId.toString().trim();
+                }
+                return null;
             } else {
                 throw new AppManagementException("Error while getting UUID of APP - " + appName + "" +
                         " from the external  AppStore - for provider " + externalPublisher +
@@ -209,6 +212,11 @@ public class WSO2ExternalAppStorePublisher implements ExternalAppStorePublisher 
         try {
 
             String uuid = getUUID(webApp, externalPublisher, storeEndpoint, httpContext);
+            if (uuid == null) {
+                // No uuid found for given web app in external store,i.e this app would have
+                //been manually deleted from external store , So consider as app is success fully deleted
+                return;
+            }
             storeEndpoint = storeEndpoint + AppMConstants.APP_STORE_DELETE_URL + uuid;
 
             HttpClient httpclient = new DefaultHttpClient();

@@ -141,6 +141,8 @@ public class AppManagerComponent {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
             AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
+            //load self sigup configuration to the registry
+            AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
 
             String gatewayType = configuration.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
             if ("Synapse".equalsIgnoreCase(gatewayType)) {
@@ -228,7 +230,7 @@ public class AppManagerComponent {
                     contextCache.put(context, true);
                 }
             }
-            new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
+            new AppManagerUtil().createSelfSignUpRoles(MultitenantConstants.SUPER_TENANT_ID);
             
             //create mobileapps directory if it does not exists
             AppManagerUtil.createMobileAppsDirectory();

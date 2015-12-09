@@ -45,5 +45,15 @@ public class WorkflowConstants {
     public static final String SUBSCRIPTION_CREATION = "SubscriptionCreation";
 
     public static final String PUBLISH_APP = "PublishAPP";
+
+    public static final String REGISTER_USER_WS_ACTION = "http://workflow.registeruser.apimgt.carbon.wso2.org/initiate";
+
+    public static final String REGISTER_USER_PAYLOAD =
+            "	  <wor:UserSignupProcessRequest xmlns:wor=\"http://workflow.registeruser.apimgt.carbon.wso2.org\">\n" +
+                    "         <wor:userName>$1</wor:userName>\n" +
+                    "         <wor:tenantDomain>$2</wor:tenantDomain>\n" +
+                    "         <wor:workflowExternalRef>$3</wor:workflowExternalRef>\n" +
+                    "         <wor:callBackURL>$4</wor:callBackURL>\n" +
+                    "      </wor:UserSignupProcessRequest>";
    
 }
