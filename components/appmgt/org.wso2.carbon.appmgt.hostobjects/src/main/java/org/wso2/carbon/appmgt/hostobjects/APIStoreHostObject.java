@@ -2842,12 +2842,23 @@ public class APIStoreHostObject extends ScriptableObject {
         }
     }
 
+    /**
+     * Check whether the self sign-up is enable for the given tenant domain
+     * @param cx context
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return 'true' if self sign-up is enabled, else 'false'
+     * @throws AppManagementException
+     */
     public static boolean jsFunction_isSelfSignupEnabledForTenant(Context cx,
-                                                                  Scriptable thisObj, Object[] args, Function funObj) {
-
+                                                                  Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
         boolean status = false;
         if (!isStringArray(args)) {
             return status;
+        }
+        if (args==null || args.length != 1) {
+            handleException("Invalid number of parameters.");
         }
 
         String tenantDomain = args[0].toString();
