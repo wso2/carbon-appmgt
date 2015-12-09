@@ -1,6 +1,6 @@
 <SelfSignUp>
 
-    <EnableSignup>false</EnableSignup>
+    <EnableSignup>true</EnableSignup>
 
     <!-- user storage to store users -->
     <SignUpDomain>PRIMARY</SignUpDomain>

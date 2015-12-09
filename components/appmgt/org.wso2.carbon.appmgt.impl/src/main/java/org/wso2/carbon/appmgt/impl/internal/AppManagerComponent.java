@@ -226,7 +226,7 @@ public class AppManagerComponent {
                     contextCache.put(context, true);
                 }
             }
-            new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
+            new AppManagerUtil().createSelfSignUpRoles(MultitenantConstants.SUPER_TENANT_ID);
             
             //create mobileapps directory if it does not exists
             AppManagerUtil.createMobileAppsDirectory();
