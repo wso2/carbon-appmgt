@@ -350,7 +350,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
 
         // only when publishing
-        if (action == "Publish") {
+        if ((action=="Publish") || ((action=="Re-Publish"))) {
             //Enforcing restrict visibility logic
             var registry = new carbon.registry.Registry(server, {
                 username: server.current(session).username,
