@@ -6690,10 +6690,10 @@ public class AppMDAO {
                     + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
-                query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP.APP_NAME) "
+                query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME) "
                         + "AS APP_NAME FROM APM_APP_HITS HIT "
                         + "WHERE HIT.USER_ID=? "
-                        + "GROUP BY HIT.UUID UNION ALL "
+                        + "GROUP BY HIT.UUID,HIT.APP_NAME, HIT.VERSION UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
                         + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? ))  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
@@ -6788,11 +6788,10 @@ public class AppMDAO {
                     + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 
             if (bamConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrivealBamQuery = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME) AS "
-                        + "APP_NAME FROM APM_APP_HITS WHERE USER_ID=? "
-                        + "GROUP BY UUID "
-                        + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC";
+                uuidRetrivealBamQuery = "SELECT * FROM(SELECT UUID, COUNT(*) AS HIT_COUNT, "
+                        + "UPPER(APP_NAME) AS APP_NAME FROM APM_APP_HITS WHERE USER_ID=? "
+                        + "GROUP BY UUID,APP_NAME,VERSION "
+                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ?";
             }
         } catch (SQLException ex) {
             throw new AppManagementException(
@@ -6815,8 +6814,8 @@ public class AppMDAO {
             uuidRetrievalQuery = uuidRetrievalAppmQuery.substring(0, uuidRetrievalAppmQuery.length() - 1);
 
             if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrievalQuery += ")  WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "ORDER BY APP_NAME ASC";
+                uuidRetrievalQuery += "SELECT * FROM (" + uuidRetrievalQuery
+                        + ") ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
             } else {
                 uuidRetrievalQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
             }
