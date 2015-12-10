@@ -164,7 +164,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     log.debug("Request is an SLO request from the IDP");
                 }
 
-                handleSLORequest();
+                handleSLORequest(messageContext);
 
                 if (log.isDebugEnabled()) {
                     log.debug("Sending SLO response to the IDP");
@@ -483,8 +483,52 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
-    private void handleSLORequest() {
-        // TODO Handle the SLO request to this app, from the IDP.
+    private void handleSLORequest(MessageContext messageContext) throws  AppManagementException{
+        //Handle the SLO request to this app, from the IDP.
+        try {
+            String encodedRequest = null;
+            SOAPBody soapBody = messageContext.getEnvelope().getBody();
+            Iterator iterator = soapBody.getChildElements();
+
+            while (iterator.hasNext()) {
+                OMElement bodyElement = (OMElement) iterator.next();
+                // Get SAML SLO request.
+                OMElement element = bodyElement.getFirstChildWithName(new QName(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_REQUEST));
+                if(element != null)
+                encodedRequest = element.getText();
+            }
+
+            if(encodedRequest != null) {
+                String decodedSAMLResponse = new String(Base64.decode(encodedRequest), CharEncoding.UTF_8);
+                XMLObject requestXmlObj = SAMLSSOUtil.unmarshall(decodedSAMLResponse);
+                if(requestXmlObj instanceof LogoutRequest) {
+                    LogoutRequest logoutRequest = (LogoutRequest) requestXmlObj;
+                    String sessionIndex = logoutRequest.getSessionIndexes().get(0).getSessionIndex();
+                    if(sessionIndex != null) {
+                        String appmSaml2CookieValue = (String)getSAML2SessionIndexCache().get(sessionIndex);
+                        getSAML2SessionIndexCache().remove(sessionIndex);
+                        if(appmSaml2CookieValue != null)
+                        getSAML2ConfigCache().remove(appmSaml2CookieValue);
+                    } else {
+                        throw new AppManagementException("SessionIndex not found in single logout saml request");
+                    }
+                } else {
+                    throw new AppManagementException("Invalid single logout saml request");
+                }
+            } else {
+                throw new AppManagementException("Couldn't find single logout saml request");
+            }
+
+        } catch (IdentityException e) {
+            String errorMessage = "Can't unmarshall the SAML single logout request.";
+            log.error(errorMessage);
+            throw new AppManagementException(errorMessage, e);
+        } catch (UnsupportedEncodingException e) {
+            String errorMessage = "Can't decode thesingle logout request.";
+            log.error(errorMessage);
+            throw new AppManagementException(errorMessage, e);
+        }
+
     }
 
     private boolean isSLORequestFromIDP(MessageContext messageContext) {
@@ -603,6 +647,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
 
         return null;
+    }
+
+    private String getCachedSessionIndex(String cacheKey) {
+        Object response = getSAML2ConfigCache().get(cacheKey);
+        String sessionIndex = null;
+        if (response != null) {
+            Map<String, SAMLTokenInfoDTO> samlResponsesMap = (HashMap<String, SAMLTokenInfoDTO>) response;
+            SAMLTokenInfoDTO samlTokenInfoDTO = samlResponsesMap.get(webAppInfoDTO.getSaml2SsoIssuer());
+
+            if (samlTokenInfoDTO != null) {
+                sessionIndex = samlTokenInfoDTO.getSessionIndex();
+            }
+        }
+
+        return sessionIndex;
     }
 
     /**
@@ -835,6 +894,10 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     log.debug(String.format("Session is expired. (Cached SAML token is expired)"));
                 }
 
+                String sessionIndex = getCachedSessionIndex(samlCookieValue);
+                if (sessionIndex != null) {
+                    getSAML2SessionIndexCache().remove(sessionIndex);
+                }
                 getSAML2ConfigCache().remove(samlCookieValue);
                 return false;
             }
@@ -1032,10 +1095,12 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             // Set the cookie value.
             String samlCookieValue = getSAMLCookie(messageContext);
             String samlResponse = idpResponseAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_RESPONSE);
+            String sessionIndex = (String)samlAttributes.get(AppMConstants.SAML2_SESSION_INDEX);
 
             SAMLTokenInfoDTO samlTokenInfoDTO = new SAMLTokenInfoDTO();
             samlTokenInfoDTO.setEncodedSamlToken(samlResponse);
             samlTokenInfoDTO.setNotOnOrAfter((DateTime) samlAttributes.get(IDP_CALLBACK_ATTRIBUTE_NAME_SAML_ASSERTION_NOT_ON_OR_AFTER));
+            samlTokenInfoDTO.setSessionIndex(sessionIndex);
 
             if (samlCookieValue == null) {
                 samlCookieValue = UUID.randomUUID().toString();
@@ -1049,6 +1114,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 Map<String, SAMLTokenInfoDTO> samlResponsesMap = new HashMap<String, SAMLTokenInfoDTO>();
                 samlResponsesMap.put(webAppInfoDTO.getSaml2SsoIssuer(), samlTokenInfoDTO);
                 getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
+                if(sessionIndex != null)
+                getSAML2SessionIndexCache().put(sessionIndex,samlCookieValue);
             } else {
 
                 //This logic get executed when the uses is accessing a new app for the first time,
@@ -1065,10 +1132,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                 if (samlResponsesMap != null && !samlResponsesMap.containsKey(samlIssuer)) {
                     samlResponsesMap.put(samlIssuer, samlTokenInfoDTO);
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
+                    if(sessionIndex != null)
+                    getSAML2SessionIndexCache().put(sessionIndex,samlCookieValue);
                 } else { //when accessing though my-subscriptions page
                     samlResponsesMap = new HashMap<String, SAMLTokenInfoDTO>();
                     samlResponsesMap.put(samlIssuer, samlTokenInfoDTO);
                     getSAML2ConfigCache().put(samlCookieValue, samlResponsesMap);
+                    if(sessionIndex != null)
+                    getSAML2SessionIndexCache().put(sessionIndex,samlCookieValue);
                 }
             }
 
@@ -1228,6 +1299,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 
                     if (encodedSamlLogOutRequest != null) {
                         getSAML2ConfigCache().remove(appmSaml2CookieValue);
+                        getSAML2SessionIndexCache().remove(sessionIndex);
                         sendSAMLRequestToIdP(messageContext, encodedSamlLogOutRequest);
                     } else {
                         throw new SynapseException("Error while sending logout request to IDP.");
@@ -1386,6 +1458,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     }
                 }
             }
+            String sessionIndex = assertion.getAuthnStatements().get(0).getSessionIndex();
+            results.put(AppMConstants.SAML2_SESSION_INDEX,sessionIndex);
         }
         return results;
     }
@@ -1393,6 +1467,11 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private Cache getSAML2ConfigCache() {
         return Caching.getCacheManager(AppMConstants.SAML2_CONFIG_CACHE_MANAGER)
                 .getCache(AppMConstants.SAML2_CONFIG_CACHE);
+    }
+
+    private Cache getSAML2SessionIndexCache() {
+        return Caching.getCacheManager(AppMConstants.SAML2_SESSION_INDEX_CACHE_MANAGER)
+                .getCache(AppMConstants.SAML2_SESSION_INDEX_CACHE);
     }
 
     private Cache getAppContextVersionConfigCache() {

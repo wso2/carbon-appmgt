@@ -464,6 +464,9 @@ public final class AppMConstants {
     public static final String AUTHENTICATED_IDP_CACHE = "APPMGT.GATEWAY.authenticatedIDPCache";
     public static final String API_CONTEXT_CACHE = "apiContextCache";
     public static final int API_CONTEXT_CACHE_EXPIRY_TIME_IN_DAYS = 3650 ;
+    public static final String SAML2_SESSION_INDEX_CACHE = "saml2SessionIndexCache";
+    public static final String SAML2_SESSION_INDEX_CACHE_MANAGER = "SAML2_SESSION_INDEX_CACHE_MANAGER";
+    public static final String SAML2_SESSION_INDEX = "SAML2_SESSION_INDEX";
     public static final String SAML2_CONFIG_CACHE = "saml2ConfigCache";
     public static final String SAML2_RELAY_STATE_CACHE = "saml2RelayStateCache";
     public static final String SAML2_CONFIG_CACHE_MANAGER = "SAML2_CONFIG_CACHE_MANAGER";

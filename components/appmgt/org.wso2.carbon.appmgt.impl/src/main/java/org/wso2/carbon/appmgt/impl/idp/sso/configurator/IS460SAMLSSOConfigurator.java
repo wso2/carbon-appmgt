@@ -195,6 +195,7 @@ public class IS460SAMLSSOConfigurator implements SSOConfigurator {
         dto.setAssertionConsumerUrl(provider.getAssertionConsumerURL());
         dto.setCertAlias(null);
         dto.setUseFullyQualifiedUsername(true);
+        dto.setDoSingleLogout(true);
 
         dto.setNameIDFormat(provider.getNameIdFormat());
         if (dto.getNameIDFormat()!=null) {
