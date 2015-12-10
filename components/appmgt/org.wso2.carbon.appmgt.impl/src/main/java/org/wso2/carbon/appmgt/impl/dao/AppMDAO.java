@@ -6814,7 +6814,7 @@ public class AppMDAO {
             uuidRetrievalQuery = uuidRetrievalAppmQuery.substring(0, uuidRetrievalAppmQuery.length() - 1);
 
             if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrievalQuery += "SELECT * FROM (" + uuidRetrievalQuery
+                uuidRetrievalQuery = "SELECT * FROM (" + uuidRetrievalQuery
                         + ") ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
             } else {
                 uuidRetrievalQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
