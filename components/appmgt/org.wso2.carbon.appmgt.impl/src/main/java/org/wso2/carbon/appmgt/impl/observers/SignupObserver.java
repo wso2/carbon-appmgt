@@ -39,6 +39,7 @@ public class SignupObserver extends AbstractAxis2ConfigurationContextObserver {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         try {
+            AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
             AppManagerUtil.createSelfSignUpRoles(tenantId);
 
         } catch (AppManagementException e) {
