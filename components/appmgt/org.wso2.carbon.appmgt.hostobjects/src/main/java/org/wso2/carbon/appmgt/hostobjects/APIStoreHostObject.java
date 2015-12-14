@@ -3196,4 +3196,35 @@ public class APIStoreHostObject extends ScriptableObject {
         return myn;
     }
 
+    /**
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isTenantActive(Context cx, Scriptable thisObj,
+                                                    Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException("Invalid number of arguments.Argument length should be one");
+        }
+
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid type of input.Tenant domain should be String");
+        }
+        String tenantDomain = (String) args[0];
+        try {
+            boolean isActive = AppManagerUtil.isTenantActive(tenantDomain);
+            return isActive;
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            throw new AppManagementException("Error while checking whether tenant with tenant domain :" + tenantDomain +
+                    "is active or not", e);
+        }
+
+
+    }
+
 }

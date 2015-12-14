@@ -2332,6 +2332,22 @@ public final class AppManagerUtil {
 
 	}
 
+    /**
+     * Check whether given tenant is active or not.
+     *
+     * @param tenantDomain Tenant Domain
+     * @return true if active false if not active/if no tenant exist
+     * @throws UserStoreException
+     */
+    public static boolean isTenantActive(String tenantDomain) throws UserStoreException {
+        int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
+                getTenantManager().getTenantId(tenantDomain);
+        boolean isTenantActive =
+                ServiceReferenceHolder.getInstance().getRealmService()
+                        .getTenantManager().isTenantActive(tenantId);
+        return isTenantActive;
+    }
+
 	/**
 	 * Retrieves the role list of system
 	 * 
