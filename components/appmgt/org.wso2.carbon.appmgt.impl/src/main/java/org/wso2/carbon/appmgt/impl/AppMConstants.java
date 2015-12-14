@@ -583,8 +583,8 @@ public final class AppMConstants {
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
 
-    public static final String EXTERNAL_APP_STORES_LOCATION = APPMGT_REGISTRY_LOCATION +
-            "/externalstores/external-app-stores.xml";
+    public static final String EXTERNAL_APP_STORES_LOCATION = APPMGT_APPLICATION_DATA_LOCATION
+            + "/external-app-stores.xml";
 
     public static final String EXTERNAL_APP_STORES_STORE_URL = "StoreURL";
     public static final String EXTERNAL_APP_STORE_CLASS_NAME = "className";
