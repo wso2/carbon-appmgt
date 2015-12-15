@@ -163,8 +163,10 @@ public final class AppManagerUtil {
 
 			// TODO revert this once proper db saving is done
 			api.setRating(1f);
-			// set description
-			api.setDescription(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
+            		//set name
+            		api.setApiName(apiName);
+            		// set description
+            		api.setDescription(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
 			// set last access time
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
 			// set url
