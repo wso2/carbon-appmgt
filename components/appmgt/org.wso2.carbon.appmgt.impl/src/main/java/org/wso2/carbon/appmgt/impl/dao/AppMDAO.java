@@ -2383,13 +2383,14 @@ public class AppMDAO {
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
+    public Map<String, Long> getSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
             throws AppManagementException {
 
 
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
+        StringBuffer sqlQueryBuffer = new StringBuffer();
 
         Map<String, Long> subscriptions = new TreeMap<String, Long>();
 
@@ -2397,28 +2398,40 @@ public class AppMDAO {
             connection = APIMgtDBUtil.getConnection();
 
 
+
             if ("__all_providers__".equals(providerName)) {
-                String sqlQuery =
-                        "SELECT" + "  API.APP_NAME,API.APP_VERSION, API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
-                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, APM_APPLICATION  APP"
-                                + " WHERE  API.APP_ID=SUB.APP_ID"
-                                + " AND SUB.APPLICATION_ID=APP.APPLICATION_ID"
-                                + " AND APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID"
-                                + " AND SUBR.TENANT_ID = ?"
-                                + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
-                                + " GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION ";
-                ps = connection.prepareStatement(sqlQuery);
+                sqlQueryBuffer.append("SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, ")
+                               .append("API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID ")
+                               .append("FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, ")
+                               .append("APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND ")
+                               .append("SUB.APPLICATION_ID=APP.APPLICATION_ID AND ")
+                               .append("APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? ")
+                               .append("AND SUB.SUBSCRIPTION_TIME BETWEEN " );
+                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                    sqlQueryBuffer.append("? AND ? ");
+                } else {
+                    sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
+                                  .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+                }
+                sqlQueryBuffer.append("GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID");
+                ps = connection.prepareStatement(sqlQueryBuffer.toString());
                 ps.setInt(1, tenantId);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
             } else {
-                String sqlQuery =
-                        "SELECT" + "  API.APP_NAME,APP_VERSION,API.APP_PROVIDER,COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid"
-                                + " FROM APM_SUBSCRIPTION SUB, APM_APP API"
-                                + " WHERE API.APP_PROVIDER = ? " +" AND API.APP_ID=SUB.APP_ID"
-                                + " AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ?"
-                                + " GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER ";
-                ps = connection.prepareStatement(sqlQuery);
+                sqlQueryBuffer.append("SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID ")
+                              .append("AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM ")
+                              .append("APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? ")
+                              .append("AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ");
+
+                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                    sqlQueryBuffer.append("? AND ? ");
+                } else {
+                    sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
+                            .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+                }
+                sqlQueryBuffer.append("GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER,API.UUID ");
+                ps = connection.prepareStatement(sqlQueryBuffer.toString());
                 ps.setString(1,providerName);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
@@ -2478,25 +2491,32 @@ public class AppMDAO {
                                                                                       AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
-        // List<WebAppInfoDTO> webAppInfoDTOList;
         List<Subscriber> subscribers;
-
-        String sqlQuery =
-                "SELECT " + "SUBR.USER_ID AS USER_ID,  API.APP_NAME AS API,API.APP_VERSION, API.APP_PROVIDER AS PROVIDER,SUB.SUBSCRIPTION_TIME as TIME  "
-                        + " FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API "
-                        + " WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND"
-                        + " SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " 
-                        + " GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION";
-
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
 
         try {
             connection = APIMgtDBUtil.getConnection();
+            StringBuffer sqlQueryBuffer = new StringBuffer();
+            sqlQueryBuffer.append("SELECT SUBR.USER_ID AS USER_ID,API.APP_NAME AS API, ")
+                          .append("API.APP_VERSION, API.APP_PROVIDER AS PROVIDER, ")
+                          .append("SUB.SUBSCRIPTION_TIME as TIME  FROM APM_SUBSCRIBER SUBR, ")
+                          .append("APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API ")
+                          .append("WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND " )
+                          .append("SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND ")
+                          .append("SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND ")
+                          .append("SUB.SUBSCRIPTION_TIME BETWEEN ");
 
-            ps = connection.prepareStatement(sqlQuery);
+            if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                sqlQueryBuffer.append("? AND ? ");
+            } else {
+                sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
+                               .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+            }
+            sqlQueryBuffer.append( "GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION, ")
+                           .append("API.APP_PROVIDER,SUB.SUBSCRIPTION_TIME");
+            ps = connection.prepareStatement(sqlQueryBuffer.toString());
             ps.setInt(1, tenantId);
             ps.setString(2, fromDate);
             ps.setString(3, toDate);
@@ -4052,8 +4072,8 @@ public class AppMDAO {
 				saveJavaPolicyMappings(connection, webAppId, javaPolicyIdList.toArray());
 			}
 
-
 			connection.commit();
+
 		} catch (SQLException e) {
 			if (connection != null) {
 				try {
