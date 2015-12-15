@@ -2390,7 +2390,7 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        StringBuffer sqlQueryBuffer = new StringBuffer();
+        String sqlQuery;
 
         Map<String, Long> subscriptions = new TreeMap<String, Long>();
 
@@ -2400,38 +2400,38 @@ public class AppMDAO {
 
 
             if ("__all_providers__".equals(providerName)) {
-                sqlQueryBuffer.append("SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, ")
-                               .append("API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID ")
-                               .append("FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, ")
-                               .append("APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND ")
-                               .append("SUB.APPLICATION_ID=APP.APPLICATION_ID AND ")
-                               .append("APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? ")
-                               .append("AND SUB.SUBSCRIPTION_TIME BETWEEN " );
+                sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, "
+                          + "API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID "
+                          + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
+                          + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
+                          + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
+                          + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? "
+                          + "AND SUB.SUBSCRIPTION_TIME BETWEEN ";
                 if (!connection.getMetaData().getDriverName().contains("Oracle")) {
-                    sqlQueryBuffer.append("? AND ? ");
+                    sqlQuery += "? AND ? ";
                 } else {
-                    sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
-                                  .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                             + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
                 }
-                sqlQueryBuffer.append("GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID");
-                ps = connection.prepareStatement(sqlQueryBuffer.toString());
+                sqlQuery += "GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID";
+                ps = connection.prepareStatement(sqlQuery);
                 ps.setInt(1, tenantId);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
             } else {
-                sqlQueryBuffer.append("SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID ")
-                              .append("AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM ")
-                              .append("APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? ")
-                              .append("AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ");
+                sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
+                         + "AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM "
+                         + "APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? "
+                         + "AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
 
                 if (!connection.getMetaData().getDriverName().contains("Oracle")) {
-                    sqlQueryBuffer.append("? AND ? ");
+                    sqlQuery += "? AND ? ";
                 } else {
-                    sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
-                            .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                            + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
                 }
-                sqlQueryBuffer.append("GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER,API.UUID ");
-                ps = connection.prepareStatement(sqlQueryBuffer.toString());
+                sqlQuery += "GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER,API.UUID ";
+                ps = connection.prepareStatement(sqlQuery);
                 ps.setString(1,providerName);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
@@ -2491,6 +2491,7 @@ public class AppMDAO {
                                                                                       AppManagementException {
 
         Map<String, List> users = new HashMap<String, List>();
+        String sqlQuery;
         List<Subscriber> subscribers;
         Connection connection = null;
         PreparedStatement ps = null;
@@ -2498,25 +2499,24 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-            StringBuffer sqlQueryBuffer = new StringBuffer();
-            sqlQueryBuffer.append("SELECT SUBR.USER_ID AS USER_ID,API.APP_NAME AS API, ")
-                          .append("API.APP_VERSION, API.APP_PROVIDER AS PROVIDER, ")
-                          .append("SUB.SUBSCRIPTION_TIME as TIME  FROM APM_SUBSCRIBER SUBR, ")
-                          .append("APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API ")
-                          .append("WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND " )
-                          .append("SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND ")
-                          .append("SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND ")
-                          .append("SUB.SUBSCRIPTION_TIME BETWEEN ");
+            sqlQuery = "SELECT SUBR.USER_ID AS USER_ID,API.APP_NAME AS API, "
+                    + "API.APP_VERSION, API.APP_PROVIDER AS PROVIDER, "
+                    + "SUB.SUBSCRIPTION_TIME as TIME  FROM APM_SUBSCRIBER SUBR, "
+                    + "APM_APPLICATION APP, APM_SUBSCRIPTION SUB, APM_APP API "
+                    + "WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND "
+                    + "SUBR.SUBSCRIBER_ID = APP.SUBSCRIBER_ID AND "
+                    + "SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND "
+                    + "SUB.SUBSCRIPTION_TIME BETWEEN ";
 
             if (!connection.getMetaData().getDriverName().contains("Oracle")) {
-                sqlQueryBuffer.append("? AND ? ");
+                sqlQuery += "? AND ? ";
             } else {
-                sqlQueryBuffer.append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND ")
-                               .append("TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ");
+                sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                             +"TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
             }
-            sqlQueryBuffer.append( "GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION, ")
-                           .append("API.APP_PROVIDER,SUB.SUBSCRIPTION_TIME");
-            ps = connection.prepareStatement(sqlQueryBuffer.toString());
+            sqlQuery += "GROUP BY SUBR.USER_ID,API.APP_NAME,API.APP_VERSION, "
+                      +  "API.APP_PROVIDER,SUB.SUBSCRIPTION_TIME";
+            ps = connection.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
             ps.setString(2, fromDate);
             ps.setString(3, toDate);
