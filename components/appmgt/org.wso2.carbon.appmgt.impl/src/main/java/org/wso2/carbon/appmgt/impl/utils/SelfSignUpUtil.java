@@ -26,9 +26,6 @@ import org.w3c.dom.NodeList;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.dto.UserRegistrationConfigDTO;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.context.RegistryType;
@@ -41,8 +38,6 @@ import org.wso2.carbon.user.core.UserRealm;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.cache.Cache;
-import javax.cache.Caching;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -63,11 +58,10 @@ public final class SelfSignUpUtil {
 	 * retrieve self signup configuration from the cache. if cache mises, load
 	 * to the cache from
 	 * the registry and return configuration
-	 * 
-	 * @param tenantDomain
-	 *            Domain name of the tenant
+	 *
+	 * @param tenantDomain Domain name of the tenant
 	 * @return UserRegistrationConfigDTO self signup configuration for the
-	 *         tenant
+	 * tenant
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 	public static UserRegistrationConfigDTO getSignupConfiguration(String tenantDomain)
@@ -77,7 +71,7 @@ public final class SelfSignUpUtil {
 
 		String currentFlowDomain =
 				PrivilegedCarbonContext.getThreadLocalCarbonContext()
-				.getTenantDomain();
+						.getTenantDomain();
 		boolean isTenantFlowStarted = false;
 		try {
 
@@ -89,37 +83,22 @@ public final class SelfSignUpUtil {
 					isTenantFlowStarted = true;
 					PrivilegedCarbonContext.startTenantFlow();
 					PrivilegedCarbonContext.getThreadLocalCarbonContext()
-					.setTenantDomain(tenantDomain, true);
+							.setTenantDomain(tenantDomain, true);
 				}
 			}
-			String cacheName = tenantDomain + "_" + AppMConstants.SELF_SIGN_UP_CONFIG_CACHE;
-			Cache signupConfigCache =
-					Caching.getCacheManager(AppMConstants.API_MANAGER_CACHE_MANAGER)
-					.getCache(AppMConstants.SELF_SIGN_UP_CONFIG_CACHE);
-			// load self signup configuration from the cache
-			config = (UserRegistrationConfigDTO) signupConfigCache.get(cacheName);
+			config = getSignupConfigurationFromRegistry(tenantDomain);
 
-			if (config == null) {
-				// get the tenant's configuration from the registry and put it
-				// in the cache
-				 if (log.isDebugEnabled()) {
-		             log.debug("Cache miss for " + cacheName );
-		         }       
-				config = getSignupConfigurationFromRegistry(tenantDomain);
-				signupConfigCache.put(cacheName, config);
-			}
 		} finally {
 			if (isTenantFlowStarted) {
 				PrivilegedCarbonContext.endTenantFlow();
 			}
-		}	
-
+		}
 		return config;
 	}
 
 	/**
 	 * load configuration from the registry
-	 * 
+	 *
 	 * @param tenantDomain
 	 * @return
 	 * @throws AppManagementException
@@ -129,12 +108,12 @@ public final class SelfSignUpUtil {
 
 
 		UserRegistrationConfigDTO config = null;
-	
+
 		try {
 
 			Registry registry =
 					(Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext()
-					.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
+							.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
 			if (registry.resourceExists(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION)) {
 				Resource resource = registry.get(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION);
 				// build config from registry resource
@@ -146,32 +125,33 @@ public final class SelfSignUpUtil {
 				NodeList nodes = doc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROOT);
 				if (nodes.getLength() > 0) {
 					config = new UserRegistrationConfigDTO();
-					config.setSignUpDomain(((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_DOMAIN_ELEM)
-					                       .item(0).getTextContent());
+					config.setSignUpDomain(((Element) nodes.item(0)).getElementsByTagName(
+							AppMConstants.SELF_SIGN_UP_REG_DOMAIN_ELEM)
+							.item(0).getTextContent());
 					// tenant admin info
 					config.setAdminUserName(((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_USERNAME)
-					                        .item(0).getTextContent());
+							.item(0).getTextContent());
 					config.setAdminPassword(((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_PASSWORD)
-					                        .item(0).getTextContent());
+							.item(0).getTextContent());
 
 					config.setSignUpEnabled(Boolean.parseBoolean(((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ENABLED)
-					                                             .item(0)
-					                                             .getTextContent()));
-				
+							.item(0)
+							.getTextContent()));
+
 					// there can be more than one <SignUpRole> elements, iterate
 					// through all elements
 
-					Element roleListParent = (Element)((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLES_ELEM).item(0);
+					Element roleListParent = (Element) ((Element) nodes.item(0)).getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLES_ELEM).item(0);
 
 					NodeList rolesEl = roleListParent.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_ELEM);
 					for (int i = 0; i < rolesEl.getLength(); i++) {
 						Element tmpEl = (Element) rolesEl.item(i);
 						String tmpRole =
 								tmpEl.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT)
-								.item(0).getTextContent();
+										.item(0).getTextContent();
 						boolean tmpIsExternal =
 								Boolean.parseBoolean(tmpEl.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL)
-								                     .item(0).getTextContent());
+										.item(0).getTextContent());
 						config.getRoles().put(tmpRole, tmpIsExternal);
 					}
 				}
@@ -194,7 +174,7 @@ public final class SelfSignUpUtil {
 
 	/**
 	 * Check whether user can signup to the tenant domain
-	 * 
+	 *
 	 * @param userName
 	 * @param realm
 	 * @return
@@ -212,7 +192,7 @@ public final class SelfSignUpUtil {
 				return !realm.getRealmConfiguration()
 						.isRestrictedDomainForSlefSignUp(userName.substring(0, index));
 			} catch (UserStoreException e) {
-				throw new AppManagementException(e.getMessage(), e);				
+				throw new AppManagementException(e.getMessage(), e);
 			}
 		}
 
@@ -221,7 +201,7 @@ public final class SelfSignUpUtil {
 
 	/**
 	 * get the full role name list (ex: internal/subscriber)
-	 * 
+	 *
 	 * @param config
 	 * @return
 	 */
@@ -235,12 +215,12 @@ public final class SelfSignUpUtil {
 				// external role
 				roleName =
 						config.getSignUpDomain().toUpperCase() +
-						UserCoreConstants.DOMAIN_SEPARATOR + entry.getKey();
+								UserCoreConstants.DOMAIN_SEPARATOR + entry.getKey();
 			} else {
 				// internal role
 				roleName =
 						UserCoreConstants.INTERNAL_DOMAIN + UserCoreConstants.DOMAIN_SEPARATOR +
-						entry.getKey();
+								entry.getKey();
 			}
 			roleNamesArr.add(roleName);
 		}
@@ -255,29 +235,29 @@ public final class SelfSignUpUtil {
 	 * @return
 	 */
 	public static String getDomainSpecificUserName(String username, UserRegistrationConfigDTO signupConfig) {
-		String modifiedUsername = null;	
+		String modifiedUsername = null;
 		// set tenant specific sign up user storage
 		if (signupConfig != null && signupConfig.getSignUpDomain() != "") {
-			
+
 			int index = username.indexOf(UserCoreConstants.DOMAIN_SEPARATOR);
 			/*
 			 * if there is a different domain provided by the user other than one 
 			 * given in the configuration, add the correct signup domain. Here signup
 			 * domain refers to the user storage
 			 */
-		
+
 			if (index > 0) {
 				modifiedUsername =
 						signupConfig.getSignUpDomain().toUpperCase() +
-						UserCoreConstants.DOMAIN_SEPARATOR +
-						username.substring(index + 1);
+								UserCoreConstants.DOMAIN_SEPARATOR +
+								username.substring(index + 1);
 			} else {
 				modifiedUsername =
 						signupConfig.getSignUpDomain().toUpperCase() +
-						UserCoreConstants.DOMAIN_SEPARATOR + username;
+								UserCoreConstants.DOMAIN_SEPARATOR + username;
 			}
 		}
-		
+
 		return modifiedUsername;
 	}
 }
