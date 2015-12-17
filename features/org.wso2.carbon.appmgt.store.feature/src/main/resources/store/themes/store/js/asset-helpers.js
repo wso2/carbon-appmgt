@@ -1,21 +1,3 @@
-/*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 var renderAssets, mouseStop, renderAssetsScroll;
 
 (function () {
@@ -45,20 +27,33 @@ var renderAssets, mouseStop, renderAssetsScroll;
         var temp = '{{#slice assets size="4"}}<div class="row-fluid">';
         temp += '{{#each .}}';
         temp += '<div class="span3 asset" data-id="{{id}}" data-path="{{path}}" data-type="{{type}}">';
-        temp += '	{{#attributes}}';
-        temp +=         '{{#if ../isSubscribed}}';
-        temp +=             ' <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>';
-        temp +=         '{{/if}}'
-        temp += '	<a href="{{url "/assets"}}/{{../type}}/{{../id}}">';
-        temp += '	<div class="asset-icon">';
-        temp += '		{{#if ../indashboard}}';
-        temp += '				<i class="icon-bookmark store-bookmark-icon"></i>';
-        temp += '		{{/if}}';
-        temp += '	<img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}">';
-        temp += '	</div> </a>';
-        temp += '	<div class="asset-details">';
+        temp += '   {{#attributes}}';
+        temp += '       {{#compare  overview_advertiseOnly "true" operator="=="}}';
+        temp += '           <div class="ribbon-wrapper-orange"><div class="ribbon-orange">Advertised</div></div>';
+        temp += '       {{/compare}}';
+        temp += '		    {{#if ../isSubscribed}}';
+        temp += '               <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>';
+        temp += '			{{/if}}';
+        temp += '       {{#compare  overview_advertiseOnly "true" operator="=="}}';
+        temp += '           <a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} " id="assetsLink">';
+        temp += '       {{else}}';
+        temp += '           <a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}" id="assetsLink">';
+        temp += '       {{/compare}}';
+        temp += '	        <div class="asset-icon">';
+        temp += '               <input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">';
+        temp += '	            {{#if ../indashboard}}';
+        temp += '	            {{/if}}';
+        temp += '	            <img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}">';
+        temp += '	        </div>';
+        temp += '			</a>';
+        temp += '	    <div class="asset-details">';
         temp += '		<div class="asset-name">';
-        temp += '			<a href="{{url "/assets"}}/{{../type}}/{{../id}}"> <h4>{{overview_displayName}}</h4> </a>';
+        temp += '		    <input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">';
+        temp += '           {{#compare  overview_advertiseOnly "true" operator="=="}}';
+        temp += '               <a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} " id="assetDeatils"> <h4>{{overview_displayName}}</h4></a>';
+        temp += '           {{else}}';
+        temp += '               <a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}" id="assetDeatils"> <h4>{{overview_displayName}}</h4></a>';
+        temp += '           {{/compare}}';
         temp += '		</div>';
         temp += '		<div class="asset-rating">';
         temp += '			<div class="asset-rating-{{../rating}}star">';
@@ -111,24 +106,29 @@ var renderAssets, mouseStop, renderAssetsScroll;
     renderPageIndices = function(data){
         var temp = '<ul class="pagination">';
         temp+= '{{#if leftNav}}';
-        temp+= '    <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}"><span aria-hidden="true">&laquo;</span><span class="sr-only"></span></a></li>';
+        temp+= '    <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">';
+        temp+= '    <span aria-hidden="true">&laquo;</span><span class="sr-only"></span></a></li>';
         temp+= '{{/if}}';
         temp+= '{{#each pageIndeces}}';
         temp+= '   {{#if this.isDisabled}}';
         temp+= '        <li class="disabled"><a>{{this.index}}</a></li>';
         temp+= '   {{else}}';
-        temp+= '        <li><a href="{{url "/assets/webapp?page="}}{{this.index}}">{{this.index}}</a></li>';
+        temp+= '        <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.index}}">';
         temp+= '   {{/if}}';
         temp+= '{{/each}}';
         temp+= '{{#if rightNav}}';
-        temp+= '    <li><a href="{{url "/assets/webapp?page="}}{{this.rightNav}}"><span aria-hidden="true">&raquo;</span><span class="sr-only"></span></a></li>';
+        temp+= '    <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">';
+        temp+= '    <span aria-hidden="true">&raquo;</span><span class="sr-only"></span></a></li>';
         temp+= '{{/if}}';
         temp+= '</ul>';
 
         var assetsTemp = Handlebars.compile(temp);
         var render = assetsTemp(data.body.assets.context);
         $('#paging-indices').html(render);
-
+        var state = History.getState();
+        if (state.data.id === 'tags') {
+            location.reload();
+        }
     };
 
     renderAssetsScroll = function(data){

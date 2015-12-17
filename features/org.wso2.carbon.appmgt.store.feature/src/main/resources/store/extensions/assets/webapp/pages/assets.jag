@@ -1,6 +1,6 @@
 <%
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -35,12 +35,14 @@ require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
             log = ctx.log,
             sso = ctx.sso,
+            isAnonymousTenantStore = ctx.isAnonymousTenantStore,
             query = ctx.params.query,
             tag = encodeURIComponent(ctx.params.tag),
             store = ctx.store,
             user = ctx.user,
             server = ctx.server,
-            tenantId = ctx.tenantId,
+            tenantId = ctx.tenant.tenantId,
+            tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
             search = require('/modules/search.js'),
@@ -51,12 +53,17 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(tag == 'undefined' ){tag = null;}
 
+    var nextPageAvailable = false;
+    var currentTenantID = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
     caramel = require('caramel');
     process = require('process'),
-            localIP = "https://" + process.getProperty('server.host'),
-            httpsPort = process.getProperty('https.port');
+    localIP = "https://" + process.getProperty('server.host'),
+    httpsPort = process.getProperty('https.port');
 
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
+        
     url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
@@ -145,11 +152,12 @@ require('/modules/store.js').exec(function (ctx) {
 
     }
 
-
     if (tag) {
+        var urlQuery = 'tag=' + tag + '&';
         subPage = '/ Tag: "' + tag + '"';
         assets = store.tagged(type, tag, paging);
     } else if (query) {
+        var urlQuery = 'query=' + query + '&';
         query = require('/modules/search.js').build(query);
         options = {
             type: type,
@@ -163,24 +171,25 @@ require('/modules/store.js').exec(function (ctx) {
         subPage = '/ Search: "' + query + '"';
         assets = store.search(options, paging);
     } else {
+        var urlQuery = 'sort=' + paging.sort + '&';
         if (paging.sort == 'popular') {
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
 
                 var ratingApi = require('/modules/rating-api.js').api;
-                registry = storeServer.systemRegistry(tenantId),
-                        am = store.assetManager(type, registry);
+                registry = storeServer.systemRegistry(currentTenantID),
+                 am = store.assetManager(type, registry);
 
                 var getNextassetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
 
-                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index);
+                    var result = ratingApi.getPopularAssets(type, currentTenantID, am, paging.start + index, PAGE_SIZE);
                     if (log.isDebugEnabled()) {
                         log.debug("Query executed successfully to get the assets hit count");
                     }
-                    index += 12;
+                    index += PAGE_SIZE;
                     return result;
                 };
 
@@ -188,11 +197,11 @@ require('/modules/store.js').exec(function (ctx) {
 
                 assets = [];
                 var aid, asset;
-                while (assets.length < 12 && maxTry < 10) {
+                while (assets.length < PAGE_SIZE && maxTry < 10) {
                     maxTry++;
                     var result = getNextassetSet();
 
-                    for (var n = 0; n < result.length && assets.length < 12; n++) {
+                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         aid = String(result[n].id);
                         try {
                             asset = store.asset(type, aid);
@@ -202,7 +211,7 @@ require('/modules/store.js').exec(function (ctx) {
                             }
                         } catch (e) {
                             log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                            aid);
+                                    aid);
                         }
                     }
                 }
@@ -219,29 +228,24 @@ require('/modules/store.js').exec(function (ctx) {
 
                     var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
                     if (log.isDebugEnabled()) {
-                        var recordCount = 0;
-                        if (result != null) {
-                            recordCount = result.length;
-                        }
-                        log.debug("Query executed successfully to get the assets hit count. " + recordCount
-                        + " records found");
+                        log.debug("Query executed successfully to get the assets hit count");
                     }
-                    index += 12;
+                    index += PAGE_SIZE;
                     return JSON.parse(result);
                 };
 
                 assets = [];
-               var done = false;
-               while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
+                var aid, asset, done = false;
+                while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                     maxTry++;
                     var result = getNextassetSet();
-                    if (result.length < 12){
+                    if (result.length < PAGE_SIZE){
                         done = true;
                     }
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
-                        var aid = String(result[n].UUID);
+                        aid = String(result[n].UUID);
                         try {
-                            var asset = store.asset(type, aid);
+                            asset = store.asset(type, aid);
                             asset.indashboard = store.isuserasset(aid, type);
                             if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
                                 assets.push(asset);
@@ -263,18 +267,16 @@ require('/modules/store.js').exec(function (ctx) {
     // If the assets count in the current page is less than PAGE_SIZE, next page is not available.
     // Else assets should be queried to decide whether there are assets available for the next page.
 
-    var nextPageAvailable = false;
-
     if(assets.length == PAGE_SIZE) {
-
         // Get the starting index, offset etc .. of the assumed next page.
-        var nextPage = store.buildNextPage(request,avaliablePages);
+
+        var nextPage = store.buildNextPage(request, avaliablePages);
 
         // Query the assets with the assumed 'next page'
         var nextAssetSet = store.assets(type, nextPage);
 
-        if(nextAssetSet.length > 0){
-          nextPageAvailable = true;
+        if((nextAssetSet.length > 0) || ((paging.sort == 'popular') && (avaliablePages * PAGE_SIZE > nextPage.start))){
+            nextPageAvailable = true;
         }
     }
 
@@ -282,21 +284,16 @@ require('/modules/store.js').exec(function (ctx) {
         var rightnav = currentPage+1;
     }
 
+    if (currentPage - 1 > 0) {
+        var leftnav = currentPage - 1;
+    }
 
     var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
-    AuthService=require(getServiceDir('authentication.js')).serviceModule;
-    authenticator=new AuthService.Authenticator();
-    authenticator.init(jagg,session);
-    //user=authenticator.getLoggedInUser();
+    AuthService = require(getServiceDir('authentication.js')).serviceModule;
+    authenticator = new AuthService.Authenticator();
+    authenticator.init(jagg, session);
 
-    if(currentPage-1 > 0){
-        var leftnav = currentPage-1;
-    }
-
-    if(nextPageAvailable && (assets.length == PAGE_SIZE)){
-        var rightnav = currentPage+1;
-    }
-
+    user = authenticator.getLoggedInUser();
 
     var subscriptionInfo;
     assets.forEach(function (asset) {
@@ -341,20 +338,23 @@ require('/modules/store.js').exec(function (ctx) {
             recentAssets[i].rating = 0;
         }
     }
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+    });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.domain = tenantDomain;
 
     caramel.render({
         title: 'Store | Assets',
         user: user,
         sso: sso,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header: headerData,
         navigation: site.navigation(tenantId),
         search: {
             mainPage: mainPage,
             subPage: subPage,
-            query: query,
             isTopAssets: false,
             searchFields: search.fields()
         },
@@ -369,8 +369,8 @@ require('/modules/store.js').exec(function (ctx) {
             ];
         },
         config:{
-            localIP : localIP,
-            httpsPort : httpsPort
+			localIP : localIP,
+			httpsPort : httpsPort
         },
         assets: assets,
         paging: {
@@ -383,7 +383,17 @@ require('/modules/store.js').exec(function (ctx) {
             url: url + 'sort='
         },
 
-        myAssets : { user:user, type: type, title: title, subscriptions: subscriptions[type], subscription : subscription, pageIndices : pageIndices, leftNav:leftnav, rightNav:rightnav},
+        myAssets: {
+            user: user,
+            type: type,
+            title: title,
+            subscriptions: subscriptions[type],
+            subscription: subscription,
+            pageIndices: pageIndices,
+            leftNav: leftnav,
+            rightNav: rightnav,
+            urlQuery: urlQuery
+        },
         recentAssets: recentAssets
 
     });

@@ -50,7 +50,7 @@ $(function () {
             "userId": $('#hdnUsertId').val(),
             "tenantId": $('#hdnTenantId').val(),
             "appName": $('#hdnOverviewName').val(),
-            "appVersion": $("#hdnOverviewVersion").val(),
+            "appVersion" : $("#hdnOverviewVersion").val(),
             "context": $("#hdnOverviewContext").val()
         },
         "appControls": {"0": "a"},
@@ -62,18 +62,18 @@ $(function () {
     $("#gatewayURL").on('click', function (e) {
         //check if subscribed only if skip gateway disabled
         if ((skipGateway == "false")) {
-            if ($('#hdnUsertId').val() != "" && (allowAnonymous != "TRUE")) {
+            if ($('#hdnUsertId').val() != ""  && (allowAnonymous != "TRUE")) {
                 var isSubscribed = $('#subscribed').val();
                 if (isSubscribed.toLowerCase() === 'false') {
-                    noty({
-                        text : 'You have not subscribed to this app',
-                        'layout' : 'center',
-                        'timeout': 1500,
-                        'modal' : true
+                    $('#messageModal2').html($('#confirmation-data2').html());
+                    $('#messageModal2 h3.modal-title').html(('Resource forbidden'));
+                    $('#messageModal2 div.modal-body').html('\n\n' + ('You have not subscribed to this Application.'));
+                    $('#messageModal2 a.btn-other').html('OK');
 
-                    });
+                    $('#messageModal2').modal();
                     e.preventDefault();
                     e.stopPropagation();
+                } else {
                 }
             }
         }

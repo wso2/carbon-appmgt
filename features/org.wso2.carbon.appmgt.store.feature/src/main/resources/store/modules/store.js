@@ -24,6 +24,16 @@ var RESOURCE_TYPE_MOBILEAPP = 'mobileapp';
 
 var log = new Log();
 
+var isUserTenantIdDifferFromUrlTenantId = function(userTenantId, urlTenantId) {
+
+    if(urlTenantId && (userTenantId !== urlTenantId)){
+        return true;
+    }else{
+        return false;
+    }
+
+};
+
 var merge = function (def, options) {
     if (options) {
         for (var op in def) {
@@ -59,8 +69,8 @@ var init = function (options) {
             }
         });
 		system.put(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE, {
-			content: 'SELECT RRT.REG_TAG_ID' 
-		 				+ ' FROM' 
+			content: 'SELECT RRT.REG_TAG_ID'
+		 				+ ' FROM'
 						+ ' REG_RESOURCE_TAG RRT, REG_TAG RT, REG_RESOURCE R, REG_RESOURCE_PROPERTY RRP, REG_PROPERTY RP'
 						+ ' WHERE'
 						+ ' RT.REG_ID = RRT.REG_TAG_ID'
@@ -138,9 +148,15 @@ var currentAsset = function () {
         matcher = new URIMatcher(request.getRequestURI());
     if (matcher.match('/{context}' + prefix + '/{type}/{+any}') || matcher.match('/{context}' + prefix + '/{type}')) {
         return matcher.elements().type;
+    }else if(matcher.match('/{context}/t/{domain}' + prefix + '/{type}/') ||
+        matcher.match('/{context}/t/{domain}' + prefix + '/{type}/{+any}')){
+        return matcher.elements().type;
     }
     prefix = require('/config/store.js').config().extensionsUrlPrefix + prefix;
     if (matcher.match('/{context}' + prefix + '/{type}/{+any}') || matcher.match('/{context}' + prefix + '/{type}')) {
+        return matcher.elements().type;
+    }else if(matcher.match('/{context}/t/{domain}' + prefix + '/{type}/') ||
+        matcher.match('/{context}/t/{domain}' + prefix + '/{type}/{+any}')){
         return matcher.elements().type;
     }
     return null;
@@ -161,7 +177,10 @@ var store = function (o, session) {
 
     tenantId = (o instanceof Request) ? server.tenant(o, session).tenantId : o;
     user = server.current(session);
-    if (user) {
+
+    //Check for logged-in user. If there is a logged-in user, then check whether the user is requesting to load
+    //the anonymous tenant registry of an another tenant
+    if (user && !isUserTenantIdDifferFromUrlTenantId(user.tenantId, tenantId)) {
         store = session.get(TENANT_STORE);
         if (cached && store) {
             return store;
@@ -241,10 +260,17 @@ Store.prototype.assetsPageSize = function () {
     return configs()[ASSETS_PAGE_SIZE];
 };
 
-Store.prototype.getPageSize = function () {
+Store.prototype.getStoreConfig = function () {
     var config  = require('/config/store.js').config();
-    var log = new Log();
-    return config.pagination.PAGE_SIZE;
+    return config;
+};
+
+Store.prototype.getPageSize = function () {
+    return this.getStoreConfig().pagination.PAGE_SIZE;
+};
+
+Store.prototype.getTopAssetPageSize = function () {
+    return this.getStoreConfig().pagination.TOP_ASSET_PAGE_SIZE;
 };
 
 Store.prototype.commentsPageSize = function () {
@@ -351,6 +377,9 @@ Store.prototype.subscriptions = function (type) {
         path = this.subscriptionSpace(type),
         assetz = {};
     fn = function (path) {
+        if(!registry){
+            return;
+        }
         var type,
             items = [],
             obj = registry.content(path);
@@ -403,14 +432,17 @@ Store.prototype.configs = function () {
  */
 Store.prototype.tags = function (type) {
     var tag, tags, assetType, i, length, count, queryParameters,
-        registry = this.registry || this.servmod.anonRegistry(this.tenantId),
+		registry = this.registry || this.servmod.anonRegistry(this.tenantId),
         tagz = [],
-        tz = {};
+        tz = {},
+		mediaType = "%",
+		lifeCycleStateKey = "%",
+		lifeCycleStateValue = "%";
 
     // NOTE : Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
 
-    if(type == RESOURCE_TYPE_WEBAPP){
+	if(type == RESOURCE_TYPE_WEBAPP){
         var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
         var tenantdomain = carbonContext.getTenantDomain();
         var storeObj = jagg.module("manager").getAPIStoreObj();
@@ -419,13 +451,12 @@ Store.prototype.tags = function (type) {
     }else if (type == RESOURCE_TYPE_MOBILEAPP){
         return tagz;
     }else if(type){
-        log.warn("Retrieving tags : Type " + type +  " is not supported.");
-        return tagz;
-    }
+		log.warn("Retrieving tags : Type " + type +  " is not supported.");
+		return tagz;
+	}
 
     return tagz;
 };
-
 
 Store.prototype.comments = function (aid, paging) {
     var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
@@ -487,51 +518,11 @@ Store.prototype.assets = function (type, paging) {
 
     var assetz = this.assetManager(type).search(options, newPaging);
 
-    var assetszReturn = [];
-
 
     for (i = 0; i < assetz.length; i++) {
         assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
-
-
-        if(assetz[i].type == "mobileapp"){
-            if( assetz[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = assetz[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        assetszReturn.push(assetz[i]);
-                    }
-                }
-
-            }else{
-                assetszReturn.push(assetz[i]);
-            }
-        }else{
-            if(assetszReturn.length == 0){
-                assetszReturn = assetz;
-            }
-
-        }
-
-
-
-
-
-
-
-        //print(assetz);
-
-
     }
-    return assetszReturn;
+    return assetz;
 };
 
 Store.prototype.assetsLazy = function (type, paging) {
@@ -607,7 +598,9 @@ Store.prototype.asset = function (type, aid) {
      }*/
 
     var asset = this.assetManager(type).get(aid);
-    asset.rating = this.rating(asset.path);
+    if(asset) {
+        asset.rating = this.rating(asset.path);
+    }
     return asset;
 };
 
@@ -630,7 +623,7 @@ Store.prototype.getAvailablePages = function (type,req,session) {
     var pages;
     var PAGE_SIZE = this.getPageSize();
     //var rxtManager = this.rxtManager(type,session);
-    var managers= storeManagers(req,session);
+    var managers= storeManagers(req,session,this.tenantId);
     var rxtManager = managers.rxtManager;
     var artifactManager = rxtManager.getArtifactManager(type);
     var appCount = artifactManager.count();
@@ -695,8 +688,6 @@ Store.prototype.recentAssets = function (type, count) {
 
     var recent = this.assetManager(type).search(options, paging);
 
-    var recentReturn = [];
-
     //log.debug('re')
     /* var recent = this.assetManager(type).list({
      start: 0,
@@ -707,41 +698,8 @@ Store.prototype.recentAssets = function (type, count) {
     for (i = 0; i < length; i++) {
         recent[i].rating = this.rating(recent[i].path).average;
         recent[i].indashboard = this.isuserasset(recent[i].id, type);
-
-
-        if(recent[i].type == "mobileapp"){
-            if( recent[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = recent[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        recentReturn.push(recent[i]);
-                    }
-                }
-
-            }else{
-                recentReturn.push(recent[i]);
-            }
-        }else{
-            if(recentReturn.length == 0){
-                recentReturn = recent;
-            }
-
-        }
-
-
-
-
-
     }
-    return recentReturn;
+    return recent;
 };
 
 /**
@@ -863,8 +821,8 @@ Store.prototype.removeAsset = function (type, options) {
     this.assetManager(type).remove(options);
 };
 
-Store.prototype.rxtManager = function (type, session) {
-    return storeManagers(this.tenantId, session).rxtManager.findAssetTemplate(function (tmpl) {
+Store.prototype.rxtManager = function (type, session, tenantId) {
+    return storeManagers(tenantId, session).rxtManager.findAssetTemplate(function (tmpl) {
         return tmpl.shortName === type;
     });
 };
@@ -913,18 +871,18 @@ var LOGGED_IN_USER = 'LOGGED_IN_USER';
  @session: The current session
  @return: An instance of the StoreMasterManager object containing all of the managers used by the Store
  */
-var storeManagers = function (o, session) {
+var storeManagers = function (o, session, tenantId) {
     var storeMasterManager;
     var tenantId;
     var server = require('store').server;
 
     //We check if there is a valid session
     if (server.current(session) != null) {
-        return handleLoggedInUser(o, session);
+        return handleLoggedInUser(o, session, tenantId);
     }
     else {
         //No session,anonymous access
-        return handleAnonUser();
+        return handleAnonUser(tenantId);
     }
 
 
@@ -954,16 +912,17 @@ function handleLoggedInUser(o, session) {
 /*
  The function handles the initialization of managers when a user is not logged in (annoymous accesS)
  */
-function handleAnonUser() {
-    var anonMasterManager = application.get(APP_MANAGERS);
+function handleAnonUser(tenantId) {
+    var appManagerName  = APP_MANAGERS + '.' + tenantId;
+    var anonMasterManager = application.get(appManagerName);
 
     //Check if it is cached
     if (anonMasterManager) {
         return anonMasterManager;
 
     }
-    anonMasterManager = new AnonStoreMasterManager();
-    application.put(APP_MANAGERS, anonMasterManager);
+    var anonMasterManager = new AnonStoreMasterManager(tenantId);
+    application.put(appManagerName, anonMasterManager);
 
     return anonMasterManager;
 }
@@ -1015,7 +974,7 @@ function PaginationFormBuilder(pagin) {
             DEFAULT_PAGIN.sortBy = 'overview_displayName';
             break;
         case 'usage':
-            // no register pagination support,  Separately handled the pagination in assets.jag
+            // no regsiter pagination support, socail feature need to check
             break;
         default:
             DEFAULT_PAGIN.sortOrder = 'ASC';
@@ -1040,16 +999,16 @@ function PaginationFormBuilder(pagin) {
  The class is used to encapsulate managers when a user is not logged in
  All managers user the system registry
  */
-function AnonStoreMasterManager() {
+function AnonStoreMasterManager(tenantId) {
     var store = require('store');
-    var registry = store.server.anonRegistry(SUPER_TENANT);
+    var registry = store.server.anonRegistry(tenantId);
 
-    var managers = buildManagers(registry, SUPER_TENANT);
+    var managers = buildManagers(registry, tenantId);
 
     this.modelManager = managers.modelManager;
     this.rxtManager = managers.rxtManager;
     this.storageSecurityProvider = managers.storageSecurityProvider;
-    this.tenantId = SUPER_TENANT;
+    this.tenantId = tenantId;
 }
 
 /*
@@ -1116,9 +1075,19 @@ var exec = function (fn, request, response, session) {
         tenant = es.server.tenant(request, session),
         user = es.server.current(session);
 
+    var tenantId;
+    tenantId = tenant.tenantId;
+
+    //Determine if the tenant domain was not resolved
+    if(tenantId===-1){
+        response.sendError(404, 'Tenant:' + tenant.domain + ' not registered');
+        return;
+    }
+
     es.server.sandbox({
-        tenantId: tenant.tenantId,
-        username: user ? user.username : carbon.user.anonUser
+        tenantId: tenantId,
+        username: tenant ? tenant.username : carbon.user.anonUser,
+        request: request
     }, function () {
         var configs = require('/config/store.js').config();
         return fn.call(null, {
@@ -1127,7 +1096,7 @@ var exec = function (fn, request, response, session) {
             sso: configs.ssoConfiguration.enabled,
             usr: es.user,
             user: user,
-            store: require('/modules/store.js').store(tenant.tenantId, session),
+            store: require('/modules/store.js').store(tenantId, session),
             configs: configs,
             request: request,
             response: response,
@@ -1138,6 +1107,7 @@ var exec = function (fn, request, response, session) {
             files: request.getAllFiles(),
             matcher: new URIMatcher(request.getRequestURI()),
             site: require('/modules/site.js'),
+            isAnonymousTenantStore : isUserTenantIdDifferFromUrlTenantId(tenant.tenantId, tenantId),
             log: new Log(request.getMappedPath())
         });
     });

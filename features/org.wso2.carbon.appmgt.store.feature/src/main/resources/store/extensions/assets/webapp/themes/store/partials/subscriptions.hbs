@@ -1,79 +1,86 @@
+<div id="myasset-container" class="row">
 
 
-<div class="col-md-12">
+    <div class="span9">
 
-    {{#if subscriptions}}
+        <h1> My Subscriptions - Web Apps</h1>
 
-        {{#each subscriptions}}
+        {{#if subscriptions}}
+        <div class="row-fluid">
+            {{#each subscriptions}}
+                <div class="span3 asset store-my-item" >
 
-                <div class="col-xs-6 col-md-4 col-lg-2 app-assets-wrapper">
-                    <div class="app-assets">
-                        <a href="{{productionURL}}" target="_blank">
-                            <img class="app-assets-icon"
-                                 src="/store/storage/webapp/{{uuid}}/{{thumbnail}}">
-                        </a>
-                        <div class="app-assets-info">
-                            <div class="app-assets-name">
-                                {{displayName}}
-                            </div>
-                            <div class="app-assets-provider">
-                                {{provider}}
-                            </div>
+                    {{#compare status "UNPUBLISHED" operator="=="}}
+                        <div class="ribbon-wrapper-red">
+                            <div class="ribbon-red">Unpublished</div>
                         </div>
+                    {{/compare}}
 
-
-                        <div class="my-apps-actions">
-
-                                <a class="btn btn-info asset-myapps-btn"  href="{{url "/assets/webapp"}}/{{uuid}}">
-                                    <i class="icon-mobile-phone"></i> View App
-                                </a>
-
+                    {{#compare status "DEPRECATED" operator="=="}}
+                        <div class="ribbon-wrapper-red">
+                            <div class="ribbon-red">Deprecated</div>
                         </div>
+                    {{/compare}}
 
-
+                    <a href="{{productionURL}}" target="_blank">
+                        <div class="asset-icon">
+                            <img class="icon" src="/store/storage/webapp/{{uuid}}/{{thumbnail}}">
+                        </div>
+                    </a>
+                    <div class="asset-details">
+                        {{#if isTenanted}}
+                            <a class="asset-title" href="{{url "/t/"}}{{tenantDomain}}/assets/webapp/{{uuid}}">
+                                <strong>{{name}}</strong>
+                            </a>
+                        {{else}}
+                            <a class="asset-title" href="{{url "/t/"}}{{tenantDomain}}/assets/webapp/{{uuid}}">
+                                <strong>{{name}}</strong>
+                            </a>
+                        {{/if}}
                     </div>
+
                 </div>
 
+            {{/each}}
+            </div>
+        {{else}}
+            <div id="no-data-my-items" class="no-data">
+                <i class="icon-inbox"></i>
+                <p>
+                    {{t "You have not subscribed to any web application as of yet."}}
+                </p>
+                <p>
+                    <a href="{{tenantedUrl "/assets/webapp/"}}" class="btn btn-primary">{{t "Subscribe now"}}</a>
+                </p>
+            </div>
+        {{/if}}
 
 
-        {{/each}}
 
-
-    {{else}}
-
-        <div class="well-large col-md-12 no-apps-box">
-            Sorry! You do not have any subscribed web apps.
-        </div>
-
-    {{/if}}
+    </div>
 
 </div>
 
+{{#if subscriptions}}
+<div class="row" style="padding-left: 30px">
+
+    <div>
+        <ul class="pagination">
+            {{#compare page 1 operator="!="}}
+                <li><a href="{{tenantedUrl "/extensions/assets/webapp/subscriptions?page="}}{{math page "-" 1}}"><span aria-hidden="true">&laquo;</span><span class="sr-only"></span></a></li>
+            {{/compare}}
+
+            {{#pagesloop pages}}
+                <li {{#compare this ../page}}class="disabled" {{/compare}} ><a  href="{{tenantedUrl "/extensions/assets/webapp/subscriptions?page="}}{{this}}">{{this}}</a></li>
+            {{/pagesloop}}
+
+            {{#compare page pages operator="!="}}
+                <li><a href="{{tenantedUrl "/extensions/assets/webapp/subscriptions?page="}}{{math page "+" 1}}"><span aria-hidden="true">&raquo;</span><span class="sr-only"></span></a></li>
+            {{/compare}}
 
 
-<div class="modal fade" id="modalDevices">
-    <div class="modal-dialog-devices">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
-            </div>
-            <div class="modal-body">
+        </ul>
+    </div>
 
-                <div class='row'>
-                    <div class='col-md-12'>
-                        <div class="carousel slide media-carousel" id="media">
-                            <div class="carousel-inner" id="devicesList">
-
-
-                            </div>
-                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
-                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+</div>
+{{/if}}

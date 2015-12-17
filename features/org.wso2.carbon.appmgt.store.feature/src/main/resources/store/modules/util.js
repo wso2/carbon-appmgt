@@ -2,7 +2,7 @@ var getRXTAttributes = function (tenantId, type) {
 
     var log=new Log('util');
    // var config = require('/config/publisher.json');
-    var store=require('/modules/store.js').storeManagers(request,session);
+    var store=require('/modules/store.js').storeManagers(request,session, tenantId);
 
     //var modelManager = application.get(config.app.MODEL_MANAGER);
     var modelManager=store.modelManager;
@@ -13,7 +13,7 @@ var getRXTAttributes = function (tenantId, type) {
 
 var getCategories = function (tenantId, type) {
     //var config = require('/config/publisher.json');
-    var store=require('/modules/store.js').storeManagers(request,session);
+    var store=require('/modules/store.js').storeManagers(request,session, tenantId);
     //var modelManager = application.get(config.app.MODEL_MANAGER);
     var modelManager=store.modelManager;
     var model = modelManager.getModel(type);
@@ -25,6 +25,8 @@ var getCategories = function (tenantId, type) {
                 return fieldArr[i].valueList;
         }
     }
+
+
 };
 
 

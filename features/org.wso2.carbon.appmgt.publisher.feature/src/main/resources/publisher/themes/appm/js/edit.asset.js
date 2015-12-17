@@ -12,31 +12,8 @@ $(function() {
 	var CHARS_REM = 'chars-rem';
 	var DESC_MAX_CHARS = 995;
 
-    var addedClaimList = [];
-
 	$('#overview_description').after('<span class="span8 ' + CHARS_REM + '"></span>');
 
-    //Validates the Web App URL
-    $("#overview_webAppUrl").blur(function () {
-        var $this = $(this), flag = $('.icon-check-appurl'), btnCreate = $('#btn-create-asset');
-        if (!flag.length) {
-            $this.after('<i class="icon-check-appurl"></i>');
-            flag = $('.icon-check-appurl');
-        }
-
-        if (isValidURL(this.value)) {
-            //if URL is valid, then proceed
-            flag.removeClass().addClass('icon-ok icon-check-appurl').show();
-            btnCreate.removeAttr('disabled');
-            $(".alert-error");
-        } else {
-            //if URL is invalid then validate
-            flag.removeClass().addClass('icon-ban-circle icon-check-appurl').show();
-            btnCreate.attr('disabled', 'disabled');
-            showAlert("Invalid URL. Please type a valid Web App URL.", 'error');
-        }
-    });
-		
 	  // let's fill all the permissions
     $.each($('.perm-check'), function () {
         // var checkbox = $(checkbox);
@@ -208,45 +185,45 @@ $(function() {
     });
     
     function addToClaimsTable(claim,clickable){
-        var isAlreadyExist = $.inArray(claim, addedClaimList);
-        if(isAlreadyExist == -1) {
-            addedClaimList.push(claim);
-            var propertyCount = $('#claimPropertyCounter');
+    	var propertyCount = $('#claimPropertyCounter');
 
-            var i = propertyCount.val();
-            var currentCount = parseInt(i);
+	var i = propertyCount.val(); 
+	var currentCount = parseInt(i);
 
-            currentCount = currentCount + 1;
-            propertyCount.val(currentCount);
+	currentCount = currentCount + 1;
+	propertyCount.val(currentCount);
 
-            $('#claimTableId').hide();
-            if (clickable) {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            } else {
-                $('#claimTableTbody').append($('<tr id="claimRow' + i + '" class="claimRow">' +
-                    '<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">' +
-                    claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> ' +
-                    '</td>' +
-                    '<td>' +
-                    '<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
-                    '</td>' +
-                    '</tr>'));
-            }
-            $('#claimTableTbody').parent().show();
-        }
+	$('#claimTableId').hide();
+	if(clickable){
+		$('#claimTableTbody').append($('<tr id="claimRow' + i +'" class="claimRow">'+
+	    		'<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">'+
+	    		claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> '+
+	    		'</td>'+
+	    		'<td>'+
+	    		'<a href="#"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
+	    		'</td>'+
+	    		'</tr>'));
+	}else{
+		$('#claimTableTbody').append($('<tr id="claimRow' + i +'" class="claimRow">'+
+	    		'<td style="padding-left: 40px ! important; color: rgb(119, 119, 119); font-style: italic;">'+
+	    		claim + '<input type="hidden" name="claimPropertyName' + i + '" id="claimPropertyName' + i + '"  value="' + claim + '"/> '+
+	    		'</td>'+
+	    		'<td>'+
+	    		'<a href="#" style="pointer-events: none; cursor: default;color:#C4C4C4"  onclick="removeClaim(' + i + ');return false;"><i class="icon-remove-sign"></i>  Delete</a>' +
+	    		'</td>'+
+	    		'</tr>'));
+	}
+	$('#claimTableTbody').parent().show();
     }
 	
     
 
 	$('#editAssetButton').on('click', function() {
+        var subAvailability = $('#sub-availability').val();
+        $('#subscription_availability').val(subAvailability);
 
+        var visibleRoles = $('#roles').val();
+        $('#visible_roles').val(visibleRoles);
 		//check if there are any url which doesn't have a policy group
 		var countResourcePolicies = 0;
 		var result = true;
@@ -493,58 +470,57 @@ $(function() {
 
 		return formData;
 	}
+	
+	
+	function createServiceProvider(){
+	    var sso_config = {};
+	    var provider_name  = $('#providers').val();
+	    var logout_url = $('#overview_logoutUrl').val();
+	    var idp_provider = $('#sso_idpProviderUrl').val();
+	    var app_name = $('#overview_name').val();
+	    var app_version = $('#overview_version').val();
+	    var app_transport = $('#overview_transports').val();
+	    var app_context = $('#overview_context').val();
+	    var app_allowAnonymous=$('#overview_allowAnonymous').val();
+	    var app_provider = $('#overview_provider').val();
+	    var app_acsURL = $('#overview_acsUrl').val();
 
+	    var claims = [];
+	    var index=0;
+	    var propertyCount = document.getElementById("claimPropertyCounter").value;
+	    while(index < propertyCount){
+	        var claim = $("#claimPropertyName"+index).val();
+	        if(claim != null){
+	            claims[claims.length] = claim;
+	        }
+	        index++;
+	    }
 
-    function createServiceProvider() {
-        var sso_config = {};
-        var provider_name = $('#providers').val();
-        var logout_url = $('#overview_logoutUrl').val();
-        var idp_provider = $('#sso_idpProviderUrl').val();
-        var app_name = $('#overview_name').val();
-        var app_version = $('#overview_version').val();
-        var app_transport = $('#overview_transports').val();
-        var app_context = $('#overview_context').val();
-        var app_allowAnonymous = $('#overview_allowAnonymous').val();
-        var app_provider = $('#overview_provider').val();
-        var app_acsURL = $('#overview_acsUrl').val();
+	    sso_config.provider = provider_name;
+	    sso_config.logout_url = logout_url;
+	    sso_config.claims = claims;
+	    sso_config.idp_provider = idp_provider;
+	    sso_config.app_name = app_name;
+	    sso_config.app_verison = app_version;
+	    sso_config.app_transport = app_transport;
+	    sso_config.app_context = app_context;
+	    sso_config.app_allowAnonymous=app_allowAnonymous;
+	    sso_config.app_provider = app_provider;
+	    sso_config.app_acsURL = app_acsURL;
 
-        var claims = [];
-        var index = 0;
-        var propertyCount = document.getElementById("claimPropertyCounter").value;
-        while (index < propertyCount) {
-            var claim = $("#claimPropertyName" + index).val();
-            if (claim != null) {
-                claims[claims.length] = claim;
-            }
-            index++;
-
-        }
-
-		sso_config.provider = provider_name;
-		sso_config.logout_url = logout_url;
-		sso_config.claims = claims;
-		sso_config.idp_provider = idp_provider;
-		sso_config.app_name = app_name;
-		sso_config.app_verison = app_version;
-		sso_config.app_transport = app_transport;
-		sso_config.app_context = app_context;
-		sso_config.app_allowAnonymous = app_allowAnonymous;
-		sso_config.app_provider = app_provider;
-		sso_config.app_acsURL = app_acsURL;
-
-        $.ajax({
-            url: '/publisher/api/sso/editConfig',
-            type: 'POST',
-            contentType: 'application/json',
-            data:JSON.stringify(sso_config),
-            success: function(response) {
-                console.log("Added SSO config successfully");
-                window.location = "/publisher/assets/webapp/";
-            },
-            error: function(response) {
-                showAlert('Error adding service provider.', 'error');
-            }
-        });
+	    $.ajax({
+	        url: '/publisher/api/sso/editConfig',
+	        type: 'POST',
+	        contentType: 'application/json',
+	        data:JSON.stringify(sso_config),
+	        success: function(response) {
+	            console.log("Added SSO config successfully");
+	            window.location = "/publisher/assets/webapp/";
+	        },
+	        error: function(response) {
+	            showAlert('Error adding service provider.', 'error');
+	        }
+	    });
 	}
 
 	/*
@@ -640,17 +616,21 @@ function removeClaimTable() {
     $('#claimPropertyCounter').val(0);
 }
 
-/**
- * Checks If the passed URL is valid
- * @param url Website URL
- * @returns {boolean} Either valid(true) or not(false)
- */
-function isValidURL(url) {
-    var RegExp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    if (RegExp.test(url)) {
-        return true;
+
+window.onload = function updateSubsVisibility() {
+    var restricted = $('.controll_visibility').is(":checked");
+    var anonymous = $('.anonymous_checkbox').is(":checked");
+    if (restricted || anonymous) {
+        $('#sub-group').hide();
     } else {
-        return false;
+        var subscription_availability = $('#subscription_availability').val();
+        if (subscription_availability == 'all_tenants') {
+            $("#sub-availability").val("all_tenants");
+        } else if (subscription_availability == 'current_tenant') {
+            $("#sub-availability").val("current_tenant");
+        } else if (subscription_availability == 'specific_tenants') {
+            $("#sub-availability").val("specific_tenants");
+        }
+        $('#sub-group').show();
     }
 }
-

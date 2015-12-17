@@ -1,155 +1,101 @@
-<header>
-    <nav class="navbar navbar-default row wr-global-header">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
-            </div>
+<div id="container-header" class="container">
+	<div class="row">
+		<div class="span12">
+			<div class="navbar">
+				<div class="navbar-inner">
+					<div class="container">
 
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <form class="nav navbar-left search-box" role="search">
-                    <select id="searchSelect" class="search-select col-md-3">
-                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
-                        <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
-                        <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
-                        <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
-                    </select>
-                    <input value="{{searchQuery.search}}" type="text" class="form-control col-md-4 search-text" id="searchTxt" placeholder="Search">
-                </form>
-                {{#if assetsPage}}
-                    <form class="nav navbar-left" role="search">
-                        <select id="category-select" class="selectpicker" data-style="btn-primary"  title='Choose a Category' data-width="100%">
-                            {{#each categories}}
-                                <option {{#compare ../selectedCategory this}}selected{{/compare}}>{{this}}</option>
-                            {{/each}}
-                        </select>
-                    </form>
+						<a class="brand" href="{{url "/"}}"></a>
+						<!--
+						<ul class="nav menu store-menu">
+						{{#itr assets}}
+						<li class="dropdown {{#if value.selected}} selected {{/if}}">
+						<a href="{{url "/assets/"}}{{key}}" data-toggle="dropdown" class="dropdown-toggle"><i
+						class="icon-{{key}}"></i> {{value.title}}</a>
+						{{#if value.isCategorySupport}}
+						{{#if value.categories}}
+						<ul aria-labelledby="dLabel" role="menu" class="dropdown-menu">
+						{{#each value.categories}}
+						<li>
+						<a href='{{url "/assets"}}/{{../../key}}?query=category:"{{this}}"'>{{this}}</a>
+						</li>
+						{{/each}}
+						</ul>
+						{{/if}}
+						{{/if}}
 
-                    <form class="nav navbar-left" role="search">
-                        <select id="platform-select" class="selectpicker" data-style="btn-primary"  title='Choose a Platform' data-width="100%">
-                            <option value="android" {{#compare selectedPlatform "android"}}selected{{/compare}}>Android</option>
-                            <option value="ios" {{#compare selectedPlatform "ios"}}selected{{/compare}}>iOS</option>
-                            <option value="webapp" {{#compare selectedPlatform "webapp"}}selected{{/compare}}>Web App</option>
-                        </select>
-                    </form>
-                {{/if}}
+						</li>
 
-                <ul class="nav navbar-nav navbar-right">
-                    {{#if user}}
+						{{/itr}}
+						</ul>-->
 
+						<ul class="nav menu pull-right">
+                          {{#if isTenanted}}
+                            <li class="nav-separator">
+                                <a href="{{url "/"}}">
+                                    <i class="icon-suitcase store-topnav-bookmark"></i> {{t "Public Store"}}
+                                </a>
+                            </li>
+                          {{/if}}
+                            <li class="nav-separator">
+                                <a href="{{tenantedUrl "/assets/webapp"}}"><i class="icon-cog store-topnav-bookmark"></i> {{t "Web Applications"}}</a>
+                            </li>
+                            <li class="nav-separator">
+                                <a href="{{tenantedUrl "/assets/mobileapp"}}"><i class="icon-mobile-phone store-topnav-bookmark"></i> {{t "Mobile Applications"}}</a>
+                            </li>
+							{{#if user}}
+							<li class="nav-separator">
+                                {{#if config.enabled}}
+                                    <a href="{{tenantedUrl "/extensions/assets/mobileapp/subscriptions"}}"><i
+                                    class="icon-mobile-phone store-topnav-bookmark"></i> {{t "My Subscriptions"}}</a>
+                                {{/if}}
+							</li>
+							<li>
 
-                        <a href="{{url "/extensions/assets/mobileapp/subscriptions"}}">
-                            <div class="auth-img">
-                                {{t "My Apps"}}
-                                <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-login"></i>
-                            </span>
-                            </div>
-                        </a>
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i
+								class="icon-user"></i> {{user.username}} <b class="caret"></b></a>
+								<ul class="dropdown-menu dropdown-account" role="menu" aria-labelledby="dLabel">
+									<li>
+										{{#if sso}}<a href="{{url "/logout"}}"><i class="icon-signout"></i> {{t "Sign out"}} </a>{{else}}<a id="btn-signout" href="#"><i class="icon-signout"></i> {{t "Sign out"}} </a>{{/if}}
+									</li>
+								</ul>
 
-                        <a href="#" data-toggle="dropdown">
-                            <div class="auth-img">
-                                {{user.username}}
-                                <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-user fw-stack-1-5x"></i>
-                            </span>
-                            </div>
-                        </a>
+							</li>
+							{{else}}
 
-                        <div class="dropdown-menu">
-                            <div class="cu-arrow"></div>
-                            <div class="dropdown-menu-content">
-                                <a class="filter-item" href="{{url "/logout"}}">Logout</a>
-                            </div>
-                        </div>
-
-                    {{else}}
-
-                        {{#if sso}}
-
-                            <a href="{{url "/login"}}">
-                                <div class="auth-img">
-                                    {{t "Sign In"}}
-                                    <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-login"></i>
-                            </span>
-                                </div>
-                            </a>
-
-                        {{else}}
-
-                            <a data-toggle="modal" data-target="#modal-login">
-                                <div class="auth-img">
-                                    {{t "Sign In"}}
-                                    <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-login"></i>
-                            </span>
-                                </div>
-                            </a>
-
-                        {{/if}}
+							{{#if sso}}
+							<li>
+								<a href="{{tenantedUrl "/login"}}">{{t "Sign In"}}</a>
+							</li>
+								{{#if isSelfSignUpEnabledForTenant}}
+							<li>
+                                <a id="btn-register" class="btn btn-primary" data-toggle="modal"
+                                   data-target="#modal-register">{{t "Register"}}</a>
+							</li>
+								{{/if}}
+							{{else}}
+							<li>
+								<a href="#" data-toggle="modal" data-target="#modal-login">{{t "Sign In"}}</a>
+							</li>
 
 
-                        <a href="#"  data-toggle="modal" data-target="#register-modal">
-                            <div class="auth-img">
-                                Register
-                            <span class="fw-stack-md fw-lg">
-                                <i class="fw fw-login"></i>
-                            </span>
-                            </div>
-                        </a>
+								{{#if isSelfSignUpEnabledForTenant}}
+                                    <li>
+                                        <a id="btn-register" class="btn btn-primary" data-toggle="modal" data-target="#modal-register">{{t "Register"}}</a>
+                                    </li>
+								{{/if}}
+							{{/if}}
 
+							{{/if}}
 
-                        {{>register}}
-
-
-
-                    {{/if}}
-
-
-                </ul>
-            </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
-    </nav>
-</header>
-
-
-<!-- secondary header - app bar -->
-<div id="nav" class="row wr-app-bar">
-    <div class="col-md-12 wr-action-container">
-        <div class="wr-action-btn-bar">
-            <a href="javascript:openCollapsedNav()" class="cu-btn wr-hidden-nav-toggle-btn" style="float: left">
-                    <span class="fw-stack">
-                        <i class="fw fw-tiles fw-stack-1-5x"></i>
-                    </span>
-            </a>
-            <a class="cu-btn page-title" style="float: left" href='{{url "/assets/mobileapp"}}'>
-            <span class="fw-stack"></span>
-            {{#compare myApps true}}
-                My Mobile Apps
-             {{else}}
-                Mobile Apps
-            {{/compare}}
-
-            </a>
-
-        </div>
-    </div>
-
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-<!-- secondary header - app bar -->
+{{>login login}}
 
-<!-- common navigation -->
-<div id="hiddenNav" class="wr-hidden-nav">
-    <ul>
-        <li><a href="{{url "/assets/webapp"}}"><i class="fw fw-globe"></i>Web Apps</a></li>
-        <li><a href="{{url "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
-    </ul>
-</div>
-<!-- /common navigation -->
+{{>register}}
+

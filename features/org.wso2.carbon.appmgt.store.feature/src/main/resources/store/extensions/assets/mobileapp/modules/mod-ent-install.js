@@ -1,7 +1,7 @@
     var log =  new Log();
     var mod =  require('store');
     var user = mod.user;
-    var server = require('store').server;
+    var server = require('store').server
     var currentUser = server.current(session);
     var SUBSCRIPTIONS_PATH = '/subscriptions/mobileapp/';
     var mobileGeneric = new Packages.org.wso2.carbon.appmgt.mobile.store.Generic();
@@ -14,34 +14,8 @@
 
     var performAction = function performAction (action, tenantId, type, app, params) {
 
-
-        //check security;
-
-
-
         registry = server.systemRegistry(tenantId);
         store = require('/modules/store.js').store(tenantId, session);
-
-
-        asset = store.asset('mobileapp', app);
-
-
-        if( asset.attributes.overview_visibility != "null"){
-
-                var assetRoles = asset.attributes.overview_visibility.split(",");
-                var um = server.userManager(tenantId);
-                var userRoles = um.getRoleListOfUser(currentUser.username);
-
-                var commonRoles = userRoles.filter(function(n) {
-                    return assetRoles.indexOf(String(n)) != -1
-                });
-                if(commonRoles.length <= 0){
-                    response.sendError(401, 'Unauthorized');
-                    return;
-                }
-
-        }
-
 
         if( typeof params === 'string' ) {
             params = [ params ];
@@ -135,8 +109,7 @@
                 }
 
                 asset = store.asset('mobileapp', app);
-                log.info(asset);
-                if( asset.attributes.overview_type == "enterprise"){
+                if( asset.attributes.overview_type == "enterprise" ||  asset.attributes.overview_type == "webapp"){
                     if(asset.attributes.overview_platform == "android"){
                         var location = serverAddress +  asset.attributes.overview_url;
                     }else if(asset.attributes.overview_platform == "ios"){
@@ -154,7 +127,9 @@
                         var location = "https://itunes.apple.com/en/app/id" + asset.attributes.overview_appid;
                     }
                 }
-                log.info(location);
+
+
+
                 print({redirect: true, location : location});
 
             }else{

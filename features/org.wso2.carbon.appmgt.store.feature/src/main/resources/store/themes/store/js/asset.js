@@ -14,7 +14,6 @@ $(function () {
     var SOCIAL_PARAM_SCRIPT_TYPE='scriptType';
     var SOCIAL_PARAM_SCRIPT='script';
 
-    isSocial = false;
     if (isSocial) {
         var script = document.createElement('script');
         script.type = $(SOCIAL_CONTAINER_ID).data(SOCIAL_PARAM_SCRIPT_TYPE);
@@ -118,7 +117,7 @@ $(function () {
 
             });
 
-        $('#tab-review-box').find('.btn-primary').on('click', function (e) {
+        $('#tab-review-box').find('.btn-primary').live('click', function (e) {
             if (!$("#form-review").valid()) return;
             caramel.post('/apis/comment', {
                 asset: $('#assetp-tabs').data('aid'),
@@ -128,7 +127,7 @@ $(function () {
             }, 'json');
         });
 
-        $('.text-review-box').on('keyup focus', function (e) {
+        $('.text-review-box').live('keyup focus', function (e) {
             if ($('#comment-content').hasClass('user-review')) {
                 $(".btn-review").removeClass("btn-primary");
                 $(".btn-review").addClass("disabled");
@@ -191,21 +190,19 @@ $(function () {
         rating = el.data('rating');
     $($('input', el)[rating - 1]).attr('checked', 'checked');
 
-    //$('.auto-submit-star').rating({
-    //    callback: function (value, link) {
-    //        if (value == undefined) {
-    //            value = 0;
-    //        }
-    //        $('.rate-num-assert').html('(' + value + ')');
-    //        caramel.post('/apis/rate', {
-    //            asset: $('#assetp-tabs').data('aid'),
-    //            value: value || 0
-    //        }, function (data) {
-    //
-    //        });
-    //    }
-    //});
+    $('.auto-submit-star').rating({
+        callback: function (value, link) {
+            if (value == undefined) {
+                value = 0;
+            }
+            $('.rate-num-assert').html('(' + value + ')');
+            caramel.post('/apis/rate', {
+                asset: $('#assetp-tabs').data('aid'),
+                value: value || 0
+            }, function (data) {
 
-    
+            });
+        }
+    });
 
 });

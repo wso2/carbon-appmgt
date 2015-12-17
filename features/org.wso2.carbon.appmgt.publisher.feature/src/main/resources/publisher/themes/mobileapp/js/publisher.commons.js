@@ -29,6 +29,11 @@ $(document).ready(function() {
 		$(this).tab('show');
 	});
 
+	$('.list-asset-table').on('click', 'tbody tr', function() {
+		var link = $(this).find('.asset-listing-name a').attr('href');
+		window.location = link;
+	});
+
 	$('#search-button').on('click', search);
 
 	$('#inp_searchAsset').keypress(function(e) {
@@ -119,6 +124,9 @@ $(document).ready(function() {
 		$(this).next().click();
 	});
 
+	$('input[type="file"]').change(function() {
+		$(this).closest('.tbl-upload').find('.txt-filepath').val($(this).val());
+	})
 	/*
 	 The function is used to check if the version entered by the user exists
 	 @versionList: A list of versions

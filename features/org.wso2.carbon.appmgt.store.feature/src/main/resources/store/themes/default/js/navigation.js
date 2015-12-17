@@ -84,7 +84,7 @@ $(function() {
         reason = validateUsername(usename);
         if (reason != "") {
             if (reason == "No conformance") {
-                showError("Entered user name is not conforming to policy. Please enter a user name of 3-30 characters without any whitespaces.")
+                showError("Entered user name is not conforming to policy. Please enter a user name, which adheres to policy.")
             } else if (reason == "Empty string") {
                 showError("Entered user name is empty. Please enter a valid user name.");
             } else if (reason == "Domain") {
@@ -99,7 +99,7 @@ $(function() {
             } else if (reason == "Password Mismatch") {
                 showError("Password and Password Repeat do not match. Please re-enter.");
             } else if (reason == "No conformance") {
-                showError("Invalid Password! Please enter a password of 5-30 characters without any whitespaces.")
+                showError("Password does not meet the system requirements. Please try again.")
             }
             return false;
         }
@@ -146,7 +146,7 @@ $(function() {
 
 	};
 
-	$('#btn-signout').on('click', function() {
+	$('#btn-signout').live('click', function() {
 		caramel.post("/apis/user/logout", function(data) {
 			location.reload();
 		}, "json");

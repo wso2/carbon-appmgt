@@ -24,7 +24,12 @@
     <link href="{{url "/themes/mobileapp/css/navigation.css"}}" rel="stylesheet" media="screen">
     <script src="{{url "/themes/mobileapp/js/modernizr.custom.js"}}"></script>
 
-    <link href="{{url "/themes/mobileapp/assets/dropdown/css/msdropdown/dd.css"}}" rel="stylesheet" media="screen">
+
+
+
+    <link href="{{url "/themes/mobileapp/css/mobileapp/bootstrap-fileupload.min.css"}}" rel="stylesheet" media="screen">	
+    <link href="{{url "/themes/mobileapp/assets/dropdown/css/msdropdown/dd.css"}}" rel="stylesheet" media="screen">	
+    <link href="{{url "/themes/mobileapp/css/mobileapp/main.css"}}" rel="stylesheet" media="screen">	
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if IE]>
@@ -34,15 +39,20 @@
     <link rel="stylesheet" href="{{url "/themes/mobileapp/css/ie.css"}}" type="text/css">
     <![endif]-->
 
+
+    <link href="{{url "/themes/mobileapp/css/mobileapp/main.css"}}" rel="stylesheet" media="screen">	
+
     {{css}}
 </head>
-
 <body>
-    <!-- Part 1: Wrap all page content here -->
-    <div id="wrap">
-        {{ include header}}
-        <!-- Begin page content -->
-        <div class="container-assets container">
+
+<!-- Part 1: Wrap all page content here -->
+<div id="wrap">
+    {{ include header}}
+    <!-- Begin page content -->
+
+    <div class="container-assets container">
+
             {{include ribbon}}
             {{include heading}}
             <div class="row">
@@ -50,31 +60,44 @@
                     {{include listassets}}
                 </div>
             </div>
-        </div>
-        <div id="push"></div>
+
     </div>
 
-    <div id="footer">
-        <div class="container">
-            {{>footer}}
-        </div>
+    <div id="push"></div>
+</div>
+
+<div id="footer">
+    <div class="container">
+        {{>footer}}
     </div>
+</div>
+<script src="{{url "/themes/mobileapp/js/jquery-1.10.2.min.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/jquery.form.min.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/bootstrap.min.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/publisher.commons.js"}}"></script>
 
-    <script src="{{url "/themes/mobileapp/js/jquery-1.10.2.min.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/js/jquery.form.min.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/assets/dropdown/js/msdropdown/jquery.dd.min.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/js/bootstrap.min.js"}}"></script>
 
-    <script src="{{url "/themes/mobileapp/js/sugyama.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/js/raphael-min.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/js/graph.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/js/token.input/jquery.tokeninput.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/mobileapp/bootstrap-fileupload.min.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/mobileapp/jquery.fileupload.js"}}"></script>
+<script src="{{url "/themes/mobileapp/assets/dropdown/js/msdropdown/jquery.dd.min.js"}}"></script>	
 
-    <script src="{{url "/themes/mobileapp/assets/noty/jquery.noty.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/assets/noty/layouts/center.js"}}"></script>
-    <script src="{{url "/themes/mobileapp/assets/noty/themes/default.js"}}"></script>
 
-    <script src="{{url "/themes/mobileapp/js/publisher.commons.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/lc.processor.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/sugyama.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/raphael-min.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/graph.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/token.input/jquery.tokeninput.js"}}"></script>
+<script src="{{url "/themes/mobileapp/js/handlebars.js"}}"></script>
+    
+<script src="{{url "/themes/mobileapp/js/mobileapp/qrcode.js"}}"></script>    
+
+<script src="{{url "/themes/mobileapp/js/mobileapp/list-assets.js"}}"></script>
+
+<script src="{{url "/themes/mobileapp/assets/noty/jquery.noty.js"}}"></script>
+<script src="{{url "/themes/mobileapp/assets/noty/layouts/center.js"}}"></script>
+<script src="{{url "/themes/mobileapp/assets/noty/themes/default.js"}}"></script>
+
+
     {{js}}
     {{code}}
 </body>

@@ -5,7 +5,7 @@ var selectedApp = "";
 
 $(document).ready( function () {
 
-
+  
 if($('#isEnterpriseInstallEnabled').val() === 'true'){
     oTable = $('#roles-table').dataTable({
         "sDom": "<'row-fluid'<'tabel-filter-group span8'T><'span4'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
@@ -78,7 +78,6 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
     $("#btn-apps-ent-install").click(function () {
 
-
             if(selectedTab === "roles"){
                 installToRoles();
             }else if (selectedTab === "users"){
@@ -94,8 +93,6 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
 
     $("#btn-apps-ent-uninstall").click(function () {
-
-
 
             if(selectedTab === "roles"){
                 unInstallFromRoles();
@@ -136,8 +133,6 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
         $(".role-checkbox:checked", oTable.fnGetNodes()).each(function(){
             rolesSelected.push($(this).val());
         });
-
-
 
         if(rolesSelected.length > 0){
 

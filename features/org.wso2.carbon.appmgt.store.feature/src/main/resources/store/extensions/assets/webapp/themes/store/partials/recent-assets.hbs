@@ -1,29 +1,38 @@
-{{#if .}}
-<div class="row visible-lg">
-    <h3>Recent Apps</h3>
-    <hr>
-
-
-    {{#slice . count="20" size="20"}}
+<div class="row">
+    <div class="span3">
+        <h4><i class="icon-time"></i> {{t "Recently Added"}}</h4>
+        {{#slice . count="20" size="20"}}
         {{#each .}}
-            <a href="{{url "/assets"}}/{{type}}/{{id}}">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
-                        <div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
-                        <span class="app-assets-rating"> {{#assetRating rating.average}}{{/assetRating}} </span>
-                    </div>
-                    <div class="col-md-4">
-                        <img class="col-md-12"
-                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
-                    </div>
-                </div>
-            </a>
-            <hr>
+        <div class="row-fluid recently-added">
+            {{#attributes}}
+            <div class="span4 recent-asset-icon">
+		<input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">
+                {{#compare  overview_advertiseOnly "true" operator="=="}}
+                    <a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} ">
+                        <img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
+                {{else}}
+                    <a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}"><img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
+                {{/compare}}
+            </div>
+            <div class="span8 recent-asset-details">
+		<input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">
+                {{#compare  overview_advertiseOnly "true" operator="=="}}
+                    <strong><a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} ">
+                        {{overview_displayName}} </a></strong>
+                {{else}}
+                    <strong><a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}">{{overview_displayName}}</a></strong>
+                {{/compare}}
+                <small>by <a href="#">{{overview_provider}}</a></small>
+                            <span class="star-rating">
+                            	<div class="asset-rating">
+                                    <div class="asset-rating-{{../rating.average}}star"></div>
+                                </div>
+                            </span>
+            </div>
+            {{/attributes}}
+        </div>
         {{/each}}
-    {{/slice}}
-
-
+        <hr/>
+        {{/slice}}
+    </div>
 </div>
-
-{{/if}}

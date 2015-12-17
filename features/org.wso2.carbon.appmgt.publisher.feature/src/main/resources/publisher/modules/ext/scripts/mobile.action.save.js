@@ -70,7 +70,7 @@ var module=function(){
 
             //name='test-gadget-7';
 
-            log.debug('Finished saving asset (mobile) : '+name);
+            log.debug('Finished saving asset : '+name);
 
             //The predicate object used to compare the assets
             var predicate={

@@ -3,18 +3,11 @@
 matcher = new URIMatcher(request.getRequestURI());
 
 
-
-
 require('/modules/store.js').exec(function (ctx) {
 
     var log = new Log();
     var configs = ctx.configs;
     var mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
-
-    var devicesClass = new Packages.org.wso2.carbon.appmgt.mobile.store.Devices();
-
-    var isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
-    var isDeviceSubscriptionEnabled = mdmConfig.EnableSubscriptionFromDevices == "true" ? true : false;
 
 
     var server = require('store').server,
@@ -35,9 +28,11 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isEnterpiseAdmin = false;
 
+
     if(user.hasRoles([mdmConfig.EnterpriseOperations_AuthorizedRole])){
         isEnterpiseAdmin = true;
     }
+
 
 
     var um = new carbon.user.UserManager(server, tenantId);
@@ -74,24 +69,11 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
 
-    if (matcher.match('/{context}/apis/enterprise/get-devices')) {
-
-        var devices = [];
-        if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
-            devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
-        }
-        print(devices);
-        return;
-    }
-
-
     if (matcher.match('/{context}/apis/enterprise/perform/{action}/{type}')) {
 
         if(!isEnterpiseAdmin){
             response.sendError(401, 'Unauthorized');
         }
-
-
 
         var elements = matcher.elements();
         var params = request.getAllParameters("UTF-8");
@@ -102,12 +84,10 @@ require('/modules/store.js').exec(function (ctx) {
         var data = params["data[]"];
 
 
+        log.debug("Params Received " +stringify(elements) + " & " + stringify(params))
 
-
-        log.debug("Params Received " +stringify(elements) + " & " + stringify(params));
 
         if(action && type && app && data){
-
             enterpriseInstall.performAction(action, tenantId, type, app, data);
             print('{"status" : "success"}');
             return;

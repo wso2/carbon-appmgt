@@ -8,50 +8,46 @@ var AuthService=require('../extensions/assets/webapp/services/authentication.js'
 
 require('/modules/store.js').exec(function (ctx) {
     var action, data, message, exists, showWorkflowTip,
-    error = false,
-    log = new Log(),
-    user = require('store').user,
-    matcher = new URIMatcher(request.getRequestURI()),
-    userDetails={},
-    parameters,
-    isEmailUsername = false;
+            error = false,
+            log = new Log(),
+            user = require('store').user,
+            matcher = new URIMatcher(request.getRequestURI()),
+            userDetails={},
+            parameters;
 
-    var authenticator=new AuthService.Authenticator();
-    authenticator.init(jagg,session);
+
+    var authenticator = new AuthService.Authenticator();
+    authenticator.init(jagg, session);
 
     if (matcher.match('/{context}/apis/user/{action}')) {
         action = matcher.elements().action;
         switch (action) {
             case 'login':
                 try {
-                    var isPermitted =true;
+                    var isPermitted = true;
                     data = request.getContent();
-                    var isUserExists = storeHostObj.isUserExists(data.username);
-                    if(isUserExists){
+
+                    error = !user.login(data.username, data.password, session);
+                    if(!error) {
                         var isSubscriberRoleAttached = storeHostObj.checkIfSubscriberRoleAttached(data.username);
 
                         //Check Whether the user has subscriber Privileges
                         if(!isSubscriberRoleAttached.error){
                             log.debug('Authenticating User : '+data.username);
 
-                            error = !user.login(data.username, data.password, session);
-
                             var tenant = ctx.tenant;
                             //parameters=request.getAllParameters();
-                            userDetails['username']=data.username;
-                            userDetails['password']=data.password;
-                            userDetails['tenantId']=tenant;
-                            userDetails['action']="login";
-                            authResult=authenticator.login(userDetails);
+                            userDetails['username'] = data.username;
+                            userDetails['password'] = data.password;
+                            userDetails['tenantId'] = tenant;
+                            userDetails['action'] = "login";
+                            authenticator.login(userDetails);
+                            message = 'User ' + data.username + ' successfully logged in';
 
                         }else{
-
-                            error=true;
+                            error = true;
                             isPermitted = false;
                         }
-
-                    }else{
-                        error=true;
                     }
 
                     if (error) {
@@ -102,10 +98,12 @@ require('/modules/store.js').exec(function (ctx) {
                         storeHostObj.addUser(data.username, data.password);
                         var isSubscriberRolePresent = storeHostObj.checkIfSubscriberRoleAttached(data.username);
 
+                        showWorkflowTip = false;
                         //Check Whether the user has subscriber privileges to login
                         if (isSubscriberRolePresent.error) {
                             showWorkflowTip = true;
                         }
+                        message = 'User ' + data.username + ' has been successfully added';
                     }
 
                 } catch (e) {
@@ -136,24 +134,6 @@ require('/modules/store.js').exec(function (ctx) {
                 print({
                     error: error,
                     exists: exists,
-                    message: message
-                });
-                return;
-
-            case 'emailLogin':
-                try {
-                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername(null);
-                    if (isEnableEmailUsername) {
-                        isEmailUsername = true;
-                    }
-                } catch (e) {
-                    log.error(e);
-                    error = true;
-                    message = e.message;
-                }
-                print({
-                    error: error,
-                    isEmailUsername: isEmailUsername,
                     message: message
                 });
                 return;

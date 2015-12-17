@@ -71,7 +71,7 @@ function initializeUserActivity(action, jsonObjTemp) {
     jsonObj = jsonObjTemp;
     page = jsonObj["pageName"];
     addUserActivity(page, action);
-};
+}
 
 /*
  * This method used to fill the events
@@ -89,7 +89,7 @@ function addUserActivity(item, action) {
     event.action = action;
     event.timestamp = $.now();
     events[events.length] = event;
-};
+}
 
 /*
  * Publisher method. This method posts the data to the path specified
@@ -102,7 +102,7 @@ function publishEvents(pageUnload) {
         addUserActivity(page, "same-page");
     }
 
-    var copiedEvents = events;
+    var copied = events;
     events = [];
 
 
@@ -112,14 +112,12 @@ function publishEvents(pageUnload) {
     $.ajax({
         url: jsonObj["path"],
         data: {
-            'events': JSON.stringify(copiedEvents)
+            'events': JSON.stringify(copied)
         },
         type: 'post',
         success: function (output) {
-            //do nothing. Since this is a hidden UI function do not interrupt the user.
         },
         error: function (request, status, error) {
-            log.warn("Error while publishing events - " + JSON.stringify(copiedEvents));
         }
     });
 
@@ -129,7 +127,7 @@ function publishEvents(pageUnload) {
         }, eventPublishTime);
     }
     return;
-};
+}
 
 var addClickEvents = function (e) {
     var inputTypes = [];
@@ -148,14 +146,13 @@ var addClickEvents = function (e) {
             break;
         }
     }
-};
+}
 
 $(document).ready(
     function ($) {
         /*
          * check if the parameters are not null
          */
-
         if (jsonObj["isActive"] != null && jsonObj["path"] != null
             && jsonObj["appData"] != null
             && jsonObj["appControls"] != null

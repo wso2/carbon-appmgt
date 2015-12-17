@@ -3,7 +3,6 @@
     <li class="active"><a href="#" data-toggle="tab" id="upload-app-again">01 - Upload application/provide URL</a><div class="nav-arrow"></div></li>
     <li><div class="nav-wedge"></div><a href="#" >Give application details</a><div class="nav-arrow"></div></li>
 </ul>
-
 <div id="modal-upload-progress" style="display: none;">
     <h2>Uploading.... Please wait.</h2>
     <div class="progress">
@@ -52,22 +51,13 @@
 
 
             <div class="form-group">
-                <label class="control-label col-sm-2" for="txtName">Name <span style="color:#FF0000">*</span></label>
+                <label class="control-label col-sm-2" for="txtName">Title <span style="color:#FF0000">*</span></label>
                 <div class="col-sm-10 inner-addon">
                     <input autocomplete='off' class="field span6" type="text" name="name" id="txtName"
-                           placeholder="Enter the full name of the app" title="Enter the full name of the app"/>
+                           placeholder="Enter the full name of the app" title="Enter the full name of the app">
                     <i id="name_is_ok"  class="icon"></i>
                 </div>
 
-            </div>
-            <div class="form-group">
-                <label class="control-label col-sm-2" for="txtDisplayName">
-					Display Name <span style="color:#FF0000">*</span>
-				</label>
-                <div class="col-sm-10 inner-addon">
-                    <input class="field span6" type="text" name="displayName" id="txtDisplayName"
-                           title="Display Name"/>
-                </div>
             </div>
             <!--
             <div class="form-group">
@@ -98,30 +88,14 @@
                 </div>
             </div>
 
+
+
+
             <div id="control-packagename"	class="form-group">
                 <label class="control-label col-sm-2" for="txtName">Version <span style="color:#FF0000">*</span></label>
                 <div class="col-sm-10">
                     <input class="field span6" style="width: 110px" type="text" name="version"
                            id="txtVersion">
-                </div>
-            </div>
-
-            <div id="control-packagename"	class="form-group">
-                <label class="control-label col-sm-2" for="txtKind">Category <span style="color:#FF0000">*</span></label>
-                <div class="col-sm-10">
-                    <select name="category"  id="txtCategory" class="field span3" >
-                        {{#categories}}
-                            <option {{#compare this ../artifact.attributes.overview_category}}selected{{/compare}}>{{this}}</option>
-                        {{/categories}}
-                    </select>
-                </div>
-            </div>
-
-            <div id="control-packagename"	class="form-group">
-                <label class="control-label col-sm-2" for="txtVisibility">Visibility</label>
-                <div class="col-sm-10">
-                    <input type="text" id="txtVisibility" name="visibility" data-roles="{{artifact.attributes.overview_visibility}}" class='col-lg-6 col-sm-8 col-xs-6'
-                           placeholder="type user role to search"/>
                 </div>
             </div>
 

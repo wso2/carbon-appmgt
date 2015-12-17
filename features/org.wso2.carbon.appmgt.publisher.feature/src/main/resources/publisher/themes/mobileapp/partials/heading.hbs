@@ -1,26 +1,21 @@
-<h1 class="map-heading">{{title}}</h1>
-<ul class="nav nav-pills pull-right secondary-pills" style="margin-top: -43px !important;">
-    {{#each menuItems.leftNavLinks}}
-        {{#ifCond this.name "==" "Edit"  }}
-            {{#if this.isEditable}}
-                <li class="{{this.additionalClasses}}" {{#if this.title}}title="{{this.title}}"{{/if}}>
-                    <a href="{{this.url}}" style="background: #efefef !important;">
-                        {{#if this.iconClass}}
-                            <i class="{{this.iconClass}}" style="font-size: 18px;"></i>
-                        {{/if}}
-                        {{this.name}}
-                    </a>
-                </li>
-            {{/if}}
-        {{else}}
-            <li class="{{this.additionalClasses}}" {{#if this.title}}title="{{this.title}}"{{/if}}>
-                <a href="{{this.url}}" style="background: #efefef !important;">
+<div class="row">
+    <div class="col-md-12">
+    <h1>
+        {{title}}
+        <ul class="nav nav-pills pull-right secondary-pills">
+            {{#each menuItems.leftNavLinks}}
+            <li class="{{this.additionalClasses}}">
+                <a href="{{this.url}}">
                     {{#if this.iconClass}}
-                        <i class="{{this.iconClass}}" style="font-size: 18px;"></i>
+                    <i class="{{this.iconClass}}"></i>
                     {{/if}}
                     {{this.name}}
                 </a>
             </li>
-        {{/ifCond}}
-    {{/each}}
-</ul>
+
+            {{/each}}
+        </ul>
+
+    </h1>
+    </div>
+</div>

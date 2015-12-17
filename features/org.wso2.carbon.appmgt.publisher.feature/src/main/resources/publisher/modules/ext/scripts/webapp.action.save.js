@@ -19,16 +19,17 @@ var meta = {
 var module = function () {
 
     var configs = require('/config/publisher.json');
+    var dataConfigs = require('/config/publisher.js').config();
     var log = new Log();
 
-    function trim (str) {
-        return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-    }
+	function trim (str) {
+		return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+	}
 
     //TODO: Change this method to take WebAppObj as argument instead of passing properties separately.
-    function addToWebApp(uuid, webappProvider, webappName, webappVersion, webappContext,
-                         webappTrackingCode, asset, ssoEnabled, idpProviderUrl, saml2SsoIssuer,
-                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint) {
+    function addToWebApp(uuid,webappProvider, webappName, webappVersion, webappContext,
+                         webappTrackingCode,asset, ssoEnabled, idpProviderUrl, saml2SsoIssuer,
+                         logoutURL,allowAnonymous, skipGateway, webAppEndpoint) {
 
         var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
         var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
@@ -38,14 +39,26 @@ var module = function () {
 
         webAppObj.setContext(webappContext);
         webAppObj.setTrackingCode(webappTrackingCode);
-        webAppObj.setSsoEnabled(ssoEnabled);
+	    webAppObj.setSsoEnabled(ssoEnabled);
         webAppObj.setIdpProviderURL(idpProviderUrl);
         webAppObj.setSaml2SsoIssuer(saml2SsoIssuer);
         webAppObj.setUUID(uuid);
         webAppObj.setLogoutURL(logoutURL);
         webAppObj.setUrl(webAppEndpoint);
-        webAppObj.setAllowAnonymous(allowAnonymous == "TRUE");
-        webAppObj.setSkipGateway(skipGateway == "true");
+
+        if (allowAnonymous=="TRUE"){
+            webAppObj.setAllowAnonymous(true);
+        }
+        else{
+            webAppObj.setAllowAnonymous(false);
+        }
+
+        if (skipGateway == "true") {
+            webAppObj.setSkipGateway(true);
+        }
+        else {
+            webAppObj.setSkipGateway(false);
+        }
 
         var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
         var appMDAOObj = new appMDAO();
@@ -63,15 +76,15 @@ var module = function () {
 
         while(urlPattern != null && trim(urlPattern).length > 0){
 
-            var URITemplate = Packages.org.wso2.carbon.appmgt.api.model.URITemplate;
-            var uriTemplate = new URITemplate();
-            uriTemplate.setHTTPVerb(attributes["uritemplate_httpVerb" + index]);
-            uriTemplate.setUriTemplate(attributes["uritemplate_urlPattern" + index]);
-            uriTemplate.setPolicyGroupId(attributes["uritemplate_policygroupid" + index]);
+        		var URITemplate = Packages.org.wso2.carbon.appmgt.api.model.URITemplate;
+        		var uriTemplate = new URITemplate();
+        		uriTemplate.setHTTPVerb(attributes["uritemplate_httpVerb" + index]);
+        		uriTemplate.setUriTemplate(attributes["uritemplate_urlPattern" + index]);
+                uriTemplate.setPolicyGroupId(attributes["uritemplate_policygroupid" + index]);
 
-            webAppObj.getUriTemplates().add(uriTemplate);
-            index++;
-            urlPattern = attributes["uritemplate_urlPattern" + index];
+                webAppObj.getUriTemplates().add(uriTemplate);
+        		index++;
+        		urlPattern = attributes["uritemplate_urlPattern" + index];
         }
         appMDAOObj.addWebApp(webAppObj);
 
@@ -162,6 +175,39 @@ var module = function () {
 
             //Export the model to an asset
             var asset = context.parent.export('asset.exporter');
+            //set sso details
+            var idpProviderUrl = dataConfigs.ssoConfiguration.identityProviderURL;
+            var ssoEnabled = dataConfigs.ssoConfiguration.enabled;
+            asset.attributes.sso_idpProviderUrl = idpProviderUrl;
+            asset.attributes.sso_saml2SsoIssuer = saml2SsoIssuer;
+            if(ssoEnabled) {
+                asset.attributes.sso_singleSignOn = "Enabled";
+            } else {
+                asset.attributes.sso_singleSignOn = "Disabled";
+            }
+
+            var appOwner = (asset.attributes.overview_appOwner).trim();
+            if (appOwner.length == 0) {
+                asset.attributes.overview_appOwner = provider;
+            }
+            var appTenant = (asset.attributes.overview_appTenant).trim();
+            if (appTenant.length == 0) {
+                asset.attributes.overview_appTenant = tenantDomain;
+            }
+
+            var isAdvertiseOnly = (asset.attributes.overview_advertiseOnly).trim();
+            if (isAdvertiseOnly.toLowerCase() != "true") {
+                asset.attributes.overview_advertiseOnly = "false";
+            }
+
+            var subscriptionAvailability = (asset.attributes.overview_subscriptionAvailability).trim();
+            if(subscriptionAvailability == "current_tenant") {
+                asset.attributes.overview_tenants = tenantDomain;
+            }
+
+            if(subscriptionAvailability == "all_tenants") {
+                asset.attributes.overview_tenants = "";
+            }
 
             log.debug('Finished exporting model to an artifact');
 
@@ -176,7 +222,7 @@ var module = function () {
 
             artifactManager.add(asset);
 
-            log.debug('Finished saving asset (webapp): ' + name);
+            log.debug('Finished saving asset : ' + name);
 
             log.debug(asset);
 
@@ -193,7 +239,7 @@ var module = function () {
                 return utility.assertEqual(adapter, predicate);
             }, null);
 
-            log.debug('Locating saved asset: ' + artifact + ' to get the asset id.');
+            log.debug('Locating saved asset: ' + stringify(artifact) + ' to get the asset id.');
 
             var id = artifact[0].id || ' ';
 
@@ -202,11 +248,13 @@ var module = function () {
             var artifact1 = artifactManager.get(id);
             var attributes = artifact1.attributes;
 
+            if (attributes.overview_advertiseOnly.toLowerCase() != "true") {
+                //adding to database
+                addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
+                    attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
+                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
+            }
 
-            //adding to database
-            addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
-                attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
-                saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
 
             //Save the id data to the model
             model.setField('*.id', id);

@@ -1,53 +1,110 @@
-
-<div class="assets-wrapper">
+<div>
+    {{#if user}}
+        <input type="hidden" value="{{user.username}}" id="assetsloggedinuser" name="loggedinuser">
+    {{else}}
+        <input type="hidden" value="{{user.username}}" id="assetsloggedinuser" name="loggedinuser">
+    {{/if}}
+    <input type="hidden" value="{{config.localIP}}" id="assetsLocalIP" name="assetsLocalIP">
+    <input type="hidden" value="{{config.httpsPort}}" id="assetshttpsPort" name="assetshttpsPort">
+    <input type="hidden" value="{{sso}}" id="sso" name="sso">
+    <div id="assets-container" data-pages="{{pages}}">
 
 	{{#if assets}}
+	{{#slice assets size="4"}}
+		<div class="row-fluid">
+		{{#each .}}
+			<div class="span3 asset" data-id="{{id}}" data-type="{{type}}" id="asset">
+				{{#attributes}}
+                    {{#compare  overview_advertiseOnly "true" operator="=="}}
+                        <div class="ribbon-wrapper-orange"><div class="ribbon-orange">Advertised</div></div>
+                    {{/compare}}
 
-		{{#each assets}}
+					{{#if ../isSubscribed}}
+                        <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
+					{{/if}}
 
-            <div class="col-xs-6 col-md-4 col-lg-1-5 app-assets-wrapper">
-                {{#if isSubscribed}}
-                    <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
-                {{/if}}
-                <div class="app-assets">
-                    <a href="{{url "/assets"}}/{{type}}/{{id}}">
-                        <img class="app-assets-icon"
-                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
-                    </a>
-                    <div class="app-assets-info">
-                        <div class="app-assets-name">
-							{{attributes.overview_displayName}}
-                        </div>
-                        <div class="app-assets-provider">
-							{{attributes.overview_provider}}
-                        </div>
-                    </div>
-                    <span class="app-assets-rating"> {{#assetRating rating}}{{/assetRating}} </span>
-                </div>
-            </div>
-
-		{{/each}}
-
+                    {{#compare  overview_advertiseOnly "true" operator="=="}}
+                        <a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} " id="assetsLink">
+                    {{else}}
+                        <a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}" id="assetsLink">
+                    {{/compare}}
+	                		<div class="asset-icon">
+                                <input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">
+	                    			{{#if ../indashboard}}
+	                    
+	                    			{{/if}}
+	                    			<img src="{{#if images_thumbnail}}{{tenantedUrl images_thumbnail}}{{/if}}">
+	                		</div>
+				</a>
+	
+	            		<div class="asset-details">
+					<div class="asset-name">
+						<input type="hidden"  value="{{overview_allowAnonymous}}" id="allowAnonymous" name="allowAnonymous">
+                        {{#compare  overview_advertiseOnly "true" operator="=="}}
+                            <a href="{{url "/t"}}/{{overview_appTenant}}/assets/{{../../type}}/{{overview_advertisedAppUuid}} " id="assetDeatils"> <h4>{{overview_displayName}}</h4></a>
+                        {{else}}
+                            <a href="{{tenantedUrl "/assets"}}/{{../../type}}/{{../../id}}" id="assetDeatils"> <h4>{{overview_displayName}}</h4></a>
+                        {{/compare}}
+	                		</div>
+	                		<div class="asset-rating">
+						<div class="asset-rating-{{../rating}}star"></div>
+					</div>
+							{{#if ../overview_skipGateway}}
+                                <style>.meta-gw-info {
+                                    position: absolute;
+                                    top: 25px;
+                                    right: 5px;
+                                    font-size: 10px;
+                                    color: red;
+                                }</style>
+                                <div class="meta-gw-info"><i class="icon-remove"></i>Skipped Proxying</div>
+							{{/if}}
+                            <div class="asset-author-category">
+						<ul>
+							<li>
+								<h4>{{t "Version"}}</h4>
+								<a class="asset-version" href="#">{{overview_version}}</a>
+	                        			</li>
+	                        			<li>
+	                        				<h4>{{t "Category"}}</h4>
+	                            				<a class="asset-category" href="#">{{cap ../type}}</a>
+	                            			</li>
+	                       				 <li>
+	                        				<h4>{{t "Author"}}</h4>
+	                            				<a class="asset-author" href="#">{{overview_provider}}</a>
+	                        			</li>
+						</ul>
+					</div>
+				</div>
+	            	{{/attributes}}
+			</div>
+        	{{/each}}
+		</div>
+    {{/slice}}
     {{else}}
-
-        <div class="well-large col-md-12 no-apps-box">
-            <i class="fw fw-paste nothing-icon"></i> Sorry, We could not find any app for you
-        </div>
-
-	{{/if}}
-
-</div>
-
-
-{{#if assets}}
-    <div class="row">
-    <ul class="pager">
-        {{#if leftNav}}
-            <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}">Previous</a></li>
-        {{/if}}
-        {{#if rightNav}}
-            <li><a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}">Next</a></li>
-        </ul>
-        {{/if}}
+	<div class="empty-assert">{{t "We couldn't find anything for you."}}</div>
+    {{/if}}
     </div>
-{{/if}}
+    <!--div class="loading-inf-scroll"></div-->
+    <div id="paging-indices">
+        <ul class="pagination">
+            {{#if leftNav}}
+                <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">
+                    <span aria-hidden="true">&laquo;</span><span class="sr-only"></span></a>
+                </li>
+            {{/if}}
+            {{#each pageIndeces}}
+                {{#if this.isDisabled}}
+                    <li class="disabled"><a>{{this.index}}</a></li>
+                {{else}}
+                    <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.index}}">
+                {{/if}}
+            {{/each}}
+            {{#if rightNav}}
+                <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">
+                    <span aria-hidden="true">&raquo;</span><span class="sr-only"></span></a>
+                </li>
+            {{/if}}
+        </ul>
+    </div>
+</div>

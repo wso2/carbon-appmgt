@@ -22,7 +22,7 @@ var resource = (function () {
     var addSubscription = function (context) {
 
         if(authenticator.getLoggedInUser() == null){
-            response.sendRedirect("/store/login");
+            response.sendRedirect(caramel.tenantedUrl('/login'));
             return;
         }
 
@@ -46,7 +46,7 @@ var resource = (function () {
 
         var result = subsApi.addSubscription(subscription);
 
-        if(result){
+        if(result.status == true){
             subscription['op_type'] = 'ALLOW';
             result = subsApi.updateVisibility(subscription);
         }

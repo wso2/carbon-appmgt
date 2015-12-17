@@ -10,7 +10,7 @@ var render = function(theme, data, meta, require) {
 	//print(caramel.build(data));
 	theme('2-column-right', {
 		title : data.title,
-
+		
 		header: [
 					{
 						partial: 'header',
@@ -23,7 +23,7 @@ var render = function(theme, data, meta, require) {
 						context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
 					}
 				],
-
+		
         body : [{
             partial : 'asset',
             context : require('/helpers/asset.js').format({

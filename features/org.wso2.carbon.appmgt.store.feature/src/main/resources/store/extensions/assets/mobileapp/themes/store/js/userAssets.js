@@ -1,28 +1,8 @@
 appToUninstall = null;
-appToInstall = null;
+appToReinstall = null;
 
 
 $(function(){
-
-
-	var visibleToDevices = function(){
-		var ua = navigator.userAgent;
-		var checker = {
-			iphone: ua.match(/(iPhone|iPod|iPad)/),
-			blackberry: ua.match(/BlackBerry/),
-			android: ua.match(/Android/)
-		};
-
-		if (checker.android){
-			$('.type-ios').hide();
-		}
-
-		if (checker.iphone){
-			$('.type-android').hide();
-		}
-
-	};
-	visibleToDevices();
 	
 
 
@@ -106,7 +86,7 @@ function urlExists(url){
 
 
 
-$(document).on('click', '.app-assets .asset-unsubscribe-btn', function() {
+$(document).on('click', '#myasset-container .asset-unsubscribe-btn', function() {
 	appToUninstall = $(this).data("aid");
     appName = $(this).data("name");
     noty({
@@ -149,22 +129,29 @@ $(document).on('click', '.app-assets .asset-unsubscribe-btn', function() {
     });
 });
 
-$(document).on('click', '.app-assets .asset-reinstall-btn', function() {
-
-	appToInstall = $(this).data("aid");
-
+$(document).on('click', '#myasset-container .asset-reinstall-btn', function() {
+	appToReinstall = $(this).data("aid");
 	   devicePlatform = $(this).data("platform").toLowerCase();
+
+
+		$(".device-image-block-modal").each(function(index) {	
+			var platform = $(this).data("platform").toLowerCase();
+
+            $(this).css("display", "block");
+
+			if(devicePlatform == 'webapp'){
+
+			}else if(devicePlatform != platform){
+				$(this).css("display", "none");
+			}
+			
+		
+		});
+		
 		
 		$('#devicesList').modal('show');
 		
 });
-
-	$(document).on('click', '.app-assets .asset-reinstall-btn-direct', function() {
-		appToInstall = $(this).data("aid");
-		performInstalltionUser(appToInstall);
-	});
-
-
 
 
 
@@ -200,7 +187,7 @@ $(".device-image-block-modal").click(function(index) {
       url: "/store/apps/devices/" + deviceId + "/install", 
       type: "POST",
       dataType: "json",	
-      data : {"asset": appToInstall}
+      data : {"asset": appToReinstall}			      
 	});	
 		
 });
@@ -219,11 +206,11 @@ $(document).on('click', '#myasset-container .btn-embed', function() {
     return false;
 });
 
-$('.popover-content').on("click",function(event){
+$('.popover-content').live("click",function(event){
 	$('.arrow').css({"display":"none"});
 });
 
-$(".popover-content").on("mouseleave",function(){
+$(".popover-content").live("mouseleave",function(){
 	$('.arrow').css({"display":"block"});
 });
 

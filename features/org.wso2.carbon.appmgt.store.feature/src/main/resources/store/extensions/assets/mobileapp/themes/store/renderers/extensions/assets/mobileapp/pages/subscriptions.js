@@ -74,7 +74,8 @@ var render = function (theme, data, meta, require) {
     }
 
 
-    data.header.myApps = true;
+
+
 
 
     theme('2-column-right', {

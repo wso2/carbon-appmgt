@@ -25,17 +25,17 @@ authenticator.init(jagg,session);
 
 
 var carbon = require('carbon');
-var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
-
+var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
 
 require('/modules/store.js').exec(function (ctx) {
-    var asset, aid, title,
+    var asset, aid, title,currentTenant,userTenant,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
             tenantId = ctx.tenantId,
             configs = ctx.configs,
+            tenantDomain = ctx.tenant.domain,
             site = ctx.site,
             matcher = ctx.matcher,
             inDashboard = false,
@@ -47,331 +47,396 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+    var tenantIdVal = user.tenantId;
 
-    matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
-    aid = matcher.elements().aid;
-    title = store.assetLinks(type).title;
+    var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+    var defaultUrl = '/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+
+    //Match the incoming request with tenanted and default URI patterns and extracts the relecant asset id
+    if(matcher.match(defaultUrl) || matcher.match(tenantedUrl)){
+        aid = matcher.elements().aid;
+        title = store.assetLinks(type).title;
+        currentTenant = matcher.elements().domain;
+    }
+    //Retrieve assets
     try {
         asset = store.asset(type, aid);
     } catch (e) {
+        log.error(e);
         response.sendError(404, 'Requested page cannot be found');
         return;
     }
 
-    if (JSON.parse(social.getRating("webapp:" + aid))) {
-        asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + aid)).rating);
+
+    if (!asset && !user) { // asset not found, may be restricted by role
+        //so need to login
+        var referer = request.getHeader("referer");
+        if (!referer) {
+            referer = request.getRequestURL();
+        }
+        var contextPath = caramel.configs().context;
+        response.sendRedirect(encodeURI(contextPath + "/login?referer=" + referer));
+    } else if (asset && !(asset.attributes.overview_allowAnonymous == "TRUE") && !user) {
+        // asset found which doesn't have anonymous access so need login
+        var referer = request.getHeader("referer");
+        if (!referer) {
+            referer = request.getRequestURL();
+        }
+        var contextPath = caramel.configs().context;
+        response.sendRedirect(encodeURI(contextPath + "/login?referer=" + referer));
+    } else if (!asset && user) {
+        // asset not found for logged in user, probably because of invalid uuid
+        response.sendError(404, 'Requested page cannot be found');
     } else {
-        asset.rating = 0.0;
-    }
-
-    //check asset LC state
-    //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
-    //}
-
-    if (store.isuserasset(aid, type)) {
-        inDashboard = true;
-    }
-
-    var rxtAttributes = utility.getRXTAttributes(tenantId, type);
-
-    var ATTR_PROVIDER = 'overview_provider';
-    var LIFECYCLE_STATE_PROPERTY = 'lcState';
-    var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
-    var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
-
-    // Init subscription service.
-    var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
-    var subscriptionService = new subscriptionServiceModule.SubscriptionService();
-    subscriptionService.init(jagg, session);
-
-    var username = null;
-    if (authenticator.getLoggedInUser()) {
-        username = authenticator.getLoggedInUser().username;
-    }
-
-    /*
-     The function obtains the assets published by the given provider
-     */
-    var getAssetsFromProvider = function (asset, store) {
-        var assetsFromProvider = {};
-        var provider = asset.attributes[ATTR_PROVIDER];
-        var searchOptions = {};
-        var paging;
-
-        searchOptions['attributes'] = {};
-        searchOptions = obtainViewQuery(searchOptions);
-        searchOptions['attributes'][ATTR_PROVIDER] = provider;
-        paging = {start: 0, count: 10, sort: 'recent'};
-        assetsFromProvider['overview_provider'] = provider;
-        assetsFromProvider['type'] = type;
-        assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
-
-        //remove the selected asset from the assets list
-        for (var i = 0; i < assetsFromProvider.assets.length; i++) {
-            if (assetsFromProvider.assets[i].id === asset.id) {
-                assetsFromProvider.assets.splice(i, 1);
-                break;
-            }
+        if (user) {
+            userTenant = user.tenantDomain;
         }
 
-        return assetsFromProvider;
-    }
-
-    /*
-     The function obtains the query used to search for assets
-     */
-    var obtainViewQuery = function (options) {
-
-        var storeConfig = require('/config/store.json').lifeCycleBehaviour;
-        var visibleStates = storeConfig.visibleIn || DEFAULT_ASSET_VIEW_STATE;
-        var attributeName = storeConfig.lcAttributeName || DEFAULT_LC_ATTRIBUTE_NAME;
-
-        //options[LIFECYCLE_STATE_PROPERTY] = visibleStates;
-        //Changed the query to check for overview_status as opposed to lifecycle state
-        options[attributeName] = visibleStates;
-
-        return options;
-    }
-
-    var getSubscriptionInfo = function(asset){
-
-        // Get the enterprise subscription the individual subscription for this user for this app.    
-        var appInfo = {};
-        appInfo["name"] = asset.attributes.overview_name;
-        appInfo["version"] = asset.attributes.overview_version;
-        appInfo["provider"] = asset.attributes.overview_provider;
-
-        var defaultApplicationName = "DefaultApplication";
-
-        var enterpriseSubscription;
-        enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", username).subscription;
-
-        var individualSubscription;
-        individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", username).subscription;
-
-        // Get all available IDPs (enterprises)
-        var enterprises = getEnterprises();
-
-        var subscriptionInfo = {};
-
-        subscriptionInfo["enterpriseSubscription"] = enterpriseSubscription;
-        subscriptionInfo["individualSubscription"] = individualSubscription;
-        subscriptionInfo["enterprises"] = enterprises;
-        subscriptionInfo["viewData"] = getSubscriptionViewData(enterpriseSubscription, enterprises);
-
-        return subscriptionInfo;
-
-    }
-
-    var getEnterprises = function () {
-        var store = jagg.module("manager").getAPIStoreObj();
-        var isEmailLoginEnabled = store.isEnableEmailUsername();
-
-        var appName = asset.attributes.overview_name;
-        var appVersion = asset.attributes.overview_version;
-        var appProvider = asset.attributes.overview_provider;
-        var result = null;
-        var issuerName = null;
-        var store = jagg.module("manager").getAPIStoreObj();
-        var isEmailLoginEnabled = store.isEnableEmailUsername();
-
-        //Check whether application author is a tenant
-        if (!isEmailLoginEnabled && appProvider != null && appProvider.indexOf("-AT-") != -1) {
-            result = appProvider.split("-AT-");
-        }
-        if (result != null) {
-            issuerName = appName + "-" + result[1] + "-" + appVersion;
+        if (JSON.parse(social.getRating("webapp:" + aid))) {
+            asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + aid)).rating);
         } else {
-            issuerName = appName + "-" + appVersion;
+            asset.rating = 0.0;
         }
 
-        var ssoProviderInfo = asset.attributes.sso_ssoProvider.split("-");
+        //check asset LC state
+        //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
+        //}
 
-        var authResult = subscriptionService.getEnterprisesForApplication(
-                {appName: issuerName, ssoProviderName: ssoProviderInfo[0], ssoProviderVersion: ssoProviderInfo[1]})
+        if (store.isuserasset(aid, type)) {
+            inDashboard = true;
+        }
 
-        return authResult.enterprises;
+        var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
-    }
+        var ATTR_PROVIDER = 'overview_provider';
+        var LIFECYCLE_STATE_PROPERTY = 'lcState';
+        var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
+        var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
 
-    // Returns HBS friendly subscription info.
-    var getSubscriptionViewData = function(enterpriseSubscription, enterprises){
+        // Init subscription service.
+        var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
+        var subscriptionService = new subscriptionServiceModule.SubscriptionService();
+        subscriptionService.init(jagg, session);
 
-        var viewData = new Array();
+        /*
+         The function obtains the assets published by the given provider
+         */
+        var getAssetsFromProvider = function (asset, store) {
+            var assetsFromProvider = {};
+            var provider = asset.attributes[ATTR_PROVIDER];
+            var searchOptions = {};
+            var paging;
 
-        if(!enterprises){
+            searchOptions['attributes'] = {};
+            searchOptions = obtainViewQuery(searchOptions);
+            searchOptions['attributes'][ATTR_PROVIDER] = provider;
+            paging = {start: 0, count: 10, sort: 'recent'};
+            assetsFromProvider['overview_provider'] = provider;
+            assetsFromProvider['type'] = type;
+            assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
+            return assetsFromProvider;
+        }
+
+        /*
+         The function obtains the query used to search for assets
+         */
+        var obtainViewQuery = function (options) {
+
+            var storeConfig = require('/config/store.json').lifeCycleBehaviour;
+            var visibleStates = storeConfig.visibleIn || DEFAULT_ASSET_VIEW_STATE;
+            var attributeName = storeConfig.lcAttributeName || DEFAULT_LC_ATTRIBUTE_NAME;
+
+            //options[LIFECYCLE_STATE_PROPERTY] = visibleStates;
+            //Changed the query to check for overview_status as opposed to lifecycle state
+            options[attributeName] = visibleStates;
+
+            return options;
+        }
+
+        var getSubscriptionInfo = function(asset){
+
+            // Get the enterprise subscription the individual subscription for this user for this app.
+            var appInfo = {};
+            appInfo["name"] = asset.attributes.overview_name;
+            appInfo["version"] = asset.attributes.overview_version;
+            appInfo["provider"] = asset.attributes.overview_provider;
+
+            var defaultApplicationName = "DefaultApplication";
+
+            var enterpriseSubscription;
+            if (authenticator.getLoggedInUser()) {
+                enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
+            }
+            else
+            {
+                enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
+            }
+
+            var individualSubscription;
+            if (authenticator.getLoggedInUser()) {
+                individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
+            }
+            else
+            {
+                individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
+            }
+
+
+
+            // Get all available IDPs (enterprises)
+            var enterprises = getEnterprises();
+
+            var subscriptionInfo = {};
+
+            subscriptionInfo["enterpriseSubscription"] = enterpriseSubscription;
+            subscriptionInfo["individualSubscription"] = individualSubscription;
+            subscriptionInfo["enterprises"] = enterprises;
+            subscriptionInfo["viewData"] = getSubscriptionViewData(enterpriseSubscription, enterprises);
+
+            return subscriptionInfo;
+
+        }
+
+        var getEnterprises = function () {
+            var store = jagg.module("manager").getAPIStoreObj();
+            var isEmailLoginEnabled = store.isEnableEmailUsername();
+
+            var appName = asset.attributes.overview_name;
+            var appVersion = asset.attributes.overview_version;
+            var appProvider = asset.attributes.overview_provider;
+            var result = null;
+            var issuerName = null;
+            var store = jagg.module("manager").getAPIStoreObj();
+            var tenantDomain = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+
+            if (tenantIdVal != '-1234') {
+                issuerName = appName + "-" + tenantDomain + "-" + appVersion;
+            } else {
+                issuerName = appName + "-" + appVersion;
+            }
+
+            var ssoProviderInfo = asset.attributes.sso_ssoProvider.split("-");
+
+            var authResult = subscriptionService.getEnterprisesForApplication(
+                    {appName: issuerName, ssoProviderName: ssoProviderInfo[0], ssoProviderVersion: ssoProviderInfo[1]})
+
+            return authResult.enterprises;
+
+        }
+
+        // Returns HBS friendly subscription info.
+        var getSubscriptionViewData = function(enterpriseSubscription, enterprises){
+
+            var viewData = new Array();
+
+            if(!enterprises){
+                return viewData;
+            }
+
+            // Create a Set of trusted IDPs in the enterprise subscription.
+            var trustedIdpsSet = {};
+
+            if(enterpriseSubscription){
+
+                var trustedIdps = JSON.parse(enterpriseSubscription.trustedIdps);
+
+                for(var i = 0; i < trustedIdps.length; i++){
+                    trustedIdpsSet[trustedIdps[i]] = true;
+                }
+            }
+
+            for(var i=0; i< enterprises.length; i++){
+                var viewEntry = {};
+                viewEntry["enterprise"] = enterprises[i];
+                viewEntry["subscribed"] = enterprises[i] in trustedIdpsSet;
+                viewData.push(viewEntry);
+            }
+
             return viewData;
         }
 
-        // Create a Set of trusted IDPs in the enterprise subscription.
-        var trustedIdpsSet = {};
-
-        if(enterpriseSubscription){
-
-            var trustedIdps = JSON.parse(enterpriseSubscription.trustedIdps);
-
-            for(var i = 0; i < trustedIdps.length; i++){
-                trustedIdpsSet[trustedIdps[i]] = true;
+        function isStoreAdmin(){
+            if(authenticator.getLoggedInUser()) {
+                return hasUserRole("Internal/store-admin");
             }
-        }
-
-        for(var i=0; i< enterprises.length; i++){
-            var viewEntry = {};
-            viewEntry["enterprise"] = enterprises[i];
-            viewEntry["subscribed"] = enterprises[i] in trustedIdpsSet;
-            viewData.push(viewEntry);
-        }
-
-        return viewData;
-    }
-
-    function isStoreAdmin() {
-        if (authenticator.getLoggedInUser()) {
-            return hasUserRole("Internal/store-admin");
-        }
-        return false;
-    }
-
-    function hasUserRole(userRoleName){
-        var usr = require('carbon').server.tenantUser(user.username);
-        var userManager = require('store').server.userManager(usr.tenantId);
-        var roles = userManager.getRoleListOfUser(usr.username);
-
-        var hasRole = false;
-
-        for(var i=0; i < roles.length; i++){
-            if(roles[i] == userRoleName){
-                hasRole = true;
-                break;
-            }
-        }
-        return hasRole;
-    }
-
-
-    var assetsByProvider = getAssetsFromProvider(asset, store);
-
-
-
-
-
-    var docs;
-    if (authenticator.getLoggedInUser()) {
-        docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                asset.attributes.overview_name,
-                asset.attributes.overview_version,
-                authenticator.getLoggedInUser().username);
-    }
-    else {
-        docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                asset.attributes.overview_name,
-                asset.attributes.overview_version,
-                null);
-    }
-
-    var apiData=apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
-            asset.attributes.overview_name,
-            asset.attributes.overview_version);
-
-    var myapps;
-    myapps = appInfoApi.getApplications(username);
-
-    var availableTiers=apiInfoManager.getTiers();
-
-   // user=authenticator.getLoggedInUser();
-
-    var subscriptionInfo = getSubscriptionInfo(asset);
-
-    var isStoreAdmin = isStoreAdmin();
-
-    if(subscriptionInfo.individualSubscription){
-        if(subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED"){
-            isSubscribed = true;
-            subscriptionInfo.individualSubscription["OnHold"] = false;
-        }else if(subscriptionInfo.individualSubscription.subscriptionStatus === "ON_HOLD"){
-            subscriptionInfo.individualSubscription["OnHold"] = true;
-        }else{
-            subscriptionInfo.individualSubscription["OnHold"] = false;
-        }
-    }
-
-    if(asset.attributes.overview_skipGateway == "true") {
-        skipGateway = true;
-    } else {
-        skipGateway = false;
-    }
-
-
-    var process = require('process');
-    //set local ip
-    asset.attributes.localIP = "https://" + process.getProperty('server.host');
-    //set http port
-    asset.attributes.httpsPort = process.getProperty('https.port');
-
-    for(var i = 0; i < assetsByProvider.assets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id))) {
-            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id)).rating)};
-        }else{
-            assetsByProvider.assets[i].rating = 0;
-        }
-    }
-
-    var recentAssets = store.recentAssets(type);
-
-    for(var i = 0; i < recentAssets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-            recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
-        }else{
-            recentAssets[i].rating = 0;
-        }
-    }
-
-    caramel.render({
-        title: 'Store | ' + type,
-        user: user,
-        sso: sso,
-
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
-
-        navigation: site.navigation(tenantId),
-        search: {
-            search: {title: type},
-            isTopAssets: false,
-            searchFields: search.fields()
-        },
-        isSocial: configs.socialCommentsEnable,
-
-        type: type,
-        embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
-        inDashboard: inDashboard,
-        isSubscribed:isSubscribed,
-        skipGateway:skipGateway,
-        webAppEndpoint:webAppEndpoint,
-        subscriptionInfo : subscriptionInfo,
-        isEnterpriseSubscriptionAllowed: isStoreAdmin,
-        asset: asset,
-        tenantId : tenantIdVal,
-        tags: [
+            else
             {
-                url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
+                return false;
             }
-        ],
-        myAssets: { user: user, type: type, title: title },
-        recentAssets: recentAssets,
-        assetsByProvider: assetsByProvider,
-        documentation: docs,
-        apiData:apiData ,
-        metadata:{
-            myapps:myapps,
-            tiers:availableTiers,
-            api:apiData,
-            apiAssetData:asset
         }
-    });
+
+        function hasUserRole(userRoleName){
+            var usr = require('carbon').server.tenantUser(user.username);
+            var userManager = require('store').server.userManager(usr.tenantId);
+            var roles = userManager.getRoleListOfUser(usr.username);
+
+            var hasRole = false;
+
+            for (var i = 0; i < roles.length; i++) {
+                if (roles[i] == userRoleName) {
+                    hasRole = true;
+                    break;
+                }
+            }
+            return hasRole;
+        }
+
+
+        var assetsByProvider = getAssetsFromProvider(asset, store);
+
+
+
+
+
+        var docs;
+        if (authenticator.getLoggedInUser()) {
+            docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
+                    asset.attributes.overview_name,
+                    asset.attributes.overview_version,
+                    authenticator.getLoggedInUser().username);
+        }
+        else{
+            docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
+                    asset.attributes.overview_name,
+                    asset.attributes.overview_version,
+                    null);
+        }
+
+        var apiData=apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
+                asset.attributes.overview_name,
+                asset.attributes.overview_version);
+
+        var myapps;
+        if (authenticator.getLoggedInUser()) {
+            myapps = appInfoApi.getApplications(authenticator.getLoggedInUser().username);
+        }
+        else
+        {
+            myapps = appInfoApi.getApplications(null);
+        }
+
+        var availableTiers=apiInfoManager.getTiers();
+
+        user=authenticator.getLoggedInUser();
+
+        var subscriptionInfo = getSubscriptionInfo(asset);
+
+        var isStoreAdmin = isStoreAdmin();
+
+        if(subscriptionInfo.individualSubscription){
+            if(subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED"){
+                isSubscribed = true;
+                subscriptionInfo.individualSubscription["OnHold"] = false;
+            }else if(subscriptionInfo.individualSubscription.subscriptionStatus === "ON_HOLD"){
+                subscriptionInfo.individualSubscription["OnHold"] = true;
+            }else{
+                subscriptionInfo.individualSubscription["OnHold"] = false;
+            }
+        }
+
+        if(asset.attributes.overview_skipGateway == "true") {
+            skipGateway = true;
+        } else {
+            skipGateway = false;
+        }
+
+
+        var process = require('process');
+        //set local ip
+        asset.attributes.localIP = "https://" + process.getProperty('server.host');
+        //set http port
+        asset.attributes.httpsPort = process.getProperty('https.port');
+
+        for(var i = 0; i < assetsByProvider.assets.length; i++){
+            if(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id))) {
+                assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id)).rating)};
+            }else{
+                assetsByProvider.assets[i].rating = 0;
+            }
+        }
+
+        var recentAssets = store.recentAssets(type);
+
+        for(var i = 0; i < recentAssets.length; i++){
+            if(JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
+                recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
+            }else{
+                recentAssets[i].rating = 0;
+            }
+        }
+
+        var subVisibility = true;
+        var subAvailability = asset.attributes.overview_subscriptionAvailability;
+        if (subAvailability && currentTenant) {
+            if (subAvailability == "current_tenant") {
+                if(userTenant != currentTenant)
+                    subVisibility = false;
+
+            } else if (subAvailability == "specific_tenants") {
+                var tenants = stringify(asset.attributes.overview_tenants);
+                if((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1))
+                    subVisibility = false;
+            }
+        }
+
+        var headerData = site.header(tenantId, {
+            sso: sso,
+            user: user,
+            isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+        });
+
+        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+        headerData.domain = tenantDomain;
+
+        caramel.render({
+            title: 'Store | ' + type,
+            user: user,
+            sso: sso,
+
+            header: headerData,
+
+            navigation: site.navigation(tenantId),
+            search: {
+                search: {title: type},
+                isTopAssets: false,
+                searchFields: search.fields()
+            },
+            isSocial: configs.socialCommentsEnable,
+
+            type: type,
+            embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
+            inDashboard: inDashboard,
+            isSubscribed:isSubscribed,
+            skipGateway:skipGateway,
+            webAppEndpoint:webAppEndpoint,
+            subscriptionInfo : subscriptionInfo,
+            isEnterpriseSubscriptionAllowed: isStoreAdmin,
+            asset: asset,
+            tenantId : tenantIdVal,
+            tags: [
+                {
+                    url: '/assets/' + type + '/?page=1&tag=',
+                    data: store.tags(type)
+                }
+            ],
+            myAssets: { user: user, type: type, title: title },
+            recentAssets: recentAssets,
+            assetsByProvider: assetsByProvider,
+            documentation: docs,
+            apiData:apiData ,
+            metadata:{
+                myapps:myapps,
+                tiers:availableTiers,
+                api:apiData,
+                apiAssetData:asset
+            },
+            subVisibility:subVisibility
+        });
+
+    }
 
 
 }, request, response, session);
