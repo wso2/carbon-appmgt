@@ -101,7 +101,7 @@
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.platform.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.registry.core:${carbon.platform.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.self.registration.server:4.2.2</importFeatureDef>
-				<importFeatureDef>org.wso2.store:1.1.0</importFeatureDef>
+				<importFeatureDef>org.wso2.carbon.store:1.1.1-SNAPSHOT</importFeatureDef>
 				<importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
 				<importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
 				<importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
