@@ -25,13 +25,20 @@
 			
 
 			<div class="form-group">
-				<label class="control-label col-sm-2" for="txtName">Title</label>
+				<label class="control-label col-sm-2" for="txtName">Name</label>
 				<div class="col-sm-10">
 					<input class="field col-md-6" type="text" name="overview_name" id="txtName" disabled="disabled"
-                           value="{{artifact.attributes.overview_name}}" placeholder="Enter the full name of the app">
-					<input type="hidden" name="app_id" id="app_id" value="{{artifact.id}}" >								
+                           value="{{artifact.attributes.overview_name}}"/>
+					<input type="hidden" name="app_id" id="app_id" value="{{artifact.id}}"/>
 				</div>
 			</div>
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="txtDisplayName">Display Name</label>
+                <div class="col-sm-10">
+                    <input class="field col-md-6" type="text" name="displayName" id="txtDisplayName"
+                           value="{{artifact.attributes.overview_displayName}}" title="Display Name"/>
+                </div>
+            </div>
 			<!--
 			<div class="form-group">
 			<label class="control-label" for="txtName">Package Name</label>
@@ -66,6 +73,26 @@
 										id="txtVersion" disabled="disabled">
 									</div>
 			</div>
+
+            <div id="control-packagename"	class="form-group">
+                <label class="control-label col-sm-2" for="txtKind">Category <span style="color:#FF0000">*</span></label>
+                <div class="col-sm-10">
+                    <select name="category"  id="txtCategory" class="field span3" >
+						{{#categories}}
+                            <option {{#compare this ../artifact.attributes.overview_category}}selected{{/compare}}>{{this}}</option>
+						{{/categories}}
+                    </select>
+                </div>
+            </div>
+
+            <div id="control-packagename"	class="form-group">
+                <label class="control-label col-sm-2" for="txtVisibility">Ristrict Visibility</label>
+                <div class="col-sm-10">
+
+                    <input type="text" id="txtVisibility" name="visibility" data-roles="{{artifact.attributes.overview_visibility}}" class='col-lg-6 col-sm-8 col-xs-6'
+                           placeholder="type user role to search"/>
+                </div>
+            </div>
 
 			
 

@@ -58,23 +58,15 @@
                 </thead>
                 <tbody>
                  {{#each artifacts}}
-
-                 {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}
-                     <tr style=" pointer-events: none; cursor: default;">
-                 {{else}}
-                     <tr>
-                 {{/ifCond}}
+                
+                    <tr>
                         <td>
                         <img src="{{this.attributes.images_thumbnail}}" class="" />
                         </td>
                         <td class="asset-listing-name col-md-3">
-                            {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}
-                                {{this.attributes.overview_displayName}}{{t " --Advertised App"}}
-                            {{else}}
-                                <a href='/publisher/asset/{{../../shortName}}/{{this.id}}'>
-                                    {{this.attributes.overview_displayName}}
-                                </a>
-                            {{/ifCond}}
+                            <a href='/publisher/asset/{{../shortName}}/{{this.id}}'>
+                                {{this.attributes.overview_displayName}}
+                            </a>
                         </td>
                         <td>
                         {{this.attributes.overview_version}}
@@ -89,45 +81,14 @@
                             <span class="lifecycle-state"><small><i class="icon-circle lc-state-{{this.lifecycleState}}"></i> {{this.lifecycleState}}</small></span>
                         </td>
                          <td>
-                             <!-only publish,unpublish and delete actions are alllowed for advertised app -->
+
                              {{#this.lifecycleAvailableActions}}
-                                {{#ifCond ../attributes.overview_advertiseOnly "==" "true"}}
-
-                                    {{#ifCond name "==" "Re-Publish"}}
-                                        <a  style=" pointer-events: auto; cursor: pointer"
-                                            data-action="{{name}}" data-app="{{../../../id}}"
-                                            data-name="{{../../../attributes.overview_name}}"
-                                            data-provider="{{../../../attributes.overview_provider}}"
-                                            data-version="{{../../../attributes.overview_version}}"
-                                            class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
-                                    {{/ifCond}}
-
-                                    {{#ifCond name "==" "Unpublish"}}
-                                        <a  style=" pointer-events: auto; cursor: pointer"
-                                            data-action="{{name}}" data-app="{{../../../id}}"
-                                            data-name="{{../../../attributes.overview_name}}"
-                                            data-provider="{{../../../attributes.overview_provider}}"
-                                            data-version="{{../../../attributes.overview_version}}"
-                                            class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
-                                    {{/ifCond}}
-
-                                {{else}}
-                                    <a  style=" pointer-events: auto; cursor: pointer"
-                                        data-action="{{name}}" data-app="{{../../id}}"
-                                        data-name="{{../../attributes.overview_name}}"
-                                        data-provider="{{../../attributes.overview_provider}}"
-                                        data-version="{{../../attributes.overview_version}}"
-                                        class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
-                                {{/ifCond}}
+                                 <a  data-action="{{name}}" data-app="{{../this.id}}" class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
                              {{/this.lifecycleAvailableActions}}
 
                              {{#this.deleteButtonAvailability}}
-                                 <input  style=" pointer-events: auto; cursor: pointer"
-                                         type="button" value="Delete" class="btn btn-danger btn-delete"
-                                        name="deleteAsset"  data-app-id="{{this.id}}"
-                                         data-name="{{../this.attributes.overview_name}}"
-                                        data-provider="{{../this.attributes.overview_provider}}"
-                                        data-version="{{../this.attributes.overview_version}}" />
+                                 <input type="button" value="Delete" class="btn btn-danger btn-delete"
+                                        name="deleteAsset"  data-app-id={{this.id}} />
                              {{/this.deleteButtonAvailability}}
 
 						<input
@@ -162,8 +123,10 @@
             <br />
             No web applications added yet.
             {{#ifCond cuser.um.tenantId "==" "-1234"}}
-                <a class="btn-deploySample" data-type="{{shortName}}">Click here</a> 
-                to deploy sample web applications.    
+                {{#if createPermission}}
+                    <a class="btn-deploySample" data-type="{{shortName}}">Click here</a>
+                    to deploy sample web applications.
+                {{/if}}
             {{/ifCond}}
             <br />
             {{#if createPermission}}
@@ -206,8 +169,8 @@
                 <input type="hidden" value="" name="action" id="action" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-reject-proceed">Proceed</button>
+                <button type="button" class="btn btn-info btn-reject-proceed">Proceed</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>

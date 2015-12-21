@@ -16,10 +16,7 @@ var type;
             return path;
         };
     };
-
-    var tenantedEndpoint = '/{context}/t/{domain}' + prefix;
-    if (matcher.match('/{context}' + prefix + '{type}/themes/{+file}') ||
-            matcher.match(tenantedEndpoint + '{type}/themes/{+file}')) {
+    if (matcher.match('/{context}' + prefix + '{type}/themes/{+file}')) {
         elements = matcher.elements();
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
@@ -30,8 +27,7 @@ var type;
         file.send(prefix + '/themes/' + elements.file);
         return;
     }
-    if (matcher.match('/{context}' + prefix + '{type}/resources/{+file}') ||
-            matcher.match(tenantedEndpoint + '{type}/resources/{+file}')) {
+    if (matcher.match('/{context}' + prefix + '{type}/resources/{+file}')) {
         elements = matcher.elements();
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
@@ -42,8 +38,7 @@ var type;
         file.send(prefix + '/resources/' + elements.file);
         return;
     }
-    if (matcher.match('/{context}' + prefix + '{type}/{+suffix}') ||
-            matcher.match(tenantedEndpoint + '{type}/{+suffix}')) {
+    if (matcher.match('/{context}' + prefix + '{type}/{+suffix}')) {
         mod = require('/modules/store.js');
         elements = matcher.elements();
         type = elements.type;
@@ -68,7 +63,7 @@ var type;
             }
 
 
-            if(type === "mobileapp"){
+            if((type === "webapp") || (type === "mobileapp")) {
                 path = pages + 'subscriptions.jag';
 
                 if (suffix === 'process') {

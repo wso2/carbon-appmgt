@@ -12,13 +12,11 @@ include('../modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
 	var store = ctx.store;
 	var sso = ctx.sso;
-	var carbon = require('carbon')
 	tenantId = ctx.tenantId;
 	site = ctx.site;
 	var recentAssets = store.recentAssets('webapp');
 	caramel = require('caramel');
 	search = require('/modules/search.js');
-	var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 		
 
 	SubscriptionService = require(getServiceDir('subscription.js')).serviceModule;
@@ -45,9 +43,6 @@ require('/modules/store.js').exec(function (ctx) {
 	var apps = subsApi.getAppsWithSubs({user: userData.username});
 
 
-
-
-
     if(apps.length >0){
         subscriptions = apps[0].subscriptions;
 
@@ -62,11 +57,9 @@ require('/modules/store.js').exec(function (ctx) {
 
         var displayApps = [];
 
-
         for(i=0;i< apps[0].subscriptions.length;i++){
             var api=apiInfoManager.getAPIDescription( apps[0].subscriptions[i].provider, apps[0].subscriptions[i].name, apps[0].subscriptions[i].version);
-			apps[0].subscriptions[i].tenantDomain = carbon.server.tenantDomain({username: apps[0].subscriptions[i].provider});
-			apps[0].subscriptions[i].productionURL = api.serverURL.productionURL;
+            apps[0].subscriptions[i].productionURL = api.serverURL.productionURL;
 
             if((i > offset && i < limit)){
                 displayApps.push(apps[0].subscriptions[i]);
@@ -79,14 +72,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     }
 
-	//Recent app rating.
-	for (var i = 0; i < recentAssets.length; i++) {
-		if (JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-			recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
-		} else {
-			recentAssets[i].rating = 0;
-		}
-	}
 
 	caramel.render({
 		header: {
@@ -111,10 +96,9 @@ require('/modules/store.js').exec(function (ctx) {
 
 }, request, response, session);
 
-
 function getServiceDir(serviceName) {
 	return '../services/' + serviceName;
 }
 
-	%>
+%>
 

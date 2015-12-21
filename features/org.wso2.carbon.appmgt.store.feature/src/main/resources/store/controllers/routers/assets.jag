@@ -16,16 +16,12 @@ var type;
         };
     };
 
-    var tenantedPrefix = '/{context}/t/{domain}' + config.assetsUrlPrefix;
-    var tenantedAssetsEndpoint = tenantedPrefix + '/{type}';
-    var tenantedAssetEndpoint = tenantedPrefix + '/{type}/{id}';
 
-    //Check whether the assets endpoint URI is tenanted or not
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/') || matcher.match(tenantedAssetsEndpoint)) {
-
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/')) {
+    	
         elements = matcher.elements();
         type = elements.type;
-
+        
         if (type == "all") {
             path = '/controllers/top-assets.jag';
             request.getMappedPath = mapper(path);
@@ -35,7 +31,7 @@ var type;
         if (configs.assets.indexOf(type) === -1) {
             response.sendError(404, 'Request Resource cannot be found');
             return;
-        }
+        } 
         path = store.ASSETS_EXT_PATH + type + '/pages/' + 'assets.jag';
         if (!new File(path).isExists()) {
             path = '/controllers/assets.jag';
@@ -44,10 +40,7 @@ var type;
         include(path);
         return;
     }
-
-    //Check whether the asset endpoint URI is tenanted or not
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}') || matcher.match(tenantedAssetEndpoint)) {
-
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}')) {
         elements = matcher.elements();
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {

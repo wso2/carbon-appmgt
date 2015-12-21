@@ -135,31 +135,42 @@ $(function(){
      */
     var subscribeToApi=function(subscription){
         $.ajax({
-           url:API_URL,
-           type:'POST',
-           data:subscription,
-           success:function(response){
-        	   if(JSON.parse(response).error == false){
-        		console.info('Successfully subscribed to Web app: '+subscription.apiName);
-        		//alert('Succsessfully subscribed to the '+subscription.apiName+' Web App.');
-        		   
-                	// Update UI based on the subscription type.
-                	if(subscription['subscriptionType'] == "INDIVIDUAL"){
-                    		showIndividualSubscriptionSuccessfulMessage(subscription.apiName);
-                	}else if(subscription['subscriptionType'] == "ENTERPRISE"){
-                    		updateUIAfterEnterpriseSubscription(subscription);
-                	}
-        		    
-        	}else{
-     			console.info('Error occured in subscribe to web app: '+subscription.apiName);
-               }
-           },
-           error : function(response) {
-      			alert('Error occured in subscribe');
-      	   },
-           success : function(e){
-               location.reload();
-           }
+            url:API_URL,
+            dataType: 'JSON',
+            type:'POST',
+            data:subscription,
+            complete: function(response, textStatus) {
+                if(textStatus == "success") {
+                    console.info('Successfully subscribed to Web app: ' + subscription.apiName);
+
+                    // Update UI based on the subscription type.
+                    if (subscription['subscriptionType'] == "INDIVIDUAL") {
+
+                        noty({
+                            text : 'You have successfully subscribed to the <b>'  + subscription.apiName + '</b>',
+                            'layout' : 'center',
+                            'timeout': 1500,
+                            'modal': true,
+                            'onClose': function() {
+                                location.reload();
+                            }
+                        });
+
+                    } else if (subscription['subscriptionType'] == "ENTERPRISE") {
+                        updateUIAfterEnterpriseSubscription(subscription);
+                    }
+                }else{
+                    alert("response error true")
+                    console.info('Error occured in subscribe to web app: '+subscription.apiName);
+                }
+            },
+            error : function(response) {
+                alert('Error occured in subscribe');
+
+            },
+            success : function(e){
+                //location.reload();
+            }
         });
     };
     
@@ -185,12 +196,12 @@ $(function(){
     }
     
     var showIndividualSubscriptionMessage = function(status,messageTitle, messageBody){
-  	  	
+
     	$('#messageModal1').html($('#confirmation-data1').html());
     	$('#messageModal1 h3.modal-title').html((messageTitle));
     	$('#messageModal1 div.modal-body').html('\n\n'+ (messageBody)+'.');
     	$('#messageModal1 a.btn-other').html('OK');
-    
+
     	$('#messageModal1').modal();
     	if(status){ 
     	  	$('#btnUnsubscribe').show();
@@ -237,13 +248,18 @@ $(function(){
         	   if(JSON.parse(response).error == false){
                	  	console.info('Successfully unsubscribed to web app: '+subscription.apiName);
                 	//alert('Succsessfully unsubscribed to the '+subscription.apiName+' Web App.');
-               	
-              		$('#messageModal1').html($('#confirmation-data1').html());
-    		    	$('#messageModal1 h3.modal-title').html(('Unsubscription Successful'));
-    		    	$('#messageModal1 div.modal-body').html('\n\n'+ ('You have successfully unsubscribed to the ')+'<b>"' + subscription.apiName + '</b>"');
-    		    	$('#messageModal1 a.btn-other').html('OK');
 
-    		    	$('#messageModal1').modal();
+                   noty({
+                       text : 'You have successfully unsubscribed from the <b>'  + subscription.apiName + '</b>',
+                       'layout' : 'center',
+                       'timeout': 1500,
+                       'modal': true,
+                       'onClose': function() {
+                           location.reload();
+                       }
+                   });
+
+
               
               		$('#btnUnsubscribe').hide();
               		$('#btnSubscribe').show();

@@ -18,22 +18,22 @@
  *
  */
 response.addHeader("Content-Type", "application/json");
-var matcher = new URIMatcher(request.getRequestURI()),
-method = request.getMethod();
+var matcher = new URIMatcher(request.getRequestURI()), method = request.getMethod();
 
 (function () {
-var userModule = require('/modules/user.js');
-var logged = userModule.current(session);
-var username = String(logged.username) + '@' + logged.tenantDomain;
-if (logged) {
-    if(method == 'POST'){    	
+    var userModule = require('/modules/user.js');
+    var logged = userModule.current(session);
+
+    if (logged) {
+        var username = String(logged.username) + '@' + logged.tenantDomain;
+        if (method == 'POST') {
             var carbon = require('carbon');
             var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
             //Read the social.json file
             //var config=require('/configs/social.json');
             //social.configPublisher(config.dataPublisherConnectionInfo);
             var activity = JSON.parse(request.getParameter('activity'));
-            activity.actor = {"id": username, "objectType": "person" };
+            activity.actor = {"id": username, "objectType": "person"};
             var id = social.publish(JSON.stringify(activity));
 
             var result = {
@@ -42,7 +42,7 @@ if (logged) {
             };
 
             print(result);
-    }else{
+        } else {
             var carbon = require('carbon');
             var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
             var ret = social.removeActivity(request.getParameter('id'), username);
@@ -52,10 +52,9 @@ if (logged) {
             };
 
             print(result);
+        }
+    } else {
+        response.sendError(401);
     }
-
-} else {
-    response.sendError(401);
-}
 })();
 %>

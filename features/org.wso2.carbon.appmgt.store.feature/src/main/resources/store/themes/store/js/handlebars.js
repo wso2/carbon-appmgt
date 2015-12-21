@@ -52,31 +52,6 @@ Handlebars.registerHelper('blockHelperMissing', function(context, options) {
   }
 });
 
-
-/**
- * Registers  'tenantedUrl' handler for resolving tenanted urls '{context}/t/{domain}/
- */
-Handlebars.registerHelper('tenantedUrl', function (path) {
-
-    var uri = window.location.href;//current page path
-    var tenantedRegex = '([0-9A-Za-z-\\.@:%_\+~#=]+)/t/{1}([0-9A-Za-z-\\.@:%_\+~#=]+)';
-    //regex to match tenanted urls '/{context}/t/{domain}/{+any}
-    var regex = '([0-9A-Za-z-\\.@:%_\+~#=]+)/{1}([0-9A-Za-z-\\.@:%_\+~#=]+)';
-    //regex to match super tenant urls '/{context}/{+any}
-    var context, domain, output;
-
-    if (uri.match(tenantedRegex)) { //if matches to tenanted url pattern
-        context = uri.match(tenantedRegex)[1];
-        domain = uri.match(tenantedRegex)[2];
-        output = '/' + context + '/t/' + domain;
-    } else if (uri.match(regex)){ //otherwise
-        context = uri.match(regex)[2];
-        output = '/' + context;
-    }
-    return output + path;
-});
-
-
 Handlebars.registerHelper('each', function(context, options) {
   var fn = options.fn, inverse = options.inverse;
   var ret = "";
@@ -116,51 +91,6 @@ Handlebars.registerHelper('with', function(context, options) {
 
 Handlebars.registerHelper('log', function(context) {
   Handlebars.log(context);
-});
-
-Handlebars.registerHelper('compare', function (lvalue, rvalue, options) {
-
-    if (arguments.length < 3)
-        throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
-
-    operator = options.hash.operator || "==";
-
-    var operators = {
-        '==': function (l, r) {
-            return l == r;
-        },
-        '===': function (l, r) {
-            return l === r;
-        },
-        '!=': function (l, r) {
-            return l != r;
-        },
-        '<': function (l, r) {
-            return l < r;
-        },
-        '>': function (l, r) {
-            return l > r;
-        },
-        '<=': function (l, r) {
-            return l <= r;
-        },
-        '>=': function (l, r) {
-            return l >= r;
-        },
-        'typeof': function (l, r) {
-            return typeof l == r;
-        }
-    }
-
-    if (!operators[operator])
-        throw new Error("Handlerbars Helper 'compare' doesn't know the operator " + operator);
-
-    var result = operators[operator](lvalue, rvalue);
-    if (result) {
-        return options.fn(this);
-    } else {
-        return options.inverse(this);
-    }
 });
 ;
 // lib/handlebars/compiler/parser.js

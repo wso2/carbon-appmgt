@@ -7,7 +7,7 @@ $(function() {
 				  var ssoEnabled = $('#sso').val();
 				  console.log(ssoEnabled);
 				  if (ssoEnabled == 'true') {
-					  caramel.tenantedUrl('/login');
+					  location.href = "/store/login";
 				  } else {
 					  var assetId = $('#asset').data('id');
 					  $('#modal-login').data('value', assetId);
@@ -27,7 +27,7 @@ $(function() {
 			  if (allowAnonymous.toUpperCase() != "TRUE") {
 				  var ssoEnabled = $('#sso').val();
 				  if (ssoEnabled == 'true') {
-					  caramel.tenantedUrl('/login');
+					  location.href = "/store/login";
 				  } else {
 					  var assetId = $('#asset').data('id');
 					  $('#modal-login').data('value', assetId);
@@ -47,7 +47,7 @@ $(function() {
 			  if (allowAnonymous.toUpperCase()!="TRUE") {
 				  var ssoEnabled = $('#sso').val();
 				  if (ssoEnabled == 'true') {
-					  caramel.tenantedUrl('/login');
+					  location.href = "/store/login";
 				  } else {
 					  var assetId = $('#asset').data('id');
 					  $('#modal-login').data('value', assetId);
@@ -67,7 +67,7 @@ $(function() {
 			  if (allowAnonymous.toUpperCase()!="TRUE") {
 				  var ssoEnabled = $('#sso').val();
 				  if (ssoEnabled == 'true') {
-					  location.href =  caramel.tenantedUrl('/login');
+					  location.href = "/store/login";
 				  } else {
 					  var assetId = $('#asset').data('id');
 					  $('#modal-login').data('value', assetId);

@@ -66,9 +66,8 @@ var addAPISubscription = function (api, subscriptionType, tier, applicationName,
     } catch (e) {
         log.error(e.message);
         return {
-            error:true,
-            status:false,
-            message: e.message
+            error:e,
+            status:false
         };
     }
 };

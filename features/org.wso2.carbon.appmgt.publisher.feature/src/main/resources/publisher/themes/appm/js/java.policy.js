@@ -22,7 +22,7 @@ var javaPolicyIndexArray = []; //used to maintain the selected Java Policy ID's 
 /**
  * Load all the available Java Policies List and the Mapping for given Application Id
  * @param applicationUUID
- * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
+ * @param isGlobalPolicy - if application level policy : true else if resource level policy : false
  */
 function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy) {
     $.ajax({

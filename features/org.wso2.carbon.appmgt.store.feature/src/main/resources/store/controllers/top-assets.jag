@@ -15,8 +15,7 @@ require('/modules/store.js').exec(function (ctx) {
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = ctx.tenant.tenantId || -1234,
-            tenantDomain = ctx.tenant.domain,
+            tenantId = ctx.tenantId,
             configs = ctx.configs,
             site = ctx.site,
             matcher = ctx.matcher,
@@ -36,10 +35,7 @@ require('/modules/store.js').exec(function (ctx) {
     process = require('process'),
     localIP = "https://" + process.getProperty('server.host'),
     httpsPort = process.getProperty('https.port');
-
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
-    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
-
+    
     length = types.length;
     recent = Math.floor(recentCount / length);
     recentDiff = recentCount - recent * length;
@@ -66,16 +62,14 @@ require('/modules/store.js').exec(function (ctx) {
         var enterpriseSubscription;
         if (authenticator.getLoggedInUser()) {
             enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", authenticator.getLoggedInUser().username).subscription;
-        }
-        else {
+        } else {
             enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", null).subscription;
         }
 
         var individualSubscription;
         if (authenticator.getLoggedInUser()) {
             individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", authenticator.getLoggedInUser().username).subscription;
-        }
-        else {
+        } else {
             individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", null).subscription;
         }
 
@@ -90,8 +84,7 @@ require('/modules/store.js').exec(function (ctx) {
     authenticator=new AuthService.Authenticator();
     authenticator.init(jagg,session);
     user=authenticator.getLoggedInUser();
-	
-	
+
     //Validate user's role and send error if user is not a subscriber. 
     if (user != null) {
 	var role = require('/modules/role.js').checkeRole(user.username, session);
@@ -115,7 +108,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else if (tag) {
             assets = store.tagged(type, tag, paging);
         } else {
-            assets = store.recentAssets(type, store.getTopAssetPageSize());
+            assets = store.assets(type, paging);
         }
 
 
@@ -172,19 +165,14 @@ require('/modules/store.js').exec(function (ctx) {
         first = false;
     });
 
-    var headerData = site.header(tenantId, {
-        sso: sso,
-        user: user,
-        isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
-    });
-    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
-    headerData.domain = tenantDomain;
-
     caramel.render({
         title: 'Store | WSO2 Enterprise Store',
         user: user,
         sso: sso,
-        header: headerData,
+        header: site.header(tenantId, {
+            sso: sso,
+            user: user
+        }),
         navigation: site.navigation(tenantId),
         search: {
             title: "Top Assets",

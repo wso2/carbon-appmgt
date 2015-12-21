@@ -34,10 +34,7 @@ $( document ).ready(function() {
                 output.push(value);
             }
         });
-
         $('#overview_transports').val(output);
-
-
     });
 
 
@@ -103,8 +100,6 @@ $( document ).ready(function() {
                     description: data[i].description
                 });
             }
-        },
-        error: function () {
         }
     });
 
@@ -214,6 +209,7 @@ $( document ).ready(function() {
             $('#overview_logoutUrl').hide();
         }
     })
+
     //set default on loading
     if($('#overview_logoutUrl').val() !=' '){
         $('.controll_overview_logoutUrl').prop('checked', true);
@@ -222,18 +218,15 @@ $( document ).ready(function() {
         $('#overview_logoutUrl').hide()
     }
 
-
     //set skip gateway checkbox value in edit mode
     var skipGateway = $('#overview_skipGateway').val();
     if (skipGateway == "true") {
         $('.skip_gateway_checkbox').prop('checked', true);
         $('#overview_acsUrl').show();
-    }
-    else {
+    } else {
         $('.skip_gateway_checkbox').prop('checked', false);
         $('#overview_acsUrl').hide();
     }
-
 
     //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
     $(".skip_gateway_checkbox").click(function () {
@@ -241,8 +234,7 @@ $( document ).ready(function() {
         if ($('.skip_gateway_checkbox').is(':checked')) {
             output.push("true");
             $('#overview_acsUrl').show();
-        }
-        else {
+        } else {
             output.push("false");
             $('#overview_acsUrl').hide();
         }
@@ -260,8 +252,6 @@ $( document ).ready(function() {
             $('.authPolicies').show(200);
         }
     });
-
-
 });
 
 // NOTE : This function is used as a workaround for a bug in registry model import and export.
@@ -316,32 +306,6 @@ function loadPolicyGroupData(uuid) {
         async: false,
         contentType: 'application/json',
         success: function (id) {
-            //get partials of web app
-            $.ajax({
-                url: '/publisher/api/entitlement/policy/partialList/' + id,
-                type: 'GET',
-                contentType: 'application/json',
-                dataType: 'json',
-                async: false,
-                success: function (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        var obj = {
-                            id: data[i].partialId,
-                            policyPartialName: data[i].partialName,
-                            policyPartial: data[i].partialContent,
-                            isShared: data[i].isShared,
-                            author: data[i].author
-                        };
-                        // avoid duplicating shared partials
-                        if (!obj.isShared) {
-                            policyPartialsArray.push(obj);
-                        }
-                    }
-                },
-                error: function () {
-                }
-            });
-
             // get the entitlement policy groups
             $.ajax({
                 url: '/publisher/api/entitlement/get/policy/Group/by/appId/' + id,
@@ -351,7 +315,6 @@ function loadPolicyGroupData(uuid) {
                 async: false,
                 success: function (data) {
                     for (var i = 0; i < data.length; i++) {
-
                         policyGroupsArray.push({
                             policyGroupId: data[i].policyGroupId,
                             policyGroupName: data[i].policyGroupName,
@@ -363,13 +326,8 @@ function loadPolicyGroupData(uuid) {
                         })
                     }
                     updatePolicyGroupPartial(policyGroupsArray);
-                },
-                error: function () {
                 }
             });
-
-        },
-        error: function () {
         }
     });
 }

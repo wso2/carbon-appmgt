@@ -1,39 +1,12 @@
+<div class="row">
 
-					<a href="#" id="search-dropdown-arrow"><i class="icon-sort-down"></i></a>
-					<input type="text" class="span12" id="search" placeholder="Search">
-					<a id="search-button" class=""> <i class="icon-search"></i> </a>
+    <form class="col-md-12">
+        <select id="searchSelect" class="input-lg search-select col-md-3">
+            <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
+            <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+            <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
+        </select>
+        <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
+    </form>
 
-					<!-- dropdown -->
-					<div id="search-dropdown-cont">
-						<a href="#" id="search-dropdown-close"><i class="icon-remove"></i></a>
-
-						<!--
-						<label>Label 1</label>
-						<input type="text" class="span12" class="search-dropdown-inp" placeholder="Author">-->
-
-						{{#if isTopAssets}}
-						{{#each search.searchFields}}
-						{{#if this.search}}
-						<div>
-							<label>{{field_label}}</label>
-							<input type="text" class="span12" id="{{field_name}}" name="{{field_name}}" placeholder="">
-						</div>
-						{{/if}}
-						{{/each}}
-
-						{{else}}
-						{{#each search.searchFields}}
-						<div>
-							<label>{{field_label}}</label>
-							<input type="text" class="span12" id="{{field_name}}" name="{{field_name}}" placeholder="">
-						</div>
-						{{/each}}
-
-						{{/if}}
-
-						<button id="search-button2" class="btn span3">
-							<i class="icon-search"></i>
-						</button>
-
-					</div>
-				
+</div>

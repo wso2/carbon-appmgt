@@ -9,6 +9,39 @@ var opened = false, currentPage = 1, infiniteScroll = null;
 
 $(function() {
 
+
+
+	$('#category-select').on('change', function(){
+		var selected = $(this).find("option:selected").val();
+		location.href = "/store/assets/mobileapp?query=category:\"" + selected + "\"";
+	});
+
+	$('#platform-select').on('change', function(){
+		var selected = $(this).find("option:selected").val();
+		location.href = "/store/assets/mobileapp?query=platform:\"" + selected + "\"";
+	});
+
+
+
+	var visibleToDevices = function(){
+		var ua = navigator.userAgent;
+		var checker = {
+			iphone: ua.match(/(iPhone|iPod|iPad)/),
+			blackberry: ua.match(/BlackBerry/),
+			android: ua.match(/Android/)
+		};
+
+		if (checker.android){
+			$('.type-ios').hide();
+		}
+
+		if (checker.iphone){
+			$('.type-android').hide();
+		}
+
+	};
+	visibleToDevices();
+
 	$(document).on('click', '#assets-container .asset-add-btn', function(event) {
 		
 		var device = getURLParameter("device");	
@@ -49,7 +82,7 @@ $(function() {
 		location.href = link;
 	});
 
-	mouseStop();
+	//mouseStop();
 
 	History.Adapter.bind(window, 'statechange', function() {
 		var state = History.getState();
@@ -132,7 +165,7 @@ $(function() {
 
 		if(infiniteScroll || (store.asset.paging.size >= 12 && infiniteScroll == null)) {
 			if($(window).scrollTop() + $(window).height() >= $(document).height() * .8) {
-				var url = caramel.tenantedUrl(store.asset.paging.url + (++currentPage));
+				var url = caramel.url(store.asset.paging.url + (++currentPage));
 				loadAssetsScroll(url);
 				$(window).unbind('scroll', scroll);
 				setTimeout(function() {
@@ -159,6 +192,6 @@ $(function() {
 		$('#my-assets').slideToggle("fast");
 	});
 
-	caramel.loaded('js', 'assets');
-	caramel.loaded('js', 'sort-assets');
+	//caramel.loaded('js', 'assets');
+	//caramel.loaded('js', 'sort-assets');
 });

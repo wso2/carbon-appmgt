@@ -193,7 +193,7 @@ var isAuthorized = function (user, permission, action) {
  */
 var userSpace = function (username) {
     try {
-        return require('/modules/server.js').options().userSpace.store + '/' + username.replace('@', '-AT-');
+        return require('/modules/server.js').options().userSpace.store + '/' + username;
     } catch (e) {
         return null;
     }

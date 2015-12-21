@@ -42,7 +42,13 @@ var module=function(){
 
            var asset=context.parent.export('asset.exporter');
 
-           log.debug('Check if there is an action to be performed in the life-cycle');
+           log.debug('Attempting to attach the lifecycle :'+lifeCycle+'to asset with id: '+id);
+
+           artifactManager.attachLifecycle(lifeCycle,asset);
+
+           log.debug('Finished attaching the lifecycle to the asset'+stringify(asset));
+
+           log.debug('Check if there is an action to be performed when attaching a life-cycle');
 
             var invokeAction='';
 

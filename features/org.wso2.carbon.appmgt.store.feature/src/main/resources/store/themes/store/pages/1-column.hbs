@@ -1,69 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
+<!--
+* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+-->
+
+<!doctype html>
+<html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{{include title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <title>WSO2 App Manager</title>
 
-    <!-- Le styles -->
+    <link rel="icon" href="favicon.png" type="image/x-icon" />
+
+
+    <link href="{{url "/themes/store/css/jquery-ui.css"}}" rel="stylesheet">
     <link href="{{url "/themes/store/css/bootstrap.min.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/bootstrap-theme.min.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/bootstrap-ext.min.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/font-wso2.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/custom-common.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/custom-desktop.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/custom-theme.css"}}" rel="stylesheet">
+    <link href="{{url "/themes/store/css/custom-styles.css"}}" rel="stylesheet">
 
-    <link href="{{url "/themes/store/css/bootstrap-responsive.min.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/font-awesome.min.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/font-awesome-ie7.min.css"}}" rel="stylesheet">
+    {{css}}
 
-    <link rel="stylesheet" href="{{url "/themes/store/css/jslider.css"}}" type="text/css">
-    <link rel="stylesheet" href="{{url "/themes/store/css/jslider.round.plastic.css"}}" type="text/css">
-
-    <link href="{{url "/themes/store/css/styles.css"}}" rel="stylesheet">
-    {{css .}}
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <script src="{{url "/themes/store/js/respond.min.js"}}"></script>
-    <script src="{{url "/themes/store/js/selectivizr-min.js"}}"></script>
-    <link rel="stylesheet" href="{{url "/themes/store/css/ie.css"}}" type="text/css">
+    <script src="js/html5shiv.min.js"></script>
+    <script src="js/respond.min.js"></script>
     <![endif]-->
-
-    <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="http://wso2.com/files/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon-precomposed" sizes="144x144"
-          href="{{url "/themes/store/img/apple-touch-icon-144-precomposed.png"}}">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114"
-          href="{{url "/themes/store/img/apple-touch-icon-114-precomposed.png"}}">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72"
-          href="{{url "/themes/store/img/apple-touch-icon-72-precomposed.png"}}">
-    <link rel="apple-touch-icon-precomposed" href="{{url "/themes/store/img/apple-touch-icon-57-precomposed.png"}}">
-    {{code .}}
 </head>
 
 <body>
-    {{include navigation}}
-<div class="container">
-    {{include header}}
-    <div class="row">
-        <div class="span12">
-            {{include body}}
-        </div>
 
-    </div>
-    {{>footer}}
+<div class="wr-modelpopup">
+    <div class="modelpopup-content"><!-- dynamic content --></div>
+    <div class="modelpopup-bg"></div>
 </div>
-<!-- /container -->
 
-<!-- Le javascript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="{{url "/themes/store/js/jquery-1.8.3.min.js"}}"></script>
+<div class="container col-lg-12 col-md-12 col-sm-12">
+
+    <!-- header -->
+    {{include header}}
+    <!-- /header -->
+
+
+
+    <!-- content/body -->
+    <div class="row">
+        <div class="col-md-12">
+
+            <!-- content -->
+            <div class="col-md-12 col-lg-12">
+                {{include body}}
+            </div>
+            <!-- /content -->
+
+        </div>
+    </div>
+    <!-- /content/body -->
+
+    <!-- footer -->
+    {{>footer}}
+    <!-- /footer -->
+
+</div>
+
+
+
+
+<script src="{{url "/themes/store/js/jquery-1.11.3.min.js"}}"></script>
+<script src="{{url "/themes/store/js/jquery-ui.min.js"}}"></script>
+
 <script src="{{url "/themes/store/js/bootstrap.min.js"}}"></script>
-<script src="{{url "/themes/store/js/async.min.js"}}"></script>
-<script src="{{url "/themes/store/js/handlebars.js"}}"></script>
-<script src="{{url "/themes/store/js/theme.js"}}"></script>
-    {{js .}}
+<script src="{{url "/themes/store/js/sortable-list.js"}}"></script>
+
+<script src="{{url "/themes/store/js/noty/jquery.noty.js"}}"></script>
+<script src="{{url "/themes/store/js/noty/layouts/center.js"}}"></script>
+<script src="{{url "/themes/store/js/noty/themes/default.js"}}"></script>
+<script src="{{url "/themes/store/js/selectpicker.js"}}"></script>
+<script src="{{url "/themes/store/js/jquery.ext.min.js"}}"></script>
+
+<script src="{{url "/themes/store/js/jquery.history.js"}}"></script>
+<script src="{{url "/themes/store/js/history-fix.js"}}"></script>
+<script src="{{url "/themes/store/js/jquery.event.mousestop.js"}}"></script>
+
+{{js}}
+
 <script src="{{url "/themes/store/js/caramel-client.js"}}"></script>
-    <script src="{{url "/themes/store/js/writeToPublisher.js"}}"></script>
+<script src="{{url "/themes/store/js/writeToPublisher.js"}}"></script>
+
+
+{{code}}
+
+<script type="text/javascript">
+
+    function openCollapsedNav(){
+        $('.wr-hidden-nav-toggle-btn').addClass('active');
+        $('#hiddenNav').slideToggle('slideDown', function(){
+            if($(this).css('display') == 'none'){
+                $('.wr-hidden-nav-toggle-btn').removeClass('active');
+            }
+        });
+    }
+
+    $('.selectpicker').selectpicker();
+    $("#input-rating").rating();
+
+</script>
+
 </body>
 </html>

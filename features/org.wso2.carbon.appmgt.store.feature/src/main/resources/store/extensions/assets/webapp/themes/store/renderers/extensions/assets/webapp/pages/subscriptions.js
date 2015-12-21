@@ -6,6 +6,7 @@ var render = function (theme, data, meta, require) {
         var subscriptions = data.appsWithSubs[0].subscriptions;
     }
 
+    data.header.myApps = true;
 
     theme('2-column-right', {
         title: 'Subscriptions',

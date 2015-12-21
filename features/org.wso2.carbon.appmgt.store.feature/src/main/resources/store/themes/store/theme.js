@@ -38,53 +38,42 @@ var engine = caramel.engine('handlebars', (function () {
                 return accum;
             });
 
-            /**
-             * Registers  'tenantedUrl' handler for resolving tenanted urls '{context}/t/{domain}/
-             */
-            Handlebars.registerHelper('tenantedUrl', function (path) {
-
-                var log = new Log();
-                var uri = request.getRequestURI();//current page path
-                var context, domain, output;
-                var matcher = new URIMatcher(uri);
-                var storageMatcher = new URIMatcher(path);
-                var mobileApiMatcher = new URIMatcher(path);
-
-                //Resolving tenanted storage URI for webapps
-                if (storageMatcher.match('/store/storage/{+any}')) {
-                    path = "/storage/" + storageMatcher.elements().any;
-                }
-                //TODO: This url pattern has been hard coded due to pattern mismatch in between mobile and webapp image urls
-
-                //Resolving mobile app image urls
-                if(mobileApiMatcher.match('/publisher/api/{+any}')){
-                    return path;
-                }
-                if (matcher.match('/{context}/t/{domain}/') || matcher.match('/{context}/t/{domain}/{+any}')) {
-                    context = matcher.elements().context;
-                    domain = matcher.elements().domain;
-                    output = '/' + context + '/t/' + domain;
-                    return output + path;
-                } else {
-                    if (path.indexOf('http://') === 0 || path.indexOf('https://') === 0) {
-                        return path;
-                    }
-                    return caramel.url(path);
+            Handlebars.registerHelper('assetRating', function(n) {
+                var html = '<span class="starRating">';
+                var id = Math.random().toString(36).substring(7);
+                for(var i = 5; i >= 1; --i){
+                    var checked = (i == n) ? "checked" : "";
+                    html += '<input name= "' + id + '" id= "' + id + '" type="radio" name="rating" value="' + i + '" disabled ' + checked + '>';
+                    html += '<label for="' + id + i + '">' + i + '</label>';
                 }
 
+                html += "<span>";
+
+                return html;
             });
 
-            Handlebars.registerHelper('isTenanted', function (path) {
-                var uri = request.getRequestURI();//current page path
-                var matcher = new URIMatcher(uri);
 
-                if (matcher.match('/{context}/t/{domain}/') || matcher.match('/{context}/t/{domain}/{+any}')) {
-                    return true;
-                } else {
-                    return false;
+            Handlebars.registerHelper('iconImage', function(imageName) {
+                if(imageName == 'android'){
+                    return 'fw-android fw-background-green';
+                }else if(imageName == 'ios'){
+                    return 'fw-apple fw-background-black';
+                }else if(imageName == 'webapp'){
+                    return 'fw-web-app fw-background-blue';
                 }
-
             });
+
+            Handlebars.registerHelper('iconImageType', function(imageName) {
+                if(imageName == 'enterprise'){
+                    return 'fw-enterprise-app fw-background-gray';
+                }else if(imageName == 'public'){
+                    return 'fw-public-app fw-background-gray';
+                }else if(imageName == 'webapp'){
+                    return 'fw-webclip fw-background-gray';
+                }
+            });
+
+
 
             Handlebars.registerHelper('compare', function (lvalue, rvalue, options) {
 

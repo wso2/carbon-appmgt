@@ -1,50 +1,37 @@
-<!-- Modal -->
-<div id="modal-register" class="modal hide fade modal-blue" tabindex="-1" role="dialog"
-     aria-labelledby="publishModalLabel" aria-hidden="true">
+<div class="modal fade" id="register-modal">
+    <div class="modal-dialog-register">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Register</h4>
+            </div>
+            <div class="modal-body">
 
-    <div class="modal-body">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="btn-register-close">
-            <i class="icon-remove"></i>
-        </button>
+                <div id="register-alert" class="alert alert-error"></div>
 
-        <div>
-            <form id="form-register"  method="post">
-                <fieldset>
-
-
-                    <h2>{{t "Register"}}</h2>
-
-                    <div id="register-alert" class="alert alert-error"></div>
-
-
-
-                        {{#if isTenanted}}
-                        <div class="input-append">
-                            <input id="inp-username-register" type="text" name="username" class="span1 required" style="width: 190px !important;" placeholder="{{t "Enter a Username"}}"/>
-                            <span class="add-on" style="background-color: transparent; border: none; margin-top: 15px">@{{domain}}</span>
-                        </div>
-                        {{else}}
-                            <input id="inp-username-register" type="text" name="username" class="span3 required"
-                                   placeholder="{{t "Enter a Username"}}">
-                        {{/if}}
-
-
-
-                    <div class="controls">
-                        <input id="inp-password-register" type="password" name="password" class="span3 required" placeholder="{{t "Password"}}"/>
+                <form id="form-register">
+                    <div class="form-group">
+                        <label for="recipient-name" class="control-label">Username:</label>
+                        <input id="inp-username-register" type="text" name="username" class="form-control required"
+                               placeholder="{{t "Enter a Username"}}">
                     </div>
-                    <div class="controls">
-                        <input id="inp-password-confirm" type="password" name="password" class="span3 required" placeholder="{{t "Confirm Password"}}"/>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">Password:</label>
+                        <input id="inp-password-register" type="password" name="password" class="form-control required"
+                               placeholder="{{t "Enter Password"}}">
                     </div>
-
-                    <hr class="emboss">
-
-                    <a href="#" id="btn-register-submit" class="btn btn-primary btn-large">
-                        {{t "Register"}}
-                    </a>
-
-                </fieldset>
-            </form>
-        </div>
-    </div>
-</div>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">Confirm Password:</label>
+                        <input  id="inp-password-confirm" type="password" name="password" class="form-control required"
+                                placeholder="{{t "Confirm Password"}}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="btn-register-submit" class="btn btn-primary btn-large">
+                    {{t "Register"}}
+                </a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

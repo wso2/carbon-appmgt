@@ -23,6 +23,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var server = require('store').server;
     var storeUser=require('store').user;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var appmgtPublisher = require('appmgtpublisher');
     var utility = require('/modules/utility.js').rxt_utility();
     var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
     var publisher = require('/modules/publisher.js').publisher(request, session);
@@ -76,12 +77,20 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var output = model.export('form');
         var title = shortName;
-        caramel.render({op: operation, cuser: server.current(session), shortName: shortName, rxtTemplate: rxtTemplate, data: output, title: title});
+        output.sso_provider = getIdentityProviderUrl();
+        caramel.render({
+            op: operation,
+            cuser: server.current(session),
+            shortName: shortName,
+            rxtTemplate: rxtTemplate,
+            data: output,
+            title: title}
+        );
     }
 });
 
-
 routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
+
     var shortName = context.params.type;
     //print(context.params);
     var id = context.params.id;
@@ -137,12 +146,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         apiData.version = model.get('overview.version').value;
         var result = mod.getAllDocumentation(apiData);
 
-        //get external store details
-        var externalAppStores = apiProvider.getExternalAppStoresList(apiData.provider, apiData.name, apiData.version);
-        var appStoresDetail = {};
-        appStoresDetail.app = apiData;
-        appStoresDetail.externalStores = externalAppStores;
-
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);
@@ -163,7 +166,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             tags:tags,
             title:title,
             docs: result.docs,
-            appStores:appStoresDetail,
             permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
         });
     } catch (e) {
@@ -320,8 +322,9 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
     var server = require('store').server;
     var user=server.current(session);
     var um = server.userManager(server.current(session).tenantId);
+    var username = user.username;
 
-    if (permissions.isAuthorized(user.username, config.permissions.webapp_create, um)) {
+    if (permissions.isAuthorized(username, config.permissions.webapp_create, um)) {
 
         var shortName = context.params.type;
         var artifactManager = rxtManager.getArtifactManager(shortName);
@@ -404,7 +407,10 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                 copyDocuments(webappId);
                 copyRolePermissions(assetId,artifactManager);
             }
-            generateEntitlementPolicies(webappId);
+            var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            username = username + "@" + tenantDomain;
+            var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
+            appMgtProviderObj.generateEntitlementPolicies(webappId);
 
             print({ok: true, message: 'asset added', id: assetId});
         }
@@ -431,12 +437,12 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
         overridePermissions(assetId, artifactManager, permissions);
     });
 
-/**
-* Generates entitlement policies.
-*/
-function generateEntitlementPolicies(webappId){
-    apiProvider.generateEntitlementPolicies(webappId);
-}
+    /**
+    * Get identity provider URL
+    */
+    function getIdentityProviderUrl() {
+        return apiProvider.getIdentityProviderUrl();
+    }
 
 /**
 * Check whether the application already exists
@@ -789,8 +795,6 @@ routeManager.register('DELETE', 'publisher', '/publisher/asset/{type}/{id}', fun
 
 
 });
-
-
 routeManager.handle(request, response);
 
 }, request, response, session);

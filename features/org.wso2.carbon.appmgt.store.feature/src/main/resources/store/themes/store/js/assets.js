@@ -9,6 +9,8 @@ var opened = false, currentPage = 1, infiniteScroll = null;
 
 $(function() {
 
+
+
 	$(document).on('click', '#assets-container .asset-add-btn', function(event) {
 		var parent = $(this).parent().parent().parent();
 		asset.process(parent.data('type'), parent.data('id'), location.href);
@@ -19,8 +21,6 @@ $(function() {
 		var link = $(this).find('.asset-name > a').attr('href');
 		location.href = link;
 	});
-
-//	mouseStop();
 
 	History.Adapter.bind(window, 'statechange', function() {
 		var state = History.getState();
@@ -130,6 +130,9 @@ $(function() {
 		$('#my-assets').slideToggle("fast");
 	});
 
+    //show App details in mouse hover event
+    mouseStop();
+
 	caramel.loaded('js', 'assets');
 	caramel.loaded('js', 'sort-assets');
 });
@@ -157,4 +160,8 @@ var mouseStop = function() {
 		}, 200) ? false : opened;
 	});
 
-}
+
+
+
+
+};

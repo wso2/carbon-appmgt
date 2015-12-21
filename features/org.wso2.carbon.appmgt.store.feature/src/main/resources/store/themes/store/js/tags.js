@@ -8,6 +8,7 @@ $(function() {
 	});
 
 	$('.store-tags').on('click', 'a', function(e) {
+        var log = new Log();
 		e.preventDefault();
 		var url = $(this).attr('href'),
 			tagName = $(this).text();
@@ -32,9 +33,13 @@ $(function() {
 				$('.search-bar h2').find('.page').text(' / Tag: "' + tagName + '"');
 
 			},
-			error : function(xhr, status, error) {
-				theme.loaded($('.store-left'), '<p>Error while retrieving data.</p>');
-			}
+            error: function (xhr, status, error) {
+                if (log.isDebugEnabeld()) {
+                    log.debug("Error occurred while retrieving data for the url: " + url
+                    + ", when searching by the tag name: " + tagName);
+                }
+                theme.loaded($('.store-left'), '<p>Error while retrieving data.</p>');
+            }
 		});
 		theme.loading($('.store-left'));
 	});

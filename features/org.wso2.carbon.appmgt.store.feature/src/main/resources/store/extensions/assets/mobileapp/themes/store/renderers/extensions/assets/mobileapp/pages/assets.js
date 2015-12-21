@@ -4,53 +4,28 @@ var render = function (theme, data, meta, require) {
     data.header.config = data.config;
 
 
-
-
-    //filter assets by useragent
-    if(data.assets){
-
-        useragent = request.getHeader("User-Agent");
-
-        if(useragent.match(/iPad/i) || useragent.match(/iPhone/i)) {
-            userOS = 'ios';
-        } else if (useragent.match(/Android/i)) {
-            userOS = 'android';
-        } else {
-            userOS = 'unknown';
-        }
-
-        var assets = [];
-
-        for( i = 0; i < data.assets.length; i++){
-
-            var platform = data.assets[i].attributes.overview_platform;
-            switch(userOS){
-                case "android":
-                    if(platform === "android" || platform === "webapp"){
-                        assets.push(data.assets[i]);
-                    }
-                    break;
-                case "ios":
-                    if(platform === "ios" || platform === "webapp"){
-                        assets.push(data.assets[i]);
-                    }
-                    break;
-                default:
-                    assets.push(data.assets[i]);
+    var searchQuery =  data.search.query;
+    if(typeof(searchQuery) != typeof({})){
+        searchQuery = {overview_name : searchQuery, searchTerm: 'overview_name', search : searchQuery};
+    }else{
+        for (var key in searchQuery) {
+            if (searchQuery.hasOwnProperty(key)) {
+                if(key.indexOf("overview_") !== -1){
+                    searchQuery.searchTerm = key;
+                    searchQuery.search = searchQuery[key];
+                }
             }
         }
-
-        data.assets = assets;
-
     }
 
-
-
-
-	
+    data.header.categories = data.navigation.assets[data.type].categories;
+    data.header.selectedPlatform = data.selectedPlatform;
+    data.header.selectedCategory = data.selectedCategory;
+    data.header.searchQuery = searchQuery;
+    data.header.assetsPage = true;
 		
     var assets = require('/helpers/assets.js');
-    theme('2-column-right', {
+    theme('1-column', {
         title: data.title,
         header: [
             {
@@ -68,7 +43,7 @@ var render = function (theme, data, meta, require) {
         body: [
         	{
                 partial: 'sort-assets',
-                context: require('/helpers/sort-assets.js').format(data.sorting, data.paging, data.navigation, data.type, data.selectedCategory)
+                context: require('/helpers/sort-assets.js').format(data.sorting, data.paging, data.navigation, data.type, data.selectedCategory, data.selectedPlatform)
             },
             {
                 partial: 'assets',

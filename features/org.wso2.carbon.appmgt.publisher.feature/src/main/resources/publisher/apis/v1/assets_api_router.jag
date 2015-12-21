@@ -42,7 +42,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         		endDate = date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate();
 
 
-                if (month.toString().length < 2) {
+                if (date.getMonth().toString().length < 2) {
                     endDate = date.getFullYear() + '-' + '0' + month + '-' + date.getDate();
                 } else {
                     endDate = date.getFullYear() + '-' + month + '-' + date.getDate();
@@ -722,7 +722,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                     print(webapps);
 
          		}
-                        else if (action == "getAppsPopularity") { /* Overall Web Application Usage Graph */
+                        else if (action == "getAppsPopularity") {
                             var output  = {};
                             usage = appMgtProviderObj.getAppsByPopularity("__all_providers__",startDate,endDate);
                             usage = parse(stringify(usage));
@@ -739,7 +739,6 @@ require('/modules/publisher.js').exec(function (ctx) {
                             }
                             print(usage);
                         }
-
 
     });
 
