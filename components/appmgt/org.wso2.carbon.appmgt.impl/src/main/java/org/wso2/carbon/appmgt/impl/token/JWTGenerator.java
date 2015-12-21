@@ -392,20 +392,20 @@ public class JWTGenerator {
         Map<String, String> claims = new HashMap<String, String> ();
         ClaimsRetriever claimsRetriever = getClaimsRetriever();
         if (claimsRetriever != null) {
+            //Subject comes with fully qualified username (i.e with tenant domain).
             String userName = (String) saml2Assertions.get("Subject");
             String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            String tenantAwareUserName = userName + "@" + tenantDomain;
 
             try {
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService()
                         .getTenantManager().getTenantId(tenantDomain);
 
                 if (MultitenantConstants.SUPER_TENANT_ID == tenantId) {
-                    tenantAwareUserName = MultitenantUtils.getTenantAwareUsername(tenantAwareUserName);
+                    userName = MultitenantUtils.getTenantAwareUsername(userName);
                 }
 
                 claims.put("sub", userName);
-                claims.putAll(claimsRetriever.getClaims(tenantAwareUserName));
+                claims.putAll(claimsRetriever.getClaims(userName));
 
                 return claims;
             } catch (UserStoreException e) {
