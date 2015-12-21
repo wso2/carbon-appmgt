@@ -20,6 +20,7 @@ package org.wso2.carbon.appmgt.impl.utils;
 
 import com.google.gson.Gson;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
@@ -2849,7 +2850,13 @@ public final class AppManagerUtil {
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (XMLStreamException e) {
-            String msg = "Malformed XML found in the External Stores Configuration resource";
+            String msg = "Malformed XML found in the External Stores Configuration resource : "
+                    + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (OMException e) {
+            String msg = "Malformed XML found in the External Stores Configuration resource "
+                    + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         }
