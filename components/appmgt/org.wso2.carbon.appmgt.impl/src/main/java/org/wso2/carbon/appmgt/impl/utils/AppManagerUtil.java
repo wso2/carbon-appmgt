@@ -2996,7 +2996,7 @@ public final class AppManagerUtil {
     }
 
 	/**
-	 *
+	 * Create self signup role under given tenant domain
 	 * @param tenantId
 	 * @throws AppManagementException
 	 */
@@ -3009,36 +3009,32 @@ public final class AppManagerUtil {
 			UserRegistry govRegistry = registryService.getGovernanceSystemRegistry(tenantId);
 			if (govRegistry.resourceExists(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION)) {
 				Resource resource = govRegistry.get(AppMConstants.SELF_SIGN_UP_CONFIG_LOCATION);
-				InputStream content=resource.getContentStream();
+				InputStream content = resource.getContentStream();
 				DocumentBuilderFactory factory
 						= DocumentBuilderFactory.newInstance();
 				DocumentBuilder parser = factory.newDocumentBuilder();
-				Document dc= parser.parse(content);
-				boolean enableSignup=Boolean.parseBoolean(dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ENABLED).item(0).getFirstChild().getNodeValue());
-				String signUpDomain=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_DOMAIN_ELEM).item(0).getFirstChild().getNodeValue();
-				if(enableSignup){
-					int roleLength=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).getLength();
-					for(int i=0;i<roleLength;i++){
-						String roleName=dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).item(i).getFirstChild().getNodeValue();
-						boolean isExternalRole=Boolean.parseBoolean(dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL).item(i).getFirstChild().getNodeValue());
-						if(roleName!=null){
-							// If isExternalRole==false ;create the subscriber role as an internal role
-							if(isExternalRole && signUpDomain!=null){
-								roleName=signUpDomain.toUpperCase()+CarbonConstants.DOMAIN_SEPARATOR+roleName;
-							}else{
-								roleName= UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR+roleName;
-							}
-							createSubscriberRole(roleName,tenantId);
+				Document dc = parser.parse(content);
+
+				String signUpDomain = dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_DOMAIN_ELEM).item(0).getFirstChild().getNodeValue();
+
+				int roleLength = dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).getLength();
+				for (int i = 0; i < roleLength; i++) {
+					String roleName = dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT).item(i).getFirstChild().getNodeValue();
+					boolean isExternalRole = Boolean.parseBoolean(dc.getElementsByTagName(AppMConstants.SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL).item(i).getFirstChild().getNodeValue());
+					if (roleName != null) {
+						// If isExternalRole==false ;create the subscriber role as an internal role
+						if (isExternalRole && signUpDomain != null) {
+							roleName = signUpDomain.toUpperCase() + CarbonConstants.DOMAIN_SEPARATOR + roleName;
+						} else {
+							roleName = UserCoreConstants.INTERNAL_DOMAIN + CarbonConstants.DOMAIN_SEPARATOR + roleName;
 						}
+						createSubscriberRole(roleName, tenantId);
 					}
 				}
 			}
 			if (log.isDebugEnabled()) {
 				log.debug("Adding Self signup configuration to the tenant's registry");
 			}
-
-
-
 		} catch (RegistryException e) {
 			throw new AppManagementException("Error while getting Self signup role information from the registry", e);
 		} catch (ParserConfigurationException e) {
