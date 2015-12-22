@@ -23,14 +23,14 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>org.wso2.carbon.appmgt.usage</artifactId>
     <name>WSO@ Carbon - APP Management Usage Aggregator Module</name>
     <packaging>pom</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <dependencies>
 
         <dependency>
