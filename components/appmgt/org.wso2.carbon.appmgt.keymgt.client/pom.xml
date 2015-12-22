@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -26,7 +26,7 @@
 	<groupId>org.wso2.carbon.appmgt</groupId>
 	<artifactId>org.wso2.carbon.appmgt.keymgt.client</artifactId>
 	<packaging>bundle</packaging>
-        <version>1.0.1</version>
+        <version>1.0.2-SNAPSHOT</version>
 	<name>WSO2 Carbon - APP Key Mgt Client</name>
 	<description>Key Management Client functionality for API Mgt/Store solution</description>
 	<url>http://wso2.org</url>
