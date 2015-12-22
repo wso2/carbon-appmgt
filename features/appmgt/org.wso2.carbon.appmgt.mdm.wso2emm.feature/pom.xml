@@ -29,7 +29,7 @@
 	<name>WSO2 Carbon - App Manager WSO2 EMM Feature</name>
 	<url>http://wso2.org</url>
 
-	<dependencyManagement>
+
 		<dependencies>
 			<dependency>
 				<groupId>org.wso2.carbon.appmgt</groupId>
@@ -40,7 +40,7 @@
             			<artifactId>dd-plist</artifactId>
         		</dependency>
 		</dependencies>
-	</dependencyManagement>
+
 
 	<build>
         <plugins>
