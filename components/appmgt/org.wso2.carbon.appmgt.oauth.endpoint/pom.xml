@@ -3,14 +3,14 @@
      <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>appmgt</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.appmgt</groupId>
     <artifactId>org.wso2.carbon.appmgt.oauth.endpoint</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>war</packaging>
     <name>WSO2 Carbon - AppM OAuth 2.0 Endpoints</name>
     <description>Endpoints for OAuth 2.0</description>
