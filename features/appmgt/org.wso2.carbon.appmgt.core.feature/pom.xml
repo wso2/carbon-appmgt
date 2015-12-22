@@ -269,7 +269,7 @@
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.identity.authentication:4.2.1</importBundleDef>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.identity.thrift.authentication:4.2.1</importBundleDef>
                                 <importBundleDef>libthrift.wso2:libthrift:0.8.0.wso2v1</importBundleDef>
-				<importBundleDef>org.wso2.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
+				<importBundleDef>org.wso2.carbon.store:jaggery-scxml-executors:${jaggery.scxml.executors.version}</importBundleDef>
                             </importBundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>

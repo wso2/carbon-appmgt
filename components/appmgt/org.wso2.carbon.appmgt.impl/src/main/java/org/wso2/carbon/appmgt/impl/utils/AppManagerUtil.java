@@ -18,37 +18,9 @@
 
 package org.wso2.carbon.appmgt.impl.utils;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-
-import javax.cache.Cache;
-import javax.cache.CacheConfiguration;
-import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.gson.Gson;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
@@ -69,8 +41,16 @@ import org.wso2.carbon.appmgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.appmgt.api.doc.model.APIResource;
 import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -108,7 +88,11 @@ import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.service.TenantRegistryLoader;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
-import org.wso2.carbon.user.api.*;
+import org.wso2.carbon.user.api.AuthorizationManager;
+import org.wso2.carbon.user.api.Permission;
+import org.wso2.carbon.user.api.Tenant;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserCoreConstants;
 import org.wso2.carbon.user.core.UserRealm;
 import org.wso2.carbon.user.core.service.RealmService;
@@ -117,9 +101,36 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.FileUtil;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-
-import com.google.gson.Gson;
 import org.xml.sax.SAXException;
+
+import javax.cache.Cache;
+import javax.cache.CacheConfiguration;
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class contains the utility methods used by the implementations of
@@ -2839,7 +2850,13 @@ public final class AppManagerUtil {
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         } catch (XMLStreamException e) {
-            String msg = "Malformed XML found in the External Stores Configuration resource";
+            String msg = "Malformed XML found in the External Stores Configuration resource : "
+                    + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        } catch (OMException e) {
+            String msg = "Malformed XML found in the External Stores Configuration resource "
+                    + AppMConstants.EXTERNAL_APP_STORES_LOCATION;
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         }
@@ -3083,6 +3100,24 @@ public final class AppManagerUtil {
 					"Self registration might not function properly.", e);
 		}
 	}
+
+    /**
+     * This get the basic authentication header as a input and decode it and gives username, password in return
+     * @param basicAuthHeader
+     * @return
+     */
+    public static String[] getCredentialsFromBasicAuthHeader(String basicAuthHeader) {
+        if (basicAuthHeader != null) {
+            String base64Credentials = basicAuthHeader.substring("Basic".length()).trim();
+            String credentialsString = new String(org.apache.commons.ssl.Base64.decodeBase64(base64Credentials.getBytes()));
+            final String[] credentials = credentialsString.split(":", 2);
+            if (credentials.length == 2) {
+                return credentials;
+            }
+        }
+
+        return null;
+    }
 
 
 }

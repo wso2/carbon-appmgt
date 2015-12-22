@@ -137,7 +137,7 @@
           <artifactId>org.wso2.carbon.governance.registry.extensions</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.wso2.store</groupId>
+          <groupId>org.wso2.carbon.store</groupId>
           <artifactId>jaggery-scxml-executors</artifactId>
         </dependency>
         <dependency>
