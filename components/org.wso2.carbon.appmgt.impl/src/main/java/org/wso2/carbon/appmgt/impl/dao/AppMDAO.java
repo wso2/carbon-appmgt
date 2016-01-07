@@ -1394,8 +1394,6 @@ public class AppMDAO {
 			if (resultSet.next()) {
 				subscriptionStatus = resultSet.getString("SUB_STATUS");
 			}
-			resultSet.close();
-			ps.close();
 			return subscriptionStatus;
 		} catch (SQLException e) {
 			handleException("Failed to retrieve subscription status", e);
@@ -2441,7 +2439,7 @@ public class AppMDAO {
 
                 long count = result.getLong("SUB_ID");
                 appApiIdentifier = new APIIdentifier(appProvider, appName, appVersion);
-                String key = appName +"/"+appVersion+"&"+appuuid;
+				String key = appName + "/" + appVersion + "&" + appuuid;
 
                 subscriptions.put(key, count);
             }
@@ -5049,7 +5047,8 @@ public class AppMDAO {
 			while (rs.next()) {
 				policyPartialId = Integer.parseInt(rs.getString(1));
 			}
-
+			rs.close();
+			
 			// Finally commit transaction.
 			connection.commit();
 
@@ -5204,7 +5203,7 @@ public class AppMDAO {
 			handleException("Failed to retrieve application entitlement policy partial with id : " +
 					policyPartialId, e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(statementToGetPolicyPartial, connection, null);
+			APIMgtDBUtil.closeAllConnections(statementToGetPolicyPartial, connection, rs);
 		}
 		return entitlementPolicyPartial;
 	}
@@ -5272,7 +5271,7 @@ public class AppMDAO {
 		} catch (SQLException e) {
             handleException("Failed to retrieve apps associated with Policy Partial Id:" + policyPartialId, e);
         } finally {
-			APIMgtDBUtil.closeAllConnections(statementToGetAppsName, connection, null);
+			APIMgtDBUtil.closeAllConnections(statementToGetAppsName, connection, rs);
 		}
 		return apiIdentifiers;
 	}
@@ -5336,7 +5335,7 @@ public class AppMDAO {
         } catch (SQLException e) {
             handleException("Failed to retrieve shared entitlement policy partials.", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetPolicyPartialList, connection, null);
+            APIMgtDBUtil.closeAllConnections(statementToGetPolicyPartialList, connection, rs);
         }
         return entitlementPolicyPartialList;
     }
@@ -7412,7 +7411,7 @@ public class AppMDAO {
 				value=rs.getString("TRACKING_CODE");
 			}
 		} catch (SQLException e) {
-			handleException("Sorry wrong UUID " +uuid, e);
+			handleException("Sorry wrong UUID " + uuid, e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
 		}
