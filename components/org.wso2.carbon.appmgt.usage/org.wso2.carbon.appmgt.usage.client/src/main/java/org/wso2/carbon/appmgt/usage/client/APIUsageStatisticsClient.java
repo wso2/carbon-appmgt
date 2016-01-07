@@ -1574,13 +1574,17 @@ public class APIUsageStatisticsClient {
     public boolean isTableExist(String tableName, Connection connection) throws SQLException {
         //This return all tables,use this because it is not db specific, Passing table name doesn't
         //work with every database
-        ResultSet tables = connection.getMetaData().getTables(null, null, "%", null);
-        while (tables.next()) {
-            if (tables.getString(3).equalsIgnoreCase(tableName)) {
-                return true;
+    	ResultSet tables = null;
+    	try {
+    		tables = connection.getMetaData().getTables(null, null, "%", null);
+            while (tables.next()) {
+                if (tables.getString(3).equalsIgnoreCase(tableName)) {
+                    return true;
+                }
             }
-        }
-        tables.close();
+    	} finally {
+    		APIMgtDBUtil.closeAllConnections(null, null, tables);
+    	}
         return false;
     }
 
