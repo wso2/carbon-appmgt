@@ -442,7 +442,7 @@ Store.prototype.tags = function (type, isSite) {
         tagz = [],
         tz = {};
 
-    //Supports only 'webapp' type as of now.
+    // Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
 
     if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {

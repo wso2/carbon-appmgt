@@ -11,8 +11,6 @@ var render = function (theme, data, meta, require) {
     var hasApps = false;
     if (data.assets.length > 0) {
         hasApps = true;
-    } else {
-        hasApps = false;
     }
 
     var searchQuery = data.search.query;
@@ -21,18 +19,15 @@ var render = function (theme, data, meta, require) {
     } else {
         for (var key in searchQuery) {
             if (searchQuery.hasOwnProperty(key)) {
-                if (key.indexOf("overview_") !== -1) {
-                    if (key.indexOf("overview_treatAsASite") == -1) {
-                        searchQuery.searchTerm = key;
-                        searchQuery.search = searchQuery[key];
-                    }
+                if (key.indexOf("overview_") !== -1 && key.indexOf("overview_treatAsASite") == -1) {
+                    searchQuery.searchTerm = key;
+                    searchQuery.search = searchQuery[key];
                 }
             }
         }
     }
 
     data.header.searchQuery = searchQuery;
-
 
     theme('2-column-right', {
         title: data.title,

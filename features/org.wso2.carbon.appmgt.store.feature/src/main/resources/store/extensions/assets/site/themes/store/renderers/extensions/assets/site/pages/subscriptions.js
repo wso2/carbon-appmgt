@@ -2,7 +2,7 @@ var render = function (theme, data, meta, require) {
 
     var subscriptions = [];
     if (data.appsWithSubs != null && data.appsWithSubs.length > 0) {
-        var subscriptions = data.appsWithSubs[0].subscriptions;
+        subscriptions = data.appsWithSubs[0].subscriptions;
     }
 
     data.header.myApps = true;
