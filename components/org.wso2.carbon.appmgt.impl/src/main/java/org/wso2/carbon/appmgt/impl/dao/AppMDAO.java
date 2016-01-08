@@ -988,6 +988,7 @@ public class AppMDAO {
 
         Connection conn = null;
         ResultSet resultSet = null;
+        ResultSet rs = null;
         PreparedStatement ps = null;
         int subscriptionId = -1;
         int apiId = -1;
@@ -1005,7 +1006,6 @@ public class AppMDAO {
             if (resultSet.next()) {
                 apiId = resultSet.getInt("APP_ID");
             }
-            resultSet.close();
             ps.close();
 
             if (apiId == -1) {
@@ -1038,7 +1038,7 @@ public class AppMDAO {
             ps.setTimestamp(++count, new Timestamp(new java.util.Date().getTime()));
 
             ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
+            rs = ps.getGeneratedKeys();
             while (rs.next()) {
                 // subscriptionId = rs.getInt(1);
                 subscriptionId = Integer.valueOf(rs.getString(1)).intValue();
@@ -1059,6 +1059,7 @@ public class AppMDAO {
             handleException("Failed to add subscriber data ", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+            APIMgtDBUtil.closeAllConnections(null, null, rs);
         }
         return subscriptionId;
     }
@@ -1826,7 +1827,7 @@ public class AppMDAO {
 	public APIKey getAccessTokenData(String accessToken) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement ps = null;
-		ResultSet result = null;
+		ResultSet getTokenRS = null;
 		APIKey apiKey = new APIKey();
 
 		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
@@ -1844,7 +1845,7 @@ public class AppMDAO {
 			connection = APIMgtDBUtil.getConnection();
 			PreparedStatement getToken = connection.prepareStatement(getTokenSql);
 			getToken.setString(1, AppManagerUtil.encryptToken(accessToken));
-			ResultSet getTokenRS = getToken.executeQuery();
+			getTokenRS = getToken.executeQuery();
 			while (getTokenRS.next()) {
 
                 String decryptedAccessToken =
@@ -1868,7 +1869,7 @@ public class AppMDAO {
 		} catch (CryptoException e) {
 			handleException("Failed to get the access token data. ", e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, connection, result);
+			APIMgtDBUtil.closeAllConnections(ps, connection, getTokenRS);
 		}
 		return apiKey;
 	}
@@ -1897,13 +1898,13 @@ public class AppMDAO {
                                                                                   AppManagementException {
 		Connection connection = null;
 		PreparedStatement ps = null;
-		ResultSet result = null;
+		ResultSet getTokenRS = null;
 		Map<Integer, APIKey> tokenDataMap = new HashMap<Integer, APIKey>();
 
 		try {
 			connection = APIMgtDBUtil.getConnection();
 			PreparedStatement getToken = connection.prepareStatement(getTokenSql);
-			ResultSet getTokenRS = getToken.executeQuery();
+			getTokenRS = getToken.executeQuery();
 			while (getTokenRS.next()) {
 				String accessToken = AppManagerUtil.decryptToken(getTokenRS.getString("ACCESS_TOKEN"));
 				String regex = "(?i)[a-zA-Z0-9_.-|]*" + query.trim() + "(?i)[a-zA-Z0-9_.-|]*";
@@ -1931,7 +1932,7 @@ public class AppMDAO {
 		} catch (CryptoException e) {
 			handleException("Failed to get access token data. ", e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, connection, result);
+			APIMgtDBUtil.closeAllConnections(ps, connection, getTokenRS);
 
 		}
 		return tokenDataMap;
@@ -1953,7 +1954,7 @@ public class AppMDAO {
                                                                                        AppManagementException {
 		Connection connection = null;
 		PreparedStatement ps = null;
-		ResultSet result = null;
+		ResultSet getTokenRS = null;
 		Map<Integer, APIKey> tokenDataMap = new HashMap<Integer, APIKey>();
 
 		String accessTokenStoreTable = AppMConstants.ACCESS_TOKEN_STORE_TABLE;
@@ -1970,7 +1971,7 @@ public class AppMDAO {
 			connection = APIMgtDBUtil.getConnection();
 			PreparedStatement getToken = connection.prepareStatement(getTokenSql);
 			getToken.setString(1, user);
-			ResultSet getTokenRS = getToken.executeQuery();
+			getTokenRS = getToken.executeQuery();
 			Integer i = 0;
 			while (getTokenRS.next()) {
 				String authorizedUser = getTokenRS.getString("AUTHZ_USER");
@@ -1994,7 +1995,7 @@ public class AppMDAO {
 		} catch (CryptoException e) {
 			handleException("Failed to get access token data. ", e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, connection, result);
+			APIMgtDBUtil.closeAllConnections(ps, connection, getTokenRS);
 		}
 		return tokenDataMap;
 	}
@@ -2033,7 +2034,7 @@ public class AppMDAO {
                                                                                              AppManagementException {
 		Connection connection = null;
 		PreparedStatement ps = null;
-		ResultSet result = null;
+		ResultSet getTokenRS = null;
 		Map<Integer, APIKey> tokenDataMap = new HashMap<Integer, APIKey>();
 
 		try {
@@ -2049,7 +2050,7 @@ public class AppMDAO {
 			}
 			getToken.setDate(1, sqlDate);
 
-			ResultSet getTokenRS = getToken.executeQuery();
+			getTokenRS = getToken.executeQuery();
 			Integer i = 0;
 			while (getTokenRS.next()) {
 				String authorizedUser = getTokenRS.getString("AUTHZ_USER");
@@ -2075,7 +2076,7 @@ public class AppMDAO {
 		} catch (CryptoException e) {
 			handleException("Failed to get access token data. ", e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, connection, result);
+			APIMgtDBUtil.closeAllConnections(ps, connection, getTokenRS);
 		}
 		return tokenDataMap;
 	}
@@ -3397,6 +3398,7 @@ public class AppMDAO {
                                                                                       AppManagementException,
 	                                                                                  SQLException {
 		PreparedStatement ps = null;
+		ResultSet rs = null;
 		int applicationId = 0;
 		try {
 			int tenantId;
@@ -3439,7 +3441,7 @@ public class AppMDAO {
 				ps.setString(6, AppMConstants.ApplicationStatus.APPLICATION_CREATED);
 			}
 			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
+			rs = ps.getGeneratedKeys();
 			while (rs.next()) {
 				applicationId = Integer.parseInt(rs.getString(1));
 			}
@@ -3448,7 +3450,7 @@ public class AppMDAO {
 		} catch (SQLException e) {
 			handleException("Failed to add Application", e);
 		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, null, null);
+			APIMgtDBUtil.closeAllConnections(ps, null, rs);
 		}
 		return applicationId;
 
@@ -4838,6 +4840,7 @@ public class AppMDAO {
 
 		Connection connection = null;
 		ResultSet resultSet = null;
+		ResultSet rs = null;
 		PreparedStatement prepStmt = null;
 		int commentId = -1;
 		int apiId = -1;
@@ -4855,7 +4858,6 @@ public class AppMDAO {
 			if (resultSet.next()) {
 				apiId = resultSet.getInt("APP_ID");
 			}
-			resultSet.close();
 			prepStmt.close();
 
 			if (apiId == -1) {
@@ -4880,7 +4882,7 @@ public class AppMDAO {
 			prepStmt.setInt(4, apiId);
 
 			prepStmt.executeUpdate();
-			ResultSet rs = prepStmt.getGeneratedKeys();
+			rs = prepStmt.getGeneratedKeys();
 			while (rs.next()) {
 				commentId = Integer.valueOf(rs.getString(1)).intValue();
 			}
@@ -4901,6 +4903,7 @@ public class AppMDAO {
 			                identifier.getVersion(), e);
 		} finally {
 			APIMgtDBUtil.closeAllConnections(prepStmt, connection, resultSet);
+			APIMgtDBUtil.closeAllConnections(null, null, rs);
 		}
 		return commentId;
 	}
