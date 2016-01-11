@@ -50,7 +50,7 @@ jagg.module("subscription", {
         return jagg.require(jagg.getModulesDir() + "subscription/key.jag").updateAccessAllowDomains .apply(this, arguments);
     },
     checkSubscriptionWorkflow :function (){
-    	return jagg.require(jagg.getModulesDir()+ "subscription/workflow.jag").checkSubscriptionWorkflow .apply(this, arguments);
+    	return jagg.require(jagg.getModulesDir() + "subscription/workflow.jag").checkSubscriptionWorkflow .apply(this, arguments);
     }
 });
 %>

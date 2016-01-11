@@ -60,7 +60,10 @@ public final class AppMConstants {
 
     //registry location of providers
     public static final String PROVIDERS_PATH = "/providers";
-    
+
+    //appm synapse configuration file resource location
+    public static final String SYNAPSE_CONFIG_RESOURCES_PATH = "/repository/resources/appm-synapse-config/";
+
     public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
     //registry location of WebApp
@@ -119,6 +122,7 @@ public final class AppMConstants {
 
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
+    public static final String API_OVERVIEW_DISPLAY_NAME = "overview_displayName";
     public static final String API_OVERVIEW_VERSION = "overview_version";
     public static final String API_OVERVIEW_CONTEXT = "overview_context";
     public static final String API_OVERVIEW_DESCRIPTION = "overview_description";
@@ -591,4 +595,8 @@ public final class AppMConstants {
     public static final String PAGE_LOAD_EVENT = "page-load";
 
     public static final int API_AUTH_FORBIDDEN = 900908;
+
+    public static final String ANALYTICS = "Analytics.";
+    public static final String APP_USAGE_BAM_UI_ACTIVITY_ENABLED = ANALYTICS
+            + "UIActivityBAMPublishEnabled";
 }

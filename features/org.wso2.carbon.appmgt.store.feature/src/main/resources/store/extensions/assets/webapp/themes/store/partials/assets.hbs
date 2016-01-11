@@ -5,7 +5,7 @@
 
 		{{#each assets}}
 
-            <div class="col-xs-6 col-md-4 col-lg-2 app-assets-wrapper">
+            <div class="col-xs-6 col-md-4 col-lg-1-5 app-assets-wrapper">
                 {{#if isSubscribed}}
                     <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
                 {{/if}}
@@ -21,11 +21,6 @@
                         <div class="app-assets-provider">
 							{{attributes.overview_provider}}
                         </div>
-                    </div>
-
-                    <div class="app-assets-icon-info">
-                        <i title="{{attributes.overview_platform}}" class="fw {{iconImage attributes.overview_platform}} fw-1_5x fw-inverse"></i>
-                        <i title="{{attributes.overview_type}}" class="fw {{iconImageType attributes.overview_type}} fw-1_5x fw-inverse"></i>
                     </div>
                     <span class="app-assets-rating"> {{#assetRating rating}}{{/assetRating}} </span>
                 </div>

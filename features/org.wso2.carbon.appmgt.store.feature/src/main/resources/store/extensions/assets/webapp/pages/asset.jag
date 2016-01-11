@@ -288,7 +288,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var availableTiers=apiInfoManager.getTiers();
 
-    user=authenticator.getLoggedInUser();
+   // user=authenticator.getLoggedInUser();
 
     var subscriptionInfo = getSubscriptionInfo(asset);
 

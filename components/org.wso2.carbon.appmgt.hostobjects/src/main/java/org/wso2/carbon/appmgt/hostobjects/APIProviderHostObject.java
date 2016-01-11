@@ -753,45 +753,6 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Retrieve the policy partial id list defined for a given application
-     *
-     * @param context Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return list of policy partial ids
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
-     */
-    public static NativeArray jsFunction_getApplicationPolicyPartialList(Context context, Scriptable thisObj,
-                                                                         Object[] args,
-                                                                         Function funObj) throws
-                                                                                          AppManagementException {
-        if (args == null || args.length != 1) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null) {
-            handleException("Error while retrieving application's policy partial list. The application id is null");
-        }
-        NativeArray myn = new NativeArray(0);
-        int applicationId = Integer.parseInt(args[0].toString());
-
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        List<EntitlementPolicyPartial> policyPartialList = apiProvider.getApplicationPolicyPartialList(applicationId);
-        int count = 0;
-        for (EntitlementPolicyPartial entitlementPolicyPartial : policyPartialList) {
-            NativeObject row = new NativeObject();
-            row.put("partialId", row, entitlementPolicyPartial.getPolicyPartialId());
-            row.put("partialName", row, entitlementPolicyPartial.getPolicyPartialName());
-            row.put("partialContent", row, entitlementPolicyPartial.getPolicyPartialContent());
-            row.put("isShared", row, entitlementPolicyPartial.isShared());
-            row.put("author", row, entitlementPolicyPartial.getAuthor());
-            count++;
-            myn.put(count, myn, row);
-        }
-        return myn;
-    }
-
-    /**
      * Retrieve the shared policy partials
      *
      * @param cx      Rhino context
@@ -3526,6 +3487,68 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
+    public static NativeArray jsFunction_getAppsByPopularity(Context ctx, Scriptable hostObj, Object[] args,
+                                                             Function funObj) throws AppManagementException {
+        List<AppHitsStatsDTO> appStatsList = null;
+        NativeArray popularApps = new NativeArray(0);
+        APIProvider apiProvider = getAPIProvider(hostObj);
+        if (!AppManagerUtil.isUIActivityBAMPublishEnabled()) {
+            return popularApps;
+        }
+        if (args.length != 3) {
+            handleException("Invalid number of parameters!");
+        }
+        String providerName = (String) args[0];
+        String fromDate = (String) args[1];
+        String toDate = (String) args[2];
+
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(
+                    AppManagerUtil.replaceEmailDomainBack(providerName));
+            if(tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(
+                        tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+            APIUsageStatisticsClient client =
+                    new APIUsageStatisticsClient(((APIProviderHostObject) hostObj).getUsername());
+            appStatsList = client.getAppHitsOverTime(fromDate, toDate, tenantId);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            handleException("Error occurred while invoking APPUsageStatisticsClient " +
+                        "for ProviderAPPUsage", e);
+        }
+
+        if (appStatsList != null) {
+            for (int i = 0; i < appStatsList.size(); i++) {
+                NativeObject row = new NativeObject();
+                Object usageObject = appStatsList.get(i);
+                AppHitsStatsDTO usage = (AppHitsStatsDTO) usageObject;
+                row.put("AppName", row, usage.getAppName());
+                row.put("Context", row, usage.getContext());
+                row.put("TotalHits", row, usage.getTotalHitCount());
+                List<UserHitsPerAppDTO> userHits = usage.getUserHitsList();
+                if (userHits != null) {
+                    NativeArray userHitsArray = new NativeArray(userHits.size());
+                    for (int j = 0; j < userHits.size(); j++) {
+                        NativeObject userHitRow = new NativeObject();
+                        Object userHitsObject = userHits.get(j);
+                        UserHitsPerAppDTO userHitsPerAppDTO = (UserHitsPerAppDTO) userHitsObject;
+                        userHitRow.put("UserName", userHitRow, userHitsPerAppDTO.getUserName());
+                        userHitRow.put("Hits", userHitRow, userHitsPerAppDTO.getUserHitsCount());
+                        userHitsArray.put(j, userHitsArray, userHitRow);
+                    }
+                    row.put("UserHits", row, userHitsArray);
+                }
+                popularApps.put(i, popularApps, row);
+            }
+        }
+        return popularApps;
+    }
 }
 
 

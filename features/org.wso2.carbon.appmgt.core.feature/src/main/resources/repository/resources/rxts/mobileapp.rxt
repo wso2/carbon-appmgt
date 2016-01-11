@@ -45,9 +45,10 @@
 						<field type="options">
 	              <name label="Category">Category</name>
                 <values>
-                    <value>iOS</value>
-                    <value>Android</value>
-                    <value>Webapp</value>
+                    <value>Business</value>
+                    <value>Communication</value>
+                    <value>Finance</value>
+                    <value>Productivity</value>
                 </values>
             </field>
 			<!-- 

@@ -241,9 +241,13 @@ require('/modules/store.js').exec(function (ctx) {
                 };
 
                 assets = [];
-                while (assets.length < PAGE_SIZE && maxTry < 10) {
+               var done = false;
+               while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                     maxTry++;
                     var result = getNextassetSet();
+                    if (result.length < 12){
+                        done = true;
+                    }
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         var aid = String(result[n].UUID);
                         try {
@@ -293,7 +297,7 @@ require('/modules/store.js').exec(function (ctx) {
     AuthService=require(getServiceDir('authentication.js')).serviceModule;
     authenticator=new AuthService.Authenticator();
     authenticator.init(jagg,session);
-    user=authenticator.getLoggedInUser();
+    //user=authenticator.getLoggedInUser();
 
     if(currentPage-1 > 0){
         var leftnav = currentPage-1;

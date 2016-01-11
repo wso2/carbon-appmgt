@@ -80,7 +80,10 @@ public class APPMgtUiActivitiesBamDataPublisher {
 				.append("    {'name':'item','type':'string'},")
 				.append("    {'name':'action',  'type':'string' },")
 				.append("    {'name':'timestamp', 'type':'long'},")
-				.append("    {'name':'tenantId', 'type':'int'}")
+				.append("    {'name':'tenantId', 'type':'int'},")
+				.append("    {'name':'appName', 'type':'string'},")
+				.append("    {'name':'appVersion', 'type':'string'},")
+                .append("    {'name':'context', 'type':'string'}")
 				.append("    ]    }");
 		return builder.toString();
 
@@ -154,9 +157,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 *            },{"appId":"111-3434-343"},{"userId":
 	 *            "admin"},{"tenantId":"-1234"}]
 	 */
-	public void processUiActivityObject(Object[] parseJSON) {
-		String action, item, timestamp, appId, userId;
-		Integer tenantId;
+    public void processUiActivityObject(Object[] parseJSON) {
+        String action, item, timestamp, appId, userId, appName, appVersion, context;
+        Integer tenantId;
 		for (int i = 0; i < parseJSON.length; i++) {
 			NativeObject obj = (NativeObject) parseJSON[i];
 			action = obj.get("action", obj).toString();
@@ -165,14 +168,17 @@ public class APPMgtUiActivitiesBamDataPublisher {
 			appId = obj.get("appId", obj).toString();
 			userId = obj.get("userId", obj).toString();
 			tenantId = Integer.parseInt(obj.get("tenantId", obj).toString());
+			appName = obj.get("appName", obj).toString();
+			appVersion = obj.get("appVersion", obj).toString();
+            context = obj.get("context", obj).toString();
 			obj = null;
 
-            // consider only form load event
-            if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
-                publishUserActivityEvents(action, item, timestamp, appId,
-                        userId, tenantId);
-            }
-        }
+			// consider only form load event
+			if ((AppMConstants.PAGE_LOAD_EVENT).equals(action)) {
+				publishUserActivityEvents(action, item, timestamp, appId,
+					userId, tenantId, appName, appVersion, context);
+			}
+		}
 	}
 
 	/**
@@ -191,8 +197,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	 * @param tenantId
 	 *            : Tenant Id
 	 */
-    public void publishUserActivityEvents(String action, String item,
-                                          String timestampStr, String appId, String userId, Integer tenantId) {
+    public void publishUserActivityEvents(String action, String item, String timestampStr, String appId,
+                                          String userId, Integer tenantId, String appName,
+                                          String appVersion, String context){
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
              // if BAM is configured
@@ -206,13 +213,14 @@ public class APPMgtUiActivitiesBamDataPublisher {
 					Event event = new Event();
 					event.setTimeStamp(System.currentTimeMillis());
 					event.setPayloadData(new Object[] { appId, userId, item,
-							action, timeStamp, tenantId });
+							action, timeStamp, tenantId,appName,appVersion,context});
 					loadBalancingDataPublisher.publish(USER_ACTIVITY_STREAM,
 							USER_ACTIVITY_STREAM_VERSION, event);
 				}
 			} else {
 				// Write directly to DB
-                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId);
+                AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(),
+                                      appVersion, context);
             }
 		} catch (AgentException e) {
              // Here the exception is only logged (but not thrown externally) as this method is
@@ -221,8 +229,6 @@ public class APPMgtUiActivitiesBamDataPublisher {
              log.error("Failed to publish build event : " + e.getMessage(), e);
         } catch (AppManagementException e) {
             log.error("Failed to write to table : " + e.getMessage(), e);
-        } catch (SQLException e) {
-            log.error("SQL exception found : " + e.getMessage(), e);
         }
     }
 }

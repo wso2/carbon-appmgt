@@ -1,11 +1,19 @@
 .app-assets{
 
-    box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
-    border: 1px solid rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #fff;
+    margin: 5px;
+    padding-bottom: 2px;
+    position: relative;
+
 }
+
 
 .app-assets-wrapper{
     padding-top: 5px;
+    padding-right: 2px;
+    padding-left: 2px;
+    padding-bottom: 5px;
 }
 
 .app-assets-icon{
@@ -18,7 +26,7 @@
 }
 
 .app-assets-icon:hover{
-    background: #f1f1f1;
+    background: #dedede;
 }
 
 .app-assets-icon-info-platform{
@@ -30,8 +38,15 @@
 }
 
 .app-assets-icon-info{
-    text-align: center;
     padding-bottom: 5px;
+    position: absolute;
+    overflow: hidden;
+    bottom:92px;
+    left: 7px;
+}
+
+.app-asset-icon-info{
+    text-align: center;
 }
 
 .app-assets-name{
@@ -95,7 +110,7 @@
 }
 
 .asset-reinstall-btn, .asset-unsubscribe-btn, .asset-reinstall-btn-direct, .asset-myapps-btn{
-    margin-left: 20%;
+    margin-left: 10%;
     margin-right: auto;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -183,10 +198,6 @@
     left:0;
     right:0;
 }
-
-
-
-
 
 
 /* carousel */
@@ -281,11 +292,6 @@
 }
 
 
-
-
-
-
-
 .tags {
     list-style: none;
     margin: 0;
@@ -353,17 +359,22 @@
     border-radius: 0px;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
     font-size: small;
+    height: 34px;
 }
 
 .search-text{
     float: left;
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
-    width: 300px;
+    width: 245px;
 }
 
 
+.search-box{
+    padding-top: 5px;
+}
 
 
 .searchbox{
@@ -372,8 +383,11 @@
 
 
 .asset-wrapper{
-    padding-top: 30px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    padding-top: 20px;
     padding-right: 30px;
+    background: white;
+    padding-bottom: 20px;
 }
 
 .assets-wrapper{
@@ -382,9 +396,17 @@
 }
 
 .right-sidebar{
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding-top: 10px;
     padding-left: 30px;
+    background: #ffffff;
+    margin-top: 10px;
 }
+
+@media (min-width: 1200px){
+    .col-lg-1-5 {
+        width: 12.5%;
+    }
 
 
 .nothing-icon{
@@ -434,4 +456,26 @@
     border: none;
     border-radius : 0;
     min-height: 53px;
+}
+
+
+.dataTables_wrapper{
+    padding-top: 20px
+}
+
+.dataTables_filter{
+    padding-bottom: 10px;
+}
+
+.paging_two_button a{
+    padding-right: 20px;
+}
+
+.paginate_disabled_previous, .paginate_disabled_previous:hover{
+    color: #efefef;
+}
+
+
+.paginate_disabled_next, .paginate_disabled_next:hover{
+    color: #efefef;
 }

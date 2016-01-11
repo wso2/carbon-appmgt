@@ -77,7 +77,8 @@ public class TenantServiceCreator extends AbstractAxis2ConfigurationContextObser
     private String faultSequenceName = "fault";
     private String mainSequenceName = "main";
     private String saml2SequenceName = "saml2_sequence";
-    private String synapseConfigRootPath = CarbonBaseUtils.getCarbonHome() + "/repository/resources/apim-synapse-config/";
+    private String synapseConfigRootPath = CarbonBaseUtils.getCarbonHome() +
+            AppMConstants.SYNAPSE_CONFIG_RESOURCES_PATH;
     private SequenceMediator authFailureHandlerSequence = null;
     private SequenceMediator resourceMisMatchSequence = null;
     private SequenceMediator throttleOutSequence = null;

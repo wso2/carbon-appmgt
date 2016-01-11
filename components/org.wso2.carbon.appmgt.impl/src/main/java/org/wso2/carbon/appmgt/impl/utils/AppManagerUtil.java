@@ -149,6 +149,7 @@ public final class AppManagerUtil {
 			// set url
 			api.setUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL));
             api.setLogoutURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL));
+			api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
 			api.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
 			api.setStatus(getApiStatus(artifact.getLifecycleState().toUpperCase()));
 			api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
@@ -2778,6 +2779,19 @@ public final class AppManagerUtil {
         }
 
         return -1;
+    }
+
+    /**
+     * Check whether UIActivityPublishEnabled is set or not.
+     * @return boolean value.
+     */
+
+    public static boolean isUIActivityBAMPublishEnabled() {
+        AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
+                .getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String isEnabled = configuration
+                .getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
+        return isEnabled != null && Boolean.parseBoolean(isEnabled);
     }
 
 

@@ -1,6 +1,6 @@
 var render = function (theme, data, meta, require) {
     var assets = require('/helpers/assets.js');
-    theme('2-column-right', {
+    theme('1-column', {
         title: data.title,
         header: [
             {

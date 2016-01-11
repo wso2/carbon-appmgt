@@ -46,9 +46,6 @@ require('/modules/store.js').exec(function (ctx) {
 	var apps = subsApi.getAppsWithSubs({user: userData.username});
 
 
-
-
-
     if(apps.length >0){
         subscriptions = apps[0].subscriptions;
 
@@ -120,7 +117,6 @@ require('/modules/store.js').exec(function (ctx) {
 	}, request, response, session);
 
 }, request, response, session);
-
 
 function getServiceDir(serviceName) {
 	return '../services/' + serviceName;
