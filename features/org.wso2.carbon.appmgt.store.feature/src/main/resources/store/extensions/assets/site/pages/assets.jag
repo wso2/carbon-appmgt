@@ -1,0 +1,417 @@
+<%
+/*
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+include('../modules/jagg/jagg.jag');
+
+var AuthService;
+var authenticator;
+var caramel;
+var storeServer = require('store').server;
+var carbon = require('carbon');
+var user = storeServer.current(session);
+var um;
+if (user) {
+    um = storeServer.userManager(user.tenantId);
+} else {
+    um = storeServer.userManager(-1234);
+}
+var WEBAPP_TYPE = 'webapp';
+var SITE_TYPE = 'site';
+
+require('/modules/store.js').exec(function (ctx) {
+    var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
+            log = ctx.log,
+            sso = ctx.sso,
+            query = ctx.params.query,
+            tag = encodeURIComponent(ctx.params.tag),
+            store = ctx.store,
+            user = ctx.user,
+            server = ctx.server,
+            tenantId = ctx.tenantId,
+            configs = ctx.configs,
+            site = ctx.site,
+            search = require('/modules/search.js'),
+            subscriptions = {},
+            subscription = false,
+            avaliablePages, isSubscribed,
+            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
+    if (tag == 'undefined') {
+        tag = null;
+    }
+
+    var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
+    var SITE_OPTIONS = {
+        type: type,
+        attributes: SITE_QUERY
+    };
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
+    caramel = require('caramel');
+    process = require('process'),
+            localIP = "https://" + process.getProperty('server.host'),
+            httpsPort = process.getProperty('https.port');
+
+    url = '/assets/' + customType + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
+
+    avaliablePages = store.getAvailablePages(type, ctx.request, ctx.session);
+    paging = store.assetsPagingOverrided(request, avaliablePages);
+    mainPage = type;
+    title = store.assetLinks(type).title;
+
+    var skipIndices = true;
+    var indices = [];
+
+    if (!skipIndices) {
+        indices = store.pageIndexPopulator(avaliablePages, paging.start + 1);
+    }
+    var PAGE_SIZE = store.getPageSize();
+    var pageIndices;
+    if (indices.length > 1) {
+        pageIndices = indices;
+    }
+
+    var currIndex = paging.start + 1;
+    var currentPage = store.getCurrentPage(currIndex);
+
+    if (user) {
+        subscriptions = store.subscriptions(type);
+        if (subscriptions[type]) {
+            var count = Object.keys(subscriptions[type]).length;
+            if (count == 0) {
+                subscriptions[type] = {};
+            } else {
+                subscription = true;
+            }
+        }
+    }
+
+    // Init subscription service.
+    var subscriptionServiceModule = require('/extensions/assets/site/services/subscription.js').serviceModule;
+    var subscriptionService = new subscriptionServiceModule.SubscriptionService();
+    subscriptionService.init(jagg, session);
+
+    var getSubscriptionInfo = function (asset) {
+
+        // Get the enterprise subscription the individual subscription for this user for this app.
+        var appInfo = {};
+        appInfo["name"] = asset.attributes.overview_name;
+        appInfo["version"] = asset.attributes.overview_version;
+        appInfo["provider"] = asset.attributes.overview_provider;
+
+        var defaultApplicationName = "DefaultApplication";
+
+        var enterpriseSubscription;
+        if (authenticator.getLoggedInUser()) {
+            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                    authenticator.getLoggedInUser().username).subscription;
+        }
+        else {
+            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
+                    null).subscription;
+        }
+
+        var individualSubscription;
+        if (authenticator.getLoggedInUser()) {
+            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                    authenticator.getLoggedInUser().username).subscription;
+        }
+        else {
+            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                    null).subscription;
+        }
+
+        var subscriptionInfo = {};
+        subscriptionInfo["enterpriseSubscription"] = enterpriseSubscription;
+        subscriptionInfo["individualSubscription"] = individualSubscription;
+        return subscriptionInfo;
+    }
+    if (tag) {
+        var urlQuery = 'tag=' + tag + '&';
+        options = {
+            attributes: SITE_QUERY
+        };
+        options.tag = tag;
+        options.type = type;
+        options.lifecycleState = ["published"];
+        assets = store.taggeds(type, options, paging);
+    } else if (query) {
+        var urlQuery = 'query=' + query + '&';
+        query = require('/modules/search.js').build(query);
+        query.overview_treatAsASite = 'TRUE';
+
+        options = {
+            type: type,
+            attributes: query
+        };
+        for (key in query) {
+            if (query.hasOwnProperty(key) && key === 'overview_category') {
+                selectedCategory = query[key];
+            }
+        }
+        subPage = '/ Search: "' + query + '"';
+        assets = store.search(options, paging);
+    } else {
+        if (paging.sort == 'popular') {
+            var urlQuery = 'sort=' + paging.sort + '&';
+            server.privileged(function () {
+                var userName = user ? user.username : "";
+                var index = 0, maxTry = 0;
+
+                var ratingApi = require('/modules/rating-api.js').api;
+                registry = storeServer.systemRegistry(tenantId),
+                        am = store.assetManager(type, registry);
+
+                var getNextassetSet = function () {
+                    var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+                    var appMgtDaoObj = new appMgtDaoService();
+                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE, 'true');
+                    if (log.isDebugEnabled()) {
+                        log.debug("Query executed successfully to get the assets hit count");
+                    }
+                    index += PAGE_SIZE;
+                    return result;
+                };
+                assets = [];
+                var aid, asset;
+                while (assets.length < PAGE_SIZE && maxTry < 10) {
+                    maxTry++;
+                    var result = getNextassetSet();
+
+                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                        aid = String(result[n].id);
+                        try {
+                            asset = store.asset(type, aid);
+                            asset.indashboard = store.isuserasset(aid, type);
+                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
+                                assets.push(asset);
+                            }
+                        } catch (e) {
+                            log.warn("error retrieving asset from store ,information might be stale in table. id=" +
+                                    aid);
+                        }
+                    }
+                }
+            });
+        } else if (paging.sort == 'usage') {
+            var urlQuery = 'sort=' + paging.sort + '&';
+            server.privileged(function () {
+                var userName = user ? user.username : "";
+                var index = 0, maxTry = 0;
+                var getNextassetSet = function () {
+                    var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+                    var appMgtDaoObj = new appMgtDaoService();
+
+                    var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                    if (log.isDebugEnabled()) {
+                        var recordCount = 0;
+                        if (result != null) {
+                            recordCount = result.length;
+                        }
+                        log.debug("Query executed successfully to get the assets hit count. " + recordCount
+                                + " records found");
+                    }
+                    index += PAGE_SIZE;
+                    if (result.length > 0) {
+                        return JSON.parse(result);
+                    } else {
+                        return {};
+                    }
+                };
+
+                assets = [];
+                while (assets.length < PAGE_SIZE && maxTry < 10) {
+                    maxTry++;
+                    var result = getNextassetSet();
+                    for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                        var aid = String(result[n].UUID);
+                        try {
+                            var asset = store.asset(type, aid);
+                            asset.indashboard = store.isuserasset(aid, type);
+                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
+                                assets.push(asset);
+                            }
+                        } catch (e) {
+                            log.warn("error retrieving asset from store ,information might be stale in table. id=" +
+                                    aid);
+                        }
+                    }
+                }
+            });
+        } else {
+            var urlQuery = 'sort=' + paging.sort + '&';
+            assets = store.search(SITE_OPTIONS, paging);
+        }
+    }
+
+    // Check whether a 'next page' navigation is needed.
+    // If the assets count in the current page is less than PAGE_SIZE, next page is not available.
+    // Else assets should be queried to decide whether there are assets available for the next page.
+
+    var nextPageAvailable = false;
+
+    if (assets.length == PAGE_SIZE) {
+
+        // Get the starting index, offset etc .. of the assumed next page.
+        var nextPage = store.buildNextPage(request, avaliablePages);
+
+        // Query the assets with the assumed 'next page'
+        var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
+
+        if (nextAssetSet.length > 0) {
+            nextPageAvailable = true;
+        }
+    }
+
+    if (nextPageAvailable) {
+        var rightnav = currentPage + 1;
+    }
+
+    var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
+    AuthService = require(getServiceDir('authentication.js')).serviceModule;
+    authenticator = new AuthService.Authenticator();
+    authenticator.init(jagg, session);
+    user = authenticator.getLoggedInUser();
+
+    if (currentPage - 1 > 0) {
+        var leftnav = currentPage - 1;
+    }
+
+    if (nextPageAvailable && (assets.length == PAGE_SIZE)) {
+        var rightnav = currentPage + 1;
+    }
+
+    var subscriptionInfo;
+    assets.forEach(function (asset) {
+
+        var appRating = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + asset.id));
+        if (appRating) {
+            asset.rating = Math.floor(appRating.rating);
+        } else {
+            asset.rating = 0;
+        }
+
+        isSubscribed = false;
+        // Set subscription details for each asset.
+        subscriptionInfo = getSubscriptionInfo(asset)
+        if (subscriptionInfo.individualSubscription) {
+            if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
+                isSubscribed = true;
+                subscriptionInfo.individualSubscription["OnHold"] = false;
+            } else if (subscriptionInfo.individualSubscription.subscriptionStatus === "ON_HOLD") {
+                subscriptionInfo.individualSubscription["OnHold"] = true;
+            } else {
+                subscriptionInfo.individualSubscription["OnHold"] = false;
+            }
+        }
+        asset.isSubscribed = isSubscribed;
+
+        // To support skip gateway label visibility.
+        if (asset.overview_skipGateway == "true") {
+            asset.overview_skipGateway = true;
+        }
+        else {
+            asset.overview_skipGateway = false;
+        }
+    });
+
+    var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
+    var siteRecentAssets = [];
+
+    for (var i = 0; i < recentAssets.length; i++) {
+        var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+        if (appRatingRecentAssets) {
+            recentAssets[i].rating = {
+                average: Math.floor(appRatingRecentAssets.rating)
+            };
+        } else {
+            recentAssets[i].rating = 0;
+        }
+        siteRecentAssets.push(recentAssets[i]);
+    }
+
+    var isSite;
+    if (customType == WEBAPP_TYPE) {
+        isSite = 'false';
+    } else if (customType == SITE_TYPE) {
+        isSite = 'true';
+    }
+
+    caramel.render({
+        title: 'Store | Assets',
+        user: user,
+        sso: sso,
+        header: site.header(tenantId, {
+            sso: sso,
+            user: user
+        }),
+        navigation: site.navigation(tenantId),
+        search: {
+            mainPage: mainPage,
+            subPage: subPage,
+            query: query,
+            isTopAssets: false,
+            searchFields: search.fields()
+        },
+        type: type,
+        selectedCategory: selectedCategory,
+        tags: function () {
+            return [
+                {
+                    url: '/assets/' + customType + '/?tag=',
+                    data: store.tags(type, isSite)
+                }
+            ];
+        },
+        config: {
+            localIP: localIP,
+            httpsPort: httpsPort
+        },
+        assets: assets,
+        paging: {
+            url: url + 'sort=' + paging.sort + '&page=',
+            sort: paging.sort,
+            tag: tag,
+            size: assets.length
+        },
+        sorting: {
+            url: url + 'sort='
+        },
+
+        myAssets: {
+            user: user,
+            type: type,
+            title: title,
+            subscriptions: subscriptions[type],
+            subscription: subscription,
+            pageIndices: pageIndices,
+            leftNav: leftnav,
+            rightNav: rightnav,
+            urlQuery: urlQuery
+        },
+        recentAssets: siteRecentAssets
+
+    });
+}, request, response, session);
+
+function getServiceDir(serviceName) {
+    return '../services/' + serviceName;
+}
+
+%>
+

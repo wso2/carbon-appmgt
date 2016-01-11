@@ -6,6 +6,7 @@ var subsApi;
 var AuthService;
 var authenticator;
 var log = new Log('subscriptions');
+var carbon = require('carbon');
 
 include('../modules/jagg/jagg.jag');
 
@@ -14,10 +15,12 @@ require('/modules/store.js').exec(function (ctx) {
 	var sso = ctx.sso;
 	tenantId = ctx.tenantId;
 	site = ctx.site;
-	var recentAssets = store.recentAssets('webapp');
+	social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
 	caramel = require('caramel');
 	search = require('/modules/search.js');
-		
+	var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
+	var RECENT_ASSET_COUNT = store.getRecentAppCount().myAppsPage;
 
 	SubscriptionService = require(getServiceDir('subscription.js')).serviceModule;
 	subsApi = new SubscriptionService.SubscriptionService();
@@ -53,25 +56,44 @@ require('/modules/store.js').exec(function (ctx) {
         if(!page) page = 1;
         var limit = page * PAGE_SIZE;
         var offset = limit - PAGE_SIZE - 1;
+		var displayApps = [];
+		var webAppAssets = [];
 
+		//Remove site assets form the asset[].
+		for(i = 0; i < apps[0].subscriptions.length; i++) {
+			var asset = store.asset(type, apps[0].subscriptions[i].uuid);
+			var treatAsASite = asset.attributes.overview_treatAsASite;
+			if(treatAsASite) {
+				if (treatAsASite.toLowerCase() == "false") {
+					webAppAssets.push(apps[0].subscriptions[i]);
+				}
+			}
+		}
 
-        var displayApps = [];
+		for(i = 0; i < webAppAssets.length; i++) {
+			var app = apiInfoManager.getAPIDescription(webAppAssets[i].provider, webAppAssets[i].name, webAppAssets[i].version);
+			webAppAssets[i].productionURL = app.serverURL.productionURL;
 
-        for(i=0;i< apps[0].subscriptions.length;i++){
-            var api=apiInfoManager.getAPIDescription( apps[0].subscriptions[i].provider, apps[0].subscriptions[i].name, apps[0].subscriptions[i].version);
-            apps[0].subscriptions[i].productionURL = api.serverURL.productionURL;
+			if((i > offset && i < limit)){
+				displayApps.push(webAppAssets[i]);
+			}
+		}
 
-            if((i > offset && i < limit)){
-                displayApps.push(apps[0].subscriptions[i]);
-            }
-
-        }
-
-
-        apps[0].subscriptions = displayApps;
+		apps[0].subscriptions = displayApps;
 
     }
 
+	var recentAssets = store.recentAssets('webapp', RECENT_ASSET_COUNT, SITE_QUERY);
+	for (var i = 0; i < recentAssets.length; i++) {
+		var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+		if (appRatingRecentAssets) {
+			recentAssets[i].rating = {
+				average: Math.floor(appRatingRecentAssets.rating)
+			};
+		} else {
+			recentAssets[i].rating = 0;
+		}
+	}
 
 	caramel.render({
 		header: {
@@ -91,7 +113,7 @@ require('/modules/store.js').exec(function (ctx) {
 		metadata: {
 			appsWithSubs: apps
 		},
-		recentAssets:recentAssets
+		recentAssets: recentAssets
 	}, request, response, session);
 
 }, request, response, session);

@@ -28,6 +28,14 @@
     "pagination": {
         "PAGE_SIZE" : 18
     },
+
+    "recentAppCount": {
+        "topAssetPage" : 15,
+        "assetPage": 5,
+        "assetsPage": 5,
+        "myAppsPage": 2,
+        "fromProvider": 5
+    },
   "permissions": {
     "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
     "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"

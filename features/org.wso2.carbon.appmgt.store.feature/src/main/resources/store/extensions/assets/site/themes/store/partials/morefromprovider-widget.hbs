@@ -1,0 +1,23 @@
+
+
+<div class="row visible-lg">
+    <h3> {{t "Recent Apps from "}}{{overview_provider}}</h3>
+    <hr>
+        {{#each assets}}
+            <a href="{{url "/assets/site"}}/{{id}}">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>
+                        <div class="recent-app-asset-provider">{{attributes.overview_provider}}</div>
+                        <span class="app-assets-rating"> {{#assetRating rating.average}}{{/assetRating}} </span>
+                    </div>
+                    <div class="col-md-4">
+                        <img class="col-md-12"
+                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    </div>
+                </div>
+            </a>
+            <hr>
+        {{/each}}
+
+</div>

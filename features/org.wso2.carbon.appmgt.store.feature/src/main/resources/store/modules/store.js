@@ -22,6 +22,8 @@ var RESOURCE_TYPE_WEBAPP = 'webapp';
 
 var RESOURCE_TYPE_MOBILEAPP = 'mobileapp';
 
+var RESOURCE_TYPE_SITE = 'site';
+
 var log = new Log();
 
 var merge = function (def, options) {
@@ -247,6 +249,11 @@ Store.prototype.getPageSize = function () {
     return config.pagination.PAGE_SIZE;
 };
 
+Store.prototype.getRecentAppCount = function () {
+    var config  = require('/config/store.js').config();
+    return config.recentAppCount;
+};
+
 Store.prototype.commentsPageSize = function () {
     return configs()[COMMENTS_PAGE_SIZE];
 };
@@ -410,7 +417,7 @@ Store.prototype.tags = function (type) {
     // NOTE : Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
 
-    if(type == RESOURCE_TYPE_WEBAPP){
+    if(type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE){
         var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
         var tenantdomain = carbonContext.getTenantDomain();
         var storeObj = jagg.module("manager").getAPIStoreObj();
@@ -426,6 +433,33 @@ Store.prototype.tags = function (type) {
     return tagz;
 };
 
+/**
+ * Returns all tags which relevant to type and flag
+ */
+Store.prototype.tags = function (type, isSite) {
+    var tag, tags, assetType, i, length, count, queryParameters,
+        registry = this.registry || this.servmod.anonRegistry(this.tenantId),
+        tagz = [],
+        tz = {};
+
+    // Supports only 'webapp' type as of now.
+    // If type = undefined retrieve tags without any filtering.
+
+    if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
+        var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
+        var tenantdomain = carbonContext.getTenantDomain();
+        var storeObj = jagg.module("manager").getAPIStoreObj();
+        tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        return tagz;
+    } else if (type == RESOURCE_TYPE_MOBILEAPP) {
+        return tagz;
+    } else if (type) {
+        log.warn("Retrieving tags : Type " + type + " is not supported.");
+        return tagz;
+    }
+
+    return tagz;
+};
 
 Store.prototype.comments = function (aid, paging) {
     var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
@@ -563,14 +597,6 @@ Store.prototype.assetsLazy = function (type, paging) {
 
 Store.prototype.tagged = function (type, tag, paging) {
 
-    // var type=(type=='null')?null:type;
-
-    //Check if a type has been provided.
-    /*if(!type){
-     log.debug('Returning an empty [] for Store.tagged.');
-     return [];
-     } */
-
     var i;
     var options = {};
     var assets;
@@ -579,15 +605,39 @@ Store.prototype.tagged = function (type, tag, paging) {
     //options['tag'] = tag;
     //options = obtainViewQuery(options);
     //TODO move this LCState to config
-    options = {"tag": tag, "lifecycleState": ["published"]};
-
-    assets = this.assetManager(type).search(options, paging);
+    options = {"tag": tag, "lifecycleState": ["published"], "overview_treatAsASite" : "TRUE"};
+    options = obtainViewQuery(options);
+    var builtPaging = PaginationFormBuilder(paging);
+    assets = this.assetManager(type).search(options, builtPaging);
 
     length = assets.length;
-
     for (i = 0; i < length; i++) {
         assets[i].rating = this.rating(assets[i].path);
         assets[i].indashboard = this.isuserasset(assets[i].id, type);
+    }
+    return assets;
+};
+
+
+Store.prototype.taggeds = function (type, options, paging) {
+
+    var i, length, types, assets;
+
+    options = obtainViewQuery(options);
+    var builtPaging = PaginationFormBuilder(paging);
+    if (type) {
+        var assetz = this.assetManager(type).search(options, builtPaging);
+        for (i = 0; i < assetz.length; i++) {
+            assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
+        }
+        return assetz;
+    }
+    types = this.assetTypes();
+    assets = {};
+    length = types.length;
+    for (i = 0; i < length; i++) {
+        type = types[i];
+        assets[type] = this.assetManager(types[i]).search(options, builtPaging);
     }
     return assets;
 };
@@ -672,7 +722,7 @@ Store.prototype.popularAssets = function (type, count) {
     return assets;
 };
 
-Store.prototype.recentAssets = function (type, count) {
+Store.prototype.recentAssets = function (type, count, options) {
 
     //var type=(type=='null')?null:type;
 
@@ -689,7 +739,9 @@ Store.prototype.recentAssets = function (type, count) {
         sortBy: 'overview_createdtime',
         sort: 'older'
     };
-    var options = {};
+    if (!options) {
+        options = {};
+    }
     options = obtainViewQuery(options);
     options = {"attributes": options};
 

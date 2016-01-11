@@ -19,7 +19,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     caramel = require('caramel');
     AppService = require(getServiceDir('app.js')).serviceModule;
-    ApiService = require(getServiceDir('api-information.js')).serviceModule;
+    ApiService = require(getServiceDir('app-information.js')).serviceModule;
     AuthService=require(getServiceDir('authentication.js')).serviceModule;
 
     authenticator=new AuthService.Authenticator();

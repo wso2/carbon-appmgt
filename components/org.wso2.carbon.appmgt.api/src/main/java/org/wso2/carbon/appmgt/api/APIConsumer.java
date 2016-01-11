@@ -98,12 +98,22 @@ public interface APIConsumer extends APIManager {
                                                                            AppManagementException;
 
     /**
-     * Get all tags of published APIs
+     * Get all tags of published Apps
      *
-     * @return a list of all Tags applied to all APIs published.
-     * @throws AppManagementException if failed to get All the tags
+     * @return a list of all tags applied to all apps published.
+     * @throws AppManagementException if failed to get all the tags
      */
     public Set<Tag> getAllTags(String tenantDomain) throws AppManagementException;
+
+    /**
+     * @param tenantDomain
+     * @param assetType Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset type.
+     * @param attributeMap Attribute map for the give assetType.
+     * @return matching tag set which qualified the conditions of assetTye and attributeMap.
+     * @throws AppManagementException
+     */
+    public Set<Tag> getAllTags(String tenantDomain, String assetType, Map<String, String> attributeMap)
+            throws AppManagementException;
 
     /**
      * Rate a particular WebApp. This will be called when subscribers rate an WebApp

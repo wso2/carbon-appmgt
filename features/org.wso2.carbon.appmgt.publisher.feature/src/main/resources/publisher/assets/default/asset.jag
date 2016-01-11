@@ -14,7 +14,10 @@
 include("/extensions/webapp/modules/jagg/jagg.jag");
 var permissions=require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
-
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
+var MOBILEAPP_TYPE = 'mobileapp';
+var assetType;
 
 require('/modules/publisher.js').exec(function(ctx) {
 
@@ -335,8 +338,13 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
         //Check if the type is valid
         try {
-
+            model.import('form.importer', context.post);
             //Process and add any files in the request if the application is not in the copy mode
+            if (model.get('overview.treatAsASite').value.toString().toLowerCase() == 'true') {
+                assetType = SITE_TYPE;
+            } else {
+                assetType = WEBAPP_TYPE;
+            }
             if(oldVersion == null || oldVersion == '') {
                 inspectFiles(request, context.post);
             }
@@ -696,64 +704,69 @@ function addTags(params,assetId,artifactManager,reg){
         return filteredActions;
     }
 
-/*
- The function inspects the files sent with a request.If files are found
- they are added to Storage and then the generated uuids are added to
- the POST parameter object
- @req: A request object
- @params: The POST parameters
- */
-function inspectFiles(req, params) {
-    var files = req.getAllFiles();
-    var fileName;
-    var file;
-    var uuid = '';
-    var extension;
-    var thumbnail;
-    var banner;
+    /*
+     The function inspects the files sent with a request.If files are found
+     they are added to Storage and then the generated uuids are added to
+     the POST parameter object
+     @req: A request object
+     @params: The POST parameters
+     */
+    function inspectFiles(req, params) {
+        var files = req.getAllFiles();
+        var fileName;
+        var file;
+        var uuid = '';
+        var extension;
+        var thumbnail;
+        var banner;
+        var thumbnailFilePath;
+        var bannerFilePath;
 
-    //setting default img if no images given for a webapp
-    if(files == null){
-        var files = {};
-        var thumbnail = new File("/config/defaults/img/thumbnail.jpg");
-        var banner = new File("/config/defaults/img/banner.jpg");
-
-        files["images_thumbnail"]= thumbnail;
-        files["images_banner"]= banner;
-    }else if(files.images_thumbnail == null){
-        thumbnail = new File("/config/defaults/img/thumbnail.jpg");
-        files["images_thumbnail"]= thumbnail;
-    }else if(files.images_banner == null){
-        var banner = new File("/config/defaults/img/banner.jpg");
-        files["images_banner"]= banner;
-    }
-
-    var storageManager = new storageModule.StorageManager({
-        context: 'storage',
-        isCached: false,
-        connectionInfo: {
-            dataSource: storageConfig.dataSource
+        if (assetType = SITE_TYPE) {
+            thumbnailFilePath = "/config/defaults/img/site-thumbnail.jpg";
+            bannerFilePath = "/config/defaults/img/site-banner.jpg"
+        } else {
+            thumbnailFilePath = "/config/defaults/img/thumbnail.jpg";
+            bannerFilePath = "/config/defaults/img/banner.jpg"
         }
-    });
+        //setting default img if no images given for a webapp
+        if (files == null) {
+            var files = {};
+            var thumbnail = new File(thumbnailFilePath);
+            var banner = new File(bannerFilePath);
 
-    for (var index in files) {
+            files["images_thumbnail"] = thumbnail;
+            files["images_banner"] = banner;
+        } else if (files.images_thumbnail == null) {
+            thumbnail = new File(thumbnailFilePath);
+            files["images_thumbnail"] = thumbnail;
+        } else if (files.images_banner == null) {
+            var banner = new File(bannerFilePath);
+            files["images_banner"] = banner;
+        }
 
-        file = files[index];
+        var storageManager = new storageModule.StorageManager({
+            context: 'storage',
+            isCached: false,
+            connectionInfo: {
+                dataSource: storageConfig.dataSource
+            }
+        });
 
-        //log.debug('file: ' + index);
+        for (var index in files) {
 
-        //Put the file in storage and get a uuid as a reference
-        var resource = {};
-        resource['file'] = file;
-        extension = utility.fileio.getExtension(file);
-        resource['contentType'] = utility.fileio.getContentType(extension);
+            file = files[index];
+            //Put the file in storage and get a uuid as a reference
+            var resource = {};
+            resource['file'] = file;
+            extension = utility.fileio.getExtension(file);
+            resource['contentType'] = utility.fileio.getContentType(extension);
+            uuid = storageManager.put(resource);
 
-        uuid=storageManager.put(resource);
-
-        //Add a new  entry into the POST parameters containing the uuid
-        params[index] = uuid;
+            //Add a new  entry into the POST parameters containing the uuid
+            params[index] = uuid;
+        }
     }
-}
 
 routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{value}', function (context) {
     log.debug('Unsupported method PUT for /asset called.');

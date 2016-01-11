@@ -27,6 +27,8 @@ authenticator.init(jagg,session);
 var carbon = require('carbon');
 var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
+var WEBAPP_TYPE = 'webapp';
+var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title,
@@ -47,6 +49,13 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
+
+    var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
+    var SITE_OPTIONS = {
+        type: type,
+        attributes: SITE_QUERY
+    };
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetPage;
 
     matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
     aid = matcher.elements().aid;
@@ -74,6 +83,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
+    var ATTR_TREAT_AS_A_SITE = 'overview_treatAsASite';
     var ATTR_PROVIDER = 'overview_provider';
     var LIFECYCLE_STATE_PROPERTY = 'lcState';
     var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
@@ -101,19 +111,19 @@ require('/modules/store.js').exec(function (ctx) {
         searchOptions['attributes'] = {};
         searchOptions = obtainViewQuery(searchOptions);
         searchOptions['attributes'][ATTR_PROVIDER] = provider;
-        paging = {start: 0, count: 10, sort: 'recent'};
+        searchOptions['attributes'][ATTR_TREAT_AS_A_SITE] = 'FALSE';
+        paging = {start: 0, count: store.getRecentAppCount().fromProvider, sort: 'recent'};
         assetsFromProvider['overview_provider'] = provider;
         assetsFromProvider['type'] = type;
         assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
-        //remove the selected asset from the assets list
+        //Remove the current asset from the assets list.
         for (var i = 0; i < assetsFromProvider.assets.length; i++) {
             if (assetsFromProvider.assets[i].id === asset.id) {
                 assetsFromProvider.assets.splice(i, 1);
                 break;
             }
         }
-
         return assetsFromProvider;
     }
 
@@ -309,21 +319,30 @@ require('/modules/store.js').exec(function (ctx) {
     asset.attributes.httpsPort = process.getProperty('https.port');
 
     for(var i = 0; i < assetsByProvider.assets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id))) {
-            assetsByProvider.assets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + assetsByProvider.assets[i].id)).rating)};
+        var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id));
+        if(appRatingByProviderJson) {
+            assetsByProvider.assets[i].rating = {average: Math.floor(appRatingByProviderJson.rating)};
         }else{
             assetsByProvider.assets[i].rating = 0;
         }
     }
 
-    var recentAssets = store.recentAssets(type);
+    var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
 
-    for(var i = 0; i < recentAssets.length; i++){
-        if(JSON.parse(social.getRating("webapp:" + recentAssets[i].id))) {
-            recentAssets[i].rating = {average: Math.floor(JSON.parse(social.getRating("webapp:" + recentAssets[i].id)).rating)};
-        }else{
+    for(var i = 0; i < recentAssets.length; i++) {
+        var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+        if (appRatingRecentAssetsJson) {
+            recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
+        } else {
             recentAssets[i].rating = 0;
         }
+    }
+
+    var isSite;
+    if (customType == WEBAPP_TYPE) {
+        isSite = 'false';
+    } else if (customType == SITE_TYPE) {
+        isSite = 'true';
     }
 
     caramel.render({
@@ -357,7 +376,7 @@ require('/modules/store.js').exec(function (ctx) {
         tags: [
             {
                 url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
+                data: store.tags(type, isSite)
             }
         ],
         myAssets: { user: user, type: type, title: title },

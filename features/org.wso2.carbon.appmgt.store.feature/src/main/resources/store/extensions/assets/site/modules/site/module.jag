@@ -1,0 +1,44 @@
+<%
+jagg.module("site", {
+
+    getAppDescription:function () {
+        return jagg.require(jagg.getModulesDir() + "site/site.jag").getAppDescription.apply(this, arguments);
+    },
+
+    getAllPublishedAPIs:function () {
+        return jagg.require(jagg.getModulesDir() + "site/published.jag").getAllPublishedAPIs.apply(this, arguments);
+    },
+
+    getAllPaginatedPublishedAPIs:function () {
+        return jagg.require(jagg.getModulesDir() + "site/published.jag").getAllPaginatedPublishedAPIs.apply(this, arguments);
+    },
+
+    getPublishedAPIsByProvider:function () {
+        return jagg.require(jagg.getModulesDir() + "site/published-by-provider.jag").getPublishedAPIsByProvider.apply(this, arguments);
+    },
+
+    getRecentlyAddedAPIs:function () {
+        return jagg.require(jagg.getModulesDir() + "site/recently-added.jag").getRecentlyAddedAPIs.apply(this, arguments);
+    },
+
+    getAPIsByTag:function () {
+        return jagg.require(jagg.getModulesDir() + "site/tagged.jag").getAPIsByTag.apply(this, arguments);
+    },
+
+    getPaginatedAPIsByTag:function () {
+        return jagg.require(jagg.getModulesDir() + "site/tagged.jag").getPaginatedAPIsByTag.apply(this, arguments);
+    },
+
+    getTopRatedAPIs:function () {
+        return jagg.require(jagg.getModulesDir() + "site/top-rated.jag").getTopRatedAPIs.apply(this, arguments);
+    },
+
+    getTiers:function () {
+        return jagg.require(jagg.getModulesDir() + "site/site.jag").getTiers.apply(this, arguments);
+    },
+
+    hasUserPermissions:function () {
+        return jagg.require(jagg.getModulesDir() + "site/permissions.jag").hasUserPermissions.apply(this, arguments);
+    }
+});
+%>

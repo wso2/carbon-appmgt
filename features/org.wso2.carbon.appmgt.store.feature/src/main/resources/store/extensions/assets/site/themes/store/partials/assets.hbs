@@ -1,0 +1,57 @@
+
+<div class="assets-wrapper">
+
+    {{#if assets}}
+
+        {{#each assets}}
+
+            <div class="col-xs-6 col-md-4 col-lg-2 app-assets-wrapper">
+                {{#if isSubscribed}}
+                    <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
+                {{/if}}
+                <div class="app-assets">
+                    <a href="{{url "/assets/site"}}/{{id}}">
+                        <img class="app-assets-icon"
+                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    </a>
+                    <div class="app-assets-info">
+                        <div class="app-assets-name">
+                            {{attributes.overview_displayName}}
+                        </div>
+                        <div class="app-assets-provider">
+                            {{attributes.overview_provider}}
+                        </div>
+                    </div>
+
+                    <div class="app-assets-icon-info">
+                        <i title="{{attributes.overview_platform}}" class="fw {{iconImage attributes.overview_platform}} fw-1_5x fw-inverse"></i>
+                        <i title="{{attributes.overview_type}}" class="fw {{iconImageType attributes.overview_type}} fw-1_5x fw-inverse"></i>
+                    </div>
+                    <span class="app-assets-rating"> {{#assetRating rating}}{{/assetRating}} </span>
+                </div>
+            </div>
+
+        {{/each}}
+
+    {{else}}
+
+        <div class="well-large col-md-12 no-apps-box">
+            <i class="fw fw-paste nothing-icon"></i> Sorry, We could not find any app for you
+        </div>
+
+    {{/if}}
+
+</div>
+
+{{#if assets}}
+    <div class="row">
+    <ul class="pager">
+        {{#if leftNav}}
+            <li><a href="{{url "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
+        {{/if}}
+        {{#if rightNav}}
+            <li><a  href="{{url "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a></li>
+        </ul>
+        {{/if}}
+    </div>
+{{/if}}
