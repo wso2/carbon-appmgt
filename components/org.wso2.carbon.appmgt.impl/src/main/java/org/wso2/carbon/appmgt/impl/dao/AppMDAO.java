@@ -6507,8 +6507,9 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
         } catch (SQLException e) {
             handleException("Error when executing the SQL ", e);
         } catch (IdentityRuntimeException e) {
-            e.printStackTrace();
-            throw new AppManagementException("Error while getting tenantId of user" + e);
+			String msg = "Error when getting the tenant id of the user for the webapp provider : " + webappProvider;
+			log.error(msg);
+            throw new AppManagementException(msg + e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }

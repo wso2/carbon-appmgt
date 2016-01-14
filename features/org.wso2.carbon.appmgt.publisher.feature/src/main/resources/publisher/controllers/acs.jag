@@ -23,7 +23,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
         application.put('sso_sessions', {});
         sso_sessions = application.get('sso_sessions');
     }
-    
+
     if (samlResponse != null) {
         samlRespObj = sso.client.getSamlObject(samlResponse);
         if (!sso.client.isLogoutResponse(samlRespObj)) {
@@ -31,54 +31,54 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             // validating the signature
             if (configs.ssoConfiguration.responseSigningEnabled) {
 
-            if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
-            var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
-			if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
-			                var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-                            var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
-                            var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
+                if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
+                    var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
+                    if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                        var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+                        var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
+                        var domainName = MultitenantUtils.getTenantDomain(sessionObj.loggedInUser);
 
-                            if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
-                                var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
-                                var ctx = service.getServerConfigContext();
-                                var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-                                TenantAxisUtils.setTenantAccessed(domainName, ctx);
-                            }
+                        if (domainName != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(domainName)) {
+                            var service = server.osgiService('org.wso2.carbon.utils.ConfigurationContextService');
+                            var ctx = service.getServerConfigContext();
+                            var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+                            TenantAxisUtils.setTenantAccessed(domainName, ctx);
+                        }
 
-                    		jagg.setUser({username:sessionObj.loggedInUser});
-                    	 	session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        	session.put("Loged", "true");
+                        jagg.setUser({username: sessionObj.loggedInUser});
+                        session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                        session.put("Loged", "true");
 
-                        	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
-                        	var identityTenantUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-				            var tenantId = identityTenantUtil.getTenantIdOfUser(sessionObj.loggedInUser);
+                        //sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
+                        var identityTenantUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+                        var tenantId = identityTenantUtil.getTenantIdOfUser(sessionObj.loggedInUser);
 
-				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
-				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
-				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
-                                                          commonUtil.getRootSystemRegistry(tenantId));
+                        var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
+                        var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
+                        commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
+                                commonUtil.getRootSystemRegistry(tenantId));
 
-                        	log.debug("session index :: " + sessionObj.sessionIndex);
-                        	log.debug("session :: " + sessionObj.sessionId);
-				log.debug("real session :: " + session.getId());
+                        log.debug("session index :: " + sessionObj.sessionIndex);
+                        log.debug("session :: " + sessionObj.sessionId);
+                        log.debug("real session :: " + session.getId());
 
-				//sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
-				sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
-                        	username = username + "";
-                        	var username = sessionObj.loggedInUser;
-                       		var role = require('/modules/role.js').checkeRole(username, session);
+                        //sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
+                        sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
+                        username = username + "";
+                        var username = sessionObj.loggedInUser;
+                        var role = require('/modules/role.js').checkeRole(username, session);
 
-                        	if(role){
-                        		var user = require('store').user;
-					log.debug('user is set :::' + sessionObj.loggedInUser);
-					response.sendRedirect('/publisher');
+                        if (role) {
+                            var user = require('store').user;
+                            log.debug('user is set :::' + sessionObj.loggedInUser);
+                            response.sendRedirect('/publisher');
 
-                        	} else {
-					log.warn('User '+sessionObj.loggedInUser+' does not have permission to access the publisher application.Make sure the user has the publisher role.');
-					response.sendError(401,'You do not have permission to login to this application.Please contact your administrator and request permission.');
-                        	}
+                        } else {
+                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the publisher application.Make sure the user has the publisher role.');
+                            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
+                        }
 
-                   	}
+                    }
                 }
             }
 
