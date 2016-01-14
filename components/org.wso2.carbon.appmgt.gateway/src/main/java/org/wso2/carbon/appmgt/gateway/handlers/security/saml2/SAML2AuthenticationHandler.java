@@ -314,7 +314,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
     }
 
-    private void populateWebAppFromWebAppInfoDTO(){
+    private void populateWebAppFromWebAppInfoDTO() {
         if (webAppInfoDTO != null) {
             webApp.setContext(webAppInfoDTO.getContext());
             webApp.setAllowAnonymous(webAppInfoDTO.getAllowAnonymous());
