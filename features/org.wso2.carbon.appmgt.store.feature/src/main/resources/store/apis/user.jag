@@ -12,11 +12,11 @@ require('/modules/store.js').exec(function (ctx) {
     log = new Log(),
     user = require('store').user,
     matcher = new URIMatcher(request.getRequestURI()),
-    userDetails={},
+    userDetails = {},
     parameters,
     isEmailUsername = false;
 
-    var authenticator=new AuthService.Authenticator();
+    var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg,session);
 
     if (matcher.match('/{context}/apis/user/{action}')) {
@@ -142,7 +142,7 @@ require('/modules/store.js').exec(function (ctx) {
 
             case 'emailLogin':
                 try {
-                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername(null);
+                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername();
                     if (isEnableEmailUsername) {
                         isEmailUsername = true;
                     }
