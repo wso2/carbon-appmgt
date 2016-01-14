@@ -1502,7 +1502,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     row.put("tierDisplayName", row, tier.getDisplayName());
                     row.put("tierDescription", row,
                             tier.getDescription() != null ? tier.getDescription() : "");
-                    row.put("tireSortKey", row, tier.getRequestPerMinute());
+                    row.put("tierSortKey", row, tier.getRequestPerMinute());
                     myn.put(i, myn, row);
                     i++;
                 }
