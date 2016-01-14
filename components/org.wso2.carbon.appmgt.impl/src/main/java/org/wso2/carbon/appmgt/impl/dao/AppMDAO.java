@@ -6503,16 +6503,16 @@ public Set<Subscriber> getSubscribersOfAPI(APIIdentifier identifier)
                 consumerSecret = rs.getString("CONSUMER_SECRET");
                 keys.add(consumerKey);
                 keys.add(consumerSecret);
-            }
-        } catch (SQLException e) {
-            handleException("Error when executing the SQL ", e);
-        } catch (IdentityRuntimeException e) {
+			}
+		} catch (SQLException e) {
+			handleException("Error when executing the SQL ", e);
+		} catch (IdentityRuntimeException e) {
 			String msg = "Error when getting the tenant id of the user for the webapp provider : " + webappProvider;
 			log.error(msg);
-            throw new AppManagementException(msg + e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
-        }
+			throw new AppManagementException(msg + e);
+		} finally {
+			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+		}
 
         return keys;
     }
