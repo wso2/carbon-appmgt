@@ -722,7 +722,7 @@ function addTags(params,assetId,artifactManager,reg){
         var thumbnailFilePath;
         var bannerFilePath;
 
-        if (assetType = SITE_TYPE) {
+        if (assetType == SITE_TYPE) {
             thumbnailFilePath = "/config/defaults/img/site-thumbnail.jpg";
             bannerFilePath = "/config/defaults/img/site-banner.jpg"
         } else {
