@@ -19,6 +19,10 @@
 package org.wso2.carbon.appmgt.impl.token;
 
 //To be fixed with - https://wso2.org/jira/browse/APPM-1060
+
+/**
+ *  This class represents the JWT signature algorithms.
+ */
 public enum JWTSignatureAlgorithm {
 
     SHA256_WITH_RSA("RS256"), NONE("none");

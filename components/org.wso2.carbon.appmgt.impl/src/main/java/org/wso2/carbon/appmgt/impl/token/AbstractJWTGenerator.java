@@ -269,7 +269,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             byte[] signedInfo = signature.sign();
             return signedInfo;
         } catch (NoSuchAlgorithmException e) {
-            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
+            String error = "Signature algorithm " + signatureAlgorithm + " not found.";
             log.error(error, e);
             throw new AppManagementException(error, e);
         } catch (InvalidKeyException e) {
@@ -399,11 +399,8 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
             throw new AppManagementException(error);
         } catch (NoSuchAlgorithmException e) {
-            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
+            String error = "Signature algorithm " + signatureAlgorithm + " not found.";
             throw new AppManagementException(error);
-        } catch (Exception e) {
-            String error = "Error in obtaining tenant's" + tenantId + "keystore";
-            throw new AppManagementException(error, e);
         }
     }
 
@@ -445,10 +442,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
             throw new AppManagementException(error);
         } catch (NoSuchAlgorithmException e) {
-            String error = "Signature algorithm " + signatureAlgorithm + "not found.";
+            String error = "Signature algorithm " + signatureAlgorithm + " not found.";
             throw new AppManagementException(error);
         } catch (Exception e) {
-            String error = "Error in obtaining tenant's" + tenantId + "keystore";
+            String error = "Error in obtaining tenant's " + tenantId + " keystore";
             throw new AppManagementException(error, e);
         }
     }
