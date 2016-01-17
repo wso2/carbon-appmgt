@@ -25,7 +25,7 @@
 
             %>
                 <div>
-                    <p>You are now redirected to Stratos Identity. If the
+                    <p>You are now redirected to Identity Server. If the
                     redirection fails, please click the post button.</p>
 
                     <form id="logoutForm" method="post" action="<%=postUrl%>">
