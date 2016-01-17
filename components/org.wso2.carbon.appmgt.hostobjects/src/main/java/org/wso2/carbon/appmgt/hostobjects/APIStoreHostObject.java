@@ -229,7 +229,7 @@ public class APIStoreHostObject extends ScriptableObject {
         AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
         String url = config.getFirstProperty(AppMConstants.SSO_CONFIGURATION_IDENTITY_PROVIDER_URL);
         if (url == null) {
-            handleException("Identity provider URL unspecified");
+            handleException("Identity provider URL unspecified in <IdentityProviderUrl> element in appmanager.xml");
         }
         return url;
     }
