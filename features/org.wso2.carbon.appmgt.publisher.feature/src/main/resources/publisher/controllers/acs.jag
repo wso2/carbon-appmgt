@@ -49,7 +49,6 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                         session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                         session.put("Loged", "true");
 
-                        //sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
                         var identityTenantUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
                         var tenantId = identityTenantUtil.getTenantIdOfUser(sessionObj.loggedInUser);
 
@@ -58,11 +57,12 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                         commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
                                 commonUtil.getRootSystemRegistry(tenantId));
 
-                        log.debug("session index :: " + sessionObj.sessionIndex);
-                        log.debug("session :: " + sessionObj.sessionId);
-                        log.debug("real session :: " + session.getId());
+                        if (log.isDebugEnabled()) {
+                            log.debug("session index :: " + sessionObj.sessionIndex);
+                            log.debug("session :: " + sessionObj.sessionId);
+                            log.debug("real session :: " + session.getId());
+                        }
 
-                        //sso_sessions[sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId] = sessionObj.sessionIndex;
                         sso_sessions[sessionObj.sessionId] = sessionObj.sessionIndex;
                         username = username + "";
                         var username = sessionObj.loggedInUser;
@@ -70,7 +70,9 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 
                         if (role) {
                             var user = require('store').user;
-                            log.debug('user is set :::' + sessionObj.loggedInUser);
+                            if (log.isDebugEnabled()) {
+                                log.debug('user is set :::' + sessionObj.loggedInUser);
+                            }
                             response.sendRedirect('/publisher');
 
                         } else {
