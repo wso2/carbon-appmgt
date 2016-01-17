@@ -37,22 +37,15 @@ public class APIDescriptionGenUtil {
 
     public static String generateDescriptionFromPolicy(OMElement policy) throws
             AppManagementException {
-        //Here as the method is about extracting some info from the policy. And it's not concern on compliance to
+        // Here as the method is about extracting some info from the policy. And it's not concern on compliance to
         // specification. So it just extract the required element.
         int requestPerMinute;
-        try {
-            requestPerMinute = generateMaxCountFromPolicy(policy);
-            if (requestPerMinute >= 1) {
-                String description = DESCRIPTION.replaceAll("\\[1\\]", Integer.toString(requestPerMinute));
-                return description;
-            }
-            return DESCRIPTION;
-        } catch (NullPointerException npe) {
-            String msg = "Policy could not be parsed correctly based on http://schemas.xmlsoap.org/ws/2004/09/policy " +
-                         "specification";
-            log.warn(msg);
-            throw new AppManagementException(msg);
+        requestPerMinute = generateMaxCountFromPolicy(policy);
+        if (requestPerMinute >= 1) {
+            String description = DESCRIPTION.replaceAll("\\[1\\]", Integer.toString(requestPerMinute));
+            return description;
         }
+        return DESCRIPTION;
     }
 
     public static int generateMaxCountFromPolicy(OMElement policy) throws
@@ -113,8 +106,8 @@ public class APIDescriptionGenUtil {
                     String displayName = element.getAttributeValue(
                             new QName(AppMConstants.THROTTLE_ATTRIBUTE_DISPLAY_NAME));
                     String localName = element.getLocalName();
-                    String attrName = (displayName != null ? displayName :
-                            localName); //If displayName not defined,use the attribute name
+                    // If displayName not defined,use the attribute name.
+                    String attrName = (displayName != null ? displayName : localName);
                     String attrValue = element.getText();
                     attributesMap.put(attrName, attrValue);
                 }

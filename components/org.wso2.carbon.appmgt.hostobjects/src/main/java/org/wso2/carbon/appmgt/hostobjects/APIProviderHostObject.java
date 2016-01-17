@@ -1502,7 +1502,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     row.put("tierDisplayName", row, tier.getDisplayName());
                     row.put("tierDescription", row,
                             tier.getDescription() != null ? tier.getDescription() : "");
-                    row.put("tireSortKey", row, tier.getRequestPerMinute());
+                    row.put("tierSortKey", row, tier.getRequestPerMinute());
                     myn.put(i, myn, row);
                     i++;
                 }
@@ -3445,7 +3445,7 @@ public class APIProviderHostObject extends ScriptableObject {
     /**
      * This method returns the endpoint for the webapps
      *
-     * @param cx      Rhino context
+     * @param ctx      Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
      * @param funObj  Function object
@@ -3453,15 +3453,16 @@ public class APIProviderHostObject extends ScriptableObject {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      *
      */
-    public static NativeArray jsFunction_getAppsByEndPoint(Context cx, Scriptable thisObj,
+    public static NativeArray jsFunction_getAppsForTenantDomain(Context ctx, Scriptable thisObj,
                                                            Object[] args,
                                                            Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(thisObj);
 
+        String tenantDomain = null;
         try {
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+            tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
             List<WebApp> apiList = apiProvider.getAppsWithEndpoint(tenantDomain);
             if (apiList != null) {
                 Iterator it = apiList.iterator();
@@ -3473,7 +3474,7 @@ public class APIProviderHostObject extends ScriptableObject {
                     APIIdentifier apiIdentifier = app.getId();
                     row.put("name", row, apiIdentifier.getApiName());
 
-                    //this WebApp is for read the registry values
+                    // This WebApp is for read the registry values.
                     WebApp tempApp = apiProvider.getAPI(apiIdentifier);
                     row.put("version", row, apiIdentifier.getVersion());
                     row.put("endpoint", row, tempApp.getUrl());
@@ -3481,8 +3482,9 @@ public class APIProviderHostObject extends ScriptableObject {
                     i++;
                 }
             }
-        } catch (Exception e) {
-            handleException("Error occurred while getting the APIs", e);
+        } catch (AppManagementException e) {
+            handleException("Error occurred while getting the application endpoints for the tenant domain "
+                    + tenantDomain, e);
         }
         return myn;
     }

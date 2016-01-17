@@ -471,7 +471,7 @@ function getApplicationId(uuid) {
 function drawThrottlingTiersDynamically() {
     var strContent = "";
     tiers.sort(function(tiersA, tiersB) {
-        return parseFloat(tiersA.tireSortKey) - parseFloat(tiersB.tireSortKey);
+        return parseFloat(tiersA.tierSortKey) - parseFloat(tiersB.tierSortKey);
     });
     for (var i = 0; i < tiers.length; i++) {
         strContent += "<option title='" + tiers[i].tierDescription + "' value='" + tiers[i].tierName + "' id='" + tiers[i].tierName + "'>" + tiers[i].tierDisplayName + "</option>";
