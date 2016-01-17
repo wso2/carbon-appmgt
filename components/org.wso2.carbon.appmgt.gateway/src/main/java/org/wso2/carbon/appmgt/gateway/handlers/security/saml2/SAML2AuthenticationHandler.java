@@ -156,7 +156,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             initJWTCapabilities();
         } catch (Exception e) {
             // Just throw it here - Synapse will handle it
-            throw new SynapseException("Error while initializing SAML or OAuth authenticator");
+            throw new SynapseException("Error while initializing SAML or OAuth authenticator", e);
         }
 
         //Initialize the context cache by calling AppContextCacheUtil to pre-load cache
