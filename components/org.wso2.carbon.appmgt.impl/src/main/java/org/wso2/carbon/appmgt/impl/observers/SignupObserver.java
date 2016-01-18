@@ -39,12 +39,12 @@ public class SignupObserver extends AbstractAxis2ConfigurationContextObserver {
     public void createdConfigurationContext(ConfigurationContext configurationContext) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        AppManagerConfiguration configuration= ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
         try {
-            new AppManagerUtil().setupSelfRegistration(configuration,tenantId);
+            AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
+            AppManagerUtil.createSelfSignUpRoles(tenantId);
+
         } catch (AppManagementException e) {
-           log.error("Error while adding role for tenant : "+tenantDomain,e);
+            log.error("Error while adding subscriber roles for tenant : " + tenantDomain, e);
         }
     }
 }
