@@ -186,29 +186,27 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 		}
 
-	  else if (action == "getAppsByEndPoint") {
-			usage = appMgtProviderObj.getAppsByEndPoint("__all_providers__");
-				var obj, result;
-				var webapps = [];
+		else if (action == "getAppsForTenantDomain") {
+			usage = appMgtProviderObj.getAppsForTenantDomain("__all_providers__");
+			var obj;
+			var webapps = [];
 
-				for(x=0;x<usage.length;x++)	{
-					var userIndex = -1;
-					var appIndex = -1;
-					webapps.push([usage[x].name, usage[x].version, usage[x].endpoint]);
-				}
-				if (usage == null) {
-					 obj = {
-						 error:true
-					 };
-				} else {
-					 obj = {
-						 error:false,
-						 webapps:webapps
-					 };
-				}
-				print(webapps);
+			for (x = 0; x < usage.length; x++) {
+				webapps.push([usage[x].name, usage[x].version, usage[x].endpoint]);
+			}
+			if (usage == null) {
+				obj = {
+					error: true
+				};
+			} else {
+				obj = {
+					error: false,
+					webapps: webapps
+				};
+			}
+			print(webapps);
 
-      } else if (action == "getAPIUsageByUser") { /* Overall Web Application Usage Graph */
+		} else if (action == "getAPIUsageByUser") { /* Overall Web Application Usage Graph */
 			usage = appMgtProviderObj.getAPIUsageByUser("__all_providers__",startDate,endDate);
 
 			usage = parse(stringify(usage));
@@ -348,7 +346,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			print(output);
 		}else if (action == "getAPIUsageByPage") { /* Overall Web Application Usage Graph */
 			usage = appMgtProviderObj.getAPIUsageByPage("__all_providers__",startDate,endDate);
-            
+
             var webapps = [];
 			var webappIndex = -1;
 			var webappDetailsIndex = -1;

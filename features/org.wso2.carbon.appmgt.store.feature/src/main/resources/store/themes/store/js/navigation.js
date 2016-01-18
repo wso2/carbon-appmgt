@@ -29,12 +29,12 @@ $(function() {
                 }),
                 success: function (data) {
                     if (!data.error) {
-                var assetId = $('#modal-login').data('value');
-                            if(assetId == "" || assetId == null){
+                        var assetId = $('#modal-login').data('value');
+                        if (assetId == "" || assetId == null) {
                             location.reload();
-                            }else  {
-                            window.location = '/store/assets/webapp/'+ assetId;
-                            }
+                        } else {
+                            window.location = '/store/assets/webapp/' + assetId;
+                        }
                     } else {
                         showLoginError(data.message);
                     }
@@ -83,12 +83,12 @@ $(function() {
         return error;
     }
 
-    var isEnableEmailUsername = function() {
+    var isEnableEmailUsername = function () {
         var isEmailUsername = false;
         caramel.ajax({
             type: 'POST',
             url: '/apis/user/emailLogin',
-            async : false,
+            async: false,
             success: function (data) {
                 isEmailUsername = data.isEmailUsername
                 return isEmailUsername;
