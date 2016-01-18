@@ -19,7 +19,21 @@
 $(".btn-action").click(function (e) {
 	$(this).hide(); //to avoid user from click again before the operation proceeds
 	var app = $(this).data("app");
+    var provider = $(this).data("provider");
+    var name = $(this).data("name");
+    var version = $(this).data("version");
 	var action = $(this).data("action");
+
+    var status = isPublishedToExternalStore(action, provider, name, version);
+
+    if(status) {
+        var msg = "This app is published to one or more external stores .\n" +
+            "Please remove this app from external stores before " +action;
+        var head = action +"Asset";
+        showMessageModel(msg, head, "webapp");
+        $(parent).children().attr('disabled', false);
+        return false;
+    }
 
 	if (action == "Reject") {
 		showCommentModel("Reason for Rejection", action, app, "webapp");
@@ -171,4 +185,38 @@ function updateQRCode(text) {
 	else
 		element.appendChild(showQRCode(text));
 
+}
+
+function isPublishedToExternalStore(action, provider, name, version) {
+    var publishedInExternalStores = false;
+    if (action == "Unpublish" || action == "Deprecate") {
+
+        $.ajax({
+            async: false,
+            url: '/publisher/api/asset/get/external/stores/webapp/' + provider + '/' + name + '/' + version,
+            type: 'GET',
+            processData: true,
+            success: function (response) {
+                if (!response.error) {
+                    var appStores = response.appStores;
+
+                    if (appStores != null && appStores != undefined) {
+                        for (var i = 0; i < appStores.length; i++) {
+                            if (appStores[i].published) {
+                                publishedInExternalStores = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                return publishedInExternalStores;
+
+            },
+            error: function (response) {
+
+            }
+        });
+
+    }
+    return publishedInExternalStores;
 }

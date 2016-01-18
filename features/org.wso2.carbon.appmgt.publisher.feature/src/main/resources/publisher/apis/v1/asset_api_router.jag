@@ -17,6 +17,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 require('/modules/publisher.js').exec(function(ctx) {
 
     var config = require('/config/publisher.json');
+    var dataConfigs = require('/config/publisher.js').config();
     var caramel = require('caramel');
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var router = require('/modules/router-g.js').router();
@@ -237,6 +238,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
     });
 
+    //delete asset
     routeManager.register('POST', 'publisher', '/publisher/api/asset/delete/{type}/{id}', function (context) {
         var shortName = context.params.type;
         var id = context.params.id;
@@ -290,9 +292,13 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
-                var webAppObj = new webApp(apiIdentifierObj);
-
-                var isDeleted = apiProvider.deleteApp(apiIdentifierObj, username, ssoProviderObj);
+                var isDeleted = false;
+                var isAdvertiseOnly = attributes["overview_advertiseOnly"].trim();
+                if (isAdvertiseOnly.toLowerCase() == "true") {
+                    isDeleted = removeArtifactOnly(shortName, id);
+                } else {
+                    isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
+                }
 
                 if (isDeleted == true) {
                     msg['isDeleted'] = true;
@@ -454,19 +460,14 @@ require('/modules/publisher.js').exec(function(ctx) {
         print(tagArray);
     });
 
+    //update asset
     routeManager.register('POST', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
-
-
-
         var shortName = context.params.type;
-
         if(shortName === "mobileapp"){
 
             editMobileApp(context, rxtManager);
             return;
         }
-
-
         var id = context.params.id;
         var msg={};
         var artifactManager = rxtManager.getArtifactManager(shortName);
@@ -501,6 +502,10 @@ require('/modules/publisher.js').exec(function(ctx) {
             if(context.post["images_banner"] == ""){
                 context.post["images_banner"] = originalArtifact.attributes["images_banner"];
             }
+
+            var appOwner = originalArtifact.attributes["overview_appOwner"];
+            var appTenant = originalArtifact.attributes["overview_appTenant"];
+            var isAdvertiseOnly = originalArtifact.attributes["overview_advertiseOnly"];
 
             modelA.import('form.importer', context.post);
 
@@ -538,6 +543,37 @@ require('/modules/publisher.js').exec(function(ctx) {
             }
             modelA.set("overview.createdtime",modelB.get("overview.createdtime").value);
             var artifact = modelA.export('asset.exporter');
+            artifact.attributes["overview_appOwner"] = appOwner;
+            artifact.attributes["overview_appTenant"] = appTenant;
+            artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+
+
+            var tenantId = server.current(session).tenantId;
+            var tenantDomain = carbon.server.tenantDomain({tenantId:tenantId});
+            var subscriptionAvailability = (artifact.attributes["overview_subscriptionAvailability"]).trim();
+            if (subscriptionAvailability == "current_tenant") {
+                artifact.attributes["overview_tenants"] = tenantDomain;
+            }
+
+            if (subscriptionAvailability == "all_tenants") {
+                artifact.attributes["overview_tenants"] = "";
+            }
+            var saml2SsoIssuer = null;
+            if (tenantId == -1234) {
+                saml2SsoIssuer = artifact.attributes["overview_name"] + "-" + artifact.attributes["overview_version"];
+            } else {
+                saml2SsoIssuer = artifact.attributes["overview_name"] + "-" + tenantDomain + "-" + artifact.attributes["overview_version"];
+            }
+            // update sso detail
+            var idpProviderUrl = dataConfigs.ssoConfiguration.identityProviderURL;
+            var ssoEnabled = dataConfigs.ssoConfiguration.enabled;
+            artifact.attributes["sso_idpProviderUrl"] = idpProviderUrl;
+            artifact.attributes["sso_saml2SsoIssuer"] = saml2SsoIssuer;
+            if (ssoEnabled) {
+                artifact.attributes["sso_singleSignOn"] = "Enabled";
+            } else {
+                artifact.attributes["sso_singleSignOn"] = "Disabled";
+            }
 
 
             var index = 0;
@@ -803,6 +839,111 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 
     });
+
+    //get uuid of given asset for-> provider,name,version
+    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/uuid/{type}/{provider}/{name}/{version}',
+            function (context) {
+                var assetProvider = context.params.provider;
+                var assetName = context.params.name;
+                var assetVersion = context.params.version;
+                var shortName = context.params.type;
+                var artifactManager = rxtManager.getArtifactManager(shortName);
+
+                var fn = function (asset) {
+                    var cond1 = (asset.attributes.overview_provider == assetProvider ) ? true : false;
+                    var cond2 = (asset.attributes.overview_name == assetName ) ? true : false;
+                    var cond3 = (asset.attributes.overview_version == assetVersion ) ? true : false;
+                    return (cond1 && cond2 && cond3);
+                }
+
+                var artifact = artifactManager.find(fn, null);
+                if (artifact && artifact != null && artifact.length > 0) {
+                    var artifactId = artifact[0].id;
+                    var res = {error: false, uuid: artifactId};
+                    response.contentType = "application/json";
+                    print(res);
+                } else {
+                    var res = {error: false, uuid: null , message :'Could not find UUID for given webapp'};
+                    response.contentType = "application/json";
+                    print(res);
+                }
+
+
+            });
+
+    //Get external
+    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/external/stores/{type}/{provider}/{name}/{version}',
+            function (context) {
+                var appProvider = context.params.provider;
+                var appName = context.params.name;
+                var appVersion = context.params.version;
+
+                try {
+                    var externalAppStores = apiProvider.getExternalAppStoresList(appProvider, appName, appVersion);
+                    if (externalAppStores && externalAppStores != null) {
+                        var res = {};
+                        res.error = false;
+                        res.appStores = externalAppStores;
+                        response.contentType = "application/json";
+                        print(res);
+                    }
+                } catch (e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug('Could not get external app store details for app:' + appProvider + '-' + appName + '' +
+                                '-' + appVersion + "->" + e);
+                    }
+                    response.contentType = "application/json";
+                    var res = {error: true, appStores: null}
+                }
+
+            });
+
+    //update external app stores
+    routeManager.register('POST', 'publisher', '/publisher/api/asset/{type}/update/external/stores/{provider}/{name}/{version}',
+            function (context) {
+                var provider = context.params.provider;
+                var name = context.params.name;
+                var version = context.params.version;
+                var data = context.request.getContent();
+                var status = false;
+
+                try {
+                    apiProvider.updateExternalAppStores(provider, name, version, data);
+                    var res = {};
+                    res.success = true;
+                    response.contentType = "application/json";
+                    print(res);
+                } catch (e) {
+                    var errorMsg = 'Could not update the external stores for app : ' + provider + '-' + name + '' +
+                            '-' + version + '. An exception was thrown.';
+                    if (log.isDebugEnabled()) {
+                        log.debug(errorMsg + ': ' + e);
+                    }
+                    var res = {};
+                    res.success = false;
+                    res.message = errorMsg;
+                    response.contentType = "application/json";
+                    print(res);
+                }
+
+            });
+
+    function removeArtifactOnly(type, uuid) {
+        var shortName = type;
+        var id = uuid;
+        var artifactManager = rxtManager.getArtifactManager(shortName);
+
+        try {
+            artifactManager.remove(id);
+            return true;
+        } catch (e) {
+            if (log.isDebugEnabled()) {
+                log.debug('Asset ' + id + 'could not be removed.An exception was thrown: ' + e);
+            }
+            return false;
+        }
+    }
+
 
 
     /**************** MOBILE APP *********************************************************/

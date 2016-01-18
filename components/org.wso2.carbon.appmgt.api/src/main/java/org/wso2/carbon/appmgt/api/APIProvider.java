@@ -501,4 +501,23 @@ public interface APIProvider extends APIManager {
      *@throws org.wso2.carbon.appmgt.api.AppManagementException
      */
     public String getTrackingID(String uuid)throws AppManagementException;
+
+
+
+    /**
+     * Update (add/delete) the the app in external stores.
+     * @param webApp Web App
+     * @param appStores External App Stores
+     * @throws AppManagementException
+     */
+    public void updateAppsInExternalAppStores(WebApp webApp, Set<AppStore> appStores)
+            throws AppManagementException;
+
+    /**
+     * Get the external app stores for given identifier.
+     * @param identifier WebApp Identifier
+     * @return Set of App Store
+     * @throws AppManagementException
+     */
+    public Set<AppStore> getExternalAppStores(APIIdentifier identifier) throws AppManagementException;
 }

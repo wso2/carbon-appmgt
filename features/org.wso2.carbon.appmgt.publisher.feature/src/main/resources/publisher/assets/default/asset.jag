@@ -149,6 +149,12 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         apiData.version = model.get('overview.version').value;
         var result = mod.getAllDocumentation(apiData);
 
+        //get external store details
+        var externalAppStores = getExternalAppStores(apiData);
+        var appStoresDetail = {};
+        appStoresDetail.app = apiData;
+        appStoresDetail.externalStores = externalAppStores;
+
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);
@@ -169,10 +175,11 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             tags:tags,
             title:title,
             docs: result.docs,
+            appStores:appStoresDetail,
             permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
         });
     } catch (e) {
-        log.debug('The asset with id ' + id + ' could not be found due to : ' + e);
+        log.error('The asset with id ' + id + ' could not be found due to : ' + e);
         response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');
     }
 
@@ -452,6 +459,20 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
         return apiProvider.getIdentityProviderUrl();
     }
 
+    /**
+     * Get external app store details
+     * @param apiData
+     * @returns {*}
+     */
+    function getExternalAppStores(apiData){
+        try{
+            var externalAppStores = apiProvider.getExternalAppStoresList(apiData.provider, apiData.name, apiData.version);
+            return externalAppStores;
+        } catch(e) {
+            log.error("Error while getting external app store details : " +e);
+        }
+
+    }
 /**
 * Check whether the application already exists
 */

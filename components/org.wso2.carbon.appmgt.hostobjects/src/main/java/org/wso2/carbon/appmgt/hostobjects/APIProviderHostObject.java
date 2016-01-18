@@ -54,6 +54,7 @@ import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.xml.stream.XMLStreamException;
@@ -451,7 +452,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setSandboxUrl(sandboxUrl);
         api.addTags(tag);
         api.setTransports(transport);
-        api.setApiOwner(apiOwner);
+        api.setAppOwner(apiOwner);
         api.setAdvertiseOnly(advertiseOnly);
         api.setRedirectURL(redirectURL);
         api.setSubscriptionAvailability(subscriptionAvailability);
@@ -2903,8 +2904,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
         APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
-        NativeJavaObject usernameNativeJavaObject = (NativeJavaObject) args[1];
-        String username = (String) usernameNativeJavaObject.unwrap();
+        String username = (String) args[1];
         username = AppManagerUtil.replaceEmailDomain(username);
         NativeJavaObject ssoProviderNativeJavaObject = (NativeJavaObject) args[2];
         SSOProvider ssoProvider = (SSOProvider) ssoProviderNativeJavaObject.unwrap();
@@ -3348,7 +3348,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                               Scriptable thisObj, Object[] args,
                                                               Function funObj)
             throws AppManagementException {
-        Set<APIStore> apistoresList = AppManagerUtil.getExternalAPIStores();
+        Set<AppStore> apistoresList = AppManagerUtil.getExternalAPIStores();
         NativeArray myn = new NativeArray(0);
         if (apistoresList == null) {
             return null;
@@ -3358,7 +3358,7 @@ public class APIProviderHostObject extends ScriptableObject {
             while (it.hasNext()) {
                 NativeObject row = new NativeObject();
                 Object apistoreObject = it.next();
-                APIStore apiStore = (APIStore) apistoreObject;
+                AppStore apiStore = (AppStore) apistoreObject;
                 row.put("displayName", row, apiStore.getDisplayName());
                 row.put("name", row, apiStore.getName());
                 row.put("endpoint", row, apiStore.getEndpoint());
@@ -3550,6 +3550,122 @@ public class APIProviderHostObject extends ScriptableObject {
             }
         }
         return popularApps;
+    }
+
+    /**
+     * This methods update(add/remove) the external app stores for given web app
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @throws AppManagementException
+     */
+    public static void jsFunction_updateExternalAppStores(Context cx, Scriptable thisObj, Object[] args,
+                                                          Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 4) {
+            handleException("Invalid number of parameters to the updateExternalAPPStores method,Expected number of" +
+                    "parameters " + 4);
+        }
+
+        if (!(args[3] instanceof NativeArray)) {
+            handleException("Invalid input parameter, 4th parameter  should be a instance of NativeArray");
+        }
+        String provider = (String) args[0];
+        if (provider != null) {
+            provider = AppManagerUtil.replaceEmailDomain(provider);
+        }
+        String name = (String) args[1];
+        String version = (String) args[2];
+        //Getting selected external App stores from UI and publish app to them.
+        NativeArray externalAppStores = (NativeArray) args[3];
+
+        if (log.isDebugEnabled()) {
+            String msg = String.format("Update external stores  for web app ->" +
+                    " app provider : %s, app name :%s, app version : %s", provider, name, version);
+            log.debug(msg);
+        }
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(provider));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            APIProvider appProvider = getAPIProvider(thisObj);
+            APIIdentifier identifier = new APIIdentifier(provider, name, version);
+            WebApp webApp = appProvider.getAPI(identifier);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantManager().getTenantId(tenantDomain);
+            //Check if no external AppStore selected from UI
+            if (externalAppStores != null) {
+                Set<AppStore> inputStores = new HashSet<AppStore>();
+                for (Object store : externalAppStores) {
+                    inputStores.add(AppManagerUtil.getExternalAppStore((String) store, tenantId));
+                }
+                appProvider.updateAppsInExternalAppStores(webApp, inputStores);
+            }
+        } catch (UserStoreException e) {
+            handleException("Error while updating external app stores", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This method returns the published and unpublished external stores.
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getExternalAppStoresList(Context cx, Scriptable thisObj, Object[] args,
+                                                                  Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 3) {
+            handleException("Invalid number of parameters to the getExternalAPPStoresList method,Expected number of" +
+                    "parameters : " + 3);
+        }
+
+        if (!isStringValues(args)) {
+            handleException("Input parameters are not type of String");
+        }
+
+        String provider = (String) args[0];
+        String appName = (String) args[1];
+        String appVersion = (String) args[2];
+
+        if (log.isDebugEnabled()) {
+            String msg = String.format("Getting external store details for web app ->" +
+                    " app provider : %s, app name :%s, app version : %s", provider, appName, appVersion);
+            log.debug(msg);
+        }
+
+        APIProvider appProvider = getAPIProvider(thisObj);
+        APIIdentifier identifier = new APIIdentifier(provider, appName, appVersion);
+        Set<AppStore> storesSet = appProvider.getExternalAppStores(identifier);
+        NativeArray appStoresArray = new NativeArray(0);
+
+        if (storesSet != null && storesSet.size() != 0) {
+            int i = 0;
+            for (AppStore store : storesSet) {
+                NativeObject storeObject = new NativeObject();
+                storeObject.put("name", storeObject, store.getName());
+                storeObject.put("displayName", storeObject, store.getDisplayName());
+                storeObject.put("published", storeObject, store.isPublished());
+                appStoresArray.put(i, appStoresArray, storeObject);
+                i++;
+            }
+        }
+        return appStoresArray;
     }
 }
 

@@ -86,7 +86,8 @@ public class WebApp {
     private String oldOutSequence;
 
     private boolean advertiseOnly;
-    private String apiOwner;
+    private String appOwner;
+    private String appTenant;
     private String redirectURL;
     private String logoutURL;
     
@@ -103,7 +104,7 @@ public class WebApp {
     private String policyPartials;
     private String policyGroups; //Policy Groups Id's list
     private String javaPolicies; //Java policies(handlers) List
-
+    private String treatAsASite;
     /**
      * The average rating provided by the WebApp subscribers
      */
@@ -141,12 +142,12 @@ public class WebApp {
         this.advertiseOnly = advertiseOnly;
     }
 
-    public String getApiOwner() {
-        return apiOwner;
+    public String getAppOwner() {
+        return appOwner;
     }
 
-    public void setApiOwner(String apiOwner) {
-        this.apiOwner = apiOwner;
+    public void setAppOwner(String appOwner) {
+        this.appOwner = appOwner;
     }
     
     public String getRedirectURL() {
@@ -662,11 +663,27 @@ public class WebApp {
         this.skipGateway = skipGateway;
     }
 
+    public String getAppTenant() {
+        return appTenant;
+    }
+
+    public void setAppTenant(String appTenant) {
+        this.appTenant = appTenant;
+    }
+
     public String getAcsURL() {
         return acsURL;
     }
 
     public void setAcsURL(String acsURL) {
         this.acsURL = acsURL;
+    }
+
+    public String getTreatAsASite() {
+        return treatAsASite;
+    }
+
+    public void setTreatAsASite(String treatAsASite) {
+        this.treatAsASite = treatAsASite;
     }
 }
