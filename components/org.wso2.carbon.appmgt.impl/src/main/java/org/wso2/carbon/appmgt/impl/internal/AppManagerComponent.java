@@ -133,6 +133,8 @@ public class AppManagerComponent {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
 
+            //load self sigup configuration to the registry
+            AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
             SignupObserver signupObserver = new SignupObserver();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
             

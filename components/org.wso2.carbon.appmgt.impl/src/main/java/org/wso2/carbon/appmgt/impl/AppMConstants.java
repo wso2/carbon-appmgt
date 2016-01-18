@@ -438,6 +438,22 @@ public final class AppMConstants {
     public static final String SUBSCRIPTION_TO_ALL_TENANTS = "all_tenants";
     public static final String SUBSCRIPTION_TO_SPECIFIC_TENANTS = "specific_tennats";
 
+    //registry resource containing the self signup user config
+    public static final String SELF_SIGN_UP_CONFIG_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/sign-up-config.xml";
+    public static final String SELF_SIGN_UP_CONFIG_MEDIA_TYPE =  "signup-config";
+
+    //elements in the configuration file in the registry related to self signup
+    public static final String SELF_SIGN_UP_REG_ROOT = "SelfSignUp";
+    public static final String SELF_SIGN_UP_REG_DOMAIN_ELEM = "SignUpDomain";
+    public static final String SELF_SIGN_UP_REG_ROLES_ELEM = "SignUpRoles";
+    public static final String SELF_SIGN_UP_REG_ROLE_ELEM = "SignUpRole";
+    public static final String SELF_SIGN_UP_REG_USERNAME = "AdminUserName";
+    public static final String SELF_SIGN_UP_REG_PASSWORD = "AdminPassword";
+    public static final String SELF_SIGN_UP_REG_ENABLED = "EnableSignup";
+    public static final String SELF_SIGN_UP_REG_ROLE_NAME_ELEMENT = "RoleName";
+    public static final String SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL = "IsExternalRole";
+    public static final String SELF_SIGN_UP_REG_ROLE_PERMISSIONS = "Permissions";
+
     //TODO: move this to a common place (& Enum) to be accessible by all components
     public static class KeyValidationStatus {
         public static final int API_AUTH_GENERAL_ERROR       = 900900;
