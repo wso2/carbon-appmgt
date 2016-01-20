@@ -3,7 +3,7 @@
 {{else}}
 	hello
     {{# if ssoParam}}
-        <a href="{{url "/login"}}"
+        <a href="{{tenantedUrl "/login"}}"
            class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
     {{else}}
 

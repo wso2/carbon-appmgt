@@ -13,13 +13,20 @@ var WEBAPP_TYPE = 'webapp';
             matcher = new URIMatcher(request.getRequestURI()),
             tenant = server.tenant(request, session),
             configs = store.configs(tenant.tenantId);
+
     mapper = function (path) {
         return function () {
             return path;
         };
     };
 
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/')) {
+    var tenantedPrefix = '/{context}/t/{domain}' + config.assetsUrlPrefix;
+    var tenantedAssetsEndpoint = tenantedPrefix + '/{type}';
+    var tenantedAssetEndpoint = tenantedPrefix + '/{type}/{id}';
+
+    //Check whether the assets endpoint URI is tenanted or not
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/') || matcher.match(tenantedAssetsEndpoint)) {
+
         elements = matcher.elements();
         type = elements.type;
 
@@ -48,8 +55,11 @@ var WEBAPP_TYPE = 'webapp';
         include(path);
         return;
     }
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}')) {
+
+    //Check whether the asset endpoint URI is tenanted or not
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}') || matcher.match(tenantedAssetEndpoint)) {
         elements = matcher.elements();
+
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
             response.sendError(404, 'Request Resource cannot be found');

@@ -2,7 +2,7 @@
     <a href="#" class="btn btn-primary btn-added">{{t "Subscribe"}}</a>
 {{else}}
     {{# if ssoParam}}
-        <a href="{{url "/login"}}" class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
+        <a href="{{tenantedUrl "/login"}}" class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
     {{else}}
         <a href="#" class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
     {{/if}}

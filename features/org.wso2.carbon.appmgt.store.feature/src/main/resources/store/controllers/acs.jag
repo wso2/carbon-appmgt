@@ -9,10 +9,15 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
             samlResponse = request.getParameter('SAMLResponse'),
             sessionId = session.getId(),
             samlRequest = request.getParameter('SAMLRequest'),
-            relayState = request.getParameter('RelayState'),
+            relayState = decodeURIComponent(request.getParameter('RelayState')),
             sso = require('sso'),
             server = require('carbon').server,
             samlRespObj,
+            caramel = require('caramel'),
+            carbon = require('carbon'),
+            contextPath = caramel.configs().context,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost,
             keyStoreProps = {
                 KEY_STORE_NAME: process.getProperty('carbon.home') + configs.ssoConfiguration.keyStoreName,
                 KEY_STORE_PASSWORD: configs.ssoConfiguration.keyStorePassword,
@@ -34,6 +39,14 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
         samlRespObj = sso.client.getSamlObject(samlResponse);
         if (!sso.client.isLogoutResponse(samlRespObj)) {
 
+            if (relayState) {
+                host = relayState.split('/')[2];
+                relayState = relayState.split(host)[1];
+            } else {
+                //TODO
+                relayState = '/store';
+            }
+
             // validating the signature
             if (configs.ssoConfiguration.responseSigningEnabled) {
 
@@ -42,6 +55,18 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                     var username = sessionObj.loggedInUser;
 
                     if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
+                        var relayStateUrlMatcher = new URIMatcher(relayState);
+                        var tenantedURIPattern = contextPath + '/t/{domain}/';
+                        var urlTenantDomain;
+
+                        //Check whether the relayState is matched with a tenanted uri pattern
+                        if (relayStateUrlMatcher.match(tenantedURIPattern) ||
+                                relayStateUrlMatcher.match(tenantedURIPattern + '{+any}')) {
+                            var elements = relayStateUrlMatcher.elements();
+
+                            //Extract the tenant domain from the url
+                            urlTenantDomain = elements.domain;
+                        }
 
                         var MultitenantUtils = Packages.org.wso2.carbon.utils.multitenancy.MultitenantUtils;
                         var MultitenantConstants = Packages.org.wso2.carbon.base.MultitenantConstants;
@@ -52,10 +77,15 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                             var ctx = service.getServerConfigContext();
                             var TenantAxisUtils = org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
                             TenantAxisUtils.setTenantAccessed(domainName, ctx);
+
                         }
+                        var tenantId = carbon.server.tenantId({
+                            domain: domainName
+                        });
 
                         session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                         session.put("Loged", "true");
+                        session.put("tenantId",tenantId)
 
                         username = username + "";
                         var userDetails = {};
@@ -70,18 +100,26 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                         if (!isSubscriberRoleAttached.error) {
                             role = require('/modules/role.js').checkeRole(username, session);
                         }
+
+                        if (urlTenantDomain && urlTenantDomain != domainName) {
+                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the tenant domain : '
+                            + urlTenantDomain + '. Make sure the user has been registered in the tenant domain');
+                            response.sendError(403, 'You do not have permission to login to this tenant domain.Please register first.');
+                            return;
+                        }
+
                         if (role) {
                             var user = require('store').user;
-                            log.debug('user is set :::' + sessionObj.loggedInUser);
-
-                            response.sendRedirect('/store');
-
-
+                            if (log.isDebugEnabled()) {
+                                log.debug('User has been set to : ' + sessionObj.loggedInUser);
+                            }
+                            if(reversProxyEnabled) {
+                                relayState = reverseProxyHost+relayState;
+                            }
+                            response.sendRedirect(relayState);
                         } else {
-                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access ' +
-                                    'the store application. Make sure the user has the store role.');
-                            response.sendError(401, 'You do not have permission to login to this application.Please ' +
-                                    'contact your administrator and request permission.');
+                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the store role.');
+                            response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
 
                         }
                     }
