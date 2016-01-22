@@ -20,6 +20,7 @@ require('/modules/store.js').exec(function (ctx) {
     authenticator.init(jagg,session);
 
     if (matcher.match('/{context}/apis/user/{action}')) {
+        response.contentType = "application/json";
         action = matcher.elements().action;
         switch (action) {
             case 'login':

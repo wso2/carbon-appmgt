@@ -28,6 +28,9 @@ var executeMethod = function (methodType, script, request, response, session) {
         default:
             break;
     }
+    if ((typeof output) == "object") {
+        response.contentType = "application/json";
+    }
     print(output);
 };
 

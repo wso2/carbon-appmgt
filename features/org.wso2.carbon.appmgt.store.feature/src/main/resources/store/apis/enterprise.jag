@@ -53,6 +53,7 @@ require('/modules/store.js').exec(function (ctx) {
         for(var i = 0; i < roles.length; i++){
             data.push([roles[i]]);
         }
+        response.contentType = "application/json";
         print({aaData:data});
 
         return;
@@ -69,6 +70,7 @@ require('/modules/store.js').exec(function (ctx) {
         for(var i = 0; i < users.length; i++){
             data.push([users[i]]);
         }
+        response.contentType = "application/json";
         print({aaData:data});
         return;
     }
@@ -80,6 +82,7 @@ require('/modules/store.js').exec(function (ctx) {
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
             devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
         }
+        response.contentType = "application/json";
         print(devices);
         return;
     }
@@ -109,6 +112,7 @@ require('/modules/store.js').exec(function (ctx) {
         if(action && type && app && data){
 
             enterpriseInstall.performAction(action, tenantId, type, app, data);
+            response.contentType = "application/json";
             print('{"status" : "success"}');
             return;
         }
