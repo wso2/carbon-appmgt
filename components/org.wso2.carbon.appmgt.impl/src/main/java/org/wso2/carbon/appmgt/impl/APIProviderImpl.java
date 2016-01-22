@@ -1510,7 +1510,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             WebApp webapp = new WebApp(identifier);
             // gatewayType check is required when WebApp Management is deployed on other servers to avoid synapse
-            if (gatewayExists && gatewayType.equals("Synapse")) {
+            if (gatewayExists && "Synapse".equals(gatewayType)) {
                 webapp.setInSequence(inSequence); //need to remove the custom sequences
                 webapp.setOutSequence(outSequence);
                 removeFromGateway(webapp);
