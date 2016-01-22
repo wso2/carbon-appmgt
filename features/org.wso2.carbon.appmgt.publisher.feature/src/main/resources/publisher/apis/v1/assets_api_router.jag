@@ -113,6 +113,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 };
             }
 
+            response.contentType = "application/json";
             print(webapps);
 
 		} else  if (action == "getSubscribedAPIsByUsers") { /* Overall Web Application Usage Graph */
@@ -182,6 +183,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 };
             }
 
+            response.contentType = "application/json";
             print(webapps);
 
 		}
@@ -204,6 +206,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 					webapps: webapps
 				};
 			}
+            response.contentType = "application/json";
 			print(webapps);
 
 		} else if (action == "getAPIUsageByUser") { /* Overall Web Application Usage Graph */
@@ -271,6 +274,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 				};
 			}
 
+            response.contentType = "application/json";
 			print(webapps);
 		}else if (action == "getAPIResponseTime") { /* Overall Web Application Usage Graph */
 			var output  = {};
@@ -343,6 +347,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 				};
 			}
 
+            response.contentType = "application/json";
 			print(output);
 		}else if (action == "getAPIUsageByPage") { /* Overall Web Application Usage Graph */
 			usage = appMgtProviderObj.getAPIUsageByPage("__all_providers__",startDate,endDate);
@@ -495,6 +500,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 				};
 			}
 
+            response.contentType = "application/json";
 			print(webappObject);
 		}else if (action == "getUsageByContext") {
             usage = appMgtProviderObj.getAPIUsageByUser("__all_providers__",startDate,endDate);
@@ -610,6 +616,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                             };
                         }
 
+                        response.contentType = "application/json";
                         print(webapps);
 		}else if (action == "getCacheHit") { /* Overall Web Application Usage Graph */
          			usage = appMgtProviderObj.getcashHitMiss("__all_providers__",startDate,endDate);
@@ -717,6 +724,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                         };
                     }
 
+                    response.contentType = "application/json";
                     print(webapps);
 
          		}
@@ -735,6 +743,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                    usage:usage
                                };
                             }
+                            response.contentType = "application/json";
                             print(usage);
                         }
 

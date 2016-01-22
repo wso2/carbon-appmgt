@@ -55,6 +55,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/cache/{type}', functio
         msg['cachedAssetsAfter']=cachedAssetsAfterRefresh;
         msg['cachedAssets']=results;
 
+        response.contentType = "application/json";
         print(msg);
 
     }catch(e){

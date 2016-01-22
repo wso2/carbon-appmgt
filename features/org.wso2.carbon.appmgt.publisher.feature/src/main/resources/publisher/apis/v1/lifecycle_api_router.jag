@@ -61,7 +61,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 			var msg = {};
 			msg['status'] = 'ok';
-
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -101,7 +101,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 			var msg = {};
 			msg['status'] = 'ok';
-
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -578,6 +578,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['asynch'] = isAsynchronousFlow;
 
 			log.debug(msg);
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -612,6 +613,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['state'] = state;
 
 			log.debug(msg);
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -723,6 +725,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			var msg = {};
 			msg['status'] = 'ok';
 			msg['checkListItems'] = checkListItems;
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The check list names were not retrieved for artifact: ' + id + ' .The following exception was thrown: ' + e);
@@ -748,6 +751,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['status'] = 'ok';
 			msg['index'] = checkListItemIndex;
 			msg['isChecked'] = isChecked;
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The check list item index state could not be  retrieved for aritfact: ' + id + ' .The following exception was thrown: ' + e);
@@ -769,6 +773,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 				var xml = new XML(historyRes.content);
 				json = utility.xml.convertE4XtoJSON(xml);
 			}
+            response.contentType = "application/json";
 			print(json);
 		} catch (e) {
 			log.debug('The lifecycle history for artifact: ' + id + ' could not be found.The following exception was thrown: ' + e);

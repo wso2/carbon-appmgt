@@ -8,6 +8,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
            // msg = require("/site/conf/ui-messages.jag");
            
     var log = new Log();
+    response.contentType = "application/json";
     if (jagg.getUser() == null) {
         print({
                   error:true,
