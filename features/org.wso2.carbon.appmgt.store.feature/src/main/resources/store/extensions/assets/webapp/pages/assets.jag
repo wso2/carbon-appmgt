@@ -37,12 +37,14 @@ require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
             log = ctx.log,
             sso = ctx.sso,
+            isAnonymousTenantStore = ctx.isAnonymousTenantStore,
             query = ctx.params.query,
             tag = encodeURIComponent(ctx.params.tag),
             store = ctx.store,
             user = ctx.user,
             server = ctx.server,
-            tenantId = ctx.tenantId,
+            tenantId = ctx.tenant.tenantId,
+            tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
             search = require('/modules/search.js'),
@@ -64,7 +66,11 @@ require('/modules/store.js').exec(function (ctx) {
             localIP = "https://" + process.getProperty('server.host'),
             httpsPort = process.getProperty('https.port');
 
-    url = '/assets/' + customType + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+
+
+    url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
 
@@ -354,6 +360,13 @@ require('/modules/store.js').exec(function (ctx) {
         }
         webAppRecentAssets.push(recentAssets[i]);
     }
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+    });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.domain = tenantDomain;
 
     var isSite;
     if (customType == WEBAPP_TYPE) {
@@ -363,13 +376,10 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     caramel.render({
-        title: 'Store | Assets',
+        title: 'webapps | Store | WSO2 App Manager',
         user: user,
         sso: sso,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header: headerData,
         navigation: site.navigation(tenantId),
         search: {
             mainPage: mainPage,

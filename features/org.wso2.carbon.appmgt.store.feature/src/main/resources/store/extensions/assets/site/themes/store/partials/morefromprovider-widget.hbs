@@ -4,7 +4,7 @@
     <h3> {{t "Recent Apps from "}}{{overview_provider}}</h3>
     <hr>
         {{#each assets}}
-            <a href="{{url "/assets/site"}}/{{id}}">
+            <a href="{{tenantedUrl "/assets/site"}}/{{id}}">
                 <div class="row">
                     <div class="col-md-8">
                         <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>

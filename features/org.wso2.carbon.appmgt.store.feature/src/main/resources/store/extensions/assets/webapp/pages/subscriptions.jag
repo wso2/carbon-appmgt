@@ -13,6 +13,7 @@ include('../modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
 	var store = ctx.store;
 	var sso = ctx.sso;
+	var carbon = require('carbon')
 	tenantId = ctx.tenantId;
 	site = ctx.site;
 	social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
@@ -73,6 +74,7 @@ require('/modules/store.js').exec(function (ctx) {
 		for(i = 0; i < webAppAssets.length; i++) {
 			var app = apiInfoManager.getAPIDescription(webAppAssets[i].provider, webAppAssets[i].name, webAppAssets[i].version);
 			webAppAssets[i].productionURL = app.serverURL.productionURL;
+			webAppAssets[i].tenantDomain = carbon.server.tenantDomain({username: webAppAssets[i].provider});
 
 			if((i > offset && i < limit)){
 				displayApps.push(webAppAssets[i]);

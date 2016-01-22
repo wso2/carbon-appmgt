@@ -25,19 +25,21 @@ authenticator.init(jagg,session);
 
 
 var carbon = require('carbon');
-var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
 
 var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
-    var asset, aid, title,
+    var asset, aid, title, currentTenant, userTenant, tenantIdVal,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
             tenantId = ctx.tenantId,
+            tenant = ctx.tenant,
             configs = ctx.configs,
+            tenantDomain = ctx.tenant.domain,
             site = ctx.site,
             matcher = ctx.matcher,
             inDashboard = false,
@@ -49,6 +51,8 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -57,9 +61,16 @@ require('/modules/store.js').exec(function (ctx) {
     };
     var RECENT_ASSET_COUNT = store.getRecentAppCount().assetPage;
 
-    matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
-    aid = matcher.elements().aid;
-    title = store.assetLinks(type).title;
+    var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+    var defaultUrl = '/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+
+    //Match the incoming request with tenanted and default URI patterns and extracts the relecant asset id
+    if(matcher.match(defaultUrl) || matcher.match(tenantedUrl)){
+        aid = matcher.elements().aid;
+        title = store.assetLinks(type).title;
+        currentTenant = matcher.elements().domain;
+    }
+    //Retrieve assets
     try {
         asset = store.asset(type, aid);
     } catch (e) {
@@ -345,15 +356,21 @@ require('/modules/store.js').exec(function (ctx) {
         isSite = 'true';
     }
 
-    caramel.render({
+        var headerData = site.header(tenantId, {
+            sso: sso,
+            user: user,
+            isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+        });
+
+        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+        headerData.domain = tenantDomain;
+
+        caramel.render({
         title: 'Store | ' + type,
         user: user,
         sso: sso,
 
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+            header: headerData,
 
         navigation: site.navigation(tenantId),
         search: {

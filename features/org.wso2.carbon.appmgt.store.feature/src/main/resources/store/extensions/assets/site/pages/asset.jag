@@ -72,9 +72,16 @@ require('/modules/store.js').exec(function (ctx) {
     };
     var RECENT_ASSET_COUNT = store.getRecentAppCount().assetPage;
 
-    matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
-    applicationId = matcher.elements().aid;
-    title = store.assetLinks(type).title;
+    var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+    var defaultUrl = '/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}';
+
+    //Match the incoming request with tenanted and default URI patterns and extracts the relecant asset id
+    if(matcher.match(defaultUrl) || matcher.match(tenantedUrl)){
+        applicationId = matcher.elements().aid;
+        title = store.assetLinks(type).title;
+        currentTenant = matcher.elements().domain;
+    }
+
     try {
         asset = store.asset(type, applicationId);
     } catch (e) {
