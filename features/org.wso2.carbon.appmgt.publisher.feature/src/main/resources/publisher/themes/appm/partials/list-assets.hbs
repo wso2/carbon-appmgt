@@ -58,44 +58,83 @@
                 </thead>
                 <tbody>
                  {{#each artifacts}}
-                
-                    <tr>
-                        <td>
-                        <img src="{{this.attributes.images_thumbnail}}" class="" />
-                        </td>
-                        <td class="asset-listing-name col-md-3">
-                            <a href='/publisher/asset/{{../shortName}}/{{this.id}}'>
-                                {{this.attributes.overview_displayName}}
-                            </a>
-                        </td>
-                        <td>
-                        {{this.attributes.overview_version}}
-                        </td>
-                        <td>
-                        {{this.attributes.overview_provider}}
-                        </td>
-                        <td>
-                        <small>{{this.attributes.overview_createdtime}}</small>
-                        </td>
-                        <td>
-                            <span class="lifecycle-state"><small><i class="icon-circle lc-state-{{this.lifecycleState}}"></i> {{this.lifecycleState}}</small></span>
-                        </td>
-                         <td>
 
+                     {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}
+                         <tr style=" pointer-events: none; cursor: default;">
+                     {{else}}
+                         <tr>
+                     {{/ifCond}}
+                         <td>
+                             <img src="{{this.attributes.images_thumbnail}}" class="" />
+                         </td>
+                         <td class="asset-listing-name col-md-3">
+                             {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}
+                                 {{this.attributes.overview_displayName}}{{t " --Advertised App"}}
+                             {{else}}
+                                 <a href='{{url "/asset/"}}{{../../shortName}}/{{this.id}}'>
+                                     {{this.attributes.overview_displayName}}
+                                 </a>
+                             {{/ifCond}}
+                         </td>
+                         <td>
+                             {{this.attributes.overview_version}}
+                         </td>
+                         <td>
+                             {{this.attributes.overview_provider}}
+                         </td>
+                         <td>
+                             <small>{{this.attributes.overview_createdtime}}</small>
+                         </td>
+                         <td>
+                             <span class="lifecycle-state"><small><i class="icon-circle lc-state-{{this.lifecycleState}}"></i> {{this.lifecycleState}}</small></span>
+                         </td>
+                         <td>
+                             <!-only publish,unpublish and delete actions are alllowed for advertised app -->
                              {{#this.lifecycleAvailableActions}}
-                                 <a  data-action="{{name}}" data-app="{{../this.id}}" class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
+                                 {{#ifCond ../attributes.overview_advertiseOnly "==" "true"}}
+
+                                     {{#ifCond name "==" "Re-Publish"}}
+                                         <a  style=" pointer-events: auto; cursor: pointer"
+                                             data-action="{{name}}" data-app="{{../../../id}}"
+                                             data-name="{{../../../attributes.overview_name}}"
+                                             data-provider="{{../../../attributes.overview_provider}}"
+                                             data-version="{{../../../attributes.overview_version}}"
+                                             class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
+                                     {{/ifCond}}
+
+                                     {{#ifCond name "==" "Unpublish"}}
+                                         <a  style=" pointer-events: auto; cursor: pointer"
+                                             data-action="{{name}}" data-app="{{../../../id}}"
+                                             data-name="{{../../../attributes.overview_name}}"
+                                             data-provider="{{../../../attributes.overview_provider}}"
+                                             data-version="{{../../../attributes.overview_version}}"
+                                             class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
+                                     {{/ifCond}}
+
+                                 {{else}}
+                                     <a  style=" pointer-events: auto; cursor: pointer"
+                                         data-action="{{name}}" data-app="{{../../id}}"
+                                         data-name="{{../../attributes.overview_name}}"
+                                         data-provider="{{../../attributes.overview_provider}}"
+                                         data-version="{{../../attributes.overview_version}}"
+                                         class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
+                                 {{/ifCond}}
                              {{/this.lifecycleAvailableActions}}
 
                              {{#this.deleteButtonAvailability}}
-                                 <input type="button" value="Delete" class="btn btn-danger btn-delete"
-                                        name="deleteAsset"  data-app-id={{this.id}} />
+                                 <input  style=" pointer-events: auto; cursor: pointer"
+                                         type="button" value="Delete" class="btn btn-danger btn-delete"
+                                         name="deleteAsset"  data-app-id="{{this.id}}"
+                                         data-name="{{../this.attributes.overview_name}}"
+                                         data-provider="{{../this.attributes.overview_provider}}"
+                                         data-version="{{../this.attributes.overview_version}}" />
                              {{/this.deleteButtonAvailability}}
 
-						<input
-								type="hidden" value="{{../shortName}}" name="{{../shortName}}"
-								id="meta-asset-type" />
-						</td>
-                    </tr>
+                             <input
+                                     type="hidden" value="{{../shortName}}" name="{{../shortName}}"
+                                     id="meta-asset-type" />
+                         </td>
+                     </tr>
                 {{/each}}
                 </tbody>
             </table>

@@ -10,7 +10,7 @@
                     <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
                 {{/if}}
                 <div class="app-assets">
-                    <a href="{{url "/assets/site"}}/{{id}}">
+                    <a href="{{tenantedUrl "/assets/site"}}/{{id}}">
                         <img class="app-assets-icon"
                              src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
                     </a>
@@ -47,10 +47,10 @@
     <div class="row">
     <ul class="pager">
         {{#if leftNav}}
-            <li><a href="{{url "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
+            <li><a href="{{tenantedUrl "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
         {{/if}}
         {{#if rightNav}}
-            <li><a  href="{{url "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a></li>
+            <li><a  href="{{tenantedUrl "/assets/site?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a></li>
         </ul>
         {{/if}}
     </div>

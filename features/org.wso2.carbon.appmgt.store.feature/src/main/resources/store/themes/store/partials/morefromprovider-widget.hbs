@@ -4,11 +4,11 @@
         {{#each assets}}
         <div class="row-fluid recently-added">
             <div class="span3">
-                <a href="{{url "/assets"}}/{{../type}}/{{../id}}"><img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
+                <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{../id}}"><img src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
             </div>
             <div class="span9">
 
-                <strong><a href="{{url "/assets"}}/{{../type}}/{{../id}}">{{attributes.overview_displayName}}</a></strong>
+                <strong><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{../id}}">{{attributes.overview_displayName}}</a></strong>
                             <span class="star-rating">
                             	<div class="asset-rating">
                                     <!--<div class="asset-rating-{{../rating}}star"></div>-->

@@ -13,12 +13,12 @@ $(function() {
 
 	$('#category-select').on('change', function(){
 		var selected = $(this).find("option:selected").val();
-		location.href = "/store/assets/mobileapp?query=category:\"" + selected + "\"";
+		location.href = caramel.tenantedUrl("/assets/mobileapp?query=category:\"" + selected + "\"");
 	});
 
 	$('#platform-select').on('change', function(){
 		var selected = $(this).find("option:selected").val();
-		location.href = "/store/assets/mobileapp?query=platform:\"" + selected + "\"";
+		location.href = caramel.tenantedUrl("/assets/mobileapp?query=platform:\"" + selected + "\"");
 	});
 
 

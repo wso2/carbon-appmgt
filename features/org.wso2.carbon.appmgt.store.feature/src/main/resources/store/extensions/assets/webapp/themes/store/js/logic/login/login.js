@@ -22,7 +22,7 @@ $(function(){
                     if(assetId == "" || assetId == null){
               		   location.reload();  
                     }else  {
-                 	  window.location = '/store/assets/webapp/'+ assetId;
+                 	  window.location = caramel.tenantedUrl('/assets/webapp/'+ assetId);
                     }               
                 } else {
                     showError(data.message);

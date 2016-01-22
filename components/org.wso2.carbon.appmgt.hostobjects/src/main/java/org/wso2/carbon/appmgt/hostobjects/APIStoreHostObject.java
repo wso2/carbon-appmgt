@@ -978,7 +978,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 row.put("visibility", row, api.getVisibility());
                 row.put("visibleRoles", row, api.getVisibleRoles());
                 row.put("description", row, api.getDescription());
-                String apiOwner = api.getApiOwner();
+                String apiOwner = api.getAppOwner();
                 if (apiOwner == null) {
                 	apiOwner = AppManagerUtil.replaceEmailDomainBack(apiIdentifier.getProviderName());
                 }
@@ -1054,7 +1054,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 row.put("visibility", row, api.getVisibility());
                 row.put("visibleRoles", row, api.getVisibleRoles());
                 row.put("description", row, api.getDescription());
-                String apiOwner = api.getApiOwner();
+                String apiOwner = api.getAppOwner();
                 if (apiOwner == null) {
                 	apiOwner = AppManagerUtil.replaceEmailDomainBack(apiIdentifier.getProviderName());
                 }
@@ -1213,7 +1213,7 @@ public class APIStoreHostObject extends ScriptableObject {
                     myn.put(1, myn, uriTempArr);
                 }
                 row.put("uriTemplates", row, uriTemplatesArr.toString());
-                String apiOwner = api.getApiOwner();
+                String apiOwner = api.getAppOwner();
                 if (apiOwner == null) {
                 	apiOwner = AppManagerUtil.replaceEmailDomainBack(apiIdentifier.getProviderName());
                 }
@@ -1583,8 +1583,8 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static boolean jsFunction_addAPISubscription(Context cx,
-			Scriptable thisObj, Object[] args, Function funObj) {
-        if(!isStringArray(args)) {
+                            Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+        if (!isStringArray(args)) {
             return false;
         }
 
@@ -1593,26 +1593,69 @@ public class APIStoreHostObject extends ScriptableObject {
         String version = args[2].toString();
         String subscriptionType = args[3].toString();
         String tier = "Unlimited";
-        String applicationName= ((String) args[5]);
+        String applicationName = ((String) args[5]);
         String userId = args[6].toString();
         String trustedIdp = null;
-        if( args.length > 7){
-        	trustedIdp = args[7].toString();
+        if (args.length > 7) {
+            trustedIdp = args[7].toString();
         }
 
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
 
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-		try {
-            int applicationId = AppManagerUtil.getApplicationId(applicationName,userId);
-			apiConsumer.addSubscription(apiIdentifier, subscriptionType, userId, applicationId, trustedIdp);
-            return true;
-		} catch (AppManagementException e) {
-			log.error("Error while adding subscription for user: " + userId, e);
-            return false;
-		}
-	}
+
+        boolean status = false;
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(providerName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            WebApp api = apiConsumer.getAPI(apiIdentifier);
+
+	    	/* Tenant based validation for subscription*/
+            String userDomain = MultitenantUtils.getTenantDomain(userId);
+            boolean subscriptionAllowed = false;
+            if (!userDomain.equals(tenantDomain)) {
+                String subscriptionAvailability = api.getSubscriptionAvailability();
+                if (AppMConstants.SUBSCRIPTION_TO_ALL_TENANTS.equals(subscriptionAvailability)) {
+                    subscriptionAllowed = true;
+                } else if (AppMConstants.SUBSCRIPTION_TO_SPECIFIC_TENANTS.equals(subscriptionAvailability)) {
+                    String subscriptionAllowedTenants = api.getSubscriptionAvailableTenants();
+                    String allowedTenants[] = null;
+                    if (subscriptionAllowedTenants != null) {
+                        allowedTenants = subscriptionAllowedTenants.split(",");
+                        if (allowedTenants != null) {
+                            for (String tenant : allowedTenants) {
+                                if (tenant != null && userDomain.equals(tenant.trim())) {
+                                    subscriptionAllowed = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                subscriptionAllowed = true;
+            }
+            if (!subscriptionAllowed) {
+                throw new AppManagementException("Subscription is not allowed for " + userDomain);
+            }
+            int applicationId = AppManagerUtil.getApplicationId(applicationName, userId);
+            apiConsumer.addSubscription(apiIdentifier, subscriptionType, userId, applicationId, trustedIdp);
+            status = true;
+        } catch (AppManagementException e) {
+            handleException("Error while adding subscription for user: " + userId + " Reason: " + e.getMessage(), e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return status;
+    }
 
     /**
      * This method takes care of updating the visibiltiy of an app to given user role.
@@ -3091,6 +3134,37 @@ public class APIStoreHostObject extends ScriptableObject {
             }
         }
         return myn;
+    }
+
+    /**
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isTenantActive(Context cx, Scriptable thisObj,
+                                                    Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException("Invalid number of arguments.Argument length should be one");
+        }
+
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid type of input.Tenant domain should be String");
+        }
+        String tenantDomain = (String) args[0];
+        try {
+            boolean isActive = AppManagerUtil.isTenantActive(tenantDomain);
+            return isActive;
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            throw new AppManagementException("Error while checking whether tenant with tenant domain :" + tenantDomain +
+                    "is active or not", e);
+        }
+
+
     }
 
 }

@@ -132,6 +132,7 @@ public class AppManagerComponent {
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             AppManagerUtil.loadTenantWorkFlowExtensions(tenantId);
+            AppManagerUtil.loadTenantExternalStoreConfig(tenantId);
 
             //load self sigup configuration to the registry
             AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);

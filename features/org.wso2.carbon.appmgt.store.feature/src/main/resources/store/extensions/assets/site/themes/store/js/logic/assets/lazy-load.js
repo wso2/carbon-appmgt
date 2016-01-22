@@ -80,7 +80,7 @@ document.lazy_load.getItems = function (from, to) {
     dynamicData["count"] = to - from;
     dynamicData["from"] = from;
     return $.ajax({
-        url: "/store/apis/assets/site/lazy",
+        url: caramel.tenantedUrl("/apis/assets/site/lazy"),
         type: "get", //Set the async false since it wouldn't do the validation otherwise.
         dataType: "json",
         data: dynamicData

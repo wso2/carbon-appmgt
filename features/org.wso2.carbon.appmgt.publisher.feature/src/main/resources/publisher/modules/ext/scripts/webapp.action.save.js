@@ -19,6 +19,7 @@ var meta = {
 var module = function () {
 
     var configs = require('/config/publisher.json');
+    var dataConfigs = require('/config/publisher.js').config()
     var log = new Log();
 
     function trim (str) {
@@ -163,6 +164,41 @@ var module = function () {
             //Export the model to an asset
             var asset = context.parent.export('asset.exporter');
 
+            //set sso details
+            var idpProviderUrl = dataConfigs.ssoConfiguration.identityProviderURL;
+            var ssoEnabled = dataConfigs.ssoConfiguration.enabled;
+            asset.attributes.sso_idpProviderUrl = idpProviderUrl;
+            asset.attributes.sso_saml2SsoIssuer = saml2SsoIssuer;
+            if(ssoEnabled) {
+                asset.attributes.sso_singleSignOn = "Enabled";
+            } else {
+                asset.attributes.sso_singleSignOn = "Disabled";
+            }
+
+            var appOwner = (asset.attributes.overview_appOwner).trim();
+            if (appOwner.length == 0) {
+                asset.attributes.overview_appOwner = provider;
+            }
+            var appTenant = (asset.attributes.overview_appTenant).trim();
+            if (appTenant.length == 0) {
+                asset.attributes.overview_appTenant = tenantDomain;
+            }
+
+            var isAdvertiseOnly = (asset.attributes.overview_advertiseOnly).trim();
+            if (isAdvertiseOnly.toLowerCase() != "true") {
+                asset.attributes.overview_advertiseOnly = "false";
+            }
+
+            var subscriptionAvailability = (asset.attributes.overview_subscriptionAvailability).trim();
+            if(subscriptionAvailability == "current_tenant") {
+                asset.attributes.overview_tenants = tenantDomain;
+            }
+
+            if(subscriptionAvailability == "all_tenants") {
+                asset.attributes.overview_tenants = "";
+            }
+
+
             log.debug('Finished exporting model to an artifact');
 
             //Save the artifact
@@ -203,10 +239,12 @@ var module = function () {
             var attributes = artifact1.attributes;
 
 
-            //adding to database
-            addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
-                attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
-                saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
+            if (attributes.overview_advertiseOnly.toLowerCase() != "true") {
+                //adding to database
+                addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
+                    attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
+                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
+            }
 
             //Save the id data to the model
             model.setField('*.id', id);

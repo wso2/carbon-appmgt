@@ -9,7 +9,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="wr-app-bar-items app-logo" href="{{url "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+                <a class="wr-app-bar-items app-logo" href="{{tenantedUrl "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -26,7 +26,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}
 
-                        <a href="{{url "/extensions/assets/site/subscriptions"}}">
+                        <a href="{{tenantedUrl "/extensions/assets/site/subscriptions"}}">
                             <div class="auth-img">
                                 {{t "My Apps"}}
                                 <span class="fw-stack-md fw-lg">
@@ -47,7 +47,7 @@
                         <div class="dropdown-menu">
                             <div class="cu-arrow"></div>
                             <div class="dropdown-menu-content">
-                                <a class="filter-item" href="{{url "/logout"}}">Logout</a>
+                                <a class="filter-item" href="{{tenantedUrl "/logout"}}">Logout</a>
                             </div>
                         </div>
 
@@ -55,7 +55,7 @@
 
                         {{#if sso}}
 
-                            <a href="{{url "/login"}}">
+                            <a href="{{tenantedUrl "/login"}}">
                                 <div class="auth-img">
                                     {{t "Sign In"}}
                                     <span class="fw-stack-md fw-lg">
@@ -104,7 +104,7 @@
                     <span class="fw-stack">
                         <i class="fw fw-tiles fw-stack-1-5x"></i>
                     </span>
-            </a><a class="cu-btn page-title" href='{{url "/assets/site"}}'>
+            </a><a class="cu-btn page-title" href='{{tenantedUrl "/assets/site"}}'>
             <span class="fw-stack"></span>
             {{#compare myApps true}}
                 My Sites
@@ -112,6 +112,12 @@
                 Sites
             {{/compare}}
         </a>
+            {{#if isTenanted}}
+                <a class="cu-btn page-title" href='{{url "/"}}'>
+                    <span class="fw-stack"></span>
+                    Public Store
+                </a>
+            {{/if}}
 
         </div>
     </div>
@@ -121,9 +127,9 @@
 <!-- common navigation -->
 <div id="hiddenNav" class="wr-hidden-nav">
     <ul>
-        <li><a href="{{url "/assets/webapp"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
-        <li><a href="{{url "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
-        <li><a href="{{url "/assets/site"}}"><i class="fw fw-website"></i>Sites</a></li>
+        <li><a href="{{tenantedUrl "/assets/webapp"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
+        <li><a href="{{tenantedUrl "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
+        <li><a href="{{tenantedUrl "/assets/site"}}"><i class="fw fw-website"></i>Sites</a></li>
     </ul>
 </div>
 <!-- /common navigation -->

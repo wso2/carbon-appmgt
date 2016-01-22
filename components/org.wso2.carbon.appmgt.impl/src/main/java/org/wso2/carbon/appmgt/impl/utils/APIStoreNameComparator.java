@@ -15,7 +15,7 @@
  */
 package org.wso2.carbon.appmgt.impl.utils;
 
-import org.wso2.carbon.appmgt.api.model.APIStore;
+import org.wso2.carbon.appmgt.api.model.AppStore;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -24,8 +24,8 @@ import java.util.Comparator;
  * <p>Compares APIStores by their names.
  */
 
-public class APIStoreNameComparator implements Comparator<APIStore>, Serializable {
-    public int compare(APIStore store1, APIStore store2) {
+public class APIStoreNameComparator implements Comparator<AppStore>, Serializable {
+    public int compare(AppStore store1, AppStore store2) {
         if (store1.getDisplayName().equals(store2.getDisplayName())) {
 
             return store1.getName().compareToIgnoreCase(store2.getName());

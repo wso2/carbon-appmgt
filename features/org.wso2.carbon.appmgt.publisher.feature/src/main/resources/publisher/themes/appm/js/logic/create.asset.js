@@ -150,6 +150,11 @@ $(function() {
 
 
 	$('#btn-create-asset').on('click', function(e) {
+        var subAvailability = $('#sub-availability').val();
+        $('#subscription_availability').val(subAvailability);
+
+        var visibleRoles = $('#roles').val();
+        $('#visible_roles').val(visibleRoles);
         //trim the value of all the text field and text area
         var fields = $('#form-asset-create :input');
         fields.each(function () {
@@ -207,6 +212,19 @@ $(function() {
 			return;
 		}
 
+        var subscribeAvailability = $('#sub-availability').val();
+        if (subscribeAvailability == 'specific_tenants') {
+            var tenantList = $('#tenant-list');
+            var tenantListValue = tenantList.val();
+            if(tenantListValue == null || tenantListValue == '') {
+                showAlert('Please enter the specific tenant list.', 'error');
+                tenantList.focus();
+                this.disabled = false;
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return;
+            }
+        }
+
 		//Check illegal characters in tags
 		var tags = $('#tag-test').tokenInput('get');
 		for (var index in tags) {
@@ -234,7 +252,7 @@ $(function() {
         var tracking_code_id = "AM_"+code;
 
 		$('#tracking_code').val(tracking_code_id);
-		
+
 		 if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
 			$('#sso_ssoProvider').val(selectedProvider);
@@ -242,7 +260,7 @@ $(function() {
 
 		// AJAX request options.
  		var options = {
-      
+
 			success: function(response) {
                 var result = {};
                 try {
@@ -256,19 +274,19 @@ $(function() {
 
 				//Check if the asset was added
 				if (result.ok) {
-					
+
 					showAlert('Asset added successfully.', 'success');
-				    
+
 				    	(function setupPermissions() {
 
                     				var rolePermissions = [];
-                        			
+
 			    			// 'GET' permission to be applied to the selected roles.
 			    			var readPermission = new Array();
 			    			readPermission.push("GET");
 
 			    			// Get roles from the UI
-			    			var rolesInUI = $('#roles').tokenInput("get");	
+			    			var rolesInUI = $('#roles').tokenInput("get");
 
 			    			for(var i = 0; i < rolesInUI.length; i++){
 			    				rolePermissions.push({
@@ -295,7 +313,7 @@ $(function() {
 								window.location = '/publisher/assets/' + type + '/';
 			    			}
                     			})();
-                    
+
 					/**adding tags**/
 
 					var data = {};
@@ -320,8 +338,8 @@ $(function() {
                             					showAlert('Unable to add the selected tag.', 'error');
                             				}
                         			});
-                    			}		
-					
+                    			}
+
 					if($('#autoConfig').is(':checked')){
 						createServiceProvider();
 					}
@@ -336,17 +354,17 @@ $(function() {
                     }
 				}
 
-			},  // post-submit callback 
- 		
+			},  // post-submit callback
+
 			error : function(response) {
 				showAlert('Failed to add asset.', 'error');
 			},
-		 
-        		url: '/publisher/asset/' + type, 
+
+        		url: '/publisher/asset/' + type,
         		type : 'POST'
-        	
-		}; 
-    
+
+		};
+
     	$('#form-asset-create').ajaxSubmit(options);
 
 	});
@@ -370,7 +388,7 @@ $(function() {
 		}
 		$('.' + CHARS_REM).text('Characters left: ' + left);
 	});
-	
+
 	$('#autoConfig').click(function () {
 		if($('#autoConfig').is(':checked')){
 			$('#provider-table').show();
@@ -381,19 +399,19 @@ $(function() {
 			var rows = $('table.sso tr');
 			var provider =  rows.filter('.provider-table');
 			provider.hide();
-									
+
 			var claims = rows.filter('.claims-table');
 			claims.hide();
 			removeClaimTable();
 
 		}
 	});
-	
+
 	$("#providers").change(function () {
 		var value = $('#providers').val();
         	loadClaims(value)
     	});
-	
+
 	$.ajax({
           url: '/publisher/api/sso/providers',
           type: 'GET',
@@ -406,27 +424,27 @@ $(function() {
               	  } else {
 			$("#ssoTable").remove();
               	  }
-  			
+
           },
           error: function(response) {
               showAlert('Error adding providers.', 'error');
           }
     	});
-	
-	
+
+
 	function loadProviders(providers_data){
 		 for(var i=0;i<providers_data.length;i++){
 			  var x = providers_data[i];
 			  $("#providers").append($("<option></option>").val(x).text(x));
 		  }
-		 
+
 		 var value = $('#providers').val();
 		 loadClaims(value);
 
         var roleClaim = "http://wso2.org/claims/role";
         addToClaimsTable(roleClaim,false);
 	}
-	
+
 	function loadClaims (provider){
 		 var sso_values = provider.split("-");
 		 $.ajax({
@@ -439,7 +457,7 @@ $(function() {
            		 		var y = claims[i];
            		 		$("#claims").append($("<option></option>").val(y).text(y));
            	 		}
-     			
+
              		},
              		error: function(response) {
                  		showAlert('Error adding claims.', 'error');
@@ -447,12 +465,12 @@ $(function() {
          	});
 	}
 
-	
+
 	$('#addClaims').click(function () {
 		var claim  = $("#claims").val();
 		addToClaimsTable(claim,true);
 	});
-	
+
 	function addToClaimsTable(claim,clickable){
         var isAlreadyExist = $.inArray(claim, addedClaimList);
         if(isAlreadyExist == -1) {
@@ -489,8 +507,8 @@ $(function() {
             $('#claimTableTbody').parent().show();
         }
 	}
-	
-	
+
+
 
 	function createServiceProvider(){
 	    var sso_config = {};
@@ -543,8 +561,8 @@ $(function() {
         });
 	}
 
-	
-	
+
+
 	/*
 	 The function is used to build a report message indicating the errors in the form
 	 @report: The report to be processed

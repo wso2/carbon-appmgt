@@ -12,7 +12,7 @@
 	{{#slice subscriptions count="20" size="20"}}
 
 		{{#each .}}
-        <a href="{{url "/assets"}}/{{type}}/{{id}}">
+        <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
             <div class="row">
                 <div class="col-md-8">
                     <div class="recent-app-assets-name">{{attributes.overview_displayName}}</div>

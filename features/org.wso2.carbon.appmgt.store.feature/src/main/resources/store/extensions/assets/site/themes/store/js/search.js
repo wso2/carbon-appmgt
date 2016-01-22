@@ -57,7 +57,7 @@ $(function () {
 
         currentPage = 1;
         if (store.asset) {
-            url = caramel.url('/assets/' + store.asset.type + '/?' + buildParams(searchVal));
+            url = caramel.tenantedUrl('/assets/' + store.asset.type + '/?' + buildParams(searchVal));
             caramel.data({
                 title: null,
                 header: ['header'],
@@ -82,7 +82,7 @@ $(function () {
             });
             theme.loading($('#assets-container').parent());
         } else if (searchVal.length > 0 && searchVal != undefined) {
-            url = caramel.url('/?' + buildParams(searchVal));
+            url = caramel.tenantedUrl('/?' + buildParams(searchVal));
             window.location = url;
         }
 
@@ -162,7 +162,7 @@ $(function () {
             if (searchSelect !== "App") {
                 searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
             }
-            location.href = "/store/assets/" + "site" + "?query=" + searchTerm;
+            location.href = caramel.tenantedUrl("/assets/" + "site" + "?query=" + searchTerm);
         }
     });
 

@@ -25,7 +25,7 @@
                             	</div>
 
 								<a data-type="gadget" class="btn btn-primary" id="btn-add-gadget"
-                           href="{{url "/assets"}}/{{../type}}/{{../id}}">View</a>
+                           href="{{tenantedUrl "/assets"}}/{{../type}}/{{../id}}">View</a>
 							</div>
                         {{/attributes}}
 
@@ -63,14 +63,14 @@
                                             {{#if ../indashboard}}
 
                                             {{/if}}
-                                            <a href="{{url "/assets"}}/{{../type}}/{{../id}}"><img
+                                            <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{../id}}"><img
                                                     src="{{#if images_thumbnail}}{{images_thumbnail}}{{/if}}"></a>
                                         </div>
                                     </a>
 
                                     <div class="asset-details">
                                         <div class="asset-name">
-                                            <a href="{{url "/assets"}}/{{../type}}/{{../id}}"><h4>{{overview_displayName}}</h4>
+                                            <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{../id}}"><h4>{{overview_displayName}}</h4>
                                             </a>
                                         </div>
                                         <div class="asset-rating">
