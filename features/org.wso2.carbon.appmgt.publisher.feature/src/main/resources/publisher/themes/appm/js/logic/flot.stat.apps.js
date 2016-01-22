@@ -27,10 +27,8 @@ function drawGraphs() {
                 'endDate': to
             },
             success: function (response) {
-
-                usageByContext = JSON.parse(response);
+                usageByContext = response;
                 $('#spinner').hide();
-
             },
             error: function (response) {
                 alert('Error occured at statistics graph rendering');
@@ -59,8 +57,7 @@ function drawGraphs() {
 
 }
 
- var parsedResponse;
-var drawAPIUsageByUser = function (response,usageByContext) {
+var drawAPIUsageByUser = function (parsedResponse, usageByContext) {
     var dataStructure = [];
     for (var i = 0; i < usageByContext.length; i++) {
         var Num =0;
@@ -74,9 +71,6 @@ var drawAPIUsageByUser = function (response,usageByContext) {
             "checked" : false
         });
     }
-
-
-    parsedResponse = JSON.parse(response);
 
     length = parsedResponse.length;
     $("#tooltipTable").find("tr:gt(0)").remove();

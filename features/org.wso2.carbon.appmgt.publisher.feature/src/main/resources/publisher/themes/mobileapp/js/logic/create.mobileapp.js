@@ -31,7 +31,6 @@ $("#txtName").change(function() {
         url: "/publisher/api/mobile/isexist",
         data: {name: $(this).val()},
         success: function (data) {
-            var data = JSON.parse(data);
             if(data.isExist){
                 $("#name_is_ok").css("color", "#ffa500");
                 $("#name_is_ok").text("App name with version " + data.versions +  " already exists.");
@@ -185,7 +184,7 @@ $(document).ready(function(){
             $('#form-asset-create').ajaxForm(function(data) {
 
             	try{
-            		data = JSON.parse(data);
+                    data = (typeof data == "string") ? JSON.parse(data) : data;
             	}catch(e){
             		window.location.replace("/publisher/assets/mobileapp/");
                		return;

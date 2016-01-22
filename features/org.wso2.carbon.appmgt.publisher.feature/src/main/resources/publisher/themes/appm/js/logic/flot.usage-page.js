@@ -77,10 +77,9 @@ function drawGraphs() {
 var colorScheme=[];
 var defaultFilterValues = [];
 var labelarray =[];
-var drawAPIUsageByPage = function (response) {
+var drawAPIUsageByPage = function (parsedResponse) {
 
     $('#checkboxContainer').empty();
-    var parsedResponse = JSON.parse(response);
     var data = parsedResponse.totalPageCount;
     var ticks = parsedResponse.webapp;
     var webapp_=parsedResponse.webapp_;

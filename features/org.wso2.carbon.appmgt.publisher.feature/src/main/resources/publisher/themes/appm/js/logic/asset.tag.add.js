@@ -17,9 +17,7 @@ $(function(){
         url:url,
         type:'GET',
         success:function(response){
-            var tags=JSON.parse(response);
-            $(TAG_CONTAINER).tokenInput(tags,{theme:THEME, allowFreeTagging: true});
-
+            $(TAG_CONTAINER).tokenInput(response, {theme: THEME, allowFreeTagging: true});
         },
         error:function(){
             console.log('unable to fetch tag cloud for '+type);

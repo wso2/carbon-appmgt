@@ -39,7 +39,7 @@ $(function () {
             type: 'GET',
             success: function (response) {
 
-                var respObj=JSON.parse(response);
+                var respObj = response;
                	
                	if(respObj.cachedAssets.length){
                		var recentTmplComp =  Handlebars.compile(recentTmpl);

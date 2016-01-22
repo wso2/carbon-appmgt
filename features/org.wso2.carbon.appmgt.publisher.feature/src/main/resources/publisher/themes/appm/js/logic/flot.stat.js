@@ -38,12 +38,9 @@ function drawGraphs() {
     });
 }
 
-var drawSubscriberCountByAPIs = function (response) {
+var drawSubscriberCountByAPIs = function (parsedResponse) {
 
     $('#pie-chart').empty();
-
-    var parsedResponse = JSON.parse(response);
-
 
     if (parsedResponse.length > 0) {
         var chartColorScheme = [];

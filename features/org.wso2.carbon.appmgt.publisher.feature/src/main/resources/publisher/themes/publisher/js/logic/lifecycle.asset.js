@@ -115,7 +115,7 @@ $(function(){
 
                 var out='<ul>';
 
-                var obj=JSON.parse(response);
+                var obj = response;
 
                 for(var index in obj.checkListItems){
 

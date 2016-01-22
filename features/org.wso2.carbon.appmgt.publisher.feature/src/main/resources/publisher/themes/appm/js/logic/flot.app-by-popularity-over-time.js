@@ -23,7 +23,7 @@ function drawGraphs() {
                    'endDate': to
                },
                success: function (response) {
-                   parsedResponse = JSON.parse(response);
+                   parsedResponse = response;
                    drawPopularityOverTime(parsedResponse);
                    $('#spinner').hide();
                },

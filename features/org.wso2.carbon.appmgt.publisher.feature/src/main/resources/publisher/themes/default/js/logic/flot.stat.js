@@ -43,8 +43,7 @@ $(function() {
 	});
 });
 
-var drawProviderAPIVersionUserLastAccess = function(response){
-	var parsedResponse = JSON.parse(response);
+var drawProviderAPIVersionUserLastAccess = function (parsedResponse) {
 	/*  Web Application Last Access Time Graph  */
 	$('#placeholder1').append($('<table class="table table-condensed" id="webAppTable">' +
 					'<tr>' +
@@ -60,8 +59,7 @@ var drawProviderAPIVersionUserLastAccess = function(response){
         } 
 }
 
-var drawProviderAPIUsage = function(response){
-	var parsedResponse = JSON.parse(response);
+var drawProviderAPIUsage = function (parsedResponse) {
 	/* Overall Web Application Usage Graph */
 	$('#placeholder2').append($('<table class="table table-condensed" id="webAppTable2">' +
 					'<tr>' +
@@ -94,7 +92,7 @@ var onDateSelected = function(from, to) {
 			'isOnChoice' : true
 		},
 		success : function(response) {
-			var parsedResponse = JSON.parse(response);
+			var parsedResponse = response;
 			
 			
 			/* Hot assets stats graph */

@@ -38,8 +38,7 @@ function drawGraphs() {
 
 }
 var labelarray=[];
-var drawAPIResponseTime = function (response) {
-    var parsedResponse = JSON.parse(response);
+var drawAPIResponseTime = function (parsedResponse) {
     var length = parsedResponse.webapps.length;
 
     $('#placeholder41').empty();

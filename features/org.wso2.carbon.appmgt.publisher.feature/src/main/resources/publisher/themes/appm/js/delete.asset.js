@@ -25,7 +25,7 @@ $('.btn-delete').on('click', function(e) {
                     type: 'POST',
                     contentType: 'application/json',
                     success: function(response) {
-                        var result = JSON.parse(response);
+                        var result = response;
                         if (result.isDeleted) {
                             showDeleteModel("Successfully deleted the Asset","Deleted Successfully",type);
                         } else if(result.isDeleted == false){

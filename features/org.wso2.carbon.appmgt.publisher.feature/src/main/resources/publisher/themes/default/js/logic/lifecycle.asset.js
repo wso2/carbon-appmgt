@@ -159,7 +159,7 @@ $(function() {
 					 graph.Renderer.initRaphael();
 					 graph.Renderer.render(graph.NMap);
 					 }       */
-					var statInfo = JSON.parse(response);
+					var statInfo = response;
 					sugyama.init(statInfo.lifecycle, paper);
 					var START_X = 10;
 					var START_Y = 50;
@@ -203,7 +203,7 @@ $(function() {
 					type : 'GET',
 					success : function(response) {
 						//Convert the response to a JSON object
-						var statInfo = JSON.parse(response);
+						var statInfo = response;
 
 						$('#state').html(statInfo.state);
 						$('#view-lifecyclestate').html(statInfo.state);
@@ -298,7 +298,7 @@ $(function() {
 
 				var out = '<ul>';
 
-				var obj = JSON.parse(response);
+				var obj = response;
 
 				for (var index in obj.checkListItems) {
 
@@ -333,8 +333,7 @@ $(function() {
 			type : 'GET',
 			success : function(response) {
 				//console.log(response);
-				var obj = JSON.parse(response);
-				var out = createHistoryEntry(obj.item);
+				var out = createHistoryEntry(response.item);
 				$('#lc-history').html(out);
 			},
 			error : function(response) {
