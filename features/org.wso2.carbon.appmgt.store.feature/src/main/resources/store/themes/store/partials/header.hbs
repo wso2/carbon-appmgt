@@ -96,7 +96,7 @@
         <div class="wr-action-btn-bar">
             <a href="javascript:openCollapsedNav()" class="cu-btn wr-hidden-nav-toggle-btn">
                     <span class="fw-stack">
-                        <i class="fw fw-tiles fw-stack-1-5x"></i>
+                        <i class="fw fw-tiles fw-stack-1-5x" id="openApps"></i>
                     </span>
             </a><a class="cu-btn page-title" href='{{tenantedUrl "/"}}'>
             <span class="fw-stack"></span>
@@ -116,7 +116,7 @@
 <!-- common navigation -->
 <div id="hiddenNav" class="wr-hidden-nav">
     <ul>
-        <li><a href="{{tenantedUrl "/assets/webapp"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
+        <li><a href="{{tenantedUrl "/assets/webapp"}}"><i class="fw fw-web-app" id="webApps"></i>Web Apps</a></li>
         <li><a href="{{tenantedUrl "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
         <li><a href="{{tenantedUrl "/assets/site"}}"><i class="fw fw-website"></i>Sites</a></li>
     </ul>
