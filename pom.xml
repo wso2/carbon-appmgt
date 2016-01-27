@@ -573,7 +573,7 @@
         
     <properties>
 	<!-- AppM Component Version -->
-        <carbon.appmgt.version>1.0.2-SNAPSHOT</carbon.appmgt.version>
+        <carbon.appmgt.version>1.0.1</carbon.appmgt.version>
         <carbon.appmgt.imp.pkg.version>[1.0.0, 1.1.0)</carbon.appmgt.imp.pkg.version>
 	<apimgt.keymgt.stub.version>4.2.2</apimgt.keymgt.stub.version>
 	<appmgt.feature.version>1.0.2-SNAPSHOT</appmgt.feature.version>

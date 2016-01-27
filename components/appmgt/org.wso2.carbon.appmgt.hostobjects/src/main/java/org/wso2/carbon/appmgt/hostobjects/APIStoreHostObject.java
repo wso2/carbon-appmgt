@@ -18,22 +18,6 @@
 
 package org.wso2.carbon.appmgt.hostobjects;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.rmi.RemoteException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -56,12 +40,26 @@ import org.wso2.carbon.apimgt.impl.dto.xsd.APIInfoDTO;
 import org.wso2.carbon.apimgt.keymgt.stub.types.carbon.ApplicationKeysDTO;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIKey;
+import org.wso2.carbon.appmgt.api.model.APIRating;
+import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.Comment;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.DocumentationType;
+import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
+import org.wso2.carbon.appmgt.api.model.SubscribedAppExtension;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Subscription;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.URITemplate;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.UserAwareAPIConsumer;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
@@ -102,6 +100,22 @@ import org.wso2.carbon.user.mgt.stub.UserAdminUserAdminException;
 import org.wso2.carbon.user.mgt.stub.types.carbon.FlaggedName;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
 
 public class APIStoreHostObject extends ScriptableObject {
@@ -2246,6 +2260,49 @@ public class APIStoreHostObject extends ScriptableObject {
             	if (isTenantFlowStarted) {
             		PrivilegedCarbonContext.endTenantFlow();
             	}
+            }
+        }
+        return myn;
+    }
+
+    public static NativeArray jsFunction_getSubscriptionsByUser(Context cx,
+                                                                Scriptable thisObj, Object[] args, Function funObj)
+            throws ScriptException, AppManagementException {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        NativeArray myn = new NativeArray(0);
+        if (args != null && isStringArray(args)) {
+            String userName = (String) args[0];
+            boolean isTenantFlowStarted = false;
+            try {
+                String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                APIConsumer appConsumer = getAPIConsumer(thisObj);
+                List<SubscribedAppExtension> subscribedAppsList = appConsumer.getSubscribedApps(userName);
+
+                int i = 0;
+                for (SubscribedAppExtension subscribedApp : subscribedAppsList) {
+                    NativeObject row = new NativeObject();
+                    row.put("subscriptionId", row, subscribedApp.getSubscriptionID());
+                    row.put("appId", row, subscribedApp.getApiId().getApplicationId());
+                    row.put("appName", row, subscribedApp.getApiId().getApiName());
+                    row.put("appVersion", row, subscribedApp.getApiId().getVersion());
+                    row.put("appProvider", row, AppManagerUtil.replaceEmailDomainBack(
+                            subscribedApp.getApiId().getProviderName()));
+                    row.put("subscriptionTime", row, dateFormat.format(subscribedApp.getSubscriptionTime()));
+                    row.put("evaluationPeriod", row, subscribedApp.getEvaluationPeriod());
+                    row.put("expiredOn", row, dateFormat.format(subscribedApp.getExpireOn()));
+                    row.put("isPaid", row, subscribedApp.isPaid());
+                    myn.put(i, myn, row);
+                    i++;
+                }
+            } finally {
+                if (isTenantFlowStarted) {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
             }
         }
         return myn;

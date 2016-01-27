@@ -21,7 +21,7 @@ package org.wso2.carbon.appmgt.impl.workflow;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.dao.AppMSubscriptionExtentionDAO;
+import org.wso2.carbon.appmgt.impl.dao.AppMSubscriptionExtensionDAO;
 import org.wso2.carbon.appmgt.impl.dto.SubscriptionExpiryDTO;
 import org.wso2.carbon.appmgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.WorkflowDTO;
@@ -85,7 +85,7 @@ public class SubscriptionCreationExpiryWorkflowExecutor extends SubscriptionCrea
     @Override
     public void complete(WorkflowDTO workflowDTO) throws WorkflowException {
         super.complete(workflowDTO);
-        AppMSubscriptionExtentionDAO appMSubscriptionExtentionDAO = new AppMSubscriptionExtentionDAO();
+        AppMSubscriptionExtensionDAO appMSubscriptionExtentionDAO = new AppMSubscriptionExtensionDAO();
         try {
             appMSubscriptionExtentionDAO.addSubscription(workflowDTO);
         } catch (AppManagementException e) {
