@@ -103,14 +103,15 @@ require('/modules/store.js').exec(function (ctx) {
 function removeInternalroles(roles){
 
     var filterdRoles =[];
+    var filterdRoles =[];
 
-    for(i = 0; i < roles.length; i++){
+    for (i = 0; i < roles.length; i++) {
 
-        if(roles[i].indexOf("Internal/") <= -1){
+        if ((roles[i].indexOf("Internal/") <= -1) && (roles[i].indexOf("Application/") <= -1)) {
             filterdRoles.push(roles[i]);
         }
     }
-
+    
     return filterdRoles;
 }
 
