@@ -161,14 +161,25 @@ require('/modules/publisher.js').exec(function (ctx) {
         var userManager = server.userManager(server.current(session).tenantId);
         var user = server.current(session);
         var permission = null;
-        if (appType == 'webapp') {
-            permission = config.permissions.webapp_publish;
-        } else if (appType == 'mobileapp') {
-            permission = config.permissions.mobileapp_publish;
+
+        // To Send an app to submit for review, created permission is required.
+        if (action != "Submit for Review") {
+            if (appType == 'webapp') {
+                permission = config.permissions.webapp_publish;
+            } else if (appType == 'mobileapp') {
+                permission = config.permissions.mobileapp_publish;
+            }
+        } else {
+            if (appType == 'webapp') {
+                permission = config.permissions.webapp_create;
+            } else if (appType == 'mobileapp') {
+                permission = config.permissions.mobileapp_create;
+            }
         }
-        // check whether current user has publisher permissions
-        var hasPublisherPermission = permissions.isAuthorized(user.username, permission, userManager);
-        if (!hasPublisherPermission) {
+
+        // check whether current user has enough permission to change the life cycle
+        var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
+        if (!hasPermission) {
             log.error("Insufficient permissions to perform '" + action + "' on " + appType);
             response.status = 401;
             response.contentType = "application/json";
@@ -419,7 +430,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         content.status = "Success";
         content.artifacts = [currentArtifact].concat(previousArtifacts);
         content.artifacts.forEach(function (artifact) {
-            artifact.isDownloadable = hasPublisherPermission;
+            artifact.isDownloadable = hasPermission;
             artifact.attributes.overview_createdtime =
                 new Date(parseInt(artifact.attributes.overview_createdtime)).toUTCString();
             artifact.lifecycleState = artifactManager.getLifecycleState(artifact);
