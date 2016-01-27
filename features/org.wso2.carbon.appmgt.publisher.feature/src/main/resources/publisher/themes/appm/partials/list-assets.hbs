@@ -62,7 +62,7 @@
                      {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}
                          <tr style=" pointer-events: none; cursor: default;">
                      {{else}}
-                         <tr>
+                         <tr id="{{this.attributes.overview_name}}{{t "-"}}{{this.attributes.overview_provider}}{{t "-"}}{{this.attributes.overview_version}}">
                      {{/ifCond}}
                          <td>
                              <img src="{{this.attributes.images_thumbnail}}" class="" />

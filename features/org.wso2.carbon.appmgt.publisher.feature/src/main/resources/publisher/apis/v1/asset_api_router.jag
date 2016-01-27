@@ -488,12 +488,22 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         if(updateAuthorized) {
             try {
+            var originalArtifact = artifactManager.get(id);
+            var editEnabled = permissions.isEditPermitted(username, originalArtifact.path, um);
+            if(!editEnabled){
+                response.contentType = 'application/json';
+                msg['ok'] = false;
+                msg['message'] = 'Update Failed. Can not update in ' + originalArtifact.lifecycleState + ' state.';
+                print(msg);
+                return;
+            }
+
             var modelA = modelManager.getModel(shortName);
             var modelB = modelManager.getModel(shortName);
 
             //Handle any files
             inspectFiles(request,context.post);
-            var originalArtifact = artifactManager.get(id);
+
 
             //Get the original artifact
             if(context.post["images_thumbnail"] == ""){
