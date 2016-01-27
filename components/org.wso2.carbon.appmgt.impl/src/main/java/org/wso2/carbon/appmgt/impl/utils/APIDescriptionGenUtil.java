@@ -39,8 +39,7 @@ public class APIDescriptionGenUtil {
             AppManagementException {
         // Here as the method is about extracting some info from the policy. And it's not concern on compliance to
         // specification. So it just extract the required element.
-        int requestPerMinute;
-        requestPerMinute = generateMaxCountFromPolicy(policy);
+        int requestPerMinute = generateMaxCountFromPolicy(policy);
         if (requestPerMinute >= 1) {
             String description = DESCRIPTION.replaceAll("\\[1\\]", Integer.toString(requestPerMinute));
             return description;

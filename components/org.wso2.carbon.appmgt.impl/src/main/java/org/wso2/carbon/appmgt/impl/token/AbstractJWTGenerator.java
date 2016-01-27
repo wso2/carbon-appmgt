@@ -115,11 +115,11 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             } catch (ClassNotFoundException e) {
                 log.error("Cannot find class: " + claimsRetrieverImplClass, e);
             } catch (InstantiationException e) {
-                log.error("Error instantiating " + claimsRetrieverImplClass);
+                log.error("Error instantiating " + claimsRetrieverImplClass, e);
             } catch (IllegalAccessException e) {
-                log.error("Illegal access to " + claimsRetrieverImplClass);
+                log.error("Illegal access to " + claimsRetrieverImplClass, e);
             } catch (AppManagementException e) {
-                log.error("Error while initializing " + claimsRetrieverImplClass);
+                log.error("Error while initializing " + claimsRetrieverImplClass, e);
             }
         }
 
@@ -281,7 +281,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             log.error(error, e);
             throw new AppManagementException(error, e);
         } catch (AppManagementException e) {
-            String error = "Error in obtaining tenant's" + tenantId + "private key";
+            String error = "Error in obtaining tenant's " + tenantId + " private key";
             log.error(error, e);
             throw new AppManagementException(error, e);
         }
@@ -315,7 +315,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
                     } catch (Exception e) {
                         String error = "Error while obtaining private key for super tenant";
                         log.error(error, e);
-                        throw new AppManagementException(error);
+                        throw new AppManagementException(error, e);
                     }
                 }
                 if (privateKey != null) {
@@ -324,7 +324,7 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             }
             return privateKey;
         } catch (AppManagementException e) {
-            String error = "Error in obtaining tenant's" + tenantId + "private key";
+            String error = "Error in obtaining tenant's " + tenantId + " private key";
             log.error(error, e);
             throw new AppManagementException(error, e);
         }
@@ -360,9 +360,9 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             jwtHeader.append(base64EncodedThumbPrint);
             jwtHeader.append("\"");
             return jwtHeader.toString();
-        } catch (Exception e) {
-            String error = "Error in adding tenant's" + tenantId + "public certificate";
-            throw new AppManagementException(error);
+        } catch (AppManagementException e) {
+            String error = "Error in adding tenant's " + tenantId + " public certificate";
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -397,10 +397,10 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             return base64EncodedThumbPrint;
         } catch (CertificateEncodingException e) {
             String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
-            throw new AppManagementException(error);
+            throw new AppManagementException(error, e);
         } catch (NoSuchAlgorithmException e) {
             String error = "Signature algorithm " + signatureAlgorithm + " not found.";
-            throw new AppManagementException(error);
+            throw new AppManagementException(error, e);
         }
     }
 
@@ -437,13 +437,13 @@ public abstract class AbstractJWTGenerator implements TokenGenerator {
             return publicCert;
         } catch (KeyStoreException e) {
             String error = "Error in obtaining tenant's " + tenantId + " keystore";
-            throw new AppManagementException(error);
+            throw new AppManagementException(error, e);
         } catch (CertificateEncodingException e) {
             String error = "Error in generating public certificate thumbprint for tenant " + tenantId;
-            throw new AppManagementException(error);
+            throw new AppManagementException(error, e);
         } catch (NoSuchAlgorithmException e) {
             String error = "Signature algorithm " + signatureAlgorithm + " not found.";
-            throw new AppManagementException(error);
+            throw new AppManagementException(error, e);
         } catch (Exception e) {
             String error = "Error in obtaining tenant's " + tenantId + " keystore";
             throw new AppManagementException(error, e);
