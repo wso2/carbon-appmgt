@@ -47,7 +47,7 @@ var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
-    var asset, applicationId, title,
+    var asset, applicationId, title, currentTenant, userTenant, tenantIdVal,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
@@ -85,8 +85,17 @@ require('/modules/store.js').exec(function (ctx) {
     try {
         asset = store.asset(type, applicationId);
     } catch (e) {
+        log.error(e);
         response.sendError(404, 'Requested page cannot be found');
         return;
+    }
+
+    if (user) {
+        userTenant = user.tenantDomain;
+        tenantIdVal = user.tenantId;
+    }
+    else {
+        tenantIdVal = tenant.tenantId;
     }
 
     var appRatingJson = JSON.parse(social.getRating(WEBAPP_TYPE + ":" + applicationId));
@@ -342,6 +351,20 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
+    var subVisibility = true;
+    var subAvailability = asset.attributes.overview_subscriptionAvailability;
+    if (subAvailability && currentTenant) {
+        if (subAvailability == "current_tenant") {
+            if(userTenant != currentTenant)
+                subVisibility = false;
+
+        } else if (subAvailability == "specific_tenants") {
+            var tenants = stringify(asset.attributes.overview_tenants);
+            if((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1))
+                subVisibility = false;
+        }
+    }
+
     var isSite;
     if (customType == WEBAPP_TYPE) {
         isSite = 'false';
@@ -393,7 +416,8 @@ require('/modules/store.js').exec(function (ctx) {
             tiers: availableTiers,
             api: apiData,
             apiAssetData: asset
-        }
+        },
+        subVisibility:subVisibility
     });
 
 }, request, response, session);

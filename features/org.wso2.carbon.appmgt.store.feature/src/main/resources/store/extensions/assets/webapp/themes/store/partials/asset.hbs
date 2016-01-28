@@ -27,7 +27,7 @@
 
             <div class="row app-asset-buttons col-md-12 col-xs-12">
                 {{#if user}}
-
+                    {{#if subVisibility}}
                     <input type="hidden" value="Unlimited" id="subsAppTier" name="subsAppTier">
 
                     <div id="subscriptionActions">
@@ -53,7 +53,7 @@
                         {{/if}}
 
                     </div>
-
+                    {{/if}}
                 {{/if}}
             </div>
         </div>

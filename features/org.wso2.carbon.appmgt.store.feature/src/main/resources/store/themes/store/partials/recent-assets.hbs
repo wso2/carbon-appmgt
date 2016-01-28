@@ -6,7 +6,11 @@
 
     {{#slice . count="20" size="20"}}
         {{#each .}}
+            {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
+            <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{type}}/{{attributes.overview_advertisedAppUuid}} ">
+            {{else}}
             <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
+            {{/compare}}
             <div class="row">
 
                     <div class="col-md-8">
