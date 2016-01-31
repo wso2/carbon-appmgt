@@ -251,6 +251,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var deleteAuthorized = permissions.isAuthorized(username, config.permissions.webapp_delete, um);
         log.debug("## Delete Authorized Check : " + deleteAuthorized);
 
+        var isDeleted = false;
         if(deleteAuthorized) {
             try {
                 //Get the original artifact
@@ -292,7 +293,6 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
-                var isDeleted = false;
                 var isAdvertiseOnly = attributes["overview_advertiseOnly"].trim();
                 if (isAdvertiseOnly.toLowerCase() == "true") {
                     isDeleted = removeArtifactOnly(shortName, id);
@@ -302,15 +302,15 @@ require('/modules/publisher.js').exec(function(ctx) {
 
                 if (isDeleted == true) {
                     msg['isDeleted'] = true;
-                    msg['message'] = 'asset delete';
+                    msg['message'] = 'Web Application is successfully deleted';
                     print(msg);
                 } else if (isDeleted == false) {
                     msg['isDeleted'] = false;
-                    msg['message'] = 'asset subscribed';
+                    msg['message'] = 'Web Application delete failed due to active subscriptions';
                     print(msg);
                 } else {
-                    msg['ok'] = null;
-                    msg['message'] = 'asset error';
+                    msg['isDeleted'] = false;
+                    msg['message'] = 'Web Application delete failed';
                     print(msg);
                 }
 
@@ -319,8 +319,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
             }
         }else{
-            msg['ok'] = false;
-            msg['message'] = 'Delete not permitted. Insufficient privilages.';
+            msg['isDeleted'] = false;
+            msg['message'] = 'Delete is not permitted due to insufficient privileges';
             print(msg);
         }
     });
