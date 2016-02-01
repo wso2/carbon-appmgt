@@ -38,7 +38,7 @@ function drawGraphs() {
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type
+        url: caramel.context + '/api/assets/' + operation + '/' + type
             + '/getUsageByContext/',
         type: 'POST',
         data: {
@@ -59,7 +59,7 @@ function drawGraphs() {
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type
+        url: caramel.context + '/api/assets/' + operation + '/' + type
             + '/getSubscribedAPIsByUsers/',
         type: 'POST',
         data: {

@@ -592,7 +592,6 @@ public final class AppMConstants {
     public static final String HTTP = "http://";
     public static final String URL_DELIMITER = "://";
 
-
     // constants related to Statistics
     public static class Statistics {
         public static final int SUBSCRIPTION_LIMIT = 10;

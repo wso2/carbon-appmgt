@@ -17,7 +17,7 @@ var utility = require('/modules/utility.js').rxt_utility();
 
 var router = require('/modules/router-g.js').router();
 var routeManager = new router.Router();
-
+var contextPath = caramel.configs().context;
 var log=new Log('version_api_router');
 
 routeManager.register('GET','publisher','/publisher/api/version/{type}/{id}',function(context){
@@ -98,7 +98,7 @@ routeManager.register('POST','publisher','/publisher/api/version/{type}/{id}/{ve
         var msg={};
         msg['ok']=true;
         msg['id']=newId.value;
-        msg['url']='/publisher/asset/'+shortName+'/'+msg.id;
+        msg['url']= contextPath + '/asset/'+shortName+'/'+msg.id;
         response.contentType = "application/json";
         print(msg);
 

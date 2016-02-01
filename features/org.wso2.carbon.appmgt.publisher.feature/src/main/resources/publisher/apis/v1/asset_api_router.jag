@@ -32,7 +32,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var server = require('store').server;
     var utility=require('/modules/utility.js').rxt_utility();
     var permissions=require('/modules/permissions.js').permissions;
-
+    var contextPath = caramel.configs().context;
 
     var checkNonSpecial = function(value){
         var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
@@ -95,7 +95,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 fileTemp.close();
             }
 
-            return "/publisher"+ mam_config.fileAPILocation + uid + file_n;
+            return contextPath + mam_config.fileAPILocation + uid + file_n;
 
         }
         return "";
@@ -251,6 +251,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var deleteAuthorized = permissions.isAuthorized(username, config.permissions.webapp_delete, um);
         log.debug("## Delete Authorized Check : " + deleteAuthorized);
 
+        var isDeleted = false;
         if(deleteAuthorized) {
             try {
                 //Get the original artifact
@@ -292,7 +293,6 @@ require('/modules/publisher.js').exec(function(ctx) {
                     ssoProviderObj = null;
                 }
 
-                var isDeleted = false;
                 var isAdvertiseOnly = attributes["overview_advertiseOnly"].trim();
                 if (isAdvertiseOnly.toLowerCase() == "true") {
                     isDeleted = removeArtifactOnly(shortName, id);
@@ -303,15 +303,15 @@ require('/modules/publisher.js').exec(function(ctx) {
                 response.contentType = "application/json";
                 if (isDeleted == true) {
                     msg['isDeleted'] = true;
-                    msg['message'] = 'asset delete';
+                    msg['message'] = 'Web Application is successfully deleted';
                     print(msg);
                 } else if (isDeleted == false) {
                     msg['isDeleted'] = false;
-                    msg['message'] = 'asset subscribed';
+                    msg['message'] = 'Web Application delete failed due to active subscriptions';
                     print(msg);
                 } else {
-                    msg['ok'] = null;
-                    msg['message'] = 'asset error';
+                    msg['isDeleted'] = false;
+                    msg['message'] = 'Web Application delete failed';
                     print(msg);
                 }
 
@@ -320,8 +320,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
             }
         }else{
+            msg['isDeleted'] = false;
+            msg['message'] = 'Delete is not permitted due to insufficient privileges';
             msg['ok'] = false;
             msg['message'] = 'Delete not permitted. Insufficient privilages.';
+            response.contentType = "application/json";
             response.contentType = "application/json";
             print(msg);
         }
@@ -384,10 +387,10 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //assigning default thumbnail and banner if not provided.
             if(context.post['images_thumbnail'] == '') {
-                context.post['images_thumbnail'] = '/publisher/config/defaults/img/thumbnail.jpg';
+                context.post['images_thumbnail'] = contextPath + '/config/defaults/img/thumbnail.jpg';
             }
             if(context.post['images_banner'] == '') {
-                context.post['images_banner'] = '/publisher/config/defaults/img/banner.jpg';
+                context.post['images_banner'] = contextPath + '/config/defaults/img/banner.jpg';
             }
 
 
@@ -493,12 +496,23 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         if(updateAuthorized) {
             try {
+            var originalArtifact = artifactManager.get(id);
+            var editEnabled = permissions.isEditPermitted(username, originalArtifact.path, um);
+            if(!editEnabled){
+                response.contentType = 'application/json';
+                msg['ok'] = false;
+                msg['message'] = 'Update Failed. Can not update in ' + originalArtifact.lifecycleState + ' state.';
+                response.contentType = "application/json";
+                print(msg);
+                return;
+            }
+
             var modelA = modelManager.getModel(shortName);
             var modelB = modelManager.getModel(shortName);
 
             //Handle any files
             inspectFiles(request,context.post);
-            var originalArtifact = artifactManager.get(id);
+
 
             //Get the original artifact
             if(context.post["images_thumbnail"] == ""){
@@ -977,10 +991,10 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //assigning default thumbnail and banner if not provided.
             if(context.post['images_thumbnail'] == '') {
-                context.post['images_thumbnail'] = '/publisher/config/defaults/img/thumbnail.jpg';
+                context.post['images_thumbnail'] = contextPath + '/config/defaults/img/thumbnail.jpg';
             }
             if(context.post['images_banner'] == '') {
-                context.post['images_banner'] = '/publisher/config/defaults/img/banner.jpg';
+                context.post['images_banner'] = contextPath + '/config/defaults/img/banner.jpg';
             }
 
             if(shortName !="mobileapp"){

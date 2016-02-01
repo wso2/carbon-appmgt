@@ -4,7 +4,7 @@ $('#media').carousel({
 });
 
 $.ajax({
-    url: "/store/apis/enterprise/get-devices",
+    url:  caramel.context +"/apis/enterprise/get-devices",
     dataType: "json"
 }).done(function(data) {
 
@@ -55,7 +55,7 @@ $(".device-image").each(function(index) {
 
     var srcImage = $(this).attr("src");
     if (!urlExists(srcImage)) {
-        $(this).attr("src", "/store/extensions/assets/mobileapp/resources/models/none.png");
+        $(this).attr("src",  caramel.context +"/extensions/assets/mobileapp/resources/models/none.png");
     }
 });
 
@@ -63,7 +63,7 @@ $(".device-image-modal").each(function(index) {
     var srcImage = $(this).attr("src");
 
     if (!urlExists(srcImage)) {
-        $(this).attr("src", "/store/extensions/assets/mobileapp/resources/models/none.png");
+        $(this).attr("src",  caramel.context +"/extensions/assets/mobileapp/resources/models/none.png");
     }
 });
 
@@ -114,7 +114,7 @@ $("#devicesList").on( "click", ".device-image-block-modal", function() {
 
 function performInstalltion(device, app){
     jQuery.ajax({
-        url: "/store/apps/devices/" + encodeURIComponent(device) + "/install",
+        url:  caramel.context +"/apps/devices/" + encodeURIComponent(device) + "/install",
         type: "POST",
         dataType: "json",
         data : {"asset": app}
@@ -151,7 +151,7 @@ function performInstalltionUser(app){
                 $noty.close();
 
                 jQuery.ajax({
-                    url: "/store/apps/user/install",
+                    url:  caramel.context +"/apps/user/install",
                     type: "POST",
                     dataType: "json",
                     data : {"asset": app},

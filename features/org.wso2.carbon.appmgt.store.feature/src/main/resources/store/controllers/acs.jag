@@ -43,8 +43,7 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                 host = relayState.split('/')[2];
                 relayState = relayState.split(host)[1];
             } else {
-                //TODO
-                relayState = '/store';
+                relayState = contextPath;
             }
 
             // validating the signature
@@ -128,7 +127,11 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
 
         } else {
             session.invalidate();
-            response.sendRedirect('/store');
+            var reDirectUrl = contextPath;
+            if(reversProxyEnabled) {
+                reDirectUrl = reverseProxyHost+contextPath;
+            }
+            response.sendRedirect(reDirectUrl);
         }
     }
 

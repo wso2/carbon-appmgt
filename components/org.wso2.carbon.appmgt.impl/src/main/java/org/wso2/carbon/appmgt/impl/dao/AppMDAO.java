@@ -4588,8 +4588,7 @@ public class AppMDAO {
 		String deleteRatingsQuery = "DELETE FROM APM_APP_RATINGS WHERE APP_ID=? ";
 		String deleteSubscriptionQuery = "DELETE FROM APM_SUBSCRIPTION WHERE APP_ID=?";
 		String deleteConsumerQuery = "DELETE FROM APM_API_CONSUMER_APPS WHERE SAML2_SSO_ISSUER=?";
-		String deleteAPIQuery =
-		                        "DELETE FROM APM_APP WHERE APP_PROVIDER=? AND APP_NAME=? AND APP_VERSION=? ";
+		String deleteAPIQuery = "DELETE FROM APM_APP WHERE APP_PROVIDER=? AND APP_NAME=? AND APP_VERSION=? ";
 
 		try {
 			connection = APIMgtDBUtil.getConnection();
@@ -4601,28 +4600,34 @@ public class AppMDAO {
 			prepStmt = connection.prepareStatement(deleteSubscriptionQuery);
 			prepStmt.setInt(1, id);
 			prepStmt.execute();
+			prepStmt.close();
 			// Delete all comments associated with given WebApp
 			prepStmt = connection.prepareStatement(deleteCommentQuery);
 			prepStmt.setInt(1, id);
 			prepStmt.execute();
+			prepStmt.close();
 
 			prepStmt = connection.prepareStatement(deleteRatingsQuery);
 			prepStmt.setInt(1, id);
 			prepStmt.execute();
+			prepStmt.close();
 
 			prepStmt = connection.prepareStatement(deleteLCEventQuery);
 			prepStmt.setInt(1, id);
 			prepStmt.execute();
+			prepStmt.close();
 
 			prepStmt = connection.prepareStatement(deleteConsumerQuery);
 			prepStmt.setString(1, apiId.getApiName() + "-" + apiId.getVersion());
 			prepStmt.execute();
+			prepStmt.close();
 
 			prepStmt = connection.prepareStatement(deleteAPIQuery);
 			prepStmt.setString(1, AppManagerUtil.replaceEmailDomainBack(apiId.getProviderName()));
 			prepStmt.setString(2, apiId.getApiName());
 			prepStmt.setString(3, apiId.getVersion());
 			prepStmt.execute();
+			prepStmt.close();
 
 			connection.commit();
 

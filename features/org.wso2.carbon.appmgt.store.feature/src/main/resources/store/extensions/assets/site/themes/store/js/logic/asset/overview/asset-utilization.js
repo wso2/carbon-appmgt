@@ -5,9 +5,9 @@ $(function () {
 
     var APP_NAME_FIELD = '#subsAppName';
     var TIER_FIELD = '#subsAppTier';
-    var APP_URL = '/store/resources/site/v1/subscription/app';
-    var APP_UNSUBSCRIPTION_URL = '/store/resources/site/v1/unsubscription/app';
-    var APP_SUBSCRIPTION_WORKFLOW = '/store/resources/site/v1/subscription-workflow/app';
+    var API_URL = caramel.context + '/resources/webapp/v1/subscription/app';
+    var API_UNSUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/unsubscription/app';
+    var API_SUBSCRIPTION_WORKFLOW = caramel.context + '/resources/webapp/v1/subscription-workflow/app';
 
     $('#btnSubscribe').on('click', function () {
         if ($(this).attr("disabled") != 'disabled') {

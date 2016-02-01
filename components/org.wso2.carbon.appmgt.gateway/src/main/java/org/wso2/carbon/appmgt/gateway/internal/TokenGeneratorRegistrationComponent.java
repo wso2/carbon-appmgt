@@ -49,7 +49,7 @@ public class TokenGeneratorRegistrationComponent {
         }
         BundleContext bundleContext = componentContext.getBundleContext();
         //register JWT implementation class as a OSGi service
-        bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(),null);
+        bundleContext.registerService(TokenGenerator.class.getName(), new JWTGenerator(), null);
     }
 
     protected void deactivate(ComponentContext componentContext) {

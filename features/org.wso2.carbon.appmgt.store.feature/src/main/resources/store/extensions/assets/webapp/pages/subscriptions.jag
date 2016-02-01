@@ -39,10 +39,18 @@ require('/modules/store.js').exec(function (ctx) {
 	var userData = authenticator.getLoggedInUser();
 
 	//If the user is not logged in, redirect to the login page
-	if (userData == null) {
-		response.sendRedirect('/store');
-		return;
-	}
+    caramel = require('caramel');
+    var contextPath = caramel.configs().context;
+    var reversProxyEnabled = caramel.configs().reverseProxyEnabled;
+    var reverseProxyHost = caramel.configs().reverseProxyHost;
+    var reDirectUrl = contextPath;
+    if(reversProxyEnabled) {
+        reDirectUrl = reverseProxyHost+contextPath;
+    }
+    if (userData == null) {
+        response.sendRedirect(reDirectUrl);
+        return;
+    }
 
 	var apps = subsApi.getAppsWithSubs({user: userData.username});
 

@@ -178,7 +178,7 @@ $(function() {
                         'modal': true,
                         'onClose': function() {
 
-                            location.href = "/store/login";
+                            location.href = caramel.tenantedUrl("/login");
                         }
                     });
 

@@ -15,7 +15,7 @@ function drawGraphs() {
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type + '/getAppsForTenantDomain/',
+        url: caramel.context + '/api/assets/' + operation + '/' + type + '/getAppsForTenantDomain/',
         type: 'POST',
         data: {
             'startDate': from,
@@ -107,7 +107,7 @@ var drawApplicationEndpointGraph = function (parsedResponse, usageByContext) {
                         '<td id="appName">' + parsedResponse[i][0] + '</td>' +
                         '<td id="appVersion">' + parsedResponse[i][1] + '</td>' +
                         '<td>' + parsedResponse[i][2] + '</td>' +
-                        '<td><a  href="/publisher/assets/apps/webapp/" id=' + detailNumber + '>Show Statistics</a>' +
+                        '<td><a  href=caramel.context + "/assets/apps/webapp/" id=' + detailNumber + '>Show Statistics</a>' +
                         '</td></tr>'));
                 detailNumber++;
                 rawNumber++;

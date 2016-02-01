@@ -23,7 +23,7 @@ var deploymentManager = deploymentManagement.cached();
 var server = require('store').server;
 var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
-
+var caramel = require('caramel');
 var log = new Log();
 
 breadcrumbItems = deploymentManager.getAssetData();
@@ -63,7 +63,7 @@ var generateLeftNavJson = function (data, listPartial) {
                     name: "Edit",
                     iconClass: "icon-edit",
                     additionalClasses: (listPartial == "edit-asset" ) ? "active" : null,
-                    url: "/publisher/asset/operations/edit/" + data.shortName + "/"
+                    url: caramel.configs().context + "/asset/operations/edit/" + data.shortName + "/"
                          + data.artifact.id,
                     isEditable: editEnabled
                 },
@@ -71,7 +71,7 @@ var generateLeftNavJson = function (data, listPartial) {
                     name: "Create New Version",
                     iconClass: "icon-file",
                     additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
-                    url: "/publisher/asset/operations/copyapp/" + data.shortName + "/"
+                    url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/"
                          + data.artifact.id
                 }
             ]
@@ -91,7 +91,7 @@ var generateLeftNavJson = function (data, listPartial) {
                     name: "Create New Version",
                     iconClass: "icon-file",
                     additionalClasses: (listPartial == "copy-app" ) ? "active" : null,
-                    url: "/publisher/asset/operations/copyapp/" + data.shortName + "/"
+                    url: caramel.configs().context + "/asset/operations/copyapp/" + data.shortName + "/"
                          + data.artifact.id
                 }
             ]

@@ -22,6 +22,11 @@
         {{#each assets}}
 
             <div class="col-xs-6 col-md-4 col-lg-1-5 app-assets-wrapper type-{{attributes.overview_platform}}">
+                {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
+                    <div class="ribbon-wrapper-orange">
+                        <div class="ribbon-orange">Advertised</div>
+                    </div>
+                {{/compare}}
                 {{#if isSubscribed}}
                     <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
                 {{/if}}
@@ -30,7 +35,15 @@
                 {{/if}}
 
                 <div class="app-assets">
-                    <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">
+                {{#compare "mobileapp" type}}
+                    <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
+                {{else}}
+                    {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
+                        <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{type}}/{{attributes.overview_advertisedAppUuid}}">
+                    {{else}}
+                        <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">
+                    {{/compare}}
+                {{/compare}}
                         <img class="app-assets-icon"
                              src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
                         <div class="app-assets-icon-info">

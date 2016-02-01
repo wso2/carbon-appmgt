@@ -19,6 +19,15 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             },
             sso_sessions = application.get('sso_sessions');
 
+    var caramel = require('caramel');
+    var contextPath = caramel.configs().context;
+    var reversProxyEnabled = caramel.configs().reverseProxyEnabled;
+    var reverseProxyHost = caramel.configs().reverseProxyHost;
+
+    if (reversProxyEnabled) {
+        contextPath = reverseProxyHost + contextPath;
+    }
+
     if (!sso_sessions) {
         application.put('sso_sessions', {});
         sso_sessions = application.get('sso_sessions');
@@ -72,7 +81,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                         	if(role){
                         		var user = require('store').user;
 					log.debug('user is set :::' + sessionObj.loggedInUser);
-					response.sendRedirect('/publisher');
+                                response.sendRedirect(contextPath);
 
                         	} else {
 					log.warn('User '+sessionObj.loggedInUser+' does not have permission to access the publisher application.Make sure the user has the publisher role.');
@@ -85,7 +94,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 
         } else {
             session.invalidate();
-            response.sendRedirect('/publisher');
+            response.sendRedirect(contextPath);
         }
     }
 

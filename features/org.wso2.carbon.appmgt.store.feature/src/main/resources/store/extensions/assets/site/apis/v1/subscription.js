@@ -19,7 +19,7 @@ var resource = (function () {
     var addSubscription = function (context) {
 
         if (authenticator.getLoggedInUser() == null) {
-            response.sendRedirect("/store/login");
+            response.sendRedirect(caramel.tenantedUrl('/login'));
             return;
         }
 

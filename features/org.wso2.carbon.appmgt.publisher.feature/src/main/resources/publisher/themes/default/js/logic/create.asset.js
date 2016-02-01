@@ -7,7 +7,7 @@ $(function() {
 	//var id=$('#meta-asset-id').html();
 	var type = $('#meta-asset-type').val();
 
-	var TAG_API_URL = '/publisher/api/tag/';
+	var TAG_API_URL = caramel.context + '/api/tag/';
 	var tagType = $('#meta-asset-type').val() + 's';
 
 	var tagUrl = TAG_API_URL + tagType;
@@ -45,7 +45,7 @@ $(function() {
 
 		//check if the asset name available as user types in
 		$.ajax({
-			url : '/publisher/api/validations/assets/' + type + '/overview_name/' + assetName,
+			url : caramel.context + '/api/validations/assets/' + type + '/overview_name/' + assetName,
 			type : 'GET',
 			success : function(response) {
 
@@ -104,7 +104,7 @@ $(function() {
 				//Check if the asset was added
 				if (result.ok) {
 					showAlert('Asset added successfully.', 'success');
-					window.location = '/publisher/assets/' + type + '/';
+					window.location = caramel.context + '/assets/' + type + '/';
 				} else {
 					var msg = processErrorReport(result.report);
 					showAlert(msg, 'error');
@@ -117,7 +117,7 @@ $(function() {
 				 },
 		 
         // other available options: 
-        url:       '/publisher/asset/' + type,         // override for form's 'action' attribute 
+        url:       caramel.context + '/asset/' + type,         // override for form's 'action' attribute
         type : 'POST'      // 'get' or 'post', override for form's 'method' attribute 
         //dataType:  null        // 'xml', 'script', or 'json' (expected server response type) 
         //clearForm: true        // clear all form fields after successful submit 
