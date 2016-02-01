@@ -86,7 +86,7 @@ $(function() {
 			},
 			success : function(response) {
 
-				var result = JSON.parse(response);
+				var result = response;
 
 				if (result.ok) {
 					var asset = result.asset;

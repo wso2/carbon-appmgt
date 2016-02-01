@@ -22,6 +22,7 @@ require('/modules/store.js').exec(function (ctx) {
             aid = asset.path;
         }
         store.rate(aid, request.getParameter('value'));
+        response.contentType = "application/json";
         print(store.rating(aid));
         return;
     }

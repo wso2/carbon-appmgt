@@ -66,7 +66,7 @@ function insertPolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
             "policyGroupDesc" :policyGroupDesc
         },
         success: function (data) {
-            editedPolicyGroup = JSON.parse(data).response.id;
+            editedPolicyGroup = data.response.id;
             var policyPartialsMapping = [];
             
             for(var i=0; i < appliedXacmlRules.length; i++){

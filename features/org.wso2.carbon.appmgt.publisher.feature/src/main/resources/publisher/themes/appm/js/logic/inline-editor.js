@@ -30,8 +30,8 @@ function loadDefaultTinyMCEContent() {
 			type:'POST',
 			data :{'provider':provider,'apiName':apiName,'version':version,'docName':docName},
 			success : function(response) {
-				 if(JSON.parse(response).error == false){
-					 var doc = JSON.parse(response).doc;
+				 if(response.error == false){
+					 var doc = response.doc;
 					 var provider = doc.provider;
 					 var docName = provider.docName;
 	                var apiName = provider.apiName;
@@ -62,7 +62,7 @@ function saveContent(provider, apiName, apiVersion, docName, mode) {
 		//dataType:json,
 		data :{'provider':provider,'apiName':apiName,'version':apiVersion,'docName':docName,'content':contentDoc},
 		success : function(response) {
-			 if(JSON.parse(response).error == false){
+			 if(response.error == false){
 
 				 if (mode == "save"){
                      window.close();

@@ -23,8 +23,7 @@ $(function() {
 		url : tagUrl,
 		type : 'GET',
 		success : function(response) {
-			var tags = JSON.parse(response);
-			$(TAG_CONTAINER).tokenInput(tags, {
+			$(TAG_CONTAINER).tokenInput(response, {
 				theme : THEME,
 				allowFreeTagging : true
 			});
@@ -100,7 +99,7 @@ $(function() {
       // data : {"tags":tags},
         success:       function(response) {
 
-				var result = JSON.parse(response);
+				var result = response;
 
 				//Check if the asset was added
 				if (result.ok) {

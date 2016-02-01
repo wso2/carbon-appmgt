@@ -47,7 +47,7 @@ function drawGraphs() {
         },
         success: function (response) {
 
-            usageByContext = JSON.parse(response);
+            usageByContext = response;
             $('#spinner').hide();
 
         },
@@ -83,9 +83,7 @@ function drawGraphs() {
 }
 
 
-var drawSubscribedAPIsByUsers = function (response, usageByContext) {
-
-    var parsedResponse = JSON.parse(response);
+var drawSubscribedAPIsByUsers = function (parsedResponse, usageByContext) {
 
     var substringMatcher = function (strs) {
         return function findMatches(q, cb) {

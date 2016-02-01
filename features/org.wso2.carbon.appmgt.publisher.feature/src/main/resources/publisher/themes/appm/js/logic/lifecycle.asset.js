@@ -151,7 +151,7 @@ $(function() {
 				if (element) {
 					var paper = new Raphael('canvas', 600, 700);
 				
-					var statInfo = JSON.parse(response);
+					var statInfo = response;
 					sugyama.init(statInfo.lifecycle, paper);
 					var isAsynch = statInfo.asynch;
 					
@@ -215,7 +215,7 @@ $(function() {
 			type : 'GET',
 			success : function(response) {
 				//Convert the response to a JSON object
-				var statInfo = JSON.parse(response);
+				var statInfo = response;
 				var subscribed = statInfo.subscribed;
 				var state= statInfo.state;
 				if((state == 'Published' && subscribed && action == 'Unpublish') || (state == 'Deprecated' && subscribed && action == 'Retire')){
@@ -237,8 +237,8 @@ $(function() {
 								url : caramel.context + '/api/lifecycle/' + asset + '/' + id,
 								type : 'GET',
 								success : function(response) {
-									//Convert the response to a JSON object
-									var statInfo = JSON.parse(response);
+									// Response is a JSON object
+									var statInfo = response;
 
 									$('#state').html(statInfo.state);
 									$('#view-lifecyclestate').html(statInfo.state);
@@ -344,7 +344,7 @@ $(function() {
 
 				var out = '<ul>';
 
-				var obj = JSON.parse(response);
+				var obj = response;
 
 				for (var index in obj.checkListItems) {
 
@@ -378,9 +378,7 @@ $(function() {
 			url : path,
 			type : 'GET',
 			success : function(response) {
-				//console.log(response);
-				var obj = JSON.parse(response);
-				var out = createHistoryEntry(obj.item);
+				var out = createHistoryEntry(response.item);
 				$('#lc-history').html(out);
 			},
 			error : function(response) {

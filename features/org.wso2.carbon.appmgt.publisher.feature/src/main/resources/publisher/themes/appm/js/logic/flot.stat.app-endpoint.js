@@ -36,9 +36,7 @@ function drawGraphs() {
     });
 }
 
-var drawApplicationEndpointGraph = function (response, usageByContext) {
-
-    var parsedResponse = JSON.parse(response);
+var drawApplicationEndpointGraph = function (parsedResponse, usageByContext) {
 
     var substringMatcher = function (strs) {
         return function findMatches(q, cb) {

@@ -179,9 +179,9 @@ $(function(){
               url:API_SUBSCRIPTION_WORKFLOW,
               type:'POST',
               success:function(response){
-           	   if(JSON.parse(response).status == false){
+           	   if(response.status == false){
            		showIndividualSubscriptionMessage(false,'Subscription Approval','your request to subscribe the application is awaiting administrator approval');
-           	   }else if(JSON.parse(response).status == true){
+           	   }else if(response.status == true){
            		showIndividualSubscriptionMessage(true,'Subscription Successful','Congratulations! You have successfully subscribed to the ' +'<b>"' + apiName + '</b>"' );
            	   }else{
         		console.info('Error occured in subscribe to web app: ');
@@ -245,7 +245,7 @@ $(function(){
            type:'POST',
            data:subscription,
            success:function(response){
-        	   if(JSON.parse(response).error == false){
+        	   if(response.error == false){
                	  	console.info('Successfully unsubscribed to web app: '+subscription.apiName);
                 	//alert('Succsessfully unsubscribed to the '+subscription.apiName+' Web App.');
 

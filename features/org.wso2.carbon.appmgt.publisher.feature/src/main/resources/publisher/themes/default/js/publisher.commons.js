@@ -87,12 +87,8 @@ $(document).ready(function() {
 			url : path,
 			type : 'GET',
 			success : function(response) {
-				// alert(response);
-
-				var versionList = JSON.parse(response);
-
 				//Check if the version entered by the user is an existing one
-				var existingVersion = checkIfExisting(versionList, userProvidedVersion);
+				var existingVersion = checkIfExisting(response, userProvidedVersion);
 
 				//Display a message to the user indicating the version exists
 				if (existingVersion) {
@@ -159,8 +155,7 @@ $(document).ready(function() {
 			success : function(response) {
 				$('#modal-redirect').modal('show');
 				setTimeout(function() {
-					var newVersionDetails = JSON.parse(response);
-					window.location = newVersionDetails.url;
+					window.location = response.url;
 				}, 2000);
 
 			},

@@ -119,6 +119,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
     
     function createResponseObject(object) {
+        response.contentType = "application/json";
         if (object !== null) {
             return {'success': true, 'response': object};
         } else {

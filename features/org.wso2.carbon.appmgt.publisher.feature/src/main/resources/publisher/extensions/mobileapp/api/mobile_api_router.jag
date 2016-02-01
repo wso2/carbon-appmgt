@@ -39,7 +39,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         map.put('overview_name', list);
 
         var versionList = artifactManager.manager.findGenericArtifacts(map);
-
+        response.contentType = "application/json";
         if(versionList.length > 0){
 
             var versionList = artifactManager.search(searchOptions, paging);

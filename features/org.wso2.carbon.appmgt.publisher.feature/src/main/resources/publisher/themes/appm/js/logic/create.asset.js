@@ -26,8 +26,7 @@ $(function() {
 		url : tagUrl,
 		type : 'GET',
 		success : function(response) {
-			var tags = JSON.parse(response);
-			$(TAG_CONTAINER).tokenInput(tags, {
+			$(TAG_CONTAINER).tokenInput(response, {
 				theme : THEME,
 				allowFreeTagging : true
 			});
@@ -265,7 +264,7 @@ $(function() {
 			success: function(response) {
                 var result = {};
                 try {
-                    result = JSON.parse(response);
+                    result = (typeof response == "string") ? JSON.parse(response) : response;
                 }
                 catch (e) {
                     //It always returns a malformed json when the session is expired
@@ -418,8 +417,8 @@ $(function() {
           type: 'GET',
           contentType: 'application/json',
           success: function(response) {
-
-        	  var providers_data = JSON.parse(response);
+        	 
+        	  var providers_data = response;
               	  if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
 			loadProviders(providers_data.response);
               	  } else {
@@ -453,7 +452,7 @@ $(function() {
              		type: 'GET',
              		contentType: 'application/json',
              		success: function(response) {
-           	  		var claims = JSON.parse(response).response;
+           	  		var claims = response.response;
            	 		for(var i=0;i<claims.length;i++){
            		 		var y = claims[i];
            		 		$("#claims").append($("<option></option>").val(y).text(y));

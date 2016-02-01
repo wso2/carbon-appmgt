@@ -89,7 +89,7 @@ $(document).ready(function() {
 			success : function(response) {
 				// alert(response);
 
-				var versionList = JSON.parse(response);
+				var versionList = response;
 
 				//Check if the version entered by the user is an existing one
 				var existingVersion = checkIfExisting(versionList, userProvidedVersion);
@@ -186,7 +186,7 @@ $(document).ready(function() {
 			success : function(response) {
 				$('#modal-redirect').modal('show');
 				setTimeout(function() {
-					var newVersionDetails = JSON.parse(response);
+					var newVersionDetails = response;
 					window.location = newVersionDetails.url;
 				}, 2000);
 

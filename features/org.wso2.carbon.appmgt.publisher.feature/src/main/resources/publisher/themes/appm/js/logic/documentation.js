@@ -267,7 +267,7 @@ var removeDocumentation = function (provider, apiName, version, docName, docType
 	 		type:'POST',
 	 		data :{'provider':provider,'apiName':apiName,'version':version,'docName':docName,'docType':docType},
 	 		success : function(response) {
-	 			if(JSON.parse(response).error == false){
+	 			if(response.error == false){
 	 				$('#messageModal').modal('hide');
 	                $('#' + apiName + '-' + docName.replace(/ /g,'__')).remove();
 	                if ($('#docTable tr').length == 1) {

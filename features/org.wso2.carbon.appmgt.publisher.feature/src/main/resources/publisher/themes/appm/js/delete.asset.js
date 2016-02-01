@@ -32,6 +32,24 @@ $(function () {
                         showDeleteModel(result.message, result.message, type);
                     } else {
                         showDeleteModel(result.message, result.message, type);
+             var confirmDel = confirm("Are you sure you want to delete this app?");
+            if (confirmDel == true) {
+                $.ajax({
+                    url: '/publisher/api/asset/delete/' + type + '/' + id,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function(response) {
+                        var result = response;
+                        if (result.isDeleted) {
+                            showDeleteModel("Successfully deleted the Asset","Deleted Successfully",type);
+                        } else if(result.isDeleted == false){
+                            showDeleteModel("Cannot Delete. Asset is already subscribed.","Asset Subscribed",type);
+                        }else{
+                            showDeleteModel("Asset is not successfully deleted","Delete Failed",type);
+                        }
+                    },
+                    error: function(response) {
+                        showDeleteModel("Asset is not successfully deleted","Delete Failed",type);
                     }
                 },
                 error: function (response) {

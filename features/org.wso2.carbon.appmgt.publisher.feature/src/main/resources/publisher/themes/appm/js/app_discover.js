@@ -48,7 +48,7 @@ $(function(){
                "policyGroupDesc" :policyGroupDesc
            },
            success: function (data) {
-               var editedPolicyGroupResp = JSON.parse(data);
+               var editedPolicyGroupResp = data;
                if(editedPolicyGroupResp.success) {
                 setupPolicyGroups(postData, editedPolicyGroupResp.response.id);
                 onSuccess(postData);

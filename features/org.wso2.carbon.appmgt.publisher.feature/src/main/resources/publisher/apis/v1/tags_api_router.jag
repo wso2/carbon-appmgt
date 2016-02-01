@@ -38,7 +38,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}', function 
     tagManager.process(tags);
 
     tags = tagManager.get(type);
-
+    response.contentType = "application/json";
     print(tags);
 });
 
@@ -66,7 +66,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}/{id}', func
     for (var index in tags) {
         tagArray.push({id: counter, name: tags[index]});
     }
-
+    response.contentType = "application/json";
     print(tagArray);
 });
 
@@ -105,7 +105,7 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     //If tags are not specified then do nothing
     if (tags.length == 0) {
-
+        response.contentType = "application/json";
         print(msg);
         return;
 
@@ -113,7 +113,7 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     //Apply the tags
     rxtManager.registry.tag(artifact.path, tags);
-
+    response.contentType = "application/json";
     print(msg);
 });
 
@@ -144,7 +144,7 @@ routeManager.register('DELETE', 'publisher', '/publisher/api/tag/{type}/{id}/{ta
 
 
     rxtManager.registry.untag(artifact.path, tag);
-
+    response.contentType = "application/json";
     print(msg);
 });
 

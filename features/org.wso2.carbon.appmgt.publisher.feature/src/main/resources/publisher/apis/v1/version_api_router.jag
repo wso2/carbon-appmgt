@@ -36,6 +36,7 @@ routeManager.register('GET','publisher','/publisher/api/version/{type}/{id}',fun
         //Only try to get the version list if the artifact is found
         if(artifact){
             var versionList=artifactManager.getAllAssetVersions(artifact.attributes.overview_name);
+            response.contentType = "application/json";
             print(versionList);
         }
         else{
@@ -98,7 +99,7 @@ routeManager.register('POST','publisher','/publisher/api/version/{type}/{id}/{ve
         msg['ok']=true;
         msg['id']=newId.value;
         msg['url']= contextPath + '/asset/'+shortName+'/'+msg.id;
-
+        response.contentType = "application/json";
         print(msg);
 
     }catch(e){

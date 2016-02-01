@@ -86,7 +86,7 @@ $('#txtMarket').on("change",function() {
             $('#form-asset-create').ajaxForm(function(data) { 
             
             	try{
-            		data = JSON.parse(data);
+                    data = (typeof data == "string") ? JSON.parse(data) : data;
             	}catch(e){
             		window.location.replace(caramel.context +"/assets/mobileapp/");
                		return;

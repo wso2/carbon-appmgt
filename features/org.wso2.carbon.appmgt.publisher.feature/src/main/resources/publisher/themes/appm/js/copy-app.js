@@ -20,7 +20,7 @@ $(function() {
             type: 'GET',
             contentType: 'application/json',
             success: function(response) {
-                var providers_data = JSON.parse(response);
+                var providers_data = response;
                 if ((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
                     loadSelectedProviders(providers_data.response);
                 } else {
@@ -38,7 +38,7 @@ $(function() {
             type: 'GET',
             contentType: 'application/json',
             success: function(response) {
-                var providers_data = JSON.parse(response);
+                var providers_data = response;
                 if ((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
                     loadProviders(providers_data.response);
                 } else {
@@ -76,7 +76,7 @@ $(function() {
             contentType: 'application/json',
             success: function(response) {
 
-                var provider_data = JSON.parse(response).response;
+                var provider_data = response.response;
                 var selected_claims = provider_data.claims;
                 for (n = 0; n < selected_claims.length; n++) {
                     var claim = selected_claims[n];
@@ -136,7 +136,7 @@ $(function() {
             var options = {
                 success: function (response) {
 
-                    var result = JSON.parse(response);
+                    var result = response;
 
                     //Check if the asset was added
                     if (result.ok) {
@@ -252,7 +252,7 @@ $(function() {
         contentType: 'application/json',
         success: function(response) {
 
-            var providers_data = JSON.parse(response);
+            var providers_data = response;
             if ((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
                 loadProviders(providers_data.response);
             } else {
@@ -283,7 +283,7 @@ $(function() {
             type: 'GET',
             contentType: 'application/json',
             success: function(response) {
-                var claims = JSON.parse(response).response;
+                var claims = response.response;
                 for (var i = 0; i < claims.length; i++) {
                     var y = claims[i];
                     $("#claims").append($("<option></option>").val(y).text(y));
