@@ -52,9 +52,7 @@ public abstract class ISBaseSAMLSSOConfigurator {
             dto.setNameIDFormat(dto.getNameIDFormat().replace(":", "/"));
         }
 
-        if (provider.getLogoutUrl() != null && !provider.getLogoutUrl().trim().isEmpty()) {
-            dto.setDoSingleLogout(true);
-        }
+        dto.setDoSingleLogout(true);
         dto.setLogoutURL(provider.getLogoutUrl());
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);

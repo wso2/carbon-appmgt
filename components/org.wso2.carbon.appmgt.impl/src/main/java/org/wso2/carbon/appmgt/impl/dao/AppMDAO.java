@@ -2367,45 +2367,50 @@ public class AppMDAO {
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, Long> GetSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
+    public Map<String, Long> getSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
             throws AppManagementException {
-
-
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-
+        String sqlQuery;
         Map<String, Long> subscriptions = new TreeMap<String, Long>();
 
         try {
             connection = APIMgtDBUtil.getConnection();
-
-
             if ("__all_providers__".equals(providerName)) {
-                String sqlQuery =
-                        "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, " +
-                                "COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID,API.UUID AS uuid " +
-                                "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, " +
-                                "APM_APPLICATION  APP " +
-                                "WHERE API.APP_ID = SUB.APP_ID " +
-                                "AND SUB.APPLICATION_ID = APP.APPLICATION_ID " +
-                                "AND APP.SUBSCRIBER_ID = SUBR.SUBSCRIBER_ID " +
-                                "AND SUBR.TENANT_ID = ? " +
-                                "AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " +
-                                "GROUP BY API.APP_NAME, API.APP_PROVIDER, APP_VERSION ";
+                sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, "
+                        + "API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID "
+                        + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
+                        + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
+                        + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
+                        + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? "
+                        + "AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                    sqlQuery += "? AND ? ";
+                } else {
+                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                            + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                }
+                sqlQuery += "GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID";
                 ps = connection.prepareStatement(sqlQuery);
                 ps.setInt(1, tenantId);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
             } else {
-                String sqlQuery = "SELECT API.APP_NAME, APP_VERSION, API.APP_PROVIDER, " +
-                        "COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, API.UUID AS uuid " +
-                        "FROM APM_SUBSCRIPTION SUB, APM_APP API " +
-                        "WHERE API.APP_PROVIDER = ? AND API.APP_ID = SUB.APP_ID " +
-                        "AND SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " +
-                        "GROUP BY API.APP_NAME, APP_VERSION, API.APP_PROVIDER ";
+                sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
+                        + "AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM "
+                        + "APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? "
+                        + "AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+
+                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                    sqlQuery += "? AND ? ";
+                } else {
+                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                            + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                }
+                sqlQuery += "GROUP BY API.APP_NAME,APP_VERSION,API.APP_PROVIDER,API.UUID ";
                 ps = connection.prepareStatement(sqlQuery);
-                ps.setString(1,providerName);
+                ps.setString(1, providerName);
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
             }
@@ -2415,19 +2420,14 @@ public class AppMDAO {
             if (result == null) {
                 return subscriptions;
             }
-            APIIdentifier appApiIdentifier;
 
             while (result.next()) {
                 String appName = result.getString("APP_NAME");
-
                 String appProvider = result.getString("APP_PROVIDER");
                 String appVersion = result.getString("APP_VERSION");
                 String appuuid = result.getString("uuid");
-
                 long count = result.getLong("SUB_ID");
-                appApiIdentifier = new APIIdentifier(appProvider, appName, appVersion);
-				String key = appName + "/" + appVersion + "&" + appuuid;
-
+                String key = appName + "/" + appVersion + "&" + appuuid;
                 subscriptions.put(key, count);
             }
         } catch (SQLException e) {
@@ -2438,6 +2438,7 @@ public class AppMDAO {
         }
         return subscriptions;
     }
+
 
 
     /**
@@ -6467,7 +6468,7 @@ public class AppMDAO {
                 query = "SELECT * FROM (SELECT HIT.UUID ,COUNT(*) AS HIT_COUNT,UPPER(APP_NAME) "
                         + "AS APP_NAME, CONTEXT FROM APM_APP_HITS HIT "
                         + "WHERE HIT.USER_ID=? "
-                        + "GROUP BY HIT.UUID UNION ALL "
+                        + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
                         + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? ))  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
@@ -6563,11 +6564,10 @@ public class AppMDAO {
                     + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 
             if (bamConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrivealBamQuery = "SELECT UUID, COUNT(*) AS HIT_COUNT, UPPER(APP_NAME) AS "
-                        + "APP_NAME, CONTEXT FROM APM_APP_HITS WHERE USER_ID=? "
-                        + "GROUP BY UUID "
-                        + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC";
+                uuidRetrivealBamQuery = "SELECT * FROM(SELECT UUID, COUNT(*) AS HIT_COUNT, "
+                        + "UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP_HITS WHERE USER_ID=? "
+                        + "GROUP BY UUID,APP_NAME,VERSION "
+                        + "ORDER BY HIT_COUNT DESC,APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ?";
             }
         } catch (SQLException ex) {
             throw new AppManagementException(
@@ -6590,8 +6590,8 @@ public class AppMDAO {
             uuidRetrievalQuery = uuidRetrievalAppmQuery.substring(0, uuidRetrievalAppmQuery.length() - 1);
 
             if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrievalQuery += ")  WHERE ROWNUM >= ? AND ROWNUM <= ? "
-                        + "ORDER BY APP_NAME ASC";
+                uuidRetrievalQuery = "SELECT * FROM (" + uuidRetrievalQuery
+                        + ") ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
             } else {
                 uuidRetrievalQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
             }

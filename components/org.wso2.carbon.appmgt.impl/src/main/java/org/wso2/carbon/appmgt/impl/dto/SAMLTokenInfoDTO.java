@@ -26,6 +26,17 @@ public class SAMLTokenInfoDTO implements Serializable{
 
     private DateTime notOnOrAfter;
 
+    private String sessionIndex;
+
+    public String getSessionIndex() {
+        return sessionIndex;
+    }
+
+    public void setSessionIndex(String sessionIndex) {
+        this.sessionIndex = sessionIndex;
+    }
+
+
     public void setEncodedSamlToken(String encodedSamlToken) {
         this.encodedSamlToken = encodedSamlToken;
     }

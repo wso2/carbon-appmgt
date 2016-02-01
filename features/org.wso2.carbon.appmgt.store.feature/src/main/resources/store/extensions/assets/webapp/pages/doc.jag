@@ -28,7 +28,10 @@ if ("".equals(username)) {
 
 var APIProviderImplObj = new APIProviderImpl(username);
 
-var content = APIProviderImplObj.getDocumentationContent(apiIdentifierObj,docName);
+var find = '%20';
+var regExp = new RegExp(find, 'g');
+var docNameWithoutSpace = docName.replace(regExp, ' ');
+var content = APIProviderImplObj.getDocumentationContent(apiIdentifierObj, docNameWithoutSpace);
 
 var docData = {};
 docData.webappName = webappName;
