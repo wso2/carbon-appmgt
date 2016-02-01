@@ -65,6 +65,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     for (var index in tags) {
         tagArray.push({id: counter, name: tags[index]});
+        counter++;
     }
     response.contentType = "application/json";
     print(tagArray);
