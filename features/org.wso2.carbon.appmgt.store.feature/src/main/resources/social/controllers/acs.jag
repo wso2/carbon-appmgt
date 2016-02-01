@@ -33,6 +33,13 @@
                 IDP_ALIAS: configs.ssoConfiguration.identityAlias
             },
             sso_sessions = application.get('sso_sessions');
+            contextPath = caramel.configs().context,
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost;
+
+    if(reversProxyEnabled) {
+        relayState = reverseProxyHost+relayState;
+    }
 
     if (!sso_sessions) {
         application.put('sso_sessions', {});
@@ -70,7 +77,11 @@
 
         } else {
             session.invalidate();
-            response.sendRedirect('/social');
+            var redirectURl = contextPath;
+            if(reversProxyEnabled) {
+                var redirectURl = reverseProxyHost+contextPath;
+            }
+            response.sendRedirect(redirectURl);
         }
     }
 

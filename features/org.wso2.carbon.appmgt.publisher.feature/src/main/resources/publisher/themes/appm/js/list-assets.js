@@ -39,7 +39,7 @@ $(".btn-action").click(function (e) {
 		showCommentModel("Reason for Rejection", action, app, "webapp");
 	} else {
 		jQuery.ajax({
-			url: '/publisher/api/lifecycle/' + action + '/webapp/' + app,
+			url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
 			type: 'PUT',
 			success: function (data, text) {
 				var msg = data.messages[0];
@@ -74,7 +74,7 @@ $(".btn-reject-proceed").click(function () {
 	var app = $("#webappName").val();
 	var action = $("#action").val();
 	jQuery.ajax({
-		url: '/publisher/api/lifecycle/' + action + '/webapp/' + app,
+		url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
 		type: "PUT",
 		data: JSON.stringify({comment: comment}),
 		success: function (msg) {
@@ -87,7 +87,7 @@ $(".btn-reject-proceed").click(function () {
 
 $(".btn-deploySample").click(function (e) {
 	jQuery.ajax({
-		url: '/publisher/api/asset/webapp/deploySample',
+		url: caramel.context + '/api/asset/webapp/deploySample',
 		type: "PUT",
 		dataType: "json",
 		async: false,
@@ -160,7 +160,7 @@ var showMessageModel = function (msg, head, type) {
 	$('#messageModal2 a.btn-other').html('OK');
 	$('#messageModal2').modal();
 	$("#messageModal2").on('hidden.bs.modal', function () {
-		window.location = '/publisher/assets/' + type + '/';
+		window.location = caramel.context + '/assets/' + type + '/';
 	});
 
 };
@@ -172,7 +172,7 @@ var showCommentModel = function (head, action, app, type) {
 	$('#messageModal3 #action').val(action);
 	$('#messageModal3').modal();
 	$("#messageModal3").on('hidden.bs.modal', function () {
-		window.location = '/publisher/assets/' + type + '/';
+		window.location = caramel.context + '/assets/' + type + '/';
 	});
 };
 
@@ -193,7 +193,7 @@ function isPublishedToExternalStore(action, provider, name, version) {
 
         $.ajax({
             async: false,
-            url: '/publisher/api/asset/get/external/stores/webapp/' + provider + '/' + name + '/' + version,
+            url: caramel.context + '/api/asset/get/external/stores/webapp/' + provider + '/' + name + '/' + version,
             type: 'GET',
             processData: true,
             success: function (response) {

@@ -54,7 +54,7 @@ function bindEventHandlersForLCActionButtons(rows) {
 function promoteLifeCycleAction(assetUUID, lcAction, comment, triggeredButton) {
     var allButtons = triggeredButton.closest('td').find('button');
     $.ajax({
-        url: '/publisher/api/lifecycle/' + lcAction + '/mobileapp/' + assetUUID,
+        url: caramel.context +'/api/lifecycle/' + lcAction + '/mobileapp/' + assetUUID,
         type: 'PUT',
         contentType: 'application/json',
         data: (comment) ? JSON.stringify({comment: comment}) : "",
@@ -165,7 +165,7 @@ $(document).ready(function () {
     var rows = $('#apps-listing-table').find('tbody').find('tr');
     // bind click event handler for each row
     rows.on('click', function (e) {
-        window.location = "/publisher/asset/mobileapp/" + $(e.target).closest('tr').data('row');
+        window.location = caramel.context +"/asset/mobileapp/" + $(e.target).closest('tr').data('row');
     });
     // bind click event handler for app download button
     rows.find('[data-column="download"]').on('click', function (e) {
@@ -223,7 +223,7 @@ $(document).ready(function () {
         var appDeleteCancelButton = appDeleteConfirmModal.find('[name="app-delete-cancel-btn"]');
         appDeleteConfirmButton.one('click', function (e) {
             $.ajax({
-                url: '/publisher/api/mobile/delete/' + uuid,
+                url: caramel.context +'/api/mobile/delete/' + uuid,
                 type: "DELETE",
                 beforeSend: function (xhr) {
                     appDeleteConfirmModal.modal({backdrop: 'static', keyboard: false});

@@ -28,7 +28,7 @@ $('#application-tab a').click(function(e) {
 $("#txtName").change(function() {
     $.ajax({
         type: "GET",
-        url: "/publisher/api/mobile/isexist",
+        url: caramel.context +"/api/mobile/isexist",
         data: {name: $(this).val()},
         success: function (data) {
             var data = JSON.parse(data);
@@ -52,7 +52,7 @@ $("#txtName").change(function() {
 });
 
 
-$('#txtVisibility').tokenInput('/publisher/api/lifecycle/information/meta/webapp/roles', {
+$('#txtVisibility').tokenInput(caramel.context +'/api/lifecycle/information/meta/webapp/roles', {
     theme: 'facebook',
     preventDuplicates: true,
     hintText: "Type in a user role"
@@ -141,7 +141,7 @@ $('#btn-create-asset-mobile').click(function(e) {
 
 	$.ajax({
       type: "POST",
-      url: "/publisher/api/asset/mobileapp",
+      url: caramel.context +"/api/asset/mobileapp",
       contentType: "application/json",
       data: JSON.stringify(params),
       success: function () {
@@ -187,7 +187,7 @@ $(document).ready(function(){
             	try{
             		data = JSON.parse(data);
             	}catch(e){
-            		window.location.replace("/publisher/assets/mobileapp/");
+            		window.location.replace(caramel.context +"/assets/mobileapp/");
                		return;
             	}
 
@@ -205,7 +205,7 @@ $(document).ready(function(){
 
 					  }
 					}
-               		//window.location.replace("/publisher/assets/mobileapp/");
+               		//window.location.replace("caramel.context +/assets/mobileapp/");
 
                		 noty({
 					    text: '<strong>Validation Failed!</strong> <br />' + validationErrors,
@@ -218,7 +218,7 @@ $(document).ready(function(){
 
 
                	}else{
-               		window.location.replace("/publisher/assets/mobileapp/");
+               		window.location.replace(caramel.context +"/assets/mobileapp/");
                	}
 
             });
@@ -256,7 +256,7 @@ $(document).ready(function(){
                 }
                 $("#modal-upload-progress").hide();
 
-              //  window.location.replace("/publisher/assets/mobileapp/");
+              //  window.location.replace(caramel.context +"/assets/mobileapp/");
 
 
                 noty({

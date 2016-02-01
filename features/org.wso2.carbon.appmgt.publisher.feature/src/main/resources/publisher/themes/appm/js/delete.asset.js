@@ -21,7 +21,7 @@ $(function () {
         var confirmDel = confirm("Are you sure you want to delete this app?");
         if (confirmDel == true) {
             $.ajax({
-                url: '/publisher/api/asset/delete/' + type + '/' + id,
+                url: caramel.context + '/api/asset/delete/' + type + '/' + id,
                 type: 'POST',
                 contentType: 'application/json',
                 success: function (response) {

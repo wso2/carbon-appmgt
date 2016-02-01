@@ -11,7 +11,7 @@ $(function(){
 
         $.ajax({
             type: 'POST',
-            url: '/store/apis/user/login',
+            url: caramel.context +'/apis/user/login',
             data: JSON.stringify({
             	 username: username,
                  password: password

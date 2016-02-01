@@ -14,7 +14,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
         ],
         "iDisplayLength": 5,
         "bStateSave": false,
-        "sAjaxSource": "/store/apis/enterprise/get-all-roles",
+        "sAjaxSource": caramel.context + "/apis/enterprise/get-all-roles",
         "oTableTools": {
             "aButtons": [
                 "copy",
@@ -48,7 +48,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
         ],
         "iDisplayLength": 5,
         "bStateSave": false,
-        "sAjaxSource": "/store/apis/enterprise/get-all-users",
+        "sAjaxSource": caramel.context + "/apis/enterprise/get-all-users",
         "oTableTools": {
             "aButtons": [
                 "copy",
@@ -165,7 +165,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
                         $.ajax({
                             type: "POST",
-                            url: "/store/apis/enterprise/perform/install/role",
+                            url: caramel.context + "/apis/enterprise/perform/install/role",
                             data: { app: selectedApp, data:  rolesSelected }
                         })
                             .done(function( msg ) {
@@ -234,7 +234,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
                         $.ajax({
                             type: "POST",
-                            url: "/store/apis/enterprise/perform/uninstall/role",
+                            url: caramel.context + "/apis/enterprise/perform/uninstall/role",
                             data: { app: selectedApp, data:  rolesSelected }
                         })
                             .done(function( msg ) {
@@ -303,7 +303,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
                         $.ajax({
                             type: "POST",
-                            url: "/store/apis/enterprise/perform/install/user",
+                            url: caramel.context + "/apis/enterprise/perform/install/user",
                             data: { app: selectedApp, data:  usersSelected }
                         })
                             .done(function( msg ) {
@@ -370,7 +370,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
 
                         $.ajax({
                             type: "POST",
-                            url: "/store/apis/enterprise/perform/uninstall/user",
+                            url: caramel.context + "/apis/enterprise/perform/uninstall/user",
                             data: { app: selectedApp, data:  usersSelected }
                         })
                             .done(function( msg ) {

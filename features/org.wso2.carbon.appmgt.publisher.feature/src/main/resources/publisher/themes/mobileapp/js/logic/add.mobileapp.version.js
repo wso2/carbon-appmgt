@@ -161,7 +161,7 @@ function gotoWizardStep(step) {
             data[inputElement.attr('name')] = inputElement.val();
         }
         $.ajax({
-            url: '/publisher/api/validate/mobileapp/form/name/copyapp',
+            url: caramel.context + '/api/validate/mobileapp/form/name/copyapp',
             type: 'GET',
             data: data,
             success: function (data, text) {
@@ -315,7 +315,7 @@ $(document).ready(function () {
 
     $('#appFileUpload').fileuploadFile({
         dataType: 'json',
-        url: "/publisher/api/mobileapp/upload",
+        url: caramel.context +"/api/mobileapp/upload",
         multipart: true,
         autoUpload: false,
         singleFileUploads: true,
@@ -377,7 +377,7 @@ $(document).ready(function () {
     wizardStep2Form.ajaxForm({
         dataType: 'json', // expected server response type
         success: function (response, statusText, xhr, $form) {
-            window.location.replace("/publisher/assets/mobileapp/");
+            window.location.replace(caramel.context +"/assets/mobileapp/");
         },
         error: function (response, statusText, err) {
             var responseData = JSON.parse(response.responseText);

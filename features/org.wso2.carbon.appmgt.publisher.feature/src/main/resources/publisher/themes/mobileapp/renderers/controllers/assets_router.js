@@ -12,6 +12,7 @@ var user = server.current(session);
 var um = server.userManager(user.tenantId);
 var publisher = require('/modules/publisher.js').publisher(request, session);
 var rxtManager = publisher.rxtManager;
+var caramel = require('caramel');
 
 var render = function (theme, data, meta, require) {
 
@@ -40,7 +41,7 @@ var render = function (theme, data, meta, require) {
                 for (var key in lcComments) {
                     if (lcComments.hasOwnProperty(key)) {
                         notifyObject = {
-                            'url': '/publisher/asset/operations/edit/mobileapp/' + artifact.id,
+                            'url': caramel.configs().context + '/asset/operations/edit/mobileapp/' + artifact.id,
                             'notification': lcComments[key],
                             'appname': artifact.attributes.overview_displayName
                         }
