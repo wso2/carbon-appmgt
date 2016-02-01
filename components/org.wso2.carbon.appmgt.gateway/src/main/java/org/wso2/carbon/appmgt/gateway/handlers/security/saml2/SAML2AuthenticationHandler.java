@@ -489,21 +489,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                         if (appmSaml2CookieValue != null)
                             getSAML2ConfigCache().remove(appmSaml2CookieValue);
                     } else {
-                        throw new AppManagementException("SessionIndex not found in single logout saml request");
+                        throw new AppManagementException("SessionIndex not found in single logout request.");
                     }
                 } else {
-                    throw new AppManagementException("Invalid single logout saml request");
+                    throw new AppManagementException("Invalid single logout request.");
                 }
             } else {
-                throw new AppManagementException("Couldn't find single logout saml request");
+                throw new AppManagementException("Couldn't find single logout request.");
             }
 
         } catch (IdentityException e) {
-            String errorMessage = "Can't unmarshall the SAML single logout request.";
+            String errorMessage = "Couldn't unmarshal the  single logout request.";
             log.error(errorMessage);
             throw new AppManagementException(errorMessage, e);
         } catch (UnsupportedEncodingException e) {
-            String errorMessage = "Can't decode thesingle logout request.";
+            String errorMessage = "Couldn't decode the single logout request.";
             log.error(errorMessage);
             throw new AppManagementException(errorMessage, e);
         }
