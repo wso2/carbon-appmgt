@@ -2287,11 +2287,11 @@ public class APIStoreHostObject extends ScriptableObject {
                 for (SubscribedAppExtension subscribedApp : subscribedAppsList) {
                     NativeObject row = new NativeObject();
                     row.put("subscriptionId", row, subscribedApp.getSubscriptionID());
-                    row.put("appId", row, subscribedApp.getApiId().getApplicationId());
-                    row.put("appName", row, subscribedApp.getApiId().getApiName());
-                    row.put("appVersion", row, subscribedApp.getApiId().getVersion());
+                    row.put("appId", row, subscribedApp.getSubscribedApp().getApiId().getApplicationId());
+                    row.put("appName", row, subscribedApp.getSubscribedApp().getApiId().getApiName());
+                    row.put("appVersion", row, subscribedApp.getSubscribedApp().getApiId().getVersion());
                     row.put("appProvider", row, AppManagerUtil.replaceEmailDomainBack(
-                            subscribedApp.getApiId().getProviderName()));
+                            subscribedApp.getSubscribedApp().getApiId().getProviderName()));
                     row.put("subscriptionTime", row, dateFormat.format(subscribedApp.getSubscriptionTime()));
                     row.put("evaluationPeriod", row, subscribedApp.getEvaluationPeriod());
                     row.put("expiredOn", row, dateFormat.format(subscribedApp.getExpireOn()));

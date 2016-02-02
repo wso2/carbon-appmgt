@@ -29,6 +29,10 @@ public class SubscriptionExpiryDTO extends SubscriptionWorkflowDTO{
 
     private Date expireOn;
 
+    private int appId;
+
+    private int subscriberId;
+
     public Date getSubscriptionTime() {
         return subscriptionTime;
     }
@@ -51,5 +55,21 @@ public class SubscriptionExpiryDTO extends SubscriptionWorkflowDTO{
 
     public void setExpireOn(Date expireOn) {
         this.expireOn = expireOn;
+    }
+
+    public int getAppId() {
+        return appId;
+    }
+
+    public void setAppId(int appId) {
+        this.appId = appId;
+    }
+
+    public int getSubscriberId() {
+        return subscriberId;
+    }
+
+    public void setSubscriberId(int subscriberId) {
+        this.subscriberId = subscriberId;
     }
 }

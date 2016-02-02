@@ -37,9 +37,6 @@ public class SubscribedAPI {
 
     private boolean isBlocked;   //TODO: what is the difference & usage of revoking & blocking users
 
-    public SubscribedAPI() {
-    }
-
     public SubscribedAPI(Subscriber subscriber, APIIdentifier apiId) {
         this.subscriber = subscriber;
         this.apiId = apiId;

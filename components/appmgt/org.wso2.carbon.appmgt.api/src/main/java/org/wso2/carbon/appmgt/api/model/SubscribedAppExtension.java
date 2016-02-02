@@ -19,7 +19,7 @@ package org.wso2.carbon.appmgt.api.model;
 
 import java.util.Date;
 
-public class SubscribedAppExtension extends SubscribedAPI{
+public class SubscribedAppExtension {
 
     private Date subscriptionTime;
     // Evaluation period must be provided as hours.
@@ -31,8 +31,10 @@ public class SubscribedAppExtension extends SubscribedAPI{
 
     private boolean isPaid;
 
+    private SubscribedAPI subscribedApp;
+
     public SubscribedAppExtension(APIIdentifier apiIdentifier) {
-        super(null, apiIdentifier);
+        subscribedApp = new SubscribedAPI(null, apiIdentifier);
     }
 
     public boolean isPaid() {
@@ -72,5 +74,13 @@ public class SubscribedAppExtension extends SubscribedAPI{
 
     public void setExpireOn(Date expireOn) {
         this.expireOn = expireOn;
+    }
+
+    public SubscribedAPI getSubscribedApp() {
+        return subscribedApp;
+    }
+
+    public void setSubscribedApp(SubscribedAPI subscribedApp) {
+        this.subscribedApp = subscribedApp;
     }
 }

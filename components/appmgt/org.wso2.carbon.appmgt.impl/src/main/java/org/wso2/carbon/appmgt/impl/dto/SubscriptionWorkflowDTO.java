@@ -36,10 +36,6 @@ public class SubscriptionWorkflowDTO extends WorkflowDTO{
 
     private String subscriptionType;
 
-    private int appId;
-
-    private int subscriberId;
-
     public String getApiName() {
         return apiName;
     }
@@ -102,21 +98,5 @@ public class SubscriptionWorkflowDTO extends WorkflowDTO{
 
     public void setSubscriptionType(String subscriptionType){
         this.subscriptionType = subscriptionType;
-    }
-
-    public int getAppId() {
-        return appId;
-    }
-
-    public void setAppId(int appId) {
-        this.appId = appId;
-    }
-
-    public int getSubscriberId() {
-        return subscriberId;
-    }
-
-    public void setSubscriberId(int subscriberId) {
-        this.subscriberId = subscriberId;
     }
 }

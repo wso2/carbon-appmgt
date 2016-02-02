@@ -67,7 +67,6 @@ public class SubscriptionCreationExpiryWorkflowExecutor extends SubscriptionCrea
             subscriptionExpiryDTO.setApiProvider(subscriptionWorkflowDTO.getApiProvider());
             subscriptionExpiryDTO.setApiName(subscriptionWorkflowDTO.getApiName());
             subscriptionExpiryDTO.setApiVersion(subscriptionWorkflowDTO.getApiVersion());
-            subscriptionExpiryDTO.setSubscriberId(subscriptionWorkflowDTO.getSubscriberId());
             subscriptionExpiryDTO.setSubscriber(subscriptionWorkflowDTO.getSubscriber());
             subscriptionExpiryDTO.setSubscriptionType(subscriptionType);
             subscriptionExpiryDTO.setSubscriptionTime(subscriptionDate);
