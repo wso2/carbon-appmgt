@@ -23,13 +23,11 @@ import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
-import org.wso2.carbon.appmgt.api.model.SubscribedAppExtension;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -143,10 +141,6 @@ public interface APIConsumer extends APIManager {
      */
     public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber) throws
                                                                        AppManagementException;
-
-    public List<SubscribedAppExtension> getSubscribedApps(String user) throws
-            AppManagementException;
-
     /**
      * Returns a set of SubscribedAPIs filtered by the given application name.
      *

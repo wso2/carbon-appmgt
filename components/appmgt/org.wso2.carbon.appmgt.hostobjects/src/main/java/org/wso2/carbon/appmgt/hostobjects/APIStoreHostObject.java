@@ -48,7 +48,6 @@ import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
-import org.wso2.carbon.appmgt.api.model.SubscribedAppExtension;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.Tag;
@@ -2260,49 +2259,6 @@ public class APIStoreHostObject extends ScriptableObject {
             	if (isTenantFlowStarted) {
             		PrivilegedCarbonContext.endTenantFlow();
             	}
-            }
-        }
-        return myn;
-    }
-
-    public static NativeArray jsFunction_getSubscriptionsByUser(Context cx,
-                                                                Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        NativeArray myn = new NativeArray(0);
-        if (args != null && isStringArray(args)) {
-            String userName = (String) args[0];
-            boolean isTenantFlowStarted = false;
-            try {
-                String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
-                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                    isTenantFlowStarted = true;
-                    PrivilegedCarbonContext.startTenantFlow();
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-                }
-                APIConsumer appConsumer = getAPIConsumer(thisObj);
-                List<SubscribedAppExtension> subscribedAppsList = appConsumer.getSubscribedApps(userName);
-
-                int i = 0;
-                for (SubscribedAppExtension subscribedApp : subscribedAppsList) {
-                    NativeObject row = new NativeObject();
-                    row.put("subscriptionId", row, subscribedApp.getSubscriptionID());
-                    row.put("appId", row, subscribedApp.getSubscribedApp().getApiId().getApplicationId());
-                    row.put("appName", row, subscribedApp.getSubscribedApp().getApiId().getApiName());
-                    row.put("appVersion", row, subscribedApp.getSubscribedApp().getApiId().getVersion());
-                    row.put("appProvider", row, AppManagerUtil.replaceEmailDomainBack(
-                            subscribedApp.getSubscribedApp().getApiId().getProviderName()));
-                    row.put("subscriptionTime", row, dateFormat.format(subscribedApp.getSubscriptionTime()));
-                    row.put("evaluationPeriod", row, subscribedApp.getEvaluationPeriod());
-                    row.put("expiredOn", row, dateFormat.format(subscribedApp.getExpireOn()));
-                    row.put("isPaid", row, subscribedApp.isPaid());
-                    myn.put(i, myn, row);
-                    i++;
-                }
-            } finally {
-                if (isTenantFlowStarted) {
-                    PrivilegedCarbonContext.endTenantFlow();
-                }
             }
         }
         return myn;

@@ -28,12 +28,10 @@ import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
-import org.wso2.carbon.appmgt.api.model.SubscribedAppExtension;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.impl.dao.AppMSubscriptionExtensionDAO;
 import org.wso2.carbon.appmgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.internal.ServiceReferenceHolder;
@@ -1235,18 +1233,6 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             handleException("Failed to get APIs of " + subscriber.getName(), e);
         }
         return subscribedAPIs;
-    }
-
-    public List<SubscribedAppExtension> getSubscribedApps(String user) throws
-                                                                       AppManagementException {
-        AppMSubscriptionExtensionDAO appMSubscriptionExtensionDAO = new AppMSubscriptionExtensionDAO();
-        List<SubscribedAppExtension> subscribedAppsList = null;
-        try {
-            subscribedAppsList = appMSubscriptionExtensionDAO.getSubscribedApps(user);
-        } catch (AppManagementException e) {
-            handleException("Failed to get APIs of " + user, e);
-        }
-        return subscribedAppsList;
     }
 
     public Set<SubscribedAPI> getSubscribedAPIs(Subscriber subscriber, String applicationName) throws

@@ -154,11 +154,7 @@
           <groupId>org.wso2.carbon</groupId>
           <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
-      <dependency>
-          <groupId>org.wso2.carbon.appmgt</groupId>
-          <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
-      </dependency>
-  </dependencies>
+    </dependencies>
 
     <build>
         <plugins>
