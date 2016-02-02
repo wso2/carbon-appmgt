@@ -39,7 +39,7 @@ var securityModule = function () {
             redirectURl = reverseProxyHost + redirectURl;
         }
         log.debug('security check failed redirecting...');
-        response.sendRedirect(caramel.context + '/login');
+        response.sendRedirect(redirectURl);
     }
 
     /*
