@@ -291,9 +291,9 @@ public class SSOConfiguratorUtil {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
 
         if(!tenantDomain.equalsIgnoreCase("carbon.super")){
-            url = url + "/t/" + tenantDomain + app.getContext() + "/" ;
+            url = url + "/t/" + tenantDomain + app.getContext() + "/";
         }else {
-            url = url + app.getContext() + "/" ;
+            url = url + app.getContext() + "/";
         }
          return url;
     }
