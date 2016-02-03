@@ -55,12 +55,12 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 	private static final String VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP =
 			"velocity-template_synapse-config_versioned-webapp.xml";
 
-	private WebApp api;
+	private WebApp webapp;
 	private String velocityLoggerName;
 	private List<HandlerConfig> handlers = new ArrayList<HandlerConfig>();
 
-	public APITemplateBuilderImpl(WebApp api) {
-		this.api = api;
+	public APITemplateBuilderImpl(WebApp webapp) {
+		this.webapp = webapp;
 		this.velocityLoggerName = getVelocityLoggerName();
 	}
 
@@ -69,13 +69,13 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			throws APITemplateException {
 
 		// build the context for template and apply the necessary decorators
-		ConfigContext configcontext = new APIConfigContext(this.api);
-		configcontext = new TransportConfigContext(configcontext, api);
-		configcontext = new ResourceConfigContext(configcontext, api);
-		configcontext = new EndpointURIConfigContext(configcontext, api);
-		configcontext = new SecurityConfigContext(configcontext, api);
+		ConfigContext configcontext = new APIConfigContext(this.webapp);
+		configcontext = new TransportConfigContext(configcontext, webapp);
+		configcontext = new ResourceConfigContext(configcontext, webapp);
+		configcontext = new EndpointURIConfigContext(configcontext, webapp);
+		configcontext = new SecurityConfigContext(configcontext, webapp);
 		configcontext = new JwtConfigContext(configcontext);
-		configcontext = new ResponseCacheConfigContext(configcontext, api);
+		configcontext = new ResponseCacheConfigContext(configcontext, webapp);
 		configcontext = new HandlerConfigContex(configcontext, handlers);
 		configcontext = new EnvironmentConfigContext(configcontext, environment);
 		configcontext = new TemplateUtilContext(configcontext);
@@ -120,18 +120,18 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			throw new APITemplateException("Cannot initialize Velocity engine", e);
 		}
 
-		ConfigContext configcontext = new APIConfigContext(this.api);
-		configcontext = new TransportConfigContext(configcontext, api);
-		configcontext = new ResourceConfigContext(configcontext, api);
+		ConfigContext configcontext = new APIConfigContext(this.webapp);
+		configcontext = new TransportConfigContext(configcontext, webapp);
+		configcontext = new ResourceConfigContext(configcontext, webapp);
 
 		VelocityContext context = configcontext.getContext();
-		context.put("apiContext", this.api.getContext());
-		String forwardAppContext = this.api.getContext();
+		context.put("apiContext", this.webapp.getContext());
+		String forwardAppContext = this.webapp.getContext();
 		if (forwardAppContext != null && forwardAppContext.charAt(0) == '/') {
 			forwardAppContext = forwardAppContext.substring(1);
 		}
 		context.put("forwardAppContext", forwardAppContext);
-		context.put("forwardAppVersion", this.api.getId().getVersion());
+		context.put("forwardAppVersion", this.webapp.getId().getVersion());
 
 		return processTemplate(velocityengine, context, getNonVersionedWebAppTemplatePath());
 	}
