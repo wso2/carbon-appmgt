@@ -55,7 +55,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			"velocity-template_synapse-config_versioned-webapp.xml";
 
 	private WebApp api;
-	private String velocityLoggerName = null;
+	private String velocityLoggerName;
 	private List<HandlerConfig> handlers = new ArrayList<HandlerConfig>();
 
 	public APITemplateBuilderImpl(WebApp api) {
