@@ -26,6 +26,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -82,10 +83,9 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		// @todo: this validation might be better to do when the builder is initialized.
 		try {
 			configcontext.validate();
-		} catch (Exception e) {
+		} catch (AppManagementException e) {
 			log.error("Cannot validate configuration context for template", e);
-			throw new APITemplateException("Cannot validate configuration context for template",
-										   e);
+			throw new APITemplateException("Cannot validate configuration context for template", e);
 		}
 
 		VelocityEngine velocityengine = new VelocityEngine();
