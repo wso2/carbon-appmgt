@@ -138,11 +138,11 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 	@Override
 	public OMElement getConfigXMLForTemplate(Environment environment) throws APITemplateException {
+        String configString = getConfigStringForVersionedWebAppTemplate(environment);
 		try {
-			return AXIOMUtil.stringToOM(getConfigStringForVersionedWebAppTemplate(environment));
+			return AXIOMUtil.stringToOM(configString);
 		} catch (XMLStreamException e) {
-			String msg = "Error converting string to OMElement - String: " +
-					getConfigStringForVersionedWebAppTemplate(environment);
+			String msg = "Error occurred when converting '" + configString + "' to OMElement";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		}
