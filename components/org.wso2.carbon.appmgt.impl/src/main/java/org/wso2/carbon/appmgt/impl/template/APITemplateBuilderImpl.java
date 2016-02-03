@@ -152,8 +152,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		addHandlerPriority(handlerName, properties, handlers.size());
 	}
 
-	public void addHandlerPriority(String handlerName, Map<String, String> properties,
-								   int priority) {
+	public void addHandlerPriority(String handlerName, Map<String, String> properties, int priority) {
 		HandlerConfig handler = new HandlerConfig(handlerName, properties);
 		handlers.add(priority, handler);
 	}
