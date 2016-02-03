@@ -21,7 +21,6 @@ package org.wso2.carbon.appmgt.gateway.handlers.common;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import java.util.Map;
 
