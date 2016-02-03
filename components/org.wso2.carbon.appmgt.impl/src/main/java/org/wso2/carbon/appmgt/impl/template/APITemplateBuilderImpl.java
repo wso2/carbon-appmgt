@@ -69,20 +69,20 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			throws APITemplateException {
 
 		// build the context for template and apply the necessary decorators
-		ConfigContext configcontext = new APIConfigContext(this.webapp);
-		configcontext = new TransportConfigContext(configcontext, webapp);
-		configcontext = new ResourceConfigContext(configcontext, webapp);
-		configcontext = new EndpointURIConfigContext(configcontext, webapp);
-		configcontext = new SecurityConfigContext(configcontext, webapp);
-		configcontext = new JwtConfigContext(configcontext);
-		configcontext = new ResponseCacheConfigContext(configcontext, webapp);
-		configcontext = new HandlerConfigContex(configcontext, handlers);
-		configcontext = new EnvironmentConfigContext(configcontext, environment);
-		configcontext = new TemplateUtilContext(configcontext);
+		ConfigContext configContext = new APIConfigContext(this.webapp);
+		configContext = new TransportConfigContext(configContext, webapp);
+		configContext = new ResourceConfigContext(configContext, webapp);
+		configContext = new EndpointURIConfigContext(configContext, webapp);
+		configContext = new SecurityConfigContext(configContext, webapp);
+		configContext = new JwtConfigContext(configContext);
+		configContext = new ResponseCacheConfigContext(configContext, webapp);
+		configContext = new HandlerConfigContex(configContext, handlers);
+		configContext = new EnvironmentConfigContext(configContext, environment);
+		configContext = new TemplateUtilContext(configContext);
 
 		// @todo: this validation might be better to do when the builder is initialized.
 		try {
-			configcontext.validate();
+			configContext.validate();
 		} catch (AppManagementException e) {
 			log.error("Cannot validate configuration context for template", e);
 			throw new APITemplateException("Cannot validate configuration context for template", e);
@@ -100,7 +100,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			log.error("Cannot initialize Velocity engine", e);
 			throw new APITemplateException("Cannot initialize Velocity engine", e);
 		}
-		VelocityContext context = configcontext.getContext();
+		VelocityContext context = configContext.getContext();
 
 		return processTemplate(velocityengine, context, getVersionedWebAppTemplatePath());
 	}
