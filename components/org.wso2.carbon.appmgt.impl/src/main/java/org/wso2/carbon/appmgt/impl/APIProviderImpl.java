@@ -25,20 +25,34 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
-import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.JavaPolicy;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
+import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.appmgt.impl.utils.APINameComparator;
@@ -49,7 +63,11 @@ import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.common.CommonConstants;
-import org.wso2.carbon.registry.core.*;
+import org.wso2.carbon.registry.core.ActionConstants;
+import org.wso2.carbon.registry.core.Association;
+import org.wso2.carbon.registry.core.CollectionImpl;
+import org.wso2.carbon.registry.core.RegistryConstants;
+import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
@@ -63,8 +81,15 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -808,12 +833,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
+
+                            //update version
+                            if (status.equals(APIStatus.PUBLISHED)) {
+                                if(api.isDefaultVersion()) {
+                                    appMDAO.updateDefaultVersionDetails(api);
+                                }
+                            }
                         } else {
                             removeFromGateway(api);
                         }
                     }
                 }
-               
+
             } catch (AppManagementException e) {
             	handleException("Error occured in the status change : " + api.getId().getApiName() , e);
             }
@@ -1934,6 +1966,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             log.debug(msg);
         }
         appMDAO.deleteExternalAppStoresDetails(identifier, removalCompletedStores);
+    }
+
+    /**
+     * Get web app default version
+     * @param appName
+     * @param providerName
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public String getDefaultVersion(String appName, String providerName) throws AppManagementException {
+        return AppMDAO.getDefaultVersion(appName, providerName);
     }
 
 }

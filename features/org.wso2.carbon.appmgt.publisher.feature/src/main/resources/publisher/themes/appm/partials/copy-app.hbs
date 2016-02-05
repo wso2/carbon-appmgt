@@ -12,6 +12,12 @@
             <div class="widget-content">
                <form class="form-horizontal" id='form-asset-copy'>
                   <fiedlset>
+                      <div><b><label class="control-label">Make As Default Version : </label></b>
+                          <input type="checkbox" class="makeAsDefaultVersion_checkbox" />
+                          <input type="hidden" value="FALSE"
+                                 class="col-lg-6 col-sm-12 col-xs-12" name="overview_makeAsDefaultVersion"
+                                 id="overview_makeAsDefaultVersion">
+                      </div>
                       <b><label class="control-label">New Version : </label></b>
                       <span class="label-required">*</span>
                       <div class="control-group">
@@ -21,7 +27,7 @@
                       <div class="control-group">
                           <input type="text" name="newDisplayName" id="newDisplayName" class="form-control">
                       </div>
-                  <fieldset/>
+                      <fieldset/>
                   <fieldset style="display:none;">
                      <input type="hidden" value="{{{snoop "fields(name=overview_version).value" data}}}" name="oldversion" id="oldversion"/>
                      <input type='text' value="{{{snoop "fields(name=overview_provider).value" data}}}" name="overview_provider" id="overview_provider"/>

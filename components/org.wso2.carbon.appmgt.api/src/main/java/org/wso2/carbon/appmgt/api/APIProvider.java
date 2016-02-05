@@ -520,4 +520,14 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public Set<AppStore> getExternalAppStores(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Get web app default version details
+     *
+     * @param appName
+     * @param providerName
+     * @return
+     * @throws AppManagementException
+     */
+    public String getDefaultVersion(String appName, String providerName) throws AppManagementException;
 }

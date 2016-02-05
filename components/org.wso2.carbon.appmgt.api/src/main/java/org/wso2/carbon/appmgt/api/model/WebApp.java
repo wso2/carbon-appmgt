@@ -116,6 +116,7 @@ public class WebApp {
 
     private String acsURL;
 
+    private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
 
@@ -685,5 +686,13 @@ public class WebApp {
 
     public void setTreatAsASite(String treatAsASite) {
         this.treatAsASite = treatAsASite;
+    }
+
+    public boolean isDefaultVersion() {
+        return isDefaultVersion;
+    }
+
+    public void setDefaultVersion(boolean isDefaultVersion) {
+        this.isDefaultVersion = isDefaultVersion;
     }
 }

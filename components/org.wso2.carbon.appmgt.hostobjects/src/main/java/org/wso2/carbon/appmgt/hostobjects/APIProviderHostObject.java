@@ -937,7 +937,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
         logoutURL = logoutURL.replace(endpoint, "");
         Boolean allowAnonymous = "TRUE".equals((String) apiData.get("overview_allowAnonymous", apiData));
-
+        Boolean makeAsDefaultVersion = "TRUE".equals((String) apiData.get("overview_makeAsDefaultVersion", apiData));
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
         String visibleRoles = "";
@@ -1028,6 +1028,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setLastUpdated(new Date());
         api.setTransports(transport);
         api.setAllowAnonymous(allowAnonymous);
+        api.setDefaultVersion(makeAsDefaultVersion);
 
         try {
             apiProvider.updateAPI(api);
@@ -3666,6 +3667,20 @@ public class APIProviderHostObject extends ScriptableObject {
             }
         }
         return appStoresArray;
+    }
+
+    public static String jsFunction_getDefaultVersion(Context cx, Scriptable thisObj,
+                                                      Object[] args,
+                                                      Function funObj)
+            throws AppManagementException {
+        NativeArray myn = new NativeArray(0);
+        if (args == null || args.length != 2) {
+            handleException("Invalid input parameters.");
+        }
+        String appName = (String) args[0];
+        String provider = (String) args[1];
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.getDefaultVersion(appName, provider);
     }
 }
 

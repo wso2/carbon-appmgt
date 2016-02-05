@@ -23,6 +23,54 @@ $( document ).ready(function() {
         }
     });
 
+    //Load default version details
+    var isDefaultVersion = "FALSE";
+    var appName = $('#overview_name').val();
+    var providerName = $('#overview_provider').val();
+    var appVersion = $('#overview_version').val();
+
+    $.ajax({
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName,
+               type: 'GET',
+               async: false,
+               success: function (data) {
+                   if (data == appVersion) {
+                       isDefaultVersion = "TRUE";
+                       $('#lblDefaultVersion').html("(This is the current default version)");
+                   } else {
+                       $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
+                   }
+               },
+               error: function (data) {
+               }
+           });
+
+    $('#overview_makeAsDefaultVersion').val(isDefaultVersion);
+
+    $(".makeAsDefaultVersion_checkbox").click(function () {
+        var output = [];
+        $(".makeAsDefaultVersion_checkbox").each(function (index) {
+            if ($(this).is(':checked')) {
+                output.push("TRUE");
+            }
+            else {
+                output.push("FALSE");
+            }
+        });
+        $('#overview_makeAsDefaultVersion').val(output);
+    });
+
+    var makeAsDefaultVal = $('#overview_makeAsDefaultVersion').val();
+    $(".makeAsDefaultVersion_checkbox").each(function (index) {
+        if (makeAsDefaultVal == "TRUE") {
+            $(this).prop('checked', true);
+            $(this).prop('disabled', true);
+        }
+        else {
+            $(this).prop('checked', false);
+        }
+    });
+
     //load throttling tiers
     $("#throttlingTier").empty().append(throttlingTierControlBlock);
 
@@ -237,7 +285,8 @@ $( document ).ready(function() {
         $('#overview_acsUrl').hide();
     }
 
-    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
+    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save
+    // operation
     $(".skip_gateway_checkbox").click(function () {
         var output = [];
         if ($('.skip_gateway_checkbox').is(':checked')) {
