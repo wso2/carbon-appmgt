@@ -1106,6 +1106,38 @@ public class AppMDAO {
 		}
 	}
 
+    /**
+     * Returns the app ID of the specified app.
+     *
+     * @param appIdentifier app
+     * @return <code>-1</code> if specified app does not exists; otherwise app ID
+     * @throws AppManagementException Db error
+     */
+    private int getAppId(APIIdentifier appIdentifier) throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet results = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement("SELECT APP_ID FROM APM_APP WHERE APP_PROVIDER = ? AND APP_NAME = ? " +
+                                               "AND APP_VERSION = ?");
+            ps.setString(1, appIdentifier.getProviderName());
+            ps.setString(2, appIdentifier.getApiName());
+            ps.setString(3, appIdentifier.getVersion());
+            results = ps.executeQuery();
+            if (results.next()) {
+                return results.getInt(1);
+            }
+        } catch (SQLException e) {
+            String msg = "Could not retrieve ID of the '" + appIdentifier.getProviderName() + "-" +
+                    appIdentifier.getApiName() + "-" + appIdentifier.getVersion() + "' app";
+            handleException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, results);
+        }
+        return -1;
+    }
+
 	/**
 	 * Moves subscriptions of one app to another app
 	 *
@@ -1114,99 +1146,41 @@ public class AppMDAO {
 	 * @return number of subscriptions moved
 	 * @throws AppManagementException
 	 */
-	public int moveSubscriptions(APIIdentifier fromIdentifier, APIIdentifier toIdentifier)
-			throws AppManagementException {
+    public int moveSubscriptions(APIIdentifier fromIdentifier, APIIdentifier toIdentifier)
+            throws AppManagementException {
+        int fromAppId = getAppId(fromIdentifier);
+        if (fromAppId == -1) {
+            String msg = "'" + fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() + "-" +
+                    fromIdentifier.getVersion() + "' app does not exists.";
+            handleException(msg, null);
+        }
+        int toAppId = getAppId(toIdentifier);
+        if (toAppId == -1) {
+            String msg = "'" + toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() + "-" +
+                    toIdentifier.getVersion() + "' app does not exists.";
+            handleException(msg, null);
+        }
 
-		Connection conn = null;
-		ResultSet results = null;
-		PreparedStatement ps = null;
-		int fromAppId = -1;
-		int toAppId = -1;
-		int count;
-
-		try {
-
-            String getAppIdQuery = "SELECT APP_ID FROM APM_APP " +
-                    "WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ?";
-
-			try {
-				conn = APIMgtDBUtil.getConnection();
-				ps = conn.prepareStatement(getAppIdQuery);
-			} catch (SQLException e) {
-				handleException("Failed to create database connection ", e);
-			}
-
-			try {
-				ps.setString(1, fromIdentifier.getProviderName());
-				ps.setString(2, fromIdentifier.getApiName());
-				ps.setString(3, fromIdentifier.getVersion());
-				results = ps.executeQuery();
-				if (results.next()) {
-					fromAppId = results.getInt(1);
-				}
-			} catch (SQLException e) {
-				APIMgtDBUtil.closeAllConnections(ps, conn, results);
-				String msg = "Could not retrieve app ID of " + fromIdentifier.getProviderName() +
-						"-" + fromIdentifier.getApiName() + "-" + fromIdentifier.getVersion();
-				handleException(msg, e);
-			}
-			APIMgtDBUtil.closeAllConnections(null, null, results);
-			if (fromAppId == -1) {
-				if (log.isDebugEnabled()) {
-					log.debug("Could not find app ID of 'from' app " + fromIdentifier);
-				}
-				return -1;
-			}
-
-			try {
-				ps.setString(1, toIdentifier.getProviderName());
-				ps.setString(2, toIdentifier.getApiName());
-				ps.setString(3, toIdentifier.getVersion());
-				results = ps.executeQuery();
-				if (results.next()) {
-					toAppId = results.getInt(1);
-				}
-			} catch (SQLException e) {
-				APIMgtDBUtil.closeAllConnections(ps, conn, results);
-				String msg = "Could not retrieve app ID of " + toIdentifier.getProviderName() + "-"
-						+ toIdentifier.getApiName() + "-" + toIdentifier.getVersion();
-				handleException(msg, e);
-			}
-			APIMgtDBUtil.closeAllConnections(null, null, results);
-			if (toAppId == -1) {
-				if (log.isDebugEnabled()) {
-					log.debug("Could not find app ID of 'to' app " + toIdentifier);
-				}
-				return -1;
-			}
-
-            String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
-            count = -1;
-			try {
-				ps = conn.prepareStatement(moveQuery);
-				ps.setInt(1, toAppId);
-				ps.setInt(2, fromAppId);
-				count = ps.executeUpdate();
-				conn.commit();
-			} catch (SQLException e) {
-				String msg = "Could not move subscriptions from " +
-						fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() +
-						"-" + fromIdentifier.getVersion() + " app to " +
-						toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() +
-						"-" + toIdentifier.getVersion() + " app";
-				handleException(msg, e);
-			}
-
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, results);
-		}
-
-		if (log.isDebugEnabled()) {
-			log.debug(count + " subscribers were moved from" + fromIdentifier + " to " +
-							  toIdentifier);
-		}
-		return count;
-
+        Connection conn = null;
+        PreparedStatement ps = null;
+        int count = -1;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement("UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?");
+            ps.setInt(1, toAppId);
+            ps.setInt(2, fromAppId);
+            count = ps.executeUpdate();
+            conn.commit();
+        } catch (SQLException e) {
+            String msg = "Could not move subscriptions from '" + fromIdentifier.getProviderName() + "-" +
+                    fromIdentifier.getApiName() + "-" + fromIdentifier.getVersion() + "' app to '" +
+                    toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() + "-" + toIdentifier.getVersion() +
+                    "' app";
+            handleException(msg, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+        return count;
 	}
 
     public void removeAPISubscription(APIIdentifier identifier) throws AppManagementException {
