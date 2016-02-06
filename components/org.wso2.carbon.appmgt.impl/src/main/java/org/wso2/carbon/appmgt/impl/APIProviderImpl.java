@@ -843,7 +843,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                             api.getId().getApiName(),
                                             api.getId().getProviderName(), true);
                                     if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
-                                        appMDAO.updateDefaultVersionDetailsForPublishedApps(api);
+                                        appMDAO.updatePublishedDefaultVersion(api);
                                     }
                                 }
                             }

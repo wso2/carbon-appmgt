@@ -7947,20 +7947,19 @@ public class AppMDAO {
      * @param api
      * @throws AppManagementException
      */
-    public void updateDefaultVersionDetailsForPublishedApps(WebApp api) throws AppManagementException {
+    public void updatePublishedDefaultVersion(WebApp api) throws AppManagementException {
         Connection connection = null;
         PreparedStatement ps = null;
         try {
             connection = APIMgtDBUtil.getConnection();
             PreparedStatement prepStmt = null;
             String query =
-                    "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=?, PUBLISHED_DEFAULT_APP_VERSION=? " +
+                    "UPDATE APM_APP_DEFAULT_VERSION SET PUBLISHED_DEFAULT_APP_VERSION=? " +
                             "WHERE APP_NAME=? AND APP_PROVIDER=? ";
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, api.getId().getVersion());
-            prepStmt.setString(2, api.getId().getVersion());
-            prepStmt.setString(3, api.getId().getApiName());
-            prepStmt.setString(4, api.getId().getProviderName());
+            prepStmt.setString(2, api.getId().getApiName());
+            prepStmt.setString(3, api.getId().getProviderName());
 
             prepStmt.executeUpdate();
             connection.commit();
