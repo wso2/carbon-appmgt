@@ -111,6 +111,25 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 }
             }
             print(obj);
+        } else if (action === "getAllDocumentation") {
+	    mod = jagg.module("documentation");
+	    var app = {};
+	    app.provider = request.getParameter("provider");
+	    app.name = request.getParameter("apiName");
+	    app.version = request.getParameter("version");
+	    result = mod.getAllDocumentation(app);
+	    if (result.error) {
+	        obj = {
+		    error:result.error,
+		    message:result.message
+		};
+	    } else {
+	        obj = {
+	            error:false,
+		    docs:result.docs
+		}
+	    }
+            print(obj);
         } else {
             print({
                       error:true,
