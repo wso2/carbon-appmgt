@@ -836,8 +836,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                             //update version
                             if (status.equals(APIStatus.PUBLISHED)) {
-                                if(api.isDefaultVersion()) {
+                                if (api.isDefaultVersion()) {
                                     appMDAO.updateDefaultVersionDetails(api);
+                                } else {
+                                    String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
+                                            api.getId().getApiName(),
+                                            api.getId().getProviderName(), true);
+                                    if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
+                                        appMDAO.updateDefaultVersionDetailsForPublishedApps(api);
+                                    }
                                 }
                             }
                         } else {
@@ -1970,14 +1977,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Get web app default version
+     *
      * @param appName
      * @param providerName
+     * @param isPublished  if true then return published app version else default app version
      * @return
      * @throws AppManagementException
      */
     @Override
-    public String getDefaultVersion(String appName, String providerName) throws AppManagementException {
-        return AppMDAO.getDefaultVersion(appName, providerName);
+    public String getDefaultVersion(String appName, String providerName, boolean isPublished)
+            throws AppManagementException {
+        return AppMDAO.getDefaultVersion(appName, providerName, isPublished);
     }
 
 }

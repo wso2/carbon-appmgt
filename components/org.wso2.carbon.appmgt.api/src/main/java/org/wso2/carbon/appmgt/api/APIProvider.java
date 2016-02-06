@@ -526,8 +526,10 @@ public interface APIProvider extends APIManager {
      *
      * @param appName
      * @param providerName
+     * @param isPublished  if true then return published app version else default app version
      * @return
      * @throws AppManagementException
      */
-    public String getDefaultVersion(String appName, String providerName) throws AppManagementException;
+    public String getDefaultVersion(String appName, String providerName, boolean isPublished)
+            throws AppManagementException;
 }

@@ -3674,13 +3674,15 @@ public class APIProviderHostObject extends ScriptableObject {
                                                       Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
-        if (args == null || args.length != 2) {
+        if (args == null || args.length != 3) {
             handleException("Invalid input parameters.");
         }
         String appName = (String) args[0];
         String provider = (String) args[1];
+        boolean isPublished = ((String) args[2] == "true");
+
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.getDefaultVersion(appName, provider);
+        return apiProvider.getDefaultVersion(appName, provider, isPublished);
     }
 }
 

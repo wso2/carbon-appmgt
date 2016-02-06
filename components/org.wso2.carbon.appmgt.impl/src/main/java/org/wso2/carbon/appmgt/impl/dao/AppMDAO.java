@@ -7897,19 +7897,26 @@ public class AppMDAO {
      *
      * @param appName
      * @param providerName
-     * @return
+     * @param isPublished  if true then return published app version else default app version
+     * @return default app version
      * @throws AppManagementException
      */
-    public static String getDefaultVersion(String appName, String providerName)
+    public static String getDefaultVersion(String appName, String providerName, boolean isPublished)
             throws AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
         Connection conn = null;
         String defaultVersion = "";
         try {
+            String columnName;
             conn = APIMgtDBUtil.getConnection();
-            final String sqlQuery =
-                    "SELECT DEFAULT_APP_VERSION FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER =? ";
+            if (isPublished) {
+                columnName = "PUBLISHED_DEFAULT_APP_VERSION";
+            } else {
+                columnName = "DEFAULT_APP_VERSION";
+            }
+            String sqlQuery =
+                    "SELECT " + columnName + " FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER=? ";
 
             ps = conn.prepareStatement(sqlQuery);
             if (log.isDebugEnabled()) {
@@ -7921,7 +7928,7 @@ public class AppMDAO {
             ps.setString(2, providerName);
             rs = ps.executeQuery();
             if (rs.next()) {
-                defaultVersion = rs.getString("DEFAULT_APP_VERSION");
+                defaultVersion = rs.getString(columnName);
             }
         } catch (SQLException e) {
             handleException("Error while getting default version details from the database for the app" +
@@ -7932,4 +7939,37 @@ public class AppMDAO {
         }
         return defaultVersion;
     }
+
+
+    /**
+     * Direct update default version for published apps
+     *
+     * @param api
+     * @throws AppManagementException
+     */
+    public void updateDefaultVersionDetailsForPublishedApps(WebApp api) throws AppManagementException {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            PreparedStatement prepStmt = null;
+            String query =
+                    "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=?, PUBLISHED_DEFAULT_APP_VERSION=? " +
+                            "WHERE APP_NAME=? AND APP_PROVIDER=? ";
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, api.getId().getVersion());
+            prepStmt.setString(2, api.getId().getVersion());
+            prepStmt.setString(3, api.getId().getApiName());
+            prepStmt.setString(4, api.getId().getProviderName());
+
+            prepStmt.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            handleException("Failed to update version details for  app" +
+                                    " : " + api.getApiName(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, null);
+        }
+    }
+
 }

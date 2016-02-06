@@ -312,7 +312,7 @@ public final class AppManagerUtil {
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
 
-            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName);
+            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName, false);
             api.setDefaultVersion(defaultVersion.equals(apiVersion));
 
 		} catch (GovernanceException e) {

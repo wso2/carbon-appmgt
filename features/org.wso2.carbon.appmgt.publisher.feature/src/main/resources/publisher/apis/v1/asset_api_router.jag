@@ -954,15 +954,16 @@ require('/modules/publisher.js').exec(function(ctx) {
             });
 
 
-    routeManager.register('GET', 'publisher', '/publisher/api/asset/default/version/{appName}/{providerName}', function (context) {
-        var defaultVersion = getDefaultVersion(context.params.appName, context.params.providerName);
+    routeManager.register('GET', 'publisher', '/publisher/api/asset/default/version/{appName}/{providerName}/{isPublished}', function (context) {
+        var defaultVersion = getDefaultVersion(context.params.appName, context.params.providerName,
+                                               context.params.isPublished);
         print(defaultVersion);
     });
 
 
     //check if the default version
-    function getDefaultVersion(appName, providerName) {
-        return apiProvider.getDefaultVersion(appName, providerName);
+    function getDefaultVersion(appName, providerName, isPublished) {
+        return apiProvider.getDefaultVersion(appName, providerName, isPublished);
     }
 
 
