@@ -7971,4 +7971,37 @@ public class AppMDAO {
         }
     }
 
+    public static List<String> getAllVersionOfWebApp(String appName, String providerName)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<String> webAppVersions = new ArrayList<>();
+        try {
+            String columnName;
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery = "SELECT APP_VERSION FROM APM_APP where APP_NAME =? and APP_PROVIDER =? ";
+
+            ps = conn.prepareStatement(sqlQuery);
+            if (log.isDebugEnabled()) {
+                String msg = String.format("Getting all versions of app : provider:%s ,name :%s"
+                        , providerName, appName);
+                log.debug(msg);
+            }
+            ps.setString(1, appName);
+            ps.setString(2, providerName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                webAppVersions.add(rs.getString("APP_VERSION"));
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting alls versionsfrom the database for the app" +
+                                    " : " + appName, e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return webAppVersions;
+    }
+
 }

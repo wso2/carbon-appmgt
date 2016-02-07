@@ -37,7 +37,9 @@
             <field type="text" required="true">
                 <name>Version</name>
             </field>
-
+            <field type="text">
+                <name>Make As Default Version</name>
+            </field>
             <field type="text" required="true">
                 <name>Display Name</name>
             </field>

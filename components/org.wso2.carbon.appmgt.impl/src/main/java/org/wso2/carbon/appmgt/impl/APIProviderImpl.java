@@ -640,6 +640,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         if (!api.getSkipGateway()) {
                             publishToGateway(apiPublished);
                         }
+
+                        //update version
+                        if (api.isDefaultVersion()) {
+                            removeDefaultVersionFromNonPublishedApps(api);
+                        }
+                    } else {
+                        //update version
+                        String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
+                                api.getId().getApiName(),
+                                api.getId().getProviderName(), true);
+                        if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
+                            appMDAO.updatePublishedDefaultVersion(api);
+                            removeDefaultVersionFromNonPublishedApps(api);
+                        }
                     }
                 } else {
                     log.debug("Gateway is not existed for the current WebApp Provider");
@@ -838,12 +852,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (status.equals(APIStatus.PUBLISHED)) {
                                 if (api.isDefaultVersion()) {
                                     appMDAO.updateDefaultVersionDetails(api);
+                                    removeDefaultVersionFromNonPublishedApps(api);
                                 } else {
                                     String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
                                             api.getId().getApiName(),
                                             api.getId().getProviderName(), true);
                                     if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
                                         appMDAO.updatePublishedDefaultVersion(api);
+                                        removeDefaultVersionFromNonPublishedApps(api);
                                     }
                                 }
                             }
@@ -855,6 +871,33 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
             } catch (AppManagementException e) {
             	handleException("Error occured in the status change : " + api.getId().getApiName() , e);
+            }
+        }
+    }
+
+    /**
+     * Remove default version tag from register for other versions of a given web app than the default
+     *
+     * @param api
+     * @throws AppManagementException
+     */
+    private void removeDefaultVersionFromNonPublishedApps(WebApp api) throws AppManagementException {
+        List<String> webAppVersions = appMDAO.getAllVersionOfWebApp(
+                api.getId().getApiName(),
+                api.getId().getProviderName());
+
+        for (String webAppVersion : webAppVersions) {
+            if (!webAppVersion.equals(api.getId().getVersion())) {
+                APIIdentifier apiIdentifier = new APIIdentifier(
+                        api.getId().getProviderName(), api.getId().getApiName(),
+                        webAppVersion);
+                String path = AppManagerUtil.getAPIPath(apiIdentifier);
+                WebApp webApp = getAPI(path);
+                if (webApp.getStatus() == null) {
+                    webApp.setStatus(api.getStatus());
+                }
+                webApp.setDefaultVersion(false);
+                updateApiArtifact(webApp, false, false);
             }
         }
     }
