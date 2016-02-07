@@ -48,7 +48,7 @@ var module = function () {
         webAppObj.setUrl(webAppEndpoint);
         webAppObj.setAllowAnonymous(allowAnonymous == "TRUE");
         webAppObj.setSkipGateway(skipGateway == "true");
-        webAppObj.setDefaultVersion(isDefaultVersion == "TRUE");
+        webAppObj.setDefaultVersion(isDefaultVersion == "true");
 
 
         var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;

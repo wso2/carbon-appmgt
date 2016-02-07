@@ -24,7 +24,7 @@ $( document ).ready(function() {
     });
 
     //Load default version details
-    var isDefaultVersion = "FALSE";
+    var isDefaultVersion = "false";
     var appName = $('#overview_name').val();
     var providerName = $('#overview_provider').val();
     var appVersion = $('#overview_version').val();
@@ -36,7 +36,7 @@ $( document ).ready(function() {
                async: false,
                success: function (data) {
                    if (data == appVersion) {
-                       isDefaultVersion = "TRUE";
+                       isDefaultVersion = "true";
                        $('#lblDefaultVersion').html("(This is the current default version)");
                    } else {
                        $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
@@ -52,10 +52,10 @@ $( document ).ready(function() {
         var output = [];
         $(".makeAsDefaultVersion_checkbox").each(function (index) {
             if ($(this).is(':checked')) {
-                output.push("TRUE");
+                output.push("true");
             }
             else {
-                output.push("FALSE");
+                output.push("false");
             }
         });
         $('#overview_makeAsDefaultVersion').val(output);
@@ -63,7 +63,7 @@ $( document ).ready(function() {
 
     var makeAsDefaultVal = $('#overview_makeAsDefaultVersion').val();
     $(".makeAsDefaultVersion_checkbox").each(function (index) {
-        if (makeAsDefaultVal == "TRUE") {
+        if (makeAsDefaultVal == "true") {
             $(this).prop('checked', true);
             $(this).prop('disabled', true);
         }

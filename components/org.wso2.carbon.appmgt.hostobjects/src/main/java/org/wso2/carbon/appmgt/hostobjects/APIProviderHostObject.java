@@ -937,7 +937,7 @@ public class APIProviderHostObject extends ScriptableObject {
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
         logoutURL = logoutURL.replace(endpoint, "");
         Boolean allowAnonymous = "TRUE".equals((String) apiData.get("overview_allowAnonymous", apiData));
-        Boolean makeAsDefaultVersion = "TRUE".equals((String) apiData.get("overview_makeAsDefaultVersion", apiData));
+        Boolean makeAsDefaultVersion = "true".equals((String) apiData.get("overview_makeAsDefaultVersion", apiData));
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
         String visibleRoles = "";

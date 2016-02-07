@@ -57,10 +57,10 @@ $(function() {
         var output = [];
         $(".makeAsDefaultVersion_checkbox").each(function (index) {
             if ($(this).is(':checked')) {
-                output.push("TRUE");
+                output.push("true");
             }
             else {
-                output.push("FALSE");
+                output.push("false");
             }
         });
         $('#overview_makeAsDefaultVersion').val(output);

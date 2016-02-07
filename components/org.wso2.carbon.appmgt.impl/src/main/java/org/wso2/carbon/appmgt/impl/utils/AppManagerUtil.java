@@ -468,8 +468,9 @@ public final class AppManagerUtil {
                                   api.getSubscriptionAvailability());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS,
                                   api.getSubscriptionAvailableTenants());
-            artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION,
-                                  String.valueOf(api.isDefaultVersion()).toUpperCase());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(
+                    api.isDefaultVersion()));
+
             String tiers = "";
 			for (Tier tier : api.getAvailableTiers()) {
 				tiers += tier.getName() + "\\|\\|";
