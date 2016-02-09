@@ -86,7 +86,7 @@ var api = {};
     };
 
 
-    api.getPopularAssets = function(type, tenantId, am, start, pageSize, siteFlag){
+    api.getPopularAssets = function (type, tenantId, am, start, pageSize, siteFlag, isMultipleVersionEnabledFlag) {
         var carbon = require('carbon');
         var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
         var index = 0, maxTry = 0; limit = pageSize;
@@ -112,10 +112,21 @@ var api = {};
                      asset.indashboard = store.isuserasset(aid, type);*/
                     asset = am.get(aid);
                     var treatAsASite = asset.attributes.overview_treatAsASite.toLocaleLowerCase();
+                    var isDefaultVersion = asset.attributes.overview_makeAsDefaultVersion;
+
                     if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0 &&
-                            treatAsASite == siteFlag) {
-                        assets.push(asset);
+                        treatAsASite == siteFlag) {
+                        if (isMultipleVersionEnabledFlag) {
+                            assets.push(asset);
+                        } else {
+                            if (isDefaultVersion == "true") {
+                                assets.push(asset);
+                            }
+                        }
+
                     }
+
+
                 } catch (e) {
                     log.warn("Error retrieving asset from store, information might be stale in social cache. id=" +
                         combinedAid + e);

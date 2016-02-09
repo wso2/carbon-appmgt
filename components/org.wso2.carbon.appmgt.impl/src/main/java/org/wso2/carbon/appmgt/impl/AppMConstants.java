@@ -346,7 +346,8 @@ public final class AppMConstants {
     public static final String EXTERNAL_APP_STORE_USERNAME = "Username";
     public static final String EXTERNAL_APP_STORE_PASSWORD ="Password";
 
-
+    public static final String STORE_CONFIGURATION = "APPStoreConfiguration.";
+    public static final String STORE_DISPLAY_MULTIPLE_VERSIONS = STORE_CONFIGURATION + "DisplayMultipleVersions";
  
     public static final String AUTH_MANAGER = "AuthManager.";
     public static final String AUTH_MANAGER_URL = AUTH_MANAGER + "ServerURL";
