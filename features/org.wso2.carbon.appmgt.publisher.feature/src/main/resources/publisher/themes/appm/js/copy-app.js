@@ -84,7 +84,7 @@ $(function() {
         var y = selectedProvider.split("-");
         var appProvider = $("#overview_provider").val();
         var appName = $("#overview_name").val();
-        var appVersion = $("#oldversion").val();
+        var appVersion = $("#overview_oldVersion").val();
         var uniqueAppName = appName+"-"+appVersion;
         $.ajax({
             url: caramel.context + '/api/sso/' + y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion,
@@ -238,7 +238,7 @@ $(function() {
 
                 url: caramel.context + '/asset/' + type,
                 type: 'POST',
-                data: {oldVersion: $("#oldversion").val()}
+                data: {oldVersion: $("#overview_oldVersion").val()}
             };
         }else{
             showAlert('Mandatory field \'New Version\' has not been filled in.', 'error');

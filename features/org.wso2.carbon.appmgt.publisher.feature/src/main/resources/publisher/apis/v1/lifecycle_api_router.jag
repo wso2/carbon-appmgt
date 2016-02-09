@@ -413,15 +413,18 @@ require('/modules/publisher.js').exec(function (ctx) {
             && ((action == "Publish") || (action == "Re-Publish"))
             && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
 
-            
+
             for (i = 0; i < previousArtifacts.length; i++) {
-                operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
-                if (operationResult.isSuccess) {
-                    content.messages.push(operationResult.message);
-                } else {
-                    // some error occurred in moveSubscriptions function
-                    // abort further subscription moving
-                    break;
+                if (previousArtifacts[i].attributes.overview_version
+                     == currentArtifact.attributes.overview_oldVersion) {
+                    operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
+                    if (operationResult.isSuccess) {
+                        content.messages.push(operationResult.message);
+                    } else {
+                        // some error occurred in moveSubscriptions function
+                        // abort further subscription moving
+                        break;
+                    }
                 }
             }
 

@@ -1182,13 +1182,19 @@ public class AppMDAO {
 				return -1;
 			}
 
-            String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
+            //String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
+
+            String moveQuery = "INSERT INTO APM_SUBSCRIPTION(SUBSCRIPTION_TYPE, TIER_ID, APP_ID, APPLICATION_ID, " +
+                    "SUB_STATUS, TRUSTED_IDP, SUBSCRIPTION_TIME ) " +
+                    "SELECT SUBSCRIPTION_TYPE, TIER_ID , ? ,APPLICATION_ID ,SUB_STATUS , TRUSTED_IDP ,? " +
+                    "FROM APM_SUBSCRIPTION WHERE APP_ID = ?";
 
             count = -1;
             try {
                 ps = conn.prepareStatement(moveQuery);
                 ps.setInt(1, toAppId);
-                ps.setInt(2, fromAppId);
+                ps.setTimestamp(2, new Timestamp(new java.util.Date().getTime()));
+                ps.setInt(3, fromAppId);
                 count = ps.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
