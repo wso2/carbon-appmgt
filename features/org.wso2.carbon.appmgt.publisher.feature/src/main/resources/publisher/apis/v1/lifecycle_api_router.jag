@@ -29,6 +29,8 @@ require('/modules/publisher.js').exec(function (ctx) {
 	var routeManager = new router.Router();
 	var log = new Log();
 	var permissions = require('/modules/permissions.js').permissions;
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
 
 	routeManager.register('POST', 'publisher', '/publisher/api/lifecycle/{type}/{id}', function (context) {
 		var shortName = context.params.type;
@@ -137,7 +139,6 @@ require('/modules/publisher.js').exec(function (ctx) {
      * @returns {{status: string, messages: string[], artifacts: Object[]}}
      */
     routeManager.register('PUT', 'publisher', '/publisher/api/lifecycle/{action}/{type}/{id}', function (context) {
-
         var appType = context.params.type; // webapp or mobileapp
         var action = context.params.action; // see '/config/publisher.json' --> publisherActions
         var uuid = context.params.id; // UUID
@@ -161,6 +162,27 @@ require('/modules/publisher.js').exec(function (ctx) {
         var userManager = server.userManager(server.current(session).tenantId);
         var user = server.current(session);
         var permission = null;
+
+        //check if its the default version and if it has any other versions when deprecating
+        if (action == "Deprecate") {
+            var webApp = apiProvider.getApplicationByUUID(uuid);
+            var appProvider = webApp.provider;
+            var appName = webApp.name;
+            var appVersion = webApp.version;
+            var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
+
+            if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
+                log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+                response.status = 401;
+                response.contentType = "application/json";
+                content.status = "Access Denied";
+                content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
+                                      + appType + "'. Please select other version of this '" + appType
+                                      + "' as the default version and proceed.");
+                response.content = stringify(content);
+                return;
+            }
+        }
 
         // To Send an app to submit for review, created permission is required.
         if (action != "Submit for Review") {
@@ -387,9 +409,9 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // For all previously published web apps when publishing or re-publishing current web app,
         // move subscriptions of that web app version to this web app version.
-        /*
         if ((appType == "webapp") && (previousArtifacts.length > 0)
-            && ((action == "Publish") || (action == "Re-Publish"))) {
+            && ((action == "Publish") || (action == "Re-Publish"))
+            && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
 
             for (i = 0; i < previousArtifacts.length; i++) {
                 operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
@@ -426,7 +448,6 @@ require('/modules/publisher.js').exec(function (ctx) {
             }
 
         }
-        */
 
         // everything went great
         response.status = 200;

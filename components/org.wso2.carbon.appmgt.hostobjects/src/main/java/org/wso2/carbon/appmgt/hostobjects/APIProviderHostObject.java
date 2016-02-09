@@ -3684,6 +3684,52 @@ public class APIProviderHostObject extends ScriptableObject {
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.getDefaultVersion(appName, provider, isPublished);
     }
+
+    public static boolean jsFunction_isDefaultVersion(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray myn = new NativeArray(0);
+        if (args == null || args.length != 1) {
+            handleException("Invalid input parameters.");
+        }
+        NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
+        APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.isDefaultVersion(apiIdentifier);
+    }
+
+    public static boolean jsFunction_hasMoreVersions(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray myn = new NativeArray(0);
+        if (args == null || args.length != 1) {
+            handleException("Invalid input parameters.");
+        }
+        NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
+        APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.hasMoreVersions(apiIdentifier);
+    }
+
+    public static NativeObject jsFunction_getApplicationByUUID(Context cx, Scriptable thisObj, Object[] args,
+                                                               Function funObj)
+            throws AppManagementException {
+        NativeObject webappNativeObj = new NativeObject();
+        if (args == null || args.length != 1) {
+            handleException("Invalid input parameters.");
+        }
+        String uuid = (String) args[0];
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        WebApp api = apiProvider.getApplicationByUUID(uuid);
+
+        if (api != null) {
+            webappNativeObj.put("name", webappNativeObj, api.getId().getApiName());
+            webappNativeObj.put("provider", webappNativeObj, api.getId().getProviderName());
+            webappNativeObj.put("version", webappNativeObj, api.getId().getVersion());
+            webappNativeObj.put("context", webappNativeObj, api.getContext());
+        } else {
+            handleException("Cannot find the requested WebApp related to UUID - " + uuid);
+        }
+        return webappNativeObj;
+    }
 }
 
 

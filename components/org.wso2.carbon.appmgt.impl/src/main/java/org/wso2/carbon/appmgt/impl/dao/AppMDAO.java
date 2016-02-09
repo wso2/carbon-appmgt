@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xpath.operations.Bool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -53,6 +54,7 @@ import org.wso2.carbon.appmgt.impl.utils.LRUCache;
 import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
 import org.wso2.carbon.appmgt.impl.utils.URLMapping;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
@@ -1181,21 +1183,22 @@ public class AppMDAO {
 			}
 
             String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
+
             count = -1;
-			try {
-				ps = conn.prepareStatement(moveQuery);
-				ps.setInt(1, toAppId);
-				ps.setInt(2, fromAppId);
-				count = ps.executeUpdate();
-				conn.commit();
-			} catch (SQLException e) {
-				String msg = "Could not move subscriptions from " +
-						fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() +
-						"-" + fromIdentifier.getVersion() + " app to " +
-						toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() +
-						"-" + toIdentifier.getVersion() + " app";
-				handleException(msg, e);
-			}
+            try {
+                ps = conn.prepareStatement(moveQuery);
+                ps.setInt(1, toAppId);
+                ps.setInt(2, fromAppId);
+                count = ps.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                String msg = "Could not move subscriptions from " +
+                        fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() +
+                        "-" + fromIdentifier.getVersion() + " app to " +
+                        toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() +
+                        "-" + toIdentifier.getVersion() + " app";
+                handleException(msg, e);
+            }
 
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, results);
@@ -4249,12 +4252,16 @@ public class AppMDAO {
         int recordCount = 0;
 
         String sqlQuery =
-                "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? ";
+                "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? AND " +
+                        "TENANT_ID=? ";
 
         try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setString(1, api.getId().getApiName());
             prepStmt.setString(2, api.getId().getProviderName());
+            prepStmt.setInt(3, tenantId);
             rs = prepStmt.executeQuery();
 
             if (rs.next()) {
@@ -4285,7 +4292,7 @@ public class AppMDAO {
         PreparedStatement prepStmt = null;
         String query =
                 "INSERT INTO APM_APP_DEFAULT_VERSION  (APP_NAME, APP_PROVIDER, DEFAULT_APP_VERSION, " +
-                        "PUBLISHED_DEFAULT_APP_VERSION) VALUES (?,?,?,?)";
+                        "PUBLISHED_DEFAULT_APP_VERSION, TENANT_ID) VALUES (?,?,?,?,?)";
 
         if (log.isDebugEnabled()) {
             log.debug("Inserting default version details for AppId -"
@@ -4293,16 +4300,18 @@ public class AppMDAO {
         }
 
         try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, api.getId().getApiName());
             prepStmt.setString(2, api.getId().getProviderName());
             prepStmt.setString(3, api.getId().getVersion());
-
             if (api.getStatus() == APIStatus.PUBLISHED) {
                 prepStmt.setString(4, api.getId().getVersion());
             } else {
                 prepStmt.setString(4, null);
             }
+            prepStmt.setInt(5, tenantId);
             prepStmt.executeUpdate();
         } catch (SQLException e) {
              /* In the code im using a single SQL connection passed from the parent function so I'm logging the error
@@ -4321,20 +4330,26 @@ public class AppMDAO {
         PreparedStatement prepStmt = null;
         String query;
         try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
             if (api.getStatus() == APIStatus.PUBLISHED && api.isDefaultVersion()) {
                 query = "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=?, PUBLISHED_DEFAULT_APP_VERSION=? " +
-                        "WHERE APP_NAME=? AND APP_PROVIDER=? ";
+                        "WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
                 prepStmt = connection.prepareStatement(query);
                 prepStmt.setString(1, api.getId().getVersion());
                 prepStmt.setString(2, api.getId().getVersion());
                 prepStmt.setString(3, api.getId().getApiName());
                 prepStmt.setString(4, api.getId().getProviderName());
+                prepStmt.setInt(5, tenantId);
             } else {
-                query = "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=? WHERE APP_NAME=? AND APP_PROVIDER=? ";
+                query =
+                        "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=? WHERE APP_NAME=? AND APP_PROVIDER=?" +
+                                " AND TENANT_ID=? ";
                 prepStmt = connection.prepareStatement(query);
                 prepStmt.setString(1, api.getId().getVersion());
                 prepStmt.setString(2, api.getId().getApiName());
                 prepStmt.setString(3, api.getId().getProviderName());
+                prepStmt.setInt(4, tenantId);
             }
             prepStmt.executeUpdate();
         } catch (SQLException e) {
@@ -7916,7 +7931,8 @@ public class AppMDAO {
                 columnName = "DEFAULT_APP_VERSION";
             }
             String sqlQuery =
-                    "SELECT " + columnName + " FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER=? ";
+                    "SELECT " + columnName +
+                            " FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER=? AND TENANT_ID=? ";
 
             ps = conn.prepareStatement(sqlQuery);
             if (log.isDebugEnabled()) {
@@ -7924,8 +7940,11 @@ public class AppMDAO {
                         , providerName, appName);
                 log.debug(msg);
             }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
             ps.setString(1, appName);
             ps.setString(2, providerName);
+            ps.setInt(3, tenantId);
             rs = ps.executeQuery();
             if (rs.next()) {
                 defaultVersion = rs.getString(columnName);
@@ -7955,11 +7974,15 @@ public class AppMDAO {
             PreparedStatement prepStmt = null;
             String query =
                     "UPDATE APM_APP_DEFAULT_VERSION SET PUBLISHED_DEFAULT_APP_VERSION=? " +
-                            "WHERE APP_NAME=? AND APP_PROVIDER=? ";
+                            "WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
             prepStmt = connection.prepareStatement(query);
             prepStmt.setString(1, api.getId().getVersion());
             prepStmt.setString(2, api.getId().getApiName());
             prepStmt.setString(3, api.getId().getProviderName());
+            prepStmt.setInt(4, tenantId);
 
             prepStmt.executeUpdate();
             connection.commit();
@@ -7995,7 +8018,7 @@ public class AppMDAO {
                 webAppVersions.add(rs.getString("APP_VERSION"));
             }
         } catch (SQLException e) {
-            handleException("Error while getting alls versionsfrom the database for the app" +
+            handleException("Error while getting all the versions from the database for the app" +
                                     " : " + appName, e);
 
         } finally {
@@ -8003,5 +8026,104 @@ public class AppMDAO {
         }
         return webAppVersions;
     }
+
+    public static boolean hasMoreVersions(APIIdentifier apiIdentifier)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        boolean hasMoreVersions = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery =
+                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP WHERE APP_NAME =? AND APP_PROVIDER =? AND APP_VERSION!=?";
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, apiIdentifier.getApiName());
+            ps.setString(2, apiIdentifier.getProviderName());
+            ps.setString(3, apiIdentifier.getVersion());
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                hasMoreVersions = (rs.getInt("ROWCOUNT") > 0);
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting more version details for the app" +
+                                    " : " + apiIdentifier.getApiName(), e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return hasMoreVersions;
+    }
+
+    public static boolean isDefaultVersion(APIIdentifier apiIdentifier)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        boolean isDefaultVersion = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery =
+                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER =? " +
+                            "AND  " +
+                            "(DEFAULT_APP_VERSION=? OR PUBLISHED_DEFAULT_APP_VERSION =?)";
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, apiIdentifier.getApiName());
+            ps.setString(2, apiIdentifier.getProviderName());
+            ps.setString(3, apiIdentifier.getVersion());
+            ps.setString(4, apiIdentifier.getVersion());
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                isDefaultVersion = (rs.getInt("ROWCOUNT") > 0);
+            }
+        } catch (SQLException e) {
+            handleException("Error while checking if the default version for the app" +
+                                    " : " + apiIdentifier.getApiName(), e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return isDefaultVersion;
+    }
+
+
+    /**
+     * Get WebApp basic details by app uuid
+     *
+     * @param webAppUUID
+     * @return
+     * @throws AppManagementException
+     */
+    public static WebApp getWebAppIdFromUUID(String webAppUUID) throws
+                                                                AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        WebApp webApp = null;
+        String query = "SELECT APP_ID, APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT " +
+                "FROM APM_APP WHERE UUID = ? ";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, webAppUUID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                APIIdentifier apiIdentifier = new APIIdentifier(rs.getString("APP_PROVIDER"), rs.getString("APP_NAME"),
+                                                                rs.getString("APP_VERSION"));
+                webApp = new WebApp(apiIdentifier);
+                webApp.setApiName(rs.getString("APP_NAME"));
+                webApp.setContext(rs.getString("CONTEXT"));
+            }
+        } catch (SQLException e) {
+            handleException("Error when executing the SQL: " + query + " (WebApp UUID:" + webAppUUID + ")", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return webApp;
+    }
+
 
 }

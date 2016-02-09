@@ -532,4 +532,31 @@ public interface APIProvider extends APIManager {
      */
     public String getDefaultVersion(String appName, String providerName, boolean isPublished)
             throws AppManagementException;
+
+    /**
+     * Check if the given app is the default version
+     *
+     * @param identifier
+     * @return
+     * @throws AppManagementException
+     */
+    public boolean isDefaultVersion(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Check if the given app has any other versions in any state
+     *
+     * @param identifier
+     * @return
+     * @throws AppManagementException
+     */
+    public boolean hasMoreVersions(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Get WebApp basic details by app uuid
+     *
+     * @param uuid
+     * @return
+     * @throws AppManagementException
+     */
+    public WebApp getApplicationByUUID(String uuid) throws AppManagementException;
 }

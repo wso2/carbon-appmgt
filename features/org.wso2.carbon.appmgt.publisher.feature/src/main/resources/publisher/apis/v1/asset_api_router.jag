@@ -285,6 +285,21 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
 
                 var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
+                if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
+                    msg['isDeleted'] = false;
+                    msg['message'] =
+                    'Delete is not permitted as this is the default version of the application. '
+                    + 'Please select other version of this application as the default version and proceed.';
+                    msg['ok'] = false;
+                    msg['message'] =
+                    'Delete is not permitted as this is the default version of the application. '
+                    + 'Please select other version of this application as the default version and proceed.';
+                    response.contentType = "application/json";
+                    print(msg);
+                    return;
+                }
+
+
                 if (ssoProvider != " ") {
                     ssoProviderObj.setProviderName(ssoProvider.split("-")[0]);
                     ssoProviderObj.setProviderVersion(ssoProvider.split("-")[1]);

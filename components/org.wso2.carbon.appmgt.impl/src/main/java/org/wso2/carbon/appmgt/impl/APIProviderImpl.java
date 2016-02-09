@@ -49,6 +49,7 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationR
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
+import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
@@ -2033,4 +2034,39 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return AppMDAO.getDefaultVersion(appName, providerName, isPublished);
     }
 
+    /**
+     * Check if the given app is the default version
+     *
+     * @param identifier
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public boolean isDefaultVersion(APIIdentifier identifier) throws AppManagementException {
+        return appMDAO.isDefaultVersion(identifier);
+    }
+
+    /**
+     * Check if the given app has any other versions in any state
+     *
+     * @param identifier
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public boolean hasMoreVersions(APIIdentifier identifier) throws AppManagementException {
+        return appMDAO.hasMoreVersions(identifier);
+    }
+
+    /**
+     * Get WebApp basic details by app uuid
+     *
+     * @param uuid
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public WebApp getApplicationByUUID(String uuid) throws AppManagementException {
+        return appMDAO.getWebAppIdFromUUID(uuid);
+    }
 }
