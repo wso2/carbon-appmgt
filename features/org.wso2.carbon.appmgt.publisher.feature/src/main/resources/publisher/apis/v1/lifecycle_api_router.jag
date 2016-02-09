@@ -413,7 +413,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             && ((action == "Publish") || (action == "Re-Publish"))
             && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
 
-            /*
+            
             for (i = 0; i < previousArtifacts.length; i++) {
                 operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
                 if (operationResult.isSuccess) {
@@ -423,12 +423,6 @@ require('/modules/publisher.js').exec(function (ctx) {
                     // abort further subscription moving
                     break;
                 }
-            }
-            */
-
-            operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
-            if (operationResult.isSuccess) {
-                content.messages.push(operationResult.message);
             }
 
             if (!operationResult.isSuccess) {
