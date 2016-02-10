@@ -438,16 +438,6 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.searchOff = false;//display search in header
         headerData.hideAllAppsLink = true; //hide all apps link in header
         showSortOptions = true; //display sorting options in  body
-    } else if (!isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled) {
-        //Get only enterprise subscribed apps and anonymous apps
-        //Since subscription data is in APPM database can not get assets from
-        //registry with pagination
-
-    } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        //Get only self subscribed apps and anonymous apps
-        //Since subscription data is in APPM database can not get assets from
-        //registry with pagination
-
     } else {
         if (user) {
             //Display anoymous apps + subscribed apps
