@@ -13,7 +13,7 @@
     This parameter specifies whether to display multiple versions of same
     API or only showing the latest version of an API.
         -->
-        <DisplayMultipleVersions>false</DisplayMultipleVersions>
+        <DisplayMultipleVersions>true</DisplayMultipleVersions>
     </APPStoreConfiguration>
 
     <!-- The authorization manager configuration to be used by store / publisher components -->

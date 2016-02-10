@@ -415,8 +415,9 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 
             for (i = 0; i < previousArtifacts.length; i++) {
+                //Move subscriptions only from the original older version which this web app was created
                 if (previousArtifacts[i].attributes.overview_version
-                     == currentArtifact.attributes.overview_oldVersion) {
+                    == currentArtifact.attributes.overview_oldVersion) {
                     operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
                     if (operationResult.isSuccess) {
                         content.messages.push(operationResult.message);
