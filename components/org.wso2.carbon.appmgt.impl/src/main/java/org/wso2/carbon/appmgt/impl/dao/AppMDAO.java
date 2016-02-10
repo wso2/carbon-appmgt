@@ -7869,7 +7869,6 @@ public class AppMDAO {
      * @param identifier API Identifier
      * @param userName   User Name
      * @param tenantId   Tenant Id
-     * @return
      * @throws AppManagementException
      */
     public void removeFromFavouriteApps(APIIdentifier identifier, String userName, int tenantId)
@@ -7938,7 +7937,7 @@ public class AppMDAO {
      * @param identifier API Identifier
      * @param userName   User Name
      * @param tenantId   Tenant Id
-     * @return
+     * @return true if favourite app else false
      * @throws AppManagementException
      */
     public boolean isFavouriteApp(APIIdentifier identifier, String userName, int tenantId)
@@ -8140,7 +8139,12 @@ public class AppMDAO {
         return apiIdentifiers;
     }
 
-
+    /**
+     * This method add myfaouvrite page as home page for given user
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @throws AppManagementException
+     */
     public void addToStoreFavouritePage(String userName, int tenantId)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
@@ -8170,7 +8174,13 @@ public class AppMDAO {
         }
     }
 
-
+    /**
+     * This method remove myfavourite page from home page for given user.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @throws AppManagementException
+     */
     public void removeFromStoreFavouritePage(String userName, int tenantId)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
@@ -8199,6 +8209,14 @@ public class AppMDAO {
         }
     }
 
+    /**
+     * This method check whether given user has selected myfavourite page as homepage.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @return true if user has selected else false
+     * @throws AppManagementException
+     */
     public boolean hasFavouritePage(String userName, int tenantId)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
