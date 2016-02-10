@@ -892,8 +892,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 APIIdentifier apiIdentifier = new APIIdentifier(
                         api.getId().getProviderName(), api.getId().getApiName(),
                         webAppVersion);
-                String path = AppManagerUtil.getAPIPath(apiIdentifier);
-                WebApp webApp = getAPI(path);
+                WebApp webApp = getAPI(apiIdentifier);
                 if (webApp.getStatus() == null) {
                     webApp.setStatus(api.getStatus());
                 }
