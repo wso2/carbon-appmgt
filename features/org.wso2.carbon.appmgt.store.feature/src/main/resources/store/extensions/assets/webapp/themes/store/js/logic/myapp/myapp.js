@@ -98,7 +98,7 @@ $(function () {
                        } else {
                            $(waitIconId).hide();
                            $(rmvIconId).show();
-                           var message = 'Error occured  when remove  web app: ' + removeFromMyFavourite.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.apiName
                                + ' from my favourite web apps';
                            notify(message);
                        }
@@ -110,7 +110,7 @@ $(function () {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + removeFromMyFavourite.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.apiName
                                + ' from my favourite web apps';
                            notify(message);
                        }

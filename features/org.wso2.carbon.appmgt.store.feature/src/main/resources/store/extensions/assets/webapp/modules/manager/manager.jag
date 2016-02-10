@@ -118,6 +118,5 @@ var hasFavouritePage = function () {
             message: e.message
         };
     }
-
 };
 %>

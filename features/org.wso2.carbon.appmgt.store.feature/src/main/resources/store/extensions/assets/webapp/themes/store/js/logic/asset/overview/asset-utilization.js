@@ -285,7 +285,6 @@ $(function(){
         } else {
             location.reload();
         }
-
     });
 
     $('#btnRemoveFromFav').on('click', function () {
@@ -293,10 +292,7 @@ $(function(){
     });
 
     var addToMyFavourite = function () {
-
         if (metadata) {
-            console.log('Found metadata');
-
             //Obtain the required information
             var data = {};
             var appDetails = metadata.apiAssetData.attributes;
@@ -309,17 +305,13 @@ $(function(){
     };
 
     var removeFromMyFavourite = function () {
-
         if (metadata) {
-            console.log('Found metadata');
-
             //Obtain the required information
             var data = {};
             var appDetails = metadata.apiAssetData.attributes;
             data['apiName'] = appDetails.overview_name;
             data['apiVersion'] = appDetails.overview_version;
             data['apiProvider'] = appDetails.overview_provider;
-
 
             removeFromFavourite(data);
         }
@@ -331,72 +323,83 @@ $(function(){
                    dataType: 'JSON',
                    type: 'POST',
                    data: data,
-                   complete: function (response, textStatus) {
-                       if (textStatus == "success") {
-                           console.info(data.apiName + 'web app is successfully added to my favourite web apps');
-                           noty({
-                                    text: 'You have successfully added  <b>' + data.apiName +
-                                          '</b> to your favourite apps',
-                                    'layout': 'center',
-                                    'timeout': 1500,
-                                    'modal': true,
-                                    'onClose': function () {
-                                        location.reload();
-                                    }
-                                });
+                   success: function (response, textStatus, xhr) {
+                       if (response.error == false) {
+                           var message = 'You have successfully added  <b>' + data.apiName +
+                                         '</b> to your favourite apps';
+                           notifyAndReload(message);
                        } else {
-                           alert("response error true")
-                           console.info('Error occured in while adding  web app: ' + data.apiName +
-                                        "to my favourite web apps");
+                           var message = 'Error occured in while adding  web app: ' + data.apiName +
+                                         "to my favourite web apps";
+                           notify(message);
                        }
                    },
                    error: function (response) {
-                       alert('Error occured when add to my favourite apps');
+                       if (response.status == 401) {
+                           var message = 'Your session has time out.Please login again';
+                           notify(message);
+                       } else {
+                           var message = 'Error occured in while adding  web app: ' + data.apiName +
+                                         ' to my favourite web apps';
+                           notify(message);
+                       }
 
-                   },
-                   success: function (e) {
-                       //location.reload();
                    }
                });
     };
 
     var removeFromFavourite = function (data) {
-
         $.ajax({
                    url: API_REMOVE_FROM_FAVOURITE,
                    type: 'POST',
                    data: data,
-                   success: function (response) {
+                   success: function (response, textStatus, xhr) {
                        if (JSON.parse(response).error == false) {
-                           console.info('Successfully unsubscribed to web app: ' + data.apiName);
-                           //alert('Succsessfully unsubscribed to the '+subscription.apiName+' Web App.');
-
-                           noty({
-                                    text: 'You have successfully remvode  <b>' + data.apiName
-                                        + '</b> from your favourite apps',
-                                    'layout': 'center',
-                                    'timeout': 1500,
-                                    'modal': true,
-                                    'onClose': function () {
-                                        location.reload();
-                                    }
-                                });
-
-
+                           var message = 'You have successfully removed  <b>' + data.apiName
+                               + '</b> from your favourite apps';
+                           notify(message);
                            $('#btnRemoveFromFav').hide();
                            $('#btnAddToFav').show();
 
                        } else {
-                           console.info('Error occured  when remove  web app: ' + removeFromMyFavourite.apiName
-                                            + 'from ' +
-                                        'my favourite web apps');
+                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                               + ' from my favourite web apps';
+                           notify(message);
                        }
 
                    },
                    error: function (response) {
-                       alert('Error occured when remove web app from my favourite web apps');
+                       if (response.status == 401) {
+                           var message = 'Your session has time out.Please login again';
+                           notify(message);
+                       } else {
+                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                               + ' from my favourite web apps';
+                           notify(message);
+                       }
                    }
                });
+    };
+
+    var notify = function (message) {
+        noty({
+                 text: message,
+                 'layout': 'center',
+                 'timeout': 1500,
+                 'modal': true
+             });
+    };
+
+    var notifyAndReload = function (message) {
+        noty({
+                 text: message,
+                 'layout': 'center',
+                 'timeout': 1500,
+                 'modal': true,
+                 'onClose': function () {
+                     location.reload();
+                 }
+             });
     };
   
 });

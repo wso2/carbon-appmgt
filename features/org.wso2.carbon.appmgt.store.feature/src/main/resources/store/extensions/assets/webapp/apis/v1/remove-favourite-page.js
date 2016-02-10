@@ -20,8 +20,8 @@ var resource = (function () {
         var result = subsApi.removeFavouritePage();
         return result;
     };
+
     return{
         post: removeFavouritePage
     }
-
 })();

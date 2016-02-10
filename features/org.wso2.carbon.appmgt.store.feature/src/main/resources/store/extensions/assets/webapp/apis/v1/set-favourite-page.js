@@ -24,5 +24,4 @@ var resource = (function () {
     return{
         post: setFavouritePage
     }
-
 })();

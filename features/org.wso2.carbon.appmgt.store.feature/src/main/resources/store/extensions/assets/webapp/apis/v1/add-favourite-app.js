@@ -27,7 +27,6 @@ var resource = (function () {
         return result;
     };
 
-
     return{
         post: addToFavouriteApps
     }

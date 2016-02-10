@@ -12,11 +12,6 @@ var assetLinks = function (user) {
                 title: 'Install',
                 url: 'process',
                 path: 'process.jag'
-            },
-            {
-                title:'Subscriptions',
-                url:'subscriptions',
-                path:'subscriptions.jag'
             }
         ]};
 };
