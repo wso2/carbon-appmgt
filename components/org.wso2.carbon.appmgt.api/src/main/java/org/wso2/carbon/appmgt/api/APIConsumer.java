@@ -20,6 +20,7 @@ package org.wso2.carbon.appmgt.api;
 
 import org.wso2.carbon.appmgt.api.model.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -324,4 +325,95 @@ public interface APIConsumer extends APIManager {
      */
     public Application[] getApplications(Subscriber subscriber) throws AppManagementException;
 
+    /**
+     * Add the given webapp to favourite webapps.
+     *
+     * @param identifier Api identifier
+     * @param userId     user id(user name)
+     * @param tenantId
+     * @return true if operation is success else false
+     * @throws AppManagementException
+     */
+    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+            throws AppManagementException;
+
+    /**
+     * Remove the given webapp from favourite webapps.
+     *
+     * @param identifier Api identifier
+     * @param userId     user id(user name)
+     * @param tenantId
+     * @return true if operation is success else false
+     * @throws AppManagementException
+     */
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+            throws AppManagementException;
+
+    /**
+     * Check whether given app exists in the favourite apps of the user.
+     *
+     * @param identifier Api identifier
+     * @param userId     user id(user name)
+     * @param tenantId
+     * @return true if favourite app else false
+     * @throws AppManagementException
+     */
+    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantId) throws AppManagementException;
+
+    /**
+     * This methods returns  favourite webapps of given user for given pagination.
+     *
+     * @param userName logged in username
+     * @param tenantId
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+            throws AppManagementException;
+
+    /**
+     * This method returns favourite apps count of logged in user.
+     *
+     * @param userName logged in username
+     * @param tenantId
+     * @return apps count
+     * @throws AppManagementException
+     */
+    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException;
+
+
+    /**
+     * This method returns the anonymous and subscribed web apps for given user.
+     *
+     * @param userName User Name.
+     * @return
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> getUserSubscribedApps(String userName) throws AppManagementException;
+
+    /**
+     * This method mark that user has selected favourite page as default landing page in store.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @throws AppManagementException
+     */
+    public void setFavouritePage(String userName, int tenantId) throws AppManagementException;
+
+    /**
+     * This method mark that user has deselected the favourite page from default landing page in store.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @throws AppManagementException
+     */
+    public void removeFavouritePage(String userName, int tenantId) throws AppManagementException;
+
+    /**
+     * This method checks whether user has  selected favourite page as default landing page in store.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @throws AppManagementException
+     */
+    public boolean hasFavouritePage(String userName, int tenantId) throws AppManagementException;
 }

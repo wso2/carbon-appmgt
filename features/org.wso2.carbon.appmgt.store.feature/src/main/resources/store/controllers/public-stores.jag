@@ -7,6 +7,16 @@ var caramel = require('caramel'),
         contextPath = caramel.configs().context,
         reversProxyEnabled = caramel.configs().reverseProxyEnabled,
         reverseProxyHost = caramel.configs().reverseProxyHost;
+var config = require("/config/store.json");
+var landingPage = config.pages.LandingPage;
+var user = jagg.getUser();
+if(user) {
+    var isFavouritePageSelected = manager.hasFavouritePage().status;
+    if(isFavouritePageSelected){
+        landingPage =config.pages.FavouritePage;
+    }
+}
+
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     require('/modules/store.js').exec(function (ctx) {
         var PAGE_SIZE = 10;
@@ -16,7 +26,10 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var numberOfTenantDomains = tenantDomains.length;
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
-            stores.push(tenantDomains[i]);
+            var store ={};
+            store['name'] = tenantDomains[i];
+            store['storeUrl'] = tenantDomains[i]+ landingPage;
+            stores.push(store);
         }
 
         caramel.render({
@@ -33,7 +46,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
-    var redirectURl = contextPath + '/assets/';
+    var redirectURl = contextPath + landingPage;
     if (reversProxyEnabled) {
         redirectURl = reverseProxyHost + redirectURl;
     }

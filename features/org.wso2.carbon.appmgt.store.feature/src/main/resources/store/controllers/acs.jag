@@ -1,7 +1,7 @@
 <%
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
-
-var storeHostObj = jagg.module("manager").getAPIStoreObj();
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
 
 (function () {
     var log = new Log(),
@@ -111,6 +111,20 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                             var user = require('store').user;
                             if (log.isDebugEnabled()) {
                                 log.debug('User has been set to : ' + sessionObj.loggedInUser);
+                            }
+                            //check whether login request came by clicking the login url and do redirect
+                            // to myfavourites page if user has already selected it as homepage.
+                            //in store login url is in the format of /login?header=true
+                            var queryParam = "?header=true";
+                            if (relayState.indexOf(queryParam)) {
+                                var isFavouritePageSelected = manager.hasFavouritePage().status;
+                                if (isFavouritePageSelected) {
+                                    var favPage = configs.pages.FavouritePage;
+                                    relayState = contextPath + favPage;
+                                } else {
+                                    //remove the query param
+                                    relayState.replace(queryParam, "");
+                                }
                             }
                             if(reversProxyEnabled) {
                                 relayState = reverseProxyHost+relayState;

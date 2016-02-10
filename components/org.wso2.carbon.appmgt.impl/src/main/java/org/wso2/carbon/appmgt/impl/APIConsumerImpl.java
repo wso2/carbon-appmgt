@@ -1625,4 +1625,53 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     public Application[] getApplications(Subscriber subscriber) throws AppManagementException {
         return appMDAO.getApplications(subscriber);
     }
+
+    @Override
+    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+            throws AppManagementException {
+        appMDAO.addToFavouriteApps(identifier, userId, tenantId);
+    }
+
+    @Override
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+            throws AppManagementException {
+        appMDAO.removeFromFavouriteApps(identifier, userId, tenantId);
+    }
+
+    @Override
+    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantId)
+            throws AppManagementException {
+        return appMDAO.isFavouriteApp(identifier, userId, tenantId);
+    }
+
+    @Override
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+            throws AppManagementException {
+        return appMDAO.getFavouriteApps(userName, tenantId);
+    }
+
+    @Override
+    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException {
+        return appMDAO.getFavouriteAppsCount(userName, tenantId);
+    }
+
+    @Override
+    public List<APIIdentifier> getUserSubscribedApps(String userName) throws AppManagementException {
+        return appMDAO.getUserSubscribedApps(userName);
+    }
+
+    @Override
+    public void setFavouritePage(String userName, int tenantId) throws AppManagementException {
+        appMDAO.addToStoreFavouritePage(userName, tenantId);
+    }
+
+    @Override
+    public void removeFavouritePage(String userName, int tenantId) throws AppManagementException {
+        appMDAO.removeFromStoreFavouritePage(userName, tenantId);
+    }
+
+    @Override
+    public boolean hasFavouritePage(String userName, int tenantId) throws AppManagementException {
+        return appMDAO.hasFavouritePage(userName, tenantId);
+    }
 }

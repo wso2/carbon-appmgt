@@ -9,13 +9,13 @@
                 {{#if stores}}
                     {{#each stores}}
                         <div class="slide asset">
-                            <a href="{{url "/t/"}}{{this}}/" style="color: #005580 !important;">
+                            <a href="{{url "/t/"}}{{storeUrl}}" style="color: #005580 !important;">
                                 <div class="asset-icon">
                                     <img src="{{url "/themes/store/img/tenant-store.png"}}" />
                                 </div>
 
                                 <div class="asset-details" style="text-align: center !important;">
-                                    <h4 style="font-weight: normal !important;">{{this}}</h4>
+                                    <h4 style="font-weight: normal !important;">{{name}}</h4>
                                 </div>
                             </a>
                         </div>

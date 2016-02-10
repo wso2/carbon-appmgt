@@ -71,4 +71,53 @@ var addAPISubscription = function (api, subscriptionType, tier, applicationName,
         };
     }
 };
+
+var addToFavouriteApps = function (api) {
+    var log = new Log();
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        store.addToFavourite(api.provider, api.name, api.version);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Add to Favourite");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            status: false,
+            message: e.message
+        };
+    }
+};
+
+var setFavouritePage = function () {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        store.setFavouritePage();
+
+        if (log.isDebugEnabled()) {
+            log.debug("Set favourite pages as default landing page");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            status: false,
+            message: e.message
+        };
+    }
+};
 %>

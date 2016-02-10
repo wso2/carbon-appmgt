@@ -29,4 +29,51 @@ var removeAPISubscription = function (api,tier,applicationName,username) {
         };
     }
 };
+
+var removeFromFavouriteApps = function (api) {
+    var status,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        store.removeFromFavouriteApps(api.provider, api.name, api.version);
+
+        if (log.isDebugEnabled()) {
+            log.debug("remove from favourite apps");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            status: false,
+            message: e.message
+        };
+    }
+};
+
+var removeFavouritePage = function () {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        store.removeFavouritePage();
+
+        if (log.isDebugEnabled()) {
+            log.debug("remove favourite pages from defualt landing page");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            status: false,
+            message: e.message
+        };
+    }
+};
 %>

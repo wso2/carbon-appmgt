@@ -94,6 +94,63 @@ var serviceModule = (function () {
         return result;
     }
 
+    Subscriber.prototype.addToFavouriteApps = function (options) {
+        var apiData = {};
+        apiData['name'] = options.apiName;
+        apiData['version'] = options.apiVersion;
+        apiData['provider'] = options.apiProvider;
+        var result = this.instance.addToFavouriteApps(apiData);
+        return result;
+    };
+
+    Subscriber.prototype.removeFromFavouriteApps = function (options) {
+        var apiData = {};
+        apiData['name'] = options.apiName;
+        apiData['version'] = options.apiVersion;
+        apiData['provider'] = options.apiProvider;
+        var result = this.instance.removeFromFavouriteApps(apiData);
+        return result;
+    };
+
+    Subscriber.prototype.isFavouriteApp = function (options) {
+        var apiData = {};
+        apiData['name'] = options.name;
+        apiData['version'] = options.version;
+        apiData['provider'] = options.provider;
+        var result = this.instance.isFavouriteApp(apiData);
+        return result;
+    };
+
+    Subscriber.prototype.getAllFavouriteApps = function () {
+        var result = this.instance.getAllFavouriteApps();
+        return (result.apps) ? result.apps : [];
+    };
+
+    Subscriber.prototype.getFavouriteAppsCount = function () {
+        var result = this.instance.getFavouriteAppsCount();
+        return result.appsCount;
+    };
+
+    Subscriber.prototype.getUserSubscribedApps = function () {
+        var result = this.instance.getUserSubscribedApps();
+        return (result.apps) ? result.apps : [];
+    };
+
+    Subscriber.prototype.setFavouritePage = function () {
+        var result = this.instance.setFavouritePage();
+        return result;
+    };
+
+    Subscriber.prototype.removeFavouritePage = function () {
+        var result = this.instance.removeFavouritePage();
+        return result;
+    };
+
+    Subscriber.prototype.hasFavouritePage = function () {
+        var result = this.instance.hasFavouritePage();
+        return result;
+    };
+
     return{
         SubscriptionService: Subscriber
     }

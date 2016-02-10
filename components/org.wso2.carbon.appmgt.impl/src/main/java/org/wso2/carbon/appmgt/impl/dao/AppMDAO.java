@@ -63,6 +63,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import sun.applet.AppletEventMulticaster;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -5687,22 +5688,50 @@ public class AppMDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             boolean hasValidSubscription = false;
-            Subscription subscription = getIndividualSubscription(consumer, appContext, appVersion, connection);
+            boolean isSelfSubscriptionEnabled = ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService()
+                    .getAPIManagerConfiguration().isSelfSubscriptionEnabled();
+            boolean isEnterpriseSubscriptionEnabled = ServiceReferenceHolder.getInstance()
+                    .getAPIManagerConfigurationService()
+                    .getAPIManagerConfiguration().isEnterpriseSubscriptionEnabled();
+            Subscription subscription = null;
 
-			// If there is an individual subscription proceed with it. Try enterprise subscription otherwise.
-			if(subscription != null){
-				hasValidSubscription = true;
-			}else if(authenticatedIDPs != null){
-				subscription = getEnterpriseSubscription(appContext, appVersion, connection);
+            if (isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled) {
+                subscription = getIndividualSubscription(consumer, appContext, appVersion, connection);
+                // If there is an individual subscription proceed with it. Try enterprise subscription otherwise
 
-				// If there is an enterprise subscription for this app and the authenticated IDP is a trusted IDP, proceed.
-				if(subscription != null && subscription.isTrustedIdp(authenticatedIDPs)){
-					hasValidSubscription = true;
-				}
-			}
+                if(subscription != null){
+                    hasValidSubscription = true;
+                }else if(authenticatedIDPs != null){
+                    subscription = getEnterpriseSubscription(appContext, appVersion, connection);
 
-			// If there is no either an individual subscription or an enterprise subscription, don't authorize;
-			APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
+                    // If there is an enterprise subscription for this app and the authenticated IDP is a trusted IDP, proceed.
+                    if(subscription != null && subscription.isTrustedIdp(authenticatedIDPs)){
+                        hasValidSubscription = true;
+                    }
+                }
+
+            } else if(isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                subscription = getIndividualSubscription(consumer, appContext, appVersion, connection);
+                // If there is an individual subscription proceed with it.
+                if(subscription != null){
+                    hasValidSubscription = true;
+                }
+            } else if(!isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled) {
+                if(authenticatedIDPs != null){
+                    subscription = getEnterpriseSubscription(appContext, appVersion, connection);
+
+                    // If there is an enterprise subscription for this app and the authenticated IDP is a trusted IDP, proceed.
+                    if(subscription != null && subscription.isTrustedIdp(authenticatedIDPs)){
+                        hasValidSubscription = true;
+                    }
+                }
+            } else {
+                hasValidSubscription = true;
+            }
+
+            // If there is no either an individual subscription or an enterprise subscription, don't authorize;
+            APIKeyValidationInfoDTO info = new APIKeyValidationInfoDTO();
 
             if (!hasValidSubscription) {
                 info.setValidationStatus(AppMConstants.API_AUTH_FORBIDDEN);
@@ -5710,44 +5739,47 @@ public class AppMDAO {
                 return info;
             }
 
-			// Get App info from the database.
-			WebApp webApp = getWebAppById(subscription.getWebAppId(), connection);
+            // Get App info from the database.
+            WebApp webApp = getWebApp(appContext, appVersion);
 
-			info.setApiName(webApp.getId().getApiName());
-			info.setApiVersion(webApp.getId().getVersion());
-			info.setApiPublisher(webApp.getId().getProviderName());
-			info.setSubscriptionId(subscription.getSubscriptionId());
-			info.setTier(subscription.getTierId());
-			info.setContext(appContext);
-			info.setLogoutURL(webApp.getLogoutURL());
+            info.setApiName(webApp.getId().getApiName());
+            info.setApiVersion(webApp.getId().getVersion());
+            info.setApiPublisher(webApp.getId().getProviderName());
+            info.setTier(AppMConstants.UNLIMITED_TIER);
+            info.setContext(appContext);
+            info.setLogoutURL(webApp.getLogoutURL());
 
-			// Set trusted IDPs.
-			info.setTrustedIdp(JSONValue.toJSONString(subscription.getTrustedIdps()));
+            if(isEnterpriseSubscriptionEnabled) {
+                // Set trusted IDPs.
+                info.setTrustedIdp(JSONValue.toJSONString(subscription.getTrustedIdps()));
+            }
 
-			// Validate the subscription status.
-			String subscriptionStatus = subscription.getSubscriptionStatus();
+            if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                // Validate the subscription status.
+                String subscriptionStatus = subscription.getSubscriptionStatus();
 
-			if (subscriptionStatus.equals(AppMConstants.SubscriptionStatus.BLOCKED)) {
-				info.setValidationStatus(AppMConstants.KeyValidationStatus.API_BLOCKED);
-				info.setAuthorized(false);
-				return info;
-			} else if (AppMConstants.SubscriptionStatus.ON_HOLD.equals(subscriptionStatus) ||
-					AppMConstants.SubscriptionStatus.REJECTED.equals(subscriptionStatus)) {
-				info.setValidationStatus(AppMConstants.KeyValidationStatus.SUBSCRIPTION_INACTIVE);
-				info.setAuthorized(false);
-				return info;
-			}
-			// Good to go !
-			info.setAuthorized(true);
-			return info;
-		} catch (SQLException e) {
-			handleException("Error while getting application data for : " + appContext + "-" +
-					appVersion, e);
-			return null;
-		} finally {
-			APIMgtDBUtil.closeAllConnections(null, connection, null);
-		}
-	}
+                if (subscriptionStatus.equals(AppMConstants.SubscriptionStatus.BLOCKED)) {
+                    info.setValidationStatus(AppMConstants.KeyValidationStatus.API_BLOCKED);
+                    info.setAuthorized(false);
+                    return info;
+                } else if (AppMConstants.SubscriptionStatus.ON_HOLD.equals(subscriptionStatus) ||
+                        AppMConstants.SubscriptionStatus.REJECTED.equals(subscriptionStatus)) {
+                    info.setValidationStatus(AppMConstants.KeyValidationStatus.SUBSCRIPTION_INACTIVE);
+                    info.setAuthorized(false);
+                    return info;
+                }
+            }
+            // Good to go !
+            info.setAuthorized(true);
+            return info;
+        } catch (SQLException e) {
+            handleException("Error while getting application data for : " + appContext + "-" +
+                                    appVersion, e);
+            return null;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+    }
 
 	/**
 	 * Returns the web application id of a given web application uuid
@@ -5939,34 +5971,42 @@ public class AppMDAO {
         return subscription;
     }
 
-    private WebApp getWebAppById(int webAppId, Connection connection){
+    /**
+     * This method returns basic webapp details(provider,name,version,logout url) for
+     * given context and version of the webapp
+     * @param context context of webapp
+     * @param version version of webapp
+     * @return
+     */
+    private WebApp getWebApp(String context, String version) throws AppManagementException{
 
         WebApp webapp = null;
-
-        String queryToGetAppInfo = "SELECT " +
-                                    "APP.APP_PROVIDER AS APP_PROVIDER, " +
-                                    "APP.APP_NAME AS APP_NAME, " +
-                                    "APP.APP_VERSION AS APP_VERSION, " +
-                                    "APP.LOG_OUT_URL AS LOGOUT_URL " +
-                                    "FROM " +
-                                    "APM_APP APP " +
-                                    "WHERE " +
-                                    "APP.APP_ID = ?";
-
+        Connection connection = null;
         PreparedStatement statementToGetAppInfo = null;
         ResultSet appInfoResult = null;
 
+        String queryToGetAppInfo = "SELECT " +
+                "APP.APP_PROVIDER AS APP_PROVIDER, " +
+                "APP.APP_NAME AS APP_NAME, " +
+                "APP.LOG_OUT_URL AS LOGOUT_URL " +
+                "FROM " +
+                "APM_APP APP " +
+                "WHERE " +
+                "APP.CONTEXT = ? " +
+                "AND APP.APP_VERSION = ?";
+
         try {
+            connection = APIMgtDBUtil.getConnection();
             statementToGetAppInfo = connection.prepareStatement(queryToGetAppInfo);
 
-            int parameterIndex = 0;
-            statementToGetAppInfo.setInt(++parameterIndex, webAppId);
+            statementToGetAppInfo.setString(1, context);
+            statementToGetAppInfo.setString(2, version);
             appInfoResult = statementToGetAppInfo.executeQuery();
 
             while(appInfoResult.next()){
                 String apiProvider = appInfoResult.getString("APP_PROVIDER");
                 String apiName = appInfoResult.getString("APP_NAME");
-                String apiVersion = appInfoResult.getString("APP_VERSION");
+                String apiVersion = version;
                 APIIdentifier identifier = new APIIdentifier(apiProvider, apiName, apiVersion);
                 webapp = new WebApp(identifier);
 
@@ -5975,10 +6015,11 @@ public class AppMDAO {
             }
 
         }catch (SQLException exception){
-            log.error(String.format("Error while getting app for the subscription id : '%d' ", webAppId));
-            return null;
+            String errorMessage = String.format("Error while getting app for the app context :" +
+                                                        " '%s' and version :'%s'", context, version);
+            handleException(errorMessage, exception);
         }finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetAppInfo, null, appInfoResult);
+            APIMgtDBUtil.closeAllConnections(statementToGetAppInfo, connection, appInfoResult);
         }
 
         return webapp;
@@ -7747,5 +7788,446 @@ public class AppMDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, null);
         }
+    }
+
+    /**
+     * This method add a new entry to table APM_FAVOURITE_APPS which contains the favourite apps detail of user.
+     *
+     * @param identifier API Identifier
+     * @param userName   User Name
+     * @param tenantId   Tenant Id
+     * @throws AppManagementException
+     */
+    public void addToFavouriteApps(APIIdentifier identifier, String userName, int tenantId)
+            throws AppManagementException {
+
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        int apiId = -1;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String getApiQuery =
+                    "SELECT APP_ID FROM APM_APP  WHERE APP_PROVIDER = ? AND APP_NAME = ? AND " +
+                            "APP_VERSION = ? AND TENANT_ID = ? ";
+            ps = conn.prepareStatement(getApiQuery);
+            ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            ps.setString(2, identifier.getApiName());
+            ps.setString(3, identifier.getVersion());
+            ps.setInt(4, tenantId);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Getting web  app id of : " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                  "-" + identifier.getVersion());
+            }
+
+            resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                apiId = resultSet.getInt("APP_ID");
+            }
+            resultSet.close();
+            ps.close();
+
+            if (apiId == -1) {
+                String msg = "Unable to get the WebApp ID for: " + identifier;
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("Adding  app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                  "-" + identifier.getVersion() + " as favourite app for  user : " + userName +
+                                  " of tenant: " + tenantId);
+            }
+            // This query to insert to the APM_FAVOURITE_APPS table
+            String sqlQuery =
+                    "INSERT INTO APM_FAVOURITE_APPS (USER_ID, APP_ID, ADDED_TIME) "
+                            + "VALUES (?,?,?)";
+
+            ps = conn.prepareStatement(sqlQuery);
+
+            ps.setString(1, userName);
+            ps.setInt(2, apiId);
+            ps.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
+
+            ps.executeUpdate();
+            // finally commit transaction
+            conn.commit();
+
+        } catch (SQLException e) {
+            handleException("Failed to add app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                    "-" + identifier.getVersion() + "as favourite app for  user : " + userName +
+                                    " of tenant: " + tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+    }
+
+    /**
+     * This method delete the an entry from APM_FAVOURITE_APPS based on given app detail and username.
+     *
+     * @param identifier API Identifier
+     * @param userName   User Name
+     * @param tenantId   Tenant Id
+     * @return
+     * @throws AppManagementException
+     */
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userName, int tenantId)
+            throws
+            AppManagementException {
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        int apiId = -1;
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String getApiQuery =
+                    "SELECT APP_ID FROM APM_APP  WHERE APP_PROVIDER = ? AND APP_NAME = ? AND " +
+                            "APP_VERSION = ? AND TENANT_ID = ? ";
+
+            ps = conn.prepareStatement(getApiQuery);
+            ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            ps.setString(2, identifier.getApiName());
+            ps.setString(3, identifier.getVersion());
+            ps.setInt(4, tenantId);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Getting web  app id of : " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                  "-" + identifier.getVersion());
+            }
+
+            resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                apiId = resultSet.getInt("APP_ID");
+            }
+            resultSet.close();
+            ps.close();
+
+            if (apiId == -1) {
+                throw new AppManagementException("Unable to get the WebApp ID for: " + identifier);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Removing  app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                  "-" + identifier.getVersion() + " from favourite apps for  user : " + userName +
+                                  " of tenant: " + tenantId);
+            }
+            // This query to updates the APM_FAVOURITE_APPS
+            String sqlQuery =
+                    "DELETE FROM APM_FAVOURITE_APPS WHERE APP_ID = ? AND USER_ID = ?";
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setInt(1, apiId);
+            ps.setString(2, userName);
+            ps.executeUpdate();
+            // finally commit transaction
+            conn.commit();
+        } catch (SQLException e) {
+            handleException("Failed to remove app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                                    "-" + identifier.getVersion() + "from favourite apps for  user : " + userName +
+                                    " of tenant: " + tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+    }
+
+
+    /**
+     * Check whether given app is favourite app of user
+     *
+     * @param identifier API Identifier
+     * @param userName   User Name
+     * @param tenantId   Tenant Id
+     * @return
+     * @throws AppManagementException
+     */
+    public boolean isFavouriteApp(APIIdentifier identifier, String userName, int tenantId)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Checking whether given app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
+                              "-" + identifier.getVersion() + " is selected as favourite by  user : " + userName +
+                              " of tenant: " + tenantId);
+        }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean status = false;
+        ResultSet rs = null;
+        String query = "SELECT * FROM APM_FAVOURITE_APPS  " +
+                "WHERE    APP_ID = (SELECT APP_ID  FROM APM_APP " +
+                "WHERE APP_NAME = ? " +
+                "AND APP_VERSION = ? AND APP_PROVIDER = ? AND TENANT_ID = ? ) " +
+                "AND USER_ID =? ";
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, identifier.getApiName());
+            ps.setString(2, identifier.getVersion());
+            ps.setString(3, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
+            ps.setInt(4, tenantId);
+            ps.setString(5, userName);
+
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                status = true;
+            }
+        } catch (SQLException e) {
+            handleException("Error while checking whether given app: " + identifier.getApiName() + "-" +
+                                    identifier.getProviderName() +
+                                    "-" + identifier.getVersion() + " is selected as favourite by  user : " + userName +
+                                    " of tenant: " + tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return status;
+    }
+
+    /**
+     * This method returns the favourite app of given user.
+     *
+     * @param userName User Name
+     * @param tenantId Tenant Id
+     * @return List of APP Identifier
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving favourite apps details of  user : " + userName + " of tenant: " + tenantId);
+        }
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet appInfoResult = null;
+        List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+
+            String query = "SELECT " +
+                    "APP.APP_PROVIDER AS APP_PROVIDER, " +
+                    "APP.APP_NAME AS APP_NAME, " +
+                    "APP.APP_VERSION AS APP_VERSION " +
+                    "FROM APM_APP APP " +
+                    "INNER JOIN APM_FAVOURITE_APPS FAV_APP " +
+                    "ON  APP.APP_ID =FAV_APP.APP_ID " +
+                    "WHERE FAV_APP.USER_ID  = ? " +
+                    "AND APP.TENANT_ID = ? ";
+
+            ps = connection.prepareStatement(query);
+            ps.setString(1, userName);
+            ps.setInt(2, tenantId);
+            appInfoResult = ps.executeQuery();
+
+            while (appInfoResult.next()) {
+                APIIdentifier identifier = new APIIdentifier(
+                        appInfoResult.getString("APP_PROVIDER"),
+                        appInfoResult.getString("APP_NAME"),
+                        appInfoResult.getString("APP_VERSION"));
+                apiIdentifiers.add(identifier);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while getting all favourite apps of  user : " + userName + " of tenant: " + tenantId,
+                            e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, appInfoResult);
+        }
+        return apiIdentifiers;
+    }
+
+
+    /**
+     * This method returns the total favourite apps count of given user.
+     *
+     * @param userName username
+     * @param tenantId tenantId
+     * @return count of favourite apps
+     * @throws AppManagementException
+     */
+    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving favourite apps count of  user : " + userName + " of tenant: " + tenantId);
+        }
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        int count = 0;
+        String query = "SELECT " +
+                "COUNT(*) AS TOTAL " +
+                "FROM APM_APP APP " +
+                "INNER JOIN APM_FAVOURITE_APPS FAV_APP " +
+                "ON  APP.APP_ID =FAV_APP.APP_ID " +
+                "WHERE FAV_APP.USER_ID  = ? " +
+                "AND APP.TENANT_ID = ?";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            ps = connection.prepareStatement(query);
+            ps.setString(1, userName);
+            ps.setInt(2, tenantId);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                count = result.getInt("TOTAL");
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while getting count of all favourite apps of  user : " + userName + " of tenant: " +
+                                    tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, result);
+        }
+        return count;
+    }
+
+    /**
+     * This method return the subscribed apps details of given user.
+     *
+     * @param userName User Name
+     * @return List of APP Identifier
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> getUserSubscribedApps(String userName)
+            throws
+            AppManagementException {
+
+        List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        int tenantId = -1;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+
+            String sqlQuery =
+                    "SELECT WEBAPP.APP_PROVIDER AS APP_PROVIDER"
+                            + "   ,WEBAPP.APP_NAME AS APP_NAME"
+                            + "   ,WEBAPP.APP_VERSION AS APP_VERSION"
+                            + "   FROM "
+                            + "   APM_SUBSCRIBER SUB," + "   APM_APPLICATION APP, "
+                            + "   APM_SUBSCRIPTION SUBS, " + "   APM_APP WEBAPP "
+                            + "   WHERE (SUB.USER_ID = ? "
+                            + "   AND SUB.TENANT_ID = ? "
+                            + "   AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID "
+                            + "   AND APP.APPLICATION_ID=SUBS.APPLICATION_ID "
+                            + "   AND WEBAPP.APP_ID=SUBS.APP_ID) ";
+
+            ps = connection.prepareStatement(sqlQuery);
+            ps.setString(1, userName);
+            tenantId = IdentityUtil.getTenantIdOFUser(userName);
+            ps.setInt(2, tenantId);
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving subscribed apps details of  user : " + userName + " of tenant: " + tenantId);
+            }
+            result = ps.executeQuery();
+
+            while (result.next()) {
+                APIIdentifier apiIdentifier = new APIIdentifier(
+                        AppManagerUtil.replaceEmailDomain(result.getString("APP_PROVIDER")),
+                        result.getString("APP_NAME"),
+                        result.getString("APP_VERSION")
+                );
+                apiIdentifiers.add(apiIdentifier);
+            }
+
+        } catch (SQLException e) {
+            handleException("Failed to get app details of  user : " + userName + " of tenant: " + tenantId, e);
+        } catch (IdentityException e) {
+            handleException("Failed get tenant id of  user : " + userName + " of tenant: " + tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, result);
+        }
+        return apiIdentifiers;
+    }
+
+
+    public void addToStoreFavouritePage(String userName, int tenantId)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Adding user : " + userName + " of tenant: " + tenantId +
+                              " from table APM_STORE_FAVOURITE_PAGE");
+        }
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            // This query to insert to the APM_STORE_FAVOURITE_PAGE table
+            String sqlQuery =
+                    "INSERT INTO APM_STORE_FAVOURITE_PAGE (USER_ID, TENANT_ID) "
+                            + "VALUES (?,?)";
+
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, userName);
+            ps.setInt(2, tenantId);
+            ps.executeUpdate();
+            // finally commit transaction
+            conn.commit();
+        } catch (SQLException e) {
+            handleException("Failed to add favourite page detail for user : " + userName + "of tenant :" + tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+    }
+
+
+    public void removeFromStoreFavouritePage(String userName, int tenantId)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Removing user : " + userName + " of tenant: " + tenantId +
+                              " from table APM_STORE_FAVOURITE_PAGE");
+        }
+        Connection conn = null;
+        ResultSet resultSet = null;
+        PreparedStatement ps = null;
+        String sqlQuery =
+                "DELETE FROM APM_STORE_FAVOURITE_PAGE WHERE USER_ID = ? AND TENANT_ID = ?";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, userName);
+            ps.setInt(2, tenantId);
+            ps.executeUpdate();
+            // finally commit transaction
+            conn.commit();
+        } catch (SQLException e) {
+            handleException("Failed to remove favourite page detail for user : " + userName + "of tenant :" + tenantId,
+                            e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
+        }
+    }
+
+    public boolean hasFavouritePage(String userName, int tenantId)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Checking whether user : " + userName + " of tenant: " + tenantId +
+                              " has selected my favourite page as default");
+        }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        boolean status = false;
+        ResultSet rs = null;
+        String query = "SELECT * FROM APM_STORE_FAVOURITE_PAGE  " +
+                "WHERE    USER_ID = ? " +
+                "AND TENANT_ID =? ";
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, userName);
+            ps.setInt(2, tenantId);
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                status = true;
+            }
+        } catch (SQLException e) {
+            handleException("Error while checking whether user : " + userName + " of tenant : " + tenantId +
+                                    " has favourite page", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return status;
     }
 }

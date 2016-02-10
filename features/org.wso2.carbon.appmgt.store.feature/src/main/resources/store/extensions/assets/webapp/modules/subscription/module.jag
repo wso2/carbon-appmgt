@@ -51,6 +51,40 @@ jagg.module("subscription", {
     },
     checkSubscriptionWorkflow :function (){
     	return jagg.require(jagg.getModulesDir() + "subscription/workflow.jag").checkSubscriptionWorkflow .apply(this, arguments);
+    },
+    addToFavouriteApps: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/add.jag").addToFavouriteApps.apply(this, arguments);
+    },
+    removeFromFavouriteApps: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/remove.jag").removeFromFavouriteApps.apply(this,
+                                                                                                            arguments);
+    },
+    isFavouriteApp: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").isFavouriteApp.apply(this, arguments);
+    },
+    getAllFavouriteApps: function () {
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getAllFavouriteApps.apply(this, arguments);
+    },
+    getFavouriteAppsCount: function () {
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getFavouriteAppsCount.apply(this,
+                                                                                                        arguments);
+    },
+    getUserSubscribedApps: function () {
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getUserSubscribedApps.apply(this,
+                                                                                                        arguments);
+    }, setFavouritePage: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/add.jag").setFavouritePage.apply(this, arguments);
+    }, removeFavouritePage: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/remove.jag").removeFavouritePage.apply(this,
+                                                                                                        arguments);
+    }, hasFavouritePage: function () {
+        var log = new Log();
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").hasFavouritePage.apply(this, arguments);
     }
 });
 %>

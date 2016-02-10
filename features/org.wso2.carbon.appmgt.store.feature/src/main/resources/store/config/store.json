@@ -36,8 +36,16 @@
         "myAppsPage": 2,
         "fromProvider": 5
     },
-  "permissions": {
-    "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
-    "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
-  }
+    "permissions": {
+        "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
+        "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
+    },
+    "SubscriptionConfiguration": {
+        "EnableSelfSubscription": false,
+        "EnableEnterpriseSubscription": false
+    },
+    "pages": {
+        "LandingPage": "/extensions/assets/webapp/myapps",
+        "FavouritePage": "/extensions/assets/webapp/favouriteapps"
+    }
 }

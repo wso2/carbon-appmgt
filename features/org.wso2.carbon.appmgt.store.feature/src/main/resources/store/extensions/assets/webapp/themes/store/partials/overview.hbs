@@ -1,4 +1,9 @@
 <div>
+    {{#unless isEnterpriseSubscriptionEnabled}}
+        {{#unless isSelfSubscriptionEnabled}}
+            <input type="hidden" value="true" id="subscription-off" name="subscriptionOff">
+        {{/unless}}
+    {{/unless}}
 
 	{{#if isSubscribed}}
 		<input type="hidden" value="true" id="subscribed" name="subscribed">

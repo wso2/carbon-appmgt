@@ -10,6 +10,8 @@ $(function(){
     var API_URL = caramel.context + '/resources/webapp/v1/subscription/app';
     var API_UNSUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/unsubscription/app';
     var API_SUBSCRIPTION_WORKFLOW = caramel.context + '/resources/webapp/v1/subscription-workflow/app';
+    var API_ADD_TO_FAVOURITE = caramel.context + '/resources/webapp/v1/add-favourite-app/app';
+    var API_REMOVE_FROM_FAVOURITE = caramel.context + '/resources/webapp/v1/remove-favourite-app/app';
 
     $('#btnSubscribe').on('click',function(){
         if( $(this).attr("disabled") != 'disabled'){
@@ -275,7 +277,126 @@ $(function(){
    		  }
         });
     };
-    
-    
+
+    $('#btnAddToFav').on('click', function () {
+        if ($(this).attr("disabled") != 'disabled') {
+            $(this).attr("disabled", true);
+            addToMyFavourite();
+        } else {
+            location.reload();
+        }
+
+    });
+
+    $('#btnRemoveFromFav').on('click', function () {
+        removeFromMyFavourite();
+    });
+
+    var addToMyFavourite = function () {
+
+        if (metadata) {
+            console.log('Found metadata');
+
+            //Obtain the required information
+            var data = {};
+            var appDetails = metadata.apiAssetData.attributes;
+            data['apiName'] = appDetails.overview_name;
+            data['apiVersion'] = appDetails.overview_version;
+            data['apiProvider'] = appDetails.overview_provider;
+
+            addToFavourite(data);
+        }
+    };
+
+    var removeFromMyFavourite = function () {
+
+        if (metadata) {
+            console.log('Found metadata');
+
+            //Obtain the required information
+            var data = {};
+            var appDetails = metadata.apiAssetData.attributes;
+            data['apiName'] = appDetails.overview_name;
+            data['apiVersion'] = appDetails.overview_version;
+            data['apiProvider'] = appDetails.overview_provider;
+
+
+            removeFromFavourite(data);
+        }
+    };
+
+    var addToFavourite = function (data) {
+        $.ajax({
+                   url: API_ADD_TO_FAVOURITE,
+                   dataType: 'JSON',
+                   type: 'POST',
+                   data: data,
+                   complete: function (response, textStatus) {
+                       if (textStatus == "success") {
+                           console.info(data.apiName + 'web app is successfully added to my favourite web apps');
+                           noty({
+                                    text: 'You have successfully added  <b>' + data.apiName +
+                                          '</b> to your favourite apps',
+                                    'layout': 'center',
+                                    'timeout': 1500,
+                                    'modal': true,
+                                    'onClose': function () {
+                                        location.reload();
+                                    }
+                                });
+                       } else {
+                           alert("response error true")
+                           console.info('Error occured in while adding  web app: ' + data.apiName +
+                                        "to my favourite web apps");
+                       }
+                   },
+                   error: function (response) {
+                       alert('Error occured when add to my favourite apps');
+
+                   },
+                   success: function (e) {
+                       //location.reload();
+                   }
+               });
+    };
+
+    var removeFromFavourite = function (data) {
+
+        $.ajax({
+                   url: API_REMOVE_FROM_FAVOURITE,
+                   type: 'POST',
+                   data: data,
+                   success: function (response) {
+                       if (JSON.parse(response).error == false) {
+                           console.info('Successfully unsubscribed to web app: ' + data.apiName);
+                           //alert('Succsessfully unsubscribed to the '+subscription.apiName+' Web App.');
+
+                           noty({
+                                    text: 'You have successfully remvode  <b>' + data.apiName
+                                        + '</b> from your favourite apps',
+                                    'layout': 'center',
+                                    'timeout': 1500,
+                                    'modal': true,
+                                    'onClose': function () {
+                                        location.reload();
+                                    }
+                                });
+
+
+                           $('#btnRemoveFromFav').hide();
+                           $('#btnAddToFav').show();
+
+                       } else {
+                           console.info('Error occured  when remove  web app: ' + removeFromMyFavourite.apiName
+                                            + 'from ' +
+                                        'my favourite web apps');
+                       }
+
+                   },
+                   error: function (response) {
+                       alert('Error occured when remove web app from my favourite web apps');
+                   }
+               });
+    };
   
 });

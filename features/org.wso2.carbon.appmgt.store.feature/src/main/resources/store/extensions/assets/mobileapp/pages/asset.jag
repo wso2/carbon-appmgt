@@ -1,6 +1,5 @@
 <%
 var caramel;
-
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title,

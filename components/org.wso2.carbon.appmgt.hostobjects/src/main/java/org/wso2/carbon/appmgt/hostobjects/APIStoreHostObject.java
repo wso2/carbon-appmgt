@@ -3164,7 +3164,431 @@ public class APIStoreHostObject extends ScriptableObject {
                     "is active or not", e);
         }
 
+    }
 
+
+    /**
+     * Add the given webapp to favourite webapps
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static void jsFunction_addToFavourite(Context cx,
+                                                 Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length == 0 || !isStringArray(args)) {
+            throw new AppManagementException("Invalid input parameters to add the  web app to favourite app list");
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = getUsernameFromObject(thisObj);
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.addToFavouriteApps(apiIdentifier, userName, tenantId);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * Remove the given webapp from favourite webapps
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeFromFavouriteApps(Context cx,
+                                                          Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length == 0 || !isStringArray(args)) {
+            throw new AppManagementException("Invalid input parameters to remove web app from favourite app list");
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = getUsernameFromObject(thisObj);
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.removeFromFavouriteApps(apiIdentifier, userName, tenantId);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
+    }
+
+    /**
+     * Check whether given app exists in the favourite apps of the user
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isFavouriteApp(Context cx,
+                                                    Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length == 0 || !isStringArray(args)) {
+            throw new AppManagementException("Invalid input parameters to check whether  app is favourite or not.");
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = getUsernameFromObject(thisObj);
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            return apiConsumer.isFavouriteApp(apiIdentifier, userName, tenantId);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This methods returns  favourite webapps of given user for given pagination.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws ScriptException
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getAllFavouriteApps(Context cx,
+                                                             Scriptable thisObj, Object[] args, Function funObj)
+            throws ScriptException, AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("Authentication Failed.Login is required");
+        }
+
+        NativeArray nativeArray = new NativeArray(0);
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getFavouriteApps(userName, tenantId);
+
+            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                List<Environment> environments = config.getApiGatewayEnvironments();
+                Environment environment = environments.get(0);
+                int i = 0;
+                for (APIIdentifier apiIdentifier : apiIdentifiers) {
+                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                    String accessUrl = null;
+                    if (app.getSkipGateway()) {
+                        accessUrl = app.getUrl();
+                    } else {
+                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                        String context = app.getContext();
+                        accessUrl = serverUrl + context + "/";
+                    }
+
+                    NativeObject row = new NativeObject();
+                    row.put("appName", row, apiIdentifier.getApiName());
+                    row.put("appProvider", row, apiIdentifier.getProviderName());
+                    row.put("version", row, apiIdentifier.getVersion());
+                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                    row.put("gatewayUrl", row, accessUrl);
+                    row.put("uuid", row, app.getUUID());
+                    nativeArray.put(i++, nativeArray, row);
+                }
+            }
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return nativeArray;
+    }
+
+    /**
+     * This method returns favourite apps count of logged in user.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws ScriptException
+     * @throws AppManagementException
+     */
+    public static int jsFunction_getFavouriteAppsCount(Context cx,
+                                                       Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("Authentication Failed.Login is required");
+        }
+
+        boolean isTenantFlowStarted = false;
+        int totalCount = 0;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            totalCount = apiConsumer.getFavouriteAppsCount(userName, tenantId);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return totalCount;
+    }
+
+    /**
+     * This method return the details of subscribed apps of logged in user.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getUserSubscribedApps(Context cx,
+                                                               Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("User is not logged in");
+        }
+
+        boolean isTenantFlowStarted = false;
+        NativeArray nativeArray = new NativeArray(0);
+
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getUserSubscribedApps(userName);
+
+            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                List<Environment> environments = config.getApiGatewayEnvironments();
+                Environment environment = environments.get(0);
+
+
+                int i = 0;
+                for (APIIdentifier apiIdentifier : apiIdentifiers) {
+                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                    String accessUrl = null;
+                    if (app.getSkipGateway()) {
+                        accessUrl = app.getUrl();
+                    } else {
+                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                        String context = app.getContext();
+                        accessUrl = serverUrl + context + "/";
+                    }
+
+                    NativeObject row = new NativeObject();
+                    row.put("appName", row, apiIdentifier.getApiName());
+                    row.put("appProvider", row, apiIdentifier.getProviderName());
+                    row.put("version", row, apiIdentifier.getVersion());
+                    row.put("appTenant", row, app.getAppTenant());
+                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                    row.put("accessUrl", row, accessUrl);
+                    row.put("uuid", row, app.getUUID());
+                    row.put("advertiseOnly", row, String.valueOf(app.isAdvertiseOnly()));
+                    row.put("advertisedAppUuid", row, app.getAdvertisedAppUuid());
+                    nativeArray.put(i++, nativeArray, row);
+                }
+            }
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return nativeArray;
+    }
+
+    /**
+     * This method mark that user has selected favourite page as default landing page in store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @throws AppManagementException
+     */
+    public static void jsFunction_setFavouritePage(Context cx,
+                                                   Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("User is not logged in");
+        }
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.setFavouritePage(userName, tenantId);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This method mark that user has deselected the favourite page from default landing page in store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeFavouritePage(Context cx,
+                                                      Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("User is not logged in");
+        }
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.removeFavouritePage(userName, tenantId);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This method check whether logged in user has selected favourite page as default page.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return true if favourite page is default page else false
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_hasFavouritePage(Context cx,
+                                                      Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        String userName = getUsernameFromObject(thisObj);
+        if (userName == null) {
+            throw new AppManagementException("User is not logged in");
+        }
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            return apiConsumer.hasFavouritePage(userName, tenantId);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
     }
 
 }

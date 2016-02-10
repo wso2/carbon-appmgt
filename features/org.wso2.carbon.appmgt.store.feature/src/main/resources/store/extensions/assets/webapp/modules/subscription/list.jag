@@ -125,4 +125,118 @@ var getEnterprisesForApplication = function(appName, ssoProviderName, ssoProvide
 
 };
 
+var isFavouriteApp = function (api) {
+    var data,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        data = store.isFavouriteApp(api.provider, api.name, api.version);
+        if (log.isDebugEnabled()) {
+            log.debug("isFavouriteApp : " + stringify(data));
+        }
+
+        return {
+            error: false,
+            isFavouriteApp: data
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            message: e.message
+        };
+    }
+};
+
+var getAllFavouriteApps = function () {
+    var data,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        data = store.getAllFavouriteApps();
+        if (log.isDebugEnabled()) {
+            log.debug("getAllFavouriteApps : " + stringify(data));
+        }
+        return {
+            error: false,
+            apps: data
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            message: e.message
+        };
+    }
+};
+
+var getFavouriteAppsCount = function () {
+    var count,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        count = store.getFavouriteAppsCount();
+        if (log.isDebugEnabled()) {
+            log.debug("getFavouriteAppsCount : " + count);
+        }
+        return {
+            error: false,
+            appsCount: count
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            message: e.message
+        };
+    }
+};
+
+var getUserSubscribedApps = function () {
+    var data,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        data = store.getUserSubscribedApps();
+        if (log.isDebugEnabled()) {
+            log.debug("getUserSubscribedApps : " + stringify(data));
+        }
+        return {
+            error: false,
+            apps: data
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            message: e.message
+        };
+    }
+};
+
+var hasFavouritePage = function () {
+    var status,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        status = store.hasFavouritePage();
+        if (log.isDebugEnabled()) {
+            log.debug("isFavouriteApp : " + stringify(data));
+        }
+
+        return {
+            error: false,
+            hasFavouritePage: status
+        };
+    } catch (e) {
+        log.error(e.message);
+        return {
+            error: true,
+            message: e.message
+        };
+    }
+};
+
 %>
