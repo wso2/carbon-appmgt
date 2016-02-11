@@ -122,7 +122,6 @@ require('/modules/store.js').exec(function (ctx) {
         if (log.isDebugEnabled()) {
             log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
         }
-        log.info("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
         if (query) {
             assets = store.search({
                 attributes: query,
