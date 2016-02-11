@@ -637,15 +637,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         apiPublished.setOldInSequence(oldApi.getInSequence());
                         apiPublished.setOldOutSequence(oldApi.getOutSequence());
 
+                        //update version
+                        if (api.isDefaultVersion()) {
+                            removeDefaultVersionFromNonPublishedApps(api);
+                            removeFromGateway(api);
+                        }
+
                         //publish to gateway if skipGateway is disabled only
                         if (!api.getSkipGateway()) {
                             publishToGateway(apiPublished);
                         }
 
-                        //update version
-                        if (api.isDefaultVersion()) {
-                            removeDefaultVersionFromNonPublishedApps(api);
-                        }
                     } else {
                         //update version
                         String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
