@@ -76,7 +76,7 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     var type = context.params.type;
     var id = context.params.id;
-
+    var contentType = "application/json";
 
     log.debug(context.content);
 
@@ -101,16 +101,23 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
     var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
     if (!hasPermission) {
         response.status = 403;
-        response.contentType = "application/json";
+        response.contentType = contentType;
         msg.status = "403";
         msg.ok = false;
-        msg.message = "User doesn't have enough privileges to add tags";
+        msg.message = "User '" + user.username + "' doesn't have enough privileges to add tags";
+        print(msg);
+        return;
+    }
+
+    //If tags are not specified.
+    if (tags.length == 0) {
+        response.contentType = contentType;
+        msg.message = "No tags are specified.";
         print(msg);
         return;
     }
 
     var artifactManager = rxtManager.getArtifactManager(type);
-
     try {
         var artifact = artifactManager.get(id);
         var model = modelManager.getModel(type);
@@ -119,27 +126,21 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
         //Check if the model is valid, the important validation here is checking if the asset is in the published state
         if ((report) && (report.failed)) {
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = contentType;
             msg.status = "500";
             msg.ok = false;
             msg.message = "Unable to attach tag";
             print(msg);
             return;
         }
-        //If tags are not specified then do nothing
-        if (tags.length == 0) {
-            response.contentType = "application/json";
-            msg.message = "No tags are specified.";
-            print(msg);
-            return;
-        }
+
         //Apply the tags
         rxtManager.registry.tag(artifact.path, tags);
-        response.contentType = "application/json";
+        response.contentType = contentType;
         msg.message = "Tags are added successfully";
         print(msg);
     }  catch (e) {
-        response.contentType = "application/json";
+        response.contentType = contentType;
         response.status = 404;
         msg.status = "404";
         msg.ok = false;
