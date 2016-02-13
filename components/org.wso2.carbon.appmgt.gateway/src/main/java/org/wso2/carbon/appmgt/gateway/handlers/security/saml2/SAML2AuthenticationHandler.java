@@ -138,6 +138,9 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     // Names of the attributes which IDP sends back containing the relay state
     private static final String IDP_CALLBACK_ATTRIBUTE_NAME_RELAY_STATE = "RelayState";
 
+    private static final String HTTP_HEADER_HOST = "HOST";
+    private static final String PROPERTY_REST_API_CONTEXT = "REST_API_CONTEXT";
+
     private Authenticator authenticator;
     private SAML2Authenticator saml2Authenticator;
     private WebAppInfoDTO webAppInfoDTO;
@@ -1746,7 +1749,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         //Note: Do not change to construct the assertionConsumerUrl directly using servicePrefix instead of headers.get("HOST").
         //It always gives IP for host which cause invalid assertionConsumerUrl
         String assertionConsumerUrl = servicePrefix.substring(0, servicePrefix.indexOf("/") + 2) +
-                headers.get("HOST") + messageContext.getProperty("REST_API_CONTEXT") + "/";
+                headers.get(HTTP_HEADER_HOST) + messageContext.getProperty(PROPERTY_REST_API_CONTEXT) + "/";
 
         return assertionConsumerUrl;
     }
