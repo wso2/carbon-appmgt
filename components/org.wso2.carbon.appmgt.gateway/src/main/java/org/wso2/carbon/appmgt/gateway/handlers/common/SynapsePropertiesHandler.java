@@ -29,22 +29,26 @@ import java.util.Map;
  */
 public class SynapsePropertiesHandler extends AbstractHandler {
 
+    private static final String HTTP_HEADER_HOST = "HOST";
+    private static final String SYNAPSE_HOT_IP = "synapse.host.ip";
+    private static final String PROPERTY_HTTP_NIO_PORT = "http.nio.port";
+    private static final String PROPERTY_HTTPS_NIO_PORT = "https.nio.port";
+
 	@SuppressWarnings("unchecked")
 	public boolean handleRequest(MessageContext messageContext) {
-
 		org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
 				getAxis2MessageContext();
 		Map<String, String> headers = (Map<String, String>) axis2MC.getProperty(
 				org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-		String ipWithPort = headers.get("HOST");
+		String ipWithPort = headers.get(HTTP_HEADER_HOST);
 		String ip = ipWithPort.substring(0, ipWithPort.indexOf(':'));
 
-		String httpPort = System.getProperty("http.nio.port");
-		String httpsPort = System.getProperty("https.nio.port");
+		String httpPort = System.getProperty(PROPERTY_HTTP_NIO_PORT);
+		String httpsPort = System.getProperty(PROPERTY_HTTPS_NIO_PORT);
 
-		messageContext.setProperty("synapse.host.ip", ip);
-		messageContext.setProperty("http.nio.port", httpPort);
-		messageContext.setProperty("https.nio.port", httpsPort);
+		messageContext.setProperty(SYNAPSE_HOT_IP, ip);
+		messageContext.setProperty(PROPERTY_HTTP_NIO_PORT, httpPort);
+		messageContext.setProperty(PROPERTY_HTTPS_NIO_PORT, httpsPort);
 		return true;
 	}
 
