@@ -88,21 +88,21 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			throw new APITemplateException("Cannot validate configuration context for template", e);
 		}
 
-		VelocityEngine velocityengine = new VelocityEngine();
+		VelocityEngine velocityEngine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-			velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-									   "org.apache.velocity.runtime.log.Log4JLogChute");
-			velocityengine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
+			velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                                       "org.apache.velocity.runtime.log.Log4JLogChute");
+			velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
 		}
 		try {
-			velocityengine.init();
+			velocityEngine.init();
 		} catch (Exception e) {
 			log.error("Cannot initialize Velocity engine", e);
 			throw new APITemplateException("Cannot initialize Velocity engine", e);
 		}
 		VelocityContext context = configContext.getContext();
 
-		return processTemplate(velocityengine, context, getVersionedWebAppTemplatePath());
+		return processTemplate(velocityEngine, context, getVersionedWebAppTemplatePath());
 	}
 
 	@Override
