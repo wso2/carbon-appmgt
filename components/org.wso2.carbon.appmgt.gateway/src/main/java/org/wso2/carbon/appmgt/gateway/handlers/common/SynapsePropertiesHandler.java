@@ -24,6 +24,9 @@ import org.apache.synapse.rest.AbstractHandler;
 
 import java.util.Map;
 
+/**
+ * This handler adds common Synapse properties to the message context.
+ */
 public class SynapsePropertiesHandler extends AbstractHandler {
 
 	@SuppressWarnings("unchecked")
