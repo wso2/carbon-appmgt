@@ -53,13 +53,6 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                     var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
                     var username = sessionObj.loggedInUser;
 
-                    //Remove super tenant domain from username
-                    if (username != null) {
-                        if (username.indexOf("@carbon.super") != -1) {
-                            username = username.split("@carbon.super")[0];
-                        }
-                    }
-
                     if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
                         var relayStateUrlMatcher = new URIMatcher(relayState);
                         var tenantedURIPattern = contextPath + '/t/{domain}/';
