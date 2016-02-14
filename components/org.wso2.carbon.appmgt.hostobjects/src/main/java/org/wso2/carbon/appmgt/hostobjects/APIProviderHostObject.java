@@ -3669,6 +3669,16 @@ public class APIProviderHostObject extends ScriptableObject {
         return appStoresArray;
     }
 
+    /**
+     * Get default version of a WebApp by Application Name and Provider and filtered by lifecycle state (isPublished)
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
     public static String jsFunction_getDefaultVersion(Context cx, Scriptable thisObj,
                                                       Object[] args,
                                                       Function funObj)
@@ -3679,12 +3689,23 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         String appName = (String) args[0];
         String provider = (String) args[1];
+        //Either lifecycle state is Published or not
         boolean isPublished = ((String) args[2] == "true");
 
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.getDefaultVersion(appName, provider, isPublished);
     }
 
+    /**
+     * Check if the given WebApp is the default version
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
     public static boolean jsFunction_isDefaultVersion(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
@@ -3697,6 +3718,16 @@ public class APIProviderHostObject extends ScriptableObject {
         return apiProvider.isDefaultVersion(apiIdentifier);
     }
 
+    /**
+     * Check if the WebApp has more versions or not
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
     public static boolean jsFunction_hasMoreVersions(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
@@ -3709,10 +3740,20 @@ public class APIProviderHostObject extends ScriptableObject {
         return apiProvider.hasMoreVersions(apiIdentifier);
     }
 
+    /**
+     * Get WebApp details by UUID
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
     public static NativeObject jsFunction_getApplicationByUUID(Context cx, Scriptable thisObj, Object[] args,
                                                                Function funObj)
             throws AppManagementException {
-        NativeObject webappNativeObj = new NativeObject();
+        NativeObject webAppNativeObj = new NativeObject();
         if (args == null || args.length != 1) {
             handleException("Invalid input parameters.");
         }
@@ -3721,14 +3762,14 @@ public class APIProviderHostObject extends ScriptableObject {
         WebApp api = apiProvider.getApplicationByUUID(uuid);
 
         if (api != null) {
-            webappNativeObj.put("name", webappNativeObj, api.getId().getApiName());
-            webappNativeObj.put("provider", webappNativeObj, api.getId().getProviderName());
-            webappNativeObj.put("version", webappNativeObj, api.getId().getVersion());
-            webappNativeObj.put("context", webappNativeObj, api.getContext());
+            webAppNativeObj.put("name", webAppNativeObj, api.getId().getApiName());
+            webAppNativeObj.put("provider", webAppNativeObj, api.getId().getProviderName());
+            webAppNativeObj.put("version", webAppNativeObj, api.getId().getVersion());
+            webAppNativeObj.put("context", webAppNativeObj, api.getContext());
         } else {
             handleException("Cannot find the requested WebApp related to UUID - " + uuid);
         }
-        return webappNativeObj;
+        return webAppNativeObj;
     }
 }
 

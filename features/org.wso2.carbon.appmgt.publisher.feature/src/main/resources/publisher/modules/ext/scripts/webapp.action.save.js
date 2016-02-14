@@ -231,8 +231,6 @@ var module = function () {
             };
             var artifact = artifactManager.find(function (adapter) {
                 //Check if the name and version are the same
-                //return
-                // ((adapter.attributes.overview_name==name)&&(adapter.attributes.overview_version==version))?true:false;
                 return utility.assertEqual(adapter, predicate);
             }, null);
 

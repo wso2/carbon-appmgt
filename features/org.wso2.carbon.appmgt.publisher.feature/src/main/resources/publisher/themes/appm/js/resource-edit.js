@@ -286,8 +286,7 @@ $( document ).ready(function() {
         $('#overview_acsUrl').hide();
     }
 
-    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save
-    // operation
+    //when skip gateway checkbox value in changed, adjust the hidden field value which used in save operation
     $(".skip_gateway_checkbox").click(function () {
         var output = [];
         if ($('.skip_gateway_checkbox').is(':checked')) {

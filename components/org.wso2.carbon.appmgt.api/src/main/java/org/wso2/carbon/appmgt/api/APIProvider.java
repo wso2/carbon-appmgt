@@ -522,7 +522,7 @@ public interface APIProvider extends APIManager {
     public Set<AppStore> getExternalAppStores(APIIdentifier identifier) throws AppManagementException;
 
     /**
-     * Get web app default version details
+     * Get WebApp default version details
      *
      * @param appName
      * @param providerName
@@ -534,7 +534,7 @@ public interface APIProvider extends APIManager {
             throws AppManagementException;
 
     /**
-     * Check if the given app is the default version
+     * Check if the given WebApp version is the default version
      *
      * @param identifier
      * @return
@@ -543,7 +543,7 @@ public interface APIProvider extends APIManager {
     public boolean isDefaultVersion(APIIdentifier identifier) throws AppManagementException;
 
     /**
-     * Check if the given app has any other versions in any state
+     * Check if the given WebApp has any other versions in any lifecycle state
      *
      * @param identifier
      * @return

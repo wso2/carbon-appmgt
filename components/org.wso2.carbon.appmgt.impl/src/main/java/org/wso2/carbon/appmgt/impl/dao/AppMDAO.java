@@ -1198,11 +1198,10 @@ public class AppMDAO {
                 count = ps.executeUpdate();
                 conn.commit();
             } catch (SQLException e) {
-                String msg = "Could not move subscriptions from " +
-                        fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() +
-                        "-" + fromIdentifier.getVersion() + " app to " +
-                        toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() +
-                        "-" + toIdentifier.getVersion() + " app";
+                String msg = "Could not move subscriptions from " + fromIdentifier.getProviderName() + "-" +
+                        fromIdentifier.getApiName() + "-" + fromIdentifier.getVersion() + " app to " +
+                        toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() + "-" +
+                        toIdentifier.getVersion() + " app";
                 handleException(msg, e);
             }
 
@@ -4283,8 +4282,8 @@ public class AppMDAO {
             }
 
         } catch (SQLException e) {
-            /* In the code im using a single SQL connection passed from the parent function so I'm logging the error
-            here and throwing the SQLException so the connection will be disposed by the parent function. */
+            /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
             log.error("Error when getting the default version record count for Application: " +
                               api.getId().getApiName(), e);
             throw e;
@@ -4320,9 +4319,9 @@ public class AppMDAO {
             prepStmt.setInt(5, tenantId);
             prepStmt.executeUpdate();
         } catch (SQLException e) {
-             /* In the code im using a single SQL connection passed from the parent function so I'm logging the error
-            here and throwing the SQLException so the connection will be disposed by the parent function. */
-            log.error("Error while inserting default versioning details for WebApp : " +
+             /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error while inserting default version details for WebApp : " +
                               api.getId(), e);
             throw e;
         } finally {
@@ -4359,8 +4358,8 @@ public class AppMDAO {
             }
             prepStmt.executeUpdate();
         } catch (SQLException e) {
-              /* In the code im using a single SQL connection passed from the parent function so I'm logging the error
-            here and throwing the SQLException so the connection will be disposed by the parent function. */
+              /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
             log.error("Error while updating default version details for WebApp : " +
                               api.getId(), e);
             throw e;
@@ -7901,9 +7900,9 @@ public class AppMDAO {
             if (conn != null) {
                 try {
                     conn.rollback();
-                } catch (SQLException e1) {
+                } catch (SQLException sqlEx) {
                     log.error("Failed to rollback version updating details for  app" +
-                                      " : " + webApp.getApiName(), e1);
+                                      " : " + webApp.getApiName(), sqlEx);
                 }
             }
             handleException("Failed to update version details for  app" +
