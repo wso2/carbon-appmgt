@@ -63,7 +63,6 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import sun.applet.AppletEventMulticaster;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -7792,13 +7791,14 @@ public class AppMDAO {
 
     /**
      * This method add a new entry to table APM_FAVOURITE_APPS which contains the favourite apps detail of user.
-     *
+     * (Add the given app as favouirte app for given user)
      * @param identifier API Identifier
      * @param userName   User Name
-     * @param tenantId   Tenant Id
+     * @param tenantIdOfUser Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @throws AppManagementException
      */
-    public void addToFavouriteApps(APIIdentifier identifier, String userName, int tenantId)
+    public void addToFavouriteApps(APIIdentifier identifier, String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
 
         Connection conn = null;
@@ -7814,7 +7814,7 @@ public class AppMDAO {
             ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
             ps.setString(2, identifier.getApiName());
             ps.setString(3, identifier.getVersion());
-            ps.setInt(4, tenantId);
+            ps.setInt(4, tenantIdOfStore);
 
             if (log.isDebugEnabled()) {
                 log.debug("Getting web  app id of : " + identifier.getApiName() + "-" + identifier.getProviderName() +
@@ -7837,18 +7837,19 @@ public class AppMDAO {
             if (log.isDebugEnabled()) {
                 log.debug("Adding  app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
                                   "-" + identifier.getVersion() + " as favourite app for  user : " + userName +
-                                  " of tenant: " + tenantId);
+                                  " of tenant: " + tenantIdOfUser);
             }
             // This query to insert to the APM_FAVOURITE_APPS table
             String sqlQuery =
-                    "INSERT INTO APM_FAVOURITE_APPS (USER_ID, APP_ID, ADDED_TIME) "
-                            + "VALUES (?,?,?)";
+                    "INSERT INTO APM_FAVOURITE_APPS (USER_ID, TENANT_ID, APP_ID, ADDED_TIME) "
+                            + "VALUES (?,?,?,?)";
 
             ps = conn.prepareStatement(sqlQuery);
 
             ps.setString(1, userName);
-            ps.setInt(2, apiId);
-            ps.setTimestamp(3, new Timestamp(new java.util.Date().getTime()));
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, apiId);
+            ps.setTimestamp(4, new Timestamp(new java.util.Date().getTime()));
 
             ps.executeUpdate();
             // finally commit transaction
@@ -7856,22 +7857,24 @@ public class AppMDAO {
 
         } catch (SQLException e) {
             handleException("Failed to add app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
-                                    "-" + identifier.getVersion() + "as favourite app for  user : " + userName +
-                                    " of tenant: " + tenantId, e);
+                                    "-" + identifier.getVersion() + " as favourite app for  user : " + userName +
+                                    " of tenant: " + tenantIdOfUser, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
     }
 
     /**
-     * This method delete the an entry from APM_FAVOURITE_APPS based on given app detail and username.
-     *
+     * This method delete  an entry from APM_FAVOURITE_APPS based on given app detail and username.
+     * (remove the given app from favourite app list of given user)
      * @param identifier API Identifier
      * @param userName   User Name
-     * @param tenantId   Tenant Id
+     * @param tenantIdOfUser Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @throws AppManagementException
      */
-    public void removeFromFavouriteApps(APIIdentifier identifier, String userName, int tenantId)
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userName, int tenantIdOfUser,
+                                        int tenantIdOfStore)
             throws
             AppManagementException {
         Connection conn = null;
@@ -7889,7 +7892,7 @@ public class AppMDAO {
             ps.setString(1, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
             ps.setString(2, identifier.getApiName());
             ps.setString(3, identifier.getVersion());
-            ps.setInt(4, tenantId);
+            ps.setInt(4, tenantIdOfStore);
 
             if (log.isDebugEnabled()) {
                 log.debug("Getting web  app id of : " + identifier.getApiName() + "-" + identifier.getProviderName() +
@@ -7909,22 +7912,23 @@ public class AppMDAO {
             if (log.isDebugEnabled()) {
                 log.debug("Removing  app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
                                   "-" + identifier.getVersion() + " from favourite apps for  user : " + userName +
-                                  " of tenant: " + tenantId);
+                                  " of tenant: " + tenantIdOfUser);
             }
             // This query to updates the APM_FAVOURITE_APPS
             String sqlQuery =
-                    "DELETE FROM APM_FAVOURITE_APPS WHERE APP_ID = ? AND USER_ID = ?";
+                    "DELETE FROM APM_FAVOURITE_APPS WHERE APP_ID = ? AND USER_ID = ? AND TENANT_ID = ?";
 
             ps = conn.prepareStatement(sqlQuery);
             ps.setInt(1, apiId);
             ps.setString(2, userName);
+            ps.setInt(3, tenantIdOfUser);
             ps.executeUpdate();
             // finally commit transaction
             conn.commit();
         } catch (SQLException e) {
             handleException("Failed to remove app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
                                     "-" + identifier.getVersion() + "from favourite apps for  user : " + userName +
-                                    " of tenant: " + tenantId, e);
+                                    " of tenant: " + tenantIdOfUser, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
@@ -7932,20 +7936,21 @@ public class AppMDAO {
 
 
     /**
-     * Check whether given app is favourite app of user
+     * Check whether given app is favourite app of user in given tenant store.
      *
-     * @param identifier API Identifier
-     * @param userName   User Name
-     * @param tenantId   Tenant Id
+     * @param identifier      APP Identifier
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store(=Tenant Id of App)
      * @return true if favourite app else false
      * @throws AppManagementException
      */
-    public boolean isFavouriteApp(APIIdentifier identifier, String userName, int tenantId)
+    public boolean isFavouriteApp(APIIdentifier identifier, String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Checking whether given app: " + identifier.getApiName() + "-" + identifier.getProviderName() +
                               "-" + identifier.getVersion() + " is selected as favourite by  user : " + userName +
-                              " of tenant: " + tenantId);
+                              " of tenant: " + tenantIdOfUser +" in the tenat store: "+tenantIdOfStore);
         }
         Connection conn = null;
         PreparedStatement ps = null;
@@ -7955,15 +7960,17 @@ public class AppMDAO {
                 "WHERE    APP_ID = (SELECT APP_ID  FROM APM_APP " +
                 "WHERE APP_NAME = ? " +
                 "AND APP_VERSION = ? AND APP_PROVIDER = ? AND TENANT_ID = ? ) " +
-                "AND USER_ID =? ";
+                "AND USER_ID = ? " +
+                "AND TENANT_ID = ?";
         try {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(query);
             ps.setString(1, identifier.getApiName());
             ps.setString(2, identifier.getVersion());
             ps.setString(3, AppManagerUtil.replaceEmailDomainBack(identifier.getProviderName()));
-            ps.setInt(4, tenantId);
+            ps.setInt(4, tenantIdOfStore);
             ps.setString(5, userName);
+            ps.setInt(6, tenantIdOfUser);
 
 
             rs = ps.executeQuery();
@@ -7974,7 +7981,7 @@ public class AppMDAO {
             handleException("Error while checking whether given app: " + identifier.getApiName() + "-" +
                                     identifier.getProviderName() +
                                     "-" + identifier.getVersion() + " is selected as favourite by  user : " + userName +
-                                    " of tenant: " + tenantId, e);
+                                    " of tenant: " + tenantIdOfUser, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
@@ -7982,17 +7989,19 @@ public class AppMDAO {
     }
 
     /**
-     * This method returns the favourite app of given user.
+     * This method returns the favourite app of given user for given tenant store.
      *
-     * @param userName User Name
-     * @param tenantId Tenant Id
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @return List of APP Identifier
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
-            log.debug("Retrieving favourite apps details of  user : " + userName + " of tenant: " + tenantId);
+            log.debug("Retrieving favourite apps details of  user : " + userName + " of tenant: " + tenantIdOfUser +
+                              " for tenant store:" + tenantIdOfStore);
         }
         Connection connection = null;
         PreparedStatement ps = null;
@@ -8010,11 +8019,13 @@ public class AppMDAO {
                     "INNER JOIN APM_FAVOURITE_APPS FAV_APP " +
                     "ON  APP.APP_ID =FAV_APP.APP_ID " +
                     "WHERE FAV_APP.USER_ID  = ? " +
+                    "AND FAV_APP.TENANT_ID = ?" +
                     "AND APP.TENANT_ID = ? ";
 
             ps = connection.prepareStatement(query);
             ps.setString(1, userName);
-            ps.setInt(2, tenantId);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
             appInfoResult = ps.executeQuery();
 
             while (appInfoResult.next()) {
@@ -8026,7 +8037,8 @@ public class AppMDAO {
             }
 
         } catch (SQLException e) {
-            handleException("Error while getting all favourite apps of  user : " + userName + " of tenant: " + tenantId,
+            handleException("Error while getting all favourite apps of  user : " + userName + " of tenant: " +
+                                    tenantIdOfUser +" for tenan",
                             e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, appInfoResult);
@@ -8034,59 +8046,16 @@ public class AppMDAO {
         return apiIdentifiers;
     }
 
-
     /**
-     * This method returns the total favourite apps count of given user.
-     *
-     * @param userName username
-     * @param tenantId tenantId
-     * @return count of favourite apps
-     * @throws AppManagementException
-     */
-    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException {
-        if (log.isDebugEnabled()) {
-            log.debug("Retrieving favourite apps count of  user : " + userName + " of tenant: " + tenantId);
-        }
-        Connection connection = null;
-        PreparedStatement ps = null;
-        ResultSet result = null;
-        int count = 0;
-        String query = "SELECT " +
-                "COUNT(*) AS TOTAL " +
-                "FROM APM_APP APP " +
-                "INNER JOIN APM_FAVOURITE_APPS FAV_APP " +
-                "ON  APP.APP_ID =FAV_APP.APP_ID " +
-                "WHERE FAV_APP.USER_ID  = ? " +
-                "AND APP.TENANT_ID = ?";
-
-        try {
-            connection = APIMgtDBUtil.getConnection();
-            ps = connection.prepareStatement(query);
-            ps.setString(1, userName);
-            ps.setInt(2, tenantId);
-            result = ps.executeQuery();
-
-            if (result.next()) {
-                count = result.getInt("TOTAL");
-            }
-
-        } catch (SQLException e) {
-            handleException("Error while getting count of all favourite apps of  user : " + userName + " of tenant: " +
-                                    tenantId, e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(ps, connection, result);
-        }
-        return count;
-    }
-
-    /**
-     * This method return the subscribed apps details of given user.
+     * This method return the subscribed apps details of given user for given tenant store.
      *
      * @param userName User Name
+     * @param tenantIdOfUser Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @return List of APP Identifier
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getUserSubscribedApps(String userName)
+    public List<APIIdentifier> getUserSubscribedApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws
             AppManagementException {
 
@@ -8107,16 +8076,20 @@ public class AppMDAO {
                             + "   APM_SUBSCRIPTION SUBS, " + "   APM_APP WEBAPP "
                             + "   WHERE (SUB.USER_ID = ? "
                             + "   AND SUB.TENANT_ID = ? "
+                            + "   AND WEBAPP.TENANT_ID = ?"
                             + "   AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID "
                             + "   AND APP.APPLICATION_ID=SUBS.APPLICATION_ID "
-                            + "   AND WEBAPP.APP_ID=SUBS.APP_ID) ";
+                            + "   AND WEBAPP.APP_ID=SUBS.APP_ID ) ";
 
             ps = connection.prepareStatement(sqlQuery);
             ps.setString(1, userName);
-            tenantId = IdentityUtil.getTenantIdOFUser(userName);
-            ps.setInt(2, tenantId);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
+
             if (log.isDebugEnabled()) {
-                log.debug("Retrieving subscribed apps details of  user : " + userName + " of tenant: " + tenantId);
+                log.debug("Retrieving subscribed apps details from tenant store :" + tenantIdOfStore + " for  user : " +
+                                  userName + " of tenant: " + tenantId
+                );
             }
             result = ps.executeQuery();
 
@@ -8130,9 +8103,9 @@ public class AppMDAO {
             }
 
         } catch (SQLException e) {
-            handleException("Failed to get app details of  user : " + userName + " of tenant: " + tenantId, e);
-        } catch (IdentityException e) {
-            handleException("Failed get tenant id of  user : " + userName + " of tenant: " + tenantId, e);
+            handleException(
+                    "Failed to get subscribed apps details from tenant store :" + tenantIdOfStore + " for  user : " +
+                            userName + " of tenant: " + tenantId, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
@@ -8140,16 +8113,18 @@ public class AppMDAO {
     }
 
     /**
-     * This method add myfaouvrite page as home page for given user
-     * @param userName User Name
-     * @param tenantId Tenant Id
+     * This method add myfaouvrite page of given store as home page for given user
+     *
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @throws AppManagementException
      */
-    public void addToStoreFavouritePage(String userName, int tenantId)
+    public void addToStoreFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
-            log.debug("Adding user : " + userName + " of tenant: " + tenantId +
-                              " from table APM_STORE_FAVOURITE_PAGE");
+            log.debug("Adding myfavourite page of tenant store : " + tenantIdOfStore + " as home page of user : "
+                              + userName + " of tenant: " + tenantIdOfUser);
         }
         Connection conn = null;
         ResultSet resultSet = null;
@@ -8158,51 +8133,57 @@ public class AppMDAO {
             conn = APIMgtDBUtil.getConnection();
             // This query to insert to the APM_STORE_FAVOURITE_PAGE table
             String sqlQuery =
-                    "INSERT INTO APM_STORE_FAVOURITE_PAGE (USER_ID, TENANT_ID) "
-                            + "VALUES (?,?)";
+                    "INSERT INTO APM_STORE_FAVOURITE_PAGE (USER_ID, TENANT_ID_OF_USER, TENANT_ID_OF_STORE) "
+                            + "VALUES (?,?,?)";
 
             ps = conn.prepareStatement(sqlQuery);
             ps.setString(1, userName);
-            ps.setInt(2, tenantId);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
             ps.executeUpdate();
             // finally commit transaction
             conn.commit();
         } catch (SQLException e) {
-            handleException("Failed to add favourite page detail for user : " + userName + "of tenant :" + tenantId, e);
+            handleException("Failed to add favourite page detail for user : " + userName + "of tenant :" +
+                                    tenantIdOfUser, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
         }
     }
 
     /**
-     * This method remove myfavourite page from home page for given user.
+     * This method remove myfavourite page of given tenant store from home page for given user.
      *
-     * @param userName User Name
-     * @param tenantId Tenant Id
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @throws AppManagementException
      */
-    public void removeFromStoreFavouritePage(String userName, int tenantId)
+    public void removeFromStoreFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
-            log.debug("Removing user : " + userName + " of tenant: " + tenantId +
-                              " from table APM_STORE_FAVOURITE_PAGE");
+            log.debug("Removing myfavourite page of tenant store : " + tenantIdOfStore + " from home page of user : "
+                              + userName + " of tenant: " + tenantIdOfUser);
         }
         Connection conn = null;
         ResultSet resultSet = null;
         PreparedStatement ps = null;
         String sqlQuery =
-                "DELETE FROM APM_STORE_FAVOURITE_PAGE WHERE USER_ID = ? AND TENANT_ID = ?";
+                "DELETE FROM APM_STORE_FAVOURITE_PAGE WHERE USER_ID = ? AND TENANT_ID_OF_USER = ? AND " +
+                        "TENANT_ID_OF_STORE= ?";
 
         try {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(sqlQuery);
             ps.setString(1, userName);
-            ps.setInt(2, tenantId);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
             ps.executeUpdate();
             // finally commit transaction
             conn.commit();
         } catch (SQLException e) {
-            handleException("Failed to remove favourite page detail for user : " + userName + "of tenant :" + tenantId,
+            handleException("Failed to remove favourite page detail for user : " + userName + "of tenant :" +
+                                    tenantIdOfUser,
                             e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, resultSet);
@@ -8210,39 +8191,41 @@ public class AppMDAO {
     }
 
     /**
-     * This method check whether given user has selected myfavourite page as homepage.
+     * This method check whether given user has selected myfavourite page given tenant store as homepage.
      *
-     * @param userName User Name
-     * @param tenantId Tenant Id
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
      * @return true if user has selected else false
      * @throws AppManagementException
      */
-    public boolean hasFavouritePage(String userName, int tenantId)
+    public boolean hasFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
-            log.debug("Checking whether user : " + userName + " of tenant: " + tenantId +
-                              " has selected my favourite page as default");
+            log.debug("Checking whether user : " + userName + " of tenant: " + tenantIdOfUser +
+                              " has selected myfavourite page of tenant store : " + tenantIdOfStore + " as homepage");
         }
         Connection conn = null;
         PreparedStatement ps = null;
         boolean status = false;
         ResultSet rs = null;
-        String query = "SELECT * FROM APM_STORE_FAVOURITE_PAGE  " +
-                "WHERE    USER_ID = ? " +
-                "AND TENANT_ID =? ";
+        String query = "SELECT * FROM APM_STORE_FAVOURITE_PAGE  WHERE " +
+                "USER_ID = ? AND TENANT_ID_OF_USER = ? AND " +
+                "TENANT_ID_OF_STORE= ?";
         try {
             conn = APIMgtDBUtil.getConnection();
             ps = conn.prepareStatement(query);
             ps.setString(1, userName);
-            ps.setInt(2, tenantId);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
 
             rs = ps.executeQuery();
             if (rs.next()) {
                 status = true;
             }
         } catch (SQLException e) {
-            handleException("Error while checking whether user : " + userName + " of tenant : " + tenantId +
-                                    " has favourite page", e);
+            handleException("Error while checking whether user : " + userName + " of tenant : " + tenantIdOfUser +
+                                    " has selecte favourite page as home page in tenant store:" + tenantIdOfStore, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }

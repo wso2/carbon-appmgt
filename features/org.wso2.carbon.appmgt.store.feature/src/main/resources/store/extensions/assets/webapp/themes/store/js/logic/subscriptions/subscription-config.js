@@ -1,8 +1,8 @@
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 
 var site = require("/config/store.json");
-var isSelfSubEnabled = site.SubscriptionConfiguration.EnableSelfSubscription;
-var isEnterpriseSubEnabled = site.SubscriptionConfiguration.EnableEnterpriseSubscription;
+var isSelfSubEnabled = site.subscriptionConfiguration.enableSelfSubscription;
+var isEnterpriseSubEnabled = site.subscriptionConfiguration.enableEnterpriseSubscription;
 var log = new Log("subscription-config.js");
 
 var isSelfSubscriptionEnabled = function () {
@@ -22,9 +22,9 @@ var isMyFavouriteMenu = function () {
     return false;
 };
 
-var getAnonymousApps = function (fn, request, session) {
+var getAnonymousApps = function (fn, request, session, tenantId) {
     var result = [];
-    var managers = require('/modules/store.js').storeManagers(request, session);
+    var managers = require('/modules/store.js').storeManagers(request, session, tenantId);
     var rxtManager = managers.rxtManager;
     var artifactManager = rxtManager.getArtifactManager(type);
     result = artifactManager.find(fn, null);

@@ -1627,51 +1627,51 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     @Override
-    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        appMDAO.addToFavouriteApps(identifier, userId, tenantId);
+        appMDAO.addToFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantId)
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser,
+                                        int tenantIdOfStore)
             throws AppManagementException {
-        appMDAO.removeFromFavouriteApps(identifier, userId, tenantId);
+        appMDAO.removeFromFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantId)
+    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        return appMDAO.isFavouriteApp(identifier, userId, tenantId);
+        return appMDAO.isFavouriteApp(identifier, userId, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
-        return appMDAO.getFavouriteApps(userName, tenantId);
+        return appMDAO.getFavouriteApps(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException {
-        return appMDAO.getFavouriteAppsCount(userName, tenantId);
+    public List<APIIdentifier> getUserSubscribedApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
+        return appMDAO.getUserSubscribedApps(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public List<APIIdentifier> getUserSubscribedApps(String userName) throws AppManagementException {
-        return appMDAO.getUserSubscribedApps(userName);
+    public void setFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
+        appMDAO.addToStoreFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void setFavouritePage(String userName, int tenantId) throws AppManagementException {
-        appMDAO.addToStoreFavouritePage(userName, tenantId);
+    public void removeFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
+        appMDAO.removeFromStoreFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void removeFavouritePage(String userName, int tenantId) throws AppManagementException {
-        appMDAO.removeFromStoreFavouritePage(userName, tenantId);
-    }
-
-    @Override
-    public boolean hasFavouritePage(String userName, int tenantId) throws AppManagementException {
-        return appMDAO.hasFavouritePage(userName, tenantId);
+    public boolean hasFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
+        return appMDAO.hasFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
     }
 }

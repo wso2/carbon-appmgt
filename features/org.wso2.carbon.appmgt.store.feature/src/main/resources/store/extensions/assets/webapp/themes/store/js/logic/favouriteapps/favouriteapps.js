@@ -3,15 +3,18 @@ $(function () {
     var API_SET_AS_HOME_PAGE = caramel.context + '/resources/webapp/v1/set-favourite-page/app';
     var API_REMOVE_FROM_HOME_PAGE = caramel.context + '/resources/webapp/v1/remove-favourite-page/app';
 
+    var storeTenantDomain = $('#store-tenant-domain').val();
     /**
      * This jquery function will be triggered when user
      * click on the icon- remove from favourite app
      */
     $('.remove-from-fav').on('click', function (event) {
         var appData = {};
-        appData['apiName'] = $(this).data("name");
-        appData['apiVersion'] = $(this).data("version");
-        appData['apiProvider'] = $(this).data("provider");
+        appData['name'] = $(this).data("name");
+        appData['version'] = $(this).data("version");
+        appData['provider'] = $(this).data("provider");
+        appData['storeTenantDomain'] = storeTenantDomain;
+
         removeFromFavourite(appData);
         disabledEventPropagation(event);
     });
@@ -21,7 +24,9 @@ $(function () {
      * click on the icon - Set this page as home page
      */
     $('#set-home').on('click', function (event) {
-        setAsHomePage();
+        var data = {};
+        data['storeTenantDomain'] = storeTenantDomain;
+        setAsHomePage(data);
     });
 
     /**
@@ -29,7 +34,9 @@ $(function () {
      * click on the icon -remove this page frin home page
      */
     $('#rmv-home').on('click', function (event) {
-        removeFromHomePage();
+        var data = {};
+        data['storeTenantDomain'] = storeTenantDomain;
+        removeFromHomePage(data);
     });
 
     function disabledEventPropagation(event) {
@@ -48,12 +55,12 @@ $(function () {
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           var message = 'You have successfully removed  <b>' + data.apiName
+                           var message = 'You have successfully removed  <b>' + data.name
                                + '</b> from your favourite apps';
                            //To remove the app from favourite page , need to reload the page
                            notifyAndReload(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.name
                                + ' from my favourite web apps';
                            notify(message)
                        }
@@ -63,7 +70,7 @@ $(function () {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.name
                                + ' from my favourite web apps';
                            notify(message);
                        }
@@ -71,17 +78,18 @@ $(function () {
                });
     };
 
-    var removeFromHomePage = function () {
+    var removeFromHomePage = function (data) {
         $.ajax({
                    url: API_REMOVE_FROM_HOME_PAGE,
                    type: 'POST',
+                   data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            var message = 'You have successfully removed   <b> MyFavourites Page'
                                + '</b> from home page';
                            notify(message);
-                           $('#set-home').hide();
-                           $('#rmv-home').show();
+                           $('#set-home').show();
+                           $('#rmv-home').hide();
 
                        } else {
                            var message = 'Error occured  when removing "MyFavourites" Page' +
@@ -102,17 +110,18 @@ $(function () {
                });
     };
 
-    var setAsHomePage = function () {
+    var setAsHomePage = function (data) {
         $.ajax({
                    url: API_SET_AS_HOME_PAGE,
                    type: 'POST',
+                   data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            var message = 'You have successfully set   <b> MyFavourites Page'
                                + '</b> as home page';
                            notify(message);
-                           $('#rmv-home').hide();
-                           $('#set-home').show();
+                           $('#rmv-home').show();
+                           $('#set-home').hide();
 
                        } else {
                            var message = 'Error occured  when setting "MyFavourites" Page' +

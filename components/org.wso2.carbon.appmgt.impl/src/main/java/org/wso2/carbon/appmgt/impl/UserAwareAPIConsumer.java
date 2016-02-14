@@ -90,61 +90,60 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     }
 
     @Override
-    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantId) throws
-                                                                                          AppManagementException {
-        checkSubscribePermission();
-        super.addToFavouriteApps(identifier, userId, tenantId);
-    }
-
-    @Override
-    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantId) throws
-                                                                                               AppManagementException {
-        checkSubscribePermission();
-        super.removeFromFavouriteApps(identifier, userId, tenantId);
-    }
-
-    @Override
-    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantId)
+    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.isFavouriteApp(identifier, userId, tenantId);
+        super.addToFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public List<APIIdentifier> getFavouriteApps(String userName, int tenantId)
+    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser,
+                                        int tenantIdOfStore) throws AppManagementException {
+        checkSubscribePermission();
+        super.removeFromFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
+    }
+
+    @Override
+    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.getFavouriteApps(userName, tenantId);
+        return super.isFavouriteApp(identifier, userId, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public int getFavouriteAppsCount(String userName, int tenantId) throws AppManagementException {
+    public List<APIIdentifier> getFavouriteApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
         checkSubscribePermission();
-        return super.getFavouriteAppsCount(userName, tenantId);
+        return super.getFavouriteApps(userName, tenantIdOfUser, tenantIdOfStore);
+    }
+
+
+    @Override
+    public List<APIIdentifier> getUserSubscribedApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
+        checkSubscribePermission();
+        return super.getUserSubscribedApps(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public List<APIIdentifier> getUserSubscribedApps(String userName) throws AppManagementException {
+    public void setFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
         checkSubscribePermission();
-        return super.getUserSubscribedApps(userName);
+        super.setFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void setFavouritePage(String userName, int tenantId) throws AppManagementException {
+    public void removeFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
         checkSubscribePermission();
-        super.setFavouritePage(userName, tenantId);
+        super.removeFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void removeFavouritePage(String userName, int tenantId) throws AppManagementException {
+    public boolean hasFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+            throws AppManagementException {
         checkSubscribePermission();
-        super.removeFavouritePage(userName, tenantId);
-    }
-
-    @Override
-    public boolean hasFavouritePage(String userName, int tenantId) throws AppManagementException {
-        checkSubscribePermission();
-        return super.hasFavouritePage(userName, tenantId);
+        return super.hasFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
 
     }
     public void checkSubscribePermission() throws AppManagementException {

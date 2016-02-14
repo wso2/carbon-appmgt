@@ -95,13 +95,18 @@ var getActiveTenantDomains=function(){
 
 };
 
-var hasFavouritePage = function () {
+var hasFavouritePage = function (username, tenantId, storeTenantDomain) {
     var status,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
-        status = store.hasFavouritePage();
+        if (username.indexOf("@carbon.super") > -1) {
+            username = username.replace("@carbon.super", "");
+        }
+        username = String(username);
+        storeTenantDomain = String(storeTenantDomain);
+        status = store.hasFavouritePage(username, tenantId, storeTenantDomain);
 
         if (log.isDebugEnabled()) {
             log.debug("hasFavouritePage : " + stringify(api));

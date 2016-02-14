@@ -68,10 +68,6 @@ jagg.module("subscription", {
     getAllFavouriteApps: function () {
         return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getAllFavouriteApps.apply(this, arguments);
     },
-    getFavouriteAppsCount: function () {
-        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getFavouriteAppsCount.apply(this,
-                                                                                                        arguments);
-    },
     getUserSubscribedApps: function () {
         return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getUserSubscribedApps.apply(this,
                                                                                                         arguments);

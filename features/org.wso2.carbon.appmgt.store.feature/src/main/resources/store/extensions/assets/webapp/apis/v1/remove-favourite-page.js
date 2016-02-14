@@ -12,12 +12,20 @@ var resource = (function () {
     authenticator.init(jagg, session);
 
     var removeFavouritePage = function (context) {
-        if (authenticator.getLoggedInUser() == null) {
+        var user = authenticator.getLoggedInUser();
+        if (user == null) {
             context.response.status = 401;
             return;
         }
 
-        var result = subsApi.removeFavouritePage();
+        var parameters = context.request.getAllParameters();
+        var storeTenantDomain = parameters.storeTenantDomain;
+
+        var es = require('store'),
+            tenant = es.server.tenant(context.request, session);
+        var userName = user.username;
+        var tenantIdOfUser = tenant.tenantId;
+        var result = subsApi.removeFavouritePage(userName,tenantIdOfUser,storeTenantDomain);
         return result;
     };
 

@@ -13,6 +13,8 @@ $(function(){
     var API_ADD_TO_FAVOURITE = caramel.context + '/resources/webapp/v1/add-favourite-app/app';
     var API_REMOVE_FROM_FAVOURITE = caramel.context + '/resources/webapp/v1/remove-favourite-app/app';
 
+    var storeTenantDomain = $('#store-tenant-domain').val();
+
     $('#btnSubscribe').on('click',function(){
         if( $(this).attr("disabled") != 'disabled'){
             $(this).attr("disabled", true);
@@ -296,9 +298,10 @@ $(function(){
             //Obtain the required information
             var data = {};
             var appDetails = metadata.apiAssetData.attributes;
-            data['apiName'] = appDetails.overview_name;
-            data['apiVersion'] = appDetails.overview_version;
-            data['apiProvider'] = appDetails.overview_provider;
+            data['name'] = appDetails.overview_name;
+            data['version'] = appDetails.overview_version;
+            data['provider'] = appDetails.overview_provider;
+            data['storeTenantDomain'] = storeTenantDomain;
 
             addToFavourite(data);
         }
@@ -309,9 +312,10 @@ $(function(){
             //Obtain the required information
             var data = {};
             var appDetails = metadata.apiAssetData.attributes;
-            data['apiName'] = appDetails.overview_name;
-            data['apiVersion'] = appDetails.overview_version;
-            data['apiProvider'] = appDetails.overview_provider;
+            data['name'] = appDetails.overview_name;
+            data['version'] = appDetails.overview_version;
+            data['provider'] = appDetails.overview_provider;
+            data['storeTenantDomain'] = storeTenantDomain;
 
             removeFromFavourite(data);
         }
@@ -325,11 +329,11 @@ $(function(){
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           var message = 'You have successfully added  <b>' + data.apiName +
+                           var message = 'You have successfully added  <b>' + data.name +
                                          '</b> to your favourite apps';
                            notifyAndReload(message);
                        } else {
-                           var message = 'Error occured in while adding  web app: ' + data.apiName +
+                           var message = 'Error occured in while adding  web app: ' + data.name +
                                          "to my favourite web apps";
                            notify(message);
                        }
@@ -339,7 +343,7 @@ $(function(){
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured in while adding  web app: ' + data.apiName +
+                           var message = 'Error occured in while adding  web app: ' + data.name +
                                          ' to my favourite web apps';
                            notify(message);
                        }
@@ -355,14 +359,14 @@ $(function(){
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (JSON.parse(response).error == false) {
-                           var message = 'You have successfully removed  <b>' + data.apiName
+                           var message = 'You have successfully removed  <b>' + data.name
                                + '</b> from your favourite apps';
                            notify(message);
                            $('#btnRemoveFromFav').hide();
                            $('#btnAddToFav').show();
 
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.name
                                + ' from my favourite web apps';
                            notify(message);
                        }
@@ -373,7 +377,7 @@ $(function(){
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
-                           var message = 'Error occured  when remove  web app: ' + data.apiName
+                           var message = 'Error occured  when remove  web app: ' + data.name
                                + ' from my favourite web apps';
                            notify(message);
                        }

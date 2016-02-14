@@ -52,7 +52,9 @@ var storeHostObj = manager.getAPIStoreObj();
                 if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
                     var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
                     var username = sessionObj.loggedInUser;
-
+                    if (username.indexOf("@carbon.super") > -1) {
+                        username= username.replace("@carbon.super","");
+                    }
                     if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
                         var relayStateUrlMatcher = new URIMatcher(relayState);
                         var tenantedURIPattern = contextPath + '/t/{domain}/';
@@ -117,7 +119,7 @@ var storeHostObj = manager.getAPIStoreObj();
                             //in store login url is in the format of /login?header=true
                             var queryParam = "?header=true";
                             if (relayState.indexOf(queryParam)) {
-                                var isFavouritePageSelected = manager.hasFavouritePage().status;
+                                var isFavouritePageSelected = manager.hasFavouritePage(username,tenantId,urlTenantDomain).status;
                                 if (isFavouritePageSelected) {
                                     var favPage = configs.pages.FavouritePage;
                                     relayState = contextPath + favPage;
@@ -126,6 +128,7 @@ var storeHostObj = manager.getAPIStoreObj();
                                     relayState.replace(queryParam, "");
                                 }
                             }
+
                             if(reversProxyEnabled) {
                                 relayState = reverseProxyHost+relayState;
                             }

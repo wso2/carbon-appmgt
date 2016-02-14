@@ -72,11 +72,12 @@ require('/modules/store.js').exec(function (ctx) {
     var headerData = site.header(tenantId, {
         sso: sso,
         user: user,
-        domain: tenantDomain,
+        domain: tenantDomain
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.searchOff = true;
     headerData.hideAllAppsLink = false;
+    headerData.storeTenantDomain = tenantDomain;
 
     var showSortOptions = false;
     var webAppRecentAssets = [];
@@ -386,16 +387,17 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
-     * This method retrieve anonymous apps from registry.
+     * This method retrieve anonymous apps from registry which are in published state.
      * @returns {*}
      */
     var getAnonymousApps = function () {
         var fn = function (asset) {
             var cond1 = (asset.attributes.overview_treatAsASite.toLowerCase() == "false" ) ? true : false;
             var cond2 = (asset.attributes.overview_allowAnonymous.toLowerCase() == "true" ) ? true : false;
-            return (cond1 && cond2);
+            var cond3 = (asset.lifecycleState == "Published" ) ? true : false;
+            return (cond1 && cond2 && cond3);
         };
-        return subscriptionUtil.getAnonymousApps(fn, request, session);
+        return subscriptionUtil.getAnonymousApps(fn, request, session, tenantId);
     };
 
     /**
@@ -414,7 +416,8 @@ require('/modules/store.js').exec(function (ctx) {
             appInfo["version"] = version;
             appInfo["provider"] = provider;
 
-            status = subsApi.isFavouriteApp(appInfo).isFavouriteApp;
+            status = subsApi.isFavouriteApp(appInfo, user.username, user.tenantId,
+                                            tenantDomain).isFavouriteApp;
         }
         return status;
     };
@@ -447,7 +450,7 @@ require('/modules/store.js').exec(function (ctx) {
             var anonymousApps = getAnonymousApps();
             anonymousApps = changeFormat(anonymousApps);
             //get user subscribed apps
-            var subscribedApps = subsApi.getUserSubscribedApps();
+            var subscribedApps = subsApi.getUserSubscribedApps(String(user.username),user.tenantId,String(tenantDomain));
             //merge anonymous + subscribe apps
             assets = mergeArrays(anonymousApps, subscribedApps);
         } else {

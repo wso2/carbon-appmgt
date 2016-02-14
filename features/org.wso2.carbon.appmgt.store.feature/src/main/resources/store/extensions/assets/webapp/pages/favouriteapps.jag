@@ -26,9 +26,13 @@ var log = new Log('favouriteapps');
 include('../modules/jagg/jagg.jag');
 
 require('/modules/store.js').exec(function (ctx) {
-    var sso = ctx.sso, store = ctx.store, user = ctx.user;
+    var sso = ctx.sso,
+        store = ctx.store,
+        user = ctx.user,
+        storeTenantId = ctx.tenant.tenantId,
+        storeTenantDomain = ctx.tenant.domain;
 
-    //if user not logged in redirec to login page
+    //if user not logged in redirect to login page
     if (!user) {
         var referer = store.getReferer(request);
         var redirectUrl = store.getRedirectUrl("/login?referer=" + referer);
@@ -60,10 +64,12 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     //Get the all favourite apps of logged in user
-    var apps = subsApi.getAllFavouriteApps();
+    var apps = subsApi.getAllFavouriteApps(user.username, user.tenantId,
+                                           storeTenantDomain);
     //Check whether use has selected favourite page as defualt ladning page
     //This is needed to show correct icon(set as home page /remove from home page) to user.
-    var hasFavouritePage = subsApi.hasFavouritePage().hasFavouritePage;
+    var hasFavouritePage = subsApi.hasFavouritePage(user.username, user.tenantId,
+                                                    storeTenantDomain).hasFavouritePage;
 
     caramel.render({
                        header: {
@@ -72,7 +78,8 @@ require('/modules/store.js').exec(function (ctx) {
                            searchOff: true,
                            hideAllAppsLink: hideAllAppsLink,
                            isHomePage: hasFavouritePage,
-                           myFav: true
+                           myFav: true,
+                           storeTenantDomain: storeTenantDomain
                        },
                        sso: sso,
                        favouriteApps: apps

@@ -41,6 +41,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
@@ -3177,32 +3178,36 @@ public class APIStoreHostObject extends ScriptableObject {
      * @return
      * @throws AppManagementException
      */
-    public static void jsFunction_addToFavourite(Context cx,
+    public static void jsFunction_addToFavouriteApps(Context cx,
                                                  Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        if (args == null || args.length == 0 || !isStringArray(args)) {
-            throw new AppManagementException("Invalid input parameters to add the  web app to favourite app list");
+        if (args == null || args.length != 6) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters to method addToFavourite.Expected parameters:6");
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = getUsernameFromObject(thisObj);
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
         boolean isTenantFlowStarted = false;
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.addToFavouriteApps(apiIdentifier, userName, tenantId);
+            apiConsumer.addToFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3224,28 +3229,32 @@ public class APIStoreHostObject extends ScriptableObject {
                                                           Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        if (args == null || args.length == 0 || !isStringArray(args)) {
-            throw new AppManagementException("Invalid input parameters to remove web app from favourite app list");
+        if (args == null || args.length != 6) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters:6");
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = getUsernameFromObject(thisObj);
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
         boolean isTenantFlowStarted = false;
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.removeFromFavouriteApps(apiIdentifier, userName, tenantId);
+            apiConsumer.removeFromFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3268,28 +3277,32 @@ public class APIStoreHostObject extends ScriptableObject {
                                                     Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        if (args == null || args.length == 0 || !isStringArray(args)) {
-            throw new AppManagementException("Invalid input parameters to check whether  app is favourite or not.");
+        if (args == null || args.length != 6) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters to method isFavouriteApp.Expected parameters:6");
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = getUsernameFromObject(thisObj);
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
         boolean isTenantFlowStarted = false;
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            return apiConsumer.isFavouriteApp(apiIdentifier, userName, tenantId);
+            return apiConsumer.isFavouriteApp(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3311,26 +3324,29 @@ public class APIStoreHostObject extends ScriptableObject {
     public static NativeArray jsFunction_getAllFavouriteApps(Context cx,
                                                              Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException, AppManagementException {
-
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("Authentication Failed.Login is required");
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters to method getAllFavouriteApps.Expected parameters:3");
         }
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
 
         NativeArray nativeArray = new NativeArray(0);
         boolean isTenantFlowStarted = false;
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            List<APIIdentifier> apiIdentifiers = apiConsumer.getFavouriteApps(userName, tenantId);
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getFavouriteApps(userName, tenantIdOfUser,
+                                                                              tenantIdOfStore);
 
             if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
                 AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
@@ -3339,23 +3355,28 @@ public class APIStoreHostObject extends ScriptableObject {
                 int i = 0;
                 for (APIIdentifier apiIdentifier : apiIdentifiers) {
                     WebApp app = apiConsumer.getAPI(apiIdentifier);
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
-                    }
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Return only apps in published status
+                    if (APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        String accessUrl = null;
+                        if (app.getSkipGateway()) {
+                            accessUrl = app.getUrl();
+                        } else {
+                            String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                            String context = app.getContext();
+                            accessUrl = serverUrl + context + "/";
+                        }
 
-                    NativeObject row = new NativeObject();
-                    row.put("appName", row, apiIdentifier.getApiName());
-                    row.put("appProvider", row, apiIdentifier.getProviderName());
-                    row.put("version", row, apiIdentifier.getVersion());
-                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                    row.put("gatewayUrl", row, accessUrl);
-                    row.put("uuid", row, app.getUUID());
-                    nativeArray.put(i++, nativeArray, row);
+                        NativeObject row = new NativeObject();
+                        row.put("appName", row, apiIdentifier.getApiName());
+                        row.put("appProvider", row, apiIdentifier.getProviderName());
+                        row.put("version", row, apiIdentifier.getVersion());
+                        row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                        row.put("gatewayUrl", row, accessUrl);
+                        row.put("uuid", row, app.getUUID());
+                        row.put("treatAsSite", row, app.getTreatAsASite());
+                        nativeArray.put(i++, nativeArray, row);
+                    }
                 }
             }
         } finally {
@@ -3364,47 +3385,6 @@ public class APIStoreHostObject extends ScriptableObject {
             }
         }
         return nativeArray;
-    }
-
-    /**
-     * This method returns favourite apps count of logged in user.
-     *
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return
-     * @throws ScriptException
-     * @throws AppManagementException
-     */
-    public static int jsFunction_getFavouriteAppsCount(Context cx,
-                                                       Scriptable thisObj, Object[] args, Function funObj)
-            throws AppManagementException {
-
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("Authentication Failed.Login is required");
-        }
-
-        boolean isTenantFlowStarted = false;
-        int totalCount = 0;
-        try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
-            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                isTenantFlowStarted = true;
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            }
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            totalCount = apiConsumer.getFavouriteAppsCount(userName, tenantId);
-
-        } finally {
-            if (isTenantFlowStarted) {
-                PrivilegedCarbonContext.endTenantFlow();
-            }
-        }
-        return totalCount;
     }
 
     /**
@@ -3421,23 +3401,30 @@ public class APIStoreHostObject extends ScriptableObject {
                                                                Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("User is not logged in");
+
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters for method removeFavouritePage.Expected parameters :3");
         }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
 
         boolean isTenantFlowStarted = false;
         NativeArray nativeArray = new NativeArray(0);
 
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            List<APIIdentifier> apiIdentifiers = apiConsumer.getUserSubscribedApps(userName);
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getUserSubscribedApps(userName, tenantIdOfUser,
+                                                                                   tenantIdOFStore);
 
             if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
                 AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
@@ -3448,26 +3435,31 @@ public class APIStoreHostObject extends ScriptableObject {
                 int i = 0;
                 for (APIIdentifier apiIdentifier : apiIdentifiers) {
                     WebApp app = apiConsumer.getAPI(apiIdentifier);
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Return only apps in published status
+                    if(APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        String accessUrl = null;
+                        if (app.getSkipGateway()) {
+                            accessUrl = app.getUrl();
+                        } else {
+                            String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                            String context = app.getContext();
+                            accessUrl = serverUrl + context + "/";
+                        }
+
+                        NativeObject row = new NativeObject();
+                        row.put("appName", row, apiIdentifier.getApiName());
+                        row.put("appProvider", row, apiIdentifier.getProviderName());
+                        row.put("version", row, apiIdentifier.getVersion());
+                        row.put("appTenant", row, app.getAppTenant());
+                        row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                        row.put("accessUrl", row, accessUrl);
+                        row.put("uuid", row, app.getUUID());
+                        row.put("advertiseOnly", row, String.valueOf(app.isAdvertiseOnly()));
+                        row.put("advertisedAppUuid", row, app.getAdvertisedAppUuid());
+                        nativeArray.put(i++, nativeArray, row);
                     }
 
-                    NativeObject row = new NativeObject();
-                    row.put("appName", row, apiIdentifier.getApiName());
-                    row.put("appProvider", row, apiIdentifier.getProviderName());
-                    row.put("version", row, apiIdentifier.getVersion());
-                    row.put("appTenant", row, app.getAppTenant());
-                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                    row.put("accessUrl", row, accessUrl);
-                    row.put("uuid", row, app.getUUID());
-                    row.put("advertiseOnly", row, String.valueOf(app.isAdvertiseOnly()));
-                    row.put("advertisedAppUuid", row, app.getAdvertisedAppUuid());
-                    nativeArray.put(i++, nativeArray, row);
                 }
             }
 
@@ -3492,22 +3484,26 @@ public class APIStoreHostObject extends ScriptableObject {
                                                    Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("User is not logged in");
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters for method setFavouritePage.Expected parameters :3");
         }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
 
         boolean isTenantFlowStarted = false;
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.setFavouritePage(userName, tenantId);
+            apiConsumer.setFavouritePage(userName, tenantIdOfUser,tenantIdOFStore);
 
         } finally {
             if (isTenantFlowStarted) {
@@ -3529,22 +3525,26 @@ public class APIStoreHostObject extends ScriptableObject {
                                                       Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("User is not logged in");
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters for method removeFavouritePage.Expected parameters :3");
         }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
 
         boolean isTenantFlowStarted = false;
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.removeFavouritePage(userName, tenantId);
+            apiConsumer.removeFavouritePage(userName, tenantIdOfUser, tenantIdOFStore);
 
         } finally {
             if (isTenantFlowStarted) {
@@ -3567,22 +3567,26 @@ public class APIStoreHostObject extends ScriptableObject {
                                                       Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
 
-        String userName = getUsernameFromObject(thisObj);
-        if (userName == null) {
-            throw new AppManagementException("User is not logged in");
+        if (args == null || args.length != 3) {
+            throw new AppManagementException(
+                    "Invalid number of input parameters for method hasFavouritePage.Expected parameters :3");
         }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
 
         boolean isTenantFlowStarted = false;
         try {
-            String tenantDomain = MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(userName));
+            String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
                 isTenantFlowStarted = true;
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            return apiConsumer.hasFavouritePage(userName, tenantId);
+            return apiConsumer.hasFavouritePage(userName, tenantIdOfUser,tenantIdOFStore );
 
         } finally {
             if (isTenantFlowStarted) {

@@ -11,20 +11,27 @@ var resource = (function () {
     var AuthService = require('/extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg, session);
-    log.info("remove favourite app");
+
     var removeFromFavourite = function (context) {
-        if(authenticator.getLoggedInUser() == null){
+        var user = authenticator.getLoggedInUser();
+        if(user == null){
             context.response.status = 401;
             return;
         }
 
         var parameters = context.request.getAllParameters();
-        var data = {};
-        data['apiName'] = parameters.apiName;
-        data['apiVersion'] = parameters.apiVersion;
-        data['apiProvider'] = parameters.apiProvider;
+        var appIdentifier = {};
+        appIdentifier['name'] = parameters.name;
+        appIdentifier['version'] = parameters.version;
+        appIdentifier['provider'] = parameters.provider;
+        var storeTenantDomain = parameters.storeTenantDomain;
 
-        var result = subsApi.removeFromFavouriteApps(data);
+        var es = require('store'),
+            tenant = es.server.tenant(context.request, session);
+        var userName = user.username;
+        var tenantIdOfUser = tenant.tenantId;
+
+        var result = subsApi.removeFromFavouriteApps(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
         return result;
 
     };

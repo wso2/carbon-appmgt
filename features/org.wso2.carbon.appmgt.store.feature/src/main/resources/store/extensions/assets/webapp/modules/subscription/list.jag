@@ -28,6 +28,9 @@ var getAPISubscriptions = function (api, username) {
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
+        if (username.indexOf("@carbon.super") > -1) {
+            username= username.replace("@carbon.super","");
+        }
         subscriptions = store.getSubscriptions(api.provider, api.name, api.version, username);
         if (log.isDebugEnabled()) {
             log.debug("getSubscriptions : " + stringify(subscriptions));
@@ -51,6 +54,9 @@ var getAPISubscription = function (app, applicationName, subscriptionType, usern
             store = jagg.module("manager").getAPIStoreObj();
     try {
 	if (username) {
+        if (username.indexOf("@carbon.super") > -1) {
+            username= username.replace("@carbon.super","");
+        }
 		subscription = store.getSubscription(app.provider, app.name, app.version, applicationName, subscriptionType, username);
 		if (log.isDebugEnabled()) {
 		    log.debug("getSubscription : " + stringify(subscription));
@@ -125,20 +131,26 @@ var getEnterprisesForApplication = function(appName, ssoProviderName, ssoProvide
 
 };
 
-var isFavouriteApp = function (api) {
-    var data,
+var isFavouriteApp = function (app, userName, tenantIdOfUser, storeTenantDomain) {
+    var status,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
-        data = store.isFavouriteApp(api.provider, api.name, api.version);
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain);
+        status = store.isFavouriteApp(app.provider, app.name, app.version, userName, tenantIdOfUser, storeTenantDomain);
+
         if (log.isDebugEnabled()) {
-            log.debug("isFavouriteApp : " + stringify(data));
+            log.debug("isFavouriteApp : " + status);
         }
 
         return {
             error: false,
-            isFavouriteApp: data
+            isFavouriteApp: status
         };
     } catch (e) {
         log.error(e.message);
@@ -149,12 +161,17 @@ var isFavouriteApp = function (api) {
     }
 };
 
-var getAllFavouriteApps = function () {
+var getAllFavouriteApps = function (userName, tenantIdOfUser, storeTenantDomain) {
     var data,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
     try {
-        data = store.getAllFavouriteApps();
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain);
+        data = store.getAllFavouriteApps(userName, tenantIdOfUser, storeTenantDomain);
         if (log.isDebugEnabled()) {
             log.debug("getAllFavouriteApps : " + stringify(data));
         }
@@ -171,34 +188,17 @@ var getAllFavouriteApps = function () {
     }
 };
 
-var getFavouriteAppsCount = function () {
-    var count,
-            log = new Log(),
-            store = jagg.module("manager").getAPIStoreObj();
-    try {
-        count = store.getFavouriteAppsCount();
-        if (log.isDebugEnabled()) {
-            log.debug("getFavouriteAppsCount : " + count);
-        }
-        return {
-            error: false,
-            appsCount: count
-        };
-    } catch (e) {
-        log.error(e.message);
-        return {
-            error: true,
-            message: e.message
-        };
-    }
-};
-
-var getUserSubscribedApps = function () {
+var getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfStore) {
     var data,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
     try {
-        data = store.getUserSubscribedApps();
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        tenantDomainOfStore= String(tenantDomainOfStore);
+        data = store.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
         if (log.isDebugEnabled()) {
             log.debug("getUserSubscribedApps : " + stringify(data));
         }
@@ -215,13 +215,18 @@ var getUserSubscribedApps = function () {
     }
 };
 
-var hasFavouritePage = function () {
+var hasFavouritePage = function (userName, tenantIdOfUser, tenantDomainOfStore) {
     var status,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
 
     try {
-        status = store.hasFavouritePage();
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName= userName.replace("@carbon.super","");
+        }
+        userName = String(userName);
+        tenantDomainOfStore= String(tenantDomainOfStore);
+        status = store.hasFavouritePage(userName, tenantIdOfUser, tenantDomainOfStore);
         if (log.isDebugEnabled()) {
             log.debug("isFavouriteApp : " + stringify(data));
         }

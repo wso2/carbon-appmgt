@@ -8,15 +8,10 @@ var caramel = require('caramel'),
         reversProxyEnabled = caramel.configs().reverseProxyEnabled,
         reverseProxyHost = caramel.configs().reverseProxyHost;
 var config = require("/config/store.json");
-var landingPage = config.pages.LandingPage;
-var user = jagg.getUser();
-if(user) {
-    var isFavouritePageSelected = manager.hasFavouritePage().status;
-    if(isFavouritePageSelected){
-        landingPage =config.pages.FavouritePage;
-    }
-}
 
+var userName = session.get("LOGGED_IN_USER");
+var userTenantId = session.get("tenantId");
+var log = new Log();
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     require('/modules/store.js').exec(function (ctx) {
         var PAGE_SIZE = 10;
@@ -26,6 +21,15 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var numberOfTenantDomains = tenantDomains.length;
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
+
+            var landingPage = config.pages.LandingPage;
+            if (userName) {
+                var isFavouritePageSelected = manager.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
+                if (isFavouritePageSelected) {
+                    landingPage = configs.pages.FavouritePage;
+                }
+            }
+
             var store ={};
             store['name'] = tenantDomains[i];
             store['storeUrl'] = tenantDomains[i]+ landingPage;
@@ -46,6 +50,13 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
+    var landingPage = config.pages.LandingPage;
+    if (userName != null) {
+        var isFavouritePageSelected = manager.hasFavouritePage(userName, userTenantId, "carbon.super").status;
+        if (isFavouritePageSelected) {
+            landingPage = configs.pages.FavouritePage;
+        }
+    }
     var redirectURl = contextPath + landingPage;
     if (reversProxyEnabled) {
         redirectURl = reverseProxyHost + redirectURl;

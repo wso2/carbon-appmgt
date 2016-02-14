@@ -40,9 +40,9 @@
         "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
         "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
     },
-    "SubscriptionConfiguration": {
-        "EnableSelfSubscription": false,
-        "EnableEnterpriseSubscription": false
+    "subscriptionConfiguration": {
+        "enableSelfSubscription": false,
+        "enableEnterpriseSubscription": false
     },
     "pages": {
         "LandingPage": "/extensions/assets/webapp/myapps",

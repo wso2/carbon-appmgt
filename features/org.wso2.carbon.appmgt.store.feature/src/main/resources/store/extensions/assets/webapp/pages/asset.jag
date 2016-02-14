@@ -458,6 +458,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
         headerData.domain = tenantDomain;
+        headerData.storeTenantDomain = tenantDomain;
 
         caramel.render({
             title: 'Store | ' + type,

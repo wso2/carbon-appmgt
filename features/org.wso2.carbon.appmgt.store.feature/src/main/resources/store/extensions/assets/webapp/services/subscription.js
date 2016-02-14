@@ -94,60 +94,43 @@ var serviceModule = (function () {
         return result;
     }
 
-    Subscriber.prototype.addToFavouriteApps = function (options) {
-        var apiData = {};
-        apiData['name'] = options.apiName;
-        apiData['version'] = options.apiVersion;
-        apiData['provider'] = options.apiProvider;
-        var result = this.instance.addToFavouriteApps(apiData);
+    Subscriber.prototype.addToFavouriteApps = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
+        var result = this.instance.addToFavouriteApps(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
         return result;
     };
 
-    Subscriber.prototype.removeFromFavouriteApps = function (options) {
-        var apiData = {};
-        apiData['name'] = options.apiName;
-        apiData['version'] = options.apiVersion;
-        apiData['provider'] = options.apiProvider;
-        var result = this.instance.removeFromFavouriteApps(apiData);
+    Subscriber.prototype.removeFromFavouriteApps = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
+        var result = this.instance.removeFromFavouriteApps(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
         return result;
     };
 
-    Subscriber.prototype.isFavouriteApp = function (options) {
-        var apiData = {};
-        apiData['name'] = options.name;
-        apiData['version'] = options.version;
-        apiData['provider'] = options.provider;
-        var result = this.instance.isFavouriteApp(apiData);
+    Subscriber.prototype.isFavouriteApp = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
+        var result = this.instance.isFavouriteApp(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
         return result;
     };
 
-    Subscriber.prototype.getAllFavouriteApps = function () {
-        var result = this.instance.getAllFavouriteApps();
+    Subscriber.prototype.getAllFavouriteApps = function (userName, tenantIdOfUser, storeTenantDomain) {
+        var result = this.instance.getAllFavouriteApps(userName, tenantIdOfUser, storeTenantDomain);
         return (result.apps) ? result.apps : [];
     };
 
-    Subscriber.prototype.getFavouriteAppsCount = function () {
-        var result = this.instance.getFavouriteAppsCount();
-        return result.appsCount;
-    };
-
-    Subscriber.prototype.getUserSubscribedApps = function () {
-        var result = this.instance.getUserSubscribedApps();
+    Subscriber.prototype.getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfStore) {
+        var result = this.instance.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
         return (result.apps) ? result.apps : [];
     };
 
-    Subscriber.prototype.setFavouritePage = function () {
-        var result = this.instance.setFavouritePage();
+    Subscriber.prototype.setFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
+        var result = this.instance.setFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
         return result;
     };
 
-    Subscriber.prototype.removeFavouritePage = function () {
-        var result = this.instance.removeFavouritePage();
+    Subscriber.prototype.removeFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
+        var result = this.instance.removeFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
         return result;
     };
 
-    Subscriber.prototype.hasFavouritePage = function () {
-        var result = this.instance.hasFavouritePage();
+    Subscriber.prototype.hasFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
+        var result = this.instance.hasFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
         return result;
     };
 
