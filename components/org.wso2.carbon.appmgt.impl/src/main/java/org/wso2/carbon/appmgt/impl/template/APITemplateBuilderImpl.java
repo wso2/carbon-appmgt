@@ -86,8 +86,9 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		try {
 			configContext.validate();
 		} catch (AppManagementException e) {
-			log.error("Cannot validate configuration context for template", e);
-			throw new APITemplateException("Cannot validate configuration context for template", e);
+            String msg = "Cannot validate configuration context for template";
+            log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 
 		VelocityEngine velocityEngine = new VelocityEngine();
@@ -98,8 +99,9 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		try {
 			velocityEngine.init();
 		} catch (Exception e) {
-			log.error("Cannot initialize Velocity engine", e);
-			throw new APITemplateException("Cannot initialize Velocity engine", e);
+            String msg = "Cannot initialize Velocity engine";
+            log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 		VelocityContext context = configContext.getContext();
 
@@ -116,8 +118,9 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		try {
 			velocityengine.init();
 		} catch (Exception e) {
-			log.error("Cannot initialize Velocity engine", e);
-			throw new APITemplateException("Cannot initialize Velocity engine", e);
+            String msg = "Cannot initialize Velocity engine";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 
 		ConfigContext configcontext = new APIConfigContext(this.webapp);
