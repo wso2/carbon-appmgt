@@ -110,24 +110,24 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 	@Override
 	public String getConfigStringForNonVersionedWebAppTemplate() throws APITemplateException {
-		VelocityEngine velocityengine = new VelocityEngine();
+		VelocityEngine velocityEngine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
-            velocityengine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
+            velocityEngine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
 		}
 		try {
-			velocityengine.init();
+			velocityEngine.init();
 		} catch (Exception e) {
             String msg = "Cannot initialize Velocity engine";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		}
 
-		ConfigContext configcontext = new APIConfigContext(this.webapp);
-		configcontext = new TransportConfigContext(configcontext, webapp);
-		configcontext = new ResourceConfigContext(configcontext, webapp);
+		ConfigContext configContext = new APIConfigContext(this.webapp);
+		configContext = new TransportConfigContext(configContext, webapp);
+		configContext = new ResourceConfigContext(configContext, webapp);
 
-		VelocityContext context = configcontext.getContext();
+		VelocityContext context = configContext.getContext();
 		context.put(SYNAPSE_PARAM_API_CONTEXT, this.webapp.getContext());
 		String forwardAppContext = this.webapp.getContext();
 		if (forwardAppContext != null && forwardAppContext.charAt(0) == '/') {
@@ -136,7 +136,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		context.put(SYNAPSE_PARAM_FORWARD_APP_CONTEXT, forwardAppContext);
 		context.put(SYNAPSE_PARAM_FORWARD_APP_VERSION, this.webapp.getId().getVersion());
 
-		return processTemplate(velocityengine, context, getNonVersionedWebAppTemplatePath());
+		return processTemplate(velocityEngine, context, getNonVersionedWebAppTemplatePath());
 	}
 
 	@Override
