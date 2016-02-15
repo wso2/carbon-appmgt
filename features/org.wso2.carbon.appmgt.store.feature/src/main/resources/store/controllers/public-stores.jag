@@ -1,12 +1,19 @@
 <%
 var a;
-include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+include('/jagg/jagg.jag');
 var manager = jagg.module("manager");
+var favourites = jagg.module("favourites");
 var tenantDomains = manager.getActiveTenantDomains().tenantDomains;
 var caramel = require('caramel'),
         contextPath = caramel.configs().context,
         reversProxyEnabled = caramel.configs().reverseProxyEnabled,
         reverseProxyHost = caramel.configs().reverseProxyHost;
+var config = require("/config/store.json");
+
+var userName = session.get("LOGGED_IN_USER");
+var userTenantId = session.get("tenantId");
+var log = new Log();
+
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     require('/modules/store.js').exec(function (ctx) {
         var PAGE_SIZE = 10;
@@ -16,7 +23,19 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var numberOfTenantDomains = tenantDomains.length;
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
-            stores.push(tenantDomains[i]);
+
+            var landingPage = config.pages.landingPage;
+            if (userName) {
+                var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
+                if (isFavouritePageSelected) {
+                    landingPage = configs.pages.favouritePage;
+                }
+            }
+
+            var store ={};
+            store['name'] = tenantDomains[i];
+            store['storeUrl'] = tenantDomains[i]+ landingPage;
+            stores.push(store);
         }
 
         caramel.render({
@@ -33,7 +52,14 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
-    var redirectURl = contextPath + '/assets/';
+    var landingPage = config.pages.landingPage;
+    if (userName != null) {
+        var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
+        if (isFavouritePageSelected) {
+            landingPage = configs.pages.favouritePage;
+        }
+    }
+    var redirectURl = contextPath + landingPage;
     if (reversProxyEnabled) {
         redirectURl = reverseProxyHost + redirectURl;
     }

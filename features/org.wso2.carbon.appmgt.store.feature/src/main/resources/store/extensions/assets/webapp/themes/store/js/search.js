@@ -256,7 +256,7 @@ $(function () {
             if(searchSelect !== "App"){
                 searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
             }
-            location.href = caramel.tenantedUrl("/assets/webapp?query=" + searchTerm);
+            location.href = location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
         }
     });
 

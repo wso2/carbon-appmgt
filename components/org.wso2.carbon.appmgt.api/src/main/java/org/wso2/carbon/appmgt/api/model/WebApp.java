@@ -86,6 +86,7 @@ public class WebApp {
     private String oldOutSequence;
 
     private boolean advertiseOnly;
+    private String advertisedAppUuid;
     private String appOwner;
     private String appTenant;
     private String redirectURL;
@@ -685,5 +686,13 @@ public class WebApp {
 
     public void setTreatAsASite(String treatAsASite) {
         this.treatAsASite = treatAsASite;
+    }
+
+    public String getAdvertisedAppUuid() {
+        return advertisedAppUuid;
+    }
+
+    public void setAdvertisedAppUuid(String advertisedAppUuid) {
+        this.advertisedAppUuid = advertisedAppUuid;
     }
 }

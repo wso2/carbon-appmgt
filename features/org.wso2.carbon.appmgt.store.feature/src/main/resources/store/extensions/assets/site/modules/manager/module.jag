@@ -35,6 +35,12 @@ jagg.module("manager", {
 
     getActiveTenantDomains:function () {
         return jagg.require(jagg.getModulesDir() + "manager/manager.jag").getActiveTenantDomains.apply(this, arguments);
+    },
+    hasFavouritePage: function () {
+        return jagg.require(jagg.getModulesDir() + "manager/manager.jag").hasFavouritePage.apply(this, arguments);
+    },
+    isFavouriteApp: function () {
+        return jagg.require(jagg.getModulesDir() + "manager/manager.jag").isFavouriteApp.apply(this, arguments);
     }
 
  });

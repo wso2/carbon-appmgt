@@ -374,7 +374,6 @@ require('/modules/store.js').exec(function (ctx) {
     } else if (customType == SITE_TYPE) {
         isSite = 'true';
     }
-
     caramel.render({
         title: 'webapps | Store | WSO2 App Manager',
         user: user,
@@ -410,7 +409,8 @@ require('/modules/store.js').exec(function (ctx) {
             size: assets.length
         },
         sorting: {
-            url: url + 'sort='
+            url: url + 'sort=',
+            showSortOptions: true
         },
 
         myAssets : {

@@ -1236,3 +1236,36 @@ var exec = function (fn, request, response, session) {
         });
     });
 };
+
+/**
+ * This method constructs redirect url with context path
+ * @param relativeUrl
+ * @returns {*}
+ */
+Store.prototype.getRedirectUrl = function (relativeUrl) {
+    var caramel = caramel = require('caramel');
+    var contextPath = caramel.configs().context,
+        reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+        reverseProxyHost = caramel.configs().reverseProxyHost;
+    var url = contextPath + relativeUrl;
+    if (reversProxyEnabled) {
+        url = reverseProxyHost + url;
+    }
+    return url;
+};
+
+/**
+ * This method extract the referer from request header and return.
+ * if referer is not found in the request header, return request
+ * url as referer(this will happen if link is shared and accessed).
+ * @param request
+ * @returns {String}
+ */
+Store.prototype.getReferer = function (request) {
+    var referer = request.getHeader("referer");
+    if (!referer) {
+        referer = request.getRequestURL();
+    }
+    return referer;
+};
+

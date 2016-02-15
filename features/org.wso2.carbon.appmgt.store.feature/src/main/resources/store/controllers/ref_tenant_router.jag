@@ -49,6 +49,9 @@ if (matcher.match(apiEndpoint)) {
 
     var elements = matcher.elements();
     path = '/controllers/routers/assets.jag';
+    if(elements.type == "favouriteapps") {
+        path = '/controllers/favouriteapps.jag';
+    }
     resolveRouter(elements.domain, path, elements.type);
 
 } else if (matcher.match(storageEndpoint)) {
@@ -91,6 +94,9 @@ function resolveRouter(tenantDomain, path, type) {
 
     if (type == 'site') {
         include('/extensions/assets/site/modules/jagg/jagg.jag');
+    }
+    if (type == "favouriteapps") {
+        include('/jagg/jagg.jag');
     } else {
         include('/extensions/assets/webapp/modules/jagg/jagg.jag');
     }

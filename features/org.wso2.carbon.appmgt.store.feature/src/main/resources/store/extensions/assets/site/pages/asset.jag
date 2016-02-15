@@ -1,35 +1,18 @@
 <%
-/*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *  WSO2 Inc. licenses this file to you under the Apache License,
- *  Version 2.0 (the "License"); you may not use this file except
- *  in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-include('../modules/jagg/jagg.jag');
 var caramel;
 var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
 var log = new Log();
+include('../modules/jagg/jagg.jag');
+
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
 
-var AppInformationService = require('../services/app-information.js').serviceModule;
-var apiInfoManager = new AppInformationService.AppInformationService();
+var APIInformationService = require('../services/api-information.js').serviceModule;
+var apiInfoManager = new APIInformationService.APIInformationService();
 apiInfoManager.init(jagg, session);
 
 AppService = require(getServiceDir('app.js')).serviceModule;
@@ -39,21 +22,29 @@ appInfoApi.init(jagg, session);
 AuthService = require(getServiceDir('authentication.js')).serviceModule;
 authenticator = new AuthService.Authenticator();
 authenticator.init(jagg, session);
+//var getDocs=jagg.module('documentation').getAllDocumentations;
+
 
 var carbon = require('carbon');
-var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
 
 var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
+var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
+var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
+var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
+
 require('/modules/store.js').exec(function (ctx) {
-    var asset, applicationId, title, currentTenant, userTenant, tenantIdVal,
+    var asset, aid, title, currentTenant, userTenant, tenantIdVal,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
             tenantId = ctx.tenantId,
+            tenant = ctx.tenant,
             configs = ctx.configs,
+            tenantDomain = ctx.tenant.domain,
             site = ctx.site,
             matcher = ctx.matcher,
             inDashboard = false,
@@ -63,7 +54,11 @@ require('/modules/store.js').exec(function (ctx) {
     utility = require('/modules/util.js');
     search = require('/modules/search.js'),
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
     caramel = require('caramel');
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
     var SITE_OPTIONS = {
@@ -76,14 +71,14 @@ require('/modules/store.js').exec(function (ctx) {
     var defaultUrl = '/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}';
 
     //Match the incoming request with tenanted and default URI patterns and extracts the relecant asset id
-    if(matcher.match(defaultUrl) || matcher.match(tenantedUrl)){
-        applicationId = matcher.elements().aid;
+    if (matcher.match(defaultUrl) || matcher.match(tenantedUrl)) {
+        aid = matcher.elements().aid;
         title = store.assetLinks(type).title;
         currentTenant = matcher.elements().domain;
     }
-
+    //Retrieve assets
     try {
-        asset = store.asset(type, applicationId);
+        asset = store.asset(type, aid);
     } catch (e) {
         log.error(e);
         response.sendError(404, 'Requested page cannot be found');
@@ -99,7 +94,7 @@ require('/modules/store.js').exec(function (ctx) {
             redirectURL = reverseProxyHost + contextPath + url;
         }
         return redirectURL;
-    }
+    };
 
     var getReferer = function () {
         var contextPath = caramel.configs().context,
@@ -117,7 +112,7 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         return referer;
-    }
+    };
 
     if (!asset && !user) { // asset not found, may be restricted by role
         //so need to login
@@ -141,22 +136,14 @@ require('/modules/store.js').exec(function (ctx) {
         else {
             tenantIdVal = tenant.tenantId;
         }
-        if (user) {
-            userTenant = user.tenantDomain;
-            tenantIdVal = user.tenantId;
-        }
-        else {
-            tenantIdVal = tenant.tenantId;
-        }
 
-        var appRatingJson = JSON.parse(social.getRating(WEBAPP_TYPE + ":" + applicationId));
-        if (appRatingJson) {
-            asset.rating = Math.floor(appRatingJson.rating);
+        if (JSON.parse(social.getRating("webapp:" + aid))) {
+            asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + aid)).rating);
         } else {
             asset.rating = 0.0;
         }
 
-        if (store.isuserasset(applicationId, type)) {
+        if (store.isuserasset(aid, type)) {
             inDashboard = true;
         }
 
@@ -165,11 +152,11 @@ require('/modules/store.js').exec(function (ctx) {
         var ATTR_TREAT_AS_A_SITE = 'overview_treatAsASite';
         var ATTR_PROVIDER = 'overview_provider';
         var LIFECYCLE_STATE_PROPERTY = 'lcState';
-        var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published.
+        var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
         var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
 
         // Init subscription service.
-        var subscriptionServiceModule = require('/extensions/assets/site/services/subscription.js').serviceModule;
+        var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
         var subscriptionService = new subscriptionServiceModule.SubscriptionService();
         subscriptionService.init(jagg, session);
 
@@ -179,7 +166,7 @@ require('/modules/store.js').exec(function (ctx) {
         }
 
         /*
-         The function obtains the assets published by the given provider.
+         The function obtains the assets published by the given provider
          */
         var getAssetsFromProvider = function (asset, store) {
             var assetsFromProvider = {};
@@ -203,12 +190,11 @@ require('/modules/store.js').exec(function (ctx) {
                     break;
                 }
             }
-
             return assetsFromProvider;
-        }
+        };
 
         /*
-         The function obtains the query used to search for assets.
+         The function obtains the query used to search for assets
          */
         var obtainViewQuery = function (options) {
 
@@ -231,15 +217,16 @@ require('/modules/store.js').exec(function (ctx) {
             appInfo["provider"] = asset.attributes.overview_provider;
 
             var defaultApplicationName = "DefaultApplication";
+
             var enterpriseSubscription;
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE",
-                    username).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", username).subscription;
 
             var individualSubscription;
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
-                    username).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", username).subscription;
 
-            // Get all available IDPs (enterprises).
+            // Get all available IDPs (enterprises)
             var enterprises = getEnterprises();
 
             var subscriptionInfo = {};
@@ -250,23 +237,24 @@ require('/modules/store.js').exec(function (ctx) {
             subscriptionInfo["viewData"] = getSubscriptionViewData(enterpriseSubscription, enterprises);
 
             return subscriptionInfo;
-        }
+
+        };
 
         var getEnterprises = function () {
             var store = jagg.module("manager").getAPIStoreObj();
+            var isEmailLoginEnabled = store.isEnableEmailUsername();
+
             var appName = asset.attributes.overview_name;
             var appVersion = asset.attributes.overview_version;
             var appProvider = asset.attributes.overview_provider;
             var result = null;
             var issuerName = null;
-            var isEmailLoginEnabled = store.isEnableEmailUsername();
+            var store = jagg.module("manager").getAPIStoreObj();
+            var tenantDomain = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-            //Check whether application author is a tenant.
-            if (!isEmailLoginEnabled && appProvider != null && appProvider.indexOf("-AT-") != -1) {
-                result = appProvider.split("-AT-");
-            }
-            if (result != null) {
-                issuerName = appName + "-" + result[1] + "-" + appVersion;
+            if (tenantIdVal != '-1234') {
+                issuerName = appName + "-" + tenantDomain + "-" + appVersion;
             } else {
                 issuerName = appName + "-" + appVersion;
             }
@@ -280,7 +268,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         }
 
-        // Returns hbs friendly subscription info.
+        // Returns HBS friendly subscription info.
         var getSubscriptionViewData = function (enterpriseSubscription, enterprises) {
 
             var viewData = new Array();
@@ -293,6 +281,7 @@ require('/modules/store.js').exec(function (ctx) {
             var trustedIdpsSet = {};
 
             if (enterpriseSubscription) {
+
                 var trustedIdps = JSON.parse(enterpriseSubscription.trustedIdps);
 
                 for (var i = 0; i < trustedIdps.length; i++) {
@@ -317,10 +306,22 @@ require('/modules/store.js').exec(function (ctx) {
             return false;
         }
 
+        var isFavouriteApp = function (asset) {
+            // check whether this is favourite app of user.
+            var appName = asset.attributes.overview_name;
+            var version = asset.attributes.overview_version;
+            var provider = asset.attributes.overview_provider;
+
+            var status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                                tenantDomain).status;
+            return status;
+        };
+
         function hasUserRole(userRoleName) {
             var usr = require('carbon').server.tenantUser(user.username);
             var userManager = require('store').server.userManager(usr.tenantId);
             var roles = userManager.getRoleListOfUser(usr.username);
+
             var hasRole = false;
 
             for (var i = 0; i < roles.length; i++) {
@@ -332,29 +333,55 @@ require('/modules/store.js').exec(function (ctx) {
             return hasRole;
         }
 
+
         var assetsByProvider = getAssetsFromProvider(asset, store);
+
+
         var docs;
         if (authenticator.getLoggedInUser()) {
             docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                    asset.attributes.overview_name,
-                    asset.attributes.overview_version,
-                    authenticator.getLoggedInUser().username);
+                                                   asset.attributes.overview_name,
+                                                   asset.attributes.overview_version,
+                                                   authenticator.getLoggedInUser().username);
         }
         else {
             docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                    asset.attributes.overview_name,
-                    asset.attributes.overview_version,
-                    null);
+                                                   asset.attributes.overview_name,
+                                                   asset.attributes.overview_version,
+                                                   null);
         }
 
-        var apiData = apiInfoManager.getAppDescription(asset.attributes.overview_provider,
-                asset.attributes.overview_name,
-                asset.attributes.overview_version);
-        var myApps = appInfoApi.getApplications(username);
+        var apiData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
+                                                       asset.attributes.overview_name,
+                                                       asset.attributes.overview_version);
+
+        var myapps;
+        myapps = appInfoApi.getApplications(username);
+
         var availableTiers = apiInfoManager.getTiers();
-        user = authenticator.getLoggedInUser();
+
+        // user=authenticator.getLoggedInUser();
+
         var subscriptionInfo = getSubscriptionInfo(asset);
-        var isStoreAdmin = isStoreAdmin();
+
+
+        var isEnterpriseSubscriptionAllowed = false;
+
+        var isFavourite = false;
+
+        if (user) {
+            if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                isFavourite = isFavouriteApp(asset);
+            } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                subscriptionInfo = getSubscriptionInfo(asset);
+            } else {
+                // !isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled
+                // OR
+                // isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled
+                subscriptionInfo = getSubscriptionInfo(asset);
+                isEnterpriseSubscriptionAllowed = isStoreAdmin();
+            }
+        }
 
         if (subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
@@ -381,7 +408,8 @@ require('/modules/store.js').exec(function (ctx) {
         asset.attributes.httpsPort = process.getProperty('https.port');
 
         for (var i = 0; i < assetsByProvider.assets.length; i++) {
-            var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id));
+            var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':'
+                                                                              + assetsByProvider.assets[i].id));
             if (appRatingByProviderJson) {
                 assetsByProvider.assets[i].rating = {average: Math.floor(appRatingByProviderJson.rating)};
             } else {
@@ -392,11 +420,9 @@ require('/modules/store.js').exec(function (ctx) {
         var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
 
         for (var i = 0; i < recentAssets.length; i++) {
-            var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
-            if (appRatingRecentAssets) {
-                recentAssets[i].rating = {
-                    average: Math.floor(appRatingRecentAssets.rating)
-                };
+            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+            if (appRatingRecentAssetsJson) {
+                recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
             } else {
                 recentAssets[i].rating = 0;
             }
@@ -416,61 +442,67 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
 
-        var isSite;
-        if (customType == WEBAPP_TYPE) {
-            isSite = 'false';
-        } else if (customType == SITE_TYPE) {
-            isSite = 'true';
-        }
+        var isSite = 'true';
+
+        var headerData = site.header(tenantId, {
+            sso: sso,
+            user: user
+        });
+
+        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+        headerData.domain = tenantDomain;
+        headerData.storeTenantDomain = tenantDomain;
+        headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
 
         caramel.render({
-            title: 'Store | ' + type,
-            user: user,
-            sso: sso,
+                           title: 'Store | ' + type,
+                           user: user,
+                           sso: sso,
 
-            header: site.header(tenantId, {
-                sso: sso,
-                user: user
-            }),
+                           header: headerData,
 
-            navigation: site.navigation(tenantId),
-            search: {
-                search: {title: type},
-                isTopAssets: false,
-                searchFields: search.fields()
-            },
-            isSocial: configs.socialCommentsEnable,
+                           navigation: site.navigation(tenantId),
+                           search: {
+                               search: {title: type},
+                               isTopAssets: false,
+                               searchFields: search.fields()
+                           },
+                           isSocial: configs.socialCommentsEnable,
 
-            type: type,
-            embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
-            inDashboard: inDashboard,
-            isSubscribed: isSubscribed,
-            skipGateway: skipGateway,
-            webAppEndpoint: webAppEndpoint,
-            subscriptionInfo: subscriptionInfo,
-            isEnterpriseSubscriptionAllowed: isStoreAdmin,
-            asset: asset,
-            tenantId: tenantIdVal,
-            tags: [
-                {
-                    url: '/assets/' + customType + '/?page=1&tag=',
-                    data: store.tags(type, isSite)
-                }
-            ],
-            myAssets: {user: user, type: type, title: title},
-            recentAssets: recentAssets,
-            assetsByProvider: assetsByProvider,
-            documentation: docs,
-            apiData: apiData,
-            metadata: {
-                myapps: myApps,
-                tiers: availableTiers,
-                api: apiData,
-                apiAssetData: asset
-            },
-            subVisibility: subVisibility
-        });
+                           type: type,
+                           embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
+                           inDashboard: inDashboard,
+                           isSubscribed: isSubscribed,
+                           skipGateway: skipGateway,
+                           webAppEndpoint: webAppEndpoint,
+                           subscriptionInfo: subscriptionInfo,
+                           isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
+                           isFavouriteApp: isFavourite,
+                           asset: asset,
+                           tenantId: tenantIdVal,
+                           tags: [
+                               {
+                                   url: '/assets/' + type + '/?page=1&tag=',
+                                   data: store.tags(type, isSite)
+                               }
+                           ],
+                           myAssets: { user: user, type: type, title: title },
+                           recentAssets: recentAssets,
+                           assetsByProvider: assetsByProvider,
+                           documentation: docs,
+                           apiData: apiData,
+                           metadata: {
+                               myapps: myapps,
+                               tiers: availableTiers,
+                               api: apiData,
+                               apiAssetData: asset
+                           },
+                           subVisibility: subVisibility,
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                       });
     }
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {

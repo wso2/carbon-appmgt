@@ -25,36 +25,79 @@
             <div class="row app-asset-buttons col-md-12 col-xs-12">
                 {{#if user}}
                     {{#if subVisibility}}
-                    <input type="hidden" value="Unlimited" id="subsAppTier" name="subsAppTier">
 
-                    <div id="subscriptionActions">
-                        {{#if isSubscribed}}
-                            <a href="#" class="btn btn-primary" id='btnUnsubscribe'>{{t "Unsubscribe Me"}}</a>
-                            <a href="#" class="btn btn-primary" id='btnSubscribe' style="display:none">{{t "Subscribe Me"}}</a>
-                        {{else}}
-                            {{#if subscriptionInfo.individualSubscription.OnHold}}
-                                <a href="#" class="btn btn-disabled" id='btnSubscribe' disabled='disabled'>{{t "Subscribe Me"}}</a>
-                                <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                        <input type="hidden" value="Unlimited" id="subsAppTier" name="subsAppTier">
+                        <div id="subscriptionActions">
+                            {{#if isSelfSubscriptionEnabled}}
+                                {{#if isEnterpriseSubscriptionEnabled}} {{!--if self subscription and enterprise subscription are enabled--}}
+
+                                    {{#if isSubscribed}}
+                                        <a href="#" class="btn btn-primary" id='btnUnsubscribe'>{{t "Unsubscribe Me"}}</a>
+                                        <a href="#" class="btn btn-primary" id='btnSubscribe' style="display:none">{{t "Subscribe Me"}}</a>
+                                    {{else}}
+                                        {{#if subscriptionInfo.individualSubscription.OnHold}}
+                                            <a href="#" class="btn btn-disabled" id='btnSubscribe' disabled='disabled'>{{t "Subscribe Me"}}</a>
+                                            <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                                        {{else}}
+                                            <a href="#" class="btn btn-primary" id='btnSubscribe'>{{t "Subscribe Me"}}</a>
+                                            <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                                        {{/if}}
+
+                                    {{/if}}
+
+                                    {{#if isEnterpriseSubscriptionAllowed}}
+                                        <div id="enterpriseSubscriptions">
+                                            <a id="btnEnterpriseSubscriptions" href="#" class="btn btn-primary" rel="popover">Enterprise Subscriptions</a>
+                                            {{>subscriptions/enterprise-subscriptions}}
+                                        </div>
+                                    {{/if}}
+
+                                {{else}} {{!-- if self subscription is enabled and enterprise subscription is disabled --}}
+
+                                    {{#if isSubscribed}}
+                                        <a href="#" class="btn btn-primary" id='btnUnsubscribe'>{{t "Unsubscribe Me"}}</a>
+                                        <a href="#" class="btn btn-primary" id='btnSubscribe' style="display:none">{{t "Subscribe Me"}}</a>
+                                    {{else}}
+                                        {{#if subscriptionInfo.individualSubscription.OnHold}}
+                                            <a href="#" class="btn btn-disabled" id='btnSubscribe' disabled='disabled'>{{t "Subscribe Me"}}</a>
+                                            <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                                        {{else}}
+                                            <a href="#" class="btn btn-primary" id='btnSubscribe'>{{t "Subscribe Me"}}</a>
+                                            <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                                        {{/if}}
+
+                                    {{/if}}
+
+                                {{/if}}
                             {{else}}
-                                <a href="#" class="btn btn-primary" id='btnSubscribe'>{{t "Subscribe Me"}}</a>
-                                <a href="#" class="btn btn-primary" id='btnUnsubscribe' style="display:none">{{t "Unsubscribe Me"}}</a>
+                                {{#if isEnterpriseSubscriptionEnabled}} {{!--if self subscription is disabled and enterprise subscription is enabled--}}
+
+                                    {{#if isEnterpriseSubscriptionAllowed}}
+                                        <div id="enterpriseSubscriptions">
+                                            <a id="btnEnterpriseSubscriptions" href="#" class="btn btn-primary" rel="popover">Enterprise Subscriptions</a>
+                                            {{>subscriptions/enterprise-subscriptions}}
+                                        </div>
+                                    {{/if}}
+
+                                {{else}} {{!-- if self subscription  and enterprise subscription are disabled --}}
+                                    {{#if isFavouriteApp}}
+                                        <a href="#" class="btn btn-primary" id='btnRemoveFromFav'>{{t "Remove From Favourite"}}</a>
+                                        <a href="#" class="btn btn-primary" id='btnAddToFav' style="display:none">{{t "Add To Favourite"}}</a>
+                                    {{else}}
+                                        <a href="#" class="btn btn-primary" id='btnAddToFav'>{{t "Add To Favourite"}}</a>
+                                        <a href="#" class="btn btn-primary" id='btnRemoveFromFav' style="display:none">{{t "Remove From Favourite"}}</a>
+                                    {{/if}}
+                                {{/if}}
                             {{/if}}
 
-                        {{/if}}
+                        </div>
 
-                        {{#if isEnterpriseSubscriptionAllowed}}
-                            <div id="enterpriseSubscriptions">
-                                <a id="btnEnterpriseSubscriptions" href="#" class="btn btn-primary" rel="popover">Enterprise Subscriptions</a>
-                                {{>subscriptions/enterprise-subscriptions}}
-                            </div>
-                        {{/if}}
-
-                    </div>
                     {{/if}}
                 {{/if}}
             </div>
         </div>
     </div>
+
 
     <div class="row app-asset-description-section">
 
@@ -86,6 +129,9 @@
                         <input value="{{../id}}" id="hdnAssetId" name="hdnAssetId" type="hidden">
                         <input value="{{../../user.username}}" id="hdnUsertId" name="hdnAssetId" type="hidden">
                         <input value="{{../../tenantId}}" id="hdnTenantId" name="hdnTenantId" type="hidden">
+                        <input type="hidden" value="{{overview_name}}" id="hdnOverviewName" name="hdnOverviewName">
+                        <input type="hidden" value="{{overview_version}}" id="hdnOverviewVersion" name="hdnOverviewVersion">
+                        <input type="hidden" value="{{overview_context}}" id="hdnOverviewContext" name="hdnOverviewContext">
 
                         {{#if ../../inDashboard}}
                             <div id="comment-content" class="content"></div>
@@ -94,6 +140,8 @@
                         {{/if}}
                     {{/attributes}}
                 {{/with}}
+
+
             </div>
         </div>
 
