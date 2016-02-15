@@ -50,10 +50,15 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 	private static final Log log = LogFactory.getLog(APITemplateBuilderImpl.class);
 
+    private static final String RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME = "org.apache.velocity.runtime.log.Log4JLogChute";
+    private static final String RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER = "runtime.log.logsystem.log4j.logger";
 	private static final String VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP =
 			"velocity-template_synapse-config_non-versioned-webapp.xml";
 	private static final String VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP =
 			"velocity-template_synapse-config_versioned-webapp.xml";
+    private static final String SYNAPSE_PARAM_API_CONTEXT = "apiContext";
+    private static final String SYNAPSE_PARAM_FORWARD_APP_CONTEXT = "forwardAppContext";
+    private static final String SYNAPSE_PARAM_FORWARD_APP_VERSION = "forwardAppVersion";
 
 	private WebApp webapp;
 	private String velocityLoggerName;
@@ -90,10 +95,9 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 		VelocityEngine velocityEngine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-			velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-                                       "org.apache.velocity.runtime.log.Log4JLogChute");
-			velocityEngine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
-		}
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
+            velocityEngine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
+        }
 		try {
 			velocityEngine.init();
 		} catch (Exception e) {
@@ -109,9 +113,8 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 	public String getConfigStringForNonVersionedWebAppTemplate() throws APITemplateException {
 		VelocityEngine velocityengine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-			velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-									   "org.apache.velocity.runtime.log.Log4JLogChute");
-			velocityengine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
+            velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
+            velocityengine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
 		}
 		try {
 			velocityengine.init();
@@ -125,13 +128,13 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		configcontext = new ResourceConfigContext(configcontext, webapp);
 
 		VelocityContext context = configcontext.getContext();
-		context.put("apiContext", this.webapp.getContext());
+		context.put(SYNAPSE_PARAM_API_CONTEXT, this.webapp.getContext());
 		String forwardAppContext = this.webapp.getContext();
 		if (forwardAppContext != null && forwardAppContext.charAt(0) == '/') {
 			forwardAppContext = forwardAppContext.substring(1);
 		}
-		context.put("forwardAppContext", forwardAppContext);
-		context.put("forwardAppVersion", this.webapp.getId().getVersion());
+		context.put(SYNAPSE_PARAM_FORWARD_APP_CONTEXT, forwardAppContext);
+		context.put(SYNAPSE_PARAM_FORWARD_APP_VERSION, this.webapp.getId().getVersion());
 
 		return processTemplate(velocityengine, context, getNonVersionedWebAppTemplatePath());
 	}
