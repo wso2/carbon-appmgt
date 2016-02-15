@@ -106,7 +106,7 @@ function filterAssets(assets) {
     if (webApps.length > 0) {
         apps.push({
                       assets: webApps,
-                      type: "Web Apps",
+                      type: "Web Apps"
                   });
     }
 
@@ -117,8 +117,6 @@ function filterAssets(assets) {
                   });
 
     }
-
-
     return apps;
 }
 %>

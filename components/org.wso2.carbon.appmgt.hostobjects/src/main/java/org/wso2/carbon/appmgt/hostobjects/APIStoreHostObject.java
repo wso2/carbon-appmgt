@@ -3169,7 +3169,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
 
     /**
-     * Add the given webapp to favourite webapps
+     * Add the given app to favourite app list of user for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3183,8 +3183,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 6) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters to method addToFavourite.Expected parameters:6");
+            String message = "Invalid number of input parameters to method addToFavourite.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String providerName = args[0].toString();
@@ -3216,7 +3217,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Remove the given webapp from favourite webapps
+     * Remove the given app from favourite app list of user for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3230,8 +3231,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 6) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters:6");
+            String message = "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String providerName = args[0].toString();
@@ -3264,7 +3266,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Check whether given app exists in the favourite apps of the user
+     * Check whether given app exists in the favourite app list of the user in given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3278,8 +3280,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 6) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters to method isFavouriteApp.Expected parameters:6");
+            String message = "Invalid number of input parameters to method isFavouriteApp.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String providerName = args[0].toString();
@@ -3311,7 +3314,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This methods returns  favourite webapps of given user for given pagination.
+     * This methods returns  favourite apps of given user for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3325,9 +3328,11 @@ public class APIStoreHostObject extends ScriptableObject {
                                                              Scriptable thisObj, Object[] args, Function funObj)
             throws ScriptException, AppManagementException {
         if (args == null || args.length != 3) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters to method getAllFavouriteApps.Expected parameters:3");
+            String message = "Invalid number of input parameters to method getAllFavouriteApps.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
+
         String userName = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
@@ -3388,7 +3393,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method return the details of subscribed apps of logged in user.
+     * This method return the details of subscribed apps of given user for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3403,8 +3408,9 @@ public class APIStoreHostObject extends ScriptableObject {
 
 
         if (args == null || args.length != 3) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters for method removeFavouritePage.Expected parameters :3");
+            String message = "Invalid number of input parameters to method getUserSubscribedApps.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String userName = args[0].toString();
@@ -3485,8 +3491,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 3) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters for method setFavouritePage.Expected parameters :3");
+            String message = "Invalid number of input parameters to method setFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String userName = args[0].toString();
@@ -3513,7 +3520,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method mark that user has deselected the favourite page from default landing page in store.
+     * This method mark that user has deselected the favourite page from default landing page in given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3526,8 +3533,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 3) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters for method removeFavouritePage.Expected parameters :3");
+            String message = "Invalid number of input parameters to method removeFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String userName = args[0].toString();
@@ -3554,7 +3562,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method check whether logged in user has selected favourite page as default page.
+     * This method check whether logged in user has selected favourite page as default page for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3568,8 +3576,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throws AppManagementException {
 
         if (args == null || args.length != 3) {
-            throw new AppManagementException(
-                    "Invalid number of input parameters for method hasFavouritePage.Expected parameters :3");
+            String message = "Invalid number of input parameters to method hasFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
         }
 
         String userName = args[0].toString();
