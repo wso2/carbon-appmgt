@@ -30,7 +30,7 @@ var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{
 var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
-var subscriptionConfig = require('../themes/store/js/logic/subscriptions/subscription-config.js');
+var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
 var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
 var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
@@ -55,7 +55,8 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
@@ -308,14 +309,13 @@ require('/modules/store.js').exec(function (ctx) {
         }
 
         var isFavouriteApp = function (asset) {
-            var status = false;
             // check whether this is favourite app of user.
-            var appInfo = {};
-            appInfo["name"] = asset.attributes.overview_name;
-            appInfo["version"] = asset.attributes.overview_version;
-            appInfo["provider"] = asset.attributes.overview_provider;
+            var appName = asset.attributes.overview_name;
+            var version = asset.attributes.overview_version;
+            var provider = asset.attributes.overview_provider;
 
-            status = subscriptionService.isFavouriteApp(appInfo).isFavouriteApp;
+            var status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                                tenantDomain).status;
             return status;
         };
 
@@ -459,6 +459,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
+        headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
 
         caramel.render({
             title: 'Store | ' + type,

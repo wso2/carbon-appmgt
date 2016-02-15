@@ -10,8 +10,8 @@ $(function(){
     var API_URL = caramel.context + '/resources/webapp/v1/subscription/app';
     var API_UNSUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/unsubscription/app';
     var API_SUBSCRIPTION_WORKFLOW = caramel.context + '/resources/webapp/v1/subscription-workflow/app';
-    var API_ADD_TO_FAVOURITE = caramel.context + '/resources/webapp/v1/add-favourite-app/app';
-    var API_REMOVE_FROM_FAVOURITE = caramel.context + '/resources/webapp/v1/remove-favourite-app/app';
+    var API_ADD_TO_FAVOURITE = caramel.context + '/apis/favourite/add-favourite-app';
+    var API_REMOVE_FROM_FAVOURITE = caramel.context + '/apis/favourite/remove-favourite-app';
 
     var storeTenantDomain = $('#store-tenant-domain').val();
 
@@ -358,10 +358,10 @@ $(function(){
                    type: 'POST',
                    data: data,
                    success: function (response, textStatus, xhr) {
-                       if (JSON.parse(response).error == false) {
+                       if (response.error == false) {
                            var message = 'You have successfully removed  <b>' + data.name
                                + '</b> from your favourite apps';
-                           notify(message);
+                           notifyAndReload(message);
                            $('#btnRemoveFromFav').hide();
                            $('#btnAddToFav').show();
 

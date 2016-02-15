@@ -1,7 +1,7 @@
 $(function () {
-    var API_REMOVE_FROM_FAVOURITE = caramel.context + '/resources/webapp/v1/remove-favourite-app/app';
-    var API_SET_AS_HOME_PAGE = caramel.context + '/resources/webapp/v1/set-favourite-page/app';
-    var API_REMOVE_FROM_HOME_PAGE = caramel.context + '/resources/webapp/v1/remove-favourite-page/app';
+    var API_REMOVE_FROM_FAVOURITE = caramel.context + '/apis/favourite/remove-favourite-app';
+    var API_SET_AS_HOME_PAGE = caramel.context + '/apis/favourite/set-favourite-page';
+    var API_REMOVE_FROM_HOME_PAGE = caramel.context + '/apis/favourite/remove-favourite-page';
 
     var storeTenantDomain = $('#store-tenant-domain').val();
     /**

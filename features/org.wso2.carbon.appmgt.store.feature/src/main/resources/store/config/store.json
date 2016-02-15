@@ -45,7 +45,7 @@
         "enableEnterpriseSubscription": false
     },
     "pages": {
-        "LandingPage": "/extensions/assets/webapp/myapps",
-        "FavouritePage": "/extensions/assets/webapp/favouriteapps"
+        "landingPage": "/extensions/assets/webapp/myapps",
+        "favouritePage": "/assets/favouriteapps"
     }
 }

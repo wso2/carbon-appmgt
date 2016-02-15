@@ -3,8 +3,6 @@ var render = function(theme, data, meta, require) {
 
 	var assetsByProvider=data.assetsByProvider;
     assetsByProvider['assets']=require('/helpers/rating-provider.js').ratingProvider.formatRating(data.assetsByProvider.assets);
-    var subsriptionConfig = require('../store/js/logic/subscriptions/subscription-config.js');
-    data.header.isFavMenu = subsriptionConfig.isMyFavouriteMenu();
 
     theme('2-column-right', {
 		title : data.title,

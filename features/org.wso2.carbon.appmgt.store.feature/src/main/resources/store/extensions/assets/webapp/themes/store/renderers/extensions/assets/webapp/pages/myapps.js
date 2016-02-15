@@ -6,13 +6,6 @@ var render = function (theme, data, meta, require) {
                                          data.pagination.leftNav, data.pagination.rightNav,
                                          data.pagination.urlQuery, data.user);
 
-    if (request.getHeader("User-Agent").indexOf("Mobile") != -1) {  //mobile devices
-        bodyPartial = "assets-for-mobiles";
-        bodyContext =
-        assets.currentPage(data.assets, data.sso, data.user, data.config,
-                           data.pagination.leftNav, data.pagination.rightNav, data.pagination.urlQuery);
-    }
-
     var hasApps = false;
     if (data.assets.length > 0) {
         hasApps = true;

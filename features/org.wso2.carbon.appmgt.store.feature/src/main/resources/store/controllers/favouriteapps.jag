@@ -23,14 +23,14 @@ var AuthService;
 var authenticator;
 var log = new Log('favouriteapps');
 
-include('../modules/jagg/jagg.jag');
+include('/jagg/jagg.jag');
 
 require('/modules/store.js').exec(function (ctx) {
     var sso = ctx.sso,
-        store = ctx.store,
-        user = ctx.user,
-        storeTenantId = ctx.tenant.tenantId,
-        storeTenantDomain = ctx.tenant.domain;
+            store = ctx.store,
+            user = ctx.user,
+            storeTenantId = ctx.tenant.tenantId,
+            storeTenantDomain = ctx.tenant.domain;
 
     //if user not logged in redirect to login page
     if (!user) {
@@ -40,21 +40,12 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
     caramel = require('caramel');
-    //initialize subscription service
-    var SubscriptionService = require(getServiceDir('subscription.js')).serviceModule;
-    var subsApi = new SubscriptionService.SubscriptionService();
-    subsApi.init(jagg, session);
-
-    //initialize authentication service
-    var AuthService = require(getServiceDir('authentication.js')).serviceModule;
-    var authenticator = new AuthService.Authenticator();
-    authenticator.init(jagg, session);
+    var favourites = jagg.module("favourites");
 
     //Get subscription configuration options
-    var subscriptionUtil = require('../themes/store/js/logic/subscriptions/subscription-config.js');
+    var subscriptionUtil = require('/themes/store/js/subscription-config.js');
     var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
     var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
-    var userData = authenticator.getLoggedInUser();
 
     var hideAllAppsLink = false;
     //if both subscriptions off no need to show the link for all apps,
@@ -64,16 +55,22 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     //Get the all favourite apps of logged in user
-    var apps = subsApi.getAllFavouriteApps(user.username, user.tenantId,
-                                           storeTenantDomain);
-    //Check whether use has selected favourite page as defualt ladning page
+    var result = favourites.getAllFavouriteApps(user.username, user.tenantId,
+                                                storeTenantDomain);
+    var apps = (result.apps) ? result.apps : [];
+    //filter webapp and sites
+    apps = filterAssets(apps);
+    //Check whether use has selected favourite page as default landing page
     //This is needed to show correct icon(set as home page /remove from home page) to user.
-    var hasFavouritePage = subsApi.hasFavouritePage(user.username, user.tenantId,
-                                                    storeTenantDomain).hasFavouritePage;
+    var hasFavouritePage = false;
+    result = favourites.hasFavouritePage(user.username, user.tenantId, storeTenantDomain);
+    if (!result.error) {
+        hasFavouritePage = result.status;
+    }
 
     caramel.render({
                        header: {
-                           user: userData,
+                           user: user,
                            sso: sso,
                            searchOff: true,
                            hideAllAppsLink: hideAllAppsLink,
@@ -89,8 +86,40 @@ require('/modules/store.js').exec(function (ctx) {
 
 
 function getServiceDir(serviceName) {
-    return '../services/' + serviceName;
+    return '/extensions/assets/webapp/services/' + serviceName;
 }
 
+/**
+ This method filter the given assets based on the type webapp/site **/
+function filterAssets(assets) {
+    var sites = [];
+    var webApps = [];
+    var apps = [];
+    for (var i = 0; i < assets.length; i++) {
+        if (assets[i].treatAsSite == "TRUE") {
+            sites.push(assets[i]);
+        } else {
+            webApps.push(assets[i]);
+        }
+    }
+
+    if (webApps.length > 0) {
+        apps.push({
+                      assets: webApps,
+                      type: "Web Apps",
+                  });
+    }
+
+    if (sites.length > 0) {
+        apps.push({
+                      assets: sites,
+                      type: "Sites"
+                  });
+
+    }
+
+
+    return apps;
+}
 %>
 

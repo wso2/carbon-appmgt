@@ -94,44 +94,9 @@ var serviceModule = (function () {
         return result;
     }
 
-    Subscriber.prototype.addToFavouriteApps = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
-        var result = this.instance.addToFavouriteApps(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
-        return result;
-    };
-
-    Subscriber.prototype.removeFromFavouriteApps = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
-        var result = this.instance.removeFromFavouriteApps(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
-        return result;
-    };
-
-    Subscriber.prototype.isFavouriteApp = function (appIdentifier, userName, tenantIdOfUser, storeTenantDomain) {
-        var result = this.instance.isFavouriteApp(appIdentifier, userName, tenantIdOfUser, storeTenantDomain);
-        return result;
-    };
-
-    Subscriber.prototype.getAllFavouriteApps = function (userName, tenantIdOfUser, storeTenantDomain) {
-        var result = this.instance.getAllFavouriteApps(userName, tenantIdOfUser, storeTenantDomain);
-        return (result.apps) ? result.apps : [];
-    };
-
     Subscriber.prototype.getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfStore) {
         var result = this.instance.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
         return (result.apps) ? result.apps : [];
-    };
-
-    Subscriber.prototype.setFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
-        var result = this.instance.setFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
-        return result;
-    };
-
-    Subscriber.prototype.removeFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
-        var result = this.instance.removeFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
-        return result;
-    };
-
-    Subscriber.prototype.hasFavouritePage = function (userName,tenantIdOfUser,tenantDomainOfStore) {
-        var result = this.instance.hasFavouritePage(userName,tenantIdOfUser,tenantDomainOfStore);
-        return result;
     };
 
     return{

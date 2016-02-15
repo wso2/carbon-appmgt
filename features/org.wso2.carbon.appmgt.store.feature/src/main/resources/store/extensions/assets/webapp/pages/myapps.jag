@@ -48,13 +48,14 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
 
-    var caramel = require('caramel');
+    caramel = require('caramel');
     //Check whether to show register link in myapps page
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     //Get the subscription configuration options
-    var subscriptionUtil = require('../themes/store/js/logic/subscriptions/subscription-config.js');
+    var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
     var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
     var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
 
@@ -69,6 +70,7 @@ require('/modules/store.js').exec(function (ctx) {
     '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
     var leftnav, rightnav, urlQuery;//For pagination
+    
     var headerData = site.header(tenantId, {
         sso: sso,
         user: user,
@@ -82,8 +84,8 @@ require('/modules/store.js').exec(function (ctx) {
     var showSortOptions = false;
     var webAppRecentAssets = [];
     var PAGE_SIZE = store.getPageSize();
-    var avaliablePages = store.getAvailablePages(type, ctx.request, ctx.session);
-    paging = store.assetsPagingOverrided(request, avaliablePages);
+    var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
+    paging = store.assetsPagingOverrided(request, availablePages);
     var currIndex = paging.start + 1;
     var currentPage = store.getCurrentPage(currIndex);
 
@@ -129,7 +131,7 @@ require('/modules/store.js').exec(function (ctx) {
                     registry = storeServer.systemRegistry(tenantId),
                             am = store.assetManager(type, registry);
 
-                    var getNextassetSet = function () {
+                    var getNextAssetSet = function () {
                         var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
                                                                 'false');
                         if (log.isDebugEnabled()) {
@@ -144,7 +146,7 @@ require('/modules/store.js').exec(function (ctx) {
                     var aid, asset;
                     while (assets.length < PAGE_SIZE && maxTry < 10) {
                         maxTry++;
-                        var result = getNextassetSet();
+                        var result = getNextAssetSet();
 
                         for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                             aid = String(result[n].id);
@@ -169,7 +171,7 @@ require('/modules/store.js').exec(function (ctx) {
                 server.privileged(function () {
                     var userName = user ? user.username : "";
                     var index = 0, maxTry = 0;
-                    var getNextassetSet = function () {
+                    var getNextAssetSet = function () {
                         var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                         var appMgtDaoObj = new appMgtDaoService();
 
@@ -194,7 +196,7 @@ require('/modules/store.js').exec(function (ctx) {
                     var done = false;
                     while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                         maxTry++;
-                        var result = getNextassetSet();
+                        var result = getNextAssetSet();
                         if (result.length < 12) {
                             done = true;
                         }
@@ -251,7 +253,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (assets.length == PAGE_SIZE) {
             // Get the starting index, offset etc .. of the assumed next page.
-            var nextPage = store.buildNextPage(request, avaliablePages);
+            var nextPage = store.buildNextPage(request, availablePages);
 
             // Query the assets with the assumed 'next page'
             var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
@@ -328,7 +330,7 @@ require('/modules/store.js').exec(function (ctx) {
         var apiInfoManager = new APIInformationService.APIInformationService();
         apiInfoManager.init(jagg, session);
 
-        var formatedApps = [];
+        var formattedApps = [];
         apps.forEach(function (app) {
             var tempApp = {};
             tempApp["appName"] = app.attributes.overview_name;
@@ -351,9 +353,9 @@ require('/modules/store.js').exec(function (ctx) {
                 //Get the direct webapp url
                 tempApp["accessUrl"] = asset.attributes.overview_webAppURL;
             }
-            formatedApps.push(tempApp);
+            formattedApps.push(tempApp);
         });
-        return formatedApps;
+        return formattedApps;
 
     };
 
@@ -411,13 +413,8 @@ require('/modules/store.js').exec(function (ctx) {
         var status = false;
         if (user) {
             // check whether this is favourite app of user.
-            var appInfo = {};
-            appInfo["name"] = appName;
-            appInfo["version"] = version;
-            appInfo["provider"] = provider;
-
-            status = subsApi.isFavouriteApp(appInfo, user.username, user.tenantId,
-                                            tenantDomain).isFavouriteApp;
+            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                            tenantDomain).status;
         }
         return status;
     };

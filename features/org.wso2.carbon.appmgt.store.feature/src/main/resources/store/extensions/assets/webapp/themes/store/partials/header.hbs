@@ -26,7 +26,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}
-                        <a href="{{tenantedUrl "/extensions/assets/webapp/favouriteapps"}}">
+                        <a href="{{tenantedUrl "/assets/favouriteapps"}}">
                             <div class="auth-img">
                                 {{t "My Favourites"}}
                                 <span class="fw-stack-md fw-lg">
@@ -134,11 +134,7 @@
                     </span>
             </a><a class="cu-btn page-title" href='{{tenantedUrl "/assets/webapp"}}'>
             <span class="fw-stack"></span>
-            {{#compare myApps true}}
-                My Web Apps
-            {{else}}
-                Web Apps
-            {{/compare}}
+             My Web Apps
         </a>
             {{#if isTenanted}}
                 <a class="cu-btn page-title" href='{{url "/"}}'>
@@ -178,7 +174,7 @@
     <ul>
         <li><a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
         <li><a href="{{tenantedUrl "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
-        <li><a href="{{tenantedUrl "/assets/site"}}"><i class="fw fw-website"></i>Sites</a></li>
+        <li><a href="{{tenantedUrl "/extensions/assets/site/myapps"}}"><i class="fw fw-website"></i>Sites</a></li>
     </ul>
 </div>
 <!-- /common navigation -->

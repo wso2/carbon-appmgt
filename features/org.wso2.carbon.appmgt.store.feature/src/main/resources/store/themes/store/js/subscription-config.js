@@ -1,5 +1,3 @@
-include('/extensions/assets/webapp/modules/jagg/jagg.jag');
-
 var site = require("/config/store.json");
 var isSelfSubEnabled = site.subscriptionConfiguration.enableSelfSubscription;
 var isEnterpriseSubEnabled = site.subscriptionConfiguration.enableEnterpriseSubscription;

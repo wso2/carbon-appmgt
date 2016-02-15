@@ -119,9 +119,12 @@ var storeHostObj = manager.getAPIStoreObj();
                             //in store login url is in the format of /login?header=true
                             var queryParam = "?header=true";
                             if (relayState.indexOf(queryParam)) {
+                                if(!urlTenantDomain){
+                                    urlTenantDomain = "carbon.super";
+                                }
                                 var isFavouritePageSelected = manager.hasFavouritePage(username,tenantId,urlTenantDomain).status;
                                 if (isFavouritePageSelected) {
-                                    var favPage = configs.pages.FavouritePage;
+                                    var favPage = configs.pages.favouritePage;
                                     relayState = contextPath + favPage;
                                 } else {
                                     //remove the query param
@@ -155,12 +158,12 @@ var storeHostObj = manager.getAPIStoreObj();
     // If saml request is a log out request, then invalidate session.
     if (samlRequest != null) {
         var index = sso.client.decodeSAMLLogoutRequest(sso.client.getSamlObject(samlRequest));
-        if (log.isDebugEnabeld()) {
+        if (log.isDebugEnabled()) {
             log.debug('Backend logout recieved from store the index is - ' + index);
         }
         var jSessionId = application.get('sso_sessions')[index];
         delete application.get('sso_sessions')[index];
-        if (log.isDebugEnabeld()) {
+        if (log.isDebugEnabled()) {
             log.debug('store Session Id :::' + jSessionId);
         }
         session.invalidate();

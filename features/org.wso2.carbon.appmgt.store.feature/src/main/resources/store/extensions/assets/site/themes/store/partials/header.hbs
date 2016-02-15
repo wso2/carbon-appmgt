@@ -9,31 +9,53 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="wr-app-bar-items app-logo" href="{{tenantedUrl "/"}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+                <a class="wr-app-bar-items app-logo" href="{{url ""}}"><img src="{{url "/themes/store/img/logo.png"}}" /><h2 class="app-title"><span>App Store</span></h2></a>
+                <input type="hidden" name="tenant-store" id="store-tenant-domain" value="{{storeTenantDomain}}">
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <form class="nav navbar-left" role="search">
-                    <select id="searchSelect" class="input-lg search-select col-md-3">
-                        <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="Name">Name</option>
-                        <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
-                        <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
-                        <option {{#compare "overview_platform" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Platform</option>
-                    </select>
-                    <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
-                </form>
+                {{#unless searchOff}}
+                    <form class="nav navbar-left search-box" role="search">
+                        <select id="searchSelect" class="search-select col-md-3">
+                            <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="Name">Name</option>
+                            <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
+                        </select>
+                        <input value="{{searchQuery.search}}" type="text" class="form-control col-md-4 search-text" id="searchTxt" placeholder="Search">
+                    </form>
+                {{/unless}}
 
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}
-
-                        <a href="{{tenantedUrl "/extensions/assets/site/subscriptions"}}">
+                        <a href="{{tenantedUrl "/assets/favouriteapps"}}">
                             <div class="auth-img">
-                                {{t "My Apps"}}
+                                {{t "My Favourites"}}
                                 <span class="fw-stack-md fw-lg">
                                 <i class="fw fw-login"></i>
                             </span>
                             </div>
                         </a>
+                    {{/if}}
+
+                    <a href="{{tenantedUrl "/extensions/assets/site/myapps"}}">
+                        <div class="auth-img">
+                            {{t "My Apps"}}
+                            <span class="fw-stack-md fw-lg">
+                                <i class="fw fw-login"></i>
+                            </span>
+                        </div>
+                    </a>
+                    {{#unless hideAllAppsLink}}
+                        <a href="{{tenantedUrl "/assets/site/"}}">
+                            <div class="auth-img">
+                                {{t "All Apps"}}
+                                <span class="fw-stack-md fw-lg">
+                                         <i class="fw fw-login"></i>
+                                    </span>
+                            </div>
+                        </a>
+                    {{/unless}}
+
+                    {{#if user}}
 
                         <a href="#" data-toggle="dropdown">
                             <div class="auth-img">
@@ -47,7 +69,7 @@
                         <div class="dropdown-menu">
                             <div class="cu-arrow"></div>
                             <div class="dropdown-menu-content">
-                                <a class="filter-item" href="{{tenantedUrl "/logout"}}">Logout</a>
+                                <a class="filter-item" href="{{url "/logout"}}">Logout</a>
                             </div>
                         </div>
 
@@ -55,7 +77,7 @@
 
                         {{#if sso}}
 
-                            <a href="{{tenantedUrl "/login"}}">
+                            <a href="{{tenantedUrl "/login?header=true"}}">
                                 <div class="auth-img">
                                     {{t "Sign In"}}
                                     <span class="fw-stack-md fw-lg">
@@ -77,6 +99,7 @@
 
                         {{/if}}
 
+
                         <a href="#"  data-toggle="modal" data-target="#register-modal">
                             <div class="auth-img">
                                 Register
@@ -86,15 +109,20 @@
                             </div>
                         </a>
 
+
                         {{>register}}
 
+
+
                     {{/if}}
+
 
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
 </header>
+
 
 <!-- secondary header - app bar -->
 <div id="nav" class="row wr-app-bar">
@@ -106,11 +134,7 @@
                     </span>
             </a><a class="cu-btn page-title" href='{{tenantedUrl "/assets/site"}}'>
             <span class="fw-stack"></span>
-            {{#compare myApps true}}
-                My Sites
-            {{else}}
-                Sites
-            {{/compare}}
+             My Sites
         </a>
             {{#if isTenanted}}
                 <a class="cu-btn page-title" href='{{url "/"}}'>
@@ -121,15 +145,36 @@
 
         </div>
     </div>
+    {{#if myFav}}
+        <div class="col-md-3">
+            <div style="cursor:pointer">
+                {{#if isHomePage}}
+                    <i title="Remove from home page"
+                       class="fw fw-home fw-background-blue fw-2_0x fw-inverse home-icon"
+                       id="rmv-home"></i>
+                    <i title="Set this page as homepage"
+                       class="fw fw-home fw-background-red fw-2_0x fw-inverse home-icon"
+                       id="set-home" style="display: none"></i>
+                {{else}}
+                    <i title="Set this page as homepage"
+                       class="fw fw-home fw-background-red fw-2_0x fw-inverse home-icon"
+                       id="set-home" style=></i>
+                    <i title="Remove from home page"
+                       class="fw fw-home fw-background-blue fw-2_0x fw-inverse home-icon"
+                       id="rmv-home" style="display: none"></i>
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
 </div>
 <!-- secondary header - app bar -->
 
 <!-- common navigation -->
 <div id="hiddenNav" class="wr-hidden-nav">
     <ul>
-        <li><a href="{{tenantedUrl "/assets/webapp"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
+        <li><a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}"><i class="fw fw-web-app"></i>Web Apps</a></li>
         <li><a href="{{tenantedUrl "/assets/mobileapp"}}"><i class="fw fw-mobile"></i>Mobile Apps</a></li>
-        <li><a href="{{tenantedUrl "/assets/site"}}"><i class="fw fw-website"></i>Sites</a></li>
+        <li><a href="{{tenantedUrl "/extensions/assets/site/myapps"}}"><i class="fw fw-website"></i>Sites</a></li>
     </ul>
 </div>
 <!-- /common navigation -->

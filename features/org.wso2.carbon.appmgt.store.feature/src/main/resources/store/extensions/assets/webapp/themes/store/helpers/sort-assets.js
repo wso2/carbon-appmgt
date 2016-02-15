@@ -15,12 +15,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var format = function (context, header, hasApps,showSortOptions) {
+var format = function (context, header, hasApps) {
     return {
         url: context.url,
         header: header,
         hasApps: hasApps,
-        showSortOptions:showSortOptions
+        showSortOptions:context.showSortOptions
     };
 };
 
