@@ -175,7 +175,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 				ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService();
 		String velocityLogPath = config.getAPIManagerConfiguration().getFirstProperty(
 				AppMConstants.VELOCITY_LOGGER);
-		if (velocityLogPath != null && velocityLogPath.length() > 1) {
+		if ((velocityLogPath != null) && !velocityLogPath.isEmpty()) {
 			return velocityLogPath;
 		} else {
 			return null;
