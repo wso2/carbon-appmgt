@@ -182,12 +182,12 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		}
 	}
 
-	private String processTemplate(VelocityEngine ve, VelocityContext vc, String templatePath)
+	private String processTemplate(VelocityEngine velocityEngine, VelocityContext velocityContext, String templatePath)
 			throws APITemplateException {
 		StringWriter writer = new StringWriter();
 		try {
-			Template t = ve.getTemplate(templatePath);
-			t.merge(vc, writer);
+			Template template = velocityEngine.getTemplate(templatePath);
+			template.merge(velocityContext, writer);
 		} catch (ResourceNotFoundException e) {
 			String msg = "Cannot find Velocity template " + templatePath;
 			log.error(msg, e);
