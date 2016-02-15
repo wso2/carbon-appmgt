@@ -165,20 +165,45 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         //check if its the default version and if it has any other versions when deprecating
         if (action == "Deprecate") {
-            var webApp = apiProvider.getApplicationByUUID(uuid);
+            var webApp;
+            try {
+                webApp = apiProvider.getAppDetailsFromUUID(uuid);
+            } catch (e) {
+                log.error("The asset with UUID " + uuid + " could not be retrieved.");
+                log.error(e);
+                response.status = 404;
+                response.contentType = "application/json";
+                content.status = "Not Found";
+                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+                response.content = stringify(content);
+                return;
+            }
             var appProvider = webApp.provider;
             var appName = webApp.name;
             var appVersion = webApp.version;
             var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
 
-            if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
-                log.error("Insufficient permissions to perform '" + action + "' on " + appType);
-                response.status = 401;
+            try {
+                if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
+                    log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+                    response.status = 401;
+                    response.contentType = "application/json";
+                    content.status = "Access Denied";
+                    content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
+                                          + appType + "'. Please select other version of this '" + appType
+                                          + "' as the default version and proceed.");
+                    response.content = stringify(content);
+                    return;
+                }
+            } catch (e) {
+                log.error("Error while retrieving default version details related to App Name: " + appName
+                          + ", Provider: " + appProvider + ", Version: " + appVersion);
+                log.error(e);
+                response.status = 404;
                 response.contentType = "application/json";
-                content.status = "Access Denied";
-                content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
-                                      + appType + "'. Please select other version of this '" + appType
-                                      + "' as the default version and proceed.");
+                content.status = "Not Found";
+                content.messages.push("Error while retrieving default version details related to App Name: " + appName
+                                      + ", Provider: " + appProvider + ", Version: " + appVersion);
                 response.content = stringify(content);
                 return;
             }

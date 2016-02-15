@@ -522,41 +522,41 @@ public interface APIProvider extends APIManager {
     public Set<AppStore> getExternalAppStores(APIIdentifier identifier) throws AppManagementException;
 
     /**
-     * Get WebApp default version details
+     * Get WebApp default version details.
      *
      * @param appName
      * @param providerName
-     * @param isPublished  if true then return published app version else default app version
-     * @return
+     * @param appStatus
+     * @return Default WebApp Version
      * @throws AppManagementException
      */
-    public String getDefaultVersion(String appName, String providerName, boolean isPublished)
+    public String getDefaultVersion(String appName, String providerName, AppDefaultVersion appStatus)
             throws AppManagementException;
 
     /**
-     * Check if the given WebApp version is the default version
+     * Check if the given WebApp version is the default version.
      *
      * @param identifier
-     * @return
+     * @return true if given app is the default version
      * @throws AppManagementException
      */
     public boolean isDefaultVersion(APIIdentifier identifier) throws AppManagementException;
 
     /**
-     * Check if the given WebApp has any other versions in any lifecycle state
+     * Check if the given WebApp has any other versions in any lifecycle state.
      *
      * @param identifier
-     * @return
+     * @return true if given app has more versions
      * @throws AppManagementException
      */
     public boolean hasMoreVersions(APIIdentifier identifier) throws AppManagementException;
 
     /**
-     * Get WebApp basic details by app uuid
+     * Get WebApp basic details by app uuid.
      *
      * @param uuid
-     * @return
+     * @return WebApp details corresponding to the given Id
      * @throws AppManagementException
      */
-    public WebApp getApplicationByUUID(String uuid) throws AppManagementException;
+    public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException;
 }

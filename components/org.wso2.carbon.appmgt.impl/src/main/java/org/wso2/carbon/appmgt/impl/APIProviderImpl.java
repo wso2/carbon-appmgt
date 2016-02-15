@@ -31,6 +31,7 @@ import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
@@ -49,7 +50,6 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationR
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
-import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.entitlement.EntitlementServiceFactory;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
@@ -652,7 +652,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         //update version
                         String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
                                 api.getId().getApiName(),
-                                api.getId().getProviderName(), true);
+                                api.getId().getProviderName(), AppDefaultVersion.APP_IS_PUBLISHED);
                         if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
                             appMDAO.updatePublishedDefaultVersion(api);
                             removeDefaultVersionFromNonPublishedApps(api);
@@ -859,7 +859,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 } else {
                                     String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
                                             api.getId().getApiName(),
-                                            api.getId().getProviderName(), true);
+                                            api.getId().getProviderName(), AppDefaultVersion.APP_IS_PUBLISHED);
                                     if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
                                         appMDAO.updatePublishedDefaultVersion(api);
                                         removeDefaultVersionFromNonPublishedApps(api);
@@ -879,22 +879,24 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Remove default version tag from register for other versions of a given web app than the default
+     * Remove the default version property from other WebApps having the same app name and provider.
+     * WebApps are stored in registry.
+     * This will ensure only one non-published app has a default version property.
      *
-     * @param api
+     * @param app
      * @throws AppManagementException
      */
-    private void removeDefaultVersionFromNonPublishedApps(WebApp api) throws AppManagementException {
+    private void removeDefaultVersionFromNonPublishedApps(WebApp app) throws AppManagementException {
         List<String> webAppVersions = appMDAO.getAllVersionOfWebApp(
-                api.getId().getApiName(),
-                api.getId().getProviderName());
+                app.getId().getApiName(),
+                app.getId().getProviderName());
 
         for (String webAppVersion : webAppVersions) {
-            if (!webAppVersion.equals(api.getId().getVersion())) {
-                APIIdentifier apiIdentifier = new APIIdentifier(
-                        api.getId().getProviderName(), api.getId().getApiName(),
+            if (!webAppVersion.equals(app.getId().getVersion())) {
+                APIIdentifier appIdentifier = new APIIdentifier(
+                        app.getId().getProviderName(), app.getId().getApiName(),
                         webAppVersion);
-                WebApp webApp = getAPI(apiIdentifier);
+                WebApp webApp = getAPI(appIdentifier);
                 webApp.setDefaultVersion(false);
                 updateApiArtifact(webApp, false, false);
             }
@@ -2018,25 +2020,25 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get web app default version
+     * Get web app default version.
      *
      * @param appName
      * @param providerName
-     * @param isPublished  if true then return published app version else default app version
+     * @param appStatus
      * @return
      * @throws AppManagementException
      */
     @Override
-    public String getDefaultVersion(String appName, String providerName, boolean isPublished)
+    public String getDefaultVersion(String appName, String providerName, AppDefaultVersion appStatus)
             throws AppManagementException {
-        return AppMDAO.getDefaultVersion(appName, providerName, isPublished);
+        return AppMDAO.getDefaultVersion(appName, providerName, appStatus);
     }
 
     /**
-     * Check if the given app is the default version
+     * Check if the given app is the default version.
      *
      * @param identifier
-     * @return
+     * @return true if given app is the default version
      * @throws AppManagementException
      */
     @Override
@@ -2045,10 +2047,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Check if the given app has any other versions in any state
+     * Check if the given app has any other versions in any state.
      *
      * @param identifier
-     * @return
+     * @return true if given app has more version
      * @throws AppManagementException
      */
     @Override
@@ -2057,14 +2059,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get WebApp basic details by app uuid
+     * Get WebApp basic details by app uuid.
      *
      * @param uuid
-     * @return
+     * @return Asset details
      * @throws AppManagementException
      */
     @Override
-    public WebApp getApplicationByUUID(String uuid) throws AppManagementException {
-        return appMDAO.getWebAppIdFromUUID(uuid);
+    public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
+        return appMDAO.getAppDetailsFromUUID(uuid);
     }
 }

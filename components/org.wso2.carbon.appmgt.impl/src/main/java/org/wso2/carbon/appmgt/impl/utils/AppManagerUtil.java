@@ -42,6 +42,7 @@ import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -312,7 +313,8 @@ public final class AppManagerUtil {
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
 
-            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName, false);
+            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
+                                                              AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
             api.setDefaultVersion(defaultVersion.equals(apiVersion));
 
 		} catch (GovernanceException e) {

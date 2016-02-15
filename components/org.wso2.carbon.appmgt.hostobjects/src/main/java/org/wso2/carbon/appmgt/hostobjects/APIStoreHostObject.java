@@ -3169,7 +3169,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
 
     /**
-     * Check if the multiple version display in store is enabled
+     * Check if the multiple version display in store is enabled.
      *
      * @param cx
      * @param thisObj
@@ -3180,7 +3180,6 @@ public class APIStoreHostObject extends ScriptableObject {
      */
     public static boolean jsFunction_isDisplayMultipleVersionsEnabled(Context cx, Scriptable thisObj, Object[] args,
                                                                       Function funObj) throws AppManagementException {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        return Boolean.parseBoolean(config.getFirstProperty(AppMConstants.STORE_DISPLAY_MULTIPLE_VERSIONS));
+        return HostObjectComponent.isDisplayMultipleVersionsEnabled();
     }
 }

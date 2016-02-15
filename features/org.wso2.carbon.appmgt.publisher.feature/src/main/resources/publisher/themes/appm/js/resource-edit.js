@@ -28,10 +28,10 @@ $( document ).ready(function() {
     var appName = $('#overview_name').val();
     var providerName = $('#overview_provider').val();
     var appVersion = $('#overview_version').val();
-    var isPublished = false;
+    var appStatus = "APP_IS_PUBLISHED";
 
     $.ajax({
-               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + isPublished,
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
                type: 'GET',
                async: false,
                success: function (data) {

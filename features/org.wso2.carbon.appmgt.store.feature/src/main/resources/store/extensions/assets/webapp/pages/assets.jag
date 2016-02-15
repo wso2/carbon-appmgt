@@ -178,6 +178,9 @@ require('/modules/store.js').exec(function (ctx) {
         var urlQuery = 'query=' + query + '&';
         query = require('/modules/search.js').build(query);
         query.overview_treatAsASite = 'FALSE';
+        if (!isMultipleVersionDisplayEnabled) {
+            query.overview_makeAsDefaultVersion = 'true';
+        }
         options = {
             type: type,
             attributes: query

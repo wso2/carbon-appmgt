@@ -936,8 +936,9 @@ public class APIProviderHostObject extends ScriptableObject {
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
         logoutURL = logoutURL.replace(endpoint, "");
-        Boolean allowAnonymous = "TRUE".equals((String) apiData.get("overview_allowAnonymous", apiData));
-        Boolean makeAsDefaultVersion = "true".equals((String) apiData.get("overview_makeAsDefaultVersion", apiData));
+        boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
+        boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
+                                                                                 apiData));
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
         String visibleRoles = "";
@@ -3670,47 +3671,52 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Get default version of a WebApp by Application Name and Provider and filtered by lifecycle state (isPublished)
+     * Get default version of a WebApp by Application Name and Provider and filtered by lifecycle state (isPublished).
      *
      * @param cx
      * @param thisObj
      * @param args
      * @param funObj
-     * @return
+     * @return Default version of the WebApp relevant to given Name and Provider
      * @throws AppManagementException
      */
-    public static String jsFunction_getDefaultVersion(Context cx, Scriptable thisObj,
-                                                      Object[] args,
-                                                      Function funObj)
+    public static String jsFunction_getDefaultVersion(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
         if (args == null || args.length != 3) {
-            handleException("Invalid input parameters.");
+            handleException("Invalid input parameters. Expecting Name, Provider and Publish State.");
         }
         String appName = (String) args[0];
         String provider = (String) args[1];
-        //Either lifecycle state is Published or not
-        boolean isPublished = ((String) args[2] == "true");
+        AppDefaultVersion appStatus = null;
+
+        try {
+            appStatus = AppDefaultVersion.valueOf((String) args[2]);
+        } catch (IllegalArgumentException e) {
+            handleException(String.format("There is no value with name '%s' in Enum %s", (String) args[2],
+                                          AppDefaultVersion.class.getName()
+            ));
+        }
 
         APIProvider apiProvider = getAPIProvider(thisObj);
-        return apiProvider.getDefaultVersion(appName, provider, isPublished);
+        return apiProvider.getDefaultVersion(appName, provider, appStatus);
     }
 
     /**
-     * Check if the given WebApp is the default version
+     * Check if the given WebApp is the default version.
      *
      * @param cx
      * @param thisObj
      * @param args
      * @param funObj
-     * @return
+     * @return true if given app is the default version
      * @throws AppManagementException
      */
     public static boolean jsFunction_isDefaultVersion(Context cx, Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
         if (args == null || args.length != 1) {
-            handleException("Invalid input parameters.");
+            handleException("Invalid input parameters. Expecting APIIdentifier.");
         }
         NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
         APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
@@ -3719,7 +3725,7 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Check if the WebApp has more versions or not
+     * Check if the WebApp has more versions or not.
      *
      * @param cx
      * @param thisObj
@@ -3732,7 +3738,7 @@ public class APIProviderHostObject extends ScriptableObject {
             throws AppManagementException {
         NativeArray myn = new NativeArray(0);
         if (args == null || args.length != 1) {
-            handleException("Invalid input parameters.");
+            handleException("Invalid input parameters. Expecting APIIdentifier.");
         }
         NativeJavaObject appIdentifierNativeJavaObject = (NativeJavaObject) args[0];
         APIIdentifier apiIdentifier = (APIIdentifier) appIdentifierNativeJavaObject.unwrap();
@@ -3741,25 +3747,25 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Get WebApp details by UUID
+     * Get WebApp details by UUID.
      *
      * @param cx
      * @param thisObj
      * @param args
      * @param funObj
-     * @return
+     * @return Asset basic details
      * @throws AppManagementException
      */
-    public static NativeObject jsFunction_getApplicationByUUID(Context cx, Scriptable thisObj, Object[] args,
+    public static NativeObject jsFunction_getAppDetailsFromUUID(Context cx, Scriptable thisObj, Object[] args,
                                                                Function funObj)
             throws AppManagementException {
         NativeObject webAppNativeObj = new NativeObject();
         if (args == null || args.length != 1) {
-            handleException("Invalid input parameters.");
+            handleException("Invalid input parameters. Expecting UUID.");
         }
         String uuid = (String) args[0];
         APIProvider apiProvider = getAPIProvider(thisObj);
-        WebApp api = apiProvider.getApplicationByUUID(uuid);
+        WebApp api = apiProvider.getAppDetailsFromUUID(uuid);
 
         if (api != null) {
             webAppNativeObj.put("name", webAppNativeObj, api.getId().getApiName());

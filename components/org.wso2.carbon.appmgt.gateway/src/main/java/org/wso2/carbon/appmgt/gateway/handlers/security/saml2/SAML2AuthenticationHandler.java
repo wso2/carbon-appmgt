@@ -1747,7 +1747,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         //It always gives IP for host which cause invalid assertionConsumerUrl
         String assertionConsumerUrl = servicePrefix.substring(0, servicePrefix.indexOf("/") + 2) +
                 headers.get("HOST") + messageContext.getProperty("REST_API_CONTEXT") + "/" + messageContext.getProperty(
-                "SYNAPSE_REST_API_VERSION") + "/";
+                RESTConstants.SYNAPSE_REST_API_VERSION) + "/";
 
         return assertionConsumerUrl;
     }

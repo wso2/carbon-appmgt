@@ -4250,7 +4250,15 @@ public class AppMDAO {
 		}
 	}
 
-    private void saveDefaultVersionDetails(WebApp api, Connection connection)
+    /**
+     * Insert or Update default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void saveDefaultVersionDetails(WebApp app, Connection connection)
             throws AppManagementException, SQLException {
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -4264,8 +4272,8 @@ public class AppMDAO {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
 
             prepStmt = connection.prepareStatement(sqlQuery);
-            prepStmt.setString(1, api.getId().getApiName());
-            prepStmt.setString(2, api.getId().getProviderName());
+            prepStmt.setString(1, app.getId().getApiName());
+            prepStmt.setString(2, app.getId().getProviderName());
             prepStmt.setInt(3, tenantId);
             rs = prepStmt.executeQuery();
 
@@ -4274,10 +4282,10 @@ public class AppMDAO {
             }
 
             if (recordCount == 0) {
-                addDefaultVersionDetails(api, connection);
+                addDefaultVersionDetails(app, connection);
             } else {
-                if (api.isDefaultVersion()) {
-                    updateDefaultVersionDetails(api, connection);
+                if (app.isDefaultVersion()) {
+                    updateDefaultVersionDetails(app, connection);
                 }
             }
 
@@ -4285,14 +4293,22 @@ public class AppMDAO {
             /* In the code it is using a single SQL connection passed from the parent function so the error is logged
              here and throwing the SQLException so the connection will be disposed by the parent function. */
             log.error("Error when getting the default version record count for Application: " +
-                              api.getId().getApiName(), e);
+                              app.getId().getApiName(), e);
             throw e;
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
         }
     }
 
-    private void addDefaultVersionDetails(WebApp api, Connection connection) throws
+    /**
+     * Insert default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void addDefaultVersionDetails(WebApp app, Connection connection) throws
                                                                              AppManagementException, SQLException {
         PreparedStatement prepStmt = null;
         String query =
@@ -4300,19 +4316,18 @@ public class AppMDAO {
                         "PUBLISHED_DEFAULT_APP_VERSION, TENANT_ID) VALUES (?,?,?,?,?)";
 
         if (log.isDebugEnabled()) {
-            log.debug("Inserting default version details for AppId -"
-                              + api.getId().getApplicationId());
+            log.debug("Inserting default version details for AppId -" + app.getId().getApplicationId());
         }
 
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
 
             prepStmt = connection.prepareStatement(query);
-            prepStmt.setString(1, api.getId().getApiName());
-            prepStmt.setString(2, api.getId().getProviderName());
-            prepStmt.setString(3, api.getId().getVersion());
-            if (api.getStatus() == APIStatus.PUBLISHED) {
-                prepStmt.setString(4, api.getId().getVersion());
+            prepStmt.setString(1, app.getId().getApiName());
+            prepStmt.setString(2, app.getId().getProviderName());
+            prepStmt.setString(3, app.getId().getVersion());
+            if (app.getStatus() == APIStatus.PUBLISHED) {
+                prepStmt.setString(4, app.getId().getVersion());
             } else {
                 prepStmt.setString(4, null);
             }
@@ -4322,7 +4337,7 @@ public class AppMDAO {
              /* In the code it is using a single SQL connection passed from the parent function so the error is logged
              here and throwing the SQLException so the connection will be disposed by the parent function. */
             log.error("Error while inserting default version details for WebApp : " +
-                              api.getId(), e);
+                              app.getId(), e);
             throw e;
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
@@ -4330,30 +4345,38 @@ public class AppMDAO {
     }
 
 
-    private void updateDefaultVersionDetails(WebApp api, Connection connection) throws
+    /**
+     * Insert default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void updateDefaultVersionDetails(WebApp app, Connection connection) throws
                                                                                 AppManagementException, SQLException {
         PreparedStatement prepStmt = null;
         String query;
         try {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
 
-            if (api.getStatus() == APIStatus.PUBLISHED && api.isDefaultVersion()) {
+            if (app.getStatus() == APIStatus.PUBLISHED && app.isDefaultVersion()) {
                 query = "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=?, PUBLISHED_DEFAULT_APP_VERSION=? " +
                         "WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
                 prepStmt = connection.prepareStatement(query);
-                prepStmt.setString(1, api.getId().getVersion());
-                prepStmt.setString(2, api.getId().getVersion());
-                prepStmt.setString(3, api.getId().getApiName());
-                prepStmt.setString(4, api.getId().getProviderName());
+                prepStmt.setString(1, app.getId().getVersion());
+                prepStmt.setString(2, app.getId().getVersion());
+                prepStmt.setString(3, app.getId().getApiName());
+                prepStmt.setString(4, app.getId().getProviderName());
                 prepStmt.setInt(5, tenantId);
             } else {
                 query =
                         "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=? WHERE APP_NAME=? AND APP_PROVIDER=?" +
                                 " AND TENANT_ID=? ";
                 prepStmt = connection.prepareStatement(query);
-                prepStmt.setString(1, api.getId().getVersion());
-                prepStmt.setString(2, api.getId().getApiName());
-                prepStmt.setString(3, api.getId().getProviderName());
+                prepStmt.setString(1, app.getId().getVersion());
+                prepStmt.setString(2, app.getId().getApiName());
+                prepStmt.setString(3, app.getId().getProviderName());
                 prepStmt.setInt(4, tenantId);
             }
             prepStmt.executeUpdate();
@@ -4361,7 +4384,7 @@ public class AppMDAO {
               /* In the code it is using a single SQL connection passed from the parent function so the error is logged
              here and throwing the SQLException so the connection will be disposed by the parent function. */
             log.error("Error while updating default version details for WebApp : " +
-                              api.getId(), e);
+                              app.getId(), e);
             throw e;
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
@@ -7884,7 +7907,7 @@ public class AppMDAO {
     }
 
     /**
-     * Update default version when updating information without appId
+     * Update default version when updating information without appId.
      *
      * @param webApp
      */
@@ -7913,15 +7936,15 @@ public class AppMDAO {
     }
 
     /**
-     * Check if the given version is the default version
+     * Check if the given version is the default version.
      *
      * @param appName
      * @param providerName
-     * @param isPublished  if true then return published app version else default app version
+     * @param appStatus  if true then return published app version else default app version
      * @return default app version
      * @throws AppManagementException
      */
-    public static String getDefaultVersion(String appName, String providerName, boolean isPublished)
+    public static String getDefaultVersion(String appName, String providerName, AppDefaultVersion appStatus)
             throws AppManagementException {
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -7930,7 +7953,7 @@ public class AppMDAO {
         try {
             String columnName;
             conn = APIMgtDBUtil.getConnection();
-            if (isPublished) {
+            if (appStatus == AppDefaultVersion.APP_IS_PUBLISHED) {
                 columnName = "PUBLISHED_DEFAULT_APP_VERSION";
             } else {
                 columnName = "DEFAULT_APP_VERSION";
@@ -7966,12 +7989,12 @@ public class AppMDAO {
 
 
     /**
-     * Direct update default version for published apps
+     * Direct update default version for published apps.
      *
-     * @param api
+     * @param app
      * @throws AppManagementException
      */
-    public void updatePublishedDefaultVersion(WebApp api) throws AppManagementException {
+    public void updatePublishedDefaultVersion(WebApp app) throws AppManagementException {
         Connection connection = null;
         PreparedStatement ps = null;
         try {
@@ -7984,21 +8007,29 @@ public class AppMDAO {
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
 
             prepStmt = connection.prepareStatement(query);
-            prepStmt.setString(1, api.getId().getVersion());
-            prepStmt.setString(2, api.getId().getApiName());
-            prepStmt.setString(3, api.getId().getProviderName());
+            prepStmt.setString(1, app.getId().getVersion());
+            prepStmt.setString(2, app.getId().getApiName());
+            prepStmt.setString(3, app.getId().getProviderName());
             prepStmt.setInt(4, tenantId);
 
             prepStmt.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
             handleException("Failed to update version details for  app" +
-                                    " : " + api.getApiName(), e);
+                                    " : " + app.getApiName(), e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, null);
         }
     }
 
+    /**
+     * Get all versions of a WebApp
+     *
+     * @param appName
+     * @param providerName
+     * @return List of Versions
+     * @throws AppManagementException
+     */
     public static List<String> getAllVersionOfWebApp(String appName, String providerName)
             throws AppManagementException {
         PreparedStatement ps = null;
@@ -8032,6 +8063,13 @@ public class AppMDAO {
         return webAppVersions;
     }
 
+    /**
+     * Check if a given WebApp has more versions.
+     *
+     * @param apiIdentifier
+     * @return true if has more versions
+     * @throws AppManagementException
+     */
     public static boolean hasMoreVersions(APIIdentifier apiIdentifier)
             throws AppManagementException {
         PreparedStatement ps = null;
@@ -8061,6 +8099,13 @@ public class AppMDAO {
         return hasMoreVersions;
     }
 
+    /**
+     * Check if the given app is the default version.
+     *
+     * @param apiIdentifier
+     * @return true if given is the default version
+     * @throws AppManagementException
+     */
     public static boolean isDefaultVersion(APIIdentifier apiIdentifier)
             throws AppManagementException {
         PreparedStatement ps = null;
@@ -8095,13 +8140,13 @@ public class AppMDAO {
 
 
     /**
-     * Get WebApp basic details by app uuid
+     * Get WebApp basic details by app uuid.
      *
      * @param webAppUUID
-     * @return
+     * @return Asset details
      * @throws AppManagementException
      */
-    public static WebApp getWebAppIdFromUUID(String webAppUUID) throws
+    public static WebApp getAppDetailsFromUUID(String webAppUUID) throws
                                                                 AppManagementException {
         Connection conn = null;
         PreparedStatement ps = null;
