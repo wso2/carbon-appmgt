@@ -70,9 +70,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 	}
 
 	@Override
-	public String getConfigStringForVersionedWebAppTemplate(Environment environment)
-			throws APITemplateException {
-
+	public String getConfigStringForVersionedWebAppTemplate(Environment environment) throws APITemplateException {
 		// build the context for template and apply the necessary decorators
 		ConfigContext configContext = new APIConfigContext(this.webapp);
 		configContext = new TransportConfigContext(configContext, webapp);
@@ -85,7 +83,6 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		configContext = new EnvironmentConfigContext(configContext, environment);
 		configContext = new TemplateUtilContext(configContext);
 
-		// @todo: this validation might be better to do when the builder is initialized.
 		try {
 			configContext.validate();
 		} catch (AppManagementException e) {
@@ -162,14 +159,12 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 	private String getVersionedWebAppTemplatePath() {
 		return "repository" + File.separator + "resources" + File.separator + "api_templates" +
-				File.separator +
-				APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP;
+				File.separator + APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP;
 	}
 
 	private String getNonVersionedWebAppTemplatePath() {
 		return "repository" + File.separator + "resources" + File.separator + "api_templates" +
-				File.separator +
-				APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP;
+				File.separator + APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP;
 	}
 
 	private String getVelocityLoggerName() {
