@@ -189,19 +189,21 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			Template template = velocityEngine.getTemplate(templatePath);
 			template.merge(velocityContext, writer);
 		} catch (ResourceNotFoundException e) {
-			String msg = "Cannot find Velocity template " + templatePath;
+			String msg = "Cannot find Velocity template '" + templatePath + "'.";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		} catch (ParseErrorException e) {
-			String msg = "Cannot parse Velocity template " + templatePath;
+			String msg = "Cannot parse Velocity template found in '" + templatePath + "'.";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		} catch (IOException e) {
-			log.error("Cannot write processed Velocity template", e);
-			throw new APITemplateException("Cannot write processed Velocity template", e);
+            String msg = "Cannot write processed Velocity template '" + templatePath + "'.";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		} catch (Exception e) {
-			log.error("Cannot process Velocity template", e);
-			throw new APITemplateException("Cannot process Velocity template", e);
+            String msg = "Cannot process Velocity template '" + templatePath + "'.";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 		return writer.toString();
 	}
