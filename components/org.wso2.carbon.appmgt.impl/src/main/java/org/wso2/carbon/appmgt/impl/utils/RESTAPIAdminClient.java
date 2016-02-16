@@ -47,8 +47,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
-			throws AxisFault {
+	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
 			if (tenantDomain != null && !("").equals(tenantDomain)
@@ -91,8 +90,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
-			throws AxisFault {
+	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
 			if (tenantDomain != null && !("").equals(tenantDomain) &&
@@ -134,8 +132,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
-			throws AxisFault {
+	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 
 		try {
 			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
@@ -157,8 +154,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @param tenantDomain
 	 * @throws AxisFault
 	 */
-	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain)
-			throws AxisFault {
+	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
 			if (tenantDomain != null && !("").equals(tenantDomain) &&
