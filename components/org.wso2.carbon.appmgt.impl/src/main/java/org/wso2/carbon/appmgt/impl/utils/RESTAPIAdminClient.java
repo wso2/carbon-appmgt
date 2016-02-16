@@ -51,9 +51,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Adds versioned web app configuration to the gateway
 	 *
-	 * @param builder
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param builder gateway configuration builder
+	 * @param tenantDomain tenant domain of the web app
+	 * @throws AxisFault if an error occurred when adding
 	 */
 	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
@@ -81,9 +81,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Returns versioned web app configuration from the gateway
 	 *
-	 * @param tenantDomain
-	 * @return
-	 * @throws AxisFault
+	 * @param tenantDomain tenant domain of the web app
+	 * @return web app gateway endpoint data
+	 * @throws AxisFault if an error occurred when retrieving
 	 */
 	public APIData getVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
@@ -108,9 +108,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Updates versioned web app configuration in the gateway
 	 *
-	 * @param builder
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param builder gateway configuration builder
+     * @param tenantDomain tenant domain of the web app
+     * @throws AxisFault if an error occurred when updating
 	 */
 	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
@@ -138,8 +138,8 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Deletes versioned web app configuration from the gateway
 	 *
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param tenantDomain tenant domain of the web app
+	 * @throws AxisFault if an error occurred when deleting
 	 */
 	public void deleteVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
@@ -162,9 +162,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Adds non-versioned web app configuration to the gateway
 	 *
-	 * @param builder
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param builder gateway configuration builder
+     * @param tenantDomain tenant domain of the web app
+     * @throws AxisFault if an error occurred when adding
 	 */
 	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
@@ -192,9 +192,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Updates non-versioned web app configuration in the gateway
 	 *
-	 * @param builder
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param builder gateway configuration builder
+     * @param tenantDomain tenant domain of the web app
+     * @throws AxisFault if an error occurred when updating
 	 */
 	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
@@ -223,8 +223,8 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Deletes non-versioned web app configuration form the gateway
 	 *
-	 * @param tenantDomain
-	 * @throws AxisFault
+	 * @param tenantDomain tenant domain of the web app
+     * @throws AxisFault if an error occurred when deleting
 	 */
 	public void deleteNonVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
@@ -247,9 +247,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	/**
 	 * Returns the non-versioned web app configuration from the gateway
 	 *
-	 * @param tenantDomain
-	 * @return
-	 * @throws AxisFault
+	 * @param tenantDomain tenant domain of the web app
+     * @return web app gateway endpoint data
+     * @throws AxisFault if an error occurred when retrieving
 	 */
 	public APIData getNonVersionedWebAppData(String tenantDomain) throws AxisFault {
 		try {
