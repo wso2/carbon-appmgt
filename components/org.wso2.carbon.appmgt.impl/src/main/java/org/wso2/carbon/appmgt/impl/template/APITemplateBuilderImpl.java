@@ -1,5 +1,5 @@
 /*
- * Copyright WSO2 Inc.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -49,100 +50,102 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 
 	private static final Log log = LogFactory.getLog(APITemplateBuilderImpl.class);
 
+    private static final String RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME = "org.apache.velocity.runtime.log.Log4JLogChute";
+    private static final String RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER = "runtime.log.logsystem.log4j.logger";
 	private static final String VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP =
 			"velocity-template_synapse-config_non-versioned-webapp.xml";
 	private static final String VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP =
 			"velocity-template_synapse-config_versioned-webapp.xml";
+    private static final String SYNAPSE_PARAM_API_CONTEXT = "apiContext";
+    private static final String SYNAPSE_PARAM_FORWARD_APP_CONTEXT = "forwardAppContext";
+    private static final String SYNAPSE_PARAM_FORWARD_APP_VERSION = "forwardAppVersion";
 
-	private WebApp api;
-	private String velocityLoggerName = null;
+	private WebApp webapp;
+	private String velocityLoggerName;
 	private List<HandlerConfig> handlers = new ArrayList<HandlerConfig>();
 
-	public APITemplateBuilderImpl(WebApp api) {
-		this.api = api;
+	public APITemplateBuilderImpl(WebApp webapp) {
+		this.webapp = webapp;
 		this.velocityLoggerName = getVelocityLoggerName();
 	}
 
 	@Override
-	public String getConfigStringForVersionedWebAppTemplate(Environment environment)
-			throws APITemplateException {
-
+	public String getConfigStringForVersionedWebAppTemplate(Environment environment) throws APITemplateException {
 		// build the context for template and apply the necessary decorators
-		ConfigContext configcontext = new APIConfigContext(this.api);
-		configcontext = new TransportConfigContext(configcontext, api);
-		configcontext = new ResourceConfigContext(configcontext, api);
-		configcontext = new EndpointURIConfigContext(configcontext, api);
-		configcontext = new SecurityConfigContext(configcontext, api);
-		configcontext = new JwtConfigContext(configcontext);
-		configcontext = new ResponseCacheConfigContext(configcontext, api);
-		configcontext = new HandlerConfigContex(configcontext, handlers);
-		configcontext = new EnvironmentConfigContext(configcontext, environment);
-		configcontext = new TemplateUtilContext(configcontext);
+		ConfigContext configContext = new APIConfigContext(this.webapp);
+		configContext = new TransportConfigContext(configContext, webapp);
+		configContext = new ResourceConfigContext(configContext, webapp);
+		configContext = new EndpointURIConfigContext(configContext, webapp);
+		configContext = new SecurityConfigContext(configContext, webapp);
+		configContext = new JwtConfigContext(configContext);
+		configContext = new ResponseCacheConfigContext(configContext, webapp);
+		configContext = new HandlerConfigContex(configContext, handlers);
+		configContext = new EnvironmentConfigContext(configContext, environment);
+		configContext = new TemplateUtilContext(configContext);
 
-		// @todo: this validation might be better to do when the builder is initialized.
 		try {
-			configcontext.validate();
-		} catch (Exception e) {
-			log.error("Cannot validate configuration context for template", e);
-			throw new APITemplateException("Cannot validate configuration context for template",
-										   e);
+			configContext.validate();
+		} catch (AppManagementException e) {
+            String msg = "Cannot validate configuration context for template";
+            log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 
-		VelocityEngine velocityengine = new VelocityEngine();
+		VelocityEngine velocityEngine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-			velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-									   "org.apache.velocity.runtime.log.Log4JLogChute");
-			velocityengine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
-		}
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
+            velocityEngine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
+        }
 		try {
-			velocityengine.init();
+			velocityEngine.init();
 		} catch (Exception e) {
-			log.error("Cannot initialize Velocity engine", e);
-			throw new APITemplateException("Cannot initialize Velocity engine", e);
+            String msg = "Cannot initialize Velocity engine";
+            log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
-		VelocityContext context = configcontext.getContext();
+		VelocityContext context = configContext.getContext();
 
-		return processTemplate(velocityengine, context, getVersionedWebAppTemplatePath());
+		return processTemplate(velocityEngine, context, getVersionedWebAppTemplatePath());
 	}
 
 	@Override
 	public String getConfigStringForNonVersionedWebAppTemplate() throws APITemplateException {
-		VelocityEngine velocityengine = new VelocityEngine();
+		VelocityEngine velocityEngine = new VelocityEngine();
 		if (this.velocityLoggerName != null) {
-			velocityengine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-									   "org.apache.velocity.runtime.log.Log4JLogChute");
-			velocityengine.setProperty("runtime.log.logsystem.log4j.logger", velocityLoggerName);
+            velocityEngine.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, RUNTIME_LOG_LOG_SYSTEM_CLASS_NAME);
+            velocityEngine.setProperty(RUNTIME_LOG_LOG_SYSTEM_LOG4J_LOGGER, velocityLoggerName);
 		}
 		try {
-			velocityengine.init();
+			velocityEngine.init();
 		} catch (Exception e) {
-			log.error("Cannot initialize Velocity engine", e);
-			throw new APITemplateException("Cannot initialize Velocity engine", e);
+            String msg = "Cannot initialize Velocity engine";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 
-		ConfigContext configcontext = new APIConfigContext(this.api);
-		configcontext = new TransportConfigContext(configcontext, api);
-		configcontext = new ResourceConfigContext(configcontext, api);
+		ConfigContext configContext = new APIConfigContext(this.webapp);
+		configContext = new TransportConfigContext(configContext, webapp);
+		configContext = new ResourceConfigContext(configContext, webapp);
 
-		VelocityContext context = configcontext.getContext();
-		context.put("apiContext", this.api.getContext());
-		String forwardAppContext = this.api.getContext();
+		VelocityContext context = configContext.getContext();
+		context.put(SYNAPSE_PARAM_API_CONTEXT, this.webapp.getContext());
+		String forwardAppContext = this.webapp.getContext();
 		if (forwardAppContext != null && forwardAppContext.charAt(0) == '/') {
 			forwardAppContext = forwardAppContext.substring(1);
 		}
-		context.put("forwardAppContext", forwardAppContext);
-		context.put("forwardAppVersion", this.api.getId().getVersion());
+		context.put(SYNAPSE_PARAM_FORWARD_APP_CONTEXT, forwardAppContext);
+		context.put(SYNAPSE_PARAM_FORWARD_APP_VERSION, this.webapp.getId().getVersion());
 
-		return processTemplate(velocityengine, context, getNonVersionedWebAppTemplatePath());
+		return processTemplate(velocityEngine, context, getNonVersionedWebAppTemplatePath());
 	}
 
 	@Override
 	public OMElement getConfigXMLForTemplate(Environment environment) throws APITemplateException {
+        String configString = getConfigStringForVersionedWebAppTemplate(environment);
 		try {
-			return AXIOMUtil.stringToOM(getConfigStringForVersionedWebAppTemplate(environment));
+			return AXIOMUtil.stringToOM(configString);
 		} catch (XMLStreamException e) {
-			String msg = "Error converting string to OMElement - String: " +
-					getConfigStringForVersionedWebAppTemplate(environment);
+			String msg = "Error occurred when converting '" + configString + "' to OMElement";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		}
@@ -152,22 +155,19 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 		addHandlerPriority(handlerName, properties, handlers.size());
 	}
 
-	public void addHandlerPriority(String handlerName, Map<String, String> properties,
-								   int priority) {
+	public void addHandlerPriority(String handlerName, Map<String, String> properties, int priority) {
 		HandlerConfig handler = new HandlerConfig(handlerName, properties);
 		handlers.add(priority, handler);
 	}
 
 	private String getVersionedWebAppTemplatePath() {
 		return "repository" + File.separator + "resources" + File.separator + "api_templates" +
-				File.separator +
-				APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP;
+				File.separator + APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_VERSIONED_WEBAPP;
 	}
 
 	private String getNonVersionedWebAppTemplatePath() {
 		return "repository" + File.separator + "resources" + File.separator + "api_templates" +
-				File.separator +
-				APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP;
+				File.separator + APITemplateBuilderImpl.VELOCITY_TEMPLATE_SYNAPSE_CONFIG_NON_VERSIONED_WEBAPP;
 	}
 
 	private String getVelocityLoggerName() {
@@ -175,33 +175,35 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 				ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService();
 		String velocityLogPath = config.getAPIManagerConfiguration().getFirstProperty(
 				AppMConstants.VELOCITY_LOGGER);
-		if (velocityLogPath != null && velocityLogPath.length() > 1) {
+		if ((velocityLogPath != null) && !velocityLogPath.isEmpty()) {
 			return velocityLogPath;
 		} else {
 			return null;
 		}
 	}
 
-	private String processTemplate(VelocityEngine ve, VelocityContext vc, String templatePath)
+	private String processTemplate(VelocityEngine velocityEngine, VelocityContext velocityContext, String templatePath)
 			throws APITemplateException {
 		StringWriter writer = new StringWriter();
 		try {
-			Template t = ve.getTemplate(templatePath);
-			t.merge(vc, writer);
+			Template template = velocityEngine.getTemplate(templatePath);
+			template.merge(velocityContext, writer);
 		} catch (ResourceNotFoundException e) {
-			String msg = "Cannot find Velocity template " + templatePath;
+			String msg = "Cannot find Velocity template '" + templatePath + "'.";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		} catch (ParseErrorException e) {
-			String msg = "Cannot parse Velocity template " + templatePath;
+			String msg = "Cannot parse Velocity template found in '" + templatePath + "'.";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		} catch (IOException e) {
-			log.error("Cannot write processed Velocity template", e);
-			throw new APITemplateException("Cannot write processed Velocity template", e);
+            String msg = "Cannot write processed Velocity template '" + templatePath + "'.";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		} catch (Exception e) {
-			log.error("Cannot process Velocity template", e);
-			throw new APITemplateException("Cannot process Velocity template", e);
+            String msg = "Cannot process Velocity template '" + templatePath + "'.";
+			log.error(msg, e);
+			throw new APITemplateException(msg, e);
 		}
 		return writer.toString();
 	}
