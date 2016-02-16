@@ -31,10 +31,10 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	private String qualifiedNonVersionedWebAppName;
 	private Environment environment;
 
-	public RESTAPIAdminClient(APIIdentifier apiId, Environment environment) throws AxisFault {
-		this.qualifiedName = apiId.getProviderName() + "--" + apiId.getApiName() + ":v" +
-				apiId.getVersion();
-		this.qualifiedNonVersionedWebAppName = apiId.getProviderName() + "--" + apiId.getApiName();
+	public RESTAPIAdminClient(APIIdentifier appIdentifier, Environment environment) throws AxisFault {
+		this.qualifiedName = appIdentifier.getProviderName() + "--" + appIdentifier.getApiName() + ":v" +
+				appIdentifier.getVersion();
+		this.qualifiedNonVersionedWebAppName = appIdentifier.getProviderName() + "--" + appIdentifier.getApiName();
 		restApiAdminStub = new RestApiAdminStub(null, environment.getServerURL() + "RestApiAdmin");
 		setup(restApiAdminStub, environment);
 		this.environment = environment;
