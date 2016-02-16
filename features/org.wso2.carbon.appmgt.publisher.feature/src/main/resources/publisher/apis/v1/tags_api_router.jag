@@ -14,6 +14,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 var config = require('/config/publisher.json');
 var caramel = require('caramel');
 var utility = require('/modules/utility.js').rxt_utility();
+var permissions = require('/modules/permissions.js').permissions;
 
 var router = require('/modules/router-g.js').router();
 var routeManager = new router.Router();
@@ -75,7 +76,7 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     var type = context.params.type;
     var id = context.params.id;
-
+    var contentType = "application/json";
 
     log.debug(context.content);
 
@@ -85,37 +86,67 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
     var msg = {};
     msg['status'] = 200;
     msg['ok'] = true;
+    msg['message'] = null;
 
-    var artifactManager = rxtManager.getArtifactManager(type);
+    var userManager = server.userManager(server.current(session).tenantId);
+    var user = server.current(session);
+    var permission = null;
 
-    var artifact = artifactManager.get(id);
-
-    var model = modelManager.getModel(type);
-    model.import('asset', artifact);
-
-    var report = model.validate();
-
-    //Check if the model is valid, the important validation here is checking if the asset is in the published state
-    if ((report) && (report.failed)) {
-        response.sendError(404, 'Unable to attach tag');
-        //msg.ok=false;
-        //msg.status=404;
-        // print(msg);
-        return;
+    if (type == 'webapp') {
+        permission = config.permissions.webapp_create;
+    } else if (type == 'mobileapp') {
+        permission = config.permissions.mobileapp_create;
     }
-
-    //If tags are not specified then do nothing
-    if (tags.length == 0) {
-        response.contentType = "application/json";
+    // check whether user has app create permission.
+    var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
+    if (!hasPermission) {
+        response.status = 403;
+        response.contentType = contentType;
+        msg.status = "403";
+        msg.ok = false;
+        msg.message = "User '" + user.username + "' doesn't have enough privileges to add tags";
         print(msg);
         return;
-
     }
 
-    //Apply the tags
-    rxtManager.registry.tag(artifact.path, tags);
-    response.contentType = "application/json";
-    print(msg);
+    //If tags are not specified.
+    if (tags.length == 0) {
+        response.contentType = contentType;
+        msg.message = "No tags are specified.";
+        print(msg);
+        return;
+    }
+
+    var artifactManager = rxtManager.getArtifactManager(type);
+    try {
+        var artifact = artifactManager.get(id);
+        var model = modelManager.getModel(type);
+        model.import('asset', artifact);
+        var report = model.validate();
+        //Check if the model is valid, the important validation here is checking if the asset is in the published state
+        if ((report) && (report.failed)) {
+            response.status = 500;
+            response.contentType = contentType;
+            msg.status = "500";
+            msg.ok = false;
+            msg.message = "Unable to attach tag";
+            print(msg);
+            return;
+        }
+
+        //Apply the tags
+        rxtManager.registry.tag(artifact.path, tags);
+        response.contentType = contentType;
+        msg.message = "Tags are added successfully";
+        print(msg);
+    }  catch (e) {
+        response.contentType = contentType;
+        response.status = 404;
+        msg.status = "404";
+        msg.ok = false;
+        msg.message = "The asset with id: " + id + " could not be found";
+        print(msg);
+    }
 });
 
 routeManager.register('DELETE', 'publisher', '/publisher/api/tag/{type}/{id}/{tag}', function (context) {
@@ -161,7 +192,9 @@ var passed = sm.check(session, function () {
 //Stop servicing the request if the check failed
 if (passed) {
 
-    var user = require('store').user;
+    var store = require('store');
+    var user = store.user;
+    var server = store.server;
     var publisher = require('/modules/publisher.js').publisher(request, session);
 
     var rxtManager = publisher.rxtManager;
