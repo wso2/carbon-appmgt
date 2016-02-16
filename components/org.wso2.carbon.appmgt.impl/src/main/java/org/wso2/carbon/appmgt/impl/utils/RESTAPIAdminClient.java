@@ -69,13 +69,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public APIData getVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
-			APIData apiData;
+			APIData appData;
 			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-				apiData = restApiAdminStub.getApiForTenant(qualifiedName, tenantDomain);
+				appData = restApiAdminStub.getApiForTenant(qualifiedName, tenantDomain);
 			} else {
-				apiData = restApiAdminStub.getApiByName(qualifiedName);
+				appData = restApiAdminStub.getApiByName(qualifiedName);
 			}
-			return apiData;
+			return appData;
 		} catch (Exception e) {
 			throw new AxisFault("Error while obtaining WebApp information from gateway", e);
 		}
@@ -90,11 +90,11 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
-			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
+			String appConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
 			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-				restApiAdminStub.updateApiForTenant(qualifiedName, apiConfig, tenantDomain);
+				restApiAdminStub.updateApiForTenant(qualifiedName, appConfig, tenantDomain);
 			} else {
-				restApiAdminStub.updateApiFromString(qualifiedName, apiConfig);
+				restApiAdminStub.updateApiFromString(qualifiedName, appConfig);
 			}
 		} catch (Exception e) {
 			throw new AxisFault("Error while updating WebApp", e);
@@ -128,11 +128,11 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
-			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
+			String appConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
 			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-				restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
+				restApiAdminStub.addApiForTenant(appConfig, tenantDomain);
 			} else {
-				restApiAdminStub.addApiFromString(apiConfig);
+				restApiAdminStub.addApiFromString(appConfig);
 			}
 		} catch (Exception e) {
 			throw new AxisFault("Error publishing non-versioned web app to the gateway", e);
@@ -148,12 +148,12 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
-			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
+			String appConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
 			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-				restApiAdminStub.updateApiForTenant(qualifiedNonVersionedWebAppName, apiConfig,
+				restApiAdminStub.updateApiForTenant(qualifiedNonVersionedWebAppName, appConfig,
 													tenantDomain);
 			} else {
-				restApiAdminStub.updateApiFromString(qualifiedNonVersionedWebAppName, apiConfig);
+				restApiAdminStub.updateApiFromString(qualifiedNonVersionedWebAppName, appConfig);
 			}
 		} catch (Exception e) {
 			throw new AxisFault("Error while updating non-versioned web app in the gateway", e);
@@ -187,14 +187,13 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public APIData getNonVersionedWebAppData(String tenantDomain) throws AxisFault {
 		try {
-			APIData apiData;
+			APIData appData;
 			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-				apiData = restApiAdminStub.getApiForTenant(qualifiedNonVersionedWebAppName,
-														   tenantDomain);
+				appData = restApiAdminStub.getApiForTenant(qualifiedNonVersionedWebAppName, tenantDomain);
 			} else {
-				apiData = restApiAdminStub.getApiByName(qualifiedNonVersionedWebAppName);
+				appData = restApiAdminStub.getApiByName(qualifiedNonVersionedWebAppName);
 			}
-			return apiData;
+			return appData;
 		} catch (Exception e) {
 			throw new AxisFault(
 					"Error while obtaining non-versioned web app information from gateway", e);
