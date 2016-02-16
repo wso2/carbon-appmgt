@@ -50,8 +50,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String appConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-			if (tenantDomain != null && !("").equals(tenantDomain)
-					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.addApiForTenant(appConfig, tenantDomain);
 			} else {
 				restApiAdminStub.addApiFromString(appConfig);
@@ -71,8 +70,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public APIData getVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
 			APIData apiData;
-			if (tenantDomain != null && !("").equals(tenantDomain)
-					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				apiData = restApiAdminStub.getApiForTenant(qualifiedName, tenantDomain);
 			} else {
 				apiData = restApiAdminStub.getApiByName(qualifiedName);
@@ -93,9 +91,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public void updateVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-			if (tenantDomain != null && !("").equals(tenantDomain) &&
-					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.updateApiForTenant(qualifiedName, apiConfig, tenantDomain);
 			} else {
 				restApiAdminStub.updateApiFromString(qualifiedName, apiConfig);
@@ -113,13 +109,11 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void deleteVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
-			if (tenantDomain != null && !("").equals(tenantDomain) &&
-					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.deleteApiForTenant(qualifiedName, tenantDomain);
 			} else {
 				restApiAdminStub.deleteApi(qualifiedName);
 			}
-
 		} catch (Exception e) {
 			throw new AxisFault("Error while deleting WebApp", e);
 		}
@@ -133,11 +127,9 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AxisFault
 	 */
 	public void addNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
-
 		try {
 			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-			if (tenantDomain != null && !("").equals(tenantDomain)
-					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
 			} else {
 				restApiAdminStub.addApiFromString(apiConfig);
@@ -157,9 +149,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public void updateNonVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
 			String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-			if (tenantDomain != null && !("").equals(tenantDomain) &&
-					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.updateApiForTenant(qualifiedNonVersionedWebAppName, apiConfig,
 													tenantDomain);
 			} else {
@@ -178,8 +168,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void deleteNonVersionedWebApp(String tenantDomain) throws AxisFault {
 		try {
-			if (tenantDomain != null && !("").equals(tenantDomain) &&
-					!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				restApiAdminStub.deleteApiForTenant(qualifiedNonVersionedWebAppName, tenantDomain);
 			} else {
 				restApiAdminStub.deleteApi(qualifiedNonVersionedWebAppName);
@@ -199,8 +188,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	public APIData getNonVersionedWebAppData(String tenantDomain) throws AxisFault {
 		try {
 			APIData apiData;
-			if (tenantDomain != null && !("").equals(tenantDomain)
-					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+			if (!MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
 				apiData = restApiAdminStub.getApiForTenant(qualifiedNonVersionedWebAppName,
 														   tenantDomain);
 			} else {
