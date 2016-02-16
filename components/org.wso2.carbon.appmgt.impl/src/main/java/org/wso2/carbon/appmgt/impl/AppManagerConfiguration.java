@@ -115,6 +115,24 @@ public class AppManagerConfiguration {
         return Boolean.parseBoolean(getFirstProperty(AppMConstants.ENABLE_JWT_GENERATION));
     }
 
+    /**
+     * Checks whether SelfSubscriptionEnabled is enabled in App Manager config.
+     *
+     * @return true if enabled else false
+     */
+    public boolean isSelfSubscriptionEnabled() {
+        return Boolean.parseBoolean(getFirstProperty(AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+    }
+
+    /**
+     * Checks whether EnterpriseSubscription is enabled in App Manager config.
+     *
+     * @return true if enabled else false
+     */
+    public boolean isEnterpriseSubscriptionEnabled() {
+        return Boolean.parseBoolean(getFirstProperty(AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+    }
+
     public String getFirstProperty(String key) {
         List<String> value = configuration.get(key);
         if (value == null) {

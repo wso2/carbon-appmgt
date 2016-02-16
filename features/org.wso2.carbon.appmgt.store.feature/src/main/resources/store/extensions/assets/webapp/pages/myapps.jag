@@ -1,57 +1,509 @@
 <%
-var caramel;
-var AppService;
-var ApiService;
-var authService;
+/*
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+var AuthService;
 var authenticator;
-var appInfoApi;
-var apiInfoApi;
-var apps;
-var tiers;
-var userData;
-var log=new Log();
+var caramel;
 
 include('../modules/jagg/jagg.jag');
+var storeServer = require('store').server;
+var carbon = require('carbon');
+var user = storeServer.current(session);
+var um;
+if (user) {
+    um = storeServer.userManager(user.tenantId);
+} else {
+    um = storeServer.userManager(-1234);
+}
+var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
-    var store = ctx.store;
-    var recentAssets=store.recentAssets('api');
+    var options, assets, paging, url,
+            log = ctx.log,
+            sso = ctx.sso,
+            query = ctx.params.query,
+            tag = encodeURIComponent(ctx.params.tag),
+            store = ctx.store,
+            user = ctx.user,
+            server = ctx.server,
+            tenantId = ctx.tenant.tenantId,
+            tenantDomain = ctx.tenant.domain,
+            configs = ctx.configs,
+            site = ctx.site,
+            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
 
     caramel = require('caramel');
-    AppService = require(getServiceDir('app.js')).serviceModule;
-    ApiService = require(getServiceDir('app-information.js')).serviceModule;
-    AuthService=require(getServiceDir('authentication.js')).serviceModule;
+    //Check whether to show register link in myapps page
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
-    authenticator=new AuthService.Authenticator();
+    //Get the subscription configuration options
+    var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
 
-    authenticator.init(jagg,session);
+    //Initialize subscription service
+    var SubscriptionService = require(getServiceDir('subscription.js')).serviceModule;
+    var subsApi = new SubscriptionService.SubscriptionService();
+    subsApi.init(jagg, session);
 
-    appApi = new AppService.AppService();
-    apiInfoApi = new ApiService.APIInformationService();
-
-    appApi.init(jagg, session);
-    apiInfoApi.init(jagg, session);
-
-
-    apps=appApi.getApplications(authenticator.getLoggedInUser().username);
-    tiers=apiInfoApi.getTiers();
-
-    userData=authenticator.getLoggedInUser();
-
-    caramel.render({
-        tiers:tiers,
-        header:{
-            user:userData
-        },
-        apps:apps ,
-        recentAssets:recentAssets
+    var isSite = 'false';//To get the webapp tags
+    var tagUrl = '/extensions/assets/' + type + '/myapps?tag=';
+    url =
+    '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
+                                                                                   '');
+    var leftnav, rightnav, urlQuery;//For pagination
+    
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        domain: tenantDomain
     });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.searchOff = true;
+    headerData.hideAllAppsLink = false;
+    headerData.storeTenantDomain = tenantDomain;
+
+    var showSortOptions = false;
+    var webAppRecentAssets = [];
+    var PAGE_SIZE = store.getPageSize();
+    var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
+    paging = store.assetsPagingOverrided(request, availablePages);
+    var currIndex = paging.start + 1;
+    var currentPage = store.getCurrentPage(currIndex);
+
+    var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
+    var SITE_OPTIONS = {
+        type: type,
+        attributes: SITE_QUERY
+    };
+
+    /**
+     * This method is used to retrieve the assets from registry when both subscriptions are disabled.
+     */
+    var getAssetsFromRegistry = function () {
+        if (tag == 'undefined') {
+            tag = null;
+        }
+
+        if (tag) {//if tag search in myapps page
+            urlQuery = 'tag=' + tag + '&';
+            options = {
+                attributes: SITE_QUERY
+            };
+            options.tag = tag;
+            options.type = type;
+            options.lifecycleState = ["published"];
+            assets = store.taggeds(type, options, paging);
+        } else if (query) { // if search from search box
+            urlQuery = 'query=' + query + '&';
+            query = require('/modules/search.js').build(query);
+            query.overview_treatAsASite = 'FALSE';
+            options = {
+                type: type,
+                attributes: query
+            };
+            assets = store.search(options, paging);
+        } else { // sort by popularity in myapps page
+            if (paging.sort == 'popular') {
+                urlQuery = 'sort=' + paging.sort + '&';
+                server.privileged(function () {
+                    var index = 0, maxTry = 0;
+
+                    var ratingApi = require('/modules/rating-api.js').api;
+                    registry = storeServer.systemRegistry(tenantId),
+                            am = store.assetManager(type, registry);
+
+                    var getNextAssetSet = function () {
+                        var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
+                                                                'false');
+                        if (log.isDebugEnabled()) {
+                            log.debug("Query executed successfully to get the assets hit count");
+                        }
+                        index += PAGE_SIZE;
+                        return result;
+                    };
 
 
+                    assets = [];
+                    var aid, asset;
+                    while (assets.length < PAGE_SIZE && maxTry < 10) {
+                        maxTry++;
+                        var result = getNextAssetSet();
 
-},request,response,session);
+                        for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                            aid = String(result[n].id);
+                            try {
+                                asset = store.asset(type, aid);
+                                asset.indashboard = store.isuserasset(aid, type);
+                                if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
+                                        >= 0) {
+                                    assets.push(asset);
+                                }
+                            } catch (e) {
+                                log.warn("error retrieving asset from store ,information might be stale in table. id=" +
+                                         aid);
+                            }
+                        }
+                    }
+                });
+
+            }
+            else if (paging.sort == 'usage') { //sort by usage in myapps page
+                urlQuery = 'sort=' + paging.sort + '&';
+                server.privileged(function () {
+                    var userName = user ? user.username : "";
+                    var index = 0, maxTry = 0;
+                    var getNextAssetSet = function () {
+                        var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+                        var appMgtDaoObj = new appMgtDaoService();
+
+                        var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                        if (log.isDebugEnabled()) {
+                            var recordCount = 0;
+                            if (result != null) {
+                                recordCount = result.length;
+                            }
+                            log.debug("Query executed successfully to get the assets hit count. " + recordCount
+                                              + " records found");
+                        }
+                        index += PAGE_SIZE;
+                        if (result.length > 0) {
+                            return JSON.parse(result);
+                        } else {
+                            return {};
+                        }
+                    };
+
+                    assets = [];
+                    var done = false;
+                    while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
+                        maxTry++;
+                        var result = getNextAssetSet();
+                        if (result.length < 12) {
+                            done = true;
+                        }
+                        for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
+                            var aid = String(result[n].UUID);
+                            try {
+                                var asset = store.asset(type, aid);
+                                asset.indashboard = store.isuserasset(aid, type);
+                                if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
+                                        >= 0) {
+                                    assets.push(asset);
+                                }
+                            } catch (e) {
+                                log.warn("error retrieving asset from store ,information might be stale in table. id=" +
+                                         aid);
+                            }
+                        }
+                    }
+                });
+            }
+            else { //myapps page request
+                urlQuery = 'sort=' + paging.sort + '&';
+                assets = store.search(SITE_OPTIONS, paging);
+            }
+        }
+    };
+
+    /**
+     * This method is used to retrieve the recently added assets from registry when both subscriptions are disabled.
+     */
+    var getRecentAssetsFromRegistry = function () {
+        var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
+        var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
+
+        for (var i = 0; i < recentAssets.length; i++) {
+            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+            if (appRatingRecentAssetsJson) {
+                recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
+            } else {
+                recentAssets[i].rating = 0;
+            }
+            webAppRecentAssets.push(recentAssets[i]);
+        }
+    };
+
+    /**
+     * Check for pagination. When both subscriptions are disabled.
+     */
+    var setPagination = function () {
+        // Check whether a 'next page' navigation is needed.
+        // If the assets count in the current page is less than PAGE_SIZE, next page is not available.
+        // Else assets should be queried to decide whether there are assets available for the next page.
+        var nextPageAvailable = false;
+
+        if (assets.length == PAGE_SIZE) {
+            // Get the starting index, offset etc .. of the assumed next page.
+            var nextPage = store.buildNextPage(request, availablePages);
+
+            // Query the assets with the assumed 'next page'
+            var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
+            if (nextAssetSet.length > 0) {
+                nextPageAvailable = true;
+            }
+        }
+
+        if (nextPageAvailable) {
+            rightnav = currentPage + 1;
+        }
+
+        if (currentPage - 1 > 0) {
+            leftnav = currentPage - 1;
+        }
+        if (nextPageAvailable && (assets.length == PAGE_SIZE)) {
+            rightnav = currentPage + 1;
+        }
+    };
+
+    /**
+     * This method add more informations to the apps retrieved from registry when both subscriptions are disabled.
+     * @param webApps
+     * @returns {*}
+     */
+    var addMoreInformationToWebApps = function (webApps) {
+        var APIInformationService = require('../services/api-information.js').serviceModule;
+        var apiInfoManager = new APIInformationService.APIInformationService();
+        apiInfoManager.init(jagg, session);
+
+        webApps.forEach(function (app) {
+            //set rating
+            if (JSON.parse(social.getRating("webapp:" + app.id))) {
+                app.rating = Math.floor(JSON.parse(social.getRating("webapp:" + app.id)).rating);
+            } else {
+                app.rating = 0;
+            }
+
+            //Set the access URL -By oneclick user should access the app in myapps page.
+            if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
+                //Get the gatewayurl
+                var appData = apiInfoManager.getAPIDescription(app.attributes.overview_provider,
+                                                               app.attributes.overview_name,
+                                                               app.attributes.overview_version);
+                app.productionURL = appData.serverURL.productionURL;
+            } else {
+                //Get the direct webapp url
+                app.productionURL = app.attributes.overview_webAppURL;
+            }
+
+            //set favourite app or not- This infomation will be used to set proper icon(add/remove favourite) on asset tile
+            app.isFavourite = false;
+            if (isFavouriteApp(app.attributes.overview_name, app.attributes.overview_version,
+                               app.attributes.overview_provider)) {
+                app.isFavourite = true;
+            }
+        });
+        return webApps;
+    };
+
+    /**
+     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in user.
+     * anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
+     * apps retrieved from registry and APPM database have different format.So in roder to combine both change the format
+     * of apps from registry to the format of apps from APPM database.
+     *
+     * After formatted - [{"appName" : "app1", "appProvider" : "admin", "version" : "1", "appTenant" : "carbon.super",
+     "thumburl" : "2567161d-0748-45bb-846c-5ebc1a937f82/Dj1FnGbOxeBSbms.jpg", "accessUrl" : "http://xxxx:8280/app1/",
+     "uuid" : "e77cbef5-48ec-4b9f-9f69-a954f0b77a1f", "advertiseOnly" : false, "advertisedAppUuid" : null}]
+     */
+
+    var changeFormat = function (apps) {
+        var APIInformationService = require('../services/api-information.js').serviceModule;
+        var apiInfoManager = new APIInformationService.APIInformationService();
+        apiInfoManager.init(jagg, session);
+
+        var formattedApps = [];
+        apps.forEach(function (app) {
+            var tempApp = {};
+            tempApp["appName"] = app.attributes.overview_name;
+            tempApp["appProvider"] = app.attributes.overview_provider;
+            tempApp["version"] = app.attributes.overview_version;
+            tempApp["appTenant"] = app.attributes.overview_appTenant;
+            tempApp["thumburl"] = app.attributes.images_thumbnail;
+            tempApp["uuid"] = app.id;
+            tempApp["advertiseOnly"] = app.attributes.overview_advertiseOnly;
+            tempApp["advertisedAppUuid"] = app.attributes.overview_advertisedAppUuid;
+
+            //Set the access URL
+            if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
+                //Get the gatewayurl
+                var appData = apiInfoManager.getAPIDescription(app.attributes.overview_provider,
+                                                               app.attributes.overview_name,
+                                                               app.attributes.overview_version);
+                tempApp["accessUrl"] = appData.serverURL.productionURL;
+            } else {
+                //Get the direct webapp url
+                tempApp["accessUrl"] = asset.attributes.overview_webAppURL;
+            }
+            formattedApps.push(tempApp);
+        });
+        return formattedApps;
+
+    };
+
+    /**
+     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in user.
+     * anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
+     * This method combine both anoymous + subscribed apps as well as mark whether an app is selected by user as favourite
+     * or not.
+     * @param array1
+     * @param array2
+     * @returns {Array}
+     */
+    var mergeArrays = function (array1, array2) {
+        var mergedArray = [];
+        for (var i = 0; i < array1.length; i++) {
+            array1[i]["isFavourite"] = false;
+            if (isFavouriteApp(array1[i].appName, array1[i].version, array1[i].appProvider)) {
+                array1[i]["isFavourite"] = true;
+            }
+            mergedArray.push(array1[i]);
+        }
+
+        for (var i = 0; i < array2.length; i++) {
+            array2[i]["isFavourite"] = false;
+            if (isFavouriteApp(array2[i].appName, array2[i].version, array2[i].appProvider)) {
+                array2[i]["isFavourite"] = true;
+            }
+            mergedArray.push(array2[i]);
+        }
+        return mergedArray;
+    };
+
+    /**
+     * This method retrieve anonymous apps from registry which are in published state.
+     * @returns {*}
+     */
+    var getAnonymousApps = function () {
+        var fn = function (asset) {
+            var cond1 = (asset.attributes.overview_treatAsASite.toLowerCase() == "false" ) ? true : false;
+            var cond2 = (asset.attributes.overview_allowAnonymous.toLowerCase() == "true" ) ? true : false;
+            var cond3 = (asset.lifecycleState == "Published" ) ? true : false;
+            return (cond1 && cond2 && cond3);
+        };
+        return subscriptionUtil.getAnonymousApps(fn, request, session, tenantId);
+    };
+
+    /**
+     * This method checks whether given app is already selected as favourite app by user or not.
+     * @param appName App Name
+     * @param version App Version
+     * @param provider App Provider
+     * @returns {boolean} true if favouirte app of user else false
+     */
+    var isFavouriteApp = function (appName, version, provider) {
+        var status = false;
+        if (user) {
+            // check whether this is favourite app of user.
+            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                            tenantDomain).status;
+        }
+        return status;
+    };
+
+    /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        //In this case all the apps in the store are accessible by user without any subscriptions
+        //So myapps page should display all the apps.Searching,Sorting,pagination,tag search,recently added apps should
+        //available in myapps page since assets are retrieved from registry.
+
+        //get the apps from registry based on the
+        //requested method(sort,search or normal)
+        getAssetsFromRegistry();
+        //Add rating , production url ,etc to retrieved apps
+        assets = addMoreInformationToWebApps(assets);
+        //get recently added apps from registry
+        getRecentAssetsFromRegistry();
+        //check for pagination
+        setPagination();
+
+        headerData.searchOff = false;//display search in header
+        headerData.hideAllAppsLink = true; //hide all apps link in header
+        showSortOptions = true; //display sorting options in  body
+    } else {
+        if (user) {
+            //Display anoymous apps + subscribed apps
+
+            //get anonymous app from registry(Can't get the anonymous apps from APPM databse together subscribed apps
+            // .Because in APPM no information available to identify whether app type is 'webapp' or 'site' )
+            var anonymousApps = getAnonymousApps();
+            anonymousApps = changeFormat(anonymousApps);
+            //get user subscribed apps
+            var subscribedApps = subsApi.getUserSubscribedApps(String(user.username),user.tenantId,String(tenantDomain));
+            //merge anonymous + subscribe apps
+            assets = mergeArrays(anonymousApps, subscribedApps);
+        } else {
+            //Display all the anonymous apps
+            var anonymousApps = getAnonymousApps();
+            assets = changeFormat(anonymousApps);
+        }
+    }
+
+    /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
+    caramel.render({
+                       title: 'webapps | Store | WSO2 App Manager',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: function () {
+                           return [
+                               {
+                                   url: tagUrl,
+                                   data: store.tags(type, isSite)
+                               }
+                           ];
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                       },
+                       assets: assets,
+                       paging: {
+                           url: url + 'sort=' + paging.sort + '&page=',
+                           sort: paging.sort,
+                           tag: tag,
+                           size: assets.length
+                       },
+                       sorting: {
+                           url: url + 'sort=',
+                           showSortOptions: showSortOptions
+                       },
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
+
+                   });
+}, request, response, session);
 
 function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
+
+
 %>
+

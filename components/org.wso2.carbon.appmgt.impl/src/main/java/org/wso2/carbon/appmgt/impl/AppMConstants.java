@@ -165,6 +165,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_OWNER = "overview_appOwner";
     public static final String API_OVERVIEW_TENANT = "overview_appTenant";
     public static final String API_OVERVIEW_ADVERTISE_ONLY = "overview_advertiseOnly";
+    public static final String API_OVERVIEW_ADVERTISED_APP_UUID = "overview_advertisedAppUuid";
     public static final String API_OVERVIEW_ENDPOINT_CONFIG = "overview_endpointConfig";
     
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABILITY = "overview_subscriptionAvailability";
@@ -383,6 +384,10 @@ public final class AppMConstants {
     public static final String TOKEN_GENERATOR_IMPL = APP_CONSUMER_AUTH_CONFIG + "TokenGeneratorImpl";
     public static final String ENABLE_JWT_GENERATION = APP_CONSUMER_AUTH_CONFIG + "EnableTokenGeneration";
     public static final String SIGNATURE_ALGORITHM = APP_CONSUMER_AUTH_CONFIG + "SignatureAlgorithm";
+
+    public static final String SUBSCRIPTION_CONFIG = "SubscriptionConfiguration.";
+    public static final String ENABLE_SELF_SUBSCRIPTION = SUBSCRIPTION_CONFIG + "EnableSelfSubscription";
+    public static final String ENABLE_ENTERPRISE_SUBSCRIPTION = SUBSCRIPTION_CONFIG + "EnableEnterpriseSubscription";
     
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
     public static final String API_KEY_TYPE_PRODUCTION = "PRODUCTION";

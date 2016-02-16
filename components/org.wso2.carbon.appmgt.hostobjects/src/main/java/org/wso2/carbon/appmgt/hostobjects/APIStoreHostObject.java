@@ -41,6 +41,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
@@ -3164,7 +3165,443 @@ public class APIStoreHostObject extends ScriptableObject {
                     "is active or not", e);
         }
 
+    }
 
+
+    /**
+     * Add the given app to favourite app list of user for given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static void jsFunction_addToFavouriteApps(Context cx,
+                                                 Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 6) {
+            String message = "Invalid number of input parameters to method addToFavourite.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.addToFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * Remove the given app from favourite app list of user for given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeFromFavouriteApps(Context cx,
+                                                          Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 6) {
+            String message = "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.removeFromFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
+    }
+
+    /**
+     * Check whether given app exists in the favourite app list of the user in given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isFavouriteApp(Context cx,
+                                                    Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 6) {
+            String message = "Invalid number of input parameters to method isFavouriteApp.Expected parameters :" +
+                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String providerName = args[0].toString();
+        String apiName = args[1].toString();
+        String version = args[2].toString();
+        String userName = args[3].toString();
+        int tenantIdOfUser = Integer.parseInt(args[4].toString());
+        String tenantDomainOfStore = args[5].toString();
+
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            return apiConsumer.isFavouriteApp(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This methods returns  favourite apps of given user for given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws ScriptException
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getAllFavouriteApps(Context cx,
+                                                             Scriptable thisObj, Object[] args, Function funObj)
+            throws ScriptException, AppManagementException {
+        if (args == null || args.length != 3) {
+            String message = "Invalid number of input parameters to method getAllFavouriteApps.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
+
+        NativeArray nativeArray = new NativeArray(0);
+        boolean isTenantFlowStarted = false;
+
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getFavouriteApps(userName, tenantIdOfUser,
+                                                                              tenantIdOfStore);
+
+            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                List<Environment> environments = config.getApiGatewayEnvironments();
+                Environment environment = environments.get(0);
+                int i = 0;
+                for (APIIdentifier apiIdentifier : apiIdentifiers) {
+                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Return only apps in published status
+                    if (APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        String accessUrl = null;
+                        if (app.getSkipGateway()) {
+                            accessUrl = app.getUrl();
+                        } else {
+                            String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                            String context = app.getContext();
+                            accessUrl = serverUrl + context + "/";
+                        }
+
+                        NativeObject row = new NativeObject();
+                        row.put("appName", row, apiIdentifier.getApiName());
+                        row.put("appProvider", row, apiIdentifier.getProviderName());
+                        row.put("version", row, apiIdentifier.getVersion());
+                        row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                        row.put("gatewayUrl", row, accessUrl);
+                        row.put("uuid", row, app.getUUID());
+                        row.put("treatAsSite", row, app.getTreatAsASite());
+                        nativeArray.put(i++, nativeArray, row);
+                    }
+                }
+            }
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return nativeArray;
+    }
+
+    /**
+     * This method return the details of subscribed apps of given user for given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getUserSubscribedApps(Context cx,
+                                                               Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+
+        if (args == null || args.length != 3) {
+            String message = "Invalid number of input parameters to method getUserSubscribedApps.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
+
+        boolean isTenantFlowStarted = false;
+        NativeArray nativeArray = new NativeArray(0);
+
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            List<APIIdentifier> apiIdentifiers = apiConsumer.getUserSubscribedApps(userName, tenantIdOfUser,
+                                                                                   tenantIdOFStore);
+
+            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                List<Environment> environments = config.getApiGatewayEnvironments();
+                Environment environment = environments.get(0);
+
+
+                int i = 0;
+                for (APIIdentifier apiIdentifier : apiIdentifiers) {
+                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                    String lifeCycleStatus = app.getStatus().getStatus();
+                    //Return only apps in published status
+                    if(APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                        String accessUrl = null;
+                        if (app.getSkipGateway()) {
+                            accessUrl = app.getUrl();
+                        } else {
+                            String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+                            String context = app.getContext();
+                            accessUrl = serverUrl + context + "/";
+                        }
+
+                        NativeObject row = new NativeObject();
+                        row.put("appName", row, apiIdentifier.getApiName());
+                        row.put("appProvider", row, apiIdentifier.getProviderName());
+                        row.put("version", row, apiIdentifier.getVersion());
+                        row.put("appTenant", row, app.getAppTenant());
+                        row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                        row.put("accessUrl", row, accessUrl);
+                        row.put("uuid", row, app.getUUID());
+                        row.put("advertiseOnly", row, String.valueOf(app.isAdvertiseOnly()));
+                        row.put("advertisedAppUuid", row, app.getAdvertisedAppUuid());
+                        nativeArray.put(i++, nativeArray, row);
+                    }
+
+                }
+            }
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return nativeArray;
+    }
+
+    /**
+     * This method mark that user has selected favourite page as default landing page in store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @throws AppManagementException
+     */
+    public static void jsFunction_setFavouritePage(Context cx,
+                                                   Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 3) {
+            String message = "Invalid number of input parameters to method setFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.setFavouritePage(userName, tenantIdOfUser,tenantIdOFStore);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This method mark that user has deselected the favourite page from default landing page in given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @throws AppManagementException
+     */
+    public static void jsFunction_removeFavouritePage(Context cx,
+                                                      Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 3) {
+            String message = "Invalid number of input parameters to method removeFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            apiConsumer.removeFavouritePage(userName, tenantIdOfUser, tenantIdOFStore);
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * This method check whether logged in user has selected favourite page as default page for given tenant store.
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return true if favourite page is default page else false
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_hasFavouritePage(Context cx,
+                                                      Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException {
+
+        if (args == null || args.length != 3) {
+            String message = "Invalid number of input parameters to method hasFavouritePage.Expected parameters :" +
+                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            handleException(message);
+        }
+
+        String userName = args[0].toString();
+        int tenantIdOfUser = Integer.parseInt(args[1].toString());
+        String tenantDomainOfStore = args[2].toString();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            String tenantDomain = tenantDomainOfStore;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
+            return apiConsumer.hasFavouritePage(userName, tenantIdOfUser,tenantIdOFStore );
+
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
     }
 
 

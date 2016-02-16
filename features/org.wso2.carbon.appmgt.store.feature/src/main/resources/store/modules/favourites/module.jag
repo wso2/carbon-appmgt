@@ -1,0 +1,32 @@
+<%
+jagg.module("favourites", {
+
+    isFavouriteApp: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").isFavouriteApp.apply(this, arguments);
+    },
+
+    getAllFavouriteApps: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").getAllFavouriteApps.apply(this,
+                                                                                                          arguments);
+    },
+    addToFavouriteApps: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").addToFavouriteApps.apply(this,
+                                                                                                         arguments);
+    },
+    removeFromFavouriteApps: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").removeFromFavouriteApps.apply(this,
+                                                                                                              arguments);
+    },
+    removeFavouritePage: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").removeFavouritePage.apply(this,
+                                                                                                          arguments);
+    },
+    setFavouritePage: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").setFavouritePage.apply(this, arguments);
+    },
+    hasFavouritePage: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").hasFavouritePage.apply(this, arguments);
+    }
+
+});
+%>

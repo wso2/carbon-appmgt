@@ -1,6 +1,16 @@
-<div>
-    {{>add-app .}}
-</div>
-<div>
-    {{>list-apps .}}
-</div>
+{{#if config.isSelfSubscriptionEnabled}}
+    {{#if config.isEnterpriseSubscriptionEnabled}}
+        <!-- Both subscription options enabled-->
+        {{>subscriptions/all-sub-on}}
+    {{else}}
+        <!-- Self subscription enabled & Enterprise subscription disabled-->
+    {{/if}}
+{{else}}
+    {{#if config.isEnterpriseSubscriptionEnabled}}
+        <!-- Enterprise subscription enabled & Self subscription disabled-->
+    {{else}}
+        <!-- Both subscription options disabled-->
+        {{>subscriptions/all-sub-off}}
+    {{/if}}
+{{/if}}
+

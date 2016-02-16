@@ -59,6 +59,10 @@ jagg.module("subscription", {
 
     checkSubscriptionWorkflow: function () {
         return jagg.require(jagg.getModulesDir() + "subscription/workflow.jag").checkSubscriptionWorkflow.apply(this, arguments);
+    },
+    getUserSubscribedApps: function () {
+        return jagg.require(jagg.getModulesDir() + "subscription/list.jag").getUserSubscribedApps.apply(this,
+                                                                                                        arguments);
     }
 });
 %>

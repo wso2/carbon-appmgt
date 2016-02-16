@@ -1,0 +1,104 @@
+<%
+include('/jagg/jagg.jag');
+var favourites = jagg.module("favourites");
+
+require('/modules/store.js').exec(function (ctx) {
+    var log = new Log();
+    var matcher = new URIMatcher(request.getRequestURI());
+    var user = user = ctx.user;
+
+    if (!user) {
+        response.status = 401;
+        response.contentType = "application/json";
+        response.content = {"message": "Login required"};
+        return;
+    }
+
+    var setFavouritePage = function () {
+        var parameters = request.getAllParameters();
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
+
+        var content = favourites.setFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
+        return content
+    };
+
+    var removeFavouritePage = function () {
+        var parameters = request.getAllParameters();
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
+
+        var content = favourites.removeFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
+        return content;
+    };
+
+    var addToFavouriteApps = function () {
+        var parameters = request.getAllParameters();
+        var name = parameters.name;
+        var version = parameters.version;
+        var provider = parameters.provider;
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
+
+        var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
+                                                    storeTenantDomain);
+        return content;
+    };
+
+    var removeFromFavourite = function () {
+        var parameters = request.getAllParameters();
+        var name = parameters.name;
+        var version = parameters.version;
+        var provider = parameters.provider;
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
+
+        var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
+                                                         storeTenantDomain);
+        return content
+    };
+
+    var hasFavouritePage = function () {
+        var parameters = request.getAllParameters();
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
+
+        var content = favourites.hasFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
+        return content;
+    };
+
+    if (matcher.match('/{context}/apis/favourite/{action}')) {
+        var action = matcher.elements().action;
+        response.status = 200;
+        response.contentType = "application/json";
+
+        switch (action) {
+            case "set-favourite-page":
+                response.content = setFavouritePage();
+                return;
+            case "remove-favourite-page":
+                response.content = removeFavouritePage();
+                return;
+            case "add-favourite-app":
+                response.content = addToFavouriteApps();
+                return;
+            case "remove-favourite-app":
+                response.content = removeFromFavourite();
+                return;
+            case "has-favourite-page":
+                response.content = hasFavouritePage();
+                return;
+        }
+    }
+    //if no cases matched
+    response.status = 404;
+    response.contentType = "application/json";
+    response.content = {"message": "API endpoint not found"};
+}, request, response, session);
+
+%>

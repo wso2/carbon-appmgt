@@ -390,7 +390,8 @@ require('/modules/store.js').exec(function (ctx) {
             size: assets.length
         },
         sorting: {
-            url: url + 'sort='
+            url: url + 'sort=',
+            showSortOptions: true
         },
 
         myAssets: {
