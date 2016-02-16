@@ -260,6 +260,14 @@
     font-size: 1.2em;
 }
 
+.fw-2_0x {
+    font-size: 2.0em;
+}
+.home-icon {
+    float: right;
+}
+
+
 .fw-background-gray {
     background: #888;
     border-radius: .3em;
@@ -268,6 +276,12 @@
 
 .fw-background-green {
     background: #A4C639;
+    border-radius: .3em;
+    padding: .4em .50em .45em;
+}
+
+.fw-background-red {
+    background: #b30000;
     border-radius: .3em;
     padding: .4em .50em .45em;
 }

@@ -116,6 +116,11 @@ var serviceModule = (function () {
         return result;
     }
 
+    Subscriber.prototype.getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfStore) {
+        var result = this.instance.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
+        return (result.apps) ? result.apps : [];
+    };
+
     return {
         SubscriptionService: Subscriber
     }

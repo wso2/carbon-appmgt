@@ -1,7 +1,7 @@
 <%
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
-
-var storeHostObj = jagg.module("manager").getAPIStoreObj();
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
 
 (function () {
     var log = new Log(),
@@ -52,7 +52,9 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                 if (sso.client.validateSignature(samlRespObj, keyStoreProps)) {
                     var sessionObj = sso.client.decodeSAMLLoginResponse(samlRespObj, samlResponse, sessionId);
                     var username = sessionObj.loggedInUser;
-
+                    if (username.indexOf("@carbon.super") > -1) {
+                        username= username.replace("@carbon.super","");
+                    }
                     if (sessionObj.sessionIndex != null || sessionObj.sessionIndex != 'undefined') {
                         var relayStateUrlMatcher = new URIMatcher(relayState);
                         var tenantedURIPattern = contextPath + '/t/{domain}/';
@@ -112,6 +114,24 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
                             if (log.isDebugEnabled()) {
                                 log.debug('User has been set to : ' + sessionObj.loggedInUser);
                             }
+                            //check whether login request came by clicking the login url and do redirect
+                            // to myfavourites page if user has already selected it as homepage.
+                            //in store login url is in the format of /login?header=true
+                            var queryParam = "?header=true";
+                            if (relayState.indexOf(queryParam)) {
+                                if(!urlTenantDomain){
+                                    urlTenantDomain = "carbon.super";
+                                }
+                                var isFavouritePageSelected = manager.hasFavouritePage(username,tenantId,urlTenantDomain).status;
+                                if (isFavouritePageSelected) {
+                                    var favPage = configs.pages.favouritePage;
+                                    relayState = contextPath + favPage;
+                                } else {
+                                    //remove the query param
+                                    relayState.replace(queryParam, "");
+                                }
+                            }
+
                             if(reversProxyEnabled) {
                                 relayState = reverseProxyHost+relayState;
                             }
@@ -138,12 +158,12 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
     // If saml request is a log out request, then invalidate session.
     if (samlRequest != null) {
         var index = sso.client.decodeSAMLLogoutRequest(sso.client.getSamlObject(samlRequest));
-        if (log.isDebugEnabeld()) {
+        if (log.isDebugEnabled()) {
             log.debug('Backend logout recieved from store the index is - ' + index);
         }
         var jSessionId = application.get('sso_sessions')[index];
         delete application.get('sso_sessions')[index];
-        if (log.isDebugEnabeld()) {
+        if (log.isDebugEnabled()) {
             log.debug('store Session Id :::' + jSessionId);
         }
         session.invalidate();

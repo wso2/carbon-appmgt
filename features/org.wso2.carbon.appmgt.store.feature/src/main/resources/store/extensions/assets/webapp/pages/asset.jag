@@ -30,6 +30,10 @@ var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{
 var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
+var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
+var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
+var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
+
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title, currentTenant, userTenant, tenantIdVal,
             log = ctx.log,
@@ -51,7 +55,8 @@ require('/modules/store.js').exec(function (ctx) {
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
@@ -303,6 +308,17 @@ require('/modules/store.js').exec(function (ctx) {
             return false;
         }
 
+        var isFavouriteApp = function (asset) {
+            // check whether this is favourite app of user.
+            var appName = asset.attributes.overview_name;
+            var version = asset.attributes.overview_version;
+            var provider = asset.attributes.overview_provider;
+
+            var status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                                tenantDomain).status;
+            return status;
+        };
+
         function hasUserRole(userRoleName) {
             var usr = require('carbon').server.tenantUser(user.username);
             var userManager = require('store').server.userManager(usr.tenantId);
@@ -350,7 +366,24 @@ require('/modules/store.js').exec(function (ctx) {
 
         var subscriptionInfo = getSubscriptionInfo(asset);
 
-        var isStoreAdmin = isStoreAdmin();
+
+        var isEnterpriseSubscriptionAllowed = false;
+
+        var isFavourite = false;
+
+        if (user) {
+            if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                isFavourite = isFavouriteApp(asset);
+            } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                subscriptionInfo = getSubscriptionInfo(asset);
+            } else {
+                // !isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled
+                // OR
+                // isSelfSubscriptionEnabled && isEnterpriseSubscriptionEnabled
+                subscriptionInfo = getSubscriptionInfo(asset);
+                isEnterpriseSubscriptionAllowed = isStoreAdmin();
+            }
+        }
 
         if (subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
@@ -425,6 +458,8 @@ require('/modules/store.js').exec(function (ctx) {
 
         headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
         headerData.domain = tenantDomain;
+        headerData.storeTenantDomain = tenantDomain;
+        headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
 
         caramel.render({
             title: 'Store | ' + type,
@@ -448,7 +483,8 @@ require('/modules/store.js').exec(function (ctx) {
             skipGateway: skipGateway,
             webAppEndpoint: webAppEndpoint,
             subscriptionInfo: subscriptionInfo,
-            isEnterpriseSubscriptionAllowed: isStoreAdmin,
+            isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
+            isFavouriteApp: isFavourite,
             asset: asset,
             tenantId: tenantIdVal,
             tags: [
@@ -468,7 +504,9 @@ require('/modules/store.js').exec(function (ctx) {
                 api: apiData,
                 apiAssetData: asset
             },
-            subVisibility: subVisibility
+            subVisibility: subVisibility,
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
         });
     }
 

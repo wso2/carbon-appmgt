@@ -36,6 +36,11 @@ var assetLinks = function (user) {
                 title:'Documentations',
                 url:'doc',
                 path:'doc.jag'
+            },
+            {
+                title:'Favourite Apps',
+                url:'favouriteapps',
+                path:'favouriteapps.jag'
             }
         ]
     }

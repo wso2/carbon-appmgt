@@ -33,6 +33,7 @@ var render = function (theme, data, meta, require) {
                 skipGateway: data.skipGateway,
                 subscriptionInfo: data.subscriptionInfo,
                 isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
+                isFavouriteApp: data.isFavouriteApp,
                 embedURL: data.embedURL,
                 isSocial: data.isSocial,
                 tabs: {
@@ -43,7 +44,9 @@ var render = function (theme, data, meta, require) {
                 apiData: data.apiData,
                 myapps: data.metadata.myapps,
                 tiers: data.metadata.tiers,
-                subVisibility:data.subVisibility
+                subVisibility:data.subVisibility,
+                isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled
             })
         }],
         right: [
