@@ -49,12 +49,12 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	 */
 	public void addVersionedWebApp(APITemplateBuilder builder, String tenantDomain) throws AxisFault {
 		try {
-			String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
+			String appConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
 			if (tenantDomain != null && !("").equals(tenantDomain)
 					&& !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-				restApiAdminStub.addApiForTenant(apiConfig, tenantDomain);
+				restApiAdminStub.addApiForTenant(appConfig, tenantDomain);
 			} else {
-				restApiAdminStub.addApiFromString(apiConfig);
+				restApiAdminStub.addApiFromString(appConfig);
 			}
 		} catch (Exception e) {
 			throw new AxisFault("Error while adding new WebApp", e);
