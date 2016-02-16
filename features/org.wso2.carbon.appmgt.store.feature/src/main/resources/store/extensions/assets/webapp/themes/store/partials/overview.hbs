@@ -20,14 +20,12 @@
 	    	</ul>
             <input type="hidden" id="skipGateway" value="true">
     {{else}}
-        {{#with apiData.serverURL}}
     		<legend>URLs:</legend>
-	    	<p><b>{{description}}</b></p>
+	    	<p><b>{{apiData.serverURL.description}}</b></p>
 	    	<ul>
-			<li><a class='icon-globe' id="gatewayURL" href="{{productionURL}}" target="_blank" >&nbsp;{{productionURL}}</a></li>
+			<li><a class='icon-globe' id="gatewayURL" href="{{apiData.serverURL.productionURL}}{{#ifCond asset.attributes.overview_makeAsDefaultVersion "==" "false"}}{{asset.attributes.overview_version}}/{{/ifCond}}" target="_blank" >&nbsp;{{apiData.serverURL.productionURL}}{{#ifCond asset.attributes.overview_makeAsDefaultVersion "==" "false"}}{{asset.attributes.overview_version}}/{{/ifCond}}</a></li>
 	    	</ul>
             <input type="hidden" id="skipGateway" value="false">
-	    {{/with}}
     {{/if}}
 
 	<div class="modal fade" id="messageModal2" style="display: none"></div>

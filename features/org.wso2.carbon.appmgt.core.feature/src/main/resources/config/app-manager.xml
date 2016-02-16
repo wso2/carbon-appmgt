@@ -8,11 +8,20 @@
     -->
     <DataSourceName>jdbc/WSO2AM_DB</DataSourceName>
 
+    <APPStoreConfiguration>
+        <!--
+    This parameter specifies whether to display multiple versions of same
+    API or only showing the latest version of an API.
+        -->
+        <DisplayMultipleVersions>true</DisplayMultipleVersions>
+    </APPStoreConfiguration>
+
     <!--subscription configuration is used by gateway-->
     <SubscriptionConfiguration>
         <EnableSelfSubscription>false</EnableSelfSubscription>
         <EnableEnterpriseSubscription>false</EnableEnterpriseSubscription>
     </SubscriptionConfiguration>
+
     <!-- The authorization manager configuration to be used by store / publisher components -->
     <AuthManager>
 

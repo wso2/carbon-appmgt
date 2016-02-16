@@ -52,6 +52,22 @@ $(function() {
 
     }
 
+
+    $(".makeAsDefaultVersion_checkbox").click(function () {
+        var output = [];
+        $(".makeAsDefaultVersion_checkbox").each(function (index) {
+            if ($(this).is(':checked')) {
+                output.push("true");
+            }
+            else {
+                output.push("false");
+            }
+        });
+        $('#overview_makeAsDefaultVersion').val(output);
+    });
+
+
+
     function loadSelectedProviders(providers_data) {
         for (var i = 0; i < providers_data.length; i++) {
             var x = providers_data[i];
@@ -68,7 +84,7 @@ $(function() {
         var y = selectedProvider.split("-");
         var appProvider = $("#overview_provider").val();
         var appName = $("#overview_name").val();
-        var appVersion = $("#oldversion").val();
+        var appVersion = $("#overview_oldVersion").val();
         var uniqueAppName = appName+"-"+appVersion;
         $.ajax({
             url: caramel.context + '/api/sso/' + y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion,
@@ -222,7 +238,7 @@ $(function() {
 
                 url: caramel.context + '/asset/' + type,
                 type: 'POST',
-                data: {oldVersion: $("#oldversion").val()}
+                data: {oldVersion: $("#overview_oldVersion").val()}
             };
         }else{
             showAlert('Mandatory field \'New Version\' has not been filled in.', 'error');
@@ -342,6 +358,7 @@ $(function() {
         var app_provider = $('#overview_provider').val();
         var app_allowAnonymous = $('#overview_allowAnonymous').val();
         var app_acsURL = $('#overview_acsUrl').val().trim();
+        var app_makeAsDefaultVersion = $('#overview_makeAsDefaultVersion').val();
 
         var claims = [];
         var index = 0;
@@ -366,6 +383,7 @@ $(function() {
         sso_config.app_provider = app_provider;
         sso_config.app_allowAnonymous = app_allowAnonymous;
         sso_config.app_acsURL = app_acsURL;
+        sso_config.app_makeAsDefaultVersion = app_makeAsDefaultVersion;
 
         $.ajax({
             url: caramel.context + '/api/sso/addConfig',

@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xpath.operations.Bool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -53,6 +54,7 @@ import org.wso2.carbon.appmgt.impl.utils.LRUCache;
 import org.wso2.carbon.appmgt.impl.utils.RemoteUserManagerClient;
 import org.wso2.carbon.appmgt.impl.utils.URLMapping;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowStatus;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
@@ -555,7 +557,7 @@ public class AppMDAO {
 		String ssoInfoSqlQuery = "SELECT USER_ROLES FROM APM_APP_URL_MAPPING MAP " +
 				"LEFT JOIN APM_POLICY_GROUP POLICY ON MAP.POLICY_GRP_ID=POLICY.POLICY_GRP_ID " +
 				"WHERE MAP.APP_ID= ? AND URL_PATTERN= ? AND HTTP_METHOD= ?";
- 
+
 
         try {
             conn = APIMgtDBUtil.getConnection();
@@ -871,7 +873,7 @@ public class AppMDAO {
 		}
 		return application;
 	}
-	
+
     public Subscription getSubscription(APIIdentifier identifier, int applicationId, String subscriptionTyp) throws
                                                                                                              AppManagementException {
 
@@ -1180,22 +1182,28 @@ public class AppMDAO {
 				return -1;
 			}
 
-            String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
+            //String moveQuery = "UPDATE APM_SUBSCRIPTION SET APP_ID = ? WHERE APP_ID = ?";
+
+            String moveQuery = "INSERT INTO APM_SUBSCRIPTION(SUBSCRIPTION_TYPE, TIER_ID, APP_ID, APPLICATION_ID, " +
+                    "SUB_STATUS, TRUSTED_IDP, SUBSCRIPTION_TIME ) " +
+                    "SELECT SUBSCRIPTION_TYPE, TIER_ID , ? ,APPLICATION_ID ,SUB_STATUS , TRUSTED_IDP ,? " +
+                    "FROM APM_SUBSCRIPTION WHERE APP_ID = ?";
+
             count = -1;
-			try {
-				ps = conn.prepareStatement(moveQuery);
-				ps.setInt(1, toAppId);
-				ps.setInt(2, fromAppId);
-				count = ps.executeUpdate();
-				conn.commit();
-			} catch (SQLException e) {
-				String msg = "Could not move subscriptions from " +
-						fromIdentifier.getProviderName() + "-" + fromIdentifier.getApiName() +
-						"-" + fromIdentifier.getVersion() + " app to " +
-						toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() +
-						"-" + toIdentifier.getVersion() + " app";
-				handleException(msg, e);
-			}
+            try {
+                ps = conn.prepareStatement(moveQuery);
+                ps.setInt(1, toAppId);
+                ps.setTimestamp(2, new Timestamp(new java.util.Date().getTime()));
+                ps.setInt(3, fromAppId);
+                count = ps.executeUpdate();
+                conn.commit();
+            } catch (SQLException e) {
+                String msg = "Could not move subscriptions from " + fromIdentifier.getProviderName() + "-" +
+                        fromIdentifier.getApiName() + "-" + fromIdentifier.getVersion() + " app to " +
+                        toIdentifier.getProviderName() + "-" + toIdentifier.getApiName() + "-" +
+                        toIdentifier.getVersion() + " app";
+                handleException(msg, e);
+            }
 
 		} finally {
 			APIMgtDBUtil.closeAllConnections(ps, conn, results);
@@ -2087,7 +2095,7 @@ public class AppMDAO {
 
 		return querySqlArr;
 	}
-	
+
 	public void updateTierPermissions(String tierName, String permissionType, String roles,
 	                                  int tenantId) throws AppManagementException {
 		Connection conn = null;
@@ -2846,7 +2854,7 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(ps, connection, result);
 		}
 	}
-	
+
 	public String[] getOAuthCredentials(String accessToken, String tokenType)
 	                                                                         throws
                                                                              AppManagementException {
@@ -3371,7 +3379,7 @@ public class AppMDAO {
 		BigDecimal decimal = new BigDecimal(avrRating);
 		return Float.valueOf(decimal.setScale(1, BigDecimal.ROUND_UP).toString());
 	}
- 
+
 	/**
 	 * @param application
 	 *            Application
@@ -3656,7 +3664,7 @@ public class AppMDAO {
      * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get Applications for given subscriber.
      */
     //ToDo: This method is added back to avoid broken UI. But we need to refactor this method since
-    // AppM only using default Application  
+    // AppM only using default Application
     public Application[] getApplications(Subscriber subscriber) throws AppManagementException {
         if (subscriber == null) {
             return null;
@@ -3988,6 +3996,8 @@ public class AppMDAO {
                 webAppId = rs.getInt(1);
             }
             addURLTemplates(webAppId, app, connection);
+            //Set default versioning details
+            saveDefaultVersionDetails(app, connection);
             recordAPILifeCycleEvent(app.getId(), null, APIStatus.CREATED,
                     AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()),
                     connection);
@@ -4240,6 +4250,147 @@ public class AppMDAO {
 		}
 	}
 
+    /**
+     * Insert or Update default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void saveDefaultVersionDetails(WebApp app, Connection connection)
+            throws AppManagementException, SQLException {
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        int recordCount = 0;
+
+        String sqlQuery =
+                "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? AND " +
+                        "TENANT_ID=? ";
+
+        try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
+            prepStmt = connection.prepareStatement(sqlQuery);
+            prepStmt.setString(1, app.getId().getApiName());
+            prepStmt.setString(2, app.getId().getProviderName());
+            prepStmt.setInt(3, tenantId);
+            rs = prepStmt.executeQuery();
+
+            if (rs.next()) {
+                recordCount = rs.getInt("ROWCOUNT");
+            }
+
+            if (recordCount == 0) {
+                addDefaultVersionDetails(app, connection);
+            } else {
+                if (app.isDefaultVersion()) {
+                    updateDefaultVersionDetails(app, connection);
+                }
+            }
+
+        } catch (SQLException e) {
+            /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error when getting the default version record count for Application: " +
+                              app.getId().getApiName(), e);
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
+        }
+    }
+
+    /**
+     * Insert default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void addDefaultVersionDetails(WebApp app, Connection connection) throws
+                                                                             AppManagementException, SQLException {
+        PreparedStatement prepStmt = null;
+        String query =
+                "INSERT INTO APM_APP_DEFAULT_VERSION  (APP_NAME, APP_PROVIDER, DEFAULT_APP_VERSION, " +
+                        "PUBLISHED_DEFAULT_APP_VERSION, TENANT_ID) VALUES (?,?,?,?,?)";
+
+        if (log.isDebugEnabled()) {
+            log.debug("Inserting default version details for AppId -" + app.getId().getApplicationId());
+        }
+
+        try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, app.getId().getApiName());
+            prepStmt.setString(2, app.getId().getProviderName());
+            prepStmt.setString(3, app.getId().getVersion());
+            if (app.getStatus() == APIStatus.PUBLISHED) {
+                prepStmt.setString(4, app.getId().getVersion());
+            } else {
+                prepStmt.setString(4, null);
+            }
+            prepStmt.setInt(5, tenantId);
+            prepStmt.executeUpdate();
+        } catch (SQLException e) {
+             /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error while inserting default version details for WebApp : " +
+                              app.getId(), e);
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
+        }
+    }
+
+
+    /**
+     * Insert default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void updateDefaultVersionDetails(WebApp app, Connection connection) throws
+                                                                                AppManagementException, SQLException {
+        PreparedStatement prepStmt = null;
+        String query;
+        try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
+            if (app.getStatus() == APIStatus.PUBLISHED && app.isDefaultVersion()) {
+                query = "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=?, PUBLISHED_DEFAULT_APP_VERSION=? " +
+                        "WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
+                prepStmt = connection.prepareStatement(query);
+                prepStmt.setString(1, app.getId().getVersion());
+                prepStmt.setString(2, app.getId().getVersion());
+                prepStmt.setString(3, app.getId().getApiName());
+                prepStmt.setString(4, app.getId().getProviderName());
+                prepStmt.setInt(5, tenantId);
+            } else {
+                query =
+                        "UPDATE APM_APP_DEFAULT_VERSION SET DEFAULT_APP_VERSION=? WHERE APP_NAME=? AND APP_PROVIDER=?" +
+                                " AND TENANT_ID=? ";
+                prepStmt = connection.prepareStatement(query);
+                prepStmt.setString(1, app.getId().getVersion());
+                prepStmt.setString(2, app.getId().getApiName());
+                prepStmt.setString(3, app.getId().getProviderName());
+                prepStmt.setInt(4, tenantId);
+            }
+            prepStmt.executeUpdate();
+        } catch (SQLException e) {
+              /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error while updating default version details for WebApp : " +
+                              app.getId(), e);
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
+        }
+    }
+
 	/**
 	 * update URI templates define for an API
 	 *
@@ -4267,7 +4418,7 @@ public class AppMDAO {
 			APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
 		}
 		addURLTemplates(apiId, api, connection);
-	}
+    }
 
 	/**
 	 * returns all URL templates define for all active(PUBLISHED) APIs.
@@ -4429,10 +4580,16 @@ public class AppMDAO {
 			if (api.getJavaPolicies() != null && !api.getJavaPolicies().isEmpty()) {
 				JSONArray javaPolicyIdList = (JSONArray) JSONValue.parse(api.getJavaPolicies());
 				updateJavaPolicies(webAppId, javaPolicyIdList.toArray(), connection);
-			}
+            }
 
-			updateURLTemplates(api, connection);
-			connection.commit();
+            updateURLTemplates(api, connection);
+
+            //if selected as default version save entry
+            if (api.isDefaultVersion()) {
+                saveDefaultVersionDetails(api, connection);
+            }
+
+            connection.commit();
 
 		} catch (SQLException e) {
             if (connection != null) {
@@ -5043,7 +5200,7 @@ public class AppMDAO {
 				policyPartialId = Integer.parseInt(rs.getString(1));
 			}
 			rs.close();
-			
+
 			// Finally commit transaction.
 			connection.commit();
 
@@ -5315,12 +5472,12 @@ public class AppMDAO {
                 }
 
                 String ruleEffect = extractEffectFromPolicyPartialContent(rs.getString("CONTENT"));
-                
+
                 // No need to handle parsing errors at this point since they are captured in the previous block.
                 if(ruleEffect != null){
                 	policyPartial.setRuleEffect(ruleEffect);
                 }
-                
+
                 policyPartial.setShared(rs.getBoolean("SHARED"));
                 policyPartial.setAuthor(rs.getString("AUTHOR"));
 				policyPartial.setDescription(rs.getString("DESCRIPTION"));
@@ -5391,34 +5548,34 @@ public class AppMDAO {
 	}
 
     private String exctractConditionFromPolicyPartialContent(String policyPartialContent){
-    	
+
     	try {
 			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
 			OMElement conditionNode = (OMElement) builder.getDocumentElement().getChildrenWithLocalName("Condition").next();
-			
+
 			return conditionNode.toString();
-			
+
 		} catch (XMLStreamException e) {
 			log.error("Can't extract the 'Condition' node from the 'Rule' node.", e);
 			return null;
 		}
     }
-    
+
 	private String extractEffectFromPolicyPartialContent(String policyPartialContent) {
-		
+
 		try {
 			StAXOMBuilder builder = new StAXOMBuilder(new ByteArrayInputStream(policyPartialContent.getBytes()));
 			String effect = builder.getDocumentElement().getAttributeValue(new QName("Effect"));
-			
+
 			return effect;
-			
+
 		} catch (XMLStreamException e) {
 			log.error("Can't extract the 'Effect' attribute value from the 'Rule' node.", e);
 			return null;
 		}
-		
+
 	}
-    
+
 	/**
 	 * Remove existing updated entitlement policies from IDP
 	 *
@@ -5558,7 +5715,7 @@ public class AppMDAO {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Identify whether the loggedin user used his Primary Login name or
 	 * Secondary login name
@@ -6189,7 +6346,7 @@ public class AppMDAO {
             prepStmt = connection.prepareStatement(getAppConsumerKeyQuery);
             prepStmt.setString(1, webApp.getId().getApiName());
             prepStmt.setInt(2, tenantId);
-            
+
             rs = prepStmt.executeQuery();
             String appConsumerKey = null;
             while (rs.next()) {
@@ -7454,9 +7611,9 @@ public class AppMDAO {
 
 	public List<String> getApplicableEntitlementPolicyIds(int appId,
 			String matchedUrlPattern, String httpVerb) throws AppManagementException {
-		
+
 		List<String> applicableEntitlementPolicies = new ArrayList<String>();
-		
+
 		Connection con = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
@@ -7475,18 +7632,18 @@ public class AppMDAO {
         try {
             con = APIMgtDBUtil.getConnection();
             prepStmt = con.prepareStatement(query);
-            
+
             prepStmt.setInt(1, appId);
             prepStmt.setString(2, matchedUrlPattern);
             prepStmt.setString(3, httpVerb);
-            
+
             rs = prepStmt.executeQuery();
 
             while(rs.next()) {
                 applicableEntitlementPolicies.add(rs.getString("POLICY_ID"));
             }
-            
-            
+
+
         } catch (SQLException e) {
             handleException(
             		String.format("Error while getting applicable entitlement policies for "
@@ -7494,9 +7651,9 @@ public class AppMDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(prepStmt, con, rs);
         }
-		
+
         return applicableEntitlementPolicies;
-		
+
 	}
 
 	/**
@@ -7790,11 +7947,281 @@ public class AppMDAO {
     }
 
     /**
-     * This method add a new entry to table APM_FAVOURITE_APPS which contains the favourite apps detail of user.
-     * (Add the given app as favouirte app for given user)
-     * @param identifier API Identifier
-     * @param userName   User Name
-     * @param tenantIdOfUser Tenant Id of Logged in user
+     * Update default version when updating information without appId.
+     *
+     * @param webApp
+     */
+    public void updateDefaultVersionDetails(WebApp webApp) throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            conn.setAutoCommit(false);
+            saveDefaultVersionDetails(webApp, conn);
+            conn.commit();
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException sqlEx) {
+                    log.error("Failed to rollback version updating details for  app" +
+                                      " : " + webApp.getApiName(), sqlEx);
+                }
+            }
+            handleException("Failed to update version details for  app" +
+                                    " : " + webApp.getApiName(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, null);
+        }
+    }
+
+    /**
+     * Check if the given version is the default version.
+     *
+     * @param appName
+     * @param providerName
+     * @param appStatus  if true then return published app version else default app version
+     * @return default app version
+     * @throws AppManagementException
+     */
+    public static String getDefaultVersion(String appName, String providerName, AppDefaultVersion appStatus)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        String defaultVersion = "";
+        try {
+            String columnName;
+            conn = APIMgtDBUtil.getConnection();
+            if (appStatus == AppDefaultVersion.APP_IS_PUBLISHED) {
+                columnName = "PUBLISHED_DEFAULT_APP_VERSION";
+            } else {
+                columnName = "DEFAULT_APP_VERSION";
+            }
+            String sqlQuery =
+                    "SELECT " + columnName +
+                            " FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER=? AND TENANT_ID=? ";
+
+            ps = conn.prepareStatement(sqlQuery);
+            if (log.isDebugEnabled()) {
+                String msg = String.format("Getting default version details of app : provider:%s ,name :%s"
+                        , providerName, appName);
+                log.debug(msg);
+            }
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
+            ps.setString(1, appName);
+            ps.setString(2, providerName);
+            ps.setInt(3, tenantId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                defaultVersion = rs.getString(columnName);
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting default version details from the database for the app" +
+                                    " : " + appName, e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return defaultVersion;
+    }
+
+
+    /**
+     * Direct update default version for published apps.
+     *
+     * @param app
+     * @throws AppManagementException
+     */
+    public void updatePublishedDefaultVersion(WebApp app) throws AppManagementException {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            PreparedStatement prepStmt = null;
+            String query =
+                    "UPDATE APM_APP_DEFAULT_VERSION SET PUBLISHED_DEFAULT_APP_VERSION=? " +
+                            "WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
+
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, app.getId().getVersion());
+            prepStmt.setString(2, app.getId().getApiName());
+            prepStmt.setString(3, app.getId().getProviderName());
+            prepStmt.setInt(4, tenantId);
+
+            prepStmt.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            handleException("Failed to update version details for  app" +
+                                    " : " + app.getApiName(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, null);
+        }
+    }
+
+    /**
+     * Get all versions of a WebApp
+     *
+     * @param appName
+     * @param providerName
+     * @return List of Versions
+     * @throws AppManagementException
+     */
+    public static List<String> getAllVersionOfWebApp(String appName, String providerName)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<String> webAppVersions = new ArrayList<>();
+        try {
+            String columnName;
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery = "SELECT APP_VERSION FROM APM_APP where APP_NAME =? and APP_PROVIDER =? ";
+
+            ps = conn.prepareStatement(sqlQuery);
+            if (log.isDebugEnabled()) {
+                String msg = String.format("Getting all versions of app : provider:%s ,name :%s"
+                        , providerName, appName);
+                log.debug(msg);
+            }
+            ps.setString(1, appName);
+            ps.setString(2, providerName);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                webAppVersions.add(rs.getString("APP_VERSION"));
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting all the versions from the database for the app" +
+                                    " : " + appName, e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return webAppVersions;
+    }
+
+    /**
+     * Check if a given WebApp has more versions.
+     *
+     * @param apiIdentifier
+     * @return true if has more versions
+     * @throws AppManagementException
+     */
+    public static boolean hasMoreVersions(APIIdentifier apiIdentifier)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        boolean hasMoreVersions = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery =
+                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP WHERE APP_NAME =? AND APP_PROVIDER =? AND APP_VERSION!=?";
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, apiIdentifier.getApiName());
+            ps.setString(2, apiIdentifier.getProviderName());
+            ps.setString(3, apiIdentifier.getVersion());
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                hasMoreVersions = (rs.getInt("ROWCOUNT") > 0);
+            }
+        } catch (SQLException e) {
+            handleException("Error while getting more version details for the app" +
+                                    " : " + apiIdentifier.getApiName(), e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return hasMoreVersions;
+    }
+
+    /**
+     * Check if the given app is the default version.
+     *
+     * @param apiIdentifier
+     * @return true if given is the default version
+     * @throws AppManagementException
+     */
+    public static boolean isDefaultVersion(APIIdentifier apiIdentifier)
+            throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        boolean isDefaultVersion = false;
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            String sqlQuery =
+                    "SELECT COUNT(*) AS ROWCOUNT FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME =? AND APP_PROVIDER =? " +
+                            "AND  " +
+                            "(DEFAULT_APP_VERSION=? OR PUBLISHED_DEFAULT_APP_VERSION =?)";
+            ps = conn.prepareStatement(sqlQuery);
+            ps.setString(1, apiIdentifier.getApiName());
+            ps.setString(2, apiIdentifier.getProviderName());
+            ps.setString(3, apiIdentifier.getVersion());
+            ps.setString(4, apiIdentifier.getVersion());
+
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                isDefaultVersion = (rs.getInt("ROWCOUNT") > 0);
+            }
+        } catch (SQLException e) {
+            handleException("Error while checking if the default version for the app" +
+                                    " : " + apiIdentifier.getApiName(), e);
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return isDefaultVersion;
+    }
+
+
+    /**
+     * Get WebApp basic details by app uuid.
+     *
+     * @param webAppUUID
+     * @return Asset details
+     * @throws AppManagementException
+     */
+    public static WebApp getAppDetailsFromUUID(String webAppUUID) throws
+                                                                AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        WebApp webApp = null;
+        String query = "SELECT APP_ID, APP_PROVIDER, APP_NAME, APP_VERSION, CONTEXT " +
+                "FROM APM_APP WHERE UUID = ? ";
+
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, webAppUUID);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                APIIdentifier apiIdentifier = new APIIdentifier(rs.getString("APP_PROVIDER"), rs.getString("APP_NAME"),
+                                                                rs.getString("APP_VERSION"));
+                webApp = new WebApp(apiIdentifier);
+                webApp.setApiName(rs.getString("APP_NAME"));
+                webApp.setContext(rs.getString("CONTEXT"));
+            }
+        } catch (SQLException e) {
+            handleException("Error when executing the SQL: " + query + " (WebApp UUID:" + webAppUUID + ")", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return webApp;
+    }
+
+    /**
+     * This method add a new entry to table APM_FAVOURITE_APPS which contains the favourite apps detail of user. (Add
+     * the given app as favouirte app for given user)
+     *
+     * @param identifier      API Identifier
+     * @param userName        User Name
+     * @param tenantIdOfUser  Tenant Id of Logged in user
      * @param tenantIdOfStore Tenant Id of Store
      * @throws AppManagementException
      */

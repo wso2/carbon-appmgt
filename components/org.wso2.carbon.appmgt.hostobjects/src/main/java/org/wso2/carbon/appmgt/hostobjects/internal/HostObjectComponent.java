@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.hostobjects.HostObjectUtils;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -113,5 +114,10 @@ public class HostObjectComponent {
 
     protected void unsetRegistryService(RegistryService registryService) {
         ServiceReferenceHolder.getInstance().setRegistryService(null);
+    }
+
+    public static boolean isDisplayMultipleVersionsEnabled() {
+        return Boolean.parseBoolean(getAPIManagerConfiguration().getFirstProperty(
+                AppMConstants.STORE_DISPLAY_MULTIPLE_VERSIONS));
     }
 }

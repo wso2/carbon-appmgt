@@ -26,10 +26,11 @@ var module = function () {
         return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
-    //TODO: Change this method to take WebAppObj as argument instead of passing properties separately.
+    //TODO: Change this method to take WebAppObj as argument instead of passing properties
+    // separately.
     function addToWebApp(uuid, webappProvider, webappName, webappVersion, webappContext,
                          webappTrackingCode, asset, ssoEnabled, idpProviderUrl, saml2SsoIssuer,
-                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint) {
+                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint, isDefaultVersion) {
 
         var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
         var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
@@ -47,6 +48,8 @@ var module = function () {
         webAppObj.setUrl(webAppEndpoint);
         webAppObj.setAllowAnonymous(allowAnonymous == "TRUE");
         webAppObj.setSkipGateway(skipGateway == "true");
+        webAppObj.setDefaultVersion(isDefaultVersion == "true");
+
 
         var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
         var appMDAOObj = new appMDAO();
@@ -123,6 +126,9 @@ var module = function () {
             var provider = model.getField('overview.provider').value;
             var name = model.getField('overview.name').value;
             var version = model.getField('overview.version').value;
+            var isDefaultVersion = model.getField('overview.makeAsDefaultVersion').value; //when a new app is created
+                                                                                          // it is always the default
+                                                                                          // version.
             var contextname = model.getField('overview.context').value;
             var allowAnonymous=model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;
@@ -225,7 +231,6 @@ var module = function () {
             };
             var artifact = artifactManager.find(function (adapter) {
                 //Check if the name and version are the same
-                //return ((adapter.attributes.overview_name==name)&&(adapter.attributes.overview_version==version))?true:false;
                 return utility.assertEqual(adapter, predicate);
             }, null);
 
@@ -243,7 +248,7 @@ var module = function () {
                 //adding to database
                 addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
                     attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
-                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
+                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL, isDefaultVersion);
             }
 
             //Save the id data to the model
