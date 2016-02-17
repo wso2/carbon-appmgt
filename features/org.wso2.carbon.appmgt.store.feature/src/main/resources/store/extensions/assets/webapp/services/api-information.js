@@ -156,13 +156,18 @@ var serviceModule = (function () {
         var api = api || {};
         var components = api.serverURL.split(',');
 
+        var prodURL = components[SERVER_URL_SANDBOX_INDEX] + api.context + "/";
+        if (api.isDefaultVersion == false) {
+            prodURL += api.version + "/";
+        }
+
         return{
             description: components[SERVER_URL_DESCRIPTION_INDEX] ?
                 components[SERVER_URL_DESCRIPTION_INDEX] :
                 MSG_UNABLE_TO_GET_API_DATA,
             productionURL: components[SERVER_URL_SANDBOX_INDEX] ?
-                components[SERVER_URL_SANDBOX_INDEX] + api.context + "/":
-                MSG_UNABLE_TO_GET_API_DATA
+                           prodURL :
+                           MSG_UNABLE_TO_GET_API_DATA
         };
         
         /*        
