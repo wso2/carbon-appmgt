@@ -1189,7 +1189,7 @@ public class AppMDAO {
                     "SELECT SUBSCRIPTION_TYPE, TIER_ID , ? ,APPLICATION_ID ,SUB_STATUS , TRUSTED_IDP ,? " +
                     "FROM APM_SUBSCRIPTION WHERE APP_ID = ?";
 
-            count = -1;
+            count = 0;
             try {
                 ps = conn.prepareStatement(moveQuery);
                 ps.setInt(1, toAppId);
