@@ -4,6 +4,42 @@ $(function () {
     var API_REMOVE_FROM_HOME_PAGE = caramel.context + '/apis/favourite/remove-favourite-page';
 
     var storeTenantDomain = $('#store-tenant-domain').val();
+    var loggedInUserName = $('#user-name').val();
+    var loggedInUserTenantId = $('#user-tenant-id').val();
+
+    var jsonObj = {
+        "isActive": "1",
+        "path": caramel.context + "/apis/eventpublish/",
+        "appData": {
+            "appId": 'init',
+            "userId": 'init',
+            "tenantId": -1234,
+            "appName": 'init',
+            "appVersion": '1',
+            "context": '/init'
+        },
+        "appControls": {"0": "a"},
+        "publishedPeriod": "1200000",
+        "pageName": "My_Favourite"
+    };
+    //Setup event publishing time.
+    if(loggedInUserName) {
+        initializeUserActivity("init", jsonObj);
+    }
+
+    $('.accessUrl').on('click', function (event) {
+        if(loggedInUserName) {
+            jsonObj.appData.appId = $(this).data("id");
+            jsonObj.appData.appName = $(this).data("name");
+            jsonObj.appData.appVersion = $(this).data("version");
+            jsonObj.appData.context = $(this).data("context");
+            jsonObj.appData.userId = loggedInUserName;
+            jsonObj.appData.tenantId = loggedInUserTenantId;
+            //only tag -"page-load"  is currently filtered in backend
+            //so even though this is a click event add the tag as 'page-load'
+            initializeUserActivity("page-load", jsonObj);
+        }
+    });
     /**
      * This jquery function will be triggered when user
      * click on the icon- remove from favourite app
