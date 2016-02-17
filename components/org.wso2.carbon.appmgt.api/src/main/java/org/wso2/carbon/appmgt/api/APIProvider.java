@@ -520,4 +520,43 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public Set<AppStore> getExternalAppStores(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Get WebApp default version details.
+     *
+     * @param appName
+     * @param providerName
+     * @param appStatus
+     * @return Default WebApp Version
+     * @throws AppManagementException
+     */
+    public String getDefaultVersion(String appName, String providerName, AppDefaultVersion appStatus)
+            throws AppManagementException;
+
+    /**
+     * Check if the given WebApp version is the default version.
+     *
+     * @param identifier
+     * @return true if given app is the default version
+     * @throws AppManagementException
+     */
+    public boolean isDefaultVersion(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Check if the given WebApp has any other versions in any lifecycle state.
+     *
+     * @param identifier
+     * @return true if given app has more versions
+     * @throws AppManagementException
+     */
+    public boolean hasMoreVersions(APIIdentifier identifier) throws AppManagementException;
+
+    /**
+     * Get WebApp basic details by app uuid.
+     *
+     * @param uuid
+     * @return WebApp details corresponding to the given Id
+     * @throws AppManagementException
+     */
+    public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException;
 }

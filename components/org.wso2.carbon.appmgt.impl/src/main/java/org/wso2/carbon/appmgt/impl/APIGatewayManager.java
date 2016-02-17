@@ -22,18 +22,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.clients.SequenceAdminServiceClient;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.RESTAPIAdminClient;
-import org.wso2.carbon.appmgt.impl.clients.SequenceAdminServiceClient;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import java.util.List;
-
 import javax.xml.namespace.QName;
+import java.util.List;
 
 public class APIGatewayManager {
 
@@ -129,11 +128,13 @@ public class APIGatewayManager {
 						          " in environment " + environment.getName());
 					}
 					operation = "add";
-					if (client.getNonVersionedWebAppData(tenantDomain) != null) {
-						client.updateNonVersionedWebApp(builder, tenantDomain);
-					} else {
-						client.addNonVersionedWebApp(builder, tenantDomain);
-					}
+                    if(api.isDefaultVersion()) {
+                        if (client.getNonVersionedWebAppData(tenantDomain) != null) {
+                            client.updateNonVersionedWebApp(builder, tenantDomain);
+                        } else {
+                            client.addNonVersionedWebApp(builder, tenantDomain);
+                        }
+                    }
 					client.addVersionedWebApp(builder, tenantDomain);
 					deployCustomSequences(api, tenantDomain, environment);
 				}

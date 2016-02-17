@@ -116,6 +116,12 @@ require('/modules/store.js').exec(function (ctx) {
             type = WEBAPP_TYPE;
         }
         manager = store.rxtManager(customType, session);
+
+        var storeHostObj = jagg.module("manager").getAPIStoreObj();
+        var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
+        if (log.isDebugEnabled()) {
+            log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
+        }
         if (query) {
             assets = store.search({
                 attributes: query,
@@ -129,9 +135,27 @@ require('/modules/store.js').exec(function (ctx) {
                 assets = store.assets(customType, paging);
             } else {
                 if (customType == SITE_TYPE) {
-                    siteAttribute = {"overview_treatAsASite": "TRUE"};
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "TRUE"};
+                    } else {
+                        siteAttribute = {
+                            //if multiple versions to be displayed do consider default version
+                            "overview_treatAsASite": "TRUE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
                 } else if (customType == WEBAPP_TYPE) {
-                    siteAttribute = {"overview_treatAsASite": "FALSE"};
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "FALSE"};
+                    } else {
+                        //if multiple versions to be displayed do consider default version
+                        siteAttribute = {
+                            "overview_treatAsASite": "FALSE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
                 }
                 var siteOption = {
                     type: type,

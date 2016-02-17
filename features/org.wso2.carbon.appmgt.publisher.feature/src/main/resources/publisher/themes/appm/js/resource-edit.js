@@ -23,6 +23,55 @@ $( document ).ready(function() {
         }
     });
 
+    //Load default version details
+    var isDefaultVersion = "false";
+    var appName = $('#overview_name').val();
+    var providerName = $('#overview_provider').val();
+    var appVersion = $('#overview_version').val();
+    var appStatus = "APP_IS_PUBLISHED";
+
+    $.ajax({
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
+               type: 'GET',
+               async: false,
+               success: function (data) {
+                   if (data == appVersion) {
+                       isDefaultVersion = "true";
+                       $('#lblDefaultVersion').html("(This is the current default version)");
+                   } else {
+                       $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
+                   }
+               },
+               error: function (data) {
+               }
+           });
+
+    $('#overview_makeAsDefaultVersion').val(isDefaultVersion);
+
+    $(".makeAsDefaultVersion_checkbox").click(function () {
+        var output = [];
+        $(".makeAsDefaultVersion_checkbox").each(function (index) {
+            if ($(this).is(':checked')) {
+                output.push("true");
+            }
+            else {
+                output.push("false");
+            }
+        });
+        $('#overview_makeAsDefaultVersion').val(output);
+    });
+
+    var makeAsDefaultVal = $('#overview_makeAsDefaultVersion').val();
+    $(".makeAsDefaultVersion_checkbox").each(function (index) {
+        if (makeAsDefaultVal == "true") {
+            $(this).prop('checked', true);
+            $(this).prop('disabled', true);
+        }
+        else {
+            $(this).prop('checked', false);
+        }
+    });
+
     //load throttling tiers
     $("#throttlingTier").empty().append(throttlingTierControlBlock);
 

@@ -19,6 +19,19 @@
         {{{ form_render "overview_context" data.fields }}}
         {{{ form_render "overview_version" data.fields }}}
 
+        <div class="form-group">
+            <label class="control-label col-sm-2">Make As Default Version: </label>
+
+            <div class="col-sm-10">
+                <label>
+                    <input type="checkbox" class="makeAsDefaultVersion_checkbox" />
+                    <label id="lblDefaultVersion"></label>
+                </label>
+            </div>
+        </div>
+        <input type="hidden"
+               class="col-lg-6 col-sm-12 col-xs-12" name="overview_makeAsDefaultVersion"
+               id="overview_makeAsDefaultVersion">
 
         <div class="form-group">
             <label class="control-label col-sm-2">Transports: <span

@@ -91,13 +91,13 @@ public class WebApp {
     private String appTenant;
     private String redirectURL;
     private String logoutURL;
-    
+
     private String subscriptionAvailability;
     private String subscriptionAvailableTenants;
- 
+
 
     private String endpointConfig;
-    
+
     private String responseCache;
     private int cacheTimeout;
 
@@ -117,6 +117,7 @@ public class WebApp {
 
     private String acsURL;
 
+    private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
 
@@ -150,7 +151,7 @@ public class WebApp {
     public void setAppOwner(String appOwner) {
         this.appOwner = appOwner;
     }
-    
+
     public String getRedirectURL() {
         return redirectURL;
     }
@@ -162,11 +163,11 @@ public class WebApp {
     public APIIdentifier getId() {
         return id;
     }
-    
+
 	public String getTransports() {
         return transports;
     }
-	 
+
     public void setTransports(String transports) {
         this.transports = transports;
     }
@@ -210,7 +211,7 @@ public class WebApp {
     public void setBusinessOwnerEmail(String businessOwnerEmail) {
         this.businessOwnerEmail = businessOwnerEmail;
     }
-   
+
 
     public String getDescription() {
         return description;
@@ -402,11 +403,11 @@ public class WebApp {
     public void setVisibleRoles(String visibleRoles) {
         this.visibleRoles = visibleRoles;
     }
-    
+
     public String getVisibleTenants() {
     	return visibleTenants;
     }
-    
+
     public void setVisibleTenants(String visibleTenants) {
     	this.visibleTenants = visibleTenants;
     }
@@ -426,7 +427,7 @@ public class WebApp {
     public void setApiResourcePatternsChanged(boolean apiResourcePatternsChanged) {
         this.apiResourcePatternsChanged = apiResourcePatternsChanged;
     }
-    
+
     /**
   	 * @return the endpointUTUsername
   	 */
@@ -454,7 +455,7 @@ public class WebApp {
   	public void setEndpointUTPassword(String endpointUTPassword) {
   		this.endpointUTPassword = endpointUTPassword;
   	}
-  	
+
  	/**
  	 * @return the endpointSecured
  	 */
@@ -468,13 +469,13 @@ public class WebApp {
  	public void setEndpointSecured(boolean endpointSecured) {
  		this.endpointSecured = endpointSecured;
  	}
- 	
+
     public String getInSequence() {
  		return inSequence;
  	}
 
     /**
-     * 
+     *
      * @param inSeq  insequence for the WebApp
      */
  	public void setInSequence(String inSeq) {
@@ -486,7 +487,7 @@ public class WebApp {
   	}
 
      /**
-      * 
+      *
       * @param outSeq outSequence for the WebApp
       */
   	public void setOutSequence(String outSeq) {
@@ -524,7 +525,7 @@ public class WebApp {
 	public void setSubscriptionAvailableTenants(String subscriptionAvailableTenants) {
 		this.subscriptionAvailableTenants = subscriptionAvailableTenants;
 	}
-    
+
     public String getEndpointConfig() {
         return endpointConfig;
     }
@@ -590,7 +591,7 @@ public class WebApp {
     }
 
 	public void setTokenEndpoint(String tokenEndpoint) {
-        this.tokenEndpoint = tokenEndpoint;        
+        this.tokenEndpoint = tokenEndpoint;
     }
 
     public String getTokenEndpoint() {
@@ -686,6 +687,14 @@ public class WebApp {
 
     public void setTreatAsASite(String treatAsASite) {
         this.treatAsASite = treatAsASite;
+    }
+
+    public boolean isDefaultVersion() {
+        return isDefaultVersion;
+    }
+
+    public void setDefaultVersion(boolean isDefaultVersion) {
+        this.isDefaultVersion = isDefaultVersion;
     }
 
     public String getAdvertisedAppUuid() {

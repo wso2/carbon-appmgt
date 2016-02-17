@@ -1746,7 +1746,8 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         //Note: Do not change to construct the assertionConsumerUrl directly using servicePrefix instead of headers.get("HOST").
         //It always gives IP for host which cause invalid assertionConsumerUrl
         String assertionConsumerUrl = servicePrefix.substring(0, servicePrefix.indexOf("/") + 2) +
-                headers.get("HOST") + messageContext.getProperty("REST_API_CONTEXT") + "/";
+                headers.get("HOST") + messageContext.getProperty("REST_API_CONTEXT") + "/" + messageContext.getProperty(
+                RESTConstants.SYNAPSE_REST_API_VERSION) + "/";
 
         return assertionConsumerUrl;
     }
