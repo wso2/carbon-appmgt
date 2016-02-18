@@ -1224,6 +1224,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 
                 row.put("subscriptionAvailability", row, api.getSubscriptionAvailability());
                 row.put("subscriptionAvailableTenants", row, api.getSubscriptionAvailableTenants());
+                row.put("isDefaultVersion", row, api.isDefaultVersion());
                 myn.put(0, myn, row);
             }
 
@@ -3370,6 +3371,9 @@ public class APIStoreHostObject extends ScriptableObject {
                             String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
                             String context = app.getContext();
                             accessUrl = serverUrl + context + "/";
+                            if (!app.isDefaultVersion()) {
+                                accessUrl += app.getId().getVersion() + "/";
+                            }
                         }
 
                         NativeObject row = new NativeObject();
@@ -3452,6 +3456,9 @@ public class APIStoreHostObject extends ScriptableObject {
                             String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
                             String context = app.getContext();
                             accessUrl = serverUrl + context + "/";
+                            if (!app.isDefaultVersion()) {
+                                accessUrl += app.getId().getVersion() + "/";
+                            }
                         }
 
                         NativeObject row = new NativeObject();

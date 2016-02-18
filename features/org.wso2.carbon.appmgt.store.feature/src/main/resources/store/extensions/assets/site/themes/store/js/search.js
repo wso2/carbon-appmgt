@@ -156,15 +156,22 @@ $(function () {
     $('#searchTxt').keypress(function (e) {
         if (e.keyCode == 13) {  // detect the enter key
             var searchTerm = $(this).val();
-            var searchSelect = $('#searchSelect').val();
-            e.stopPropagation();
-            e.preventDefault();
-            if (searchSelect !== "App") {
-                searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
+            if (checkNonSpecial(searchTerm)) {
+                var searchSelect = $('#searchSelect').val();
+                e.stopPropagation();
+                e.preventDefault();
+                if (searchSelect !== "App") {
+                    searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
+                }
+                location.href = caramel.tenantedUrl("/assets/" + "site" + "?query=" + searchTerm);
             }
-            location.href = caramel.tenantedUrl("/assets/" + "site" + "?query=" + searchTerm);
         }
     });
+
+    function checkNonSpecial(value){
+        var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
+        return non_special_regex.test(value);
+    }
 
     $('#search-dropdown-close').click(function (e) {
         e.stopPropagation();
