@@ -224,7 +224,7 @@ $(document).on("click", ".policy-group-edit-button", function () {
             $('#policy-group-editor #policyGroupName').val(obj.policyGroupName);
             $('#policy-group-editor #policyGroupDescription').val(obj.policyGroupDesc);
             $("#policy-group-editor #throttlingTier").val(obj.throttlingTier);
-            $("#policy-group-editor #anonymousAccessToUrlPattern").val(JSON.stringify(obj.anonymousAccessToUrlPattern));
+            $("#policy-group-editor #anonymousAccessToUrlPattern").val(obj.anonymousAccessToUrlPattern);
             $('#policy-group-editor #userRoles').val(obj.userRoles);
             //clear all checkbox
             $('.policy-group-xacml-rule').each(function () {
@@ -473,7 +473,7 @@ function drawThrottlingTiersDynamically() {
     tiers.sort(function(tiersA, tiersB) {
         return parseFloat(tiersA.tierSortKey) - parseFloat(tiersB.tierSortKey);
     });
-    for (var i = 0; i < tiers.length; i++) {
+    for (var i = tiers.length - 1; i >=  0; i--) {
         strContent += "<option title='" + tiers[i].tierDescription + "' value='" + tiers[i].tierName + "' id='" + tiers[i].tierName + "'>" + tiers[i].tierDisplayName + "</option>";
     }
     return strContent;

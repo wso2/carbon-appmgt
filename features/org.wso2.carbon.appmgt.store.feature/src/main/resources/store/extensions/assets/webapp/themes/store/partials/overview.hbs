@@ -23,7 +23,7 @@
     		<legend>URLs:</legend>
 	    	<p><b>{{apiData.serverURL.description}}</b></p>
 	    	<ul>
-			<li><a class='icon-globe' id="gatewayURL" href="{{apiData.serverURL.productionURL}}{{#ifCond asset.attributes.overview_makeAsDefaultVersion "==" "false"}}{{asset.attributes.overview_version}}/{{/ifCond}}" target="_blank" >&nbsp;{{apiData.serverURL.productionURL}}{{#ifCond asset.attributes.overview_makeAsDefaultVersion "==" "false"}}{{asset.attributes.overview_version}}/{{/ifCond}}</a></li>
+			<li><a class='icon-globe' id="gatewayURL" href="{{apiData.serverURL.productionURL}}" target="_blank" >&nbsp;{{apiData.serverURL.productionURL}}</a></li>
 	    	</ul>
             <input type="hidden" id="skipGateway" value="false">
     {{/if}}

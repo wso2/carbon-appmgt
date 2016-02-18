@@ -9,14 +9,16 @@
  Filename:assets.js
  Created Date: 29/7/2013
  */
+include("/extensions/webapp/modules/jagg/jagg.jag");
 
 require('/modules/publisher.js').exec(function(ctx) {
 
-var router = require('/modules/router-g.js').router();
-var config = require('/config/publisher.json');
-caramel = require('caramel');
-var server = require('store').server;
-var publisher = require('/modules/publisher.js').publisher(request, session);
+    var router = require('/modules/router-g.js').router();
+    var config = require('/config/publisher.json');
+    caramel = require('caramel');
+    var server = require('store').server;
+    var publisher = require('/modules/publisher.js').publisher(request, session);
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
 
 var routeMnger = new router.Router();
 //var routeManager=application.get(config.app.ROUTE_MANAGER);
@@ -243,9 +245,11 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{type}/', function(co
 routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/', function (context) {
     var operation = (context.params.operation) || '';
     var type = context.params.type;
+
+    var isSelfSubscriptionEnabled = apiProvider.isSelfSubscriptionEnabled();
     if (operation == 'statistics') {
         try {
-            caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+            caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:isSelfSubscriptionEnabled});
 
         } catch (e) {
             response.sendError(404, 'Asset type not found'); //TODO: Replace
