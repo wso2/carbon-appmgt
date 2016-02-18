@@ -301,7 +301,7 @@ require('/modules/store.js').exec(function (ctx) {
                 app.productionURL = appData.serverURL.productionURL;
             } else {
                 //Get the direct webapp url
-                app.productionURL = app.attributes.overview_webAppURL;
+                app.productionURL = app.attributes.overview_webAppUrl;
             }
 
             //set favourite app or not- This infomation will be used to set proper icon(add/remove favourite) on asset tile
@@ -335,6 +335,7 @@ require('/modules/store.js').exec(function (ctx) {
             var tempApp = {};
             tempApp["appName"] = app.attributes.overview_name;
             tempApp["appProvider"] = app.attributes.overview_provider;
+            tempApp["context"] = app.attributes.overview_context;
             tempApp["version"] = app.attributes.overview_version;
             tempApp["appTenant"] = app.attributes.overview_appTenant;
             tempApp["thumburl"] = app.attributes.images_thumbnail;
@@ -351,7 +352,7 @@ require('/modules/store.js').exec(function (ctx) {
                 tempApp["accessUrl"] = appData.serverURL.productionURL;
             } else {
                 //Get the direct webapp url
-                tempApp["accessUrl"] = asset.attributes.overview_webAppURL;
+                tempApp["accessUrl"] = asset.attributes.overview_webAppUrl;
             }
             formattedApps.push(tempApp);
         });

@@ -26,6 +26,8 @@
 
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}
+                        <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
+                        <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
                         <a href="{{tenantedUrl "/assets/favouriteapps"}}">
                             <div class="auth-img">
                                 {{t "My Favourites"}}

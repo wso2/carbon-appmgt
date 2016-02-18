@@ -8,9 +8,14 @@
                     </div>
                 {{/compare}}
                 <div class="app-assets">
-                    <a href="{{accessUrl}}">
+                    <a href="{{accessUrl}}" target="_blank" data-name="{{appName}}"
+                       data-version="{{version}}"
+                       data-context="{{context}}" data-id="{{uuid}}" class="accessUrl">
                         <img class="app-assets-icon"
-                             src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}">
+                             src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}"
+                             data-name="{{appName}}"
+                             data-version="{{version}}"
+                             data-context="{{context}}" data-id="{{uuid}}">
                     </a>
 
                     <div class="app-assets-icon-info" style="cursor:pointer">
