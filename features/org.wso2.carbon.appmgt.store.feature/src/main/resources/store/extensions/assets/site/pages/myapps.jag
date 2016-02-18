@@ -64,7 +64,7 @@ require('/modules/store.js').exec(function (ctx) {
     subsApp.init(jagg, session);
 
     var isSite = 'true';//To get the webapp tags
-    var tagUrl = '/extensions/assets/' + type + '/myapps?tag=';
+    var tagUrl = '/extensions/assets/site/myapps?tag=';
     url =
     '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
