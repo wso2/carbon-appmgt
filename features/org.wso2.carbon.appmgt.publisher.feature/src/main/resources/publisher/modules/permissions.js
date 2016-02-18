@@ -66,6 +66,9 @@ var manager = jagg.module("manager").getAPIStoreObj();
         var role;
         for (var index in roles) {
             role=roles[index];
+            if (role.toLowerCase() == 'internal/creator') {
+                role = "INTERNAL/creator";
+            }
             var isAuthorized = userManager.isAuthorized(role, resourcePath, action);
             log.debug('Role: '+role+' resource: '+resourcePath+'action: '+action);
             if (isAuthorized) {
