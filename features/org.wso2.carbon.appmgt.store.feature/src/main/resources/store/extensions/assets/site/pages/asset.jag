@@ -152,7 +152,8 @@ require('/modules/store.js').exec(function (ctx) {
         var ATTR_TREAT_AS_A_SITE = 'overview_treatAsASite';
         var ATTR_PROVIDER = 'overview_provider';
         var LIFECYCLE_STATE_PROPERTY = 'lcState';
-        var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when Published
+        var DEFAULT_ASSET_VIEW_STATE = 'Published'; //Unless specified otherwise, assets are always visible when
+                                                    // Published
         var DEFAULT_LC_ATTRIBUTE_NAME = LIFECYCLE_STATE_PROPERTY;
 
         // Init subscription service.
@@ -369,9 +370,12 @@ require('/modules/store.js').exec(function (ctx) {
 
         var isFavourite = false;
 
+        var hideAllAppsLink = false;
+
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 isFavourite = isFavouriteApp(asset);
+                hideAllAppsLink = true;
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -453,6 +457,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
+        headerData.hideAllAppsLink = hideAllAppsLink;
 
         caramel.render({
                            title: 'Store | ' + type,
