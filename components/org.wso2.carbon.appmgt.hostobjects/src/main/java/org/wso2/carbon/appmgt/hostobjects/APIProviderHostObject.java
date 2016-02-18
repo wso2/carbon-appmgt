@@ -3777,6 +3777,11 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         return webAppNativeObj;
     }
+
+    public static boolean jsFunction_isSelfSubscriptionEnabled(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        return Boolean.parseBoolean(config.getFirstProperty(AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+    }
 }
 
 
