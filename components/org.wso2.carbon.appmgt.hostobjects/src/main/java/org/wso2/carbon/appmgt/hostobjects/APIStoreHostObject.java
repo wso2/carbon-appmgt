@@ -3380,6 +3380,7 @@ public class APIStoreHostObject extends ScriptableObject {
                         row.put("appName", row, apiIdentifier.getApiName());
                         row.put("appProvider", row, apiIdentifier.getProviderName());
                         row.put("version", row, apiIdentifier.getVersion());
+                        row.put("context", row, app.getContext());
                         row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
                         row.put("gatewayUrl", row, accessUrl);
                         row.put("uuid", row, app.getUUID());
@@ -3463,6 +3464,7 @@ public class APIStoreHostObject extends ScriptableObject {
                         NativeObject row = new NativeObject();
                         row.put("appName", row, apiIdentifier.getApiName());
                         row.put("appProvider", row, apiIdentifier.getProviderName());
+                        row.put("context", row, app.getContext());
                         row.put("version", row, apiIdentifier.getVersion());
                         row.put("appTenant", row, app.getAppTenant());
                         row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));

@@ -8,8 +8,13 @@
                     </div>
                 {{/compare}}
                 <div class="app-assets">
-                    <a href="{{productionURL}}">
-                        <img class="app-assets-icon" src="{{attributes.images_thumbnail}}">
+                    <a href="{{productionURL}}" target="_blank" data-name="{{attributes.overview_name}}"
+                       data-version="{{attributes.overview_version}}"
+                       data-context="{{attributes.overview_context}}" data-id="{{id}}" class="accessUrl">
+                        <img class="app-assets-icon" src="{{attributes.images_thumbnail}}"
+                             data-name="{{attributes.overview_name}}"
+                             data-version="{{attributes.overview_version}}"
+                             data-context="{{attributes.overview_context}}" data-id="{{id}}">
                     </a>
 
                     <div class="app-assets-icon-info" style="cursor:pointer">
