@@ -368,14 +368,19 @@ require('/modules/store.js').exec(function (ctx) {
         isSite = 'true';
     }
 
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user
+    });
+    
+    headerData.appBarLink = caramel.configs().context + "/assets/site";
+    headerData.appBarLinkText = "ALL SITES";
+
     caramel.render({
         title: 'Store | Assets',
         user: user,
         sso: sso,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header:headerData,
         navigation: site.navigation(tenantId),
         search: {
             mainPage: mainPage,

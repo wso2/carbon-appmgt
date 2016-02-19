@@ -79,6 +79,8 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.searchOff = true;
     headerData.hideAllAppsLink = false;
     headerData.storeTenantDomain = tenantDomain;
+    headerData.appBarLink = caramel.configs().context + "/extensions/assets/site/myapps";
+    headerData.appBarLinkText = "MY SITES";
 
     var showSortOptions = false;
     var webAppRecentAssets = [];
