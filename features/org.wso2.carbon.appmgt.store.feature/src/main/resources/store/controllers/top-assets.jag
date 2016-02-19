@@ -117,7 +117,6 @@ require('/modules/store.js').exec(function (ctx) {
         }
         manager = store.rxtManager(customType, session);
 
-        var storeHostObj = jagg.module("manager").getAPIStoreObj();
         var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
         if (log.isDebugEnabled()) {
             log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -172,9 +171,10 @@ require('/modules/store.js').exec(function (ctx) {
 
             var subscriptionInfo;
             assets.forEach(function (asset) {
+                // set default thumbnail
+                setDefaultThumbnail(asset);
 
                 //set rating
-                
                 if(JSON.parse(social.getRating("webapp:" + asset.id))){
                     asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + asset.id)).rating);
                 }else{
@@ -224,11 +224,15 @@ require('/modules/store.js').exec(function (ctx) {
         }
 
         for (var i = 0; i < recentItems.length; i++) {
-            var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentItems[i].id));
+            var recentItem = recentItems[i];
+            // set default thumbnail
+            setDefaultThumbnail(recentItem);
+            // set ratings
+            var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentItem.id));
             if (appRatingRecentAssets) {
-                recentItems[i].rating = Math.floor(appRatingRecentAssets.rating);
+                recentItem.rating = Math.floor(appRatingRecentAssets.rating);
             } else {
-                recentItems[i].rating = 0;
+                recentItem.rating = 0;
             }
         }
 
@@ -273,5 +277,16 @@ require('/modules/store.js').exec(function (ctx) {
 
 function getServiceDir(serviceName) {
     return '/extensions/assets/webapp/services/' + serviceName;
+}
+
+/**
+ * Sets the default thumbnail of the specified asset.
+ * @param asset {Object} asset
+ */
+function setDefaultThumbnail(asset) {
+    var assetThumbnail = asset.attributes.images_thumbnail;
+    if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+        asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+    }
 }
 %>
