@@ -38,7 +38,7 @@ var render=function(theme,data,meta,require){
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             var assetThumbnail = data.newViewData.images.images_thumbnail;
             if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
-                var appName = String(data.newViewData.displayName.overview_displayName);
+                var appName = String(data.newViewData.displayName.value);
                 data.newViewData.images.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(appName);
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
