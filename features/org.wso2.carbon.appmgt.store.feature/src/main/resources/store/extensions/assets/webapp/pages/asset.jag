@@ -489,6 +489,8 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
         headerData.hideAllAppsLink = hideAllAppsLink;
+        headerData.appBarLink = caramel.configs().context + "/assets/webapp/" + aid;
+        headerData.appBarLinkText = "WEB APP OVERVIEW";
 
         caramel.render({
             title: 'Store | ' + type,
