@@ -95,6 +95,17 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
+     * Sets the default thumbnail of the specified asset.
+     * @param asset {Object} asset
+     */
+    var setDefaultThumbnail = function (asset) {
+        var assetThumbnail = asset.attributes.images_thumbnail;
+        if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+        }
+    };
+
+    /**
      * This method is used to retrieve the assets from registry when both subscriptions are disabled.
      */
     var getAssetsFromRegistry = function () {
@@ -231,13 +242,16 @@ require('/modules/store.js').exec(function (ctx) {
         var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
 
         for (var i = 0; i < recentAssets.length; i++) {
-            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+            var recentAsset = recentAssets[i];
+            // set default thumbnail of 'recentAsset'
+            setDefaultThumbnail(recentAsset);
+            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAsset.id));
             if (appRatingRecentAssetsJson) {
-                recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
+                recentAsset.rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
             } else {
-                recentAssets[i].rating = 0;
+                recentAsset.rating = 0;
             }
-            webAppRecentAssets.push(recentAssets[i]);
+            webAppRecentAssets.push(recentAsset);
         }
     };
 
@@ -303,7 +317,8 @@ require('/modules/store.js').exec(function (ctx) {
                 app.productionURL = app.attributes.overview_webAppUrl;
             }
 
-            //set favourite app or not- This infomation will be used to set proper icon(add/remove favourite) on asset tile
+            //set favourite app or not- This infomation will be used to set proper icon(add/remove favourite) on asset
+            // tile
             app.isFavourite = false;
             if (isFavouriteApp(app.attributes.overview_name, app.attributes.overview_version,
                                app.attributes.overview_provider)) {
@@ -454,6 +469,11 @@ require('/modules/store.js').exec(function (ctx) {
             var anonymousApps = getAnonymousApps();
             assets = changeFormat(anonymousApps);
         }
+    }
+
+    var numberOfAssets = assets.length;
+    for (var i = 0; i < numberOfAssets; i++) {
+        setDefaultThumbnail(assets[i])
     }
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
