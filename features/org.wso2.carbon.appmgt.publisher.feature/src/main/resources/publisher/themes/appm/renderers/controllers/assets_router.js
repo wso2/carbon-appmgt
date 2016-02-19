@@ -21,7 +21,7 @@ var render = function (theme, data, meta, require) {
     //Check whether the app publish workflow is enabled
     appPublishWFExecutor = org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_APPLICATION_PUBLISH");
     var isAsynchronousFlow = appPublishWFExecutor.isAsynchronus();
-
+    var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
     if(data.artifacts){
 
         var deleteButtonAvailability = false;
@@ -139,7 +139,7 @@ var render = function (theme, data, meta, require) {
             var asset = data.artifacts[i];
             var assetThumbnail = asset.attributes.images_thumbnail;
             if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
-                asset.defaultThumbnail = appmPublisher.getDefaultThumbnail(asset.attributes.overview_displayName);
+                asset.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(asset.attributes.overview_displayName);
             }
         }
         //handle asset based notification - bind with session
