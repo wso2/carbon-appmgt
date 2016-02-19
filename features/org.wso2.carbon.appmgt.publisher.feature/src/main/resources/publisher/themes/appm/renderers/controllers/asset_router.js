@@ -17,7 +17,7 @@ var render=function(theme,data,meta,require){
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
-
+    var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
     //var _url = "/publisher/asset/"  + data.meta.shortName + "/" + data.info.id + "/edit"
     var listPartial='view-asset';
     var heading = "";
@@ -38,7 +38,8 @@ var render=function(theme,data,meta,require){
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             var assetThumbnail = data.newViewData.images.images_thumbnail;
             if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
-                data.newViewData.images.defaultThumbnail = appmPublisher.getDefaultThumbnail(data.newViewData.displayName);
+                var appName = String(data.newViewData.displayName.overview_displayName);
+                data.newViewData.images.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(appName);
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
