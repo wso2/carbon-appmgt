@@ -80,6 +80,8 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.searchOff = true;
     headerData.hideAllAppsLink = false;
     headerData.storeTenantDomain = tenantDomain;
+    headerData.appBarLink = caramel.configs().context + "/extensions/assets/webapp/myapps";
+    headerData.appBarLinkText = "MY WEB APPS";
 
     var showSortOptions = false;
     var webAppRecentAssets = [];

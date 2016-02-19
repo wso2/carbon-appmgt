@@ -388,6 +388,8 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.domain = tenantDomain;
+    headerData.appBarLink = caramel.configs().context + "/assets/webapp";
+    headerData.appBarLinkText = "ALL WEB APPS";
 
     var isSite;
     if (customType == WEBAPP_TYPE) {
