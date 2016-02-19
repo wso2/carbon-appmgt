@@ -88,7 +88,23 @@ require('/modules/store.js').exec(function (ctx) {
     var currIndex = paging.start + 1;
     var currentPage = store.getCurrentPage(currIndex);
 
-    var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
+    if (log.isDebugEnabled()) {
+        log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
+    }
+
+    var SITE_QUERY;
+    if (isMultipleVersionDisplayEnabled) {
+        //if multiple versions to be displayed don't consider default version
+        SITE_QUERY =
+        {"overview_treatAsASite": "FALSE"};
+    } else {
+        //if multiple versions to be displayed don consider default version
+        SITE_QUERY =
+        {"overview_treatAsASite": "FALSE", "overview_makeAsDefaultVersion": "true"};
+    }
+
     var SITE_OPTIONS = {
         type: type,
         attributes: SITE_QUERY
@@ -126,6 +142,9 @@ require('/modules/store.js').exec(function (ctx) {
             urlQuery = 'query=' + query + '&';
             query = require('/modules/search.js').build(query);
             query.overview_treatAsASite = 'FALSE';
+            if (!isMultipleVersionDisplayEnabled) {
+                query.overview_makeAsDefaultVersion = 'true';
+            }
             options = {
                 type: type,
                 attributes: query
