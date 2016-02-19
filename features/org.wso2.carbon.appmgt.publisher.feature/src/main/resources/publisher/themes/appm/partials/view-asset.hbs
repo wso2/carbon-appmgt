@@ -12,10 +12,19 @@
                 <div class="row">
                     <div class="col-xs-12">
                             <div class="panel-body">
-                                <div class="space-right-20 pull-left">
-                                    {{#each newViewData.images}}
-                                        {{#ifCond value "!=" "null"}}{{#ifCond name "==" "images_thumbnail"}}<img src="{{value}}" style="max-width: 400px; max-height: 400px" class="pull-left app-stand-alone-icon"  />{{/ifCond}}{{/ifCond}}
-                                    {{/each}}
+                                <div class="space-right-20 pull-left" style="width: 25%;">
+                                    {{#if newViewData.images.defaultThumbnail}}
+                                        <div class="app-default-thumbnail"
+                                             style="background: #{{newViewData.images.defaultThumbnail.color}};">
+                                            {{newViewData.images.defaultThumbnail.text}}
+                                        </div>
+                                    {{else}}
+                                        <div>
+                                            <img src="{{newViewData.images.images_thumbnail}}"
+                                                 style="max-width: 400px; max-height: 400px"
+                                                 class="pull-left app-stand-alone-icon" />
+                                    {{/if}}
+
                                 </div>
                                 <div class="pull-left main-data-container">
                                     {{#each newViewData.meta}}
