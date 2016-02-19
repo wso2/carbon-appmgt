@@ -65,7 +65,11 @@
                          <tr id="{{this.attributes.overview_name}}{{t "-"}}{{this.attributes.overview_provider}}{{t "-"}}{{this.attributes.overview_version}}">
                      {{/ifCond}}
                          <td>
-                             <img src="{{this.attributes.images_thumbnail}}" class="" />
+                             {{#if this.defaultThumbnail}}
+                                 <div style="background: #{{this.defaultThumbnail.color}};">&nbsp;</div>
+                             {{else}}
+                                 <img src="{{this.attributes.images_thumbnail}}" />
+                             {{/if}}
                          </td>
                          <td class="asset-listing-name col-md-3">
                              {{#ifCond this.attributes.overview_advertiseOnly "==" "true"}}

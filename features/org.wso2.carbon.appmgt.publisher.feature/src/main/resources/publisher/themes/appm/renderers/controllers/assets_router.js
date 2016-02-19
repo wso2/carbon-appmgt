@@ -12,6 +12,7 @@ var user=server.current(session);
 var um=server.userManager(user.tenantId);
 var publisher = require('/modules/publisher.js').publisher(request, session);
 var rxtManager = publisher.rxtManager;
+var appmPublisher = require('appmgtpublisher');
 
 var render = function (theme, data, meta, require) {
     var log = new Log();
@@ -132,6 +133,13 @@ var render = function (theme, data, meta, require) {
 
                 }
                 notifications.push(notifyObject);
+            }
+
+            // set default thumbnail
+            var asset = data.artifacts[i];
+            var assetThumbnail = asset.attributes.images_thumbnail;
+            if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+                asset.defaultThumbnail = appmPublisher.getDefaultThumbnail(asset.attributes.overview_displayName);
             }
         }
         //handle asset based notification - bind with session

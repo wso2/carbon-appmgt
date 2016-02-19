@@ -1,13 +1,27 @@
 <div class="col-md-12 asset-wrapper">
     <div class="row">
         <div class="col-md-8">
-            <img class="col-md-12 hidden-xs hidden-sm" src="{{#if asset.attributes.images_banner}}{{ asset.attributes.images_banner}}{{/if}}">
+            {{#if asset.defaultBanner}}
+                <div class="app-assets-default-icon" style="background: #{{asset.defaultBanner.color}}; font-size: 10em;">
+                    {{asset.defaultBanner.text}}
+                </div>
+            {{else}}
+                <div class="app-assets-icon">
+                    <img src="{{asset.attributes.images_banner}}" />
+                </div>
+            {{/if}}
         </div>
         <div class="col-md-3">
             <div class="row">
-                <div class="col-md-12 col-xs-12 app-asset-icon">
-                    <img class="col-md-8 col-xs-8 col-centered" src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}">
-                </div>
+                {{#if asset.defaultThumbnail}}
+                    <div class="app-assets-default-icon" style="background: #{{asset.defaultThumbnail.color}};">
+                        {{asset.defaultThumbnail.text}}
+                    </div>
+                {{else}}
+                    <div class="app-assets-icon">
+                        <img src="{{asset.attributes.images_thumbnail}}" />
+                    </div>
+                {{/if}}
             </div>
             <div class="row">
                 <div class="app-asset-title">{{#if asset.attributes.overview_displayName}}{{ asset.attributes.overview_displayName}}{{/if}}</div>

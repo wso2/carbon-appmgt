@@ -6,6 +6,7 @@
 var server = require('store').server;
 var permissions=require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
+var appmPublisher = require('appmgtpublisher');
 
 var render=function(theme,data,meta,require){
 
@@ -35,6 +36,10 @@ var render=function(theme,data,meta,require){
             listPartial='view-asset';
             var copyOfData = parse(stringify(data));
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            var assetThumbnail = data.newViewData.images.images_thumbnail;
+            if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+                data.newViewData.images.defaultThumbnail = appmPublisher.getDefaultThumbnail(data.newViewData.displayName);
+            }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
             break;

@@ -17,8 +17,15 @@
                     {{else}}
                     <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
                     {{/compare}}
-                        <img class="app-assets-icon"
-                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    {{#if defaultThumbnail}}
+                        <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                            {{defaultThumbnail.text}}
+                        </div>
+                    {{else}}
+                        <div class="app-assets-icon">
+                            <img src="{{attributes.images_thumbnail}}" />
+                        </div>
+                    {{/if}}
                     </a>
                     <div class="app-assets-info">
                         <div class="app-assets-name">

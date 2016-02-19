@@ -11,11 +11,18 @@
                     <a href="{{accessUrl}}" target="_blank" data-name="{{appName}}"
                        data-version="{{version}}"
                        data-context="{{context}}" data-id="{{uuid}}" class="accessUrl">
-                        <img class="app-assets-icon"
-                             src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}"
-                             data-name="{{appName}}"
-                             data-version="{{version}}"
-                             data-context="{{context}}" data-id="{{uuid}}>
+                        {{#if defaultThumbnail}}
+                            <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                                {{defaultThumbnail.text}}
+                            </div>
+                        {{else}}
+                            <div class="app-assets-icon">
+                                    <img src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}"
+                                         data-name="{{appName}}"
+                                         data-version="{{version}}"
+                                         data-context="{{context}}" data-id="{{uuid}} />
+                            </div>
+                        {{/if}}
                     </a>
 
                     <div class="app-assets-icon-info" style="cursor:pointer">

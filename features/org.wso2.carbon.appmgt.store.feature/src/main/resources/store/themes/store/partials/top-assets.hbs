@@ -44,8 +44,15 @@
                         <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">
                     {{/compare}}
                 {{/compare}}
-                        <img class="app-assets-icon"
-                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    {{#if defaultThumbnail}}
+                        <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                            {{defaultThumbnail.text}}
+                        </div>
+                    {{else}}
+                        <div class="app-assets-icon">
+                            <img src="{{attributes.images_thumbnail}}" />
+                        </div>
+                    {{/if}}
                         <div class="app-assets-icon-info">
                             <i title="{{attributes.overview_platform}}" class="fw {{iconImage attributes.overview_platform}} fw-1_5x fw-inverse"></i>
                             <i title="{{attributes.overview_type}}" class="fw {{iconImageType attributes.overview_type}} fw-1_5x fw-inverse"></i>
