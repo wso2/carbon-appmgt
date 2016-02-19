@@ -217,9 +217,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 							USER_ACTIVITY_STREAM_VERSION, event);
 				}
 			} else {
-				// Write directly to DB
+                // Write directly to DB
                 AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(),
-                                      appVersion, context);
+                                      appVersion, context, timeStamp);
             }
 		} catch (AgentException e) {
              // Here the exception is only logged (but not thrown externally) as this method is

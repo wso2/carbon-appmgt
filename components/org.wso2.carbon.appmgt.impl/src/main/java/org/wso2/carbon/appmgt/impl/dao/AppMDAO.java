@@ -6525,20 +6525,21 @@ public class AppMDAO {
     /**
      * Save store wise hits.
      *
-     * @param webAppUUID Application UUID.
-     * @param userId     User Id.
-     * @param tenantId   Tenant Id.
-     * @param appName    App Name.
-     * @param appVersion App Version.
-     * @param context Context.
+     * @param webAppUUID Application UUID
+     * @param userId     User Id
+     * @param tenantId   Tenant Id
+     * @param appName    App Name
+     * @param appVersion App Version
+     * @param context    Context
+     * @param timeStamp  Hit timestamp
      */
     public static void saveStoreHits(String webAppUUID, String userId, Integer tenantId,
-                                     String appName, String appVersion, String context)
+                                     String appName, String appVersion, String context, Long timeStamp)
             throws AppManagementException {
         Connection conn = null;
         try {
             conn = APIMgtDBUtil.getUiActivityDBConnection();
-            insertStoreHits(webAppUUID, userId, tenantId, appName, appVersion, context, conn);
+            insertStoreHits(webAppUUID, userId, tenantId, appName, appVersion, context, timeStamp, conn);
             conn.commit();
         } catch (SQLException e) {
             String webAppInfo =
@@ -6554,16 +6555,17 @@ public class AppMDAO {
     /**
      * Insert store wise hits.
      *
-     * @param webAppUUID Application UUID.
-     * @param userId     User Id.
-     * @param tenantId   Tenant Id.
-     * @param appName    App Name.
-     * @param appVersion App Version.
-     * @param context Context.
+     * @param webAppUUID Application UUID
+     * @param userId     User Id
+     * @param tenantId   Tenant Id
+     * @param appName    App Name
+     * @param appVersion App Version
+     * @param context    Context
+     * @param timeStamp  Hit timestamp
      */
-    public static void insertStoreHits(String webAppUUID, String userId, Integer tenantId,
-                                       String appName, String appVersion, String context,
-                                       Connection conn) throws AppManagementException {
+    public static void insertStoreHits(String webAppUUID, String userId, Integer tenantId, String appName,
+                                       String appVersion, String context, Long timeStamp, Connection conn)
+            throws AppManagementException {
         ResultSet rs = null;
         PreparedStatement ps = null;
         try {
@@ -6576,7 +6578,7 @@ public class AppMDAO {
             ps.setString(4,context);
             ps.setString(5, userId);
             ps.setInt(6, tenantId);
-            ps.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(7, new Timestamp(timeStamp));
             ps.executeUpdate();
             if (log.isDebugEnabled()) {
                 log.debug("Record relevant to webapp id '" + webAppUUID + "' saved successfully");
