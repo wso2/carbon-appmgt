@@ -3386,6 +3386,7 @@ public class APIStoreHostObject extends ScriptableObject {
                         row.put("gatewayUrl", row, accessUrl);
                         row.put("uuid", row, app.getUUID());
                         row.put("treatAsSite", row, app.getTreatAsASite());
+                        row.put("appDisplayName", row, app.getDisplayName());
                         nativeArray.put(i++, nativeArray, row);
                     }
                 }
