@@ -144,6 +144,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 
 			loadBalancingDataPublisher = new LoadBalancingDataPublisher(
 					allReceiverGroups, agent);
+            loadBalancingDataPublisher.addStreamDefinition(userActivityStream, USER_ACTIVITY_STREAM,
+                                                           USER_ACTIVITY_STREAM_VERSION);
 		}
 	}
 
@@ -205,11 +207,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
              // if BAM is configured
 			if (enableUiActivityBamPublishing) {
 				// publish to BAM
-				if (!loadBalancingDataPublisher.isStreamDefinitionAdded(
+				if (loadBalancingDataPublisher.isStreamDefinitionAdded(
 						USER_ACTIVITY_STREAM, USER_ACTIVITY_STREAM_VERSION)) {
-					loadBalancingDataPublisher.addStreamDefinition(
-							userActivityStream, USER_ACTIVITY_STREAM,
-							USER_ACTIVITY_STREAM_VERSION);
 					Event event = new Event();
 					event.setTimeStamp(System.currentTimeMillis());
 					event.setPayloadData(new Object[] { appId, userId, item,
