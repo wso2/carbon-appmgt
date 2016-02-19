@@ -98,11 +98,11 @@ require('/modules/store.js').exec(function (ctx) {
     if (isMultipleVersionDisplayEnabled) {
         //if multiple versions to be displayed don't consider default version
         SITE_QUERY =
-        {"overview_treatAsASite": "FALSE"};
+        {"overview_treatAsASite": "TRUE"};
     } else {
         //if multiple versions to be displayed don consider default version
         SITE_QUERY =
-        {"overview_treatAsASite": "FALSE", "overview_makeAsDefaultVersion": "true"};
+        {"overview_treatAsASite": "TRUE", "overview_makeAsDefaultVersion": "true"};
     }
 
     var SITE_OPTIONS = {
