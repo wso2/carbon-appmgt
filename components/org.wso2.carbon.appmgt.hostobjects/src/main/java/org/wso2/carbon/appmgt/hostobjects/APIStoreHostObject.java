@@ -25,6 +25,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
@@ -3627,5 +3628,29 @@ public class APIStoreHostObject extends ScriptableObject {
     public static boolean jsFunction_isDisplayMultipleVersionsEnabled(Context cx, Scriptable thisObj, Object[] args,
                                                                       Function funObj) throws AppManagementException {
         return HostObjectComponent.isDisplayMultipleVersionsEnabled();
+    }
+
+    public static NativeObject jsFunction_getDefaultThumbnail(Context cx, Scriptable thisObj, Object[] args,
+                                                              Function funObj) throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        String appName = (String) args[0];
+
+        Map<String, String> defaultThumbnailData;
+        try {
+            defaultThumbnailData = HostObjectUtils.getDefaultThumbnail(appName);
+        } catch (IllegalArgumentException e) {
+            throw new AppManagementException("App name cannot be null or empty string.", e);
+        }
+
+        NativeObject defaultThumbnail = new NativeObject();
+        for (Map.Entry<String, String> entry : defaultThumbnailData.entrySet()) {
+            defaultThumbnail.put(entry.getKey(), defaultThumbnail, entry.getValue());
+        }
+        return defaultThumbnail;
     }
 }
