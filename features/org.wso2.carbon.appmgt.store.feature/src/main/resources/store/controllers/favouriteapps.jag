@@ -107,7 +107,7 @@ function filterAssets(assets) {
         // set default thumbnail
         var assetThumbnail = asset.thumburl;
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
-            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.appName);
+            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.appDisplayName);
         }
         // categorize asset either as webapp or site
         if (asset.treatAsSite == "TRUE") {
