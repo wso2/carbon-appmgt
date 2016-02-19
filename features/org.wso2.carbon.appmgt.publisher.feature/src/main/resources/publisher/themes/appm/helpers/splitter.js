@@ -24,7 +24,7 @@ var splitData = function(copyOfData){
     var overview_main = [];
     var overview_description;
     var uriTemplate = [];
-    var images = [];
+    var images ={};
     var sso = [];
     var oauthapis =[];
     var isMoreInfo = false;
@@ -57,7 +57,7 @@ var splitData = function(copyOfData){
         }else if (dataPart[i].name.search("uritemplate_")!=-1) {
             uriTemplate.push(dataPart[i]);
         }else if (dataPart[i].name.search("images_")!=-1) {
-            images.push(dataPart[i]);
+            images[dataPart[i].name] = dataPart[i].value;
         }else if (dataPart[i].name.search("sso_")!=-1) {
             sso.push(dataPart[i]);
         }else if (dataPart[i].name.search("oauthapis_")!=-1) {
