@@ -51,12 +51,12 @@
                         <i title="processing" class="fw fw-refresh fw-spin  fw-1_5x"
                            id="wait-{{uuid}}" style="display: none"></i>
                         {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
-                            <a href="{{url "/t"}}/{{appTenant}}/assets/webapp/{{advertisedAppUuid}}">
+                            <a href="{{url "/t"}}/{{appTenant}}/assets/site/{{advertisedAppUuid}}">
                                 <i title="App Overview"
                                    class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
                             </a>
                         {{else}}
-                            <a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
+                            <a href="{{tenantedUrl "/assets/site"}}/{{uuid}}">
                                 <i title="App Overview"
                                    class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
                             </a>

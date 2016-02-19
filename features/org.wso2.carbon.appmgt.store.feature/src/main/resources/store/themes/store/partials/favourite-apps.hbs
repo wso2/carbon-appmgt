@@ -29,10 +29,17 @@
                                    class="fw fw-minus fw-background-green fw-1_5x fw-inverse remove-from-fav"
                                    data-name="{{appName}}" data-provider="{{appProvider}}"
                                    data-version="{{version}}" id="rmv-{{uuid}}"></i>
-                                <a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
-                                    <i title="App Overview"
-                                       class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
-                                </a>
+                                {{#compare  ../type "Sites" operator="=="}}
+                                    <a href="{{tenantedUrl "/assets/site"}}/{{uuid}}">
+                                        <i title="App Overview"
+                                           class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
+                                    </a>
+                                {{else}}
+                                    <a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
+                                        <i title="App Overview"
+                                           class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
+                                    </a>
+                                {{/compare}}
                             </div>
                             <div class="app-assets-info">
 

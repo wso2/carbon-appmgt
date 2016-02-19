@@ -11,9 +11,9 @@ var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
 
-var APIInformationService = require('../services/api-information.js').serviceModule;
-var apiInfoManager = new APIInformationService.APIInformationService();
-apiInfoManager.init(jagg, session);
+var AppInformationService = require('../services/app-information.js').serviceModule;
+var appInfoManager = new AppInformationService.AppInformationService();
+appInfoManager.init(jagg, session);
 
 AppService = require(getServiceDir('app.js')).serviceModule;
 appInfoApi = new AppService.AppService();
@@ -363,14 +363,14 @@ require('/modules/store.js').exec(function (ctx) {
                                                    null);
         }
 
-        var apiData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
+        var apiData = appInfoManager.getAppDescription(asset.attributes.overview_provider,
                                                        asset.attributes.overview_name,
                                                        asset.attributes.overview_version);
 
         var myapps;
         myapps = appInfoApi.getApplications(username);
 
-        var availableTiers = apiInfoManager.getTiers();
+        var availableTiers = appInfoManager.getTiers();
 
         // user=authenticator.getLoggedInUser();
 
@@ -482,6 +482,8 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
         headerData.hideAllAppsLink = hideAllAppsLink;
+        headerData.appBarLink = caramel.configs().context + "/assets/site/" + aid;
+        headerData.appBarLinkText = "SITE OVERVIEW";
 
         caramel.render({
                            title: 'Store | ' + type,
