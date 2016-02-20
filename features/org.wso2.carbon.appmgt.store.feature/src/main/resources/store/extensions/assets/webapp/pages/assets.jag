@@ -208,7 +208,7 @@ require('/modules/store.js').exec(function (ctx) {
                     var appMgtDaoObj = new appMgtDaoService();
 
                     var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
-                                                            'false', isMultipleVersionDisplayEnabled);
+                                                            isSite, isMultipleVersionDisplayEnabled);
                     if (log.isDebugEnabled()) {
                         log.debug("Query executed successfully to get the assets hit count");
                     }
