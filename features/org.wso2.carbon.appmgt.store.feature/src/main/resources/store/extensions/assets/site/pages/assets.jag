@@ -196,7 +196,8 @@ require('/modules/store.js').exec(function (ctx) {
                 var getNextassetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
-                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE, 'true');
+                    var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE, isSite,
+                                                            isMultipleVersionDisplayEnabled);
                     if (log.isDebugEnabled()) {
                         log.debug("Query executed successfully to get the assets hit count");
                     }

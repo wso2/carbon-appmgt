@@ -23,6 +23,7 @@ $(function () {
     var loggedUser = $("#hdnUsertId").val();
     var allowAnonymous = $("#allowAnonymous").val();
     var skipGateway = $("#skipGateway").val();
+    var subscriptionOff = $("#subscription-off").val();
 
     //Hide html body when loading.
     $('#wrap').css('visibility', 'hidden');
@@ -51,16 +52,18 @@ $(function () {
         //Check if subscribed only if skip gateway disabled.
         if ((skipGateway == "false")) {
             if ($('#hdnUsertId').val() != "" && (allowAnonymous != "TRUE")) {
-                var isSubscribed = $('#subscribed').val();
-                if (isSubscribed.toLowerCase() === 'false') {
-                    noty({
-                        text : 'You have not subscribed to this app',
-                        'layout' : 'center',
-                        'timeout': 1500,
-                        'modal' : true
-                    });
-                    e.preventDefault();
-                    e.stopPropagation();
+                if(subscriptionOff != "true") {
+                    var isSubscribed = $('#subscribed').val();
+                    if (isSubscribed.toLowerCase() === 'false') {
+                        noty({
+                                 text: 'You have not subscribed to this app',
+                                 'layout': 'center',
+                                 'timeout': 1500,
+                                 'modal': true
+                             });
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 }
             }
         }
