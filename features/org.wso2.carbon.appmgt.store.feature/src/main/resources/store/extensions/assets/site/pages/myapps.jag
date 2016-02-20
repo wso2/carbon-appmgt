@@ -66,7 +66,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isSite = 'true';//To get the webapp tags
     var tagUrl = '/extensions/assets/site/myapps?tag=';
     url =
-    '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
+    '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
     var leftnav, rightnav, urlQuery;//For pagination
     
@@ -143,7 +143,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else if (query) { // if search from search box
             urlQuery = 'query=' + query + '&';
             query = require('/modules/search.js').build(query);
-            query.overview_treatAsASite = 'FALSE';
+            query.overview_treatAsASite = 'TRUE';
             if (!isMultipleVersionDisplayEnabled) {
                 query.overview_makeAsDefaultVersion = 'true';
             }
@@ -164,7 +164,7 @@ require('/modules/store.js').exec(function (ctx) {
 
                     var getNextAssetSet = function () {
                         var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
-                                                                'false');
+                                                                isSite, isMultipleVersionDisplayEnabled);
                         if (log.isDebugEnabled()) {
                             log.debug("Query executed successfully to get the assets hit count");
                         }
@@ -350,10 +350,10 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
-     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in user.
-     * anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
-     * apps retrieved from registry and APPM database have different format.So in roder to combine both change the format
-     * of apps from registry to the format of apps from APPM database.
+     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in
+     * user. anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
+     * apps retrieved from registry and APPM database have different format.So in roder to combine both change the
+     * format of apps from registry to the format of apps from APPM database.
      *
      * After formatted - [{"appName" : "app1", "appProvider" : "admin", "version" : "1", "appTenant" : "carbon.super",
      "thumburl" : "2567161d-0748-45bb-846c-5ebc1a937f82/Dj1FnGbOxeBSbms.jpg", "accessUrl" : "http://xxxx:8280/app1/",
@@ -395,10 +395,10 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
-     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in user.
-     * anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
-     * This method combine both anonymous + subscribed apps as well as mark whether an app is selected by user as favourite
-     * or not.
+     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in
+     * user. anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
+     * This method combine both anonymous + subscribed apps as well as mark whether an app is selected by user as
+     * favourite or not.
      * @param array1
      * @param array2
      * @returns {Array}
