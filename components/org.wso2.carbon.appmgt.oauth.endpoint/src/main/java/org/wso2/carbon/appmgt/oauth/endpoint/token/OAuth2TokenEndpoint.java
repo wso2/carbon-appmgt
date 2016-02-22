@@ -1,24 +1,24 @@
 package org.wso2.carbon.appmgt.oauth.endpoint.token;
 
 
-import org.apache.amber.oauth2.as.response.OAuthASResponse;
-import org.apache.amber.oauth2.as.response.OAuthASResponse.OAuthTokenResponseBuilder;
-import org.apache.amber.oauth2.common.OAuth;
-import org.apache.amber.oauth2.common.exception.OAuthProblemException;
-import org.apache.amber.oauth2.common.exception.OAuthSystemException;
-import org.apache.amber.oauth2.common.message.OAuthResponse;
-import org.apache.amber.oauth2.common.message.types.GrantType;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.oltu.oauth2.as.response.OAuthASResponse;
+import org.apache.oltu.oauth2.as.response.OAuthASResponse.OAuthTokenResponseBuilder;
+import org.apache.oltu.oauth2.common.OAuth;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.wso2.carbon.appmgt.gateway.dto.Token;
 import org.wso2.carbon.appmgt.oauth.endpoint.OAuthRequestWrapper;
+import org.wso2.carbon.appmgt.oauth.endpoint.util.EndpointUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.identity.oauth2.model.CarbonOAuthTokenRequest;
 import org.wso2.carbon.identity.oauth.common.OAuth2ErrorCodes;
 import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.common.exception.OAuthClientException;
-import org.wso2.carbon.appmgt.oauth.endpoint.util.EndpointUtil;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2AccessTokenReqDTO;
+import org.wso2.carbon.identity.oauth2.model.CarbonOAuthTokenRequest;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -42,8 +41,7 @@ public class OAuth2TokenEndpoint {
     @Path("/")
     @Consumes("application/x-www-form-urlencoded")
     public Response issueAccessToken(@Context HttpServletRequest request,
-            MultivaluedMap<String, String> paramMap) throws  OAuthSystemException
-    {
+                                     MultivaluedMap<String, String> paramMap) throws OAuthSystemException {
 
         try {
             PrivilegedCarbonContext.startTenantFlow();
@@ -110,18 +108,11 @@ public class OAuth2TokenEndpoint {
                 return respBuilder.entity(response.getBody()).build();
 
             } catch (OAuthProblemException e) {
-                log.debug(e.getError());
+                log.error("Error while creating the Carbon OAuth token request", e);
                 OAuthResponse res = OAuthASResponse
                         .errorResponse(HttpServletResponse.SC_BAD_REQUEST).error(e)
                         .buildJSONMessage();
                 return Response.status(res.getResponseStatus()).entity(res.getBody()).build();
-            } catch (OAuthClientException e) {
-                OAuthResponse response = OAuthASResponse
-                        .errorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-                        .setError(OAuth2ErrorCodes.SERVER_ERROR)
-                        .setErrorDescription(e.getMessage()).buildJSONMessage();
-                return Response.status(response.getResponseStatus()).entity(response.getBody())
-                        .build();
             }
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
@@ -138,8 +129,7 @@ public class OAuth2TokenEndpoint {
                 .entity(response.getBody()).build();
     }
 
-    private Token getAccessToken(CarbonOAuthTokenRequest oauthRequest)
-            throws OAuthClientException {
+    private Token getAccessToken(CarbonOAuthTokenRequest oauthRequest) {
 
         OAuth2AccessTokenReqDTO tokenReqDTO = new OAuth2AccessTokenReqDTO();
         String grantType = oauthRequest.getGrantType();
@@ -149,14 +139,14 @@ public class OAuth2TokenEndpoint {
         tokenReqDTO.setCallbackURI(oauthRequest.getRedirectURI());
         tokenReqDTO.setScope(oauthRequest.getScopes().toArray(new String[oauthRequest.getScopes().size()]));
         // Check the grant type and set the corresponding parameters
-        if(GrantType.AUTHORIZATION_CODE.toString().equals(grantType)){
+        if(GrantType.AUTHORIZATION_CODE.toString().equals(grantType)) {
             tokenReqDTO.setAuthorizationCode(oauthRequest.getCode());
-        } else if(GrantType.PASSWORD.toString().equals(grantType)){
+        } else if(GrantType.PASSWORD.toString().equals(grantType)) {
             tokenReqDTO.setResourceOwnerUsername(oauthRequest.getUsername().toLowerCase());
             tokenReqDTO.setResourceOwnerPassword(oauthRequest.getPassword());
-        } else if (GrantType.REFRESH_TOKEN.toString().equals(grantType)){
+        } else if (GrantType.REFRESH_TOKEN.toString().equals(grantType)) {
             tokenReqDTO.setRefreshToken(oauthRequest.getRefreshToken());
-        } else if (org.wso2.carbon.identity.oauth.common.GrantType.SAML20_BEARER.toString().equals(grantType)){
+        } else if (org.wso2.carbon.identity.oauth.common.GrantType.SAML20_BEARER.toString().equals(grantType)) {
             tokenReqDTO.setAssertion(oauthRequest.getAssertion());
             //tokenReqDTO.setIdp(oauthRequest.getIdP());
             tokenReqDTO.setTenantDomain(oauthRequest.getTenantDomain());

@@ -53,8 +53,6 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
     private static String AUTH_TYPE = "samlsso";
     private static String IDP_NAME = "idpName";
     private static String AUTHENTICATION_STEP = "authenticationStep";
-
-
     private IdentityApplicationManagementServiceStub appMgtStub;
     private IdentitySAMLSSOConfigServiceStub ssoStub;
     private Map<String, String> parameters;
@@ -281,7 +279,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             SAMLSSOServiceProviderDTO samlSPDTO = getIssuer(issuerName);
             ssoProvider.setAssertionConsumerURL(samlSPDTO.getAssertionConsumerUrl());
             ssoProvider.setNameIdFormat(samlSPDTO.getNameIDFormat());
-            ssoProvider.setLogoutUrl(samlSPDTO.getLogoutURL());
+            ssoProvider.setLogoutUrl(samlSPDTO.getSloResponseURL());
             ssoProvider.setIssuerName(samlSPDTO.getIssuer());
 
             return ssoProvider;

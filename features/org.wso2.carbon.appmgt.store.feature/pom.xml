@@ -88,7 +88,7 @@
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:greaterOrEqual:${carbon.kernel.base.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.registry.core:greaterOrEqual:${carbon.kernel.base.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.identity.self.registration.server:greaterOrEqual:${carbon.identity.base.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.user.registration.server:greaterOrEqual:${carbon.identity.base.version}</importFeatureDef>
 				                <importFeatureDef>org.wso2.carbon.store:${carbon.store.version}</importFeatureDef>
 			                    <importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
 				                <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
