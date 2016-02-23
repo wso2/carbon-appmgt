@@ -246,10 +246,17 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
     var operation = (context.params.operation) || '';
     var type = context.params.type;
 
-    var isSelfSubscriptionEnabled = apiProvider.isSelfSubscriptionEnabled();
+    var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+    var disableSubscriptionStats;
+    if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+       disableSubscriptionStats = false;
+    }else{
+       disableSubscriptionStats = true;
+    }
+
     if (operation == 'statistics') {
         try {
-            caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:isSelfSubscriptionEnabled});
+            caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
 
         } catch (e) {
             response.sendError(404, 'Asset type not found'); //TODO: Replace

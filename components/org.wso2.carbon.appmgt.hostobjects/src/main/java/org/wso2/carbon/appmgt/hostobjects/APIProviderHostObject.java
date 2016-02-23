@@ -3778,9 +3778,23 @@ public class APIProviderHostObject extends ScriptableObject {
         return webAppNativeObj;
     }
 
-    public static boolean jsFunction_isSelfSubscriptionEnabled(Context cx, Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
-        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-        return Boolean.parseBoolean(config.getFirstProperty(AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+    /**
+     * Returns the current subscription configuration defined in app-manager.xml.
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return Subscription Configuration
+     * @throws AppManagementException
+     */
+    public static NativeObject jsFunction_getSubscriptionConfiguration(Context cx, Scriptable thisObj, Object[] args,
+                                                                       Function funObj) throws AppManagementException {
+        Map<String, Boolean> subscriptionConfigurationData = HostObjectUtils.getSubscriptionConfiguration();
+        NativeObject subscriptionConfiguration = new NativeObject();
+        for (Map.Entry<String, Boolean> entry : subscriptionConfigurationData.entrySet()) {
+            subscriptionConfiguration.put(entry.getKey(), subscriptionConfiguration, entry.getValue().booleanValue());
+        }
+        return subscriptionConfiguration;
     }
 
     public static NativeObject jsFunction_getDefaultThumbnail(Context cx, Scriptable thisObj, Object[] args,

@@ -80,10 +80,16 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var output = model.export('form');
         var title = shortName;
-        var isSelfSubscriptionEnabled = apiProvider.isSelfSubscriptionEnabled();
+        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var isSubscriptionEnabled;
+        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+            isSubscriptionEnabled = false;
+        }else{
+            isSubscriptionEnabled = true;
+        }
         output.sso_provider = getIdentityProviderUrl();
         caramel.render({
-            isSelfSubscriptionEnabled:isSelfSubscriptionEnabled,
+            isSubscriptionEnabled:isSubscriptionEnabled,
             op: operation,
             cuser: server.current(session),
             shortName: shortName,
@@ -197,7 +203,13 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             return;
         }
 
-        var isSelfSubscriptionEnabled = apiProvider.isSelfSubscriptionEnabled();
+        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var isSubscriptionEnabled;
+        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+            isSubscriptionEnabled = false;
+        }else{
+            isSubscriptionEnabled = true;
+        }
 
         //print(context.params);
         var id = context.params.id;
@@ -305,7 +317,7 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                 });
             } else {
                 caramel.render({
-                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                    isSubscriptionEnabled: isSubscriptionEnabled,
                     op: operation,
                     cuser: user,
                     shortName: shortName,
