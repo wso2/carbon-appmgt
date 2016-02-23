@@ -144,6 +144,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 
 			loadBalancingDataPublisher = new LoadBalancingDataPublisher(
 					allReceiverGroups, agent);
+            loadBalancingDataPublisher.addStreamDefinition(userActivityStream, USER_ACTIVITY_STREAM,
+                                                           USER_ACTIVITY_STREAM_VERSION);
 		}
 	}
 
@@ -205,11 +207,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
              // if BAM is configured
 			if (enableUiActivityBamPublishing) {
 				// publish to BAM
-				if (!loadBalancingDataPublisher.isStreamDefinitionAdded(
+				if (loadBalancingDataPublisher.isStreamDefinitionAdded(
 						USER_ACTIVITY_STREAM, USER_ACTIVITY_STREAM_VERSION)) {
-					loadBalancingDataPublisher.addStreamDefinition(
-							userActivityStream, USER_ACTIVITY_STREAM,
-							USER_ACTIVITY_STREAM_VERSION);
 					Event event = new Event();
 					event.setTimeStamp(System.currentTimeMillis());
 					event.setPayloadData(new Object[] { appId, userId, item,
@@ -218,9 +217,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 							USER_ACTIVITY_STREAM_VERSION, event);
 				}
 			} else {
-				// Write directly to DB
+                // Write directly to DB
                 AppMDAO.saveStoreHits(appId.trim(), userId.trim(), tenantId, appName.trim(),
-                                      appVersion, context);
+                                      appVersion, context, timeStamp);
             }
 		} catch (AgentException e) {
              // Here the exception is only logged (but not thrown externally) as this method is

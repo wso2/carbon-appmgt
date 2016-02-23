@@ -208,7 +208,7 @@ require('/modules/store.js').exec(function (ctx) {
                     var appMgtDaoObj = new appMgtDaoService();
 
                     var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
-                                                            'false', isMultipleVersionDisplayEnabled);
+                                                            isSite, isMultipleVersionDisplayEnabled);
                     if (log.isDebugEnabled()) {
                         log.debug("Query executed successfully to get the assets hit count");
                     }
@@ -388,6 +388,8 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.domain = tenantDomain;
+    headerData.appBarLink = caramel.configs().context + "/assets/webapp";
+    headerData.appBarLinkText = "ALL WEB APPS";
 
     var isSite;
     if (customType == WEBAPP_TYPE) {

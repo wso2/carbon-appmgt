@@ -90,19 +90,32 @@ function getServiceDir(serviceName) {
 }
 
 /**
- This method filter the given assets based on the type webapp/site **/
+ * Filter specified assets whiles setting their default thumbnail.
+ * @param assets {Object[]} assets to be filtered & processed
+ * @returns {{assets: Object[], type: string}[]} filtered assets
+ */
 function filterAssets(assets) {
     var sites = [];
     var webApps = [];
     var apps = [];
-    for (var i = 0; i < assets.length; i++) {
-        if (assets[i].treatAsSite == "TRUE") {
-            sites.push(assets[i]);
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
+
+    var numberOfAssets = assets.length;
+    for (var i = 0; i < numberOfAssets; i++) {
+        var asset = assets[i];
+        // set default thumbnail
+        var assetThumbnail = asset.thumburl;
+        if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.appDisplayName);
+        }
+        // categorize asset either as webapp or site
+        if (asset.treatAsSite == "TRUE") {
+            sites.push(asset);
         } else {
-            webApps.push(assets[i]);
+            webApps.push(asset);
         }
     }
-
     if (webApps.length > 0) {
         apps.push({
                       assets: webApps,

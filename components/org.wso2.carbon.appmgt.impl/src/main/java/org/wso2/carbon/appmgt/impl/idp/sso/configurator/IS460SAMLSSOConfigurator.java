@@ -125,7 +125,7 @@ public class IS460SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             ssoProvider.setClaims(samlSPDTO.getRequestedClaims());
             ssoProvider.setAssertionConsumerURL(samlSPDTO.getAssertionConsumerUrl());
             ssoProvider.setNameIdFormat(samlSPDTO.getNameIDFormat());
-            ssoProvider.setLogoutUrl(samlSPDTO.getLogoutURL());
+            ssoProvider.setLogoutUrl(samlSPDTO.getSloResponseURL());
             ssoProvider.setIssuerName(samlSPDTO.getIssuer());
 
             return ssoProvider;

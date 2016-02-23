@@ -11,10 +11,18 @@
                     <a href="{{productionURL}}" target="_blank" data-name="{{attributes.overview_name}}"
                        data-version="{{attributes.overview_version}}"
                        data-context="{{attributes.overview_context}}" data-id="{{id}}" class="accessUrl">
-                        <img class="app-assets-icon" src="{{attributes.images_thumbnail}}"
-                             data-name="{{attributes.overview_name}}"
-                             data-version="{{attributes.overview_version}}"
-                             data-context="{{attributes.overview_context}}" data-id="{{id}}">
+                        {{#if defaultThumbnail}}
+                            <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                                {{defaultThumbnail.text}}
+                            </div>
+                        {{else}}
+                            <div class="app-assets-icon">
+                                <img src="{{attributes.images_thumbnail}}"
+                                     data-name="{{attributes.overview_name}}"
+                                     data-version="{{attributes.overview_version}}"
+                                     data-context="{{attributes.overview_context}}" data-id="{{id}}" />
+                            </div>
+                        {{/if}}
                     </a>
 
                     <div class="app-assets-icon-info" style="cursor:pointer">
@@ -48,12 +56,12 @@
                         <i title="Remove From Favourite" class="fw fw-refresh fw-spin  fw-1_5x"
                            id="wait-{{id}}" style="display: none"></i>
                         {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
-                            <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/webapp/{{attributes.overview_advertisedAppUuid}}">
+                            <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/site/{{attributes.overview_advertisedAppUuid}}">
                                 <i title="App Overview"
                                    class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
                             </a>
                         {{else}}
-                            <a href="{{tenantedUrl "/assets/webapp"}}/{{id}}">
+                            <a href="{{tenantedUrl "/assets/site"}}/{{id}}">
                                 <i title="App Overview"
                                    class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
                             </a>
@@ -87,12 +95,12 @@
     <ul class="pager">
         {{#if leftNav}}
             <li>
-                <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a>
+                <a href="{{tenantedUrl "/extensions/assets/site/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a>
             </li>
         {{/if}}
         {{#if rightNav}}
             <li>
-                <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a>
+                <a href="{{tenantedUrl "/extensions/assets/site/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a>
             </li>
         </ul>
         {{/if}}

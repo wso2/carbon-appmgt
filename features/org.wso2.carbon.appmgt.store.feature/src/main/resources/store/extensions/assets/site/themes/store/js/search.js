@@ -163,7 +163,7 @@ $(function () {
                 if (searchSelect !== "App") {
                     searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
                 }
-                location.href = caramel.tenantedUrl("/assets/" + "site" + "?query=" + searchTerm);
+                location.href = caramel.tenantedUrl("/extensions/assets/site/myapps" + "?query=" + searchTerm);
             }
         }
     });

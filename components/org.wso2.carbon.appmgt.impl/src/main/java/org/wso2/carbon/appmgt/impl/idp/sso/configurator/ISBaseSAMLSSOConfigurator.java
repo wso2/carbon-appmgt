@@ -44,7 +44,8 @@ public abstract class ISBaseSAMLSSOConfigurator {
         SAMLSSOServiceProviderDTO dto = new SAMLSSOServiceProviderDTO();
 
         dto.setIssuer(provider.getIssuerName());
-        dto.setAssertionConsumerUrl(provider.getAssertionConsumerURL());
+        dto.setAssertionConsumerUrls(new String[]{provider.getAssertionConsumerURL()});
+        dto.setDefaultAssertionConsumerUrl(provider.getAssertionConsumerURL());
         dto.setCertAlias(null);
 
         dto.setNameIDFormat(provider.getNameIdFormat());
@@ -53,7 +54,7 @@ public abstract class ISBaseSAMLSSOConfigurator {
         }
 
         dto.setDoSingleLogout(true);
-        dto.setLogoutURL(provider.getLogoutUrl());
+        dto.setSloResponseURL(provider.getLogoutUrl());
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);
 

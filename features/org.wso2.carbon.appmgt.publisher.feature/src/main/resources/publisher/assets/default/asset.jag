@@ -350,9 +350,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
         //Check if the type is valid
         try {
-            model.import('form.importer', context.post);
             //Process and add any files in the request if the application is not in the copy mode
-            if (model.get('overview.treatAsASite').value.toString().toLowerCase() == 'true') {
+            if (context.post["overview_treatAsASite"].toLowerCase() == 'true') {
                 assetType = SITE_TYPE;
             } else {
                 assetType = WEBAPP_TYPE;
@@ -363,9 +362,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
             model.import('form.importer', context.post);
 
-
             //Perform validation on the model
-
             var report = model.validate();
 
             if ((report) && (report.failed)) {
@@ -744,36 +741,16 @@ function addTags(params,assetId,artifactManager,reg){
      */
     function inspectFiles(req, params) {
         var files = req.getAllFiles();
-        var fileName;
-        var file;
-        var uuid = '';
-        var extension;
-        var thumbnail;
-        var banner;
-        var thumbnailFilePath;
-        var bannerFilePath;
 
-        if (assetType == SITE_TYPE) {
-            thumbnailFilePath = "/config/defaults/img/site-thumbnail.jpg";
-            bannerFilePath = "/config/defaults/img/site-banner.jpg"
-        } else {
-            thumbnailFilePath = "/config/defaults/img/thumbnail.jpg";
-            bannerFilePath = "/config/defaults/img/banner.jpg"
-        }
-        //setting default img if no images given for a webapp
+        // For thumbnail & banner: if not uploaded then set the POST parameter to empty string
         if (files == null) {
-            var files = {};
-            var thumbnail = new File(thumbnailFilePath);
-            var banner = new File(bannerFilePath);
-
-            files["images_thumbnail"] = thumbnail;
-            files["images_banner"] = banner;
+            params["images_thumbnail"] = "";
+            params["images_banner"] = "";
+            return;
         } else if (files.images_thumbnail == null) {
-            thumbnail = new File(thumbnailFilePath);
-            files["images_thumbnail"] = thumbnail;
+            params["images_thumbnail"] = "";
         } else if (files.images_banner == null) {
-            var banner = new File(bannerFilePath);
-            files["images_banner"] = banner;
+            params["images_banner"] = "";
         }
 
         var storageManager = new storageModule.StorageManager({
@@ -785,14 +762,16 @@ function addTags(params,assetId,artifactManager,reg){
         });
 
         for (var index in files) {
-
-            file = files[index];
+            if (!files.hasOwnProperty(index)) {
+                continue;
+            }
+            var file = files[index];
             //Put the file in storage and get a uuid as a reference
             var resource = {};
             resource['file'] = file;
-            extension = utility.fileio.getExtension(file);
+            var extension = utility.fileio.getExtension(file);
             resource['contentType'] = utility.fileio.getContentType(extension);
-            uuid = storageManager.put(resource);
+            var uuid = storageManager.put(resource);
 
             //Add a new  entry into the POST parameters containing the uuid
             params[index] = uuid;

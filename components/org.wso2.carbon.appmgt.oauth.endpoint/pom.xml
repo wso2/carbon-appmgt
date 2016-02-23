@@ -58,11 +58,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.amber.wso2</groupId>
-            <artifactId>amber</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.cxf.wso2</groupId>
             <artifactId>cxf-bundle</artifactId>
             <scope>provided</scope>

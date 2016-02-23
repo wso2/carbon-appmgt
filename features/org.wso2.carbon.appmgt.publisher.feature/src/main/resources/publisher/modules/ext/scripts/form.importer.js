@@ -21,7 +21,9 @@ var module = function () {
 
         //Go through each key
         for (var key in data) {
-
+            if (!data.hasOwnProperty(key)) {
+                continue;
+            }
             //break up the key
             var field = key.replace('_', '.');
             log.debug('Saving field: ' + field);
@@ -38,10 +40,8 @@ var module = function () {
             }
 
             var fieldValue = data[key];
-            if ((!data[key]) && (fieldData)) {
-                log.debug('* ' + fieldData.value);
+            if ((!fieldValue) && (fieldData)) {
                 fieldValue = fieldData.value || ' ';
-
             }
 
             model.setField(field, fieldValue);

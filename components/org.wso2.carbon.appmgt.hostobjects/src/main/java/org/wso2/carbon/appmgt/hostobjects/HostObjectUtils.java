@@ -20,6 +20,7 @@
 package org.wso2.carbon.appmgt.hostobjects;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -33,9 +34,19 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HostObjectUtils {
     private static final Log log = LogFactory.getLog(APIProviderHostObject.class);
+    /**
+     * Hex color codes for generating default thumbnails.
+     * TODO: load colors from a config file
+     */
+    private static final String[] DEFAULT_THUMBNAIL_COLORS = new String[]{"1abc9c", "2ecc71", "3498db", "9b59b6",
+            "34495e", "16a085", "27ae60", "2980b9", "8e44ad", "2c3e50", "f1c40f", "e67e22", "e74c3c", "95a5a6",
+            "f39c12", "d35400", "c0392b", "7f8c8d"};
+
     private static ConfigurationContextService configContextService = null;
 
      public static void setConfigContextService(ConfigurationContextService configContext) {
@@ -141,5 +152,41 @@ public class HostObjectUtils {
                 ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String enabledStr = configuration.getFirstProperty(APIMgtUsagePublisherConstants.API_USAGE_ENABLED);
         return enabledStr != null && Boolean.parseBoolean(enabledStr);
+    }
+
+    /**
+     * Returns the text (key {@code text}) and color (key {@code color}) of the default thumbnail based on the specified app name.
+     * @param appName app name
+     * @return default thumbnail data
+     * @exception IllegalArgumentException if {@code appName} is {@code null} or empty
+     */
+    public static Map<String, String> getDefaultThumbnail(String appName) {
+        if (appName == null) {
+            throw new IllegalArgumentException("Invalid argument. App name cannot be null.");
+        }
+        if (appName.isEmpty()) {
+            throw new IllegalArgumentException("Invalid argument. App name cannot be empty.");
+        }
+
+        String[] wordsInAppName = StringUtils.split(appName);
+        int firstCodePoint, secondCodePoint;
+        if (wordsInAppName.length == 1) {
+            // one word
+            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+            secondCodePoint = wordsInAppName[0].codePointAt(Character.charCount(firstCodePoint));
+        } else {
+            // two or more words
+            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+            secondCodePoint = wordsInAppName[1].codePointAt(0);
+        }
+        String defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
+                Character.toChars(secondCodePoint)).toString();
+        String defaultThumbnailColor = DEFAULT_THUMBNAIL_COLORS[Math.abs(appName.hashCode()) %
+                DEFAULT_THUMBNAIL_COLORS.length];
+
+        Map<String, String> defaultThumbnail = new HashMap<String, String>(2);
+        defaultThumbnail.put("text", defaultThumbnailText);
+        defaultThumbnail.put("color", defaultThumbnailColor);
+        return defaultThumbnail;
     }
 }

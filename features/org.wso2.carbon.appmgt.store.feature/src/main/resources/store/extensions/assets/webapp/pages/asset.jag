@@ -169,6 +169,17 @@ require('/modules/store.js').exec(function (ctx) {
             username = authenticator.getLoggedInUser().username;
         }
 
+        /**
+         * Sets the default thumbnail of the specified asset.
+         * @param asset {Object} asset
+         */
+        var setDefaultThumbnail = function (asset) {
+            var assetThumbnail = asset.attributes.images_thumbnail;
+            if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+                asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+            }
+        };
+
         /*
          The function obtains the assets published by the given provider
          */
@@ -406,6 +417,14 @@ require('/modules/store.js').exec(function (ctx) {
             skipGateway = false;
         }
 
+        // set default thumbnail
+        setDefaultThumbnail(asset);
+        // set default banner
+        var assetBanner = asset.attributes.images_banner;
+        if (!assetBanner || (assetBanner.trim().length == 0)) {
+            asset.defaultBanner =
+                asset.defaultThumbnail || storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+        }
 
         var process = require('process');
         //set local ip
@@ -414,23 +433,28 @@ require('/modules/store.js').exec(function (ctx) {
         asset.attributes.httpsPort = process.getProperty('https.port');
 
         for (var i = 0; i < assetsByProvider.assets.length; i++) {
-            var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetsByProvider.assets[i].id));
+            var assetByProvider = assetsByProvider.assets[i];
+            var appRatingByProviderJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + assetByProvider.id));
             if (appRatingByProviderJson) {
-                assetsByProvider.assets[i].rating = {average: Math.floor(appRatingByProviderJson.rating)};
+                assetByProvider.rating = {average: Math.floor(appRatingByProviderJson.rating)};
             } else {
-                assetsByProvider.assets[i].rating = 0;
+                assetByProvider.rating = 0;
             }
+            // set default thumbnail of 'assetByProvider'
+            setDefaultThumbnail(assetByProvider);
         }
 
         var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
-
         for (var i = 0; i < recentAssets.length; i++) {
-            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAssets[i].id));
+            var recentAsset = recentAssets[i];
+            var appRatingRecentAssetsJson = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentAsset.id));
             if (appRatingRecentAssetsJson) {
-                recentAssets[i].rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
+                recentAsset.rating = {average: Math.floor(appRatingRecentAssetsJson.rating)};
             } else {
-                recentAssets[i].rating = 0;
+                recentAsset.rating = 0;
             }
+            // set default thumbnail of 'recentAsset'
+            setDefaultThumbnail(recentAsset);
         }
 
         var subVisibility = true;
@@ -465,6 +489,8 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
         headerData.hideAllAppsLink = hideAllAppsLink;
+        headerData.appBarLink = caramel.configs().context + "/assets/webapp/" + aid;
+        headerData.appBarLinkText = "WEB APP OVERVIEW";
 
         caramel.render({
             title: 'Store | ' + type,

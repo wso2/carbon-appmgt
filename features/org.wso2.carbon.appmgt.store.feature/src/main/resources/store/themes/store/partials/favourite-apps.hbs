@@ -10,10 +10,18 @@
                             <a href="{{gatewayUrl}}" target="_blank" data-name="{{appName}}"
                                data-version="{{version}}"
                                data-context="{{context}}" data-id="{{uuid}}" class="accessUrl">
-                                <img class="app-assets-icon" src={{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}"
-                                     data-name="{{appName}}"
-                                     data-version="{{version}}"
-                                     data-context="{{context}}" data-id="{{uuid}}>
+                                {{#if defaultThumbnail}}
+                                    <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                                        {{defaultThumbnail.text}}
+                                    </div>
+                                {{else}}
+                                    <div class="app-assets-icon">
+                                            <img class="app-assets-icon"
+                                                 src={{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}"
+                                                 data-name="{{appName}}" data-version="{{version}}"
+                                                 data-context="{{context}}" data-id="{{uuid}} />
+                                    </div>
+                                {{/if}}
                             </a>
 
                             <div class="app-assets-icon-info" style="cursor:pointer">
@@ -21,15 +29,22 @@
                                    class="fw fw-minus fw-background-green fw-1_5x fw-inverse remove-from-fav"
                                    data-name="{{appName}}" data-provider="{{appProvider}}"
                                    data-version="{{version}}" id="rmv-{{uuid}}"></i>
-                                <a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
-                                    <i title="App Overview"
-                                       class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
-                                </a>
+                                {{#compare  ../type "Sites" operator="=="}}
+                                    <a href="{{tenantedUrl "/assets/site"}}/{{uuid}}">
+                                        <i title="App Overview"
+                                           class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
+                                    </a>
+                                {{else}}
+                                    <a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
+                                        <i title="App Overview"
+                                           class="fw fw-view fw-background-green fw-1_5x fw-inverse"></i>
+                                    </a>
+                                {{/compare}}
                             </div>
                             <div class="app-assets-info">
 
                                 <div class="app-assets-name">
-                                    {{appName}}
+                                    {{appDisplayName}}
                                 </div>
                                 <div class="app-assets-provider">
                                     {{appProvider}}
