@@ -119,12 +119,13 @@ require('/modules/store.js').exec(function (ctx) {
     var setDefaultThumbnail = function (asset) {
         var assetThumbnail = asset.attributes.images_thumbnail;
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
-            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+            var displayName = String(asset.attributes.overview_displayName);
+            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(displayName);
         }
     };
 
     /**
-     * This method is used to retrieve the assets from registry when both subscriptions are disabled.
+     * Retrieve the assets from registry when both subscriptions are disabled.
      */
     var getAssetsFromRegistry = function () {
         if (tag == 'undefined') {
@@ -256,7 +257,7 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
-     * This method is used to retrieve the recently added assets from registry when both subscriptions are disabled.
+     * Retrieve the recently added assets from registry when both subscriptions are disabled.
      */
     var getRecentAssetsFromRegistry = function () {
         var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
@@ -309,16 +310,14 @@ require('/modules/store.js').exec(function (ctx) {
     };
 
     /**
-     * This method add more informations to the apps retrieved from registry when both subscriptions are disabled.
-     * @param webApps
-     * @returns {*}
+     * Add more information to the apps.
      */
-    var addMoreInformationToWebApps = function (webApps) {
+    var addMoreInformationToWebApps = function () {
         var AppInformationService = require('../services/app-information.js').serviceModule;
         var appInfoManager = new AppInformationService.AppInformationService();
         appInfoManager.init(jagg, session);
 
-        webApps.forEach(function (app) {
+        assets.forEach(function (app) {
             //set rating
             if (JSON.parse(social.getRating("webapp:" + app.id))) {
                 app.rating = Math.floor(JSON.parse(social.getRating("webapp:" + app.id)).rating);
@@ -326,56 +325,56 @@ require('/modules/store.js').exec(function (ctx) {
                 app.rating = 0;
             }
 
-            //Set the access URL -By oneclick user should access the app in myapps page.
-            if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
-                //Get the gatewayurl
-                var appData = appInfoManager.getAppDescription(app.attributes.overview_provider,
-                                                               app.attributes.overview_name,
-                                                               app.attributes.overview_version);
-                app.productionURL = appData.serverURL.productionURL;
-            } else {
-                //Get the direct webapp url
-                app.productionURL = app.attributes.overview_webAppUrl;
+            //Set the access URL -By one click user should access the app in myapps page.
+            if(!app.accessUrl) {
+                if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
+                    //Get the gatewayurl
+                    var appData = appInfoManager.getAppDescription(app.attributes.overview_provider,
+                                                                   app.attributes.overview_name,
+                                                                   app.attributes.overview_version);
+                    app.accessUrl = appData.serverURL.productionURL;
+                } else {
+                    //Get the direct webapp url
+                    app.accessUrl = app.attributes.overview_webAppUrl;
+                }
             }
 
-            //set favourite app or not- This infomation will be used to set proper icon(add/remove favourite) on asset
+            //set favourite app or not- This information will be used to set proper icon(add/remove favourite) on asset
             // tile
             app.isFavourite = false;
             if (isFavouriteApp(app.attributes.overview_name, app.attributes.overview_version,
                                app.attributes.overview_provider)) {
                 app.isFavourite = true;
             }
+
+            //set thumbnail
+            setDefaultThumbnail(app);
         });
-        return webApps;
     };
 
     /**
      * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in
      * user. anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
-     * apps retrieved from registry and APPM database have different format.So in roder to combine both change the
+     * apps retrieved from registry and APPM database have different format.So in order to combine both change the
      * format of apps from registry to the format of apps from APPM database.
-     *
-     * After formatted - [{"appName" : "app1", "appProvider" : "admin", "version" : "1", "appTenant" : "carbon.super",
-     "thumburl" : "2567161d-0748-45bb-846c-5ebc1a937f82/Dj1FnGbOxeBSbms.jpg", "accessUrl" : "http://xxxx:8280/app1/",
-     "uuid" : "e77cbef5-48ec-4b9f-9f69-a954f0b77a1f", "advertiseOnly" : false, "advertisedAppUuid" : null}]
      */
-
     var changeFormat = function (apps) {
         var AppInformationService = require('../services/app-information.js').serviceModule;
         var appInfoManager = new AppInformationService.AppInformationService();
         appInfoManager.init(jagg, session);
 
-        var formattedApps = [];
+        var resultApps = [];
         apps.forEach(function (app) {
             var tempApp = {};
-            tempApp["appName"] = app.attributes.overview_name;
-            tempApp["appProvider"] = app.attributes.overview_provider;
-            tempApp["version"] = app.attributes.overview_version;
-            tempApp["appTenant"] = app.attributes.overview_appTenant;
-            tempApp["thumburl"] = app.attributes.images_thumbnail;
-            tempApp["uuid"] = app.id;
-            tempApp["advertiseOnly"] = app.attributes.overview_advertiseOnly;
-            tempApp["advertisedAppUuid"] = app.attributes.overview_advertisedAppUuid;
+            tempApp["overview_name"] = app.attributes.overview_name;
+            tempApp["overview_provider"] = app.attributes.overview_provider;
+            tempApp["overview_context"] = app.attributes.overview_context;
+            tempApp["overview_version"] = app.attributes.overview_version;
+            tempApp["overview_appTenant"] = app.attributes.overview_appTenant;
+            tempApp["images_thumbnail"] = app.attributes.images_thumbnail;
+            tempApp["id"] = app.id;
+            tempApp["overview_advertiseOnly"] = app.attributes.overview_advertiseOnly;
+            tempApp["overview_advertisedAppUuid"] = app.attributes.overview_advertisedAppUuid;
 
             //Set the access URL
             if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
@@ -388,9 +387,9 @@ require('/modules/store.js').exec(function (ctx) {
                 //Get the direct webapp url
                 tempApp["accessUrl"] = asset.attributes.overview_webAppUrl;
             }
-            formattedApps.push(tempApp);
+            resultApps.push(tempApp);
         });
-        return formattedApps;
+        return resultApps;
 
     };
 
@@ -406,18 +405,10 @@ require('/modules/store.js').exec(function (ctx) {
     var mergeArrays = function (array1, array2) {
         var mergedArray = [];
         for (var i = 0; i < array1.length; i++) {
-            array1[i]["isFavourite"] = false;
-            if (isFavouriteApp(array1[i].appName, array1[i].version, array1[i].appProvider)) {
-                array1[i]["isFavourite"] = true;
-            }
             mergedArray.push(array1[i]);
         }
 
         for (var i = 0; i < array2.length; i++) {
-            array2[i]["isFavourite"] = false;
-            if (isFavouriteApp(array2[i].appName, array2[i].version, array2[i].appProvider)) {
-                array2[i]["isFavourite"] = true;
-            }
             mergedArray.push(array2[i]);
         }
         return mergedArray;
@@ -435,6 +426,21 @@ require('/modules/store.js').exec(function (ctx) {
             return (cond1 && cond2 && cond3);
         };
         return subscriptionUtil.getAnonymousApps(fn, request, session, tenantId);
+    };
+
+    /**
+     * Get user subscribed webapps from APM db and filter for sites
+     * @returns {*}
+     */
+    var getUserSubscribedWebApps = function () {
+        var apps = subsApp.getUserSubscribedApps(String(user.username),user.tenantId,String(tenantDomain));
+        var webApps = [];
+        for (var i = 0; i < apps.length; i++) {
+            if (apps[i].attributes.overview_treatAsSite == "TRUE") {
+                webApps.push(apps[i]);
+            }
+        }
+        return webApps;
     };
 
     /**
@@ -464,7 +470,7 @@ require('/modules/store.js').exec(function (ctx) {
         //requested method(sort,search or normal)
         getAssetsFromRegistry();
         //Add rating , production url ,etc to retrieved apps
-        assets = addMoreInformationToWebApps(assets);
+        addMoreInformationToWebApps();
         //get recently added apps from registry
         getRecentAssetsFromRegistry();
         //check for pagination
@@ -475,20 +481,22 @@ require('/modules/store.js').exec(function (ctx) {
         showSortOptions = true; //display sorting options in  body
     } else {
         if (user) {
-            //Display anoymous apps + subscribed apps
+            //Display anonymous apps + subscribed apps
 
             //get anonymous app from registry(Can't get the anonymous apps from APPM databse together subscribed apps
             // .Because in APPM no information available to identify whether app type is 'webapp' or 'site' )
             var anonymousApps = getAnonymousApps();
             anonymousApps = changeFormat(anonymousApps);
             //get user subscribed apps
-            var subscribedApps = subsApp.getUserSubscribedApps(String(user.username),user.tenantId,String(tenantDomain));
+            var subscribedApps = getUserSubscribedWebApps();
             //merge anonymous + subscribe apps
             assets = mergeArrays(anonymousApps, subscribedApps);
+            addMoreInformationToWebApps();
         } else {
             //Display all the anonymous apps
             var anonymousApps = getAnonymousApps();
             assets = changeFormat(anonymousApps);
+            addMoreInformationToWebApps();
         }
     }
 

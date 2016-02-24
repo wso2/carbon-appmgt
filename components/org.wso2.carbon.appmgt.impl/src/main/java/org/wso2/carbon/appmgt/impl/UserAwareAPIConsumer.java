@@ -90,60 +90,60 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     }
 
     @Override
-    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
+    public void addToFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        super.addToFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
+        super.addToFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser,
+    public void removeFromFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser,
                                         int tenantIdOfStore) throws AppManagementException {
         checkSubscribePermission();
-        super.removeFromFavouriteApps(identifier, userId, tenantIdOfUser, tenantIdOfStore);
+        super.removeFromFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
+    public boolean isFavouriteApp(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.isFavouriteApp(identifier, userId, tenantIdOfUser, tenantIdOfStore);
+        return super.isFavouriteApp(identifier, username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public List<APIIdentifier> getFavouriteApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.getFavouriteApps(userName, tenantIdOfUser, tenantIdOfStore);
+        return super.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore);
     }
 
 
     @Override
-    public List<APIIdentifier> getUserSubscribedApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.getUserSubscribedApps(userName, tenantIdOfUser, tenantIdOfStore);
+        return super.getUserSubscribedApps(username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void setFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public void setFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        super.setFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
+        super.setFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public void removeFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public void removeFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        super.removeFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
+        super.removeFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
     }
 
     @Override
-    public boolean hasFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public boolean hasFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.hasFavouritePage(userName, tenantIdOfUser, tenantIdOfStore);
+        return super.hasFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
 
     }
     public void checkSubscribePermission() throws AppManagementException {

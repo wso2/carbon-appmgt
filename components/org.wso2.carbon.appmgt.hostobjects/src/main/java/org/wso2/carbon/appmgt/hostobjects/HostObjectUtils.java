@@ -189,4 +189,25 @@ public class HostObjectUtils {
         defaultThumbnail.put("color", defaultThumbnailColor);
         return defaultThumbnail;
     }
+
+    /**
+     * Returns the current subscription configuration values of "EnableSelfSubscription" and
+     * "EnableEnterpriseSubscription" elements, defined in app-manager.xml.
+     *
+     * @return Subscription Configuration.
+     */
+    public static Map<String, Boolean> getSubscriptionConfiguration() {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        Boolean selfSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
+                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
+                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+        Map<String, Boolean> subscriptionCofig = new HashMap<String, Boolean>(2);
+        subscriptionCofig.put("EnableSelfSubscription", selfSubscriptionStatus);
+        subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
+        return subscriptionCofig;
+    }
+
+
 }
