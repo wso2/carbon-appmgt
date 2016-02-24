@@ -419,8 +419,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             var roleRestrictionPath = currentArtifact.path + "role_restrictions";
             try {
                 var permissionSet = registry.get(roleRestrictionPath);
-                var permissionContent = '' + permissionSet.content;
-                if (permissionContent) {
+                if (Object.keys(permissionSet.content).length > 0) {
                     userManager.denyRole('Internal/everyone', currentArtifact.path,
                                          carbon.registry.actions.GET);
                     userManager.denyRole('system/wso2.anonymous.role', currentArtifact.path,
