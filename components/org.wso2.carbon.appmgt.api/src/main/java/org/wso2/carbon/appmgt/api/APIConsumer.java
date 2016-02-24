@@ -328,25 +328,25 @@ public interface APIConsumer extends APIManager {
     /**
      * Add the given app as favourite app for given user.
      *
-     * @param identifier      Api identifier
-     * @param userId          User Id(user name)
+     * @param identifier      App identifier
+     * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
      * @throws AppManagementException
      */
-    public void addToFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
+    public void addToFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
      * Remove the given app from favourite app list of given user.
      *
      * @param identifier      App identifier
-     * @param userId          User Id(user name)
+     * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
      * @throws AppManagementException
      */
-    public void removeFromFavouriteApps(APIIdentifier identifier, String userId, int tenantIdOfUser,
+    public void removeFromFavouriteApps(APIIdentifier identifier, String username, int tenantIdOfUser,
                                         int tenantIdOfStore)
             throws AppManagementException;
 
@@ -354,65 +354,65 @@ public interface APIConsumer extends APIManager {
      * Check whether given app exists in the favourite app list of  the user in given tenant store.
      *
      * @param identifier      Api identifier
-     * @param userId          user id(user name)
-     * @param tenantIdOfUser
-     * @param tenantIdOfStore
+     * @param username        Username
+     * @param tenantIdOfUser  Tenant Id Of User
+     * @param tenantIdOfStore Tenant Id Of Store
      * @return true if favourite app else false
      * @throws AppManagementException
      */
-    public boolean isFavouriteApp(APIIdentifier identifier, String userId, int tenantIdOfUser, int tenantIdOfStore)
+    public boolean isFavouriteApp(APIIdentifier identifier, String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
      * This methods returns  favourite webapps of given user for given tenant store.
      *
-     * @param userName        logged in username
+     * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getFavouriteApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
-     * This method returns the  subscribed web apps for given user for given tenant store.
+     * Returns the  subscribed web apps for given user for given tenant store.
      *
-     * @param userName        User Name.
+     * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getUserSubscribedApps(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
-     * This method mark that user has selected favourite page as default landing page in store.
+     * Add favourite page as default landing page in store.
      *
-     * @param userName        User Name
+     * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
      * @throws AppManagementException
      */
-    public void setFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public void setFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
-     * This method mark that user has deselected the favourite page from default landing page in store.
+     * Remove the favourite page from default landing page in store.
      *
-     * @param userName        User Name
-     * @param tenantIdOfUser
+     * @param username        Username
+     * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore @throws AppManagementException
      */
-    public void removeFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public void removeFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 
     /**
-     * This method checks whether user has  selected favourite page as default landing page in store.
+     * Checks whether user has  selected favourite page as default landing page in store.
      *
-     * @param userName        User Name
-     * @param tenantIdOfUser
+     * @param username        Username
+     * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore @throws AppManagementException
      */
-    public boolean hasFavouritePage(String userName, int tenantIdOfUser, int tenantIdOfStore)
+    public boolean hasFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
 }

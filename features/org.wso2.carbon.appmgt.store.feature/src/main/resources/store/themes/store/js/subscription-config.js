@@ -1,6 +1,10 @@
+var manager = jagg.module("manager");
+var subscriptionConfig = manager.getSubscriptionConfiguration();
+
 var site = require("/config/store.json");
-var isSelfSubEnabled = site.subscriptionConfiguration.enableSelfSubscription;
-var isEnterpriseSubEnabled = site.subscriptionConfiguration.enableEnterpriseSubscription;
+var isSelfSubEnabled = subscriptionConfig.EnableSelfSubscription;
+var isEnterpriseSubEnabled = subscriptionConfig.EnableEnterpriseSubscription;
+
 var log = new Log("subscription-config.js");
 
 var isSelfSubscriptionEnabled = function () {
