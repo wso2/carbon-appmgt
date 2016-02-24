@@ -3181,24 +3181,22 @@ public class APIStoreHostObject extends ScriptableObject {
      * @throws AppManagementException
      */
     public static void jsFunction_addToFavouriteApps(Context cx,
-                                                 Scriptable thisObj, Object[] args, Function funObj)
+                                                     Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 6) {
             String message = "Invalid number of input parameters to method addToFavourite.Expected parameters :" +
-                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+                    "App Provider,App Name,App Version, Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = args[3].toString();
+        String username = args[3].toString();
         int tenantIdOfUser = Integer.parseInt(args[4].toString());
         String tenantDomainOfStore = args[5].toString();
 
         boolean isTenantFlowStarted = false;
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3206,11 +3204,10 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-
             int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIIdentifier identifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.addToFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+            apiConsumer.addToFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3219,7 +3216,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Remove the given app from favourite app list of user for given tenant store.
+     * Remove the given app from favourite app list of user for the given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3231,22 +3228,21 @@ public class APIStoreHostObject extends ScriptableObject {
     public static void jsFunction_removeFromFavouriteApps(Context cx,
                                                           Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 6) {
-            String message = "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters :" +
-                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+            String message =
+                    "Invalid number of input parameters to method removeFromFavouriteApps.Expected parameters :" +
+                            "App Provider,App Name,App Version, Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = args[3].toString();
+        String username = args[3].toString();
         int tenantIdOfUser = Integer.parseInt(args[4].toString());
         String tenantDomainOfStore = args[5].toString();
 
         boolean isTenantFlowStarted = false;
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3254,17 +3250,15 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-
             int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIIdentifier identifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.removeFromFavouriteApps(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+            apiConsumer.removeFromFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-
     }
 
     /**
@@ -3280,22 +3274,20 @@ public class APIStoreHostObject extends ScriptableObject {
     public static boolean jsFunction_isFavouriteApp(Context cx,
                                                     Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 6) {
             String message = "Invalid number of input parameters to method isFavouriteApp.Expected parameters :" +
-                    "App Provider,App Name,App Version, User Name,Tenant Id Of User,Tenant Domain of Store";
+                    "App Provider,App Name,App Version, Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
         String providerName = args[0].toString();
         String apiName = args[1].toString();
         String version = args[2].toString();
-        String userName = args[3].toString();
+        String username = args[3].toString();
         int tenantIdOfUser = Integer.parseInt(args[4].toString());
         String tenantDomainOfStore = args[5].toString();
 
         boolean isTenantFlowStarted = false;
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3303,11 +3295,10 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-
             int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
+            APIIdentifier identifier = new APIIdentifier(providerName, apiName, version);
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            return apiConsumer.isFavouriteApp(apiIdentifier, userName, tenantIdOfUser, tenantIdOfStore);
+            return apiConsumer.isFavouriteApp(identifier, username, tenantIdOfUser, tenantIdOfStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3316,32 +3307,30 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This methods returns  favourite apps of given user for given tenant store.
+     * Returns  favourite apps of given user for the given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
      * @param funObj  Function object
      * @return
-     * @throws ScriptException
      * @throws AppManagementException
      */
     public static NativeArray jsFunction_getAllFavouriteApps(Context cx,
                                                              Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException {
+            throws AppManagementException {
         if (args == null || args.length != 3) {
             String message = "Invalid number of input parameters to method getAllFavouriteApps.Expected parameters :" +
-                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+                    " Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
-        String userName = args[0].toString();
+        String username = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
 
         NativeArray nativeArray = new NativeArray(0);
         boolean isTenantFlowStarted = false;
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3352,16 +3341,16 @@ public class APIStoreHostObject extends ScriptableObject {
 
             int tenantIdOfStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            List<APIIdentifier> apiIdentifiers = apiConsumer.getFavouriteApps(userName, tenantIdOfUser,
-                                                                              tenantIdOfStore);
+            List<APIIdentifier> identifiers = apiConsumer.getFavouriteApps(username, tenantIdOfUser,
+                                                                           tenantIdOfStore);
 
-            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+            if (identifiers != null && identifiers.size() > 0) {
                 AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
                 List<Environment> environments = config.getApiGatewayEnvironments();
                 Environment environment = environments.get(0);
                 int i = 0;
-                for (APIIdentifier apiIdentifier : apiIdentifiers) {
-                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                for (APIIdentifier identifier : identifiers) {
+                    WebApp app = apiConsumer.getAPI(identifier);
                     String lifeCycleStatus = app.getStatus().getStatus();
                     //Return only apps in published status
                     if (APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
@@ -3378,9 +3367,9 @@ public class APIStoreHostObject extends ScriptableObject {
                         }
 
                         NativeObject row = new NativeObject();
-                        row.put("appName", row, apiIdentifier.getApiName());
-                        row.put("appProvider", row, apiIdentifier.getProviderName());
-                        row.put("version", row, apiIdentifier.getVersion());
+                        row.put("appName", row, identifier.getApiName());
+                        row.put("appProvider", row, identifier.getProviderName());
+                        row.put("version", row, identifier.getVersion());
                         row.put("context", row, app.getContext());
                         row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
                         row.put("gatewayUrl", row, accessUrl);
@@ -3400,7 +3389,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method return the details of subscribed apps of given user for given tenant store.
+     * Return the subscribed apps of  user for the given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3409,18 +3398,18 @@ public class APIStoreHostObject extends ScriptableObject {
      * @return
      * @throws AppManagementException
      */
-    public static NativeArray jsFunction_getUserSubscribedApps(Context cx,
-                                                               Scriptable thisObj, Object[] args, Function funObj)
+    public static NativeArray jsFunction_getSubscriptionsOnTenantStore(Context cx,
+                                                                       Scriptable thisObj, Object[] args,
+                                                                       Function funObj)
             throws AppManagementException {
-
-
         if (args == null || args.length != 3) {
-            String message = "Invalid number of input parameters to method getUserSubscribedApps.Expected parameters :" +
-                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+            String message =
+                    "Invalid number of input parameters to method getUserSubscribedApps.Expected parameters :" +
+                            " Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
-        String userName = args[0].toString();
+        String username = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
 
@@ -3436,21 +3425,19 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
             int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-            List<APIIdentifier> apiIdentifiers = apiConsumer.getUserSubscribedApps(userName, tenantIdOfUser,
-                                                                                   tenantIdOFStore);
+            List<APIIdentifier> identifiers = apiConsumer.getUserSubscribedApps(username, tenantIdOfUser,
+                                                                                tenantIdOFStore);
 
-            if (apiIdentifiers != null && apiIdentifiers.size() > 0) {
+            if (identifiers != null && identifiers.size() > 0) {
                 AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
                 List<Environment> environments = config.getApiGatewayEnvironments();
                 Environment environment = environments.get(0);
-
-
                 int i = 0;
-                for (APIIdentifier apiIdentifier : apiIdentifiers) {
-                    WebApp app = apiConsumer.getAPI(apiIdentifier);
+                for (APIIdentifier identifier : identifiers) {
+                    WebApp app = apiConsumer.getAPI(identifier);
                     String lifeCycleStatus = app.getStatus().getStatus();
                     //Return only apps in published status
-                    if(APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                    if (APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
                         String accessUrl = null;
                         if (app.getSkipGateway()) {
                             accessUrl = app.getUrl();
@@ -3463,23 +3450,27 @@ public class APIStoreHostObject extends ScriptableObject {
                             }
                         }
 
-                        NativeObject row = new NativeObject();
-                        row.put("appName", row, apiIdentifier.getApiName());
-                        row.put("appProvider", row, apiIdentifier.getProviderName());
-                        row.put("context", row, app.getContext());
-                        row.put("version", row, apiIdentifier.getVersion());
-                        row.put("appTenant", row, app.getAppTenant());
-                        row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                        row.put("accessUrl", row, accessUrl);
-                        row.put("uuid", row, app.getUUID());
-                        row.put("advertiseOnly", row, String.valueOf(app.isAdvertiseOnly()));
-                        row.put("advertisedAppUuid", row, app.getAdvertisedAppUuid());
-                        nativeArray.put(i++, nativeArray, row);
-                    }
+                        NativeObject attributes = new NativeObject();
+                        attributes.put("overview_name", attributes, identifier.getApiName());
+                        attributes.put("overview_displayName", attributes, app.getDisplayName());
+                        attributes.put("overview_provider", attributes, identifier.getProviderName());
+                        attributes.put("overview_context", attributes, app.getContext());
+                        attributes.put("overview_version", attributes, identifier.getVersion());
+                        attributes.put("overview_appTenant", attributes, app.getAppTenant());
+                        attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                        attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
+                        attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
+                        attributes.put("overview_treatAsSite", attributes,app.getTreatAsASite());
 
+                        NativeObject asset = new NativeObject();
+                        asset.put("id", asset, app.getUUID());
+                        asset.put("accessUrl", asset, accessUrl);
+                        asset.put("attributes", asset, attributes);
+
+                        nativeArray.put(i++, nativeArray, asset);
+                    }
                 }
             }
-
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3489,7 +3480,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method mark that user has selected favourite page as default landing page in store.
+     * Add MyFavourite page as default landing page for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3500,14 +3491,13 @@ public class APIStoreHostObject extends ScriptableObject {
     public static void jsFunction_setFavouritePage(Context cx,
                                                    Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 3) {
             String message = "Invalid number of input parameters to method setFavouritePage.Expected parameters :" +
-                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+                    " Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
-        String userName = args[0].toString();
+        String username = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
 
@@ -3521,8 +3511,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.setFavouritePage(userName, tenantIdOfUser,tenantIdOFStore);
-
+            apiConsumer.setFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3531,7 +3520,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method mark that user has deselected the favourite page from default landing page in given tenant store.
+     * Remove favourite page from default landing page in given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3542,14 +3531,13 @@ public class APIStoreHostObject extends ScriptableObject {
     public static void jsFunction_removeFavouritePage(Context cx,
                                                       Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 3) {
             String message = "Invalid number of input parameters to method removeFavouritePage.Expected parameters :" +
-                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+                    " Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
-        String userName = args[0].toString();
+        String username = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
 
@@ -3563,8 +3551,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            apiConsumer.removeFavouritePage(userName, tenantIdOfUser, tenantIdOFStore);
-
+            apiConsumer.removeFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3573,7 +3560,7 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * This method check whether logged in user has selected favourite page as default page for given tenant store.
+     * Checks whether logged in user has selected favourite page as default page for given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3585,14 +3572,13 @@ public class APIStoreHostObject extends ScriptableObject {
     public static boolean jsFunction_hasFavouritePage(Context cx,
                                                       Scriptable thisObj, Object[] args, Function funObj)
             throws AppManagementException {
-
         if (args == null || args.length != 3) {
             String message = "Invalid number of input parameters to method hasFavouritePage.Expected parameters :" +
-                    " User Name,Tenant Id Of User,Tenant Domain of Store";
+                    " Username,Tenant Id Of User,Tenant Domain of Store";
             handleException(message);
         }
 
-        String userName = args[0].toString();
+        String username = args[0].toString();
         int tenantIdOfUser = Integer.parseInt(args[1].toString());
         String tenantDomainOfStore = args[2].toString();
 
@@ -3606,8 +3592,7 @@ public class APIStoreHostObject extends ScriptableObject {
             }
             int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            return apiConsumer.hasFavouritePage(userName, tenantIdOfUser,tenantIdOFStore );
-
+            return apiConsumer.hasFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -3653,5 +3638,25 @@ public class APIStoreHostObject extends ScriptableObject {
             defaultThumbnail.put(entry.getKey(), defaultThumbnail, entry.getValue());
         }
         return defaultThumbnail;
+    }
+
+    /**
+     * Returns the current subscription configuration defined in app-manager.xml.
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return Subscription Configuration
+     * @throws AppManagementException
+     */
+    public static NativeObject jsFunction_getSubscriptionConfiguration(Context cx, Scriptable thisObj, Object[] args,
+                                                                       Function funObj) throws AppManagementException {
+        Map<String, Boolean> subscriptionConfigurationData = HostObjectUtils.getSubscriptionConfiguration();
+        NativeObject subscriptionConfiguration = new NativeObject();
+        for (Map.Entry<String, Boolean> entry : subscriptionConfigurationData.entrySet()) {
+            subscriptionConfiguration.put(entry.getKey(), subscriptionConfiguration, entry.getValue().booleanValue());
+        }
+        return subscriptionConfiguration;
     }
 }

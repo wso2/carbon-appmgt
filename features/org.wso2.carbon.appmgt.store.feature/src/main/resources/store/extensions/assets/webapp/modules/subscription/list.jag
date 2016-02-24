@@ -171,7 +171,7 @@ var getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfSt
         }
         userName = String(userName);
         tenantDomainOfStore= String(tenantDomainOfStore);
-        data = store.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
+        data = store.getSubscriptionsOnTenantStore(userName, tenantIdOfUser, tenantDomainOfStore);
         if (log.isDebugEnabled()) {
             log.debug("getUserSubscribedApps : " + stringify(data));
         }
