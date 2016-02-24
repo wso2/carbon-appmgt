@@ -3643,10 +3643,10 @@ public class APIStoreHostObject extends ScriptableObject {
     /**
      * Returns the current subscription configuration defined in app-manager.xml.
      *
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
      * @return Subscription Configuration
      * @throws AppManagementException
      */
@@ -3655,7 +3655,7 @@ public class APIStoreHostObject extends ScriptableObject {
         Map<String, Boolean> subscriptionConfigurationData = HostObjectUtils.getSubscriptionConfiguration();
         NativeObject subscriptionConfiguration = new NativeObject();
         for (Map.Entry<String, Boolean> entry : subscriptionConfigurationData.entrySet()) {
-            subscriptionConfiguration.put(entry.getKey(), entry.getValue().booleanValue());
+            subscriptionConfiguration.put(entry.getKey(), subscriptionConfiguration, entry.getValue().booleanValue());
         }
         return subscriptionConfiguration;
     }

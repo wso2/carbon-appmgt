@@ -208,6 +208,4 @@ public class HostObjectUtils {
         subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
         return subscriptionCofig;
     }
-
-
 }
