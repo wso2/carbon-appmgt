@@ -41,6 +41,9 @@ jagg.module("manager", {
     },
     isFavouriteApp: function () {
         return jagg.require(jagg.getModulesDir() + "manager/manager.jag").isFavouriteApp.apply(this, arguments);
+    },
+    getSubscriptionConfiguration:function () {
+        return jagg.require(jagg.getModulesDir() + "manager/manager.jag").getSubscriptionConfiguration.apply(this, arguments);
     }
 
  });

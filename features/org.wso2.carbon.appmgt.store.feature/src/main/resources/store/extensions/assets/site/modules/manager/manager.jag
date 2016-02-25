@@ -149,4 +149,8 @@ var isFavouriteApp = function (provider, name, version, userName, tenantIdOfUser
         };
     }
 };
+
+var getSubscriptionConfiguration = function() {
+    return getAPIStoreObj().getSubscriptionConfiguration();
+};
 %>
