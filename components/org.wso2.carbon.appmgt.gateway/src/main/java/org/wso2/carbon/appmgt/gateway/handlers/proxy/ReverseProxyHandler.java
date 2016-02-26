@@ -27,19 +27,22 @@ import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 
+import java.net.HttpCookie;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class ReverseProxyHandler extends AbstractHandler {
 
 	private static final String URL_SEPERATOR = "/";
 	private static final String EMPTY_STRING = "";
-	private static final String SET_COOKIE_PATH = "Path=";
-	private static final int SET_COOKIE_PATH_LENGTH = SET_COOKIE_PATH.length();
-	private static final String SEMICOLON = ";";
+	private static final long MAX_AGE_UNSPECIFIED = -1;
 
-	public boolean handleRequest(MessageContext arg0) {
+	public boolean handleRequest(MessageContext messageContext) {
 		return true;
 	}
+
 
 	public boolean handleResponse(MessageContext messageContext) {
 
@@ -84,17 +87,8 @@ public class ReverseProxyHandler extends AbstractHandler {
 			axis2MC.setProperty(NhttpConstants.HTTP_SC, 302);
 		}
 
-		Object cookie = headers.get(HTTPConstants.HEADER_SET_COOKIE);
-		if (cookie != null) {
-			String cookieString = String.valueOf(cookie);
-			int start = cookieString.indexOf(SET_COOKIE_PATH) + SET_COOKIE_PATH_LENGTH;
-			int end = cookieString.indexOf(SEMICOLON, start + 1);
-			end = end == -1 ? cookieString.length() : end;
-			String remoteContext = cookieString.substring(start, end);
-			cookieString = cookieString.replace(remoteContext, webContextWithVersion);
+		fixCookiePaths(axis2MC, headers, webContextWithVersion);
 
-			headers.put(HTTPConstants.HEADER_SET_COOKIE, cookieString);
-		}
 
 		// final Pipe pipe = (Pipe)
 		// axis2MC.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
@@ -114,5 +108,89 @@ public class ReverseProxyHandler extends AbstractHandler {
 		// }
 
 		return true;
+	}
+
+	/**
+	 * Fixes the cookie paths if there exists any in the response so that it matches only to this context.
+	 * Otherwise cookies destined to other applications will also arrive onto this application. Because most cookies are
+	 * set to the root context or the context of the the original web application.
+	 *
+	 * @param axis2MC
+	 * @param headers
+	 * @param webContextWithVersion
+	 */
+	private void fixCookiePaths(org.apache.axis2.context.MessageContext axis2MC, TreeMap headers,
+			String webContextWithVersion) {
+		Map<String, Object> excessHeaders = (Map<String, Object>) axis2MC.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+
+		List<String> excessCookies = (List<String>) excessHeaders.get(HTTPConstants.HEADER_SET_COOKIE);
+
+		if(excessCookies != null) {
+			List<String> fixedCookies = new ArrayList<>();
+			for (String cookie : excessCookies) {
+				List<HttpCookie> httpCookies = HttpCookie.parse(cookie);
+				for (HttpCookie httpCookie : httpCookies) {
+					String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
+					httpCookie.setPath(newPath);
+					fixedCookies.add(toHeaderString(httpCookie));
+				}
+			}
+
+			if (fixedCookies.size() > 0) {
+				excessHeaders.remove(HTTPConstants.HEADER_SET_COOKIE);
+				for (int i = 0; i < fixedCookies.size(); i++) {
+					excessHeaders.put(HTTPConstants.HEADER_SET_COOKIE, fixedCookies.get(i));
+				}
+			}
+		}
+
+		Object cookieFromHeader = headers.get(HTTPConstants.HEADER_SET_COOKIE);
+		if(cookieFromHeader != null) {
+			List<HttpCookie> httpCookies = HttpCookie.parse(String.valueOf(cookieFromHeader));
+			for (HttpCookie httpCookie : httpCookies) {
+				String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
+				httpCookie.setPath(newPath);
+				//Put the last cookie as the header cookie. This works as there is only one header cookie in the list.
+				headers.put(HTTPConstants.HEADER_SET_COOKIE, toHeaderString(httpCookie));
+			}
+		}
+	}
+
+	private String replaceCookieContextPath(String webContextWithVersion, HttpCookie httpCookie) {
+		String oldPath = httpCookie.getPath();
+		if (oldPath == null) {
+			return webContextWithVersion;
+		}
+
+		int firstSlashIndex = oldPath.indexOf("/");
+		boolean pathEdsWithSlash = oldPath.endsWith("/");
+		if (firstSlashIndex >=0) {
+			int lastPosition = pathEdsWithSlash ? oldPath.length() -1: oldPath.length();
+			oldPath = oldPath.substring(firstSlashIndex, lastPosition);
+		}
+		return webContextWithVersion + oldPath;
+	}
+
+	/*
+     *  Converts the HttpCookie into the header string
+     */
+	private String toHeaderString(HttpCookie cookie) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(cookie.getName()).append("=").append(cookie.getValue());
+		if (cookie.getPath() != null)
+			sb.append("; Path=").append(cookie.getPath());
+		if (cookie.getDomain() != null)
+			sb.append("; Domain=").append(cookie.getDomain());
+
+		if( cookie.getMaxAge() != MAX_AGE_UNSPECIFIED) {
+			sb.append("; Max-Age=").append(cookie.getMaxAge());
+		}
+		if (cookie.getSecure())
+			sb.append("; Secure");
+		if (cookie.isHttpOnly())
+			sb.append("; HttpOnly");
+
+		return sb.toString();
 	}
 }
