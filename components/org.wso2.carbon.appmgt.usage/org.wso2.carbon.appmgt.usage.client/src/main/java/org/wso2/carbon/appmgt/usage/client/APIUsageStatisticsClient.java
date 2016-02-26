@@ -23,21 +23,32 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.wso2.carbon.appmgt.api.APIConsumer;
-import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.usage.client.billing.PaymentPlan;
-import org.wso2.carbon.appmgt.usage.client.dto.*;
+import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIResourcePathUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIResponseFaultCountDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIVersionLastAccessTimeDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUserUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.AppHitsStatsDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.PerUserAPIUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.UserHitsPerAppDTO;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.appmgt.usage.client.internal.AppMUsageClientServiceComponent;
 import org.wso2.carbon.bam.presentation.stub.QueryServiceStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.naming.Context;
@@ -51,13 +62,25 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URLDecoder;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 
 public class APIUsageStatisticsClient {
@@ -407,8 +430,8 @@ public class APIUsageStatisticsClient {
         try {
             connection = dataSource.getConnection();
             String queryToGetAppsHits = "SELECT APP_NAME, CONTEXT, COUNT(*) " +
-                    "AS TOTAL_HITS_COUNT FROM APM_APP_HITS WHERE TENANT_ID = ? AND HIT_TIME " +
-                    "BETWEEN ? AND ? GROUP BY CONTEXT ORDER BY TOTAL_HITS_COUNT";
+                    "AS TOTAL_HITS_COUNT, VERSION FROM APM_APP_HITS WHERE TENANT_ID = ? AND HIT_TIME " +
+                    "BETWEEN ? AND ? GROUP BY CONTEXT,VERSION ORDER BY TOTAL_HITS_COUNT";
             getAppHitsStatement = connection.prepareStatement(queryToGetAppsHits);
             getAppHitsStatement.setInt(1, tenantId);
             getAppHitsStatement.setString(2, fromDate);
@@ -416,7 +439,7 @@ public class APIUsageStatisticsClient {
             appInfoResult = getAppHitsStatement.executeQuery();
 
             boolean noData = true;
-            String queryToGetUserHits = "SELECT CONTEXT, USER_ID, COUNT(*) AS USER_HITS_COUNT " +
+            String queryToGetUserHits = "SELECT APP_NAME, CONTEXT, USER_ID, COUNT(*) AS USER_HITS_COUNT, VERSION " +
                     "FROM APM_APP_HITS WHERE CONTEXT IN ( ";
 
             while (appInfoResult.next()) {
@@ -428,13 +451,14 @@ public class APIUsageStatisticsClient {
                 if (!appInfoResult.isLast()) {
                     queryToGetUserHits += ",";
                 }
-                appHitsStats.setAppName(appInfoResult.getString(
-                        APIUsageStatisticsClientConstants.APP_NAME));
+                String appNameWithVersion = appInfoResult.getString("APP_NAME") + "(v" + appInfoResult.getString(
+                        "VERSION") + ")";
+                appHitsStats.setAppName(appNameWithVersion);
                 appHitsStats.setTotalHitCount(appInfoResult.getInt(
                         APIUsageStatisticsClientConstants.TOTAL_HITS_COUNT));
-                appHitsStatsMap.put(context, appHitsStats);
+                appHitsStatsMap.put(appHitsStats.getAppName(), appHitsStats);
             }
-            queryToGetUserHits += ") GROUP BY USER_ID,CONTEXT ORDER BY USER_ID";
+            queryToGetUserHits += ") GROUP BY USER_ID,CONTEXT,VERSION ORDER BY USER_ID";
             if (!noData) {
                 appHitsStatsList = getUserHitsStats(connection, appHitsStatsMap, queryToGetUserHits);
             }
@@ -1485,7 +1509,9 @@ public class APIUsageStatisticsClient {
                         appInfoResult.getInt(APIUsageStatisticsClientConstants.USER_HITS_COUNT));
                 String context = appInfoResult.getString(APIUsageStatisticsClientConstants.CONTEXT);
                 userHitsPerApp.setContext(context);
-                AppHitsStatsDTO appHitsStats = appHitsStatsMap.get(context);
+                String appNameWithVersion = appInfoResult.getString("APP_NAME") + "(v" + appInfoResult.getString(
+                        "VERSION") + ")";
+                AppHitsStatsDTO appHitsStats = appHitsStatsMap.get(appNameWithVersion);
                 List<UserHitsPerAppDTO> userHitsStatsList = appHitsStats.getUserHitsList();
                 userHitsStatsList.add(userHitsPerApp);
             }
