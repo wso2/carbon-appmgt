@@ -89,24 +89,6 @@ public class ReverseProxyHandler extends AbstractHandler {
 
 		fixCookiePaths(axis2MC, headers, webContextWithVersion);
 
-
-		// final Pipe pipe = (Pipe)
-		// axis2MC.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
-		// if (pipe != null &&
-		// !Boolean.TRUE.equals(messageContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)))
-		// {
-		// InputStream in = pipe.getInputStream();
-		//
-		// // try {
-		// // RelayUtils.builldMessage(axis2MC, false, in);
-		// // } catch (AxisFault e) {
-		// // e.printStackTrace();
-		// // } catch (IOException e) {
-		// // e.printStackTrace();
-		// // }
-		//
-		// }
-
 		return true;
 	}
 
@@ -115,45 +97,58 @@ public class ReverseProxyHandler extends AbstractHandler {
 	 * Otherwise cookies destined to other applications will also arrive onto this application. Because most cookies are
 	 * set to the root context or the context of the the original web application.
 	 *
+	 * The headers.get(x) from axis2MC.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS)
+	 * only returns single header entry even the transport contains multiple headers with the same header name. However
+	 * the other headers are put into axis2MC.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS).
+	 *
+	 * This method re-writes the Cookie Path value so that it always starts with "ProxyContext/Version" on all the
+	 * "Set-Cookie" headers.
+	 *
 	 * @param axis2MC
 	 * @param headers
 	 * @param webContextWithVersion
 	 */
 	private void fixCookiePaths(org.apache.axis2.context.MessageContext axis2MC, TreeMap headers,
 			String webContextWithVersion) {
-		Map<String, Object> excessHeaders = (Map<String, Object>) axis2MC.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
 
+		Object cookieFromHeader = headers.get(HTTPConstants.HEADER_SET_COOKIE);
+		if (cookieFromHeader == null) {
+			//No cookie in main header, which means no cookies available in excess headers. No need to continue.
+			return;
+		}
+
+		//Fix the path in the cookie in the header (primary map).
+		List<HttpCookie> httpCookies = HttpCookie.parse(String.valueOf(cookieFromHeader));
+		for (HttpCookie httpCookie : httpCookies) {
+			String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
+			httpCookie.setPath(newPath);
+			//Put the last cookie as the header cookie. This works as there is only one header cookie in the list.
+			headers.put(HTTPConstants.HEADER_SET_COOKIE, toHeaderString(httpCookie));
+		}
+
+		//Now Fix the paths in Excess Cookies.
+		Map<String, Object> excessHeaders = (Map<String, Object>) axis2MC
+				.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
 		List<String> excessCookies = (List<String>) excessHeaders.get(HTTPConstants.HEADER_SET_COOKIE);
-
-		if(excessCookies != null) {
+		if (excessCookies != null) {
 			List<String> fixedCookies = new ArrayList<>();
 			for (String cookie : excessCookies) {
-				List<HttpCookie> httpCookies = HttpCookie.parse(cookie);
-				for (HttpCookie httpCookie : httpCookies) {
+				List<HttpCookie> httpExcessCookies = HttpCookie.parse(cookie);
+				for (HttpCookie httpCookie : httpExcessCookies) {
 					String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
 					httpCookie.setPath(newPath);
 					fixedCookies.add(toHeaderString(httpCookie));
 				}
 			}
 
-			if (fixedCookies.size() > 0) {
+			if (! fixedCookies.isEmpty()) {
 				excessHeaders.remove(HTTPConstants.HEADER_SET_COOKIE);
-				for (int i = 0; i < fixedCookies.size(); i++) {
-					excessHeaders.put(HTTPConstants.HEADER_SET_COOKIE, fixedCookies.get(i));
+				for (String fixedCookie : fixedCookies) {
+					excessHeaders.put(HTTPConstants.HEADER_SET_COOKIE, fixedCookie);
 				}
 			}
 		}
 
-		Object cookieFromHeader = headers.get(HTTPConstants.HEADER_SET_COOKIE);
-		if(cookieFromHeader != null) {
-			List<HttpCookie> httpCookies = HttpCookie.parse(String.valueOf(cookieFromHeader));
-			for (HttpCookie httpCookie : httpCookies) {
-				String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
-				httpCookie.setPath(newPath);
-				//Put the last cookie as the header cookie. This works as there is only one header cookie in the list.
-				headers.put(HTTPConstants.HEADER_SET_COOKIE, toHeaderString(httpCookie));
-			}
-		}
 	}
 
 	private String replaceCookieContextPath(String webContextWithVersion, HttpCookie httpCookie) {
@@ -163,16 +158,16 @@ public class ReverseProxyHandler extends AbstractHandler {
 		}
 
 		int firstSlashIndex = oldPath.indexOf("/");
-		boolean pathEdsWithSlash = oldPath.endsWith("/");
-		if (firstSlashIndex >=0) {
-			int lastPosition = pathEdsWithSlash ? oldPath.length() -1: oldPath.length();
+		boolean pathEndsWithSlash = oldPath.endsWith("/");
+		if (firstSlashIndex >= 0) {
+			int lastPosition = pathEndsWithSlash ? oldPath.length() - 1 : oldPath.length();
 			oldPath = oldPath.substring(firstSlashIndex, lastPosition);
 		}
 		return webContextWithVersion + oldPath;
 	}
 
 	/*
-     *  Converts the HttpCookie into the header string
+	 *  Converts the HttpCookie into the header string
      */
 	private String toHeaderString(HttpCookie cookie) {
 		StringBuilder sb = new StringBuilder();
@@ -183,7 +178,7 @@ public class ReverseProxyHandler extends AbstractHandler {
 		if (cookie.getDomain() != null)
 			sb.append("; Domain=").append(cookie.getDomain());
 
-		if( cookie.getMaxAge() != MAX_AGE_UNSPECIFIED) {
+		if (cookie.getMaxAge() != MAX_AGE_UNSPECIFIED) {
 			sb.append("; Max-Age=").append(cookie.getMaxAge());
 		}
 		if (cookie.getSecure())
