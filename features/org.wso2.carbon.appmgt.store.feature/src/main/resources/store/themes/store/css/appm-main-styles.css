@@ -1,0 +1,325 @@
+/*
+~ Copyright (c) 2016 WSO2 Inc. (http://wso2.com) All Rights Reserved.
+~
+~ Licensed under the Apache License, Version 2.0 (the "License");
+~ you may not use this file except in compliance with the License.
+~ You may obtain a copy of the License at
+~
+~  http://www.apache.org/licenses/LICENSE-2.0
+~
+~ Unless required by applicable law or agreed to in writing, software
+~ distributed under the License is distributed on an "AS IS" BASIS,
+~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~ See the License for the specific language governing permissions and
+~ limitations under the License.
+*/
+
+/*========== HTML ELEMENTS ==========*/
+header {
+    background: #1F1F1F;
+}
+
+ul.nav.nav-tabs {
+    background-color: #ddd;
+}
+
+a.btn .icon-caret, .btn .icon-caret {
+    margin-left: 49px;
+    border: none;
+}
+
+/**/
+/*========== BODY ==========*/
+.body-wrapper a:hover {
+    text-decoration: none;
+}
+
+.body-wrapper > hr {
+    border-top: 1px solid #CECDCD;
+    margin-top: 50px;
+}
+
+/**/
+/*=========== nav CLASS ========*/
+.navbar-dark {
+    background: #2c313b;
+}
+
+.navbar-dark .dropdown-menu {
+    background: #2c313b;
+}
+
+.navbar-dark .navbar-nav > li a:hover,
+.navbar-dark .navbar-nav > li a:focus,
+.navbar-dark .navbar-nav > li a:active {
+    background: #4d5461;
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav > li a:hover {
+    background: #4d5461;
+}
+
+.navbar-dark .navbar-nav > .active > a,
+.navbar-dark .navbar-nav > .active > a:hover,
+.navbar-dark .navbar-nav > .active > a:focus,
+.navbar-dark .navbar-nav > .active > a:active {
+    background: #4d5461;
+    color: #ffffff;
+}
+
+.navbar-dark .navbar-nav > .active > a:hover {
+    background: #4d5461;
+}
+
+.navbar .navbar-nav > li a {
+    line-height: 50px;
+}
+
+/**/
+/*========== SEARCH ==========*/
+.input-group {
+    position: relative;
+    display: table;
+    border-collapse: separate;
+    margin-top: 3px;
+}
+
+.input-wrap > .form-control, .input-wrap .btn.wrap-input-right {
+    background-color: #215080;
+    border: 0;
+    color: #FFF;
+    height: 40px;
+    margin-top: -3px;
+}
+
+.input-wrap > .form-control::-webkit-input-placeholder {
+    color: #fff;
+    opacity: 0.9;
+    font-weight: 100;
+}
+
+.input-group-btn > ul.dropdown-menu {
+    background-color: #193C5F;
+    margin-top: 0;
+}
+
+.input-group-btn > .dropdown-menu > li > a {
+    color: #fff;
+}
+
+.input-group-btn > .dropdown-menu > li > a:focus, .dropdown-menu > li > a:hover {
+    color: #fff;
+    background-color: #1A78D8;
+}
+
+button.btn.btn-default.dropdown-toggle {
+    border: 1px solid #215080;
+}
+
+button.btn.btn-default.dropdown-toggle:hover {
+    background-color: #193C5F;
+    border: 1px solid #193C5F;
+}
+
+.open > .dropdown-toggle.btn-default:focus,
+.open > .dropdown-toggle.btn-default:active,
+.open > .dropdown-toggle.btn-default:hover {
+    background-color: #193C5F;
+    color: #fff;
+    border: 1px solid #193C5F;
+}
+
+.search-wrap .dropdown-toggle {
+    color: #FFF;
+    background-color: #215080;
+    border-color: #215080;
+    padding: 9px 12px;
+    margin-top: -4px;
+}
+
+.search-wrap .dropdown-toggle:hover {
+    border-color: #215080;
+}
+
+/**/
+/*========== PAGE ==========*/
+.page-header {
+    height: auto;
+    padding: 20px 00px;
+    border-bottom: none;
+    margin: 0;
+}
+
+.page-header:after {
+    clear: both;
+    content: " ";
+    display: block;
+    height: 0;
+}
+
+.page-title {
+    width: auto;
+    float: left;
+    margin-right: 20px;
+}
+
+.page-title h3 {
+    margin: 0;
+}
+
+/**/
+/*========== APP TILE ==========*/
+.image-container {
+    position: relative;
+}
+
+.image-container .after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    color: #FFF;
+}
+
+.image-container:hover .after {
+    display: block;
+    background: rgba(0, 0, 0, .6);
+    cursor: pointer;
+}
+
+.image-container > .after > a > span.fw-stack.fw-lg {
+    /* background: red; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    font-size: 26px;
+}
+
+.app-data h4 {
+    margin-bottom: 0;
+}
+
+.app-data h5, .launch-app-data h5 {
+    margin-top: 0;
+}
+
+.launch-app-data h4 {
+    margin-top: 0;
+}
+
+.more-list {
+    float: right;
+    height: Auto;
+    opacity: .5;
+    background-color: #F7F7F7;
+    padding: 10px;
+    margin-right: -10px;
+    margin-top: -10px;
+}
+
+.more-list:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.more-info {
+    position: relative;
+}
+
+.more-info.pull-right > .dropdown-menu {
+    margin-right: -10px;
+}
+
+.ribbon {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 33px;
+    height: 35px;
+    line-height: 40px;
+    text-align: center;
+    /* opacity: 0.7; */
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background-color: #c0392b;
+    border: none;
+    z-index: 500;
+    padding-bottom: 7px;
+}
+
+/**/
+/*========== APP DETAILS ==========*/
+.white-wrapper {
+    background-color: #ffffff;
+    position: relative;
+}
+
+.summary-wrapper {
+    color: #909090;
+    margin-bottom: 10px;
+}
+
+/*========== APP DETAILS - TABS==========*/
+.white-wrapper > .nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover .nav-tabs > li.active > a:visited .nav-tabs > li.active > a:active {
+    background-color: #fff;
+    border: 1px solid #FFF;
+    border-bottom-width: 0;
+    border-radius: 0;
+}
+
+.white-wrapper > .nav-tabs > li > a:hover {
+    border-radius: 0;
+}
+
+.tab-content {
+    padding: 20px 17px;
+}
+
+.tab-content h3 {
+    margin-top: 0;
+}
+
+/**/
+/*========== btn CLASS ========*/
+.btn {
+    background-color: #0E75DC;
+    color: #fff;
+}
+
+.btn .disabled {
+    background-color: #0E75DC;
+    color: #fff;
+}
+
+.btn:hover {
+    background-color: #005ABA;
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: #444;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #686868;
+    color: #fff;
+}
+
+.btn-default.active,
+.btn-default:active,
+.open > .dropdown-toggle.btn-default {
+    color: #fff;
+    background-color: #193C5F;
+    border: 1px solid #444444;
+}
