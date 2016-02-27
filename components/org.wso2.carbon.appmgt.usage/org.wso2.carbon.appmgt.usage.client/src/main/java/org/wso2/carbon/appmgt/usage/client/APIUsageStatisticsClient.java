@@ -348,7 +348,8 @@ public class APIUsageStatisticsClient {
                         providerAPI.getContext().equals(usage.context)) {
 
                     APIPageUsageDTO usageDTO = new APIPageUsageDTO();
-                    usageDTO.setApiName(usage.apiName);
+                    String apiName = usage.apiName + "(v" + providerAPI.getId().getVersion() + ")";
+                    usageDTO.setApiName(apiName);
                     usageDTO.setVersion(usage.apiVersion);
                     usageDTO.setUserId(usage.userid);
 
@@ -523,7 +524,7 @@ public class APIUsageStatisticsClient {
                 if (providerAPI.getId().getApiName().equals(responseTime.apiName) &&
                         providerAPI.getId().getVersion().equals(responseTime.apiVersion) &&
                         providerAPI.getContext().equals(responseTime.context)) {
-                    String apiName = responseTime.apiName + " ( v" + providerAPI.getId().getVersion() + ")";
+                    String apiName = responseTime.apiName + "(v" + providerAPI.getId().getVersion() + ")";
                     responseTimeDTO = new APIResponseTimeDTO();
                     responseTimeDTO.setApiName(apiName);
                     responseTimeDTO.setContext(responseTime.context);
