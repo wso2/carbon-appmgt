@@ -148,13 +148,11 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // validating action
         if (config.publisherActions.indexOf(action) == -1) {
-            log.error("Invalid action '" + action + "' invoked on a " + appType
-                      + " with UUID " + uuid + ".");
+            log.error("Invalid '" + action + "' action invoked on a " + appType + " with UUID '" + uuid + "'.");
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
             response.contentType = "application/json";
             content.status = "Invalid Action";
-            content.messages.push("Action '" + action + "' cannot be performed on "
-                                  + appType + "s.");
+            content.messages.push("'" + action + "' action cannot be performed on " + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -169,7 +167,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             try {
                 webApp = apiProvider.getAppDetailsFromUUID(uuid);
             } catch (e) {
-                log.error("The asset with UUID " + uuid + " could not be retrieved.");
+                log.error("The asset with UUID '" + uuid + "' could not be retrieved.");
                 log.error(e);
                 response.status = 404;
                 response.contentType = "application/json";
@@ -231,8 +229,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 401;
             response.contentType = "application/json";
             content.status = "Access Denied";
-            content.messages.push("You do not have publisher permissions to perform '"
-                                  + action + "' on " + appType + "s.");
+            content.messages.push("You do not have publisher permissions to perform '" + action + "' action on "
+                                  + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -266,8 +264,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                                               carbon.registry.actions.GET);
                 });
             } catch (e) {
-                log.error("Cannot grant permissions to role '" + currentRole
-                          + "' to perform action '" + carbon.registry.actions.GET + "'.");
+                log.error("Cannot grant permissions to '" + currentRole + "' role to perform action '"
+                          + carbon.registry.actions.GET + "' action.");
                 log.error(e);
                 // continue work flow
             }
@@ -277,16 +275,16 @@ require('/modules/publisher.js').exec(function (ctx) {
         try {
             if (!permissions.isLCActionsPermitted(user.username, currentArtifact.path,
                                                   userManager)) {
-                log.error("Insufficient permissions to perform '" + action + "' on " + appType
-                          + " for user " + user.username + ".");
+                log.warn("Insufficient permissions to perform '" + action + "' action on "
+                         + currentArtifact.attributes.overview_version + "' version of '"
+                         + currentArtifact.attributes.overview_name + "' " + appType + " for '" + user.username
+                         + "' user.");
                 response.status = 401;
                 response.contentType = "application/json";
                 content.status = "Insufficient Permissions";
-                content.messages.push("You do not have permissions to perform action '"
-                                      + action + "' on version "
-                                      + currentArtifact.attributes.overview_version
-                                      + " of '" + currentArtifact.attributes.overview_name + "' "
-                                      + appType + ".");
+                content.messages.push("You do not have enough permissions to perform '" + action + "' action on '"
+                                      + currentArtifact.attributes.overview_version + "' version of '"
+                                      + currentArtifact.attributes.overview_name + "' " + appType + ".");
                 response.content = stringify(content);
                 return;
             }
@@ -294,13 +292,13 @@ require('/modules/publisher.js').exec(function (ctx) {
             // this exception is thrown by
             // org.wso2.carbon.user.core.AuthorizationManager.isRoleAuthorized(roleName,
             // resourceId, action) throws UserStoreException
-            log.error("Cannot retrieve permissions for action '" + action + "' on artifact '" +
-                      currentArtifact.path + "' for user " + user.username + ".");
+            log.error("Cannot retrieve permissions for '" + action + "' action on artifact in '" +
+                      currentArtifact.path + "' for user '" + user.username + "'.");
             log.error(e);
             response.status = 500;
             response.contentType = "application/json";
             content.status = "Error";
-            content.messages.push("Cannot retrieve permissions for action '" + action + "'.");
+            content.messages.push("Cannot retrieve permissions for '" + action + "' action.");
             response.content = stringify(content);
             return;
         }
@@ -403,8 +401,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                                                    newChangeOrder);
             }
         } catch (e) {
-            log.error("Cannot add comment '" + comment + " for action '" + action + "' on "
-                      + "artifact '" + currentArtifact.path + "' for user " + user.username + ".");
+            log.error("Cannot add '" + comment + "' comment for '" + action + "' action on "
+                      + "artifact in '" + currentArtifact.path + "' for user '" + user.username + "'.");
             log.error(e);
             // continue work flow
         }
@@ -427,7 +425,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                          carbon.registry.actions.GET);
                 }
             } catch (e) {
-                log.debug('No role restrictions found for APP ' + uuid);
+                log.debug("No role restrictions found for artifact in '" + currentArtifact.path + "'.");
                 // continue work flow
             }
         }
@@ -578,19 +576,19 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             var count = provider.moveSubscriptions(fromIdentifier, toIdentifier);
             result.isSuccess = true;
-            result.message = count + " subscription(s) moved from version " +
-                             fromAsset.attributes.overview_version + " to " +
-                             toAsset.attributes.overview_version + " of '" +
+            result.message = count + " subscription(s) moved from version '" +
+                             fromAsset.attributes.overview_version + "' to '" +
+                             toAsset.attributes.overview_version + "' of '" +
                              fromAsset.attributes.overview_name + "' " + assetType + ".";
         } catch (e) {
             // this exception is thrown by
             // APIProviderImpl.moveSubscriptions(fromIdentifier, toIdentifier) throws
             //														AppManagementException
             result.isSuccess = false;
-            result.message = "Cannot move subscriptions from version " +
-                             fromAsset.attributes.overview_version + " of '" +
-                             fromAsset.attributes.overview_name + "' " + assetType + " to " +
-                             toAsset.attributes.overview_version + " of '" +
+            result.message = "Cannot move subscriptions from version '" +
+                             fromAsset.attributes.overview_version + "' of '" +
+                             fromAsset.attributes.overview_name + "' " + assetType + " to version '" +
+                             toAsset.attributes.overview_version + "' of '" +
                              toAsset.attributes.overview_name + "' " + assetType + ".";
             log.error(result.message);
             log.error(e);
