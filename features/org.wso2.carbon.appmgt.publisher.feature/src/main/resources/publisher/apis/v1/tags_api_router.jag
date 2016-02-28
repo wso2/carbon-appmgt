@@ -58,17 +58,13 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     //Obtain the tags
     var tags = rxtManager.registry.tags(path);
-
-    //Create a tag array
-    var counter = 0;
-    var tagArray = [];
-
-    for (var index in tags) {
-        tagArray.push({id: counter, name: tags[index]});
-        counter++;
+    var numberOfTags = tags.length;
+    var tagsData = [];
+    for (var i = 0; i < numberOfTags; i++) {
+        tagsData.push({id: i, name: tags[i]});
     }
     response.contentType = "application/json";
-    print(tagArray);
+    print(tagsData);
 });
 
 routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', function (context) {
