@@ -1,5 +1,4 @@
 var resources = function (page, meta) {
-	var log = new Log();
 	return {
 		js: ['bootstrap-select.min.js'],
 		css: ['bootstrap-select.min.css']
@@ -8,16 +7,14 @@ var resources = function (page, meta) {
 };
 
 var selectCategory = function (data) {
-	var selected,
-		selectedCategories = [],
+	var selectedCategories = [],
 		currentCategory = data.artifact.attributes['overview_category'],
 		categories = selectCategories(data.data.fields);
 
 	for (var i in categories) {
-		selected = (currentCategory == categories[i]) ? true : false;
 		selectedCategories.push({
 			cat: categories[i],
-			sel: selected
+			sel: (currentCategory == categories[i])
 		});
 	}
 	data.categorySelect = selectedCategories;
@@ -34,7 +31,6 @@ var selectCategories = function (fields) {
 
 var screenshots = function (data) {
 	var screenShotsCombinedString = data.artifact.attributes.images_screenshots;
-	var screenShots = screenShotsCombinedString.split(",");
-	data.artifact.attributes.images_screenshots = screenShots;
+	data.artifact.attributes.images_screenshots = screenShotsCombinedString.split(",");
 	return data;
 };
