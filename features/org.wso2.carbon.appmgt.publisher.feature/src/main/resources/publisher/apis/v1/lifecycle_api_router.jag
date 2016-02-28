@@ -23,6 +23,21 @@
 
 require('/modules/publisher.js').exec(function (ctx) {
 
+    var CONTENT_TYPE_JSON = "application/json";
+
+    var LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW = "Submit for Review";
+    var LIFE_CYCLE_ACTION_APPROVE = "Approve";
+    var LIFE_CYCLE_ACTION_REJECT = "Reject";
+    var LIFE_CYCLE_ACTION_PUBLISH = "Publish";
+    var LIFE_CYCLE_ACTION_UNPUBLISH = "Unpublish";
+    var LIFE_CYCLE_ACTION_RE_PUBLISH = "Re-Publish";
+    var LIFE_CYCLE_ACTION_DEPRECATE = "Deprecate";
+    var LIFE_CYCLE_ACTION_RETIRE = "Retire";
+    var LIFE_CYCLE_ACTION_RECYCLE = "Recycle";
+
+    var APP_TYPE_WEB_APP = "webapp";
+    var APP_TYPE_MOBILE_APP = "mobileapp";
+
 	var config = require('/config/publisher.json');
 	var caramel = require('caramel');
 	var router = require('/modules/router-g.js').router();
@@ -150,7 +165,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         if (config.publisherActions.indexOf(action) == -1) {
             log.error("Invalid '" + action + "' action invoked on a " + appType + " with UUID '" + uuid + "'.");
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Invalid Action";
             content.messages.push("'" + action + "' action cannot be performed on " + appType + "s.");
             response.content = stringify(content);
@@ -162,7 +177,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         var permission = null;
 
         //check if its the default version and if it has any other versions when deprecating
-        if (action == "Deprecate") {
+        if (action == LIFE_CYCLE_ACTION_DEPRECATE) {
             var webApp;
             try {
                 webApp = apiProvider.getAppDetailsFromUUID(uuid);
@@ -170,7 +185,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 log.error("The asset with UUID '" + uuid + "' could not be retrieved.");
                 log.error(e);
                 response.status = 404;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Not Found";
                 content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
                 response.content = stringify(content);
@@ -185,7 +200,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
                     log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
                     response.status = 401;
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     content.status = "Access Denied";
                     content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
                                           + appType + "'. Please select other version of this '" + appType
@@ -198,7 +213,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                           + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
                 log.error(e);
                 response.status = 404;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Not Found";
                 content.messages.push("Error while retrieving default version details related to App Name: " + appName
                                       + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
@@ -208,16 +223,16 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
 
         // To Send an app to submit for review, created permission is required.
-        if (action != "Submit for Review") {
-            if (appType == 'webapp') {
+        if (action != LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW) {
+            if (appType == APP_TYPE_WEB_APP) {
                 permission = config.permissions.webapp_publish;
-            } else if (appType == 'mobileapp') {
+            } else if (appType == APP_TYPE_MOBILE_APP) {
                 permission = config.permissions.mobileapp_publish;
             }
         } else {
-            if (appType == 'webapp') {
+            if (appType == APP_TYPE_WEB_APP) {
                 permission = config.permissions.webapp_create;
-            } else if (appType == 'mobileapp') {
+            } else if (appType == APP_TYPE_MOBILE_APP) {
                 permission = config.permissions.mobileapp_create;
             }
         }
@@ -227,7 +242,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         if (!hasPermission) {
             log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
             response.status = 401;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Access Denied";
             content.messages.push("You do not have publisher permissions to perform '" + action + "' action on "
                                   + appType + "s.");
@@ -246,7 +261,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             log.error("The asset with UUID " + uuid + " could not be retrieved.");
             log.error(e);
             response.status = 404;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Not Found";
             content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
             response.content = stringify(content);
@@ -280,7 +295,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                          + currentArtifact.attributes.overview_name + "' " + appType + " for '" + user.username
                          + "' user.");
                 response.status = 401;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Insufficient Permissions";
                 content.messages.push("You do not have enough permissions to perform '" + action + "' action on '"
                                       + currentArtifact.attributes.overview_version + "' version of '"
@@ -296,7 +311,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                       currentArtifact.path + "' for user '" + user.username + "'.");
             log.error(e);
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
             content.messages.push("Cannot retrieve permissions for '" + action + "' action.");
             response.content = stringify(content);
@@ -335,12 +350,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // For all previously published apps when publishing or re-publishing current app,
         // unpublish previously published version of this app.
         /*
-        if (((action == "Publish") || (action == "Re-Publish"))
+        if (((action == LIFE_CYCLE_ACTION_PUBLISH) || (action == LIFE_CYCLE_ACTION_RE_PUBLISH))
             && (previousArtifacts.length > 0)) {
             var i;
             for (i = 0; i < previousArtifacts.length; i++) {
                 operationResult = promoteArtifactLifeCycle(artifactManager, previousArtifacts[i],
-                                                           appType, "Unpublish");
+                                                           appType, LIFE_CYCLE_ACTION_UNPUBLISH);
                 if (operationResult.isSuccess) {
                     content.messages.push(operationResult.message);
                 } else {
@@ -353,11 +368,11 @@ require('/modules/publisher.js').exec(function (ctx) {
                 // something went wrong in the above loop, revert changes
                 for (var j = 0; j < i; j++) {
                     promoteArtifactLifeCycle(artifactManager, previousArtifacts[j], appType,
-                                             "Re-Publish");
+                                             LIFE_CYCLE_ACTION_RE_PUBLISH);
                     // ignore errors when reverting changes
                 }
                 response.status = 500;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Error";
                 content.messages.push(operationResult.message); // error message from last operation
                 response.content = stringify(content);
@@ -375,12 +390,11 @@ require('/modules/publisher.js').exec(function (ctx) {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
             for (i = 0; i < previousArtifacts.length; i++) {
-                promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
-                                         "Re-Publish");
+                promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType, LIFE_CYCLE_ACTION_RE_PUBLISH);
                 // ignore errors when reverting changes
             }
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
             content.messages.push(operationResult.message); // error message from last operation
             response.content = stringify(content);
@@ -408,7 +422,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
 
         // only when publishing
-        if ((action=="Publish") || ((action=="Re-Publish"))) {
+        if ((action == LIFE_CYCLE_ACTION_PUBLISH) || ((action == LIFE_CYCLE_ACTION_RE_PUBLISH))) {
             //Enforcing restrict visibility logic
             var registry = new carbon.registry.Registry(server, {
                 username: server.current(session).username,
@@ -432,8 +446,8 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // For all previously published web apps when publishing or re-publishing current web app,
         // move subscriptions of that web app version to this web app version.
-        if ((appType == "webapp") && (previousArtifacts.length > 0)
-            && ((action == "Publish") || (action == "Re-Publish"))
+        if ((appType == APP_TYPE_WEB_APP) && (previousArtifacts.length > 0)
+            && ((action == LIFE_CYCLE_ACTION_PUBLISH) || (action == LIFE_CYCLE_ACTION_RE_PUBLISH))
             && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
 
 
@@ -461,15 +475,15 @@ require('/modules/publisher.js').exec(function (ctx) {
                     // ignore errors when reverting changes
                 }
                 // revert this app (current artifact) to unpublish state
-                promoteArtifactLifeCycle(artifactManager, currentArtifact, appType, "Unpublish");
+                promoteArtifactLifeCycle(artifactManager, currentArtifact, appType, LIFE_CYCLE_ACTION_UNPUBLISH);
                 // revert previously unpublished artifacts to Publish state
                 for (i = 0; i < previousArtifacts.length; i++) {
                     promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
-                                             "Re-Publish");
+                                             LIFE_CYCLE_ACTION_RE_PUBLISH);
                     // ignore errors when reverting changes
                 }
                 response.status = 500;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Error";
                 content.messages.push(operationResult.message); // error message from last operation
                 response.content = stringify(content);
@@ -480,7 +494,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // everything went great
         response.status = 200;
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         content.status = "Success";
         content.artifacts = [currentArtifact].concat(previousArtifacts);
         content.artifacts.forEach(function (artifact) {
@@ -533,10 +547,10 @@ require('/modules/publisher.js').exec(function (ctx) {
         // Recycle
         if (isSuccess) {
             var msgAction = null;
-            if (action == "Submit for Review") {
+            if (action == LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW) {
                 msgAction = "submitted for review"
-            } else if ((action == "Approve") || (action == "Deprecate") ||
-                       (action == "Retire") || (action == "Recycle")) {
+            } else if ((action == LIFE_CYCLE_ACTION_APPROVE) || (action == LIFE_CYCLE_ACTION_DEPRECATE) ||
+                       (action == LIFE_CYCLE_ACTION_RETIRE) || (action == LIFE_CYCLE_ACTION_RECYCLE)) {
                 msgAction = action.toLowerCase() + "d";
             } else {
                 // Reject, Publish, Unpublish, Re-Publish
