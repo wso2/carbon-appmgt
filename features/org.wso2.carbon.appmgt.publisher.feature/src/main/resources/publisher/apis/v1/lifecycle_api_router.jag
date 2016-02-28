@@ -439,7 +439,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                                          carbon.registry.actions.GET);
                 }
             } catch (e) {
-                log.debug("No role restrictions found for artifact in '" + currentArtifact.path + "'.");
+                log.error("No role restrictions found for artifact in '" + currentArtifact.path + "'.");
+                log.error(e);
                 // continue work flow
             }
         }
