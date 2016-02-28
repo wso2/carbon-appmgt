@@ -178,9 +178,9 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         //check if its the default version and if it has any other versions when deprecating
         if (action == LIFE_CYCLE_ACTION_DEPRECATE) {
-            var webApp;
+            var app;
             try {
-                webApp = apiProvider.getAppDetailsFromUUID(uuid);
+                app = apiProvider.getAppDetailsFromUUID(uuid);
             } catch (e) {
                 log.error("The asset with UUID '" + uuid + "' could not be retrieved.");
                 log.error(e);
@@ -191,32 +191,33 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.content = stringify(content);
                 return;
             }
-            var appProvider = webApp.provider;
-            var appName = webApp.name;
-            var appVersion = webApp.version;
+            var appProvider = app.provider;
+            var appName = app.name;
+            var appVersion = app.version;
             var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
 
             try {
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
-                    log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
-                    response.status = 401;
+                    var msg = "'Deprecate' action is not permitted as this is the default version (" + appVersion
+                              + ") of '" + appName + "' " + appType + ". Please select other version of this " + appType
+                              + " as the default version and proceed.";
+                    log.warn(msg);
+                    response.status = 403;
                     response.contentType = CONTENT_TYPE_JSON;
                     content.status = "Access Denied";
-                    content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
-                                          + appType + "'. Please select other version of this '" + appType
-                                          + "' as the default version and proceed.");
+                    content.messages.push(msg);
                     response.content = stringify(content);
                     return;
                 }
             } catch (e) {
-                log.error("Error while retrieving default version details related to App Name: " + appName
-                          + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
+                var msg = "Cannot retrieve default version details of '" + appVersion + "' version of '" + appName
+                          + "' " + appType + " published by '" + appProvider + "'.";
+                log.error(msg);
                 log.error(e);
-                response.status = 404;
+                response.status = 500;
                 response.contentType = CONTENT_TYPE_JSON;
-                content.status = "Not Found";
-                content.messages.push("Error while retrieving default version details related to App Name: " + appName
-                                      + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
+                content.status = "Error";
+                content.messages.push(msg);
                 response.content = stringify(content);
                 return;
             }
@@ -347,40 +348,6 @@ require('/modules/publisher.js').exec(function (ctx) {
         /** @type {{isSuccess: boolean, message: string}} */
         var operationResult;
 
-        // For all previously published apps when publishing or re-publishing current app,
-        // unpublish previously published version of this app.
-        /*
-        if (((action == LIFE_CYCLE_ACTION_PUBLISH) || (action == LIFE_CYCLE_ACTION_RE_PUBLISH))
-            && (previousArtifacts.length > 0)) {
-            var i;
-            for (i = 0; i < previousArtifacts.length; i++) {
-                operationResult = promoteArtifactLifeCycle(artifactManager, previousArtifacts[i],
-                                                           appType, LIFE_CYCLE_ACTION_UNPUBLISH);
-                if (operationResult.isSuccess) {
-                    content.messages.push(operationResult.message);
-                } else {
-                    // some error occurred in promoteArtifactLifeCycle function,
-                    // abort further unpublishing previousArtifacts
-                    break;
-                }
-            }
-            if (!operationResult.isSuccess) {
-                // something went wrong in the above loop, revert changes
-                for (var j = 0; j < i; j++) {
-                    promoteArtifactLifeCycle(artifactManager, previousArtifacts[j], appType,
-                                             LIFE_CYCLE_ACTION_RE_PUBLISH);
-                    // ignore errors when reverting changes
-                }
-                response.status = 500;
-                response.contentType = CONTENT_TYPE_JSON;
-                content.status = "Error";
-                content.messages.push(operationResult.message); // error message from last operation
-                response.content = stringify(content);
-                return;
-            }
-        }
-        */
-
         // promote lifecycle of this app (current artifact)
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
                                                    appType, action);
@@ -389,7 +356,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         } else {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
-            for (i = 0; i < previousArtifacts.length; i++) {
+            for (var i = 0; i < previousArtifacts.length; i++) {
                 promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType, LIFE_CYCLE_ACTION_RE_PUBLISH);
                 // ignore errors when reverting changes
             }
@@ -408,11 +375,10 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (comment) {
                 var lcHistory = artifactManager.getLifecycleHistory(currentArtifact);
                 var lcHistoryXML = new XML(lcHistory.content);
-                lcHistoryJSON = utility.xml.convertE4XtoJSON(lcHistoryXML);
+                var lcHistoryJSON = utility.xml.convertE4XtoJSON(lcHistoryXML);
                 var newChangeOrder = lcHistoryJSON.item[0].order;
                 var commentHandler = require('/modules/comment.js');
-                commentHandler.addLifecycleComment(artifactManager, currentArtifact.path, comment,
-                                                   newChangeOrder);
+                commentHandler.addLifecycleComment(artifactManager, currentArtifact.path, comment, newChangeOrder);
             }
         } catch (e) {
             log.error("Cannot add '" + comment + "' comment for '" + action + "' action on "
