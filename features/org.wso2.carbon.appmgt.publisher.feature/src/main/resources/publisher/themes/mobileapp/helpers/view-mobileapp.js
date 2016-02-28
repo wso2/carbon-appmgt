@@ -9,18 +9,18 @@ var resources = function (page, meta) {
 
 var selectCategory = function (data) {
 	var selected,
-		arr = [],
+		selectedCategories = [],
 		currentCategory = data.artifact.attributes['overview_category'],
 		categories = selectCategories(data.data.fields);
 
 	for (var i in categories) {
 		selected = (currentCategory == categories[i]) ? true : false;
-		arr.push({
+		selectedCategories.push({
 			cat: categories[i],
 			sel: selected
 		});
 	}
-	data.categorySelect = arr;
+	data.categorySelect = selectedCategories;
 	return data;
 };
 
@@ -33,8 +33,8 @@ var selectCategories = function (fields) {
 };
 
 var screenshots = function (data) {
-	var screens = data.artifact.attributes.images_screenshots;
-	var shots = screens.split(",");
-	data.artifact.attributes.images_screenshots = shots;
+	var screenShotsCombinedString = data.artifact.attributes.images_screenshots;
+	var screenShots = screenShotsCombinedString.split(",");
+	data.artifact.attributes.images_screenshots = screenShots;
 	return data;
 };
