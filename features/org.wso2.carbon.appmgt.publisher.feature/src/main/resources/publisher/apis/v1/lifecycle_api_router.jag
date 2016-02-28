@@ -149,12 +149,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // validating action
         if (config.publisherActions.indexOf(action) == -1) {
             log.error("Invalid action '" + action + "' invoked on a " + appType
-                      + " with UUID " + uuid);
+                      + " with UUID " + uuid + ".");
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
             response.contentType = "application/json";
             content.status = "Invalid Action";
             content.messages.push("Action '" + action + "' cannot be performed on "
-                                  + appType + "s");
+                                  + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -174,7 +174,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.status = 404;
                 response.contentType = "application/json";
                 content.status = "Not Found";
-                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
                 response.content = stringify(content);
                 return;
             }
@@ -185,7 +185,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             try {
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
-                    log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+                    log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
                     response.status = 401;
                     response.contentType = "application/json";
                     content.status = "Access Denied";
@@ -197,13 +197,13 @@ require('/modules/publisher.js').exec(function (ctx) {
                 }
             } catch (e) {
                 log.error("Error while retrieving default version details related to App Name: " + appName
-                          + ", Provider: " + appProvider + ", Version: " + appVersion);
+                          + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
                 log.error(e);
                 response.status = 404;
                 response.contentType = "application/json";
                 content.status = "Not Found";
                 content.messages.push("Error while retrieving default version details related to App Name: " + appName
-                                      + ", Provider: " + appProvider + ", Version: " + appVersion);
+                                      + ", Provider: " + appProvider + ", Version: " + appVersion + ".");
                 response.content = stringify(content);
                 return;
             }
@@ -227,12 +227,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // check whether current user has enough permission to change the life cycle
         var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
         if (!hasPermission) {
-            log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+            log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
             response.status = 401;
             response.contentType = "application/json";
             content.status = "Access Denied";
             content.messages.push("You do not have publisher permissions to perform '"
-                                  + action + "' on " + appType + "s");
+                                  + action + "' on " + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -250,7 +250,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 404;
             response.contentType = "application/json";
             content.status = "Not Found";
-            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
             response.content = stringify(content);
             return;
         }
@@ -267,7 +267,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 });
             } catch (e) {
                 log.error("Cannot grant permissions to role '" + currentRole
-                          + "' to perform action '" + carbon.registry.actions.GET + "'");
+                          + "' to perform action '" + carbon.registry.actions.GET + "'.");
                 log.error(e);
                 // continue work flow
             }
@@ -278,7 +278,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (!permissions.isLCActionsPermitted(user.username, currentArtifact.path,
                                                   userManager)) {
                 log.error("Insufficient permissions to perform '" + action + "' on " + appType
-                          + " for user " + user.username);
+                          + " for user " + user.username + ".");
                 response.status = 401;
                 response.contentType = "application/json";
                 content.status = "Insufficient Permissions";
@@ -286,7 +286,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                       + action + "' on version "
                                       + currentArtifact.attributes.overview_version
                                       + " of '" + currentArtifact.attributes.overview_name + "' "
-                                      + appType);
+                                      + appType + ".");
                 response.content = stringify(content);
                 return;
             }
@@ -295,12 +295,12 @@ require('/modules/publisher.js').exec(function (ctx) {
             // org.wso2.carbon.user.core.AuthorizationManager.isRoleAuthorized(roleName,
             // resourceId, action) throws UserStoreException
             log.error("Cannot retrieve permissions for action '" + action + "' on artifact '" +
-                      currentArtifact.path + "' for user " + user.username);
+                      currentArtifact.path + "' for user " + user.username + ".");
             log.error(e);
             response.status = 500;
             response.contentType = "application/json";
             content.status = "Error";
-            content.messages.push("Cannot retrieve permissions for action '" + action + "'");
+            content.messages.push("Cannot retrieve permissions for action '" + action + "'.");
             response.content = stringify(content);
             return;
         }
@@ -326,7 +326,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         } catch (e) {
             log.error("Cannot retrieve previously published " + appType + " "
                       + currentArtifact.attributes.overview_name + " by "
-                      + currentArtifact.attributes.overview_provider);
+                      + currentArtifact.attributes.overview_provider + ".");
             log.error(e);
             // continue work flow
         }
@@ -404,7 +404,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             }
         } catch (e) {
             log.error("Cannot add comment '" + comment + " for action '" + action + "' on "
-                      + "artifact '" + currentArtifact.path + "' for user " + user.username);
+                      + "artifact '" + currentArtifact.path + "' for user " + user.username + ".");
             log.error(e);
             // continue work flow
         }
@@ -551,7 +551,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             return "Cannot perform action '" + action + "' on version " +
                    artifact.attributes.overview_version + " of '" +
                    artifact.attributes.overview_name + "' " + artifactType +
-                   " which is in '" + artifact.lifecycleState + "' state";
+                   " which is in '" + artifact.lifecycleState + "' state.";
         }
     }
 
@@ -591,7 +591,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                              fromAsset.attributes.overview_version + " of '" +
                              fromAsset.attributes.overview_name + "' " + assetType + " to " +
                              toAsset.attributes.overview_version + " of '" +
-                             toAsset.attributes.overview_name + "' " + assetType;
+                             toAsset.attributes.overview_name + "' " + assetType + ".";
             log.error(result.message);
             log.error(e);
         }
