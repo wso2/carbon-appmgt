@@ -19,6 +19,15 @@ header {
     background: #1F1F1F;
 }
 
+header .header-action {
+    display: inline-block;
+    color: #ffffff;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 30px;
+    padding: 10px 10px 10px 10px;
+}
+
 ul.nav.nav-tabs {
     background-color: #ddd;
 }

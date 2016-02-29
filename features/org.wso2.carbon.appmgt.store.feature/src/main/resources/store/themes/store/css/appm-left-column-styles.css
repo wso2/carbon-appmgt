@@ -74,7 +74,7 @@ nav.navigation > a > .icon > i {
     margin: 5px 11px 0;
 }
 
-nav.navigation > a > .left-menu-item {
+nav.navigation > a > .navigation-item {
     text-align: left;
     vertical-align: middle;
     padding-left: 10px;
@@ -83,32 +83,6 @@ nav.navigation > a > .left-menu-item {
     width: 160px;
     height: 40px;
     font-size: 14px;
-}
-
-nav a.active .sublevel-menu {
-    display: block;
-}
-
-nav .sublevel-menu {
-    display: none;
-}
-
-nav.navigation.sublevel-menu {
-    display: none;
-}
-
-nav.navigation > a.home .icon {
-    background: #c0392b;
-    color: white;
-}
-
-nav.navigation > a.home.active {
-    background: #c0392b;
-    color: white;
-}
-
-nav.navigation > a.home.active > .left-menu-item {
-    background: #c0392b;
 }
 
 nav.navigation > a.green .icon {
@@ -121,12 +95,11 @@ nav.navigation > a.green:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.green:hover > .left-menu-item,
-nav.navigation > a.green.active > .left-menu-item,
-nav.navigation > a.green.hover > .left-menu-item {
+nav.navigation > a.green:hover > .navigation-item,
+nav.navigation > a.green.active > .navigation-item,
+nav.navigation > a.green.hover > .navigation-item {
     background: #27ae60;
     color: white;
-
 }
 
 nav.navigation > a.red .icon {
@@ -139,12 +112,11 @@ nav.navigation > a.red:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.red:hover > .left-menu-item,
-nav.navigation > a.red.active > .left-menu-item,
-nav.navigation > a.red.hover > .left-menu-item {
+nav.navigation > a.red:hover > .navigation-item,
+nav.navigation > a.red.active > .navigation-item,
+nav.navigation > a.red.hover > .navigation-item {
     background: #c0392b;
     color: white;
-
 }
 
 nav.navigation > a.orange .icon {
@@ -157,12 +129,11 @@ nav.navigation > a.orange:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.orange:hover > .left-menu-item,
-nav.navigation > a.orange.active > .left-menu-item,
-nav.navigation > a.orange.hover > .left-menu-item {
+nav.navigation > a.orange:hover > .navigation-item,
+nav.navigation > a.orange.active > .navigation-item,
+nav.navigation > a.orange.hover > .navigation-item {
     background: #d35400;
     color: white;
-
 }
 
 nav.navigation > a.yellow .icon {
@@ -175,12 +146,11 @@ nav.navigation > a.yellow:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.yellow:hover > .left-menu-item,
-nav.navigation > a.yellow.active > .left-menu-item,
-nav.navigation > a.yellow.hover > .left-menu-item {
+nav.navigation > a.yellow:hover > .navigation-item,
+nav.navigation > a.yellow.active > .navigation-item,
+nav.navigation > a.yellow.hover > .navigation-item {
     background: #f39c12;
     color: white;
-
 }
 
 nav.navigation > a.blue .icon {
@@ -193,12 +163,11 @@ nav.navigation > a.blue:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.blue:hover > .left-menu-item,
-nav.navigation > a.blue.active > .left-menu-item,
-nav.navigation > a.blue.hover > .left-menu-item {
+nav.navigation > a.blue:hover > .navigation-item,
+nav.navigation > a.blue.active > .navigation-item,
+nav.navigation > a.blue.hover > .navigation-item {
     background: #2980b9;
     color: white;
-
 }
 
 nav.navigation > a.purple .icon {
@@ -211,9 +180,9 @@ nav.navigation > a.purple:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.purple:hover > .left-menu-item,
-nav.navigation > a.purple.active > .left-menu-item,
-nav.navigation > a.purple.hover > .left-menu-item {
+nav.navigation > a.purple:hover > .navigation-item,
+nav.navigation > a.purple.active > .navigation-item,
+nav.navigation > a.purple.hover > .navigation-item {
     background: #8e44ad;
     color: white;
 
@@ -229,44 +198,11 @@ nav.navigation > a.grey:hover > .icon {
     color: white;
 }
 
-nav.navigation > a.grey:hover > .left-menu-item,
-nav.navigation > a.grey.active > .left-menu-item,
-nav.navigation > a.grey.hover > .left-menu-item {
+nav.navigation > a.grey:hover > .navigation-item,
+nav.navigation > a.grey.active > .navigation-item,
+nav.navigation > a.grey.hover > .navigation-item {
     background: #2c3e50;
     color: white;
-
-}
-
-nav.navigation .second_level {
-    display: none;
-}
-
-nav.navigation .second_level a {
-    line-height: 20px;
-    padding: 8px 0 8px 10px;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-
-nav.navigation .second_level a:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-nav.navigation .second_level > .back {
-    height: 100%;
-    padding: 0 3px;
-    background: #FFF;
-    vertical-align: middle;
-    font-size: 13px;
-    width: 5px;
-}
-
-nav.navigation .second_level > .left-menu-item {
-    padding: 6px 0;
-    text-align: left;
-    width: 100%;
-    vertical-align: middle;
 }
 
 /**/
