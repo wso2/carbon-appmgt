@@ -100,52 +100,45 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             status = ssoStub.addRPServiceProvider(serviceProviderDTO);
             String attributeConsumingServiceIndex = getServiceProvider(provider.getIssuerName()).getAttributeConsumingServiceIndex();
             ServiceProvider serviceProvider = generateSPCreate(provider);
-            int appId = appMgtStub.createApplication(serviceProvider);
-            serviceProvider.setApplicationID(appId);
-            serviceProvider = generateSPUpdate(serviceProvider, attributeConsumingServiceIndex);
+            appMgtStub.createApplication(serviceProvider);
+            serviceProvider = generateSPUpdate(provider, serviceProvider, attributeConsumingServiceIndex);
             appMgtStub.updateApplication(serviceProvider);
         } catch (Exception e) {
             log.error("Error adding a new Service Provider", e);
         }
         return status;
     }
-
 
     @Override
     public boolean createProvider(WebApp webApp) {
         String acsUrl = webApp.getAcsURL().trim();
         SSOProvider ssoProvider = webApp.getSsoProviderDetails();
+        boolean status = false;
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
-        }
-
-        if(acsUrl != null) {
-            if (acsUrl.length() > 0) {
+        } else {
+            if (acsUrl != null && acsUrl.length() > 0) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
             }
-        } else {
-            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(webApp));
-        }
 
-        ServiceProvider serviceProvider = null;
-        SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
-        boolean status = false;
-        try {
-            status = ssoStub.addRPServiceProvider(serviceProviderDTO);
-            String attributeConsumingServiceIndex = getServiceProvider(ssoProvider.getIssuerName()).getAttributeConsumingServiceIndex();
-            serviceProvider = generateSPCreate(ssoProvider);
-            int appId = appMgtStub.createApplication(serviceProvider);
-            serviceProvider.setApplicationID(appId);
-            serviceProvider = generateSPUpdate(serviceProvider, attributeConsumingServiceIndex);
-            appMgtStub.updateApplication(serviceProvider);
-        } catch (Exception e) {
-            log.error("Error adding a new Service Provider", e);
+            ServiceProvider serviceProvider;
+            SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
+            try {
+                status = ssoStub.addRPServiceProvider(serviceProviderDTO);
+                String attributeConsumingServiceIndex = getServiceProvider(ssoProvider.getIssuerName()).getAttributeConsumingServiceIndex();
+                serviceProvider = generateSPCreate(ssoProvider);
+                appMgtStub.createApplication(serviceProvider);
+                serviceProvider = appMgtStub.getApplication(serviceProvider.getApplicationName());
+                serviceProvider = generateSPUpdate(ssoProvider, serviceProvider, attributeConsumingServiceIndex);
+                appMgtStub.updateApplication(serviceProvider);
+            } catch (Exception e) {
+                log.error("Error adding a new Service Provider", e);
+            }
         }
         return status;
     }
-
 
     @Override
     public boolean removeProvider(SSOProvider provider) {
@@ -197,47 +190,41 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
     public boolean updateProvider(WebApp application) {
         String acsUrl = application.getAcsURL().trim();
         SSOProvider ssoProvider = application.getSsoProviderDetails();
+        boolean isUpdated = false;
+
         if (ssoProvider == null) {
             log.warn("No SSO Configurator details given. Manual setup of SSO Provider required.");
-        }
-
-        //ssoProvider.setIssuerName(app.getId().getApiName());
-        if(acsUrl != null) {
-            if (acsUrl.length() > 0) {
+        } else {
+            if (acsUrl != null && acsUrl.length() > 0) {
                 ssoProvider.setAssertionConsumerURL(acsUrl);
             } else {
                 ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
             }
-        } else {
-            ssoProvider.setAssertionConsumerURL(SSOConfiguratorUtil.getGatewayUrl(application));
-        }
-
-        SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
-        ServiceProvider serviceProvider = null;
-        boolean isUpdated = false;
-
-        try {
-            serviceProvider = appMgtStub.getApplication(ssoProvider.getIssuerName());
-            if (serviceProvider != null) {
-                ssoStub.removeServiceProvider(ssoProvider.getIssuerName());
-                ssoStub.addRPServiceProvider(serviceProviderDTO);
-                updateServiceProvider(ssoProvider, serviceProvider);
-                appMgtStub.updateApplication(serviceProvider);
-                isUpdated = true;
-            } else {
-                createProvider(ssoProvider);
+            SAMLSSOServiceProviderDTO serviceProviderDTO = generateDTO(ssoProvider);
+            ServiceProvider serviceProvider = null;
+            try {
+                serviceProvider = appMgtStub.getApplication(ssoProvider.getIssuerName());
+                if (serviceProvider != null) {
+                    ssoStub.removeServiceProvider(ssoProvider.getIssuerName());
+                    ssoStub.addRPServiceProvider(serviceProviderDTO);
+                    updateServiceProvider(ssoProvider, serviceProvider);
+                    appMgtStub.updateApplication(serviceProvider);
+                    isUpdated = true;
+                } else {
+                    createProvider(ssoProvider);
+                }
+            } catch (RemoteException e) {
+                //An exception is not thrown here in the purpose of continuing in rest of webapp update
+                log.error("Error occurred in invoking remote service while updating service provider : " +
+                          ssoProvider.getProviderName(), e);
+            } catch (IdentityApplicationManagementServiceIdentityApplicationManagementException e) {
+                //An exception is not thrown here in the purpose of continuing in rest of webapp update
+                log.error("Error in invoking IdentityApplicationManagementService while updating the provider : " +
+                          ssoProvider.getProviderName(), e);
+            } catch (IdentitySAMLSSOConfigServiceIdentityException e) {
+                log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : " +
+                          ssoProvider.getIssuerName(), e);
             }
-        } catch (RemoteException e) {
-            //An exception is not thrown here in the purpose of continuing in rest of webapp update
-            log.error("Error occurred in invoking remote service while updating service provider : " +
-                    ssoProvider.getProviderName(), e);
-        } catch (IdentityApplicationManagementServiceIdentityApplicationManagementException e) {
-            //An exception is not thrown here in the purpose of continuing in rest of webapp update
-            log.error("Error in invoking IdentityApplicationManagementService while updating the provider : " +
-                    ssoProvider.getProviderName(), e);
-        } catch (IdentitySAMLSSOConfigServiceIdentityException e) {
-            log.error("Error occurred in invoking IdentitySAMLSSOConfigService while updating provider : " +
-                    ssoProvider.getIssuerName(), e);
         }
         return isUpdated;
     }
@@ -386,12 +373,24 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         ServiceProvider serviceProvider = new ServiceProvider();
         serviceProvider.setApplicationName(provider.getIssuerName());
         serviceProvider.setDescription(APP_DESC);
-        serviceProvider.setSaasApp(true);
 
+        return serviceProvider;
+    }
+
+    private ServiceProvider updateServiceProvider(SSOProvider ssoProvider,
+                                                  ServiceProvider serviceProvider) {
+        serviceProvider.setApplicationName(ssoProvider.getIssuerName());
+        updateClaimConfiguration(ssoProvider, serviceProvider);
+
+        return serviceProvider;
+    }
+
+    private ServiceProvider updateClaimConfiguration(SSOProvider ssoProvider,
+                                                     ServiceProvider serviceProvider) {
         ClaimConfig claimConfig = new ClaimConfig();
         List<ClaimMapping> claimMappings = new ArrayList<ClaimMapping>();
 
-        for(String claim: provider.getClaims()) {
+        for (String claim : ssoProvider.getClaims()) {
             Claim localClaim = new Claim();
             Claim remoteClaim = new Claim();
             localClaim.setClaimUri(claim);
@@ -412,40 +411,16 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
         return serviceProvider;
     }
 
-    private ServiceProvider updateServiceProvider(SSOProvider ssoProvider, ServiceProvider serviceProvider) {
+    private ServiceProvider generateSPUpdate(SSOProvider ssoProvider,
+                                             ServiceProvider serviceProvider,
+                                             String attrConsumServiceIndex) {
+        serviceProvider.setSaasApp(true);
+        updateClaimConfiguration(ssoProvider, serviceProvider);
 
-        serviceProvider.setApplicationName(ssoProvider.getIssuerName());
-        ClaimConfig claimConfig = new ClaimConfig();
-        List<ClaimMapping> claimMappings = new ArrayList<ClaimMapping>();
-        Claim localClaim;
-        Claim remoteClaim;
-        ClaimMapping claimMapping;
-
-        for (String claim : ssoProvider.getClaims()) {
-            localClaim = new Claim();
-            remoteClaim = new Claim();
-            localClaim.setClaimUri(claim);
-            remoteClaim.setClaimUri(claim);
-
-            claimMapping = new ClaimMapping();
-            claimMapping.setLocalClaim(localClaim);
-            claimMapping.setRemoteClaim(remoteClaim);
-            claimMapping.setRequested(true);
-            claimMappings.add(claimMapping);
-
-        }
-
-        claimConfig.setLocalClaimDialect(true);
-        claimConfig.setClaimMappings(claimMappings.toArray(new ClaimMapping[claimMappings.size()]));
-        serviceProvider.setClaimConfig(claimConfig);
-
-        return serviceProvider;
-    }
-
-    private ServiceProvider generateSPUpdate(ServiceProvider serviceProvider, String attrConsumServiceIndex) {
         InboundAuthenticationConfig iac = new InboundAuthenticationConfig();
         InboundAuthenticationRequestConfig iarc = new InboundAuthenticationRequestConfig();
         iarc.setInboundAuthKey(serviceProvider.getApplicationName());
+        iarc.setFriendlyName(serviceProvider.getApplicationName());
         iarc.setInboundAuthType(AUTH_TYPE);
         if (attrConsumServiceIndex != null && !attrConsumServiceIndex.isEmpty()) {
             Property property = new Property();

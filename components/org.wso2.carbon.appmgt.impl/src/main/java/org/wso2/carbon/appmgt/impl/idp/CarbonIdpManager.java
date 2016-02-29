@@ -30,7 +30,7 @@ import org.wso2.carbon.identity.application.common.model.xsd.AuthenticationStep;
 import org.wso2.carbon.identity.application.common.model.xsd.IdentityProvider;
 import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceIdentityApplicationManagementException;
 import org.wso2.carbon.identity.application.mgt.stub.IdentityApplicationManagementServiceStub;
-import org.wso2.carbon.idp.mgt.stub.IdentityProviderMgtServiceIdentityApplicationManagementExceptionException;
+import org.wso2.carbon.idp.mgt.stub.IdentityProviderMgtServiceIdentityProviderManagementExceptionException;
 import org.wso2.carbon.idp.mgt.stub.IdentityProviderMgtServiceStub;
 import org.wso2.carbon.utils.CarbonUtils;
 
@@ -62,7 +62,7 @@ public class CarbonIdpManager implements WebAppIdPManager {
 			} catch (RemoteException e) {
 				log.error(e);
 				throw new AppManagementException(e.getMessage());
-			} catch (IdentityProviderMgtServiceIdentityApplicationManagementExceptionException e) {
+			} catch (IdentityProviderMgtServiceIdentityProviderManagementExceptionException e) {
                 log.error(e);
 				throw new AppManagementException(e.getMessage());
             }
