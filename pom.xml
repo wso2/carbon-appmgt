@@ -372,7 +372,7 @@
         <version>${carbon.sequences.stub.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
         <version>${idp.mgt.stub.version}</version>
       </dependency>
@@ -397,7 +397,7 @@
         <version>${identity.sso.saml.stub.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
         <version>${identity.application.mgt.version}</version>
       </dependency>
@@ -611,8 +611,8 @@
     <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
     <carbon.kernel.pkg.version>[4.4.0,4.5.0)</carbon.kernel.pkg.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
-    <carbon.mediation.version>4.4.3</carbon.mediation.version>
-    <carbon.mediation.pkg.version>[4.4.0,4.5.0)</carbon.mediation.pkg.version>
+    <carbon.mediation.version>4.6.0</carbon.mediation.version>
+    <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
     <carbon.identity.version>5.0.7</carbon.identity.version>
     <carbon.identity.base.version>5.0.7</carbon.identity.base.version>
     <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
@@ -671,9 +671,9 @@
 	<identity.core.version>${carbon.identity.version}</identity.core.version>
 	<identity.oauth.common.version>${carbon.identity.version}</identity.oauth.common.version>
 	<identity.provider.version>${carbon.identity.version}</identity.provider.version>
-	<identity.application.mgt.version>4.2.0</identity.application.mgt.version>
+	<identity.application.mgt.version>5.0.7</identity.application.mgt.version>
 	<identity.entitlement.version>${carbon.identity.version}</identity.entitlement.version>
-	<idp.mgt.stub.version>4.2.1</idp.mgt.stub.version>
+	<idp.mgt.stub.version>5.0.7</idp.mgt.stub.version>
 
     <!-- Registry -->
     <governance.registry.extensions.imp.pkg.version>[4.5.8,4.6.0)</governance.registry.extensions.imp.pkg.version>

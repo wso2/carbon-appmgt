@@ -1456,7 +1456,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
 
                     APISubscription sub = new APISubscription();
-                    sub.name = part1;
+                    sub.name = part1 + "(v" + version + ")";
                     sub.version = version;
                     sub.count = entry.getValue();
                     sub.uuid=uuid;
