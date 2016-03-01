@@ -40,10 +40,6 @@
         "webapp_subscribe": "/permission/admin/manage/webapp/subscribe",
         "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
     },
-    "subscriptionConfiguration": {
-        "enableSelfSubscription": false,
-        "enableEnterpriseSubscription": false
-    },
     "pages": {
         "landingPage": "/extensions/assets/webapp/myapps",
         "favouritePage": "/assets/favouriteapps"

@@ -32,7 +32,7 @@ var render = function (theme, data, meta, require) {
         page = '2-column-right'
     }
 
-    theme(page, {
+    theme('2-column-right', {
         title: data.title,
         header: [
             {
@@ -43,7 +43,7 @@ var render = function (theme, data, meta, require) {
         body: [
             {
                 partial: 'sort-assets',
-                context: require('/helpers/sort-assets.js').format(data.sorting, data.header, hasApps)
+                context: data.sortOptions
             },
             {
                 partial: bodyPartial,
