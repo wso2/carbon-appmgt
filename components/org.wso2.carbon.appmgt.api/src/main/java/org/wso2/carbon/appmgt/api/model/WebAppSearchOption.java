@@ -18,5 +18,12 @@
 package org.wso2.carbon.appmgt.api.model;
 
 public enum WebAppSearchOption {
-    SEARCH_BY_APP_NAME,SEARCH_BY_APP_PROVIDER
+    /**
+     * Search for apps by app name.
+     */
+    SEARCH_BY_APP_NAME,
+    /**
+     * Search for apps by app provider name.
+     */
+    SEARCH_BY_APP_PROVIDER
 }

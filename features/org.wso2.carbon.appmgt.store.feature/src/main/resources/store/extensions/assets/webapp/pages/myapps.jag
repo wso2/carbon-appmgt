@@ -359,6 +359,7 @@ require('/modules/store.js').exec(function (ctx) {
      * Sort by recent(recently subscribed apps) option will be available for only logged in user
      */
     var getAssetsFromDB = function () {
+        var carbon = require('carbon');
         var treatAsSite = "FALSE";
         if (query) {
             var array = query.split(":");
@@ -375,14 +376,14 @@ require('/modules/store.js').exec(function (ctx) {
                 assets = subsApi.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             } else {
-                assets = subsApi.searchUserAccessibleApps("wso2.anonymous.user", tenantId, String(tenantDomain),
+                assets = subsApi.searchUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             }
         } else {
-            var sortOption = encodeURIComponent(request.getParameter('sort'));
+            var sortOption = request.getParameter('sort');
             if (sortOption == "az") {
                 sortOption = "SORT_BY_APP_NAME_ASC";
-            } else if (user && sortOption == "recent") {
+            } else if (sortOption == "recent") {
                 sortOption = "SORT_BY_SUBSCRIBED_TIME_DESC";
             } else {
                 sortOption = "INSERTED_ORDER";
@@ -396,7 +397,7 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 //get anonymous apps
                 assets =
-                subsApi.getUserAccessibleApps("wso2.anonymous.user", tenantId, String(tenantDomain), sortOption,
+                subsApi.getUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain), sortOption,
                                               treatAsSite);
             }
         }
@@ -496,9 +497,9 @@ function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscrip
     var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
 
     var options = [];
-    options.push(sortByAlphabet);
 
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        options.push(sortByAlphabet);
         options.push(sortByRecent);// recently added
         options.push(sortByPopularity);
         if (user) {
@@ -506,6 +507,7 @@ function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscrip
         }
     } else {
         if(user) {
+            options.push(sortByAlphabet);
             options.push(sortByRecent);// recently subscribed
         }
     }

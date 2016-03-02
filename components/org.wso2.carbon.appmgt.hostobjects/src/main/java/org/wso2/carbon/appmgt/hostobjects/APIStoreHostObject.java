@@ -3339,7 +3339,6 @@ public class APIStoreHostObject extends ScriptableObject {
             ));
         }
 
-        NativeArray nativeArray = new NativeArray(0);
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = tenantDomainOfStore;
@@ -3355,47 +3354,13 @@ public class APIStoreHostObject extends ScriptableObject {
             List<APIIdentifier> identifiers = apiConsumer.getFavouriteApps(username, tenantIdOfUser,
                                                                            tenantIdOfStore,
                                                                            sortOption);
-
-            if (identifiers != null && identifiers.size() > 0) {
-                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-                List<Environment> environments = config.getApiGatewayEnvironments();
-                Environment environment = environments.get(0);
-                int i = 0;
-                for (APIIdentifier identifier : identifiers) {
-                    WebApp app = apiConsumer.getAPI(identifier);
-                    String lifeCycleStatus = app.getStatus().getStatus();
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
-                        if (!app.isDefaultVersion()) {
-                            accessUrl += app.getId().getVersion() + "/";
-                        }
-                    }
-
-                    NativeObject row = new NativeObject();
-                    row.put("appName", row, identifier.getApiName());
-                    row.put("appProvider", row, identifier.getProviderName());
-                    row.put("version", row, identifier.getVersion());
-                    row.put("context", row, app.getContext());
-                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                    row.put("gatewayUrl", row, accessUrl);
-                    row.put("uuid", row, app.getUUID());
-                    row.put("treatAsSite", row, app.getTreatAsASite());
-                    row.put("appDisplayName", row, app.getDisplayName());
-                    row.put("lifeCycleStatus", row, lifeCycleStatus);
-                    nativeArray.put(i++, nativeArray, row);
-                }
-            }
+            NativeArray nativeArray = getFavouriteAppsInDetail(identifiers, apiConsumer);
+            return nativeArray;
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return nativeArray;
     }
 
     /**
@@ -3432,7 +3397,6 @@ public class APIStoreHostObject extends ScriptableObject {
             ));
         }
 
-        NativeArray nativeArray = new NativeArray(0);
         boolean isTenantFlowStarted = false;
         try {
             String tenantDomain = tenantDomainOfStore;
@@ -3448,52 +3412,52 @@ public class APIStoreHostObject extends ScriptableObject {
             List<APIIdentifier> identifiers = apiConsumer.searchFavouriteApps(username, tenantIdOfUser,
                                                                               tenantIdOfStore,
                                                                               searchOption, searchValue);
-
-            if (identifiers != null && identifiers.size() > 0) {
-                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-                List<Environment> environments = config.getApiGatewayEnvironments();
-                Environment environment = environments.get(0);
-                int i = 0;
-                for (APIIdentifier identifier : identifiers) {
-                    WebApp app = apiConsumer.getAPI(identifier);
-                    String lifeCycleStatus = app.getStatus().getStatus();
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
-                        if (!app.isDefaultVersion()) {
-                            accessUrl += app.getId().getVersion() + "/";
-                        }
-                    }
-
-                    NativeObject row = new NativeObject();
-                    row.put("appName", row, identifier.getApiName());
-                    row.put("appProvider", row, identifier.getProviderName());
-                    row.put("version", row, identifier.getVersion());
-                    row.put("context", row, app.getContext());
-                    row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
-                    row.put("gatewayUrl", row, accessUrl);
-                    row.put("uuid", row, app.getUUID());
-                    row.put("treatAsSite", row, app.getTreatAsASite());
-                    row.put("appDisplayName", row, app.getDisplayName());
-                    row.put("lifeCycleStatus", row, lifeCycleStatus);
-
-                    nativeArray.put(i++, nativeArray, row);
-                }
-            }
+            NativeArray nativeArray = getFavouriteAppsInDetail(identifiers, apiConsumer);
+            return nativeArray;
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+    }
+
+    /**
+     * Add needed webapp information
+     *
+     * @param identifiers App Identifiers
+     * @param apiConsumer APIConsumer object
+     * @return
+     * @throws AppManagementException
+     */
+    private static NativeArray getFavouriteAppsInDetail(List<APIIdentifier> identifiers, APIConsumer apiConsumer)
+            throws AppManagementException {
+        NativeArray nativeArray = new NativeArray(0);
+        if (identifiers != null && identifiers.size() > 0) {
+            int i = 0;
+            for (APIIdentifier identifier : identifiers) {
+                WebApp app = apiConsumer.getAPI(identifier);
+                String lifeCycleStatus = app.getStatus().getStatus();
+                String accessUrl = getAccessUrl(app);
+
+                NativeObject row = new NativeObject();
+                row.put("appName", row, identifier.getApiName());
+                row.put("appProvider", row, identifier.getProviderName());
+                row.put("version", row, identifier.getVersion());
+                row.put("context", row, app.getContext());
+                row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
+                row.put("gatewayUrl", row, accessUrl);
+                row.put("uuid", row, app.getUUID());
+                row.put("treatAsSite", row, app.getTreatAsASite());
+                row.put("appDisplayName", row, app.getDisplayName());
+                row.put("lifeCycleStatus", row, lifeCycleStatus);
+                nativeArray.put(i++, nativeArray, row);
             }
         }
         return nativeArray;
     }
 
     /**
-     * Returns  accessible apps(anonymous + subscribed) of  user on the given tenant store.
+     * Returns  accessible apps(anonymous + subscribed) of  user for the given tenant store.
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3504,8 +3468,7 @@ public class APIStoreHostObject extends ScriptableObject {
      */
     public static NativeArray jsFunction_getUserAccessibleApps(Context cx,
                                                                Scriptable thisObj, Object[] args,
-                                                               Function funObj)
-            throws AppManagementException {
+                                                               Function funObj) throws AppManagementException {
         if (args == null || args.length != 5) {
             String message =
                     "Invalid number of input parameters to method getUserAccessibleApps.Expected parameters :" +
@@ -3527,10 +3490,7 @@ public class APIStoreHostObject extends ScriptableObject {
             ));
         }
 
-
         boolean isTenantFlowStarted = false;
-        NativeArray nativeArray = new NativeArray(0);
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3543,68 +3503,14 @@ public class APIStoreHostObject extends ScriptableObject {
             List<APIIdentifier> identifiers = apiConsumer.getUserAccessibleApps(username, tenantIdOfUser,
                                                                                 tenantIdOFStore, sortOption,
                                                                                 treatAsSite);
-
-            if (identifiers != null && identifiers.size() > 0) {
-                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-                List<Environment> environments = config.getApiGatewayEnvironments();
-                Environment environment = environments.get(0);
-                int i = 0;
-                for (APIIdentifier identifier : identifiers) {
-                    WebApp app = apiConsumer.getAPI(identifier);
-                    String lifeCycleStatus = app.getStatus().getStatus();
-                    //Anonymous apps which are in published status, and subscribed apps which are in published,
-                    // unpublished, deprecated and retired states will be displayed in myapp apps page when
-                    // subscription option is enabled
-                    if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
-                        continue;
-                    } else if (APIStatus.CREATED.getStatus().equals(lifeCycleStatus) ||
-                            APIStatus.INREVIEW.getStatus().equals(lifeCycleStatus)
-                            || APIStatus.APPROVED.getStatus().equals(lifeCycleStatus)) {
-                        continue;
-                    }
-
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
-                        if (!app.isDefaultVersion()) {
-                            accessUrl += app.getId().getVersion() + "/";
-                        }
-                    }
-
-                    NativeObject attributes = new NativeObject();
-                    attributes.put("overview_name", attributes, identifier.getApiName());
-                    attributes.put("overview_displayName", attributes, app.getDisplayName());
-                    attributes.put("overview_provider", attributes, identifier.getProviderName());
-                    attributes.put("overview_context", attributes, app.getContext());
-                    attributes.put("overview_version", attributes, identifier.getVersion());
-                    attributes.put("overview_appTenant", attributes, app.getAppTenant());
-                    attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
-                            app.getThumbnailUrl()));
-                    attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
-                    attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
-                    attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
-
-                    NativeObject asset = new NativeObject();
-                    asset.put("id", asset, app.getUUID());
-                    asset.put("lifeCycleStatus", asset, lifeCycleStatus);
-                    asset.put("accessUrl", asset, accessUrl);
-                    asset.put("attributes", asset, attributes);
-
-                    nativeArray.put(i++, nativeArray, asset);
-                }
-            }
+            NativeArray nativeArray = getUserAccessibleAppsInDetail(identifiers, apiConsumer);
+            return nativeArray;
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
-        return nativeArray;
     }
-
 
     /**
      * Returns accessible apps(anonymous + subscribed) of  user on the given tenant store based on given search
@@ -3619,8 +3525,7 @@ public class APIStoreHostObject extends ScriptableObject {
      */
     public static NativeArray jsFunction_searchUserAccessibleApps(Context cx,
                                                                   Scriptable thisObj, Object[] args,
-                                                                  Function funObj)
-            throws AppManagementException {
+                                                                  Function funObj) throws AppManagementException {
         if (args == null || args.length != 6) {
             String message =
                     "Invalid number of input parameters to method getUserAccessibleApps.Expected parameters :" +
@@ -3644,10 +3549,7 @@ public class APIStoreHostObject extends ScriptableObject {
             ));
         }
 
-
         boolean isTenantFlowStarted = false;
-        NativeArray nativeArray = new NativeArray(0);
-
         try {
             String tenantDomain = tenantDomainOfStore;
             if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
@@ -3661,66 +3563,88 @@ public class APIStoreHostObject extends ScriptableObject {
                                                                                    tenantIdOFStore, treatAsSite,
                                                                                    searchOption,
                                                                                    searchValue);
-
-            if (identifiers != null && identifiers.size() > 0) {
-                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
-                List<Environment> environments = config.getApiGatewayEnvironments();
-                Environment environment = environments.get(0);
-                int i = 0;
-                for (APIIdentifier identifier : identifiers) {
-                    WebApp app = apiConsumer.getAPI(identifier);
-                    String lifeCycleStatus = app.getStatus().getStatus();
-                    //Anonymous apps which are in published status, and subscribed apps which are in published,
-                    // unpublished, deprecated and retired states will be displayed in myapp apps page when
-                    // subscription  option is enabled
-                    if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
-                        continue;
-                    } else if (APIStatus.CREATED.getStatus().equals(lifeCycleStatus) ||
-                            APIStatus.INREVIEW.getStatus().equals(lifeCycleStatus)
-                            || APIStatus.APPROVED.getStatus().equals(lifeCycleStatus)) {
-                        continue;
-                    }
-
-                    String accessUrl = null;
-                    if (app.getSkipGateway()) {
-                        accessUrl = app.getUrl();
-                    } else {
-                        String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
-                        String context = app.getContext();
-                        accessUrl = serverUrl + context + "/";
-                        if (!app.isDefaultVersion()) {
-                            accessUrl += app.getId().getVersion() + "/";
-                        }
-                    }
-
-                    NativeObject attributes = new NativeObject();
-                    attributes.put("overview_name", attributes, identifier.getApiName());
-                    attributes.put("overview_displayName", attributes, app.getDisplayName());
-                    attributes.put("overview_provider", attributes, identifier.getProviderName());
-                    attributes.put("overview_context", attributes, app.getContext());
-                    attributes.put("overview_version", attributes, identifier.getVersion());
-                    attributes.put("overview_appTenant", attributes, app.getAppTenant());
-                    attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
-                            app.getThumbnailUrl()));
-                    attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
-                    attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
-                    attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
-
-                    NativeObject asset = new NativeObject();
-                    asset.put("id", asset, app.getUUID());
-                    asset.put("lifeCycleStatus", asset, lifeCycleStatus);
-                    asset.put("accessUrl", asset, accessUrl);
-                    asset.put("attributes", asset, attributes);
-
-                    nativeArray.put(i++, nativeArray, asset);
-                }
-            }
+            NativeArray nativeArray = getUserAccessibleAppsInDetail(identifiers, apiConsumer);
+            return nativeArray;
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         }
+    }
+
+    /**
+     * Add needed webapp information
+     * @param identifiers App Identifiers
+     * @param apiConsumer APIConsumer object
+     * @return
+     * @throws AppManagementException
+     */
+    private static NativeArray getUserAccessibleAppsInDetail(List<APIIdentifier> identifiers, APIConsumer apiConsumer)
+            throws AppManagementException {
+        NativeArray nativeArray = new NativeArray(0);
+        if (identifiers != null && identifiers.size() > 0) {
+            int i = 0;
+            for (APIIdentifier identifier : identifiers) {
+                WebApp app = apiConsumer.getAPI(identifier);
+                String lifeCycleStatus = app.getStatus().getStatus();
+                //Anonymous apps which are in published status, and subscribed apps which are in published,
+                //unpublished, deprecated and retired states will be displayed in myapps page when
+                //subscription option is enabled
+                if (app.getAllowAnonymous() && !APIStatus.PUBLISHED.getStatus().equals(lifeCycleStatus)) {
+                    continue;
+                }
+
+                String accessUrl = getAccessUrl(app);
+
+                NativeObject attributes = new NativeObject();
+                attributes.put("overview_name", attributes, identifier.getApiName());
+                attributes.put("overview_displayName", attributes, app.getDisplayName());
+                attributes.put("overview_provider", attributes, identifier.getProviderName());
+                attributes.put("overview_context", attributes, app.getContext());
+                attributes.put("overview_version", attributes, identifier.getVersion());
+                attributes.put("overview_appTenant", attributes, app.getAppTenant());
+                attributes.put("images_thumbnail", attributes, AppManagerUtil.prependWebContextRoot(
+                        app.getThumbnailUrl()));
+                attributes.put("overview_advertiseOnly", attributes, String.valueOf(app.isAdvertiseOnly()));
+                attributes.put("overview_advertisedAppUuid", attributes, app.getAdvertisedAppUuid());
+                attributes.put("overview_treatAsSite", attributes, app.getTreatAsASite());
+
+                NativeObject asset = new NativeObject();
+                asset.put("id", asset, app.getUUID());
+                asset.put("lifeCycleStatus", asset, lifeCycleStatus);
+                asset.put("accessUrl", asset, accessUrl);
+                asset.put("attributes", asset, attributes);
+
+                nativeArray.put(i++, nativeArray, asset);
+            }
+        }
         return nativeArray;
+    }
+
+
+    /**
+     * Get the web app access url. if app is type of skip the gateway then backend url of the app else
+     * gateway url of the app
+     * @param app Web App
+     * @return
+     */
+    private static String getAccessUrl(WebApp app) {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        List<Environment> environments = config.getApiGatewayEnvironments();
+        Environment environment = environments.get(0);
+
+        String accessUrl = null;
+        if (app.getSkipGateway()) {
+            accessUrl = app.getUrl();
+        } else {
+            String serverUrl = filterUrls(environment.getApiGatewayEndpoint(), app.getTransports());
+            String context = app.getContext();
+            accessUrl = serverUrl + context + "/";
+            if (!app.isDefaultVersion()) {
+                accessUrl += app.getId().getVersion() + "/";
+            }
+        }
+        return accessUrl;
     }
 
     /**

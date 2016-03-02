@@ -83,6 +83,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import scala.App;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -8429,7 +8430,7 @@ public class AppMDAO {
     }
 
     /**
-     * This method returns the favourite app of given user for given tenant store.
+     * Returns the favourite app of given user for given tenant store based on given sort option.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id of Logged in user
@@ -8443,7 +8444,7 @@ public class AppMDAO {
             throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Retrieving favourite apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
-                              " for tenant store:" + tenantIdOfStore);
+                              " for tenant store: " + tenantIdOfStore + ",Sort option: " + sortOption);
         }
         Connection connection = null;
         PreparedStatement ps = null;
@@ -8452,32 +8453,24 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-
             String query = "SELECT " +
                     " APP.APP_PROVIDER AS APP_PROVIDER," +
                     " APP.APP_NAME AS APP_NAME," +
                     " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP " +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  APP.APP_ID =FAV_APP.APP_ID " +
-                    " WHERE FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ?" +
-                    " AND APP.TENANT_ID = ? ";
+                    " FROM APM_APP APP" +
+                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
+                    " AND FAV_APP.USER_ID  = ?" +
+                    " AND FAV_APP.TENANT_ID = ? )" +
+                    " WHERE APP.TENANT_ID = ?";
 
-            String orderBy = "";
-            switch (sortOption) {
-                case SORT_BY_CREATED_TIME_DESC:
-                    orderBy = " ORDER BY FAV_APP.CREATED_TIME DESC";
-                    break;
-                default:
-                    orderBy = " ORDER BY APP.APP_NAME ASC";
-                    break;
+            if (sortOption == WebAppSortOption.SORT_BY_CREATED_TIME_DESC) {
+                query = query + " ORDER BY FAV_APP.CREATED_TIME DESC";
+            } else {
+                query = query + " ORDER BY APP.APP_NAME ASC";
             }
 
-            StringBuilder sqlQuery = new StringBuilder(query);
-            sqlQuery.append(orderBy);
-
-            ps = connection.prepareStatement(sqlQuery.toString());
+            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8517,7 +8510,7 @@ public class AppMDAO {
             throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Searching favourite apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
-                              " for tenant store:" + tenantIdOfStore + ", SearchOption: " + searchOption +
+                              " for tenant store: " + tenantIdOfStore + ", SearchOption: " + searchOption +
                               ",Search Value: " + searchValue);
         }
         Connection connection = null;
@@ -8527,32 +8520,24 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-
             String query = "SELECT " +
                     " APP.APP_PROVIDER AS APP_PROVIDER," +
                     " APP.APP_NAME AS APP_NAME," +
                     " APP.APP_VERSION AS APP_VERSION" +
-                    " FROM APM_APP APP " +
-                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
-                    " ON  APP.APP_ID =FAV_APP.APP_ID " +
-                    " WHERE FAV_APP.USER_ID  = ?" +
-                    " AND FAV_APP.TENANT_ID = ?" +
-                    " AND APP.TENANT_ID = ? ";
+                    " FROM APM_APP APP" +
+                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
+                    " AND FAV_APP.USER_ID  = ?" +
+                    " AND FAV_APP.TENANT_ID = ? )" +
+                    " WHERE APP.TENANT_ID = ?";
 
-            String searchBy = "";
-            switch (searchOption) {
-                case SEARCH_BY_APP_PROVIDER:
-                    searchBy = " AND  APP.APP_PROVIDER LIKE ?";
-                    break;
-                default:
-                    searchBy = " AND  APP.APP_NAME LIKE ?";
-                    break;
+            if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
+                query = query + " AND  APP.APP_PROVIDER LIKE ?";
+            } else {
+                query = query + " AND  APP.APP_NAME LIKE ?";
             }
 
-            StringBuilder sqlQuery = new StringBuilder(query);
-            sqlQuery.append(searchBy);
-
-            ps = connection.prepareStatement(sqlQuery.toString());
+            ps = connection.prepareStatement(query);
             ps.setString(1, username);
             ps.setInt(2, tenantIdOfUser);
             ps.setInt(3, tenantIdOfStore);
@@ -8570,8 +8555,7 @@ public class AppMDAO {
         } catch (SQLException e) {
             handleException("Error while searching  favourite apps of  user : " + username + " of tenant: " +
                                     tenantIdOfUser + " for tenant store:" + tenantIdOfStore + ", SearchOption: " +
-                                    searchOption + ",Search Value: " + searchValue,
-                            e);
+                                    searchOption + ",Search Value: " + searchValue, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, appInfoResult);
         }
@@ -8591,8 +8575,7 @@ public class AppMDAO {
      */
     public List<APIIdentifier> getUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
                                                      WebAppSortOption sortOption, boolean treatAsSite)
-            throws
-            AppManagementException {
+            throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Retrieving accessible apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
                               " for tenant store:" + tenantIdOfStore + ", " + "Sort Option: " + sortOption +
@@ -8602,42 +8585,27 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
+        boolean allowAnonymous = true;
         try {
             connection = APIMgtDBUtil.getConnection();
-            String query =
-                    "SELECT  WEBAPP.APP_PROVIDER AS APP_PROVIDER," +
-                            " WEBAPP.APP_NAME AS APP_NAME," +
-                            " WEBAPP.APP_VERSION AS APP_VERSION" +
-                            " FROM APM_APP WEBAPP" +
-                            " LEFT JOIN APM_SUBSCRIPTION SUBS" +
-                            " ON WEBAPP.APP_ID=SUBS.APP_ID" +
-                            " LEFT JOIN APM_APPLICATION APP" +
-                            " ON SUBS.APPLICATION_ID = APP.APPLICATION_ID" +
-                            " LEFT JOIN APM_SUBSCRIBER SUB" +
-                            " ON APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID" +
-                            " WHERE (SUB.USER_ID = ? AND SUB.TENANT_ID = ? OR WEBAPP.APP_ALLOW_ANONYMOUS = TRUE)" +
-                            " AND WEBAPP.TENANT_ID = ?" +
-                            " AND WEBAPP.TREAT_AS_SITE = ?";
+            int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String orderBy = "";
-            switch (sortOption) {
-                case SORT_BY_SUBSCRIBED_TIME_DESC:
-                    orderBy = " ORDER BY SUBS.SUBSCRIPTION_TIME DESC";
-                    break;
-                default:
-                    orderBy = " ORDER BY WEBAPP.APP_NAME ASC";
-                    break;
+            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
+                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
+                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
+                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
+
+            if (sortOption == WebAppSortOption.SORT_BY_SUBSCRIBED_TIME_DESC) {
+                query = query + " ORDER BY APM_SUBSCRIPTION.SUBSCRIPTION_TIME DESC";
+            } else {
+                query = query + " ORDER BY APM_APP.APP_NAME ASC";
             }
 
-            StringBuilder sqlQuery = new StringBuilder(query);
-            sqlQuery.append(orderBy);
-
-            ps = connection.prepareStatement(sqlQuery.toString());
-            ps.setString(1, username);
-            ps.setInt(2, tenantIdOfUser);
-            ps.setInt(3, tenantIdOfStore);
-            ps.setBoolean(4, treatAsSite);
-
+            ps = connection.prepareStatement(query);
+            ps.setBoolean(1,treatAsSite);
+            ps.setInt(2,tenantIdOfStore);
+            ps.setInt(3,applicationId);
+            ps.setBoolean(4,allowAnonymous);
             result = ps.executeQuery();
 
             while (result.next()) {
@@ -8660,7 +8628,7 @@ public class AppMDAO {
     }
 
     /**
-     * Returns apps(anonymous + subscribed) based on give search option.
+     * Returns apps(anonymous + subscribed) of given user for given tenant store based on given search option.
      *
      * @param username        UserName
      * @param tenantIdOfUser  Tenant Id of Logged in user
@@ -8684,45 +8652,29 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
+        boolean allowAnonymous = true;
 
         try {
             connection = APIMgtDBUtil.getConnection();
+            int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String query =
-                    "SELECT  WEBAPP.APP_PROVIDER AS APP_PROVIDER," +
-                            " WEBAPP.APP_NAME AS APP_NAME," +
-                            " WEBAPP.APP_VERSION AS APP_VERSION" +
-                            " FROM APM_APP WEBAPP" +
-                            " LEFT JOIN APM_SUBSCRIPTION SUBS" +
-                            " ON WEBAPP.APP_ID=SUBS.APP_ID" +
-                            " LEFT JOIN APM_APPLICATION APP" +
-                            " ON SUBS.APPLICATION_ID = APP.APPLICATION_ID" +
-                            " LEFT JOIN APM_SUBSCRIBER SUB" +
-                            " ON APP.SUBSCRIBER_ID = SUB.SUBSCRIBER_ID" +
-                            " WHERE (SUB.USER_ID = ? AND SUB.TENANT_ID = ? OR WEBAPP.APP_ALLOW_ANONYMOUS = TRUE)" +
-                            " AND WEBAPP.TENANT_ID = ?" +
-                            " AND WEBAPP.TREAT_AS_SITE = ?";
+            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
+                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
+                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
+                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
 
-            String searchBy = "";
-            switch (searchOption) {
-                case SEARCH_BY_APP_PROVIDER:
-                    searchBy = " AND  WEBAPP.APP_PROVIDER LIKE ?";
-                    break;
-                default:
-                    searchBy = " AND  WEBAPP.APP_NAME LIKE ?";
-                    break;
+            if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
+                query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+            } else {
+                query = query + " AND  APM_APP.APP_NAME LIKE ?";
             }
 
-            StringBuilder sqlQuery = new StringBuilder(query);
-            sqlQuery.append(searchBy);
-
-            ps = connection.prepareStatement(sqlQuery.toString());
-            ps.setString(1, username);
-            ps.setInt(2, tenantIdOfUser);
-            ps.setInt(3, tenantIdOfStore);
-            ps.setBoolean(4, treatAsSite);
+            ps = connection.prepareStatement(query);
+            ps.setBoolean(1,treatAsSite);
+            ps.setInt(2,tenantIdOfStore);
+            ps.setInt(3,applicationId);
+            ps.setBoolean(4,allowAnonymous);
             ps.setString(5, "%" + searchValue + "%");
-
             result = ps.executeQuery();
 
             while (result.next()) {
@@ -8742,6 +8694,43 @@ public class AppMDAO {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
         return apiIdentifiers;
+    }
+
+    /**
+     * Returns application id mapped to username.
+     * @param username Username
+     * @param tenantId Tenant Id of User
+     * @param connection SQL Connection to the data store
+     * @return Application Id
+     * @throws AppManagementException
+     */
+    private int getApplicationId(String username, int tenantId, Connection connection) throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String query = "SELECT APPLICATION_ID" +
+                " FROM APM_SUBSCRIBER  ,APM_APPLICATION" +
+                " WHERE APM_SUBSCRIBER.SUBSCRIBER_ID = APM_APPLICATION.SUBSCRIBER_ID" +
+                " AND APM_SUBSCRIBER.TENANT_ID = ? AND APM_SUBSCRIBER.USER_ID = ?";
+        int applicationId = -1;
+
+        try {
+            ps = connection.prepareStatement(query);
+            ps.setInt(1, tenantId);
+            ps.setString(2, username);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                applicationId = result.getInt("APPLICATION_ID");
+            }
+
+        } catch (SQLException e) {
+            handleException(
+                    "Failed to get application id from table APM_APPLICATION for user :" + username + "of tenant id :" +
+                            tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, result);
+        }
+        return applicationId;
     }
 
     /**

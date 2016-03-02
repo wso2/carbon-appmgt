@@ -20,8 +20,20 @@ package org.wso2.carbon.appmgt.api.model;
 
 
 public enum WebAppSortOption {
+    /**
+     * Sort the result by app name in ascending order.
+     */
     SORT_BY_APP_NAME_ASC,
+    /**
+     * Sort the result by created time in descending order.
+     */
     SORT_BY_CREATED_TIME_DESC,
+    /**
+     * Sort the result by subscribed time in descending order.
+     */
     SORT_BY_SUBSCRIBED_TIME_DESC,
+    /**
+     * Sort the app in default order.
+     */
     INSERTED_ORDER
 }

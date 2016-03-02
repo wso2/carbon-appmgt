@@ -358,7 +358,7 @@ require('/modules/store.js').exec(function (ctx) {
      * Sort by recent(recently subscribed apps) option will be available for only logged in user
      */
     var getAssetsFromDB = function () {
-
+        var carbon = require('carbon');
         var treatAsSite = "TRUE";
         if (query) {
             var array = query.split(":");
@@ -374,14 +374,14 @@ require('/modules/store.js').exec(function (ctx) {
                 assets = subsApp.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             } else {
-                assets = subsApp.searchUserAccessibleApps("wso2.anonymous.user", tenantId, String(tenantDomain),
+                assets = subsApp.searchUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             }
         } else {
-            var sortOption = encodeURIComponent(request.getParameter('sort'));
+            var sortOption = request.getParameter('sort');
             if (sortOption == "az") {
                 sortOption = "SORT_BY_APP_NAME_ASC";
-            } else if (user && sortOption == "recent") {
+            } else if (sortOption == "recent") {
                 sortOption = "SORT_BY_SUBSCRIBED_TIME_DESC";
             } else {
                 sortOption = "INSERTED_ORDER";
@@ -395,7 +395,7 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 //get anonymous apps
                 assets =
-                subsApp.getUserAccessibleApps("wso2.anonymous.user", tenantId, String(tenantDomain), sortOption,
+                subsApp.getUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain), sortOption,
                                               treatAsSite);
             }
         }
@@ -435,7 +435,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     } else {
         //show anonymous + subscribed apps for logged in user.
-        //show anonymous apps for anoymous user.
+        //show anonymous apps for anonymous user.
         getAssetsFromDB();
     }
 
@@ -495,13 +495,12 @@ function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscrip
     var sortOptions = {};
     var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
-    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Time", class: "fw fw-calendar"};
     var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
 
     var options = [];
-    options.push(sortByAlphabet);
-
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        options.push(sortByAlphabet);
         options.push(sortByRecent);// recently added
         options.push(sortByPopularity);
         if (user) {
@@ -509,6 +508,7 @@ function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscrip
         }
     } else {
         if(user) {
+            options.push(sortByAlphabet);
             options.push(sortByRecent);// recently subscribed
         }
     }

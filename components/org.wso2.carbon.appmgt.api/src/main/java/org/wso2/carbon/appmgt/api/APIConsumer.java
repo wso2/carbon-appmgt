@@ -364,7 +364,7 @@ public interface APIConsumer extends APIManager {
             throws AppManagementException;
 
     /**
-     * Returns  favourite webapps of given user for given tenant store based on given sorting option.
+     * Returns  favourite apps of given user for given tenant store based on given sorting option.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
@@ -377,7 +377,7 @@ public interface APIConsumer extends APIManager {
             throws AppManagementException;
 
     /**
-     * Returns favourite apps of user based on given search criteria.
+     * Returns favourite apps of user for given tenant store  based on given search criteria.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id of Logged in user
@@ -391,7 +391,7 @@ public interface APIConsumer extends APIManager {
                                                    WebAppSearchOption searchOption, String searchValue)
             throws AppManagementException;
     /**
-     * Returns the  accessible web apps(anonymous + subscribed) for given user on given tenant store.
+     * Returns the  accessible web apps(anonymous + subscribed) of given user for given tenant store.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
@@ -405,7 +405,7 @@ public interface APIConsumer extends APIManager {
             throws AppManagementException;
 
     /**
-     * Returns accessible apps(anonymous + subscribed) based on give search option.
+     * Returns accessible apps(anonymous + subscribed) of given user based on give search option.
      *
      * @param username        UserName
      * @param tenantIdOfUser  Tenant Id of Logged in user
