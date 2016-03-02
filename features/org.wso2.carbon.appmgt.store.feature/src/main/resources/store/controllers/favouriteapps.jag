@@ -30,7 +30,8 @@ require('/modules/store.js').exec(function (ctx) {
             store = ctx.store,
             user = ctx.user,
             storeTenantId = ctx.tenant.tenantId,
-            storeTenantDomain = ctx.tenant.domain;
+            storeTenantDomain = ctx.tenant.domain,
+            query = ctx.params.query;
 
     //if user not logged in redirect to login page
     if (!user) {
@@ -54,10 +55,36 @@ require('/modules/store.js').exec(function (ctx) {
         hideAllAppsLink = true;
     }
 
-    //Get the all favourite apps of logged in user
-    var result = favourites.getAllFavouriteApps(user.username, user.tenantId,
-                                                storeTenantDomain);
-    var apps = (result.apps) ? result.apps : [];
+    var apps;
+    if(query) {
+        var array = query.split(":");
+        var searchOption = array[0];
+        var searchValue = array[1].replace(/\"/g, "");// replace all the occurrences of double quote with empty
+
+        if (searchOption.toLowerCase() == "provider") {
+            searchOption = "SEARCH_BY_APP_PROVIDER";
+        } else {
+            searchOption = "SEARCH_BY_APP_NAME";
+        }
+
+        result = favourites.searchFavouriteApps(user.username, user.tenantId, storeTenantDomain,
+                                              searchOption, searchValue);
+        apps = (result.apps) ? result.apps : [];
+    } else {
+        var sortOption = encodeURIComponent(request.getParameter('sort'));
+        if (sortOption == "az") {
+            sortOption = "SORT_BY_APP_NAME_ASC";
+        } else if (sortOption == "recent") {
+            sortOption = "SORT_BY_CREATED_TIME_DESC";
+        } else {
+            sortOption = "INSERTED_ORDER";
+        }
+        //Get the all favourite apps of logged in user based on sort option
+        var result = favourites.getAllFavouriteApps(user.username, user.tenantId,
+                                                    storeTenantDomain, sortOption);
+        apps = (result.apps) ? result.apps : [];
+    }
+
     //filter webapp and sites
     apps = filterAssets(apps);
     //Check whether use has selected favourite page as default landing page
@@ -68,17 +95,19 @@ require('/modules/store.js').exec(function (ctx) {
         hasFavouritePage = result.status;
     }
 
+    var sortOptions = createSortOptions();
+
     caramel.render({
                        header: {
                            user: user,
                            sso: sso,
-                           searchOff: true,
                            hideAllAppsLink: hideAllAppsLink,
                            isHomePage: hasFavouritePage,
                            myFav: true,
                            storeTenantDomain: storeTenantDomain
                        },
                        sso: sso,
+                       sortOptions: sortOptions,
                        favouriteApps: apps
                    }, request, response, session);
 
@@ -131,6 +160,22 @@ function filterAssets(assets) {
 
     }
     return apps;
+}
+
+/**
+ * Decides which sorting options should be shown in my favourite page.
+ * @returns {{}}
+ */
+function createSortOptions() {
+    var url = "/assets/favouriteapps?sort="
+    var sortOptions = {};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var options = [];
+    options.push(sortByAlphabet);
+    options.push(sortByRecent);
+    sortOptions["options"] = options;
+    return sortOptions;
 }
 %>
 

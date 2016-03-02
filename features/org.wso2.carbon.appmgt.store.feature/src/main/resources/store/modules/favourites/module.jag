@@ -4,7 +4,6 @@ jagg.module("favourites", {
     isFavouriteApp: function () {
         return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").isFavouriteApp.apply(this, arguments);
     },
-
     getAllFavouriteApps: function () {
         return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").getAllFavouriteApps.apply(this,
                                                                                                           arguments);
@@ -26,6 +25,10 @@ jagg.module("favourites", {
     },
     hasFavouritePage: function () {
         return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").hasFavouritePage.apply(this, arguments);
+    },
+    searchFavouriteApps: function () {
+        return jagg.require(jagg.getModulesDir() + "favourites/favourites.jag").searchFavouriteApps.apply(this,
+                                                                                                          arguments);
     }
 
 });

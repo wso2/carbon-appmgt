@@ -9,6 +9,10 @@ var render = function (theme, data, meta, require) {
         ] ,
         body:[
             {
+                partial: 'sort-assets',
+                context: data.sortOptions
+            },
+            {
                 partial:'favourite-apps',
                 context:{favouriteApps:data.favouriteApps}
             }

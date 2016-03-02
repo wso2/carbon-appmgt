@@ -94,8 +94,17 @@ var serviceModule = (function () {
         return result;
     }
 
-    Subscriber.prototype.getUserSubscribedApps = function (userName, tenantIdOfUser, tenantDomainOfStore) {
-        var result = this.instance.getUserSubscribedApps(userName, tenantIdOfUser, tenantDomainOfStore);
+    Subscriber.prototype.getUserAccessibleApps = function (userName, tenantIdOfUser, tenantDomainOfStore,
+                                                           sortOption, treatAsSite) {
+        var result = this.instance.getUserAccessibleApps(userName, tenantIdOfUser, tenantDomainOfStore, sortOption,
+                                                         treatAsSite);
+        return (result.apps) ? result.apps : [];
+    };
+
+    Subscriber.prototype.searchUserAccessibleApps = function (userName, tenantIdOfUser, tenantDomainOfStore, treatAsSite
+                                                    , searchOption,searchValue) {
+        var result = this.instance.searchUserAccessibleApps(userName, tenantIdOfUser, tenantDomainOfStore, treatAsSite,
+                                                            searchOption,searchValue);
         return (result.apps) ? result.apps : [];
     };
 
