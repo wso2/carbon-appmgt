@@ -1433,9 +1433,17 @@ public class APIProviderHostObject extends ScriptableObject {
             }
 
             if (providerName != null) {
+                AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+                Boolean selfSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean enterpriseSubscriptionStatus = Boolean.valueOf(config.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+                boolean isSubscriptionOn = (selfSubscriptionStatus || enterpriseSubscriptionStatus);
+
                 // Map consists data as <<appProvider,appName>,subscriptionCount>
-                Map<String ,Long> subscriptions = apiProvider.getSubscriptionCountByAPPs(providerName,
-                        fromDate, toDate);
+                Map<String, Long> subscriptions = apiProvider.getSubscriptionCountByAPPs(providerName, fromDate, toDate,
+                                                                                         isSubscriptionOn);
 
                 List<APISubscription> subscriptionData = new ArrayList<APISubscription>();
 

@@ -2385,13 +2385,15 @@ public class AppMDAO {
     /**
      * This method returns the subscription count of apps for given period.
      *
-     * @param providerName  web apps
-     * @param fromDate From Date
-     * @param toDate   To Date
+     * @param providerName     web apps
+     * @param fromDate         From Date
+     * @param toDate           To Date
+     * @param isSubscriptionOn if any subscription(self or enterprise) model is on or off
      * @return subscription count of apps
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public Map<String, Long> getSubscriptionCountByApp(String providerName, String fromDate, String toDate, int tenantId)
+    public Map<String, Long> getSubscriptionCountByApp(String providerName, String fromDate, String toDate,
+                                                       int tenantId, boolean isSubscriptionOn)
             throws AppManagementException {
         Connection connection = null;
         PreparedStatement ps = null;
@@ -2402,13 +2404,23 @@ public class AppMDAO {
         try {
             connection = APIMgtDBUtil.getConnection();
             if ("__all_providers__".equals(providerName)) {
-                sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, "
-                        + "API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID "
-                        + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
-                        + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
-                        + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
-                        + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? "
-                        + "AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                if (isSubscriptionOn) {
+                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, "
+                            + "API.UUID AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID "
+                            + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
+                            + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
+                            + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
+                            + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? "
+                            + "AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                } else {
+                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, " +
+                            "API.UUID AS UUID, COUNT(DISTINCT HIT.USER_ID) AS SUB_ID " +
+                            "FROM APM_APP API " +
+                            "INNER JOIN APM_APP_HITS HIT ON API.UUID=HIT.UUID " +
+                            "WHERE HIT.TENANT_ID = ? " +
+                            "AND HIT.HIT_TIME BETWEEN ";
+                }
+
                 if (!connection.getMetaData().getDriverName().contains("Oracle")) {
                     sqlQuery += "? AND ? ";
                 } else {
@@ -2421,10 +2433,19 @@ public class AppMDAO {
                 ps.setString(2, fromDate);
                 ps.setString(3, toDate);
             } else {
-                sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
-                        + "AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM "
-                        + "APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? "
-                        + "AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                if (isSubscriptionOn) {
+                    sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
+                            + "AS UUID, COUNT(SUB.SUBSCRIPTION_ID) AS SUB_ID, FROM "
+                            + "APM_SUBSCRIPTION SUB, APM_APP API WHERE API.APP_PROVIDER = ? "
+                            + "AND API.APP_ID=SUB.APP_ID AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                } else {
+                    sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, " +
+                            "API.UUID AS UUID, COUNT(DISTINCT HIT.USER_ID) AS SUB_ID " +
+                            "FROM APM_APP API " +
+                            "INNER JOIN APM_APP_HITS HIT ON API.UUID=HIT.UUID " +
+                            "WHERE API.APP_PROVIDER= ? " +
+                            "AND HIT.HIT_TIME BETWEEN ";
+                }
 
                 if (!connection.getMetaData().getDriverName().contains("Oracle")) {
                     sqlQuery += "? AND ? ";
