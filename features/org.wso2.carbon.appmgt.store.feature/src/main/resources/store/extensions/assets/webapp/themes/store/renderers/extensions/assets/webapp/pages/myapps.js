@@ -1,15 +1,9 @@
 var render = function (theme, data, meta, require) {
-    var log = new Log();
     var assets = require('/helpers/myapps.js');
-    var bodyPartial = "myapps";
-    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config,
-                                         data.pagination.leftNav, data.pagination.rightNav,
-                                         data.pagination.urlQuery, data.user);
+    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
+                                         data.pagination.rightNav, data.pagination.urlQuery, data.user);
 
-    var hasApps = false;
-    if (data.assets.length > 0) {
-        hasApps = true;
-    }
+    var hasApps = (data.assets.length > 0);
 
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
@@ -24,15 +18,22 @@ var render = function (theme, data, meta, require) {
             }
         }
     }
-    data.header.searchQuery = searchQuery;
 
-    var page = '1-column';
-    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
-        //need to display tags and recent assets in my apps page
-        page = '2-column-right'
+    var leftNavigationData = [{
+        active: true, partial: 'my-apps'
+    }];
+    if(data.user){
+        leftNavigationData.push({
+            active: false, partial: 'my-favorites'
+        });
+    }
+    if(!data.navigation.showAllAppsLink){
+        leftNavigationData.push({
+            active: false, partial: 'all-apps'
+        });
     }
 
-    theme(page, {
+    theme('2-column-left', {
         title: data.title,
         header: [
             {
@@ -40,25 +41,35 @@ var render = function (theme, data, meta, require) {
                 context: data.header
             }
         ],
-        body: [
+        leftColumn: [
             {
-                partial: 'sort-assets',
-                context: require('/helpers/sort-assets.js').format(data.sorting, data.header, hasApps)
-            },
-            {
-                partial: bodyPartial,
-                context: bodyContext
+                partial: 'left-column',
+                context: {
+                    navigation: leftNavigationData,
+                    tags: data.tags,
+                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                }
             }
-
         ],
-        right: [
+        search: [
             {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
+                partial: 'search',
+                context: searchQuery
+            }
+        ],
+        pageHeader: [
             {
-                partial: 'tags',
-                context: data.tags
+                partial: 'page-header',
+                context: {
+                    title: "My Web Apps",
+                    sorting: require('/helpers/sort-assets.js').format(data.sorting, data.header, hasApps)
+                }
+            }
+        ],
+        pageContent: [
+            {
+                partial: 'page-content-myapps',
+                context: bodyContext
             }
         ]
     });
