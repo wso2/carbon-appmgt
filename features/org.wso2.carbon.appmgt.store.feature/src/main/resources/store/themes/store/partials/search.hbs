@@ -1,12 +1,27 @@
-<div class="row">
+<div class="navbar-wrapper">
+    <nav class="navbar navbar-default">
+        <div class="form-group">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+                <div class="search-box input-group">
+                    <input type="text" value="{{search}}" class="search-field form-control" placeholder="Search..." />
 
-    <form class="col-md-12">
-        <select id="searchSelect" class="input-lg search-select col-md-3">
-            <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="App">Name</option>
-            <option {{#compare "overview_provider" searchQuery.searchTerm}}selected{{/compare}}  value="Provider">Provider</option>
-            <option {{#compare "overview_category" searchQuery.searchTerm}}selected{{/compare}}  value="Category">Category</option>
-        </select>
-        <input value="{{searchQuery.search}}" type="text" class="form-control input-lg col-md-4 search-text" id="searchTxt" placeholder="Search">
-    </form>
-
+                    <div class="input-group-btn">
+                        <button class="search-btn form-control-btn" type="button" title="Search">
+                            <i class="fw fw-search" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <span class="search-category input-group-addon">
+                        <select>
+                            <option {{#ifCond searchTerm "==" "overview_name"}}selected{{/ifCond}} value="Name">
+                                By Name
+                            </option>
+                            <option {{#ifCond searchTerm "==" "overview_provider"}}selected{{/ifCond}} value="Provider">
+                                By Provider
+                            </option>
+                        </select>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
 </div>
