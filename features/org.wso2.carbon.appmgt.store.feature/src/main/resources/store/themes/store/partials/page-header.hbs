@@ -1,0 +1,22 @@
+<div class="pull-left hidden-xs">
+    <h3 class="page-title">{{t title}}</h3>
+</div>
+
+{{#if sorting}}
+    <div class="sorting-options pull-right float-remove-xs text-center-xs">
+        <div class="btn-group" role="group">
+            <a href="{{tenantedUrl sorting.url}}popular" class="btn btn-default" title="{{t "Sort by Popularity"}}">
+                <i class="fw fw-star"></i>
+            </a>
+            <a href="{{tenantedUrl sorting.url}}az" class="btn btn-default" title="{{t "Sort by Alphabetical Order"}}">
+                <i class="fw fw-list-sort"></i>
+            </a>
+            <a href="{{tenantedUrl sorting.url}}recent" class="btn btn-default" title="{{t "Sort by Created Date"}}">
+                <i class="fw fw-calendar"></i>
+            </a>
+            <a href="{{tenantedUrl sorting.url}}usage" class="btn btn-default" title="{{t "Sort by Usage"}}">
+                <i class="fw fw-statistics"></i>
+            </a>
+        </div>
+    </div>
+{{/if}}
