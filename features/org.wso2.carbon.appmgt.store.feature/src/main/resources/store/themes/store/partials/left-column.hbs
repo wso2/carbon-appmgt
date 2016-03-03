@@ -1,0 +1,30 @@
+{{!-- navigation --}}
+<nav class="navigation">
+    {{#each navigation}}
+        {{#ifCond partial "==" "my-apps"}}
+            {{> left-column-navigation/my-apps this}}
+        {{/ifCond}}
+        {{#ifCond partial "==" "my-favorites"}}
+            {{> left-column-navigation/my-favorites this}}
+        {{/ifCond}}
+        {{#ifCond partial "==" "all-apps"}}
+            {{> left-column-navigation/all-apps this}}
+        {{/ifCond}}
+    {{/each}}
+</nav>
+
+{{!-- tags --}}
+{{#if tags}}
+    <div class="tags-wrapper hidden-xs hidden-sm">
+        <div class="tag-title"> {{t "Tags"}}</div>
+        <ul class="tag-content">
+            {{#each tags.data}}
+                <li><a href="{{tenantedUrl ../this.url}}{{name}}">{{name}}</a></li>
+            {{/each}}
+        </ul>
+    </div>
+{{/if}}
+
+
+{{!-- recent apps --}}
+<!--goes here {recentApps}-->

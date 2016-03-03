@@ -14,6 +14,7 @@
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                {{#unless searchOff}}
                     <form class="nav navbar-left search-box" role="search">
                         <select id="searchSelect" class="search-select col-md-3">
                             <option {{#compare "overview_name" searchQuery.searchTerm}}selected{{/compare}}  value="Name">Name</option>
@@ -21,6 +22,7 @@
                         </select>
                         <input value="{{searchQuery.search}}" type="text" class="form-control col-md-4 search-text" id="searchTxt" placeholder="Search">
                     </form>
+                {{/unless}}
 
                 <ul class="nav navbar-nav navbar-right">
                     {{#if user}}

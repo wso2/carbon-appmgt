@@ -1,0 +1,15 @@
+<div class="pull-left hidden-xs">
+    <h3 class="page-title">{{t title}}</h3>
+</div>
+
+{{#if sorting}}
+    <div class="sorting-options pull-right float-remove-xs text-center-xs">
+        <div class="btn-group" role="group">
+            {{#each sorting.options}}
+                <a href="{{tenantedUrl this.url}}" class="btn btn-default" title="{{t title}}">
+                    <i class="{{class}}"></i>
+                </a>
+            {{/each}}
+        </div>
+    </div>
+{{/if}}
