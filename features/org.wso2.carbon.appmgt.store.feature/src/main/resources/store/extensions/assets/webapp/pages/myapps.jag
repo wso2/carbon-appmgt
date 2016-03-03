@@ -82,8 +82,7 @@ require('/modules/store.js').exec(function (ctx) {
     var navigationData = {
         showAllAppsLink: true
     };
-    
-    var sortOptions = {};
+
     var webAppRecentAssets = [];
     var PAGE_SIZE = store.getPageSize();
     var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
@@ -443,7 +442,6 @@ require('/modules/store.js').exec(function (ctx) {
     //get recently added apps from registry
     getRecentAssetsFromRegistry();
     //create sort options
-    sortOptions = createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscriptionEnabled);
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     caramel.render({
@@ -475,7 +473,6 @@ require('/modules/store.js').exec(function (ctx) {
                            tag: tag,
                            size: assets.length
                        },
-                       sortOptions: sortOptions,
                        pagination: {
                            leftNav: leftnav,
                            rightNav: rightnav,
@@ -488,34 +485,6 @@ require('/modules/store.js').exec(function (ctx) {
 
 function getServiceDir(serviceName) {
     return '../services/' + serviceName;
-}
-
-function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscriptionEnabled) {
-    var url = "/extensions/assets/webapp/myapps?sort=";
-    var sortOptions = {};
-    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
-    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
-    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
-
-    var options = [];
-
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        options.push(sortByAlphabet);
-        options.push(sortByRecent);// recently added
-        options.push(sortByPopularity);
-        if (user) {
-            options.push(sortByUsage);
-        }
-    } else {
-        if(user) {
-            options.push(sortByAlphabet);
-            options.push(sortByRecent);// recently subscribed
-        }
-    }
-
-    sortOptions["options"] = options;
-    return sortOptions;
 }
 
 %>

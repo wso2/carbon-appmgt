@@ -62,7 +62,7 @@ var render = function (theme, data, meta, require) {
                 partial: 'page-header',
                 context: {
                     title: "My Web Apps",
-                    sorting: data.sortOptions
+                    sorting: createSortOptions(data.user, data.config)
                 }
             }
         ],
@@ -74,3 +74,33 @@ var render = function (theme, data, meta, require) {
         ]
     });
 };
+
+function createSortOptions(user, config) {
+    var isSelfSubscriptionEnabled = config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = config.isEnterpriseSubscriptionEnabled;
+    var url = "/extensions/assets/webapp/myapps?sort=";
+    var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
+
+    var options = [];
+
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        options.push(sortByAlphabet);
+        options.push(sortByRecent);// recently added
+        options.push(sortByPopularity);
+        if (user) {
+            options.push(sortByUsage);
+        }
+    } else {
+        if (user) {
+            options.push(sortByAlphabet);
+            options.push(sortByRecent);// recently subscribed
+        }
+    }
+
+    sortOptions["options"] = options;
+    return sortOptions;
+}
