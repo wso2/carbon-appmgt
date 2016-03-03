@@ -768,16 +768,6 @@ header .dropdown[aria-expanded=true], header .dropdown:hover {
   background: #155faa;
 }
 
-@media only screen and (max-width: 768px) {
-  header .brand img.logo {
-    margin-top: 15px;
-  }
-  header .brand h1 {
-    display: block;
-    line-height: 0.6;
-  }
-}
-
 /* ========================================================================
  * navbar styles
  * ======================================================================== */
@@ -1790,12 +1780,10 @@ a.btn:hover, .btn:hover {
 .btn-default, .btn-default:focus {
   color: #222;
   background-color: #ffffff;
-  border-color: #ffffff;
 }
 
 .btn-default:hover {
   background-color: #e6e6e6;
-  border-color: #ffffff;
 }
 
 .btn-primary, .btn-primary:focus {
