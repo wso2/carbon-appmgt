@@ -6765,19 +6765,17 @@ public class AppMDAO {
                 String uuid = bamResultSet.getString("UUID");
                 uuidsList.add(uuid);
             }
-            if (uuidsList.size() > 0) {
-                String uuidRetrievalAppmQuery = getAppUuidsFromAppmDb(uuidsList, appMCon);
-                appmPs = appMCon.prepareStatement(uuidRetrievalAppmQuery);
-                for (int j = 0; j < uuidsList.size(); j++) {
-                    appmPs.setString(j + 1, uuidsList.get(j));
-                }
-                appmPs.setInt(uuidsList.size() + 1, startIndex);
-                appmPs.setInt(uuidsList.size() + 2, pageSize);
-                appmResultSet = appmPs.executeQuery();
-                while (appmResultSet.next()) {
-                    uuidsList.add(appmResultSet.getString("UUID"));
-                }
+            String uuidRetrievalAppmQuery = getAppUuidsFromAppmDb(uuidsList, appMCon);
+            appmPs = appMCon.prepareStatement(uuidRetrievalAppmQuery);
+            for (int j = 0; j < uuidsList.size(); j++) {
+                appmPs.setString(j + 1, uuidsList.get(j));
             }
+            appmPs.setInt(uuidsList.size() + 1, startIndex);
+            appmPs.setInt(uuidsList.size() + 2, pageSize);
+            appmResultSet = appmPs.executeQuery();
+            while (appmResultSet.next()) {
+                uuidsList.add(appmResultSet.getString("UUID"));
+            } 
         } catch (SQLException e) {
             throw new AppManagementException(
                     "SQL Exception is occurred while fetching the store hit sorted data from " +
