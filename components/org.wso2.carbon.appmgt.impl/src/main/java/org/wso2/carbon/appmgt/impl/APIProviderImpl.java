@@ -1786,14 +1786,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
-            throws AppManagementException {
-        Map<String,Long> subscriptions = null;
+    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate,
+                                                        boolean isSubscriptionOn) throws AppManagementException {
+        Map<String, Long> subscriptions = null;
         try {
-            subscriptions = appMDAO.getSubscriptionCountByApp(provider, fromDate, toDate, tenantId);
+            subscriptions = appMDAO.getSubscriptionCountByApp(provider, fromDate, toDate, tenantId, isSubscriptionOn);
         } catch (AppManagementException e) {
             handleException("Failed to get subscriptionCount by apps for provider :" + provider + "for the period "
-                    + fromDate + "to" + toDate, e);
+                                    + fromDate + "to" + toDate, e);
         }
         return subscriptions;
     }

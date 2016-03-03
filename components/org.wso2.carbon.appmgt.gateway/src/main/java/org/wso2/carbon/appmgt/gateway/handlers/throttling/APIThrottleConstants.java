@@ -20,7 +20,7 @@ public class APIThrottleConstants {
 
 	public static final int THROTTLE_OUT_ERROR_CODE = 900800;
 
-	public static final String API_THROTTLE_NS = "http://wso2.org/apimanager/throttling";
+	public static final String API_THROTTLE_NS = "http://wso2.org/appmanager/throttling";
 	public static final String API_THROTTLE_NS_PREFIX = "amt";
 
 	public static final String API_THROTTLE_OUT_HANDLER = "_throttle_out_handler_";

@@ -210,13 +210,13 @@ require('/modules/store.js').exec(function (ctx) {
                         if (log.isDebugEnabled()) {
                             var recordCount = 0;
                             if (result != null) {
-                                recordCount = result.length;
+                                recordCount = JSON.parse(result).length;
                             }
                             log.debug("Query executed successfully to get the assets hit count. " + recordCount
                                               + " records found");
                         }
                         index += PAGE_SIZE;
-                        if (result.length > 0) {
+                        if (JSON.parse(result).length > 0) {
                             return JSON.parse(result);
                         } else {
                             return {};
@@ -227,7 +227,13 @@ require('/modules/store.js').exec(function (ctx) {
                     var done = false;
                     while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                         maxTry++;
-                        var result = getNextAssetSet();
+                        //var result = getNextAssetSet();
+
+                        var result;
+                        if ((paging.start + index) < PAGE_SIZE) {
+                            result = getNextAssetSet();
+                        }
+
                         if (result.length < 12) {
                             done = true;
                         }

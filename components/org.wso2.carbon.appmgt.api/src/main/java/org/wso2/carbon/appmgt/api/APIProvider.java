@@ -472,16 +472,17 @@ public interface APIProvider extends APIManager {
 
     /**
      * This method returns the subscription count of apps for given period.
-     * @param provider provider of app
-     * @param fromDate From date
-     * @param toDate To date
+     *
+     * @param provider         provider of app
+     * @param fromDate         From date
+     * @param toDate           To date
+     * @param isSubscriptionOn if any subscription(self or enterprise) model is on or off
      * @return subscription count of apps
      * @throws AppManagementException
      */
 
-    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate)
-
-            throws AppManagementException;
+    public Map<String, Long> getSubscriptionCountByAPPs(String provider, String fromDate, String toDate,
+                                                        boolean isSubscriptionOn) throws AppManagementException;
 
 
     /**
