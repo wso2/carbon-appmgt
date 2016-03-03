@@ -6775,7 +6775,7 @@ public class AppMDAO {
             appmResultSet = appmPs.executeQuery();
             while (appmResultSet.next()) {
                 uuidsList.add(appmResultSet.getString("UUID"));
-            } 
+            }
         } catch (SQLException e) {
             throw new AppManagementException(
                     "SQL Exception is occurred while fetching the store hit sorted data from " +
@@ -6812,21 +6812,34 @@ public class AppMDAO {
 
     private static String getAppUuidsFromAppmDb(List<String> uuidList, Connection appmConn)
             throws AppManagementException {
+
         StringBuilder uuidRetrievalAppmQuery = new StringBuilder();
         String uuidRetrievalQuery;
         try {
-            uuidRetrievalAppmQuery.append("SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM "
-                                                  + "APM_APP WHERE UUID NOT IN (");
-            for (int i = 0; i < uuidList.size(); i++) {
-                uuidRetrievalAppmQuery.append("?,");
-            }
-            uuidRetrievalQuery = uuidRetrievalAppmQuery.substring(0, uuidRetrievalAppmQuery.length() - 1);
+            if (uuidList.size() > 0) {
+                uuidRetrievalAppmQuery.append("SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM "
+                                                      + "APM_APP WHERE UUID NOT IN (");
+                for (int i = 0; i < uuidList.size(); i++) {
+                    uuidRetrievalAppmQuery.append("?,");
+                }
+                uuidRetrievalQuery = uuidRetrievalAppmQuery.substring(0, uuidRetrievalAppmQuery.length() - 1);
 
-            if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
-                uuidRetrievalQuery = "SELECT * FROM (" + uuidRetrievalQuery
-                        + ") ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
+                if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
+                    uuidRetrievalQuery = "SELECT * FROM (" + uuidRetrievalQuery
+                            + ") ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
+                } else {
+                    uuidRetrievalQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
+                }
             } else {
-                uuidRetrievalQuery += ") ORDER BY APP_NAME ASC LIMIT ? , ?";
+                if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
+                    uuidRetrievalQuery =
+                            "SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP WHERE ROWNUM >= ? AND " +
+                                    "ROWNUM <= ? ORDER BY APP_NAME ASC";
+                } else {
+                    uuidRetrievalQuery =
+                            "SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP ORDER BY APP_NAME ASC " +
+                                    "LIMIT ? , ?";
+                }
             }
         } catch (SQLException ex) {
             throw new AppManagementException(
