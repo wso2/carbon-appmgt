@@ -28,6 +28,12 @@ header .header-action {
     padding: 10px 10px 10px 10px;
 }
 
+header .header-action:hover,
+header .header-action:focus,
+header .header-action:active {
+    background: #4d5461;
+}
+
 ul.nav.nav-tabs {
     background-color: #ddd;
 }
@@ -54,8 +60,8 @@ a.btn .icon-caret, .btn .icon-caret {
     background: #2c313b;
 }
 
-.navbar-dark .dropdown-menu {
-    background: #2c313b;
+.navbar-dark .navbar-nav > li a {
+    line-height: 50px;
 }
 
 .navbar-dark .navbar-nav > li a:hover,
@@ -63,10 +69,6 @@ a.btn .icon-caret, .btn .icon-caret {
 .navbar-dark .navbar-nav > li a:active {
     background: #4d5461;
     color: #ffffff;
-}
-
-.navbar-dark .navbar-nav > li a:hover {
-    background: #4d5461;
 }
 
 .navbar-dark .navbar-nav > .active > a,
@@ -77,51 +79,80 @@ a.btn .icon-caret, .btn .icon-caret {
     color: #ffffff;
 }
 
-.navbar-dark .navbar-nav > .active > a:hover {
-    background: #4d5461;
+.navbar-dark .dropdown-menu {
+    background: #2c313b;
 }
 
-.navbar .navbar-nav > li a {
-    line-height: 50px;
+.navbar-dark .dropdown-menu > li a {
+    line-height: 30px;
 }
 
 /**/
 /*========== SEARCH ==========*/
-.input-group {
-    position: relative;
-    display: table;
-    border-collapse: separate;
-    margin-top: 3px;
+.search-box .search-field {
+    border: none;
 }
 
-.input-wrap > .form-control, .input-wrap .btn.wrap-input-right {
-    background-color: #215080;
-    border: 0;
-    color: #FFF;
-    height: 40px;
-    margin-top: -3px;
-}
-
-.input-wrap > .form-control::-webkit-input-placeholder {
+.search-box .search-field::-webkit-input-placeholder {
+    /* WebKit, Blink, Edge */
     color: #fff;
     opacity: 0.9;
     font-weight: 100;
 }
 
-.input-group-btn > ul.dropdown-menu {
-    background-color: #193C5F;
-    margin-top: 0;
-}
-
-.input-group-btn > .dropdown-menu > li > a {
+.search-box .search-field:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
     color: #fff;
+    opacity: 0.9;
+    font-weight: 100;
 }
 
-.input-group-btn > .dropdown-menu > li > a:focus, .dropdown-menu > li > a:hover {
+.search-box .search-field::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
     color: #fff;
-    background-color: #1A78D8;
+    opacity: 0.9;
+    font-weight: 100;
 }
 
+.search-box .search-field:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #fff;
+    opacity: 0.9;
+    font-weight: 100;
+}
+
+.search-box .search-btn {
+    opacity: 1;
+}
+
+.search-box .search-field, .search-box .search-btn {
+    background-color: #215080;
+    color: #ffffff;
+    border-style: solid;
+    border-color: #215080;
+    border-width: 2px 0 2px 0;
+}
+
+.search-box .search-category {
+    padding: 0 0 0 0;
+}
+
+.search-box .search-category > select {
+    padding-left: 5px;
+}
+
+.search-box .search-category, .search-box .search-category > select {
+    border: none;
+    background-color: #15304B;
+    color: #ffffff;
+}
+
+.search-box .search-field, .search-box .search-btn, .search-box .search-category {
+    min-height: 40px;
+}
+
+/**/
+/* ========= other unknown ========== */
 button.btn.btn-default.dropdown-toggle {
     border: 1px solid #215080;
 }
@@ -139,23 +170,11 @@ button.btn.btn-default.dropdown-toggle:hover {
     border: 1px solid #193C5F;
 }
 
-.search-wrap .dropdown-toggle {
-    color: #FFF;
-    background-color: #215080;
-    border-color: #215080;
-    padding: 9px 12px;
-    margin-top: -4px;
-}
-
-.search-wrap .dropdown-toggle:hover {
-    border-color: #215080;
-}
-
 /**/
 /*========== PAGE ==========*/
 .page-header {
     height: auto;
-    padding: 20px 00px;
+    padding: 10px 0 10px 0;
     border-bottom: none;
     margin: 0;
 }
@@ -168,22 +187,92 @@ button.btn.btn-default.dropdown-toggle:hover {
 }
 
 .page-title {
-    width: auto;
-    float: left;
-    margin-right: 20px;
+    margin: 0;
+    padding-top: 5px;
 }
 
-.page-title h3 {
-    margin: 0;
+.sorting-options > button {
+    padding: 0 5px 0 5px;
+}
+
+/**/
+/*========== NO APPS ==========*/
+.no-apps {
+    width: 100%;
+}
+
+.no-apps, .no-apps div, .no-apps p {
+    background-color: #ffffff;
+    text-align: center;
 }
 
 /**/
 /*========== APP TILE ==========*/
-.image-container {
+.app-tile {
+    background-color: #ffffff;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.app-tile-thumbnail {
     position: relative;
 }
 
-.image-container .after {
+.app-tile-thumbnail .thumbnail-ribbon {
+    display: block;
+    position: absolute;
+    top: 0;
+    height: 25%;
+    color: #fff;
+    border: none;
+    z-index: 500;
+}
+
+.thumbnail-ribbon.favorite-ribbon {
+    background-color: #c0392b;
+}
+
+.thumbnail-ribbon.subscribe-ribbon {
+    background-color: #2b5797;
+}
+
+.thumbnail-ribbon.ad-ribbon {
+    background-color: #d35400;
+}
+
+.app-tile-thumbnail .thumbnail-image {
+    /*display: block;*/
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding: 75% 0 0 0;
+    overflow: hidden;
+}
+
+.app-tile-thumbnail .thumbnail-image > img {
+    /*display: block;*/
+    position: absolute;
+    max-height: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.app-tile-thumbnail .thumbnail-default {
+    position: relative;
+    width: 100%;
+    padding: 0 0 75% 0;
+}
+
+.app-tile-thumbnail .thumbnail-default > div {
+    color: #ffffff;
+    font-size: 666%;
+}
+
+.app-tile-thumbnail .thumbnail-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -193,36 +282,39 @@ button.btn.btn-default.dropdown-toggle:hover {
     color: #FFF;
 }
 
-.image-container:hover .after {
+.app-tile-thumbnail:hover .thumbnail-overlay {
     display: block;
     background: rgba(0, 0, 0, .6);
     cursor: pointer;
 }
 
-.image-container > .after > a > span.fw-stack.fw-lg {
-    /* background: red; */
+.app-tile-thumbnail > .thumbnail-overlay > span {
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     margin: auto;
-    font-size: 26px;
+    font-size: 250%;
 }
 
-.app-data h4 {
+.app-tile-details {
+    padding: 10px;
+}
+
+.app-tile-details > h4 {
     margin-bottom: 0;
 }
 
-.app-data h5, .launch-app-data h5 {
+.app-tile-details > h5 {
     margin-top: 0;
 }
 
-.launch-app-data h4 {
-    margin-top: 0;
+.app-tile-details .more-menu {
+    position: relative;
 }
 
-.more-list {
+.more-menu .more-menu-btn {
     float: right;
     height: Auto;
     opacity: .5;
@@ -232,52 +324,88 @@ button.btn.btn-default.dropdown-toggle:hover {
     margin-top: -10px;
 }
 
-.more-list:hover {
+.more-menu .more-menu-btn:hover {
     background-color: #333;
     color: #fff;
 }
 
-.more-info {
-    position: relative;
-}
-
-.more-info.pull-right > .dropdown-menu {
+.more-menu .more-menu-items {
     margin-right: -10px;
-}
-
-.ribbon {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 20px;
-    width: 33px;
-    height: 35px;
-    line-height: 40px;
-    text-align: center;
-    /* opacity: 0.7; */
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    background-color: #c0392b;
-    border: none;
-    z-index: 500;
-    padding-bottom: 7px;
 }
 
 /**/
 /*========== APP DETAILS ==========*/
-.white-wrapper {
-    background-color: #ffffff;
-    position: relative;
-}
-
 .summary-wrapper {
     color: #909090;
     margin-bottom: 10px;
 }
 
+.launch-app-data h4 {
+    margin-top: 0;
+}
+
 /*========== APP DETAILS - TABS==========*/
-.white-wrapper > .nav-tabs > li.active > a,
+.app-details {
+    background-color: #ffffff;
+}
+
+.app-details-banner {
+    /*display: block;*/
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding: 56.25% 0 0 0;
+    overflow: hidden;
+}
+
+.app-details-banner .banner-image > img {
+    /*display: block;*/
+    position: absolute;
+    max-height: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.app-details-thumbnail {
+    position: relative;
+}
+
+.app-details-thumbnail .thumbnail-image {
+    /*display: block;*/
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding: 75% 0 0 0;
+    overflow: hidden;
+}
+
+.app-details-thumbnail .thumbnail-image > img {
+    /*display: block;*/
+    position: absolute;
+    max-height: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.app-details-thumbnail .thumbnail-default {
+    position: relative;
+    width: 100%;
+    padding: 0 0 75% 0;
+}
+
+.app-details-thumbnail .thumbnail-default > div {
+    color: #ffffff;
+    font-size: 666%;
+}
+
 .nav-tabs > li.active > a:focus,
 .nav-tabs > li.active > a:hover .nav-tabs > li.active > a:visited .nav-tabs > li.active > a:active {
     background-color: #fff;
@@ -299,36 +427,14 @@ button.btn.btn-default.dropdown-toggle:hover {
 }
 
 /**/
-/*========== btn CLASS ========*/
-.btn {
-    background-color: #0E75DC;
-    color: #fff;
-}
-
-.btn .disabled {
-    background-color: #0E75DC;
-    color: #fff;
-}
-
-.btn:hover {
-    background-color: #005ABA;
-    color: #fff;
-}
-
-.btn-secondary {
-    background-color: #444;
-    color: #fff;
-}
-
-.btn-secondary:hover {
-    background-color: #686868;
-    color: #fff;
-}
-
-.btn-default.active,
-.btn-default:active,
-.open > .dropdown-toggle.btn-default {
-    color: #fff;
-    background-color: #193C5F;
-    border: 1px solid #444444;
+/*========== utils ==========*/
+.text-center-force {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
 }
