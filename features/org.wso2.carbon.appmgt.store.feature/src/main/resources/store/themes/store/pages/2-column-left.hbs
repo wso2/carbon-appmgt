@@ -1,4 +1,4 @@
-{{!
+{{!--
 * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
@@ -14,7 +14,7 @@
 * KIND, either express or implied. See the License for the
 * specific language governing permissions and limitations
 * under the License.
-}}
+--}}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -43,29 +43,35 @@
     <script src="{{url "/themes/store/libs/respond_1.4.2/respond.min.js"}}"></script>
     <![endif]-->
 
-    <!--other CSS-->
+    <!--other CSS -->
     {{css}}
 </head>
 
 <body>
-
+<!-- header -->
 {{include header}}
 
-<!-- #page-content-wrapper -->
+<!-- page content wrapper -->
 <div class="page-content-wrapper">
     <div class="media">
-        <!-- media left-->
+        <!-- media left -->
         <div class="media-left">
             {{include leftColumn}}
         </div>
 
-        <!-- media body-->
+        <!-- media body -->
         <div class="media-body">
-            <!-- Search-->
+            <!-- Search -->
             {{include search}}
-            <!-- page content -->
+            <!-- page -->
             <div class="container-fluid body-wrapper">
-                {{include body}}
+                <div class="page-header">
+                    {{include pageHeader}}
+                </div>
+
+                <div class="page-content">
+                    {{include pageContent}}
+                </div>
             </div>
         </div>
     </div>
@@ -84,14 +90,13 @@
 <script src="{{url "/themes/store/js/caramel/caramel-client.js"}}"></script>
 <script src="{{url "/themes/store/js/caramel/caramel.handlebars.client.js"}}"></script>
 <script src="{{url "/themes/store/js/caramel/async.min.js"}}"></script>
-<!--handlebars JS-->
+<!--handlebars JS -->
 <script src="{{url "/themes/store/js/handlebars/handlebars.js"}}"></script>
 <!-- noty JS -->
 <script src="{{url "/themes/store/js/noty/jquery.noty.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/layouts/center.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/themes/default.js"}}"></script>
-<!--other JS-->
+<!--other JS -->
 {{js}}
-
 </body>
 </html>
