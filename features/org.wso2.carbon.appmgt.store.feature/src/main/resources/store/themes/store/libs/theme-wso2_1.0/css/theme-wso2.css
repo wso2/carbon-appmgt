@@ -1774,7 +1774,6 @@ a.btn.active, a.btn:active, .btn.active, .btn:active {
 
 a.btn:hover, .btn:hover {
   text-decoration: none;
-  background: #eee;
 }
 
 .btn-default, .btn-default:focus {
