@@ -99,6 +99,7 @@ public class Deployer {
                 webAppDetail.setUserName(username);
                 webAppDetail.setWarFileName(webAppJsonObject.get("warfilename").toString());
                 webAppDetail.setDisplayName(webAppJsonObject.get("displayname").toString());
+                webAppDetail.setTreatAsASite(String.valueOf(webAppJsonObject.get("treatAsASite")));
                 JSONObject claims = (JSONObject) webAppJsonObject.get("claims");
                 JSONArray pagesJA = (JSONArray) webAppJsonObject.get("pages");
                 ConcurrentHashMap<String, String[]> claimsMap = new ConcurrentHashMap<String, String[]>();
