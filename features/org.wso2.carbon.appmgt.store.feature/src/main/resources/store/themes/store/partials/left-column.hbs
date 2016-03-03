@@ -1,4 +1,4 @@
-{{!-- navigation --}}
+{{!-- left-column - navigation --}}
 <nav class="navigation">
     {{#each navigation}}
         {{#ifCond partial "==" "my-apps"}}
@@ -13,7 +13,7 @@
     {{/each}}
 </nav>
 
-{{!-- tags --}}
+{{!-- left-column - tags --}}
 {{#if tags}}
     <div class="tags-wrapper hidden-xs hidden-sm">
         <div class="tag-title"> {{t "Tags"}}</div>
@@ -26,5 +26,5 @@
 {{/if}}
 
 
-{{!-- recent apps --}}
+{{!-- left-column - recent apps --}}
 <!--goes here {recentApps}-->
