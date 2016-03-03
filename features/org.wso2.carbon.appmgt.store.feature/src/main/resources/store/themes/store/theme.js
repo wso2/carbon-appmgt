@@ -38,18 +38,20 @@ var engine = caramel.engine('handlebars', (function () {
                 return accum;
             });
 
-            Handlebars.registerHelper('assetRating', function(n) {
-                var html = '<span class="starRating">';
-                var id = Math.random().toString(36).substring(7);
-                for(var i = 5; i >= 1; --i){
-                    var checked = (i == n) ? "checked" : "";
-                    html += '<input name= "' + id + '" id= "' + id + '" type="radio" name="rating" value="' + i + '" disabled ' + checked + '>';
-                    html += '<label for="' + id + i + '">' + i + '</label>';
+            Handlebars.registerHelper('assetRating', function(rating, ratedHtml, unratedHtml, options) {
+                var min = options.hash['min'] || 0;
+                var max = options.hash['max'] || 5;
+                rating = parseInt(rating);
+                var htmlBuffer = [];
+                var i = min;
+                for (; i < max; i++) {
+                    if (i < rating) {
+                        htmlBuffer.push(ratedHtml);
+                    } else {
+                        htmlBuffer.push(unratedHtml);
+                    }
                 }
-
-                html += "<span>";
-
-                return html;
+                return new Handlebars.SafeString(htmlBuffer.join(""));
             });
 
 
@@ -91,7 +93,8 @@ var engine = caramel.engine('handlebars', (function () {
                 if (storageMatcher.match(pattern)) {
                     path = "/storage/" + storageMatcher.elements().any;
                 }
-                //TODO: This url pattern has been hard coded due to pattern mismatch in between mobile and webapp image urls
+                //TODO: This url pattern has been hard coded due to pattern mismatch in between mobile and webapp image
+                // urls
 
                 //Resolving mobile app image urls
                 if (mobileApiMatcher.match('/publisher/api/{+any}')) {
