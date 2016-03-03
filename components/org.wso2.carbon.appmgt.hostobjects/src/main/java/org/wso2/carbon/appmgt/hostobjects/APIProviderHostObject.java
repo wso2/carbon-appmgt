@@ -939,6 +939,7 @@ public class APIProviderHostObject extends ScriptableObject {
         boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
                                                                                  apiData));
+        String treatAsSite = (String) apiData.get("overview_treatAsASite", apiData);
         //FileHostObject thumbnail_fileHostObject = (FileHostObject) apiData.get("images_thumbnail", apiData);
         //String icon = (String) apiData.get("images_icon", apiData);
         String visibleRoles = "";
@@ -1030,6 +1031,7 @@ public class APIProviderHostObject extends ScriptableObject {
         api.setTransports(transport);
         api.setAllowAnonymous(allowAnonymous);
         api.setDefaultVersion(makeAsDefaultVersion);
+        api.setTreatAsASite(treatAsSite);
 
         try {
             apiProvider.updateAPI(api);
@@ -1454,7 +1456,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
 
                     APISubscription sub = new APISubscription();
-                    sub.name = part1;
+                    sub.name = part1 + "(v" + version + ")";
                     sub.version = version;
                     sub.count = entry.getValue();
                     sub.uuid=uuid;

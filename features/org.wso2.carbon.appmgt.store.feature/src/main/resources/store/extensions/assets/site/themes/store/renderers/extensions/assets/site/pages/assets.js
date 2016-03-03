@@ -47,7 +47,7 @@ var render = function (theme, data, meta, require) {
         body: [
             {
                 partial: 'sort-assets',
-                context: require('/helpers/sort-assets.js').format(data.sorting, data.paging, data.navigation, data.type, data.selectedCategory, data.header, hasApps)
+                context: data.sortOptions
             },
             {
                 partial: bodyPartial,

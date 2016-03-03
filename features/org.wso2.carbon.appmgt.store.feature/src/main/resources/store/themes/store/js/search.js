@@ -1,161 +1,90 @@
 $(function () {
     History.Adapter.bind(window, 'statechange', function () {
 
-
         var state = History.getState();
         if (state.data.id === 'sort-assets') {
             renderAssets(state.data.context);
         } else if (state.data.id === 'top-assets') {
             var el = $('.store-left'), data = state.data.context;
-            //caramel.css($('head'), data.header['sort-assets'].resources.css, 'sort-assets');
-            //caramel.code($('head'), data.body['assets'].resources.code);
             async.parallel({
-                topAssets: function (callback) {
-                    caramel.render('top-assets', data.body['top-assets'].context, callback);
-                }
-            }, function (err, result) {
+                               topAssets: function (callback) {
+                                   caramel.render('top-assets', data.body['top-assets'].context, callback);
+                               }
+                           }, function (err, result) {
                 theme.loaded(el, result.sort);
                 el.html(result.topAssets);
                 $("#top-asset-slideshow-gadget").carouFredSel({
-                    items: 4,
-                    width: "100%",
-                    infinite: false,
-                    auto: false,
-                    circular: false,
-                    pagination: "#top-asset-slideshow-pag-gadget"
+                                                                  items: 4,
+                                                                  width: "100%",
+                                                                  infinite: false,
+                                                                  auto: false,
+                                                                  circular: false,
+                                                                  pagination: "#top-asset-slideshow-pag-gadget"
 
-                });
+                                                              });
 
                 $("#top-asset-slideshow-site").carouFredSel({
-                    items: 4,
-                    width: "100%",
-                    infinite: false,
-                    auto: false,
-                    circular: false,
-                    pagination: "#top-asset-slideshow-pag-site"
+                                                                items: 4,
+                                                                width: "100%",
+                                                                infinite: false,
+                                                                auto: false,
+                                                                circular: false,
+                                                                pagination: "#top-asset-slideshow-pag-site"
 
-                });
+                                                            });
 
                 $("#top-asset-slideshow-ebook").carouFredSel({
-                    items: 4,
-                    width: "100%",
-                    infinite: false,
-                    auto: false,
-                    circular: false,
-                    pagination: "#top-asset-slideshow-pag-ebook"
+                                                                 items: 4,
+                                                                 width: "100%",
+                                                                 infinite: false,
+                                                                 auto: false,
+                                                                 circular: false,
+                                                                 pagination: "#top-asset-slideshow-pag-ebook"
 
-                });
+                                                             });
                 mouseStop();
-                /*el.append(result.paging);
-                 caramel.js($('body'), data.body['assets'].resources.js, 'assets', function () {
-                 mouseStop();
-                 });
-                 caramel.js($('body'), data.header['sort-assets'].resources.js, 'sort-assets', function () {
-                 updateSortUI();
-                 });*/
                 $(document).scrollTop(0);
             });
         }
     });
 
-
-    /*
-     var search = function () {
-     var url;
-     currentPage = 1;
-     if (store.asset) {
-     url = caramel.url('/assets/' + store.asset.type + '/?query=' + $('#search').val());
-     caramel.data({
-     title: null,
-     header: ['sort-assets'],
-     body: ['assets', 'pagination']
-     }, {
-     url: url,
-     success: function (data, status, xhr) {
-     //TODO: Integrate a new History.js library to fix this
-     if ($.browser.msie == true && $.browser.version < 10) {
-     renderAssets(data);
-     } else {
-     History.pushState({
-     id: 'sort-assets',
-     context: data
-     }, document.title, url);
-     }
-     },
-     error: function (xhr, status, error) {
-     theme.loaded($('#assets-container').parent(), '<p>Error while retrieving data.</p>');
-     }
-     });
-     theme.loading($('#assets-container').parent());
-     } else if ($('#search').val().length > 0 && $('#search').val() != undefined) {
-     url = caramel.url('/assets/all/?query=' + $('#search').val());
-     caramel.data({
-     title: null,
-     body: ['top-assets']
-     }, {
-     url: url,
-     success: function (data, status, xhr) {
-     //TODO: Integrate a new History.js library to fix this
-     if ($.browser.msie == true && $.browser.version < 10) {
-     renderAssets(data);
-     } else {
-     History.pushState({
-     id: 'top-assets',
-     context: data
-     }, document.title, url);
-     }
-     },
-     error: function (xhr, status, error) {
-     theme.loaded($('#assets-container').parent(), '<p>Error while retrieving data.</p>');
-     }
-     });
-     theme.loading($('#assets-container').parent());
-     }
-     };
-     */
-
-	var buildParams = function(query) {
-	    return 'query=' + query;
-	};
+    var buildParams = function (query) {
+        return 'query=' + query;
+    };
 
     var search = function () {
         var url, searchVal = $('#search').val();
-        //var url, searchVal = test($('#search').val());
-
 
         currentPage = 1;
         if (store.asset) {
-            url = caramel.url('/assets/' + store.asset.type + '/?' + buildParams(searchVal));
+            url = caramel.tenantedUrl('/assets/' + store.asset.type + '/?' + buildParams(searchVal));
             caramel.data({
-                title: null,
-                header: ['header'],
-                body: ['assets', 'sort-assets']
-            }, {
-                url: url,
-                success: function (data, status, xhr) {
-                    //TODO: Integrate a new History.js library to fix this
+                             title: null,
+                             header: ['header'],
+                             body: ['assets', 'sort-assets']
+                         }, {
+                             url: url,
+                             success: function (data, status, xhr) {
+                                 //TODO: Integrate a new History.js library to fix this
 
-                    if ($.browser.msie == true && $.browser.version < 10) {
-                        renderAssets(data);
-                    } else {
-                        History.pushState({
-                            id: 'sort-assets',
-                            context: data
-                        }, document.title, url);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    theme.loaded($('#assets-container').parent(), '<p>Error while retrieving data.</p>');
-                }
-            });
+                                 if ($.browser.msie == true && $.browser.version < 10) {
+                                     renderAssets(data);
+                                 } else {
+                                     History.pushState({
+                                                           id: 'sort-assets',
+                                                           context: data
+                                                       }, document.title, url);
+                                 }
+                             },
+                             error: function (xhr, status, error) {
+                                 theme.loaded($('#assets-container').parent(), '<p>Error while retrieving data.</p>');
+                             }
+                         });
             theme.loading($('#assets-container').parent());
-        }else if (searchVal.length > 0 && searchVal != undefined) {
-            url = caramel.url('/?' + buildParams(searchVal));
+        } else if (searchVal.length > 0 && searchVal != undefined) {
+            url = caramel.tenantedUrl('/?' + buildParams(searchVal));
             window.location = url;
-
         }
-
-      // window.location.reload();
 
         $('.search-bar h2').find('.page').text(' / Search: "' + searchVal + '"');
     };
@@ -173,30 +102,18 @@ $(function () {
             }
             search();
         } else if (e.keyCode == 27) {
-
             $('#search-dropdown-cont').toggle();
         }
 
     })
-    .click(function(e){
-            $(this).animate({width:'500px'}, 100);
-            e.stopPropagation();
-        })
-    /*
-    .blur(function(){
-             $(this).animate({width:'100%'});
-        })*/
+        .click(function (e) {
+                   $(this).animate({width: '500px'}, 100);
+                   e.stopPropagation();
+               });
 
-    ;
-
-    $(document).click(function(){
-    	 $('#search').animate({width:'100%'});
+    $(document).click(function () {
+        $('#search').animate({width: '100%'});
     });
-    /*
-     $('#search').blur(function(){
-     $(this).fadeOut();
-     $('#search-button').fadeIn("fast");
-     });*/
 
     $('#search-button').click(function () {
         if ($('#search').val() == '') return;
@@ -205,11 +122,6 @@ $(function () {
             makeQuery();
         }
         search();
-
-        /*
-         $(this).fadeOut("fast", function(){
-         $('#search').fadeIn("fast").focus();
-         });*/
     });
 
     $('#search-dropdown-arrow').click(function (e) {
@@ -224,7 +136,6 @@ $(function () {
                     $('#search-dropdown-cont').children('div').each(function () {
                         var $this = $(this);
                         $this.find('input').val('')
-
                     });
                     for (var i = 0; i < qarray.length; i++) {
                         $('#search-dropdown-cont').children('div').each(function () {
@@ -234,17 +145,33 @@ $(function () {
                                 $this.find('input').val(qarray[i].split(':')[1])
                             }
                         });
-
-//                        $('#search-dropdown-cont').children('div').find('#'+qarray[i].split(':')[0].toLowerCase()).val(qarray[i].split(':')[1]);
-//                        $('#'+qarray[i].split(':')[0]).val(qarray[i].split(':')[1]);
                     }
-
                 }
             }
         }
         $('#search-dropdown-cont').delay(300).slideToggle("fast");
         $('#search').trigger('click');
     });
+
+    $('#searchTxt').keypress(function (e) {
+        if (e.keyCode == 13) {  // detect the enter key
+            var searchTerm = $(this).val();
+            if (checkNonSpecial(searchTerm)) {
+                var searchSelect = $('#searchSelect').val();
+                e.stopPropagation();
+                e.preventDefault();
+                if (searchSelect !== "App") {
+                    searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
+                }
+                location.href = location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
+            }
+        }
+    });
+
+    function checkNonSpecial(value){
+        var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
+        return non_special_regex.test(value);
+    }
 
     $('#search-dropdown-close').click(function (e) {
         e.stopPropagation();
@@ -256,7 +183,6 @@ $(function () {
     $('html').click(function () {
         if ($('#search-dropdown-cont').is(':visible')) {
             $('#search-dropdown-cont').hide();
-
             var icon = $('#search-dropdown-arrow').find('i'), cls = icon.attr('class');
             icon.removeClass().addClass(cls == 'icon-sort-down' ? 'icon-sort-up' : 'icon-sort-down');
         }
@@ -267,72 +193,11 @@ $(function () {
         e.stopPropagation();
     });
 
-	 $('#search-dropdown-cont').find('input').keypress(function(e){
-	 	if(e.keyCode == 13){
-	 		$('#search-button2').trigger('click');
-	 	}
-	 });
-    /*
-     $('#search').keypress(function (e) {
-     if (e.keyCode === 13) {
-     search();
-     }
-     });
-
-     $('#search-button').click(function () {
-     search();
-     return false;
-     });*/
-    /*
-     var test = function (que) {
-     var map = {};
-     var key = "";
-     var value = "";
-     var isKey = true;
-     for (var i = 0; i < que.length; i++) {
-     if (isKey) {
-     for (; i < que.length; i++) {
-     if (que.charAt(i) == ":") {
-     isKey = false;
-     break;
-     }
-     key += que.charAt(i);
-     }
-     } else if (que.charAt(i) != " ") {
-     if (que.charAt(i) == "\"") {
-     i++;
-     for (; i < que.length; i++) {
-     if (que.charAt(i) == "\"") {
-     break;
-     }
-     value += que.charAt(i);
-     }
-     } else {
-     for (; i < que.length; i++) {
-     if (que.charAt(i) == " ") {
-     break;
-     }
-     value += que.charAt(i);
-     }
-     }
-     isKey = true;
-     } else {
-
-     }
-     if (isKey) {
-     map[key] = value;
-     key = "";
-     value = "";
-     }
-
-     }
-     var query = "";
-     for (var searchKey in map) {
-     query += searchKey + "=" + map[searchKey] + "&";
-     }
-     return query.substring(0, query.length - 1);
-     };
-     */
+    $('#search-dropdown-cont').find('input').keypress(function (e) {
+        if (e.keyCode == 13) {
+            $('#search-button2').trigger('click');
+        }
+    });
 
     var makeQuery = function () {
 
@@ -347,9 +212,7 @@ $(function () {
                     $('#search').val($this.find('input').attr('name') + ':"' + $this.find('input').val() + '"');
                 }
             }
-
         });
-
     }
 
     $('#search-button2').click(function () {
@@ -361,8 +224,4 @@ $(function () {
         $('#search-dropdown-cont input').val('');
         return false;
     });
-
-    /*$('#container-search').affix({
-       offset: { top: $('.navbar').offset().top + 80}
-   });*/
 });

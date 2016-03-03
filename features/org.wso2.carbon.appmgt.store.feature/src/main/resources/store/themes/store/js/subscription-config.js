@@ -9,12 +9,10 @@ var log = new Log("subscription-config.js");
 
 var isSelfSubscriptionEnabled = function () {
     return isSelfSubEnabled;
-
 };
 
 var isEnterpriseSubscriptionEnabled = function () {
     return isEnterpriseSubEnabled;
-
 };
 
 var isMyFavouriteMenu = function () {

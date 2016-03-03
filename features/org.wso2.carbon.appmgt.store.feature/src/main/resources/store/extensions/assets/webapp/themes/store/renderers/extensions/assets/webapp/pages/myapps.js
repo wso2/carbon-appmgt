@@ -62,7 +62,7 @@ var render = function (theme, data, meta, require) {
                 partial: 'page-header',
                 context: {
                     title: "My Web Apps",
-                    sorting: require('/helpers/sort-assets.js').format(data.sorting, data.header, hasApps)
+                    sorting: data.sortOptions
                 }
             }
         ],
