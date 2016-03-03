@@ -31,6 +31,7 @@ public class AppCreateRequest extends AbstractRequest {
     private String overview_transports = "http";
     private String overview_webAppUrl = "http://localhost:8080/travel-booking-1.0/";
     private String overview_description = "The provider has not given a description.";
+    private String overview_treatAsASite = "FALSE";
     private String images_thumbnail = "";
     private String images_banner = "";
     private String context = "";
@@ -98,6 +99,7 @@ public class AppCreateRequest extends AbstractRequest {
         addParameter("overview_transports", getOverview_transports());
         addParameter("overview_webAppUrl", getOverview_webAppUrl());
         addParameter("overview_description", getOverview_description());
+        addParameter("overview_treatAsASite", getOverview_treatAsASite());
         addParameter("images_thumbnail", getImages_thumbnail());
         addParameter("images_banner", getImages_banner());
         addParameter("context", getContext());
@@ -640,5 +642,13 @@ public class AppCreateRequest extends AbstractRequest {
 
     public void setUritemplate_javaPolicyIds(String uritemplate_javaPolicyIds) {
         this.uritemplate_javaPolicyIds = uritemplate_javaPolicyIds;
+    }
+
+    public String getOverview_treatAsASite() {
+        return overview_treatAsASite;
+    }
+
+    public void setOverview_treatAsASite(String overview_treatAsASite) {
+        this.overview_treatAsASite = overview_treatAsASite;
     }
 }

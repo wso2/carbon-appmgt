@@ -19,6 +19,16 @@ public class WebAppDetail {
     private String warFileName;
     private String trackingCode;
 
+    public String getTreatAsASite() {
+        return treatAsASite;
+    }
+
+    public void setTreatAsASite(String treatAsASite) {
+        this.treatAsASite = treatAsASite;
+    }
+
+    private String treatAsASite;
+
     public String getUserName() {
         return userName;
     }
