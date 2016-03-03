@@ -317,6 +317,10 @@ header .header-action:active {
 }
 
 .app-details-banner {
+    position: relative;
+}
+
+.app-details-banner .banner-image {
     /*display: block;*/
     position: relative;
     width: 100%;
@@ -335,6 +339,17 @@ header .header-action:active {
     top: 0;
     bottom: 0;
     margin: auto;
+}
+
+.app-details-banner .banner-default {
+    position: relative;
+    width: 100%;
+    padding: 0 0 56.25% 0;
+}
+
+.app-details-banner .banner-default > div {
+    color: #ffffff;
+    font-size: 666%;
 }
 
 .app-details-banner .banner-overlay {
@@ -402,13 +417,12 @@ header .header-action:active {
     font-size: 666%;
 }
 
-.app-details-summery {
-    color: #909090;
-    margin-bottom: 10px;
+.app-details-actions {
+    margin: 10px 0 0 0;
 }
 
-.app-details-actions {
-    margin: 10px 0 10px 0;
+.app-details-actions > a {
+    margin: 5px 5px 5px 0;
 }
 
 .app-details-actions > a > i {
@@ -457,6 +471,10 @@ header .header-action:active {
     -moz-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     -o-transform: translate(-50%, -50%);
+}
+
+a.disabled {
+    cursor: default;
 }
 
 /**/
