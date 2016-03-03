@@ -6,6 +6,8 @@ require('/modules/store.js').exec(function (ctx) {
     var log = new Log();
     var matcher = new URIMatcher(request.getRequestURI());
     var user = user = ctx.user;
+    var requestMethod =  request.getMethod();
+    var HTTP_POST = "POST";
 
     if (!user) {
         response.status = 401;
@@ -72,7 +74,7 @@ require('/modules/store.js').exec(function (ctx) {
         return content;
     };
 
-    if (matcher.match('/{context}/apis/favourite/{action}')) {
+    if (requestMethod == HTTP_POST && matcher.match('/{context}/apis/favourite/{action}')) {
         var action = matcher.elements().action;
         response.status = 200;
         response.contentType = "application/json";

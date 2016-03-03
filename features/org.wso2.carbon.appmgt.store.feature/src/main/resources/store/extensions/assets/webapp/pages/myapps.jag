@@ -65,7 +65,7 @@ require('/modules/store.js').exec(function (ctx) {
     subsApi.init(jagg, session);
 
     var isSite = 'false';//To get the webapp tags
-    var tagUrl = '/extensions/assets/' + type + '/myapps?tag=';
+    var tagUrl = '/assets/webapp/?tag=';
     url =
     '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
@@ -77,13 +77,12 @@ require('/modules/store.js').exec(function (ctx) {
         domain: tenantDomain
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
-    headerData.searchOff = true;
     headerData.hideAllAppsLink = false;
     headerData.storeTenantDomain = tenantDomain;
     headerData.appBarLink = caramel.configs().context + "/extensions/assets/webapp/myapps";
     headerData.appBarLinkText = "MY WEB APPS";
 
-    var showSortOptions = false;
+    var sortOptions = {};
     var webAppRecentAssets = [];
     var PAGE_SIZE = store.getPageSize();
     var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
@@ -318,131 +317,91 @@ require('/modules/store.js').exec(function (ctx) {
         var apiInfoManager = new APIInformationService.APIInformationService();
         apiInfoManager.init(jagg, session);
 
-        assets.forEach(function (app) {
+        for (var i = 0; i < assets.length; i++) {
             //set rating
-            if (JSON.parse(social.getRating("webapp:" + app.id))) {
-                app.rating = Math.floor(JSON.parse(social.getRating("webapp:" + app.id)).rating);
+            if (JSON.parse(social.getRating("webapp:" + assets[i].id))) {
+                assets[i].rating = Math.floor(JSON.parse(social.getRating("webapp:" + assets[i].id)).rating);
             } else {
-                app.rating = 0;
+                assets[i].rating = 0;
             }
 
             //Set the access URL -By one click user should access the app in myapps page.
-            if(!app.accessUrl) {
-                if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
+            if (!assets[i].accessUrl) {
+                if (assets[i].attributes.overview_skipGateway.toLowerCase() == "false") {
                     //Get the gatewayurl
-                    var appData = apiInfoManager.getAPIDescription(app.attributes.overview_provider,
-                                                                   app.attributes.overview_name,
-                                                                   app.attributes.overview_version);
-                    app.accessUrl = appData.serverURL.productionURL;
+                    var appData = apiInfoManager.getAPIDescription(assets[i].attributes.overview_provider,
+                                                                   assets[i].attributes.overview_name,
+                                                                   assets[i].attributes.overview_version);
+                    assets[i].accessUrl = appData.serverURL.productionURL;
                 } else {
                     //Get the direct webapp url
-                    app.accessUrl = app.attributes.overview_webAppUrl;
+                    assets[i].accessUrl = assets[i].attributes.overview_webAppUrl;
                 }
             }
 
             //set favourite app or not- This information will be used to set proper icon(add/remove favourite) on asset
             // tile
-            app.isFavourite = false;
-            if (isFavouriteApp(app.attributes.overview_name, app.attributes.overview_version,
-                               app.attributes.overview_provider)) {
-                app.isFavourite = true;
+            assets[i].isFavourite = false;
+            if (isFavouriteApp(assets[i].attributes.overview_name, assets[i].attributes.overview_version,
+                               assets[i].attributes.overview_provider)) {
+                assets[i].isFavourite = true;
             }
 
             //set thumbnail
-            setDefaultThumbnail(app);
-        });
+            setDefaultThumbnail(assets[i]);
+        }
     };
 
     /**
-     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in
-     * user. anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
-     * apps retrieved from registry and APPM database have different format.So in order to combine both change the
-     * format of apps from registry to the format of apps from APPM database.
+     * Get the apps from APM DB when subscription is enabled.
+     * When subscription is enabled myapp page should show anonymous + user subscribed apps for logged in user.
+     * For an anonymous user it should show only anonymous apps.
+     * Sort by recent(recently subscribed apps) option will be available for only logged in user
      */
-    var changeFormat = function (apps) {
-        var APIInformationService = require('../services/api-information.js').serviceModule;
-        var apiInfoManager = new APIInformationService.APIInformationService();
-        apiInfoManager.init(jagg, session);
+    var getAssetsFromDB = function () {
+        var carbon = require('carbon');
+        var treatAsSite = "FALSE";
+        if (query) {
+            var array = query.split(":");
+            var searchOption = array[0];
+            var searchValue = array[1].replace(/\"/g,"");// replace all the occurrences of double quote with empty
 
-        var resultApps = [];
-        apps.forEach(function (app) {
-            var tempApp = {};
-            tempApp["overview_name"] = app.attributes.overview_name;
-            tempApp["overview_provider"] = app.attributes.overview_provider;
-            tempApp["overview_context"] = app.attributes.overview_context;
-            tempApp["overview_version"] = app.attributes.overview_version;
-            tempApp["overview_appTenant"] = app.attributes.overview_appTenant;
-            tempApp["images_thumbnail"] = app.attributes.images_thumbnail;
-            tempApp["id"] = app.id;
-            tempApp["overview_advertiseOnly"] = app.attributes.overview_advertiseOnly;
-            tempApp["overview_advertisedAppUuid"] = app.attributes.overview_advertisedAppUuid;
-
-            //Set the access URL
-            if (app.attributes.overview_skipGateway.toLowerCase() == "false") {
-                //Get the gatewayurl
-                var appData = apiInfoManager.getAPIDescription(app.attributes.overview_provider,
-                                                               app.attributes.overview_name,
-                                                               app.attributes.overview_version);
-                tempApp["accessUrl"] = appData.serverURL.productionURL;
+            if (searchOption.toLowerCase() == "provider") {
+                searchOption = "SEARCH_BY_APP_PROVIDER";
             } else {
-                //Get the direct webapp url
-                tempApp["accessUrl"] = asset.attributes.overview_webAppUrl;
+                searchOption = "SEARCH_BY_APP_NAME";
             }
-            resultApps.push(tempApp);
-        });
-        return resultApps;
-    };
 
-    /**
-     * When any subscription is enabled,MyApps page should display anonymous apps + subscribed apps for a logged in
-     * user. anonymous apps are retrieved from registry and subscribed app details are retrieved from APPM database.
-     * This method combine both anoymous + subscribed apps as well as mark whether an app is selected by user as
-     * favourite or not.
-     * @param array1
-     * @param array2
-     * @returns {Array}
-     */
-    var mergeArrays = function (array1, array2) {
-        var mergedArray = [];
-        for (var i = 0; i < array1.length; i++) {
-            mergedArray.push(array1[i]);
-        }
+            if (user) {
+                assets = subsApi.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
+                                                          treatAsSite, searchOption, searchValue);
+            } else {
+                assets = subsApi.searchUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain),
+                                                          treatAsSite, searchOption, searchValue);
+            }
+        } else {
+            var sortOption = request.getParameter('sort');
+            if (sortOption == "az") {
+                sortOption = "SORT_BY_APP_NAME_ASC";
+            } else if (sortOption == "recent") {
+                sortOption = "SORT_BY_SUBSCRIBED_TIME_DESC";
+            } else {
+                sortOption = "INSERTED_ORDER";
+            }
 
-        for (var i = 0; i < array2.length; i++) {
-            mergedArray.push(array2[i]);
-        }
-        return mergedArray;
-    };
-
-    /**
-     * Retrieve anonymous apps from registry which are in published state.
-     * @returns {*}
-     */
-    var getAnonymousApps = function () {
-        var fn = function (asset) {
-            var cond1 = (asset.attributes.overview_treatAsASite.toLowerCase() == "false" ) ? true : false;
-            var cond2 = (asset.attributes.overview_allowAnonymous.toLowerCase() == "true" ) ? true : false;
-            var cond3 = (asset.lifecycleState == "Published" ) ? true : false;
-            return (cond1 && cond2 && cond3);
-        };
-        return subscriptionUtil.getAnonymousApps(fn, request, session, tenantId);
-    };
-
-    /**
-     * Get user subscribed webapps from APM db and filter for type "webapp"
-     * @returns {*}
-     */
-    var getUserSubscribedWebApps = function () {
-        var apps = subsApi.getUserSubscribedApps(String(user.username), user.tenantId, String(tenantDomain));
-        var webApps = [];
-        for (var i = 0; i < apps.length; i++) {
-            if (apps[i].attributes.overview_treatAsSite == "FALSE") {
-                webApps.push(apps[i]);
+            if (user) {
+                //get anonymous + subscribed apps
+                assets =
+                subsApi.getUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain), sortOption,
+                                              treatAsSite);
+            } else {
+                //get anonymous apps
+                assets =
+                subsApi.getUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain), sortOption,
+                                              treatAsSite);
             }
         }
-        return webApps;
     };
-
     /**
      * This method checks whether given app is already selected as favourite app by user or not.
      * @param appName App Name
@@ -468,36 +427,22 @@ require('/modules/store.js').exec(function (ctx) {
         //get the apps from registry based on the
         //requested method(sort,search or normal)
         getAssetsFromRegistry();
-        //Add rating , production url ,etc to retrieved apps
-        addMoreInformationToWebApps();
-        //get recently added apps from registry
-        getRecentAssetsFromRegistry();
         //check for pagination
         setPagination();
 
-        headerData.searchOff = false;//display search in header
         headerData.hideAllAppsLink = true; //hide all apps link in header
-        showSortOptions = true; //display sorting options in  body
     } else {
-        if (user) {
-            //Display anonymous apps + subscribed apps
-
-            //get anonymous app from registry(Can't get the anonymous apps from APPM databse together subscribed apps
-            // .Because in APPM no information available to identify whether app type is 'webapp' or 'site' )
-            var anonymousApps = getAnonymousApps();
-            anonymousApps = changeFormat(anonymousApps);
-            //get user subscribed apps
-            var subscribedApps = getUserSubscribedWebApps();
-            //merge anonymous + subscribe apps
-            assets = mergeArrays(anonymousApps, subscribedApps);
-            addMoreInformationToWebApps();
-        } else {
-            //Display all the anonymous apps
-            var anonymousApps = getAnonymousApps();
-            assets = changeFormat(anonymousApps);
-            addMoreInformationToWebApps();
-        }
+        //show anonymous + subscribed apps for logged in user.
+        //show anonymous apps for anoymous user.
+        getAssetsFromDB();
     }
+
+    // add rating,access url etc to retrieved webapps
+    addMoreInformationToWebApps();
+    //get recently added apps from registry
+    getRecentAssetsFromRegistry();
+    //create sort options
+    sortOptions = createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscriptionEnabled);
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     caramel.render({
@@ -528,10 +473,7 @@ require('/modules/store.js').exec(function (ctx) {
                            tag: tag,
                            size: assets.length
                        },
-                       sorting: {
-                           url: url + 'sort=',
-                           showSortOptions: showSortOptions
-                       },
+                       sortOptions: sortOptions,
                        pagination: {
                            leftNav: leftnav,
                            rightNav: rightnav,
@@ -546,6 +488,33 @@ function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
+function createSortOptions(user, isSelfSubscriptionEnabled, isEnterpriseSubscriptionEnabled) {
+    var url = "/extensions/assets/webapp/myapps?sort=";
+    var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
+
+    var options = [];
+
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        options.push(sortByAlphabet);
+        options.push(sortByRecent);// recently added
+        options.push(sortByPopularity);
+        if (user) {
+            options.push(sortByUsage);
+        }
+    } else {
+        if(user) {
+            options.push(sortByAlphabet);
+            options.push(sortByRecent);// recently subscribed
+        }
+    }
+
+    sortOptions["options"] = options;
+    return sortOptions;
+}
 
 %>
 

@@ -19,6 +19,8 @@ package org.wso2.carbon.appmgt.impl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 
@@ -111,18 +113,19 @@ public class UserAwareAPIConsumer extends APIConsumerImpl {
     }
 
     @Override
-    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                WebAppSortOption sortOption)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore);
+        return super.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, sortOption);
     }
 
-
     @Override
-    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> searchFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                   WebAppSearchOption searchOption, String searchValue)
             throws AppManagementException {
         checkSubscribePermission();
-        return super.getUserSubscribedApps(username, tenantIdOfUser, tenantIdOfStore);
+        return super.searchFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, searchOption, searchValue);
     }
 
     @Override

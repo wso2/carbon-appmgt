@@ -364,27 +364,60 @@ public interface APIConsumer extends APIManager {
             throws AppManagementException;
 
     /**
-     * This methods returns  favourite webapps of given user for given tenant store.
+     * Returns  favourite apps of given user for given tenant store based on given sorting option.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
+     * @param sortOption      Sort Option
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                WebAppSortOption sortOption)
             throws AppManagementException;
 
     /**
-     * Returns the  subscribed web apps for given user for given tenant store.
+     * Returns favourite apps of user for given tenant store  based on given search criteria.
+     *
+     * @param username        Username
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store
+     * @param searchOption    Search Option
+     * @param searchValue     Search Value
+     * @return List of App Identifiers
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> searchFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                   WebAppSearchOption searchOption, String searchValue)
+            throws AppManagementException;
+    /**
+     * Returns the  accessible web apps(anonymous + subscribed) of given user for given tenant store.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id Of User
      * @param tenantIdOfStore Tenant Id Of Store
+     * @param sortOption      Sort Option
+     * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                     WebAppSortOption sortOption, boolean treatAsSite)
             throws AppManagementException;
 
+    /**
+     * Returns accessible apps(anonymous + subscribed) of given user based on give search option.
+     *
+     * @param username        UserName
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store(=Tenant Id of App)
+     * @param searchOption    Search Option
+     * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
+     * @return List of App Identifiers
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                        boolean treatAsSite, WebAppSearchOption searchOption,
+                                                        String searchValue) throws AppManagementException;
     /**
      * Add favourite page as default landing page in store.
      *

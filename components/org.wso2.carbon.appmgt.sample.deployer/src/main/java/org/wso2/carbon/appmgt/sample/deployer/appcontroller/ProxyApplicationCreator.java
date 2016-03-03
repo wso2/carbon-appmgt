@@ -144,6 +144,7 @@ public class ProxyApplicationCreator {
         appCreateRequest.setOverview_trackingCode(appCreateRequest.generateTrackingID());
         appCreateRequest.setOverview_transports("http");
         appCreateRequest.setOverview_webAppUrl(httpBackEndUrl + "/" + webAppDetail.getWarFileName() + "/");
+        appCreateRequest.setOverview_treatAsASite(webAppDetail.getTreatAsASite());
         String UUID = null;
         String errorMessage = "Error while creating a web application" + webAppDetail.getDisplayName();
         try {

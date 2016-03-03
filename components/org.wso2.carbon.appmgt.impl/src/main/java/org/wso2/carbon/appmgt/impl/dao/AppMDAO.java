@@ -40,6 +40,8 @@ import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.JavaPolicy;
 import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
@@ -81,6 +83,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import scala.App;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -3988,8 +3991,8 @@ public class AppMDAO {
         ResultSet rs = null;
 
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4024,6 +4027,7 @@ public class AppMDAO {
             prepStmt.setString(9, logoutURL);
             prepStmt.setBoolean(10, app.getAllowAnonymous());
             prepStmt.setString(11, app.getUrl());
+            prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
 
             prepStmt.execute();
 
@@ -4568,8 +4572,9 @@ public class AppMDAO {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
-        String query = "UPDATE APM_APP SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? "
-                + " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
+        String query = "UPDATE APM_APP " +
+                " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
+                " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
 				getAPIManagerConfiguration().getFirstProperty(GATEWAY_URL);
@@ -4593,10 +4598,11 @@ public class AppMDAO {
 			prepStmt.setString(2, logoutURL);
 			prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
-			prepStmt.setString(5, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-			prepStmt.setString(6, api.getId().getApiName());
-			prepStmt.setString(7, api.getId().getVersion());
-			prepStmt.execute();
+            prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
+			prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+			prepStmt.setString(7, api.getId().getApiName());
+			prepStmt.setString(8, api.getId().getVersion());
+            prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);
 
@@ -8445,19 +8451,21 @@ public class AppMDAO {
     }
 
     /**
-     * This method returns the favourite app of given user for given tenant store.
+     * Returns the favourite app of given user for given tenant store based on given sort option.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id of Logged in user
      * @param tenantIdOfStore Tenant Id of Store
+     * @param sortOption      Sorting option
      * @return List of APP Identifier
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                WebAppSortOption sortOption)
             throws AppManagementException {
         if (log.isDebugEnabled()) {
             log.debug("Retrieving favourite apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
-                              " for tenant store:" + tenantIdOfStore);
+                              " for tenant store: " + tenantIdOfStore + ",Sort option: " + sortOption);
         }
         Connection connection = null;
         PreparedStatement ps = null;
@@ -8466,17 +8474,22 @@ public class AppMDAO {
 
         try {
             connection = APIMgtDBUtil.getConnection();
-
             String query = "SELECT " +
-                    "APP.APP_PROVIDER AS APP_PROVIDER, " +
-                    "APP.APP_NAME AS APP_NAME, " +
-                    "APP.APP_VERSION AS APP_VERSION " +
-                    "FROM APM_APP APP " +
-                    "INNER JOIN APM_FAVOURITE_APPS FAV_APP " +
-                    "ON  APP.APP_ID =FAV_APP.APP_ID " +
-                    "WHERE FAV_APP.USER_ID  = ? " +
-                    "AND FAV_APP.TENANT_ID = ?" +
-                    "AND APP.TENANT_ID = ? ";
+                    " APP.APP_PROVIDER AS APP_PROVIDER," +
+                    " APP.APP_NAME AS APP_NAME," +
+                    " APP.APP_VERSION AS APP_VERSION" +
+                    " FROM APM_APP APP" +
+                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
+                    " AND FAV_APP.USER_ID  = ?" +
+                    " AND FAV_APP.TENANT_ID = ? )" +
+                    " WHERE APP.TENANT_ID = ?";
+
+            if (sortOption == WebAppSortOption.SORT_BY_CREATED_TIME_DESC) {
+                query = query + " ORDER BY FAV_APP.CREATED_TIME DESC";
+            } else {
+                query = query + " ORDER BY APP.APP_NAME ASC";
+            }
 
             ps = connection.prepareStatement(query);
             ps.setString(1, username);
@@ -8494,7 +8507,7 @@ public class AppMDAO {
 
         } catch (SQLException e) {
             handleException("Error while getting all favourite apps of  user : " + username + " of tenant: " +
-                                    tenantIdOfUser +" for tenan",
+                                    tenantIdOfUser + " for tenant store:" + tenantIdOfStore,
                             e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, appInfoResult);
@@ -8503,50 +8516,117 @@ public class AppMDAO {
     }
 
     /**
-     * This method return the subscribed apps details of given user for given tenant store.
+     * Returns favourite apps of user based on given search criteria.
      *
      * @param username        Username
      * @param tenantIdOfUser  Tenant Id of Logged in user
      * @param tenantIdOfStore Tenant Id of Store
+     * @param searchOption    Search Option
+     * @param searchValue     Search Value
+     * @return List of App Identifiers
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> searchFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                   WebAppSearchOption searchOption, String searchValue)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Searching favourite apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
+                              " for tenant store: " + tenantIdOfStore + ", SearchOption: " + searchOption +
+                              ",Search Value: " + searchValue);
+        }
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet appInfoResult = null;
+        List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            String query = "SELECT " +
+                    " APP.APP_PROVIDER AS APP_PROVIDER," +
+                    " APP.APP_NAME AS APP_NAME," +
+                    " APP.APP_VERSION AS APP_VERSION" +
+                    " FROM APM_APP APP" +
+                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " ON  (APP.APP_ID =FAV_APP.APP_ID" +
+                    " AND FAV_APP.USER_ID  = ?" +
+                    " AND FAV_APP.TENANT_ID = ? )" +
+                    " WHERE APP.TENANT_ID = ?";
+
+            if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
+                query = query + " AND  APP.APP_PROVIDER LIKE ?";
+            } else {
+                query = query + " AND  APP.APP_NAME LIKE ?";
+            }
+
+            ps = connection.prepareStatement(query);
+            ps.setString(1, username);
+            ps.setInt(2, tenantIdOfUser);
+            ps.setInt(3, tenantIdOfStore);
+            ps.setString(4, "%" + searchValue + "%");
+            appInfoResult = ps.executeQuery();
+
+            while (appInfoResult.next()) {
+                APIIdentifier identifier = new APIIdentifier(
+                        appInfoResult.getString("APP_PROVIDER"),
+                        appInfoResult.getString("APP_NAME"),
+                        appInfoResult.getString("APP_VERSION"));
+                apiIdentifiers.add(identifier);
+            }
+
+        } catch (SQLException e) {
+            handleException("Error while searching  favourite apps of  user : " + username + " of tenant: " +
+                                    tenantIdOfUser + " for tenant store:" + tenantIdOfStore + ", SearchOption: " +
+                                    searchOption + ",Search Value: " + searchValue, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, appInfoResult);
+        }
+        return apiIdentifiers;
+    }
+
+    /**
+     * Returns the  apps(anonymous + subscribed) which can be accessed by user in given tenant store.
+     *
+     * @param username        Username
+     * @param tenantIdOfUser  Tenant Id of Logged in User
+     * @param tenantIdOfStore Tenant Id of Store
+     * @param sortOption      Sorting option
+     * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
      * @return List of APP Identifier
      * @throws AppManagementException
      */
-    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
-            throws
-            AppManagementException {
-
+    public List<APIIdentifier> getUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                     WebAppSortOption sortOption, boolean treatAsSite)
+            throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving accessible apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
+                              " for tenant store:" + tenantIdOfStore + ", " + "Sort Option: " + sortOption +
+                              ",Treat As Site: " + treatAsSite);
+        }
         List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
         Connection connection = null;
         PreparedStatement ps = null;
         ResultSet result = null;
-        int tenantId = -1;
+        boolean allowAnonymous = true;
         try {
             connection = APIMgtDBUtil.getConnection();
+            int applicationId = getApplicationId(username, tenantIdOfUser, connection);
 
-            String sqlQuery =
-                    "SELECT WEBAPP.APP_PROVIDER AS APP_PROVIDER"
-                            + "   ,WEBAPP.APP_NAME AS APP_NAME"
-                            + "   ,WEBAPP.APP_VERSION AS APP_VERSION"
-                            + "   FROM "
-                            + "   APM_SUBSCRIBER SUB," + "   APM_APPLICATION APP, "
-                            + "   APM_SUBSCRIPTION SUBS, " + "   APM_APP WEBAPP "
-                            + "   WHERE (SUB.USER_ID = ? "
-                            + "   AND SUB.TENANT_ID = ? "
-                            + "   AND WEBAPP.TENANT_ID = ?"
-                            + "   AND SUB.SUBSCRIBER_ID=APP.SUBSCRIBER_ID "
-                            + "   AND APP.APPLICATION_ID=SUBS.APPLICATION_ID "
-                            + "   AND WEBAPP.APP_ID=SUBS.APP_ID ) ";
+            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
+                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
+                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
+                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
 
-            ps = connection.prepareStatement(sqlQuery);
-            ps.setString(1, username);
-            ps.setInt(2, tenantIdOfUser);
-            ps.setInt(3, tenantIdOfStore);
-
-            if (log.isDebugEnabled()) {
-                log.debug("Retrieving subscribed apps details from tenant store :" + tenantIdOfStore + " for  user : " +
-                                  username + " of tenant: " + tenantId
-                );
+            if (sortOption == WebAppSortOption.SORT_BY_SUBSCRIBED_TIME_DESC) {
+                query = query + " ORDER BY APM_SUBSCRIPTION.SUBSCRIPTION_TIME DESC";
+            } else {
+                query = query + " ORDER BY APM_APP.APP_NAME ASC";
             }
+
+            ps = connection.prepareStatement(query);
+            ps.setBoolean(1,treatAsSite);
+            ps.setInt(2,tenantIdOfStore);
+            ps.setInt(3,applicationId);
+            ps.setBoolean(4,allowAnonymous);
             result = ps.executeQuery();
 
             while (result.next()) {
@@ -8560,12 +8640,118 @@ public class AppMDAO {
 
         } catch (SQLException e) {
             handleException(
-                    "Failed to get subscribed apps details from tenant store :" + tenantIdOfStore + " for  user : " +
-                            username + " of tenant: " + tenantId, e);
+                    "Failed to get accessible apps details from tenant store :" + tenantIdOfStore + " for  user : " +
+                            username + " of tenant: " + tenantIdOfUser, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(ps, connection, result);
         }
         return apiIdentifiers;
+    }
+
+    /**
+     * Returns apps(anonymous + subscribed) of given user for given tenant store based on given search option.
+     *
+     * @param username        UserName
+     * @param tenantIdOfUser  Tenant Id of Logged in user
+     * @param tenantIdOfStore Tenant Id of Store(=Tenant Id of App)
+     * @param treatAsSite     Treat As Site (TRUE->site,FALSE->WebApp)
+     * @param searchOption    Search Option
+     * @param searchValue     Search Value
+     * @return List of App Identifiers
+     * @throws AppManagementException
+     */
+    public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                        boolean treatAsSite, WebAppSearchOption searchOption,
+                                                        String searchValue) throws AppManagementException {
+        if (log.isDebugEnabled()) {
+            log.debug("Searching accessible apps details of  user : " + username + " of tenant: " + tenantIdOfUser +
+                              " for tenant store: " + tenantIdOfStore + ",Search Option: " + searchOption +
+                              ",Search Value: " + searchValue + ",Treat As Site: " + treatAsSite);
+        }
+
+        List<APIIdentifier> apiIdentifiers = new ArrayList<APIIdentifier>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        boolean allowAnonymous = true;
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            int applicationId = getApplicationId(username, tenantIdOfUser, connection);
+
+            String query = "SELECT APP_NAME,APP_PROVIDER,APP_VERSION" +
+                    " FROM APM_APP LEFT JOIN APM_SUBSCRIPTION ON APM_APP.APP_ID = APM_SUBSCRIPTION.APP_ID" +
+                    " WHERE APM_APP.TREAT_AS_SITE = ? AND APM_APP.TENANT_ID = ?" +
+                    " AND (APM_SUBSCRIPTION.APPLICATION_ID =? OR APM_APP.APP_ALLOW_ANONYMOUS= ?)";
+
+            if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
+                query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+            } else {
+                query = query + " AND  APM_APP.APP_NAME LIKE ?";
+            }
+
+            ps = connection.prepareStatement(query);
+            ps.setBoolean(1,treatAsSite);
+            ps.setInt(2,tenantIdOfStore);
+            ps.setInt(3,applicationId);
+            ps.setBoolean(4,allowAnonymous);
+            ps.setString(5, "%" + searchValue + "%");
+            result = ps.executeQuery();
+
+            while (result.next()) {
+                APIIdentifier apiIdentifier = new APIIdentifier(
+                        AppManagerUtil.replaceEmailDomain(result.getString("APP_PROVIDER")),
+                        result.getString("APP_NAME"),
+                        result.getString("APP_VERSION")
+                );
+                apiIdentifiers.add(apiIdentifier);
+            }
+
+        } catch (SQLException e) {
+            handleException(
+                    "Failed to search accessible apps details from tenant store :" + tenantIdOfStore + " for  user : " +
+                            username + " of tenant: " + tenantIdOfUser, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, connection, result);
+        }
+        return apiIdentifiers;
+    }
+
+    /**
+     * Returns application id mapped to username.
+     * @param username Username
+     * @param tenantId Tenant Id of User
+     * @param connection SQL Connection to the data store
+     * @return Application Id
+     * @throws AppManagementException
+     */
+    private int getApplicationId(String username, int tenantId, Connection connection) throws AppManagementException {
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        String query = "SELECT APPLICATION_ID" +
+                " FROM APM_SUBSCRIBER  ,APM_APPLICATION" +
+                " WHERE APM_SUBSCRIBER.SUBSCRIBER_ID = APM_APPLICATION.SUBSCRIBER_ID" +
+                " AND APM_SUBSCRIBER.TENANT_ID = ? AND APM_SUBSCRIBER.USER_ID = ?";
+        int applicationId = -1;
+
+        try {
+            ps = connection.prepareStatement(query);
+            ps.setInt(1, tenantId);
+            ps.setString(2, username);
+            result = ps.executeQuery();
+
+            if (result.next()) {
+                applicationId = result.getInt("APPLICATION_ID");
+            }
+
+        } catch (SQLException e) {
+            handleException(
+                    "Failed to get application id from table APM_APPLICATION for user :" + username + "of tenant id :" +
+                            tenantId, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, null, result);
+        }
+        return applicationId;
     }
 
     /**

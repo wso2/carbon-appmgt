@@ -1646,15 +1646,32 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
     }
 
     @Override
-    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> getFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                WebAppSortOption sortOption)
             throws AppManagementException {
-        return appMDAO.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore);
+        return appMDAO.getFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, sortOption);
     }
 
     @Override
-    public List<APIIdentifier> getUserSubscribedApps(String username, int tenantIdOfUser, int tenantIdOfStore)
+    public List<APIIdentifier> searchFavouriteApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                   WebAppSearchOption searchOption, String searchValue)
             throws AppManagementException {
-        return appMDAO.getUserSubscribedApps(username, tenantIdOfUser, tenantIdOfStore);
+        return appMDAO.searchFavouriteApps(username, tenantIdOfUser, tenantIdOfStore, searchOption, searchValue);
+    }
+
+    @Override
+    public List<APIIdentifier> getUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                     WebAppSortOption sortOption, boolean treatAsSite)
+            throws AppManagementException {
+        return appMDAO.getUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, sortOption, treatAsSite);
+    }
+
+    @Override
+    public List<APIIdentifier> searchUserAccessibleApps(String username, int tenantIdOfUser, int tenantIdOfStore,
+                                                        boolean treatAsSite, WebAppSearchOption searchOption,
+                                                        String searchValue) throws AppManagementException {
+        return appMDAO.searchUserAccessibleApps(username, tenantIdOfUser, tenantIdOfStore, treatAsSite, searchOption,
+                                                searchValue);
     }
 
     @Override
