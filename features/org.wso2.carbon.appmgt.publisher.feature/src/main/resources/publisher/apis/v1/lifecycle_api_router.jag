@@ -23,6 +23,21 @@
 
 require('/modules/publisher.js').exec(function (ctx) {
 
+    var CONTENT_TYPE_JSON = "application/json";
+
+    var LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW = "Submit for Review";
+    var LIFE_CYCLE_ACTION_APPROVE = "Approve";
+    var LIFE_CYCLE_ACTION_REJECT = "Reject";
+    var LIFE_CYCLE_ACTION_PUBLISH = "Publish";
+    var LIFE_CYCLE_ACTION_UNPUBLISH = "Unpublish";
+    var LIFE_CYCLE_ACTION_RE_PUBLISH = "Re-Publish";
+    var LIFE_CYCLE_ACTION_DEPRECATE = "Deprecate";
+    var LIFE_CYCLE_ACTION_RETIRE = "Retire";
+    var LIFE_CYCLE_ACTION_RECYCLE = "Recycle";
+
+    var APP_TYPE_WEB_APP = "webapp";
+    var APP_TYPE_MOBILE_APP = "mobileapp";
+
 	var config = require('/config/publisher.json');
 	var caramel = require('caramel');
 	var router = require('/modules/router-g.js').router();
@@ -148,13 +163,11 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // validating action
         if (config.publisherActions.indexOf(action) == -1) {
-            log.error("Invalid action '" + action + "' invoked on a " + appType
-                      + " with UUID " + uuid);
+            log.error("Invalid '" + action + "' action invoked on a " + appType + " with UUID '" + uuid + "'.");
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Invalid Action";
-            content.messages.push("Action '" + action + "' cannot be performed on "
-                                  + appType + "s");
+            content.messages.push("'" + action + "' action cannot be performed on " + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -164,62 +177,63 @@ require('/modules/publisher.js').exec(function (ctx) {
         var permission = null;
 
         //check if its the default version and if it has any other versions when deprecating
-        if (action == "Deprecate") {
-            var webApp;
+        if (action == LIFE_CYCLE_ACTION_DEPRECATE) {
+            var app;
             try {
-                webApp = apiProvider.getAppDetailsFromUUID(uuid);
+                app = apiProvider.getAppDetailsFromUUID(uuid);
             } catch (e) {
-                log.error("The asset with UUID " + uuid + " could not be retrieved.");
+                log.error("The asset with UUID '" + uuid + "' could not be retrieved.");
                 log.error(e);
                 response.status = 404;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Not Found";
-                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
                 response.content = stringify(content);
                 return;
             }
-            var appProvider = webApp.provider;
-            var appName = webApp.name;
-            var appVersion = webApp.version;
+            var appProvider = app.provider;
+            var appName = app.name;
+            var appVersion = app.version;
             var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
 
             try {
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
-                    log.error("Insufficient permissions to perform '" + action + "' on " + appType);
-                    response.status = 401;
-                    response.contentType = "application/json";
+                    var msg = "'Deprecate' action is not permitted as this is the default version (" + appVersion
+                              + ") of '" + appName + "' " + appType + ". Please select other version of this " + appType
+                              + " as the default version and proceed.";
+                    log.warn(msg);
+                    response.status = 403;
+                    response.contentType = CONTENT_TYPE_JSON;
                     content.status = "Access Denied";
-                    content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
-                                          + appType + "'. Please select other version of this '" + appType
-                                          + "' as the default version and proceed.");
+                    content.messages.push(msg);
                     response.content = stringify(content);
                     return;
                 }
             } catch (e) {
-                log.error("Error while retrieving default version details related to App Name: " + appName
-                          + ", Provider: " + appProvider + ", Version: " + appVersion);
+                var msg = "Cannot retrieve default version details of '" + appVersion + "' version of '" + appName
+                          + "' " + appType + " published by '" + appProvider + "'.";
+                log.error(msg);
                 log.error(e);
-                response.status = 404;
-                response.contentType = "application/json";
-                content.status = "Not Found";
-                content.messages.push("Error while retrieving default version details related to App Name: " + appName
-                                      + ", Provider: " + appProvider + ", Version: " + appVersion);
+                response.status = 500;
+                response.contentType = CONTENT_TYPE_JSON;
+                content.status = "Error";
+                content.messages.push(msg);
                 response.content = stringify(content);
                 return;
             }
         }
 
         // To Send an app to submit for review, created permission is required.
-        if (action != "Submit for Review") {
-            if (appType == 'webapp') {
+        if (action != LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW) {
+            if (appType == APP_TYPE_WEB_APP) {
                 permission = config.permissions.webapp_publish;
-            } else if (appType == 'mobileapp') {
+            } else if (appType == APP_TYPE_MOBILE_APP) {
                 permission = config.permissions.mobileapp_publish;
             }
         } else {
-            if (appType == 'webapp') {
+            if (appType == APP_TYPE_WEB_APP) {
                 permission = config.permissions.webapp_create;
-            } else if (appType == 'mobileapp') {
+            } else if (appType == APP_TYPE_MOBILE_APP) {
                 permission = config.permissions.mobileapp_create;
             }
         }
@@ -227,12 +241,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         // check whether current user has enough permission to change the life cycle
         var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
         if (!hasPermission) {
-            log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+            log.error("Insufficient permissions to perform '" + action + "' on " + appType + ".");
             response.status = 401;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Access Denied";
-            content.messages.push("You do not have publisher permissions to perform '"
-                                  + action + "' on " + appType + "s");
+            content.messages.push("You do not have publisher permissions to perform '" + action + "' action on "
+                                  + appType + "s.");
             response.content = stringify(content);
             return;
         }
@@ -248,9 +262,9 @@ require('/modules/publisher.js').exec(function (ctx) {
             log.error("The asset with UUID " + uuid + " could not be retrieved.");
             log.error(e);
             response.status = 404;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Not Found";
-            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved.");
             response.content = stringify(content);
             return;
         }
@@ -266,8 +280,8 @@ require('/modules/publisher.js').exec(function (ctx) {
                                               carbon.registry.actions.GET);
                 });
             } catch (e) {
-                log.error("Cannot grant permissions to role '" + currentRole
-                          + "' to perform action '" + carbon.registry.actions.GET + "'");
+                log.error("Cannot grant permissions to '" + currentRole + "' role to perform action '"
+                          + carbon.registry.actions.GET + "' action.");
                 log.error(e);
                 // continue work flow
             }
@@ -277,16 +291,16 @@ require('/modules/publisher.js').exec(function (ctx) {
         try {
             if (!permissions.isLCActionsPermitted(user.username, currentArtifact.path,
                                                   userManager)) {
-                log.error("Insufficient permissions to perform '" + action + "' on " + appType
-                          + " for user " + user.username);
+                log.warn("Insufficient permissions to perform '" + action + "' action on "
+                         + currentArtifact.attributes.overview_version + "' version of '"
+                         + currentArtifact.attributes.overview_name + "' " + appType + " for '" + user.username
+                         + "' user.");
                 response.status = 401;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Insufficient Permissions";
-                content.messages.push("You do not have permissions to perform action '"
-                                      + action + "' on version "
-                                      + currentArtifact.attributes.overview_version
-                                      + " of '" + currentArtifact.attributes.overview_name + "' "
-                                      + appType);
+                content.messages.push("You do not have enough permissions to perform '" + action + "' action on '"
+                                      + currentArtifact.attributes.overview_version + "' version of '"
+                                      + currentArtifact.attributes.overview_name + "' " + appType + ".");
                 response.content = stringify(content);
                 return;
             }
@@ -294,13 +308,13 @@ require('/modules/publisher.js').exec(function (ctx) {
             // this exception is thrown by
             // org.wso2.carbon.user.core.AuthorizationManager.isRoleAuthorized(roleName,
             // resourceId, action) throws UserStoreException
-            log.error("Cannot retrieve permissions for action '" + action + "' on artifact '" +
-                      currentArtifact.path + "' for user " + user.username);
+            log.error("Cannot retrieve permissions for '" + action + "' action on artifact in '" +
+                      currentArtifact.path + "' for user '" + user.username + "'.");
             log.error(e);
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
-            content.messages.push("Cannot retrieve permissions for action '" + action + "'");
+            content.messages.push("Cannot retrieve permissions for '" + action + "' action.");
             response.content = stringify(content);
             return;
         }
@@ -326,47 +340,13 @@ require('/modules/publisher.js').exec(function (ctx) {
         } catch (e) {
             log.error("Cannot retrieve previously published " + appType + " "
                       + currentArtifact.attributes.overview_name + " by "
-                      + currentArtifact.attributes.overview_provider);
+                      + currentArtifact.attributes.overview_provider + ".");
             log.error(e);
             // continue work flow
         }
 
         /** @type {{isSuccess: boolean, message: string}} */
         var operationResult;
-
-        // For all previously published apps when publishing or re-publishing current app,
-        // unpublish previously published version of this app.
-        /*
-        if (((action == "Publish") || (action == "Re-Publish"))
-            && (previousArtifacts.length > 0)) {
-            var i;
-            for (i = 0; i < previousArtifacts.length; i++) {
-                operationResult = promoteArtifactLifeCycle(artifactManager, previousArtifacts[i],
-                                                           appType, "Unpublish");
-                if (operationResult.isSuccess) {
-                    content.messages.push(operationResult.message);
-                } else {
-                    // some error occurred in promoteArtifactLifeCycle function,
-                    // abort further unpublishing previousArtifacts
-                    break;
-                }
-            }
-            if (!operationResult.isSuccess) {
-                // something went wrong in the above loop, revert changes
-                for (var j = 0; j < i; j++) {
-                    promoteArtifactLifeCycle(artifactManager, previousArtifacts[j], appType,
-                                             "Re-Publish");
-                    // ignore errors when reverting changes
-                }
-                response.status = 500;
-                response.contentType = "application/json";
-                content.status = "Error";
-                content.messages.push(operationResult.message); // error message from last operation
-                response.content = stringify(content);
-                return;
-            }
-        }
-        */
 
         // promote lifecycle of this app (current artifact)
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
@@ -376,13 +356,12 @@ require('/modules/publisher.js').exec(function (ctx) {
         } else {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
-            for (i = 0; i < previousArtifacts.length; i++) {
-                promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
-                                         "Re-Publish");
+            for (var i = 0; i < previousArtifacts.length; i++) {
+                promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType, LIFE_CYCLE_ACTION_RE_PUBLISH);
                 // ignore errors when reverting changes
             }
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
             content.messages.push(operationResult.message); // error message from last operation
             response.content = stringify(content);
@@ -396,21 +375,20 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (comment) {
                 var lcHistory = artifactManager.getLifecycleHistory(currentArtifact);
                 var lcHistoryXML = new XML(lcHistory.content);
-                lcHistoryJSON = utility.xml.convertE4XtoJSON(lcHistoryXML);
+                var lcHistoryJSON = utility.xml.convertE4XtoJSON(lcHistoryXML);
                 var newChangeOrder = lcHistoryJSON.item[0].order;
                 var commentHandler = require('/modules/comment.js');
-                commentHandler.addLifecycleComment(artifactManager, currentArtifact.path, comment,
-                                                   newChangeOrder);
+                commentHandler.addLifecycleComment(artifactManager, currentArtifact.path, comment, newChangeOrder);
             }
         } catch (e) {
-            log.error("Cannot add comment '" + comment + " for action '" + action + "' on "
-                      + "artifact '" + currentArtifact.path + "' for user " + user.username);
+            log.error("Cannot add '" + comment + "' comment for '" + action + "' action on "
+                      + "artifact in '" + currentArtifact.path + "' for user '" + user.username + "'.");
             log.error(e);
             // continue work flow
         }
 
         // only when publishing
-        if ((action=="Publish") || ((action=="Re-Publish"))) {
+        if ((action == LIFE_CYCLE_ACTION_PUBLISH) || ((action == LIFE_CYCLE_ACTION_RE_PUBLISH))) {
             //Enforcing restrict visibility logic
             var registry = new carbon.registry.Registry(server, {
                 username: server.current(session).username,
@@ -426,15 +404,16 @@ require('/modules/publisher.js').exec(function (ctx) {
                                          carbon.registry.actions.GET);
                 }
             } catch (e) {
-                log.debug('No role restrictions found for APP ' + uuid);
+                log.error("No role restrictions found for artifact in '" + currentArtifact.path + "'.");
+                log.error(e);
                 // continue work flow
             }
         }
 
         // For all previously published web apps when publishing or re-publishing current web app,
         // move subscriptions of that web app version to this web app version.
-        if ((appType == "webapp") && (previousArtifacts.length > 0)
-            && ((action == "Publish") || (action == "Re-Publish"))
+        if ((appType == APP_TYPE_WEB_APP) && (previousArtifacts.length > 0)
+            && ((action == LIFE_CYCLE_ACTION_PUBLISH) || (action == LIFE_CYCLE_ACTION_RE_PUBLISH))
             && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
 
 
@@ -462,15 +441,15 @@ require('/modules/publisher.js').exec(function (ctx) {
                     // ignore errors when reverting changes
                 }
                 // revert this app (current artifact) to unpublish state
-                promoteArtifactLifeCycle(artifactManager, currentArtifact, appType, "Unpublish");
+                promoteArtifactLifeCycle(artifactManager, currentArtifact, appType, LIFE_CYCLE_ACTION_UNPUBLISH);
                 // revert previously unpublished artifacts to Publish state
                 for (i = 0; i < previousArtifacts.length; i++) {
                     promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
-                                             "Re-Publish");
+                                             LIFE_CYCLE_ACTION_RE_PUBLISH);
                     // ignore errors when reverting changes
                 }
                 response.status = 500;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Error";
                 content.messages.push(operationResult.message); // error message from last operation
                 response.content = stringify(content);
@@ -481,7 +460,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
         // everything went great
         response.status = 200;
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         content.status = "Success";
         content.artifacts = [currentArtifact].concat(previousArtifacts);
         content.artifacts.forEach(function (artifact) {
@@ -534,10 +513,10 @@ require('/modules/publisher.js').exec(function (ctx) {
         // Recycle
         if (isSuccess) {
             var msgAction = null;
-            if (action == "Submit for Review") {
+            if (action == LIFE_CYCLE_ACTION_SUBMIT_FOR_REVIEW) {
                 msgAction = "submitted for review"
-            } else if ((action == "Approve") || (action == "Deprecate") ||
-                       (action == "Retire") || (action == "Recycle")) {
+            } else if ((action == LIFE_CYCLE_ACTION_APPROVE) || (action == LIFE_CYCLE_ACTION_DEPRECATE) ||
+                       (action == LIFE_CYCLE_ACTION_RETIRE) || (action == LIFE_CYCLE_ACTION_RECYCLE)) {
                 msgAction = action.toLowerCase() + "d";
             } else {
                 // Reject, Publish, Unpublish, Re-Publish
@@ -550,7 +529,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             return "Cannot perform action '" + action + "' on version " +
                    artifact.attributes.overview_version + " of '" +
                    artifact.attributes.overview_name + "' " + artifactType +
-                   " which is in '" + artifact.lifecycleState + "' state";
+                   " which is in '" + artifact.lifecycleState + "' state.";
         }
     }
 
@@ -577,20 +556,20 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             var count = provider.moveSubscriptions(fromIdentifier, toIdentifier);
             result.isSuccess = true;
-            result.message = count + " subscription(s) moved from version " +
-                             fromAsset.attributes.overview_version + " to " +
-                             toAsset.attributes.overview_version + " of '" +
+            result.message = count + " subscription(s) moved from version '" +
+                             fromAsset.attributes.overview_version + "' to '" +
+                             toAsset.attributes.overview_version + "' of '" +
                              fromAsset.attributes.overview_name + "' " + assetType + ".";
         } catch (e) {
             // this exception is thrown by
             // APIProviderImpl.moveSubscriptions(fromIdentifier, toIdentifier) throws
             //														AppManagementException
             result.isSuccess = false;
-            result.message = "Cannot move subscriptions from version " +
-                             fromAsset.attributes.overview_version + " of '" +
-                             fromAsset.attributes.overview_name + "' " + assetType + " to " +
-                             toAsset.attributes.overview_version + " of '" +
-                             toAsset.attributes.overview_name + "' " + assetType;
+            result.message = "Cannot move subscriptions from version '" +
+                             fromAsset.attributes.overview_version + "' of '" +
+                             fromAsset.attributes.overview_name + "' " + assetType + " to version '" +
+                             toAsset.attributes.overview_version + "' of '" +
+                             toAsset.attributes.overview_name + "' " + assetType + ".";
             log.error(result.message);
             log.error(e);
         }
