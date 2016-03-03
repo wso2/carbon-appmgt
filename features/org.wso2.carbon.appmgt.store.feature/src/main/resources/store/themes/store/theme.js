@@ -38,9 +38,12 @@ var engine = caramel.engine('handlebars', (function () {
                 return accum;
             });
 
-            Handlebars.registerHelper('assetRating', function(rating, ratedHtml, unratedHtml, options) {
-                var min = options.hash['min'] || 0;
-                var max = options.hash['max'] || 5;
+            Handlebars.registerHelper('assetRating', function(rating, options) {
+                var optionsHash = options.hash;
+                var min = optionsHash['min'] || 0;
+                var max = optionsHash['max'] || 5;
+                var ratedHtml = optionsHash['ratedHtml'] || '<i class="fw fw-star one"></i>';
+                var unratedHtml = optionsHash['unratedHtml'] || '<i class="fw fw-star zero"></i>';
                 rating = parseInt(rating);
                 var htmlBuffer = [];
                 var i = min;
@@ -51,7 +54,7 @@ var engine = caramel.engine('handlebars', (function () {
                         htmlBuffer.push(unratedHtml);
                     }
                 }
-                return new Handlebars.SafeString(htmlBuffer.join(""));
+                return new Handlebars.SafeString(htmlBuffer.join(" "));
             });
 
 
