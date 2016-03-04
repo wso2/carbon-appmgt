@@ -38,15 +38,7 @@
 /*========== NAVIGATION ==========*/
 nav.navigation {
     background: #525252;
-    color: #fff;
-    position: relative;
-    -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -ms-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+    max-width: 200px;
 }
 
 nav.navigation, nav.navigation > a {
@@ -69,149 +61,22 @@ nav.navigation > a > .icon {
 nav.navigation > a > .icon > i {
     line-height: 100%;
     font-size: 21px;
-    position: relative;
-    top: 2px;
-    margin: 5px 11px 0;
+    margin-top: 25%;
 }
 
 nav.navigation > a > .navigation-item {
     text-align: left;
     vertical-align: middle;
     padding-left: 10px;
-    line-height: 38px;
+    line-height: 40px;
     float: left;
     width: 160px;
-    height: 40px;
     font-size: 14px;
-}
-
-nav.navigation > a.green .icon {
-    background: #27ae60;
-    color: white;
-}
-
-nav.navigation > a.green:hover > .icon {
-    background: #27ae60;
-    color: white;
-}
-
-nav.navigation > a.green:hover > .navigation-item,
-nav.navigation > a.green.active > .navigation-item,
-nav.navigation > a.green.hover > .navigation-item {
-    background: #27ae60;
-    color: white;
-}
-
-nav.navigation > a.red .icon {
-    background: #c0392b;
-    color: white;
-}
-
-nav.navigation > a.red:hover > .icon {
-    background: #c0392b;
-    color: white;
-}
-
-nav.navigation > a.red:hover > .navigation-item,
-nav.navigation > a.red.active > .navigation-item,
-nav.navigation > a.red.hover > .navigation-item {
-    background: #c0392b;
-    color: white;
-}
-
-nav.navigation > a.orange .icon {
-    background: #d35400;
-    color: white;
-}
-
-nav.navigation > a.orange:hover > .icon {
-    background: #d35400;
-    color: white;
-}
-
-nav.navigation > a.orange:hover > .navigation-item,
-nav.navigation > a.orange.active > .navigation-item,
-nav.navigation > a.orange.hover > .navigation-item {
-    background: #d35400;
-    color: white;
-}
-
-nav.navigation > a.yellow .icon {
-    background: #f39c12;
-    color: white;
-}
-
-nav.navigation > a.yellow:hover > .icon {
-    background: #f39c12;
-    color: white;
-}
-
-nav.navigation > a.yellow:hover > .navigation-item,
-nav.navigation > a.yellow.active > .navigation-item,
-nav.navigation > a.yellow.hover > .navigation-item {
-    background: #f39c12;
-    color: white;
-}
-
-nav.navigation > a.blue .icon {
-    background: #2980b9;
-    color: white;
-}
-
-nav.navigation > a.blue:hover > .icon {
-    background: #2980b9;
-    color: white;
-}
-
-nav.navigation > a.blue:hover > .navigation-item,
-nav.navigation > a.blue.active > .navigation-item,
-nav.navigation > a.blue.hover > .navigation-item {
-    background: #2980b9;
-    color: white;
-}
-
-nav.navigation > a.purple .icon {
-    background: #8e44ad;
-    color: white;
-}
-
-nav.navigation > a.purple:hover > .icon {
-    background: #8e44ad;
-    color: white;
-}
-
-nav.navigation > a.purple:hover > .navigation-item,
-nav.navigation > a.purple.active > .navigation-item,
-nav.navigation > a.purple.hover > .navigation-item {
-    background: #8e44ad;
-    color: white;
-
-}
-
-nav.navigation > a.grey .icon {
-    background: #2c3e50;
-    color: white;
-}
-
-nav.navigation > a.grey:hover > .icon {
-    background: #2c3e50;
-    color: white;
-}
-
-nav.navigation > a.grey:hover > .navigation-item,
-nav.navigation > a.grey.active > .navigation-item,
-nav.navigation > a.grey.hover > .navigation-item {
-    background: #2c3e50;
-    color: white;
 }
 
 /**/
 /*========== TAGS ==========*/
-.tags-wrapper {
-    margin-top: 15px;
-}
-
-.tag-title {
+.tags-title {
     background-color: #444444;
     border: 1px solid #444444;
     height: 40px;
@@ -220,7 +85,6 @@ nav.navigation > a.grey.hover > .navigation-item {
     padding-left: 10px;
     font-size: 18px;
     color: #fff;
-
 }
 
 .tag-content {
@@ -234,7 +98,6 @@ nav.navigation > a.grey.hover > .navigation-item {
     background-color: #FBFBFB;
     padding-top: 7px;
     display: inline-block;
-
 }
 
 .tag-content > li {
@@ -249,14 +112,10 @@ nav.navigation > a.grey.hover > .navigation-item {
     margin: 5px;
 }
 
-.tag-content > li:hover {
-    background-color: #C9E4FF;
-    border: 1px solid #C9E4FF;
-}
-
-.tag-content > li.active {
-    background-color: #C9E4FF;
-    border: 1px solid #C9E4FF;
+.tag-content > li:hover, .tag-content > li.active {
+    color: #ffffff;
+    background-color: #7f8c8d;
+    border: 1px solid #7f8c8d;
 }
 
 .tag-more {
