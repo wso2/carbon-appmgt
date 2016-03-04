@@ -164,8 +164,12 @@ $(function () {
                     searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
                 }
                 var currentUrl = window.location.href;
-                if (currentUrl.indexOf('?') > -1) {
-                    location.href = currentUrl + "&query=" + searchTerm;
+                if (currentUrl.indexOf('type=webapp') > -1) {
+                    location.href =
+                    location.protocol + '//' + location.host + location.pathname + '?type=webapp&query=' + searchTerm;
+                } else if (currentUrl.indexOf('type=site') > -1) {
+                    location.href =
+                    location.protocol + '//' + location.host + location.pathname + '?type=site&query=' + searchTerm;
                 } else {
                     location.href =
                     location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;

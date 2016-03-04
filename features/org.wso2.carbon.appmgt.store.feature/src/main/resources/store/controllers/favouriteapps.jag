@@ -37,9 +37,11 @@ require('/modules/store.js').exec(function (ctx) {
     //Favourite app page can be accessed from web app or site
     //this query parameter indicates,where request came from.
     var  assetType = "webapp";
-    if(ctx.params.type == "site") {
+    if(request.getParameter('type') == "site") {
         assetType = "site"
     }
+    log.info("assetType" +assetType);
+    log.info("ctx.params.type" +request.getParameter('type'));
     //if user not logged in redirect to login page
     if (!user) {
         var referer = store.getReferer(request);
