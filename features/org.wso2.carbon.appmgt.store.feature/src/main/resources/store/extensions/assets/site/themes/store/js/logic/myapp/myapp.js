@@ -1,4 +1,4 @@
-$(function () {
+$( document ).ready(function() {
 
     var API_ADD_TO_FAVOURITE = caramel.context + '/apis/favourite/add-favourite-app';
     var API_REMOVE_FROM_FAVOURITE = caramel.context + '/apis/favourite/remove-favourite-app';

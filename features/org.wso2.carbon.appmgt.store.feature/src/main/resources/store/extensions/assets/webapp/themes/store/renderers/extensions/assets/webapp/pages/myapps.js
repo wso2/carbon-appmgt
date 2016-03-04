@@ -1,5 +1,5 @@
 var render = function (theme, data, meta, require) {
-    var assets = require('/helpers/myapps.js');
+    var assets = require('/helpers/page-content-myapps.js');
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
                                          data.pagination.rightNav, data.pagination.urlQuery, data.user);
 
@@ -45,7 +45,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'left-column',
                 context: {
-                    navigation: leftNavigationData,
+                    navigation: createLeftNavLinks(data),
                     tags: data.tags,
                     recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
                 }
@@ -103,4 +103,27 @@ function createSortOptions(user, config) {
 
     sortOptions["options"] = options;
     return sortOptions;
+}
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [
+        {
+            active: true, partial: 'my-apps', url : context+"/extensions/assets/webapp/myapps"
+        }
+    ];
+
+    if(data.user) {
+        leftNavigationData.push({
+                                    active: false, partial: 'my-favorites', url: context
+                + "/assets/favouriteapps?type=webapp"
+                                });
+    }
+    if (!data.navigation.showAllAppsLink) {
+        leftNavigationData.push({
+                                    active: false, partial: 'all-apps', url : context + "/extensions/assets/webapp"
+                                });
+    }
+
+    return leftNavigationData;
 }

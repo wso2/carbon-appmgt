@@ -1,0 +1,78 @@
+{{#each favouriteApps}}
+    <div class="row page-title">
+
+        <h4>{{type}}</h4>
+    </div>
+    <div class="row">
+        {{#each assets}}
+            <div id="app-tile-{{uuid}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+
+                <div class="app-tile">
+                    <a href="{{gatewayUrl}}" target="_blank" data-id="{{uuid}}"
+                       data-name="{{appName}}" data-version="{{version}}"
+                       data-context="{{context}}" class="accessUrl">
+                        <div class="app-tile-thumbnail">
+
+                            {{#if defaultThumbnail}}
+                                <div class="thumbnail-default" style="background-color: #{{defaultThumbnail.color}};">
+                                    <div class="text-center-force">{{defaultThumbnail.text}}</div>
+                                </div>
+                            {{else}}
+                                <div class="thumbnail-image">
+                                    <img src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}" />
+                                </div>
+                            {{/if}}
+
+                            <div class="thumbnail-overlay" title="Click to launch app">
+                        <span class="fw-stack">
+                            <i class="fw fw-circle-outline fw-stack-2x"></i>
+                            <i class="fw fw-deploy fw-stack-1x"></i>
+                        </span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="app-tile-details">
+                        <h4>{{appDisplayName}}</h4>
+                        <h5>{{version}}</h5>
+
+                        <p>{{appProvider}}</p>
+                         <span class="rating">
+                             {{assetRating rating}}
+                         </span>
+
+                        <div class="more-menu pull-right">
+                            <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown">
+                                <i class="fw fw-ellipsis fw-rotate-90"></i>
+                            </a>
+                            <ul class="more-menu-items dropdown-menu">
+                                <li>
+                                    <a href="#" id="rmv-{{uuid}}" data-name="{{appName}}"
+                                       data-provider="{{appProvider}}"
+                                       data-version="{{version}}" class="remove-from-fav">
+                                        Remove from Favorites
+                                    </a>
+                                </li>
+                                <li><a href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">More Details</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+{{/each}}
+
+{{#unless favouriteApps}}
+    <div class="no-apps">
+        <div class="jumbotron">
+            <h1>
+                <span class="fw fw-warning"></span> No Apps Here!
+            </h1>
+
+            <p class="lead add-padding-top-3x text-muted">
+                Sorry, We could not find any apps for you.
+            </p>
+        </div>
+    </div>
+{{/unless}}

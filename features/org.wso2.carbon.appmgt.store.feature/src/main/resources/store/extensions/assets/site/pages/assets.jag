@@ -376,6 +376,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     headerData.appBarLink = caramel.configs().context + "/assets/site";
     headerData.appBarLinkText = "ALL SITES";
+    headerData.assetType = "site";
 
     caramel.render({
         title: 'Store | Assets',
