@@ -393,7 +393,8 @@ public class APIUsageStatisticsClient {
                         providerAPI.getId().getVersion().equals(usage.apiVersion)) {
 
                     APIUsageByUserDTO usageDTO = new APIUsageByUserDTO();
-                    usageDTO.setApiName(usage.apiName);
+                    String apiName = usage.apiName + "(v" + providerAPI.getId().getVersion() + ")";
+                    usageDTO.setApiName(apiName);
                     usageDTO.setVersion(usage.apiVersion);
                     usageDTO.setUserID(usage.userID);
                     usageDTO.setContext(usage.context);

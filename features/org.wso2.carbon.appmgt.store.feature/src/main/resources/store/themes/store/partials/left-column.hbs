@@ -1,5 +1,4 @@
 {{!-- navigation --}}
-
 <nav class="navigation">
     <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
     <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
@@ -29,6 +28,11 @@
         {{/ifCond}}
     {{/each}}
 </nav>
+
+{{!-- left-column - tags --}}
+{{#if tags}}
+    <div class="tags-wrapper hidden-xs hidden-sm">
+        <div class="tag-title"> {{t "Tags"}}</div>
 {{!-- tags --}}
 
 <div class="tags-wrapper hidden-xs hidden-sm">
@@ -44,5 +48,5 @@
 
 
 
-{{!-- recent apps --}}
+{{!-- left-column - recent apps --}}
 <!--goes here {recentApps}-->

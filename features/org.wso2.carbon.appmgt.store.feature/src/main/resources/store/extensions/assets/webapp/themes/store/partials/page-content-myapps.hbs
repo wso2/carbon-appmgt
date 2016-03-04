@@ -1,3 +1,4 @@
+{{!-- page content - my apps page --}}
 <div class="row">
     {{#each assets}}
         <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
@@ -39,11 +40,9 @@
                     <h5>{{attributes.overview_version}}</h5>
 
                     <p>{{attributes.overview_provider}}</p>
-                    <i class="fw fw-star"></i>
-                    <i class="fw fw-star"></i>
-                    <i class="fw fw-star"></i>
-                    <i class="fw fw-star"></i>
-                    <i class="fw fw-star"></i>
+                    <span class="rating">
+                        {{assetRating rating}}
+                    </span>
 
                     <div class="more-menu pull-right">
                         <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown">
@@ -106,7 +105,7 @@
         <!--Navigation-->
         {{#if assets}}
             <!-- pagination -->
-            <div class="pull-left add-padding-bottom-2x">
+            <div class="pull-right-lg pull-right-md text-center-sm text-center-xs add-padding-bottom-2x">
                 <div class="btn-group" role="group">
                     {{#if leftNav}}
                         <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}"

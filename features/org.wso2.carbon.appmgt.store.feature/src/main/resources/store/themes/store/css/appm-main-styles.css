@@ -14,7 +14,7 @@
 ~ limitations under the License.
 */
 
-/*========== HTML ELEMENTS ==========*/
+/*========== HEADER ==========*/
 header {
     background: #1F1F1F;
 }
@@ -32,15 +32,6 @@ header .header-action:hover,
 header .header-action:focus,
 header .header-action:active {
     background: #4d5461;
-}
-
-ul.nav.nav-tabs {
-    background-color: #ddd;
-}
-
-a.btn .icon-caret, .btn .icon-caret {
-    margin-left: 49px;
-    border: none;
 }
 
 /**/
@@ -152,25 +143,6 @@ a.btn .icon-caret, .btn .icon-caret {
 }
 
 /**/
-/* ========= other unknown ========== */
-button.btn.btn-default.dropdown-toggle {
-    border: 1px solid #215080;
-}
-
-button.btn.btn-default.dropdown-toggle:hover {
-    background-color: #193C5F;
-    border: 1px solid #193C5F;
-}
-
-.open > .dropdown-toggle.btn-default:focus,
-.open > .dropdown-toggle.btn-default:active,
-.open > .dropdown-toggle.btn-default:hover {
-    background-color: #193C5F;
-    color: #fff;
-    border: 1px solid #193C5F;
-}
-
-/**/
 /*========== PAGE ==========*/
 .page-header {
     height: auto;
@@ -223,9 +195,15 @@ button.btn.btn-default.dropdown-toggle:hover {
     position: absolute;
     top: 0;
     height: 25%;
-    color: #fff;
-    border: none;
+    color: #ffffff;
     z-index: 500;
+    border: 1px solid rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, .5);
+    /* for Safari */
+    -webkit-background-clip: padding-box;
+    /* for IE9+, Firefox 4+, Opera, Chrome */
+    background-clip: padding-box;
+    border-top-width: 0;
 }
 
 .thumbnail-ribbon.favorite-ribbon {
@@ -333,23 +311,16 @@ button.btn.btn-default.dropdown-toggle:hover {
     margin-right: -10px;
 }
 
-/**/
 /*========== APP DETAILS ==========*/
-.summary-wrapper {
-    color: #909090;
-    margin-bottom: 10px;
-}
-
-.launch-app-data h4 {
-    margin-top: 0;
-}
-
-/*========== APP DETAILS - TABS==========*/
 .app-details {
     background-color: #ffffff;
 }
 
 .app-details-banner {
+    position: relative;
+}
+
+.app-details-banner .banner-image {
     /*display: block;*/
     position: relative;
     width: 100%;
@@ -368,6 +339,46 @@ button.btn.btn-default.dropdown-toggle:hover {
     top: 0;
     bottom: 0;
     margin: auto;
+}
+
+.app-details-banner .banner-default {
+    position: relative;
+    width: 100%;
+    padding: 0 0 56.25% 0;
+}
+
+.app-details-banner .banner-default > div {
+    color: #ffffff;
+    font-size: 666%;
+}
+
+.app-details-banner .banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    display: none;
+    color: #FFF;
+}
+
+.app-details-banner:hover .banner-overlay {
+    display: block;
+    background: rgba(0, 0, 0, .6);
+    cursor: pointer;
+    -webkit-transition: opacity .15s linear;
+    -o-transition: opacity .15s linear;
+    transition: opacity .15s linear
+}
+
+.app-details-banner > .banner-overlay > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    font-size: 250%;
 }
 
 .app-details-thumbnail {
@@ -406,28 +417,51 @@ button.btn.btn-default.dropdown-toggle:hover {
     font-size: 666%;
 }
 
-.nav-tabs > li.active > a:focus,
-.nav-tabs > li.active > a:hover .nav-tabs > li.active > a:visited .nav-tabs > li.active > a:active {
+.app-details-actions {
+    margin: 10px 0 0 0;
+}
+
+.app-details-actions > a {
+    margin: 5px 5px 5px 0;
+}
+
+.app-details-actions > a > i {
+    padding-right: 5px;
+}
+
+.app-details-tabs > .nav-tabs > li > a {
+    border-radius: 0;
+}
+
+.app-details-tabs > .nav-tabs > li.active > a,
+.app-details-tabs > .nav-tabs > li > a:hover,
+.app-details-tabs > .nav-tabs > li > a:focus,
+.app-details-tabs > .nav-tabs > li > a:active {
     background-color: #fff;
     border: 1px solid #FFF;
-    border-bottom-width: 0;
     border-radius: 0;
 }
 
-.white-wrapper > .nav-tabs > li > a:hover {
-    border-radius: 0;
-}
-
-.tab-content {
+.app-details-tabs > .tab-content {
     padding: 20px 17px;
 }
 
-.tab-content h3 {
+.app-details-tabs > .tab-content > h3 {
     margin-top: 0;
 }
 
 /**/
-/*========== utils ==========*/
+/*========== RATING ==========*/
+.rating > .one {
+    opacity: 1;
+}
+
+.rating > .zero {
+    opacity: 0.3;
+}
+
+/**/
+/*========== UTILS ==========*/
 .text-center-force {
     position: absolute;
     top: 50%;
@@ -437,4 +471,36 @@ button.btn.btn-default.dropdown-toggle:hover {
     -moz-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     -o-transform: translate(-50%, -50%);
+}
+
+a.disabled {
+    cursor: default;
+}
+
+/**/
+/* ========= other unknown ========== */
+button.btn.btn-default.dropdown-toggle {
+    border: 1px solid #215080;
+}
+
+button.btn.btn-default.dropdown-toggle:hover {
+    background-color: #193C5F;
+    border: 1px solid #193C5F;
+}
+
+.open > .dropdown-toggle.btn-default:focus,
+.open > .dropdown-toggle.btn-default:active,
+.open > .dropdown-toggle.btn-default:hover {
+    background-color: #193C5F;
+    color: #fff;
+    border: 1px solid #193C5F;
+}
+
+ul.nav.nav-tabs {
+    background-color: #ddd;
+}
+
+a.btn .icon-caret, .btn .icon-caret {
+    margin-left: 49px;
+    border: none;
 }
