@@ -11,7 +11,7 @@ for (name in hps) {
 
 var resources=function(page,meta){
     return{
-        js:['search.js','logic/myapp/myapp.js'] ,
+        js:['search.js','logic/myapp/myapp.js']
     };
 };
 
