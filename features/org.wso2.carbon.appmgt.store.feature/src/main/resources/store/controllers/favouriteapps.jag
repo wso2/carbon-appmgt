@@ -135,7 +135,8 @@ require('/modules/store.js').exec(function (ctx) {
                            sso: sso,
                            isHomePage: hasFavouritePage,
                            myFav: true,
-                           storeTenantDomain: storeTenantDomain
+                           storeTenantDomain: storeTenantDomain,
+                           assetType : assetType
                        },
                        assetType : assetType,
                        tags: {

@@ -79,7 +79,7 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.storeTenantDomain = tenantDomain;
-
+    headerData.assetType = "webapp";
     var navigationData = {
         showAllAppsLink: true
     };

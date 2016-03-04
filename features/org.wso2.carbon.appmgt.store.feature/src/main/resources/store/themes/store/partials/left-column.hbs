@@ -30,10 +30,6 @@
 </nav>
 
 {{!-- left-column - tags --}}
-{{#if tags}}
-    <div class="tags-wrapper hidden-xs hidden-sm">
-        <div class="tag-title"> {{t "Tags"}}</div>
-{{!-- tags --}}
 
 <div class="tags-wrapper hidden-xs hidden-sm">
     <div class="tag-title"> {{t "Tags"}}</div>
@@ -43,10 +39,10 @@
                 <li><a href="{{../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
             {{/each}}
         </ul>
+    {{else}}
+        <p>No Tags Found</p>
     {{/if}}
+
 </div>
-
-
-
 {{!-- left-column - recent apps --}}
 <!--goes here {recentApps}-->
