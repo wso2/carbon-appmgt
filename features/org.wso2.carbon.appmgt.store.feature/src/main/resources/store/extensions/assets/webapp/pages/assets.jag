@@ -55,7 +55,8 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(tag == 'undefined' ){tag = null;}
 
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -178,6 +179,22 @@ require('/modules/store.js').exec(function (ctx) {
         }
     };
 
+    /**
+     * This method checks whether given app is already selected as favourite app by user or not.
+     * @param appName App Name
+     * @param version App Version
+     * @param provider App Provider
+     * @returns {boolean} true if favouirte app of user else false
+     */
+    var isFavouriteApp = function (appName, version, provider) {
+        var status = false;
+        if (user) {
+            // check whether this is favourite app of user.
+            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                            tenantDomain).status;
+        }
+        return status;
+    };
 
     if (tag) {
         var urlQuery = 'tag=' + tag + '&';
@@ -373,13 +390,19 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         asset.isSubscribed = isSubscribed;
-
         //to support skip gateway label visibility
         if (asset.overview_skipGateway == "true") {
             asset.overview_skipGateway = true;
         }
         else {
             asset.overview_skipGateway = false;
+        }
+        //set favourite app or not- This information will be used to set proper icon on asset
+        // tile
+        asset.isFavourite = false;
+        if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
+                           asset.attributes.overview_provider)) {
+            asset.isFavourite = true;
         }
         setDefaultThumbnail(asset);
     });
