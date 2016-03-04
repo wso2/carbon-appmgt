@@ -47,40 +47,43 @@
 </header>
 
 {{!-- navbar --}}
-<nav class="navbar navbar-default navbar-dark" data-spy="affix" data-offset-top="50" data-offset-bottom="40">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <ul class="nav navbar-nav">
-                {{#if isTenanted}}
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <i class="fw fw-organization add-margin-right-1x"></i>
-                            Store abc.com <span class="caret"></span>
+{{#unless hideNavBar}}
+    <nav class="navbar navbar-default navbar-dark" data-spy="affix" data-offset-top="50" data-offset-bottom="40">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <ul class="nav navbar-nav">
+                    {{#if isTenanted}}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <i class="fw fw-organization add-margin-right-1x"></i>
+                                Store abc.com <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#">carbon.super</a></li>
+                                <li><a href="#">xyz.com</a></li>
+                                <li class="divider"></li>
+                                <li><a href="{{url "/"}}">Public Store</a></li>
+                            </ul>
+                        </li>
+                    {{/if}}
+                    <li class="{{#ifCond assetType "==" "webapp"}}active{{/ifCond}}">
+                        <a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-web-app fw-lg"></i></span>Web Apps
                         </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">carbon.super</a></li>
-                            <li><a href="#">xyz.com</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{{url "/"}}">Public Store</a></li>
-                        </ul>
                     </li>
-                {{/if}}
-                <li class="{{#ifCond assetType "==" "webapp"}}active{{/ifCond}}">
-                    <a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}">
-                        <span class="icon add-margin-right-1x"><i class="fw fw-web-app fw-lg"></i></span>Web Apps
-                    </a>
-                </li>
-                <li class="{{#ifCond assetType "==" "mobileapp"}}active{{/ifCond}}">
-                    <a href="{{tenantedUrl "/assets/mobileapp"}}">
-                        <span class="icon add-margin-right-1x"><i class="fw fw-mobile fw-lg"></i></span>Mobile apps
-                    </a>
-                </li>
-                <li class="{{#ifCond assetType "==" "site"}}active{{/ifCond}}">
-                    <a href="{{tenantedUrl "/extensions/assets/site/myapps"}}">
-                        <span class="icon add-margin-right-1x"><i class="fw fw-globe fw-lg"></i></span>Sites
-                    </a>
-                </li>
-            </ul>
+                    <li class="{{#ifCond assetType "==" "mobileapp"}}active{{/ifCond}}">
+                        <a href="{{tenantedUrl "/assets/mobileapp"}}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-mobile fw-lg"></i></span>Mobile apps
+                        </a>
+                    </li>
+                    <li class="{{#ifCond assetType "==" "site"}}active{{/ifCond}}">
+                        <a href="{{tenantedUrl "/extensions/assets/site/myapps"}}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-globe fw-lg"></i></span>Sites
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+{{/unless}}

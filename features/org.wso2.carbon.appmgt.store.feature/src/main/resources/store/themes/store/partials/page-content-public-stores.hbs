@@ -1,0 +1,31 @@
+<div class="row">
+    {{#if stores}}
+        {{#each stores}}
+            <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+                <div class="app-tile">
+                    <a href="{{url "/t/"}}{{storeUrl}}">
+                        <div class="app-tile-thumbnail">
+                            <div class="thumbnail-image">
+                                <img src="{{url "/themes/store/img/tenant-store.png"}}">
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="app-tile-details">
+                        <h4>{{name}}</h4>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    {{else}}
+        <div class="jumbotron">
+            <h1>
+                <span class="fw fw-warning"></span> No Public Stores Here!
+            </h1>
+
+            <p class="lead add-padding-top-3x text-muted">
+                Sorry, We couldn't find anything for you.
+            </p>
+        </div>
+    {{/if}}
+</div>

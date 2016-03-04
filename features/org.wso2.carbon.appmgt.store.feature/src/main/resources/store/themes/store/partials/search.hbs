@@ -1,16 +1,18 @@
 {{!-- search --}}
-<div class="navbar-wrapper">
-    <nav class="navbar navbar-default">
-        <div class="form-group">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-                <div class="search-box input-group">
-                    <input id="searchTxt" type="text" value="{{search}}" class="search-field form-control" placeholder="Search..." />
+{{#unless hideSearch}}
+    <div class="navbar-wrapper">
+        <nav class="navbar navbar-default">
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
+                    <div class="search-box input-group">
+                        <input id="searchTxt" type="text" value="{{search}}" class="search-field form-control"
+                               placeholder="Search..." />
 
-                    <div class="input-group-btn">
-                        <button class="search-btn form-control-btn" type="button" title="Search">
-                            <i class="fw fw-search" aria-hidden="true"></i>
-                        </button>
-                    </div>
+                        <div class="input-group-btn">
+                            <button class="search-btn form-control-btn" type="button" title="Search">
+                                <i class="fw fw-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
                     <span class="search-category input-group-addon">
                         <select id="searchSelect">
                             <option {{#ifCond searchTerm "==" "overview_name"}}selected{{/ifCond}} value="Name">
@@ -21,8 +23,9 @@
                             </option>
                         </select>
                     </span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
-</div>
+        </nav>
+    </div>
+{{/unless}}
