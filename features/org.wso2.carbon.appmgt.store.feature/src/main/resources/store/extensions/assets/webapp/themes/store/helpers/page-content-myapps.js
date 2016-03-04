@@ -9,12 +9,9 @@ for (name in hps) {
     }
 }
 
-var fn = that.resources;
-
-
-var resources = function (page, meta) {
-    return {
-        js: ['logic/myapp/myapp.js']
+var resources=function(page,meta){
+    return{
+        js:['search.js','logic/myapp/myapp.js'] ,
     };
 };
 

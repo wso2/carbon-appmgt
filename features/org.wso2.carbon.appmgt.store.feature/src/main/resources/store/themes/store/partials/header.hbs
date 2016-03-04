@@ -1,5 +1,6 @@
 {{!-- header --}}
 <header class="header header-default">
+    <input type="hidden" value="{{storeTenantDomain}}" id="store-tenant-domain"/>
     <div class="container-fluid">
         <div class="brand pull-left float-remove-xs text-center-xs">
             <a href="{{url "/"}}">
@@ -64,17 +65,17 @@
                         </ul>
                     </li>
                 {{/if}}
-                <li class="active">
+                <li class="{{#ifCond assetType "==" "webapp"}}active{{/ifCond}}">
                     <a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}">
                         <span class="icon add-margin-right-1x"><i class="fw fw-web-app fw-lg"></i></span>Web Apps
                     </a>
                 </li>
-                <li>
+                <li class="{{#ifCond assetType "==" "mobileapp"}}active{{/ifCond}}">
                     <a href="{{tenantedUrl "/assets/mobileapp"}}">
                         <span class="icon add-margin-right-1x"><i class="fw fw-mobile fw-lg"></i></span>Mobile apps
                     </a>
                 </li>
-                <li>
+                <li class="{{#ifCond assetType "==" "site"}}active{{/ifCond}}">
                     <a href="{{tenantedUrl "/extensions/assets/site/myapps"}}">
                         <span class="icon add-margin-right-1x"><i class="fw fw-globe fw-lg"></i></span>Sites
                     </a>
