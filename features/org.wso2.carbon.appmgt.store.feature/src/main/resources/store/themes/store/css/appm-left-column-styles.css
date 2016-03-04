@@ -38,15 +38,7 @@
 /*========== NAVIGATION ==========*/
 nav.navigation {
     background: #525252;
-    color: #fff;
-    position: relative;
-    -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -ms-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+    max-width: 200px;
 }
 
 nav.navigation, nav.navigation > a {
@@ -69,29 +61,22 @@ nav.navigation > a > .icon {
 nav.navigation > a > .icon > i {
     line-height: 100%;
     font-size: 21px;
-    position: relative;
-    top: 2px;
-    margin: 5px 11px 0;
+    margin-top: 25%;
 }
 
 nav.navigation > a > .navigation-item {
     text-align: left;
     vertical-align: middle;
     padding-left: 10px;
-    line-height: 38px;
+    line-height: 40px;
     float: left;
     width: 160px;
-    height: 40px;
     font-size: 14px;
 }
 
 /**/
 /*========== TAGS ==========*/
-.tags-wrapper {
-    margin-top: 15px;
-}
-
-.tag-title {
+.tags-title {
     background-color: #444444;
     border: 1px solid #444444;
     height: 40px;
@@ -100,7 +85,6 @@ nav.navigation > a > .navigation-item {
     padding-left: 10px;
     font-size: 18px;
     color: #fff;
-
 }
 
 .tag-content {
@@ -114,7 +98,6 @@ nav.navigation > a > .navigation-item {
     background-color: #FBFBFB;
     padding-top: 7px;
     display: inline-block;
-
 }
 
 .tag-content > li {
@@ -129,14 +112,10 @@ nav.navigation > a > .navigation-item {
     margin: 5px;
 }
 
-.tag-content > li:hover {
-    background-color: #C9E4FF;
-    border: 1px solid #C9E4FF;
-}
-
-.tag-content > li.active {
-    background-color: #C9E4FF;
-    border: 1px solid #C9E4FF;
+.tag-content > li:hover, .tag-content > li.active {
+    color: #ffffff;
+    background-color: #7f8c8d;
+    border: 1px solid #7f8c8d;
 }
 
 .tag-more {

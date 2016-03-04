@@ -36,9 +36,8 @@
 </nav>
 
 {{!-- left-column - tags --}}
-
-<div class="tags-wrapper hidden-xs hidden-sm">
-    <div class="tag-title"> {{t "Tags"}}</div>
+<div class="add-margin-top-3x hidden-xs hidden-sm">
+    <div class="tags-title"> {{t "Tags"}}</div>
     {{#if tags}}
         <ul class="tag-content">
             {{#each tags.data}}
@@ -50,5 +49,6 @@
     {{/if}}
 
 </div>
+
 {{!-- left-column - recent apps --}}
 <!--goes here {recentApps}-->
