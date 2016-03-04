@@ -1,5 +1,5 @@
 var render = function (theme, data, meta, require) {
-    theme('2-column-left', {
+    theme('1-column', {
         title: data.title,
         header: [
             {
@@ -10,13 +10,13 @@ var render = function (theme, data, meta, require) {
         leftColumn: [
             {
                 partial: 'left-column',
-                context: {hideTags: true}
+                context: {}
             }
         ],
         search: [
             {
                 partial: 'search',
-                context: {hideSearch: true}
+                context: {}
             }
         ],
         pageHeader: [

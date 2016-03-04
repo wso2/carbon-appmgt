@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row add-padding-top-3x">
     {{#if stores}}
         {{#each stores}}
             <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
@@ -12,7 +12,7 @@
                     </a>
 
                     <div class="app-tile-details">
-                        <h4>{{name}}</h4>
+                        <h4 class="text-center"><a href="{{url "/t/"}}{{storeUrl}}">{{name}}</a></h4>
                     </div>
                 </div>
             </div>
