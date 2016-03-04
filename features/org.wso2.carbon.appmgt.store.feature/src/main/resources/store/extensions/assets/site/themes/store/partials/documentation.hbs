@@ -1,3 +1,4 @@
+{{!-- TODO: styling documentation of webapps --}}
 <div>
 
 	{{#with tabs.documentation.data}}
@@ -23,23 +24,23 @@
 						{{summary}}
 					</td>
 					<td>
-						{{#if isFile}} 
-							<a class='icon-download'></a><a href='{{filePath}}' download>Download</a> 
-						{{/if}} 
-						{{#if isUrl}} 
+						{{#if isFile}}
+							<a class='icon-download'></a><a href='{{filePath}}' download>Download</a>
+						{{/if}}
+						{{#if isUrl}}
 							<a class='icon-globe'></a> <a href='{{sourceUrl}}' target="_blank">View</a>
-						{{/if}} 
-						{{#if isInline}} 
-						
+						{{/if}}
+						{{#if isInline}}
+
 							<a class='icon-globe' href="{{tenantedUrl "/extensions/assets/webapp/doc"}}?{{name}}&{{../../../../asset.attributes.overview_provider}}&{{../../../../asset.attributes.overview_version}}&{{../../../../asset.attributes.overview_name}}&{{../../../../user.username}}" target="_blank">View</a>
 						{{/if}}
 
 					</td>
 
 				</tr>
-				{{/each}} 
-				{{/if}} 
-				
+				{{/each}}
+				{{/if}}
+
 				{{#if Samples.hasContent}}
 				<tr>
 					{{#each Samples.entries}}

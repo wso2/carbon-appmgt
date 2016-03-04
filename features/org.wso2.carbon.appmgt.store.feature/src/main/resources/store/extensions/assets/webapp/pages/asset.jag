@@ -50,9 +50,9 @@ require('/modules/store.js').exec(function (ctx) {
             isSubscribed = false,
             skipGateway = false,
             webAppEndpoint;
-    utility = require('/modules/util.js');
-    search = require('/modules/search.js'),
-            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+    var utility = require('/modules/util.js');
+    var search = require('/modules/search.js');
+    var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
     var manager = jagg.module("manager");
@@ -383,12 +383,14 @@ require('/modules/store.js').exec(function (ctx) {
 
         var isFavourite = false;
 
-        var hideAllAppsLink = false;
+        var navigationData = {
+            showAllAppsLink: true
+        };
 
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 isFavourite = isFavouriteApp(asset);
-                hideAllAppsLink = true;
+                navigationData.showAllAppsLink = false;
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -457,17 +459,17 @@ require('/modules/store.js').exec(function (ctx) {
             setDefaultThumbnail(recentAsset);
         }
 
-        var subVisibility = true;
+        var isSubscriptionAvailable = true;
         var subAvailability = asset.attributes.overview_subscriptionAvailability;
         if (subAvailability && currentTenant) {
             if (subAvailability == "current_tenant") {
                 if (userTenant != currentTenant)
-                    subVisibility = false;
+                    isSubscriptionAvailable = false;
 
             } else if (subAvailability == "specific_tenants") {
                 var tenants = stringify(asset.attributes.overview_tenants);
                 if ((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1))
-                    subVisibility = false;
+                    isSubscriptionAvailable = false;
             }
         }
 
@@ -488,25 +490,14 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
-        headerData.hideAllAppsLink = hideAllAppsLink;
-        headerData.appBarLink = caramel.configs().context + "/assets/webapp/" + aid;
-        headerData.appBarLinkText = "WEB APP OVERVIEW";
 
         caramel.render({
             title: 'Store | ' + type,
             user: user,
             sso: sso,
-
             header: headerData,
-
-            navigation: site.navigation(tenantId),
-            search: {
-                search: {title: type},
-                isTopAssets: false,
-                searchFields: search.fields()
-            },
+            navigation: navigationData,
             isSocial: configs.socialCommentsEnable,
-
             type: type,
             embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
             inDashboard: inDashboard,
@@ -515,7 +506,7 @@ require('/modules/store.js').exec(function (ctx) {
             webAppEndpoint: webAppEndpoint,
             subscriptionInfo: subscriptionInfo,
             isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
-            isFavouriteApp: isFavourite,
+            isFavourite: isFavourite,
             asset: asset,
             tenantId: tenantIdVal,
             tags: [
@@ -535,7 +526,7 @@ require('/modules/store.js').exec(function (ctx) {
                 api: apiData,
                 apiAssetData: asset
             },
-            subVisibility: subVisibility,
+            isSubscriptionAvailable: isSubscriptionAvailable,
             isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
             isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
         });
