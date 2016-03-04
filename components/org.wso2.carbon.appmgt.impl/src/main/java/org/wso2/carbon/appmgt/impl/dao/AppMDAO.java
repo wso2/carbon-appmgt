@@ -6833,8 +6833,8 @@ public class AppMDAO {
             } else {
                 if (appmConn.getMetaData().getDriverName().contains("Oracle")) {
                     uuidRetrievalQuery =
-                            "SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP WHERE ROWNUM >= ? AND " +
-                                    "ROWNUM <= ? ORDER BY APP_NAME ASC";
+                            "SELECT * FROM (SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT " +
+                                    "FROM APM_APP ORDER BY APP_NAME ASC) WHERE ROWNUM >= ? AND ROWNUM <= ? ";
                 } else {
                     uuidRetrievalQuery =
                             "SELECT UUID, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP ORDER BY APP_NAME ASC " +
