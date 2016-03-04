@@ -121,7 +121,7 @@ function createLeftNavLinks(data) {
     }
     if (!data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url : context + "/extensions/assets/webapp"
+                                    active: false, partial: 'all-apps', url : context + "/assets/webapp"
                                 });
     }
 

@@ -4,7 +4,7 @@ var render = function(theme, data, meta, require) {
 	var assetsByProvider=data.assetsByProvider;
     assetsByProvider['assets']=require('/helpers/rating-provider.js').ratingProvider.formatRating(data.assetsByProvider.assets);
 
-    theme('2-column-right', {
+    theme('2-column-left', {
 		title : data.title,
 		metadata:data.metadata,
 		header: [
