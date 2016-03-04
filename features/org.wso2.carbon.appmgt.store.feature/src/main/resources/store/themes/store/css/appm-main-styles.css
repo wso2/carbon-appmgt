@@ -206,18 +206,6 @@ header .header-action:active {
     border-top-width: 0;
 }
 
-.thumbnail-ribbon.favorite-ribbon {
-    background-color: #c0392b;
-}
-
-.thumbnail-ribbon.subscribe-ribbon {
-    background-color: #2b5797;
-}
-
-.thumbnail-ribbon.ad-ribbon {
-    background-color: #d35400;
-}
-
 .app-tile-thumbnail .thumbnail-image {
     /*display: block;*/
     position: relative;
@@ -503,4 +491,114 @@ ul.nav.nav-tabs {
 a.btn .icon-caret, .btn .icon-caret {
     margin-left: 49px;
     border: none;
+}
+
+/**/
+/*========== COLORS ==========*/
+/*
+focus : background 5% lighter, border 5% darker
+hover: background 10% lighter, border 5% darker
+active: background 10% lighter, border 5% darker
+*/
+
+/* subscribe  - main color: #603cba */
+.background-color-subscribe {
+    background-color: #603cba;
+}
+
+.background-color-on-hover-subscribe {
+    background-color: transparent;
+}
+
+.background-color-on-hover-subscribe:hover {
+    background-color: #603cba;
+}
+
+.color-subscribe {
+    color: #603cba;
+}
+
+.btn-subscribe {
+    color: #fff;
+    background-color: #603cba;
+    border-color: #603cba;
+}
+
+.btn-subscribe:focus,
+.btn-subscribe.focus {
+    color: #fff;
+    background-color: #6D49C7;
+    border-color: #532FAD;
+}
+
+.btn-subscribe:hover,
+.btn-subscribe:active,
+.btn-subscribe.active {
+    color: #fff;
+    background-color: #7A56D4;
+    border-color: #532FAD;
+}
+
+/* favorite  - main color: #c0392b */
+.background-color-favorite {
+    background-color: #c0392b;
+}
+
+.background-color-on-hover-favorite {
+    background-color: transparent;
+}
+
+.background-color-on-hover-favorite:hover {
+    background-color: #c0392b;
+}
+
+.color-favorite {
+    color: #c0392b;
+}
+
+.btn-favorite {
+    color: #fff;
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+.btn-favorite:focus,
+.btn-favorite.focus {
+    color: #fff;
+    background-color: #CD4638;
+    border-color: #B32C1E;
+}
+
+.btn-favorite:hover,
+.btn-favorite:active,
+.btn-favorite.active {
+    color: #fff;
+    background-color: #DA5345;
+    border-color: #B32C1E;
+}
+
+/* all apps  - main color: #27ae60 */
+.background-color-all-apps {
+    background-color: #27ae60;
+}
+
+.background-color-on-hover-all-apps {
+    background-color: transparent;
+}
+
+.background-color-on-hover-all-apps:hover {
+    background-color: #27ae60;
+}
+
+.color-all-apps {
+    color: #27ae60;
+}
+
+/* advertised  - main color: #d35400 */
+.background-color-ad {
+    background-color: #d35400;
+}
+
+.color-ad {
+    color: #d35400;
 }
