@@ -5,25 +5,31 @@
     {{#each navigation}}
         {{#ifCond partial "==" "my-apps"}}
             <a id="my-apps-link" href="{{this.url}}"
-               class="{{#if active}}active{{/if}} purple">
-                <span class="icon"><i class="fw fw-application"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm">{{t "My Apps"}}</span>
+               class="{{#if active}}background-color-subscribe{{/if}}">
+                <span class="icon background-color-subscribe"><i class="fw fw-application"></i></span>
+                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-subscribe">
+                    {{t "My Apps"}}
+                </span>
             </a>
         {{/ifCond}}
         {{#ifCond partial "==" "my-favorites"}}
             <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
             <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
             <a id="my-favorites-link" href="{{this.url}}"
-               class="{{#if active}}active{{/if}} red">
-                <span class="icon"><i class="fw fw-heart"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm">{{t "My Favorites"}}</span>
+               class="{{#if active}}background-color-favorite{{/if}}">
+                <span class="icon background-color-favorite"><i class="fw fw-heart"></i></span>
+                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-favorite">
+                    {{t "My Favorites"}}
+                </span>
             </a>
         {{/ifCond}}
         {{#ifCond partial "==" "all-apps"}}
             <a id="all-apps-link" href="{{this.url}}"
-               class="{{#if active}}active{{/if}} blue">
-                <span class="icon"><i class="fw fw-resource"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm">{{t "All Apps"}}</span>
+               class="{{#if active}}background-color-all-apps{{/if}}">
+                <span class="icon background-color-all-apps"><i class="fw fw-resource"></i></span>
+                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-all-apps">
+                    {{t "All Apps"}}
+                </span>
             </a>
         {{/ifCond}}
     {{/each}}
