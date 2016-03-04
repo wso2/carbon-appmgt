@@ -56,7 +56,7 @@ function createLeftNavLinks(data) {
     var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'my-favorites', url: context + "/assets/favouriteapps"
+            active: true, partial: 'my-favorites', url: context + "/assets/favouriteapps?type=" +data.assetType
         }
     ];
 
@@ -65,7 +65,7 @@ function createLeftNavLinks(data) {
             + "/myapps"
                             });
 
-    if (!data.navigation.showAllAppsLink) {
+    if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
                                     active: false, partial: 'all-apps', url: context + "/assets/"
                 + data.assetType

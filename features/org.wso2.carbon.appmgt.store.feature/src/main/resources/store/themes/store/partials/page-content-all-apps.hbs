@@ -15,10 +15,13 @@
                     {{#if isFavourite}}
                         {{> ribbons/favorite}}
                     {{else}}
-                        {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                            {{> ribbons/advertise}}
-                        {{/ifCond}}
+                        {{#if isSubscribed}}
+                            {{> ribbons/subscribed}}
+                        {{/if}}
                     {{/if}}
+                    {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                        {{> ribbons/advertise}}
+                    {{/ifCond}}
 
                     {{#if defaultThumbnail}}
                         <div class="thumbnail-default" style="background-color: #{{defaultThumbnail.color}};">
