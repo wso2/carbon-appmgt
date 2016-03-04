@@ -32,17 +32,18 @@
 {{!-- left-column - tags --}}
 
 <div class="tags-wrapper hidden-xs hidden-sm">
-    <div class="tag-title"> {{t "Tags"}}</div>
-    {{#if tags}}
-        <ul class="tag-content">
-            {{#each tags.data}}
-                <li><a href="{{../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
-            {{/each}}
-        </ul>
-    {{else}}
-        <p>No Tags Found</p>
-    {{/if}}
-
+    {{#unless hideTags}}
+        <div class="tag-title"> {{t "Tags"}}</div>
+        {{#if tags}}
+            <ul class="tag-content">
+                {{#each tags.data}}
+                    <li><a href="{{../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
+                {{/each}}
+            </ul>
+        {{else}}
+            <p>No Tags Found</p>
+        {{/if}}
+    {{/unless}}
 </div>
 {{!-- left-column - recent apps --}}
 <!--goes here {recentApps}-->

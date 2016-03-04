@@ -1,21 +1,33 @@
 var render = function (theme, data, meta, require) {
-    theme('2-column-right', {
+    theme('2-column-left', {
         title: data.title,
         header: [
             {
-                partial: 'public-stores-header',
+                partial: 'header',
+                context: {hideNavBar: true}
+            }
+        ],
+        leftColumn: [
+            {
+                partial: 'left-column',
+                context: {hideTags: true}
+            }
+        ],
+        search: [
+            {
+                partial: 'search',
+                context: {hideSearch: true}
+            }
+        ],
+        pageHeader: [
+            {
+                partial: 'page-header',
                 context: {}
             }
         ],
-        navigation: [
+        pageContent: [
             {
-                partial: 'navigation',
-                context: {}//require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-            }
-        ],
-        body: [
-            {
-                partial: 'public-stores',
+                partial: 'page-content-public-stores',
                 context: {currentPage: data.currentPageNumber, stores: data.stores}
             }
         ]
