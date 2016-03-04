@@ -31,8 +31,15 @@ require('/modules/store.js').exec(function (ctx) {
             user = ctx.user,
             storeTenantId = ctx.tenant.tenantId,
             storeTenantDomain = ctx.tenant.domain,
+            store = ctx.store,
             query = ctx.params.query;
 
+    //Favourite app page can be accessed from web app or site
+    //this query parameter indicates,where request came from.
+    var  assetType = "webapp";
+    if(ctx.params.type == "site") {
+        assetType = "site"
+    }
     //if user not logged in redirect to login page
     if (!user) {
         var referer = store.getReferer(request);
@@ -41,19 +48,41 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
     caramel = require('caramel');
-    var favourites = jagg.module("favourites");
-
+    var context = caramel.configs().context;
+    var tagUrl = context;
     //Get subscription configuration options
+    var favourites = jagg.module("favourites");
     var subscriptionUtil = require('/themes/store/js/subscription-config.js');
     var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
     var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
 
-    var hideAllAppsLink = false;
+    var isSite = "true"; //To get the site tags
+    if(assetType == "webapp") {
+        isSite = "false"; //To get the webapps tags
+    }
+
+    var navigationData = {
+        showAllAppsLink: true
+    };
     //if both subscriptions off no need to show the link for all apps,
     //because all apps will be displayed in myapps page.
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        hideAllAppsLink = true;
+        navigationData.showAllAppsLink = false;
+        if(assetType == "webapp") {
+            tagUrl = tagUrl + '/extensions/assets/webapp/myapps';
+        } else {
+            tagUrl = tagUrl + '/extensions/assets/site/myapps';
+        }
+    } else {
+        if(assetType == "webapp") {
+            tagUrl = tagUrl + '/assets/webapp';
+        } else {
+            tagUrl = tagUrl + '/assets/webapp';
+        }
+
     }
+
+    var searchQuery = {search: "", searchTerm: ""};
 
     var apps;
     if(query) {
@@ -63,10 +92,12 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (searchOption.toLowerCase() == "provider") {
             searchOption = "SEARCH_BY_APP_PROVIDER";
+            searchQuery.searchTerm = "overview_provider";
         } else {
             searchOption = "SEARCH_BY_APP_NAME";
+            searchQuery.searchTerm = "overview_name";
         }
-
+        searchQuery.search = searchValue;
         result = favourites.searchFavouriteApps(user.username, user.tenantId, storeTenantDomain,
                                               searchOption, searchValue);
         apps = (result.apps) ? result.apps : [];
@@ -86,7 +117,7 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     //filter webapp and sites
-    apps = filterAssets(apps);
+    apps = filterAssets(apps, assetType);
     //Check whether use has selected favourite page as default landing page
     //This is needed to show correct icon(set as home page /remove from home page) to user.
     var hasFavouritePage = false;
@@ -98,14 +129,25 @@ require('/modules/store.js').exec(function (ctx) {
     var sortOptions = createSortOptions();
 
     caramel.render({
+                       title: 'Favourite Apps | Store',
                        header: {
                            user: user,
                            sso: sso,
-                           hideAllAppsLink: hideAllAppsLink,
                            isHomePage: hasFavouritePage,
                            myFav: true,
                            storeTenantDomain: storeTenantDomain
                        },
+                       assetType : assetType,
+                       tags: {
+                           tagUrl: tagUrl,
+                           data: store.tags("webapp", isSite)
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                       },
+                       navigation: navigationData,
+                       searchQuery: searchQuery,
                        sso: sso,
                        sortOptions: sortOptions,
                        favouriteApps: apps
@@ -120,10 +162,12 @@ function getServiceDir(serviceName) {
 
 /**
  * Filter specified assets whiles setting their default thumbnail.
+ * if request came from webapps page (type parameter = webapp) create the array to
+ * display webapps first in the myfavourite page else display site first.
  * @param assets {Object[]} assets to be filtered & processed
  * @returns {{assets: Object[], type: string}[]} filtered assets
  */
-function filterAssets(assets) {
+function filterAssets(assets,type) {
     var sites = [];
     var webApps = [];
     var apps = [];
@@ -145,19 +189,40 @@ function filterAssets(assets) {
             webApps.push(asset);
         }
     }
-    if (webApps.length > 0) {
-        apps.push({
-                      assets: webApps,
-                      type: "Web Apps"
-                  });
-    }
 
-    if (sites.length > 0) {
-        apps.push({
-                      assets: sites,
-                      type: "Sites"
-                  });
+    if (type == "webapp") {
+        //display web app first and then site
+        if (webApps.length > 0) {
+            apps.push({
+                          assets: webApps,
+                          type: "Web Apps"
+                      });
+        }
 
+        if (sites.length > 0) {
+            apps.push({
+                          assets: sites,
+                          type: "Sites"
+                      });
+
+        }
+    } else {
+        //display site first and then webapp
+        if (sites.length > 0) {
+            apps.push({
+                          assets: sites,
+                          type: "Sites"
+                      });
+        }
+
+        if (webApps.length > 0) {
+            apps.push({
+                          assets: webApps,
+                          type: "Web Apps"
+
+                      });
+
+        }
     }
     return apps;
 }

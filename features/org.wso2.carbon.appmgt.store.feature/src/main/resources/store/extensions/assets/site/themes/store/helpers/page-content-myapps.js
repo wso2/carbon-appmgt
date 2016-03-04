@@ -9,19 +9,10 @@ for (name in hps) {
     }
 }
 
-var fn = that.resources;
-
-
-var resources = function (page, meta) {
-    var o = fn(page, meta);
-    o.js.push('logic/assets/lazy-load.js');
-    o.js.push('logic/assets/assets.js');
-    o.js.push('search.js');
-    o.js.push('logic/login/login.js');
-    o.js.push('logic/myapp/myapp.js');
-
-    o.css.push('cstyles.css');
-    return o;
+var resources=function(page,meta){
+    return{
+        js:['search.js','logic/myapp/myapp.js'] ,
+    };
 };
 
 var cp = that.currentPage;

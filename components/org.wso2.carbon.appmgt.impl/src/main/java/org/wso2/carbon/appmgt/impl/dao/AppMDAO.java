@@ -8458,7 +8458,7 @@ public class AppMDAO {
                     " APP.APP_NAME AS APP_NAME," +
                     " APP.APP_VERSION AS APP_VERSION" +
                     " FROM APM_APP APP" +
-                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
                     " ON  (APP.APP_ID =FAV_APP.APP_ID" +
                     " AND FAV_APP.USER_ID  = ?" +
                     " AND FAV_APP.TENANT_ID = ? )" +
@@ -8525,7 +8525,7 @@ public class AppMDAO {
                     " APP.APP_NAME AS APP_NAME," +
                     " APP.APP_VERSION AS APP_VERSION" +
                     " FROM APM_APP APP" +
-                    " LEFT JOIN APM_FAVOURITE_APPS FAV_APP" +
+                    " INNER JOIN APM_FAVOURITE_APPS FAV_APP" +
                     " ON  (APP.APP_ID =FAV_APP.APP_ID" +
                     " AND FAV_APP.USER_ID  = ?" +
                     " AND FAV_APP.TENANT_ID = ? )" +

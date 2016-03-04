@@ -1,15 +1,10 @@
 var render = function (theme, data, meta, require) {
-    var log = new Log();
-    var assets = require('/helpers/myapps.js');
-    var bodyPartial = "myapps";
-    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config,
-                                         data.pagination.leftNav, data.pagination.rightNav,
-                                         data.pagination.urlQuery, data.user);
+    var assets = require('/helpers/page-content-myapps.js');
+    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
+                                         data.pagination.rightNav, data.pagination.urlQuery, data.user);
 
-    var hasApps = false;
-    if (data.assets.length > 0) {
-        hasApps = true;
-    }
+
+    var hasApps = (data.assets.length > 0);
 
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
@@ -24,15 +19,8 @@ var render = function (theme, data, meta, require) {
             }
         }
     }
-    data.header.searchQuery = searchQuery;
 
-    var page = '1-column';
-    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
-        //need to display tags and recent assets in my apps page
-        page = '2-column-right'
-    }
-
-    theme('2-column-right', {
+    theme('2-column-left', {
         title: data.title,
         header: [
             {
@@ -40,26 +28,89 @@ var render = function (theme, data, meta, require) {
                 context: data.header
             }
         ],
-        body: [
+        leftColumn: [
             {
-                partial: 'sort-assets',
-                context: data.sortOptions
-            },
-            {
-                partial: bodyPartial,
-                context: bodyContext
+                partial: 'left-column',
+                context: {
+                    navigation: createLeftNavLinks(data),
+                    tags: data.tags,
+                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                }
             }
-
         ],
-        right: [
+        search: [
             {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
+                partial: 'search',
+                context: searchQuery
+            }
+        ],
+        pageHeader: [
             {
-                partial: 'tags',
-                context: data.tags
+                partial: 'page-header',
+                context: {
+                    title: "My Sites",
+                    sorting: createSortOptions(data.user, data.config)
+                }
+            }
+        ],
+        pageContent: [
+            {
+                partial: 'page-content-myapps',
+                context: bodyContext
             }
         ]
     });
 };
+
+function createSortOptions(user, config) {
+    var isSelfSubscriptionEnabled = config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = config.isEnterpriseSubscriptionEnabled;
+    var url = "/extensions/assets/webapp/myapps?sort=";
+    var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
+
+    var options = [];
+
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        options.push(sortByAlphabet);
+        options.push(sortByRecent);// recently added
+        options.push(sortByPopularity);
+        if (user) {
+            options.push(sortByUsage);
+        }
+    } else {
+        if (user) {
+            options.push(sortByAlphabet);
+            options.push(sortByRecent);// recently subscribed
+        }
+    }
+
+    sortOptions["options"] = options;
+    return sortOptions;
+}
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [
+        {
+            active: true, partial: 'my-apps', url : context+"/extensions/assets/site/myapps"
+        }
+    ];
+
+    if(data.user) {
+        leftNavigationData.push({
+                                    active: false, partial: 'my-favorites', url: context
+                + "/assets/favouriteapps?type=site"
+                                });
+    }
+    if (!data.navigation.showAllAppsLink) {
+        leftNavigationData.push({
+                                    active: false, partial: 'all-apps', url : context + "/extensions/assets/site"
+                                });
+    }
+
+    return leftNavigationData;
+}
