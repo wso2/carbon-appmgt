@@ -1,17 +1,7 @@
 var render = function (theme, data, meta, require) {
-    var assets = require('/helpers/assets.js');
-    var bodyPartial = "assets";
-    var bodyContext =  assets.currentPage(data.assets,data.sso,data.user, data.paging,data.config, data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav, data.myAssets.urlQuery);
-
-    if(request.getHeader("User-Agent").indexOf("Mobile") != -1){  //mobile devices
-        bodyPartial = "assets-for-mobiles";
-        bodyContext =  assets.currentPage(data.assets,data.sso,data.user, data.paging,data.config, data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
-    }
-
-    var hasApps = false;
-    if(data.assets.length > 0){
-        hasApps = true;
-    }
+    var assets = require('/helpers/page-content-all-apps.js');
+    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
+                                         data.pagination.rightNav, data.pagination.urlQuery, data.user);
 
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
@@ -30,7 +20,7 @@ var render = function (theme, data, meta, require) {
     data.header.searchQuery = searchQuery;
 
 
-    theme('2-column-right', {
+    theme('2-column-left', {
         title: data.title,
         header: [
             {
@@ -38,41 +28,76 @@ var render = function (theme, data, meta, require) {
                 context: data.header
             }
         ],
-        navigation: [
+        leftColumn: [
             {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, assets.format(data.search))
+                partial: 'left-column',
+                context: {
+                    navigation: createLeftNavLinks(data),
+                    tags: data.tags,
+                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                }
             }
         ],
-
-        body: [
+        search: [
             {
-                partial: 'sort-assets',
-                context: data.sortOptions
-            },
+                partial: 'search',
+                context: searchQuery
+            }
+        ],
+        pageHeader: [
             {
-                partial: bodyPartial,
+                partial: 'page-header',
+                context: {
+                    title: "All Web Apps",
+                    sorting: createSortOptions(data)
+                }
+            }
+        ],
+        pageContent: [
+            {
+                partial: 'page-content-all-apps',
                 context: bodyContext
-            }
-            /*,
-             {
-             partial: 'pagination',
-             context: require('/helpers/pagination.js').format(data.paging)
-             } */
-        ],
-        right: [
-            {
-                partial: 'my-assets-link',
-                context: data.myAssets
-            },
-            {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
-            {
-                partial: 'tags',
-                context: data.tags
             }
         ]
     });
 };
+
+function createSortOptions(data) {
+    var url = "/assets/webapp?sort=";
+    var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
+
+    var options = [];
+    options.push(sortByAlphabet);
+    options.push(sortByRecent);// recently created
+    options.push(sortByPopularity);
+    if (data.user) {
+        options.push(sortByUsage);
+    }
+    sortOptions["options"] = options;
+    return sortOptions;
+}
+
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [
+        {
+            active: true, partial: 'all-apps', url: context + "/assets/webapp"
+        }
+    ];
+
+    leftNavigationData.push({
+                                active: false, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                            });
+    if (data.user) {
+        leftNavigationData.push({
+                                    active: false, partial: 'my-favorites', url: context
+                + "/assets/favouriteapps?type=webapp"
+                                });
+    }
+    return leftNavigationData;
+}

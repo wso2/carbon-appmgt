@@ -55,7 +55,8 @@ require('/modules/store.js').exec(function (ctx) {
 
     if(tag == 'undefined' ){tag = null;}
 
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var manager = jagg.module("manager");
+    var storeHostObj = manager.getAPIStoreObj();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -86,7 +87,9 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
-
+    var isSite = 'false';//To get the webapp tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
     url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
@@ -162,8 +165,36 @@ require('/modules/store.js').exec(function (ctx) {
         subscriptionInfo["individualSubscription"] = individualSubscription;
         return subscriptionInfo;
 
-    }
+    };
 
+    /**
+     * Sets the default thumbnail of the specified asset.
+     * @param asset {Object} asset
+     */
+    var setDefaultThumbnail = function (asset) {
+        var assetThumbnail = asset.attributes.images_thumbnail;
+        if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+            var displayName = String(asset.attributes.overview_displayName);
+            asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(displayName);
+        }
+    };
+
+    /**
+     * This method checks whether given app is already selected as favourite app by user or not.
+     * @param appName App Name
+     * @param version App Version
+     * @param provider App Provider
+     * @returns {boolean} true if favouirte app of user else false
+     */
+    var isFavouriteApp = function (appName, version, provider) {
+        var status = false;
+        if (user) {
+            // check whether this is favourite app of user.
+            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                            tenantDomain).status;
+        }
+        return status;
+    };
 
     if (tag) {
         var urlQuery = 'tag=' + tag + '&';
@@ -359,7 +390,6 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
         asset.isSubscribed = isSubscribed;
-
         //to support skip gateway label visibility
         if (asset.overview_skipGateway == "true") {
             asset.overview_skipGateway = true;
@@ -367,6 +397,14 @@ require('/modules/store.js').exec(function (ctx) {
         else {
             asset.overview_skipGateway = false;
         }
+        //set favourite app or not- This information will be used to set proper icon on asset
+        // tile
+        asset.isFavourite = false;
+        if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
+                           asset.attributes.overview_provider)) {
+            asset.isFavourite = true;
+        }
+        setDefaultThumbnail(asset);
     });
 
     var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT, SITE_QUERY);
@@ -388,87 +426,40 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.domain = tenantDomain;
-    headerData.appBarLink = caramel.configs().context + "/assets/webapp";
-    headerData.appBarLinkText = "ALL WEB APPS";
     headerData.assetType = "webapp";
-    var isSite;
-    if (customType == WEBAPP_TYPE) {
-        isSite = 'false';
-    } else if (customType == SITE_TYPE) {
-        isSite = 'true';
-    }
-    caramel.render({
-        title: 'webapps | Store | WSO2 App Manager',
-        user: user,
-        sso: sso,
-        header: headerData,
-        navigation: site.navigation(tenantId),
-        search: {
-            mainPage: mainPage,
-            subPage: subPage,
-            query: query,
-            isTopAssets: false,
-            searchFields: search.fields()
-        },
-        type: type,
-        selectedCategory: selectedCategory,
-        tags: function () {
-            return [
-                {
-                    url: '/assets/' + type + '/?tag=',
-                    data: store.tags(type, isSite)
-                }
-            ];
-        },
-        config:{
-            localIP : localIP,
-            httpsPort : httpsPort
-        },
-        assets: assets,
-        paging: {
-            url: url + 'sort=' + paging.sort + '&page=',
-            sort: paging.sort,
-            tag: tag,
-            size: assets.length
-        },
-        sortOptions: createSortOptions(user),
-        myAssets : {
-            user:user,
-            type: type,
-            title: title,
-            subscriptions: subscriptions[type],
-            subscription : subscription,
-            pageIndices : pageIndices,
-            leftNav:leftnav,
-            rightNav:rightnav,
-            urlQuery: urlQuery
-        },
-        recentAssets: webAppRecentAssets
 
-    });
+    caramel.render({
+                       title: 'Web Apps | Store',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           tagUrl: tagUrl,
+                           data: store.tags(type, isSite)
+                       },
+                       assets: assets,
+                       paging: {
+                           url: url + 'sort=' + paging.sort + '&page=',
+                           sort: paging.sort,
+                           tag: tag,
+                           size: assets.length
+                       },
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
+
+                   });
 }, request, response, session);
 
 function getServiceDir(serviceName) {
     return '../services/' + serviceName;
-}
-
-function createSortOptions(user) {
-    var url = "/assets/webapp?sort=";
-    var sortOptions = {};
-    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
-    var sortByRecent = {url: url + "recent", title: "Sort by Created Date", class: "fw fw-calendar"};
-    var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
-
-    var options = [];
-    options.push(sortByPopularity);
-    options.push(sortByAlphabet);
-    options.push(sortByRecent);
-    if (user) {
-        options.push(sortByUsage);
-    }
-    sortOptions["options"] = options;
-    return sortOptions;
 }
 
 %>

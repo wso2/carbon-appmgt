@@ -119,9 +119,9 @@ function createLeftNavLinks(data) {
                 + "/assets/favouriteapps?type=webapp"
                                 });
     }
-    if (!data.navigation.showAllAppsLink) {
+    if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url : context + "/extensions/assets/webapp"
+                                    active: false, partial: 'all-apps', url : context + "/assets/webapp"
                                 });
     }
 

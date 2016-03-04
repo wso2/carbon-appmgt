@@ -3,9 +3,6 @@ var render = function (theme, data, meta, require) {
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
                                          data.pagination.rightNav, data.pagination.urlQuery, data.user);
 
-
-    var hasApps = (data.assets.length > 0);
-
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
         searchQuery = {overview_name: searchQuery, searchTerm: 'overview_name', search: searchQuery};
@@ -106,9 +103,9 @@ function createLeftNavLinks(data) {
                 + "/assets/favouriteapps?type=site"
                                 });
     }
-    if (!data.navigation.showAllAppsLink) {
+    if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url : context + "/extensions/assets/site"
+                                    active: false, partial: 'all-apps', url : context + "/assets/site"
                                 });
     }
 
