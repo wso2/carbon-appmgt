@@ -103,7 +103,7 @@ function createLeftNavLinks(data) {
                 + "/assets/favouriteapps?type=site"
                                 });
     }
-    if (!data.navigation.showAllAppsLink) {
+    if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
                                     active: false, partial: 'all-apps', url : context + "/assets/site"
                                 });

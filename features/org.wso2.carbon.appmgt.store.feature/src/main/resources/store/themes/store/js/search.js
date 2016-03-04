@@ -163,7 +163,13 @@ $(function () {
                 if (searchSelect !== "App") {
                     searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
                 }
-                location.href = location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
+                var currentUrl = window.location.href;
+                if (currentUrl.indexOf('?') > -1) {
+                    location.href = currentUrl + "&query=" + searchTerm;
+                } else {
+                    location.href =
+                    location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
+                }
             }
         }
     });
