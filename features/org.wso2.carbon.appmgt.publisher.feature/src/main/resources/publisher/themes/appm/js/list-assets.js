@@ -46,7 +46,8 @@ $(".btn-action").click(function (e) {
 				for (var i = 1; i < data.messages.length; i++) {
 					msg = msg + "</br>" + data.messages[i];
 				}
-				showMessageModel(msg, data.status, 'webapp');
+				//showMessageModel(msg, data.status, 'webapp');
+                location.reload();
 			},
 			error: function (request, status, error) {
 				var data = jQuery.parseJSON(request.responseText);
