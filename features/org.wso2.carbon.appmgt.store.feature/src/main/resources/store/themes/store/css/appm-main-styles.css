@@ -179,18 +179,8 @@ header .header-action:active {
 }
 
 /**/
-/*========== APP TILE ==========*/
-.app-tile {
-    background-color: #ffffff;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.app-tile-thumbnail {
-    position: relative;
-}
-
-.app-tile-thumbnail .thumbnail-ribbon {
+/*========== APP THUMBNAIL ITEMS==========*/
+.app-thumbnail-ribbon {
     display: block;
     position: absolute;
     top: 0;
@@ -206,215 +196,113 @@ header .header-action:active {
     border-top-width: 0;
 }
 
-.app-tile-thumbnail .thumbnail-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 75% 0 0 0;
-    overflow: hidden;
-}
-
-.app-tile-thumbnail .thumbnail-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-tile-thumbnail .thumbnail-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 75% 0;
-}
-
-.app-tile-thumbnail .thumbnail-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-tile-thumbnail .thumbnail-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    color: #FFF;
-}
-
-.app-tile-thumbnail:hover .thumbnail-overlay {
+.app-thumbnail-type {
     display: block;
-    background: rgba(0, 0, 0, .6);
-    cursor: pointer;
-}
-
-.app-tile-thumbnail > .thumbnail-overlay > span {
     position: absolute;
-    top: 0;
-    left: 0;
     bottom: 0;
-    right: 0;
-    margin: auto;
-    font-size: 250%;
+    left: 0;
+    height: 30%;
+    color: #ffffff;
+    z-index: 500;
+    border: 1px solid rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, .5);
+    /* for Safari */
+    -webkit-background-clip: padding-box;
+    /* for IE9+, Firefox 4+, Opera, Chrome */
+    background-clip: padding-box;
+    border-left-width: 0;
+    border-bottom-width: 0;
+    font-size: 2em;
 }
 
-.app-tile-details {
+.app-thumbnail-ribbon > span, .app-thumbnail-type > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+}
+
+/**/
+/*========== APP TILE ==========*/
+.app-tile {
+    background-color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.app-tile .summery {
     padding: 10px;
 }
 
-.app-tile-details > h4 {
+.app-tile .summery > h4 {
+    margin-top: 5px;
     margin-bottom: 0;
 }
 
-.app-tile-details > h5 {
+.app-tile .summery > h5 {
     margin-top: 0;
 }
 
-.app-tile-details .more-menu {
+.app-tile .summery > h4, .app-tile .summery > h5, .app-tile .summery > p {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.app-tile .summery > .more-menu {
     position: relative;
 }
 
-.more-menu .more-menu-btn {
+.app-tile .summery > .more-menu .more-menu-btn {
     float: right;
-    height: Auto;
-    opacity: .5;
+    height: auto;
     background-color: #F7F7F7;
+    color: #838383;
     padding: 10px;
     margin-right: -10px;
     margin-top: -10px;
 }
 
-.more-menu .more-menu-btn:hover {
-    background-color: #333;
-    color: #fff;
+.app-tile .summery > .more-menu.open .more-menu-btn {
+    background-color: #D2D2D2;
 }
 
-.more-menu .more-menu-items {
+.app-tile .summery > .more-menu .more-menu-btn:hover {
+    background-color: #e4e4e4;
+}
+
+.app-tile .summery > .more-menu .more-menu-items {
     margin-right: -10px;
+    margin-top: 0;
 }
 
+/**/
 /*========== APP DETAILS ==========*/
 .app-details {
     background-color: #ffffff;
 }
 
-.app-details-banner {
-    position: relative;
-}
-
-.app-details-banner .banner-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 56.25% 0 0 0;
+.app-details .summery > h4, .app-details .summery > p {
+    white-space: nowrap;
     overflow: hidden;
 }
 
-.app-details-banner .banner-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-details-banner .banner-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 56.25% 0;
-}
-
-.app-details-banner .banner-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-details-banner .banner-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 20%;
-    display: none;
-    color: #FFF;
-}
-
-.app-details-banner:hover .banner-overlay {
-    display: block;
-    background: rgba(0, 0, 0, .6);
-    cursor: pointer;
-    -webkit-transition: opacity .15s linear;
-    -o-transition: opacity .15s linear;
-    transition: opacity .15s linear
-}
-
-.app-details-banner > .banner-overlay > span {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-    font-size: 250%;
-}
-
-.app-details-thumbnail {
-    position: relative;
-}
-
-.app-details-thumbnail .thumbnail-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 75% 0 0 0;
-    overflow: hidden;
-}
-
-.app-details-thumbnail .thumbnail-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-details-thumbnail .thumbnail-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 75% 0;
-}
-
-.app-details-thumbnail .thumbnail-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-details-actions {
+.app-details .summery > .actions {
     margin: 10px 0 0 0;
 }
 
-.app-details-actions > a {
+.app-details .summery > .actions > a {
     margin: 5px 5px 5px 0;
 }
 
-.app-details-actions > a > i {
+.app-details .summery > .actions > a > i {
     padding-right: 5px;
+}
+
+.app-details-tabs {
+    padding: 0 15px 0 15px;
 }
 
 .app-details-tabs > .nav-tabs > li > a {
@@ -422,20 +310,43 @@ header .header-action:active {
 }
 
 .app-details-tabs > .nav-tabs > li.active > a,
+.app-details-tabs > .nav-tabs > li.active > a:hover,
+.app-details-tabs > .nav-tabs > li.active > a:focus,
+.app-details-tabs > .nav-tabs > li.active > a:active {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 0;
+}
+
 .app-details-tabs > .nav-tabs > li > a:hover,
 .app-details-tabs > .nav-tabs > li > a:focus,
 .app-details-tabs > .nav-tabs > li > a:active {
-    background-color: #fff;
-    border: 1px solid #FFF;
+    background-color: #E8E8E8;
+    border: 1px solid #E8E8E8;
     border-radius: 0;
 }
 
 .app-details-tabs > .tab-content {
     padding: 20px 17px;
+    background-color: #fff;
 }
 
 .app-details-tabs > .tab-content > h3 {
     margin-top: 0;
+}
+
+/**/
+/*========== DEFAULT THUMBNAIL & BANNER ==========*/
+.default-thumbnail, .default-banner {
+    color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
 }
 
 /**/
@@ -450,19 +361,188 @@ header .header-action:active {
 
 /**/
 /*========== UTILS ==========*/
-.text-center-force {
+a.disabled {
+    cursor: default;
+}
+
+.absolute-center {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%) translateY(-50%);
     -webkit-transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     -o-transform: translate(-50%, -50%);
 }
 
-a.disabled {
-    cursor: default;
+.ratio-responsive-1by1 {
+    padding: 100% 0 0 0;
+}
+
+.ratio-responsive-4by3 {
+    padding: 75% 0 0 0;
+}
+
+.ratio-responsive-16by9 {
+    padding: 56.25% 0 0 0;
+}
+
+.ratio-responsive-1by1, .ratio-responsive-4by3, .ratio-responsive-16by9 {
+    width: 100%;
+    position: relative;
+}
+
+.ratio-responsive-item {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.ratio-responsive-item:after {
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.ratio-responsive-img > img {
+    display: block;
+    position: absolute;
+    max-height: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.hover-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    color: #FFF;
+}
+
+.hover-overlay-container:hover .hover-overlay {
+    display: block;
+    background: rgba(0, 0, 0, .6);
+    cursor: pointer;
+}
+
+/**/
+/*========== COLORS ==========*/
+/*
+focus : background 5% lighter, border 5% darker
+hover: background 10% lighter, border 5% darker
+active: background 10% lighter, border 5% darker
+*/
+
+/* subscribe  - main color: #603cba */
+.background-color-subscribe {
+    background-color: #603cba;
+}
+
+.background-color-on-hover-subscribe {
+    background-color: transparent;
+}
+
+.background-color-on-hover-subscribe:hover {
+    background-color: #603cba;
+}
+
+.btn-subscribe {
+    color: #fff;
+    background-color: #603cba;
+    border-color: #603cba;
+}
+
+.btn-subscribe:focus,
+.btn-subscribe.focus {
+    color: #fff;
+    background-color: #6D49C7;
+    border-color: #532FAD;
+}
+
+.btn-subscribe:hover,
+.btn-subscribe:active,
+.btn-subscribe.active {
+    color: #fff;
+    background-color: #7A56D4;
+    border-color: #532FAD;
+}
+
+/* favorite  - main color: #810847 */
+.background-color-favorite {
+    background-color: #810847;
+}
+
+.background-color-on-hover-favorite {
+    background-color: transparent;
+}
+
+.background-color-on-hover-favorite:hover {
+    background-color: #810847;
+}
+
+.btn-favorite {
+    color: #fff;
+    background-color: #810847;
+    border-color: #810847;
+}
+
+.btn-favorite:focus,
+.btn-favorite.focus {
+    color: #fff;
+    background-color: #8E1554;
+    border-color: #75003B;
+}
+
+.btn-favorite:hover,
+.btn-favorite:active,
+.btn-favorite.active {
+    color: #fff;
+    background-color: #9B2261;
+    border-color: #75003B;
+}
+
+/* all apps  - main color: #007A5F */
+.background-color-all-apps {
+    background-color: #007A5F;
+}
+
+.background-color-on-hover-all-apps {
+    background-color: transparent;
+}
+
+.background-color-on-hover-all-apps:hover {
+    background-color: #007A5F;
+}
+
+/* advertised  - main color: #C64700 */
+.background-color-ad {
+    background-color: #C64700;
+}
+
+/*========== MOBILE PLATFORM COLORS ========*/
+.background-color-android {
+    background-color: #a4c639;
+}
+
+.background-color-apple {
+    background-color: #CCCCCC;
+}
+
+.background-color-windows {
+    background-color: #00bcf2;
 }
 
 /**/
@@ -491,114 +571,4 @@ ul.nav.nav-tabs {
 a.btn .icon-caret, .btn .icon-caret {
     margin-left: 49px;
     border: none;
-}
-
-/**/
-/*========== COLORS ==========*/
-/*
-focus : background 5% lighter, border 5% darker
-hover: background 10% lighter, border 5% darker
-active: background 10% lighter, border 5% darker
-*/
-
-/* subscribe  - main color: #603cba */
-.background-color-subscribe {
-    background-color: #603cba;
-}
-
-.background-color-on-hover-subscribe {
-    background-color: transparent;
-}
-
-.background-color-on-hover-subscribe:hover {
-    background-color: #603cba;
-}
-
-.color-subscribe {
-    color: #603cba;
-}
-
-.btn-subscribe {
-    color: #fff;
-    background-color: #603cba;
-    border-color: #603cba;
-}
-
-.btn-subscribe:focus,
-.btn-subscribe.focus {
-    color: #fff;
-    background-color: #6D49C7;
-    border-color: #532FAD;
-}
-
-.btn-subscribe:hover,
-.btn-subscribe:active,
-.btn-subscribe.active {
-    color: #fff;
-    background-color: #7A56D4;
-    border-color: #532FAD;
-}
-
-/* favorite  - main color: #c0392b */
-.background-color-favorite {
-    background-color: #c0392b;
-}
-
-.background-color-on-hover-favorite {
-    background-color: transparent;
-}
-
-.background-color-on-hover-favorite:hover {
-    background-color: #c0392b;
-}
-
-.color-favorite {
-    color: #c0392b;
-}
-
-.btn-favorite {
-    color: #fff;
-    background-color: #c0392b;
-    border-color: #c0392b;
-}
-
-.btn-favorite:focus,
-.btn-favorite.focus {
-    color: #fff;
-    background-color: #CD4638;
-    border-color: #B32C1E;
-}
-
-.btn-favorite:hover,
-.btn-favorite:active,
-.btn-favorite.active {
-    color: #fff;
-    background-color: #DA5345;
-    border-color: #B32C1E;
-}
-
-/* all apps  - main color: #27ae60 */
-.background-color-all-apps {
-    background-color: #27ae60;
-}
-
-.background-color-on-hover-all-apps {
-    background-color: transparent;
-}
-
-.background-color-on-hover-all-apps:hover {
-    background-color: #27ae60;
-}
-
-.color-all-apps {
-    color: #27ae60;
-}
-
-/* advertised  - main color: #d35400 */
-.background-color-ad {
-    background-color: #d35400;
-}
-
-.color-ad {
-    color: #d35400;
 }
