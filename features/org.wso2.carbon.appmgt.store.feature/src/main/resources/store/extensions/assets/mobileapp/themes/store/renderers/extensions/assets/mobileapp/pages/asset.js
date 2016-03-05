@@ -7,7 +7,7 @@ var render = function(theme, data, meta, require) {
 		
 	data.header.config = data.config;
 
-	//print(caramel.build(data));
+	/*
 	theme('2-column-right', {
 		title : data.title,
 
@@ -55,4 +55,57 @@ var render = function(theme, data, meta, require) {
 			}
 		]
 	});
+	*/
+
+    theme('2-column-left', {
+        title: data.title,
+        header: [
+            {
+                partial: 'header',
+                context: data.header
+            }
+        ],
+        leftColumn: [
+            {
+                partial: 'my-assets-link',
+                context: data.myAssets
+            }, {
+                partial: 'tags',
+                context: data.tags
+            }
+        ],
+        search: [
+            {
+                partial: 'navigation',
+                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
+            }
+        ],
+        pageHeader: [
+            {
+                partial: 'page-header',
+                context: {
+                    title: "Mobile App",
+                    sorting: null
+                }
+            }
+        ],
+        pageContent: [{
+                          partial: 'asset',
+                          context: require('/helpers/asset.js').format({
+                                                                           user: data.user,
+                                                                           sso: data.sso,
+                                                                           asset: data.asset,
+                                                                           type: data.type,
+                                                                           inDashboard: data.inDashboard,
+                                                                           isEnterpriseInstallEnabled: data.isEnterpriseInstallEnabled,
+                                                                           isDeviceSubscriptionEnabled: data.isDeviceSubscriptionEnabled,
+                                                                           isDirectDownloadEnabled: data.isDirectDownloadEnabled,
+                                                                           embedURL: data.embedURL,
+                                                                           isSocial: data.isSocial,
+                                                                           devices: data.devices,
+                                                                           config: data.config
+                                                                       })
+                      }]
+    });
+
 };

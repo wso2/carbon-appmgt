@@ -16,112 +16,80 @@
 * under the License.
 -->
 
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WSO2 App Manager</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon" href="/favicon.png" type="image/x-icon" />
+    <title>{{title}}</title>
 
+    <link rel="shortcut icon" href="{{url "/themes/store/libs/theme-wso2_1.0/images/favicon.png"}}" />
+    <!-- Bootstrap CSS -->
+    <link href="{{url "/themes/store/libs/bootstrap_3.3.5/css/bootstrap.min.css"}}" rel="stylesheet" type="text/css" />
+    <!-- Font WSO2 CSS -->
+    <link href="{{url "/themes/store/libs/font-wso2_1.0.0/css/font-wso2.min.css"}}" rel="stylesheet" type="text/css" />
+    <!-- Theme WSO2 CSS -->
+    <link href="{{url "/themes/store/libs/theme-wso2_1.0/css/theme-wso2.css"}}" rel="stylesheet" type="text/css" />
+    <!-- AppM CSS -->
+    <link href="{{url "/themes/store/css/appm-main-styles.css"}}" rel="stylesheet" type="text/css" />
+    <link href="{{url "/themes/store/css/appm-left-column-styles.css"}}" rel="stylesheet" type="text/css" />
 
-    <link href="{{url "/themes/store/css/jquery-ui.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/bootstrap.min.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/bootstrap-theme.min.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/bootstrap-ext.min.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/font-wso2.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/custom-common.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/custom-desktop.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/custom-theme.css"}}" rel="stylesheet">
-    <link href="{{url "/themes/store/css/custom-styles.css"}}" rel="stylesheet">
-
-    {{css}}
-
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-    <script src="js/html5shiv.min.js"></script>
-    <script src="js/respond.min.js"></script>
+    <script src="{{url "/themes/store/libs/html5shiv_3.7.2/html5shiv.min.js"}}"></script>
+    <script src="{{url "/themes/store/libs/respond_1.4.2/respond.min.js"}}"></script>
     <![endif]-->
+
+    <!--other CSS -->
+    {{css}}
 </head>
 
 <body>
+<!-- header -->
+{{include header}}
 
-<div class="wr-modelpopup">
-    <div class="modelpopup-content"><!-- dynamic content --></div>
-    <div class="modelpopup-bg"></div>
-</div>
-
-<div class="container col-lg-12 col-md-12 col-sm-12">
-
-    <!-- header -->
-    {{include header}}
-    <!-- /header -->
-
-
-
-    <!-- content/body -->
-    <div class="row">
-        <div class="col-md-12">
-
-            <!-- content -->
-            <div class="col-md-12 col-lg-12">
-                {{include body}}
+<!-- page content wrapper -->
+<div class="page-content-wrapper">
+    <div class="media">
+        <!-- media body -->
+        <div class="media-body">
+            <!-- page -->
+            <div class="container-fluid body-wrapper">
+                <div class="page-content">
+                    {{include pageContent}}
+                </div>
             </div>
-            <!-- /content -->
-
         </div>
     </div>
-    <!-- /content/body -->
-
-    <!-- footer -->
-    {{>footer}}
-    <!-- /footer -->
-
 </div>
 
+<!-- footer -->
+{{>footer}}
 
-
-
-<script src="{{url "/themes/store/js/jquery-1.11.3.min.js"}}"></script>
-<script src="{{url "/themes/store/js/jquery-ui.min.js"}}"></script>
-
-<script src="{{url "/themes/store/js/bootstrap.min.js"}}"></script>
-<script src="{{url "/themes/store/js/sortable-list.js"}}"></script>
-
+<!-- Jquery/Jquery UI JS -->
+<script src="{{url "/themes/store/libs/jquery_1.11.0/jquery-1.11.3.min.js"}}"></script>
+<!-- Bootstrap JS -->
+<script src="{{url "/themes/store/libs/bootstrap_3.3.5/js/bootstrap.min.js"}}"></script>
+<!-- Theme WSO2 JS -->
+<script src="{{url "/themes/store/libs/theme-wso2_1.0/js/theme-wso2.js"}}"></script>
+<!-- noty JS -->
 <script src="{{url "/themes/store/js/noty/jquery.noty.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/layouts/center.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/themes/default.js"}}"></script>
-<script src="{{url "/themes/store/js/selectpicker.js"}}"></script>
-<script src="{{url "/themes/store/js/jquery.ext.min.js"}}"></script>
-
+<!-- history -->
 <script src="{{url "/themes/store/js/jquery.history.js"}}"></script>
 <script src="{{url "/themes/store/js/history-fix.js"}}"></script>
-<script src="{{url "/themes/store/js/jquery.event.mousestop.js"}}"></script>
-
+<!--other JS -->
 {{js}}
-<script src="{{url "/themes/store/js/handlebars.js"}}"></script>
-<script src="{{url "/themes/store/js/caramel-client.js"}}"></script>
-<script src="{{url "/themes/store/js/writeToPublisher.js"}}"></script>
-<script src="{{url "/themes/store/js/caramel.handlebars.client.js"}}"></script>
-
-
-{{code}}
-
-<script type="text/javascript">
-
-    function openCollapsedNav(){
-        $('.wr-hidden-nav-toggle-btn').addClass('active');
-        $('#hiddenNav').slideToggle('slideDown', function(){
-            if($(this).css('display') == 'none'){
-                $('.wr-hidden-nav-toggle-btn').removeClass('active');
-            }
-        });
-    }
-
-    $('.selectpicker').selectpicker();
-    $("#input-rating").rating();
-
-</script>
-
+<!--handlebars JS -->
+<script src="{{url "/themes/store/js/handlebars/handlebars.js"}}"></script>
+<!-- caramel client-side JS -->
+<script src="{{url "/themes/store/js/caramel/caramel-client.js"}}"></script>
+<script src="{{url "/themes/store/js/caramel/caramel.handlebars.client.js"}}"></script>
+<script src="{{url "/themes/store/js/caramel/async.min.js"}}"></script>
+<script src="{{url "/themes/store/js/search.js"}}"></script>
 </body>
 </html>
