@@ -1,23 +1,23 @@
 <div class="row add-padding-top-3x">
-    {{#if stores}}
-        {{#each stores}}
-            <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-                <div class="app-tile">
-                    <a href="{{url "/t/"}}{{storeUrl}}">
-                        <div class="app-tile-thumbnail">
-                            <div class="thumbnail-image">
-                                <img src="{{url "/themes/store/img/tenant-store.png"}}">
-                            </div>
+    {{#each stores}}
+        <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+            <div class="app-tile">
+                <a href="{{url "/t/"}}{{storeUrl}}" class="hover-overlay-container">
+                    <div class="ratio-responsive-4by3">
+                        <div class="ratio-responsive-img">
+                            <img src="{{url "/themes/store/img/tenant-store.png"}}" />
                         </div>
-                    </a>
-
-                    <div class="app-tile-details">
-                        <h4 class="text-center"><a href="{{url "/t/"}}{{storeUrl}}">{{name}}</a></h4>
                     </div>
+                    {{> overlays/view}}
+                </a>
+
+                <div class="summery">
+                    <h4 class="text-center"><a href="{{url "/t/"}}{{storeUrl}}">{{name}}</a></h4>
                 </div>
             </div>
-        {{/each}}
-    {{else}}
+        </div>
+    {{/each}}
+    {{#unless stores}}
         <div class="jumbotron">
             <h1>
                 <span class="fw fw-warning"></span> No Public Stores Here!
@@ -27,5 +27,5 @@
                 Sorry, We couldn't find anything for you.
             </p>
         </div>
-    {{/if}}
+    {{/unless}}
 </div>

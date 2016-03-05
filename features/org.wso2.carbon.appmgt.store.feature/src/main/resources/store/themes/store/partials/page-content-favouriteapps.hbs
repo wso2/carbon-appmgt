@@ -1,6 +1,6 @@
+{{!-- page content - favourite apps --}}
 {{#each favouriteApps}}
     <div class="row page-title">
-
         <h4>{{type}}</h4>
     </div>
     <div class="row">
@@ -10,29 +10,24 @@
                 <div class="app-tile">
                     <a href="{{gatewayUrl}}" target="_blank" data-id="{{uuid}}"
                        data-name="{{appName}}" data-version="{{version}}"
-                       data-context="{{context}}" class="accessUrl">
-                        <div class="app-tile-thumbnail">
-
+                       data-context="{{context}}" class="hover-overlay-container">
+                        <div class="ratio-responsive-4by3">
                             {{#if defaultThumbnail}}
-                                <div class="thumbnail-default" style="background-color: #{{defaultThumbnail.color}};">
-                                    <div class="text-center-force">{{defaultThumbnail.text}}</div>
+                                <div class="ratio-responsive-item"
+                                     style="background-color: #{{defaultThumbnail.color}};">
+                                    <span class="default-thumbnail responsive-text">{{defaultThumbnail.text}}</span>
                                 </div>
                             {{else}}
-                                <div class="thumbnail-image">
+                                <div class="ratio-responsive-img">
                                     <img src="{{url "/storage/webapp/"}}{{uuid}}/{{thumburl}}" />
                                 </div>
                             {{/if}}
 
-                            <div class="thumbnail-overlay" title="Click to launch app">
-                        <span class="fw-stack">
-                            <i class="fw fw-circle-outline fw-stack-2x"></i>
-                            <i class="fw fw-deploy fw-stack-1x"></i>
-                        </span>
-                            </div>
+                            {{> overlays/launch}}
                         </div>
                     </a>
 
-                    <div class="app-tile-details">
+                    <div class="summery">
                         <h4>{{appDisplayName}}</h4>
                         <h5>{{version}}</h5>
 
@@ -42,7 +37,8 @@
                          </span>
 
                         <div class="more-menu pull-right">
-                            <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown">
+                            <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                               title="Click for more options">
                                 <i class="fw fw-ellipsis fw-rotate-90"></i>
                             </a>
                             <ul class="more-menu-items dropdown-menu">
@@ -64,15 +60,5 @@
 {{/each}}
 
 {{#unless favouriteApps}}
-    <div class="no-apps">
-        <div class="jumbotron">
-            <h1>
-                <span class="fw fw-warning"></span> No Apps Here!
-            </h1>
-
-            <p class="lead add-padding-top-3x text-muted">
-                Sorry, We could not find any apps for you.
-            </p>
-        </div>
-    </div>
+    {{> no-apps-found}}
 {{/unless}}
