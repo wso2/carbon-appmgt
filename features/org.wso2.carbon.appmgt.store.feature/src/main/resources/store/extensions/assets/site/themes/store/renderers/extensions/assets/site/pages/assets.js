@@ -65,7 +65,7 @@ function createSortOptions(data) {
     var url = "/assets/site?sort=";
     var sortOptions = {};
     var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
     var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
     var sortByUsage = {url: url + "usage", title: "Sort by Usage", class: "fw fw-statistics"};
 
