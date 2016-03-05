@@ -1,7 +1,7 @@
 var render = function (theme, data, meta, require) {
     var assets = require('/helpers/page-content-all-apps.js');
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
-                                         data.pagination.rightNav, data.pagination.urlQuery, data.user);
+                                         data.pagination.rightNav, data.pagination.urlQuery, data.user,data.assetType);
 
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {

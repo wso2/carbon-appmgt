@@ -4,21 +4,26 @@ $(function(){
 
     var SUBSCRIPTION_TYPE_INDIVIDUAL = "INDIVIDUAL";
     var SUBSCRIPTION_TYPE_ENTERPRISE =  "ENTERPRISE";
+    var APPLICATION = "DefaultApplication";
+    var TIER = "Unlimited";
 
     var APP_NAME_FIELD='#subsAppName';
     var TIER_FIELD='#subsAppTier';
-    var API_URL = caramel.context + '/resources/webapp/v1/subscription/app';
+    var API_SUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/subscription/app';
     var API_UNSUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/unsubscription/app';
     var API_SUBSCRIPTION_WORKFLOW = caramel.context + '/resources/webapp/v1/subscription-workflow/app';
     var API_ADD_TO_FAVOURITE = caramel.context + '/apis/favourite/add-favourite-app';
     var API_REMOVE_FROM_FAVOURITE = caramel.context + '/apis/favourite/remove-favourite-app';
 
     var storeTenantDomain = $('#store-tenant-domain').val();
+    var appName = $('#metadata-app-name').val();
+    var appVersion = $('#metadata-app-version').val();
+    var appProvider = $('#metadata-app-provider').val();
 
     $('#btnSubscribe').on('click',function(){
         if( $(this).attr("disabled") != 'disabled'){
             $(this).attr("disabled", true);
-            getAppDetails();
+            selfSubScribe();
         }else{
             location.reload();
         }
@@ -38,28 +43,18 @@ $(function(){
     });
 
     $('#btnUnsubscribe').on('click',function(){
-    	 removeAppDetails();
+    	 unSubscribe();
     });
 
-   var getAppDetails=function(){
-
-         if(metadata){
-             console.log('Found metadata');
-             var appName=getAppName();
-             var tier=getTier();
-
-             //Obtain the required information
-             var subscription={};
-             var apiDetails=metadata.apiAssetData.attributes;
-             subscription['apiName']=apiDetails.overview_name;
-             subscription['apiVersion']=apiDetails.overview_version;
-             subscription['apiTier']=tier;
-             subscription['subscriptionType'] = SUBSCRIPTION_TYPE_INDIVIDUAL;
-             subscription['apiProvider']=apiDetails.overview_provider;
-             subscription['appName']="DefaultApplication";
-
-             subscribeToApi(subscription);
-         }
+    var selfSubScribe = function () {
+        var subscription = {};
+        subscription['apiName'] = appName;
+        subscription['apiVersion'] = appVersion;
+        subscription['apiProvider'] = appProvider;
+        subscription['apiTier'] = TIER;
+        subscription['subscriptionType'] = SUBSCRIPTION_TYPE_INDIVIDUAL;
+        subscription['appName'] = APPLICATION;
+        subscribeToApp(subscription);
     };
     
     var saveEnterpriseSubscriptions = function(){
@@ -98,32 +93,21 @@ $(function(){
         subscription['apiProvider']=apiDetails.overview_provider;
         subscription['appName']="DefaultApplication";
         subscription['enterprises'] = JSON.stringify(subscribedEnterprises);
-        subscribeToApi(subscription);
+        subscribeToApp(subscription);
       }
                 
             
     };
 
-    var removeAppDetails=function(){
-
-        if(metadata){
-            console.log('Found metadata');
-            var appName=getAppName();
-            var tier=getTier();
-
-            //Obtain the required information
-            var subscription={};
-            var apiDetails=metadata.apiAssetData.attributes;
-            subscription['apiName']=apiDetails.overview_name;
-            subscription['apiVersion']=apiDetails.overview_version;
-            subscription['apiTier']=tier;
-            subscription['apiProvider']=apiDetails.overview_provider;
-            subscription['appName']="DefaultApplication";
-
-
-            unsubscribeToApi(subscription);
-        }
-   };
+    var unSubscribe = function () {
+        var subscription = {};
+        subscription['apiName'] = appName;
+        subscription['apiVersion'] = appVersion;
+        subscription['apiProvider'] = appProvider;
+        subscription['apiTier'] = TIER;
+        subscription['appName'] = APPLICATION;
+        unsubscribeToApp(subscription);
+    };
     
 
     var getAppName=function(){
@@ -137,9 +121,9 @@ $(function(){
     /*
     The method invokes the API call which will subscribe the provided application to the given api
      */
-    var subscribeToApi=function(subscription){
+    var subscribeToApp=function(subscription){
         $.ajax({
-            url:API_URL,
+            url:API_SUBSCRIPTION_URL,
             dataType: 'JSON',
             type:'POST',
             data:subscription,
@@ -242,7 +226,7 @@ $(function(){
       }
     }
 
-    var unsubscribeToApi=function(subscription){
+    var unsubscribeToApp=function(subscription){
 
         $.ajax({
            url:API_UNSUBSCRIPTION_URL,
@@ -294,31 +278,21 @@ $(function(){
     });
 
     var addToMyFavourite = function () {
-        if (metadata) {
-            //Obtain the required information
             var data = {};
-            var appDetails = metadata.apiAssetData.attributes;
-            data['name'] = appDetails.overview_name;
-            data['version'] = appDetails.overview_version;
-            data['provider'] = appDetails.overview_provider;
+            data['name'] = appName;
+            data['version'] = appVersion;
+            data['provider'] = appProvider;
             data['storeTenantDomain'] = storeTenantDomain;
-
             addToFavourite(data);
-        }
     };
 
     var removeFromMyFavourite = function () {
-        if (metadata) {
-            //Obtain the required information
-            var data = {};
-            var appDetails = metadata.apiAssetData.attributes;
-            data['name'] = appDetails.overview_name;
-            data['version'] = appDetails.overview_version;
-            data['provider'] = appDetails.overview_provider;
-            data['storeTenantDomain'] = storeTenantDomain;
-
-            removeFromFavourite(data);
-        }
+        var data = {};
+        data['name'] = appName;
+        data['version'] = appVersion;
+        data['provider'] = appProvider;
+        data['storeTenantDomain'] = storeTenantDomain;
+        removeFromFavourite(data);
     };
 
     var addToFavourite = function (data) {

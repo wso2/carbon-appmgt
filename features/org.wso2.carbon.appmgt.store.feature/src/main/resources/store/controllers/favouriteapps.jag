@@ -40,8 +40,6 @@ require('/modules/store.js').exec(function (ctx) {
     if(request.getParameter('type') == "site") {
         assetType = "site"
     }
-    log.info("assetType" +assetType);
-    log.info("ctx.params.type" +request.getParameter('type'));
     //if user not logged in redirect to login page
     if (!user) {
         var referer = store.getReferer(request);
@@ -79,7 +77,7 @@ require('/modules/store.js').exec(function (ctx) {
         if(assetType == "webapp") {
             tagUrl = tagUrl + '/assets/webapp';
         } else {
-            tagUrl = tagUrl + '/assets/webapp';
+            tagUrl = tagUrl + '/assets/site';
         }
 
     }

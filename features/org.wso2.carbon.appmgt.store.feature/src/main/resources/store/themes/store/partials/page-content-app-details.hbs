@@ -1,7 +1,10 @@
-{{!-- page content - app details page --}}
+{{!-- page content - app details page of webapp and site--}}
 <div class="app-details row remove-margin-left remove-margin-right">
+    <input type="hidden" id="metadata-app-name" value="{{metadata.appName}}">
+    <input type="hidden" id="metadata-app-provider" value="{{metadata.appProvider}}">
+    <input type="hidden" id="metadata-app-version" value="{{metadata.appVersion}}">
     <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
-        <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}}>
+        <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}} target="_blank">
             <div class="app-details-banner">
                 {{#if asset.defaultBanner}}
                     <div class="banner-default" style="background-color: #{{asset.defaultBanner.color}};">
@@ -25,7 +28,8 @@
     <div class="col-xs-12 col-sm-5 col-md-6 col-lg-6">
         <div class="row">
             <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
-                <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}}>
+                <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}}
+                   target="_blank">
                     <div class="app-details-thumbnail">
                         {{#if asset.defaultThumbnail}}
                             <div class="thumbnail-default" style="background-color: #{{asset.defaultThumbnail.color}};">
@@ -56,7 +60,7 @@
                 <div class="app-details-actions">
                     {{#if appUrl}}
                     {{!-- user can access this app --}}
-                        <a id="btnLaunch" href="{{appUrl}}" class="btn btn-primary">
+                        <a id="btnLaunch" href="{{appUrl}}" class="btn btn-primary" target="_blank">
                             <i class="fw fw-deploy"></i>Launch
                         </a>
                         {{#if isFavouriteApp}}

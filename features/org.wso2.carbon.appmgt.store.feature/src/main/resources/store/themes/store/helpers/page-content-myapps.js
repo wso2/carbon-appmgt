@@ -1,3 +1,9 @@
+var resources=function(page,meta){
+    return{
+        js:['logic/myapp/myapp.js']
+    };
+};
+
 var currentPage = function (assetsx, ssox, userx, config, leftNav, rightNav, urlQuery,user,assetType) {
     var result  = {
         'assets': assetsx,
@@ -22,3 +28,4 @@ var currentPage = function (assetsx, ssox, userx, config, leftNav, rightNav, url
     }
     return result;
 };
+

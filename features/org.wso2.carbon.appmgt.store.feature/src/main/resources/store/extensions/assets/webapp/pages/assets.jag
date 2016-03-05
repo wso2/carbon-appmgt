@@ -442,6 +442,7 @@ require('/modules/store.js').exec(function (ctx) {
                            data: store.tags(type, isSite)
                        },
                        assets: assets,
+                       assetType: 'webapp',
                        paging: {
                            url: url + 'sort=' + paging.sort + '&page=',
                            sort: paging.sort,

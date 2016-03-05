@@ -83,7 +83,7 @@ require('/modules/store.js').exec(function (ctx) {
             localIP = "https://" + process.getProperty('server.host'),
             httpsPort = process.getProperty('https.port');
 
-    var isSite = 'false';//To get the webapp tags
+    var isSite = 'true';//To get the sites tags
     var context = caramel.configs().context;
     var tagUrl = context + '/assets/site';
     url = '/assets/' + customType + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
@@ -424,6 +424,7 @@ require('/modules/store.js').exec(function (ctx) {
                            data: store.tags(type, isSite)
                        },
                        assets: assets,
+                       assetType : 'site',
                        paging: {
                            url: url + 'sort=' + paging.sort + '&page=',
                            sort: paging.sort,
