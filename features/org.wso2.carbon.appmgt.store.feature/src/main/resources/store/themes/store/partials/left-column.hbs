@@ -1,7 +1,5 @@
 {{!-- navigation --}}
 <nav class="navigation">
-    <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
-    <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
     {{#each navigation}}
         {{#ifCond partial "==" "my-apps"}}
             <a id="my-apps-link" href="{{this.url}}"
@@ -13,8 +11,6 @@
             </a>
         {{/ifCond}}
         {{#ifCond partial "==" "my-favorites"}}
-            <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
-            <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
             <a id="my-favorites-link" href="{{this.url}}"
                class="{{#if active}}background-color-favorite{{/if}}">
                 <span class="icon background-color-favorite"><i class="fw fw-heart"></i></span>

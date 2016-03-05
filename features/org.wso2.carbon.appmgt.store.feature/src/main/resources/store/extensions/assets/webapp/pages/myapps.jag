@@ -121,6 +121,9 @@ require('/modules/store.js').exec(function (ctx) {
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
             var displayName = String(asset.attributes.overview_displayName);
             asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(displayName);
+        } else if (!(assetThumbnail.indexOf(asset.id) > -1)) {
+            //when getting subscribed apps from appm db it doesn't give full url of thubnail
+            asset.attributes.images_thumbnail = context + "/storage/webapp/" + asset.id + "/" + assetThumbnail;
         }
     };
 
@@ -468,6 +471,7 @@ require('/modules/store.js').exec(function (ctx) {
                            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
                        },
                        assets: assets,
+                       assetType: 'webapp',
                        paging: {
                            url: url + 'sort=' + paging.sort + '&page=',
                            sort: paging.sort,

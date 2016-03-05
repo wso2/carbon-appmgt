@@ -50,6 +50,7 @@ require('/modules/store.js').exec(function (ctx) {
             inDashboard = false,
             isSubscribed = false,
             skipGateway = false,
+            store = ctx.store,
             webAppEndpoint;
     utility = require('/modules/util.js');
     search = require('/modules/search.js'),
@@ -59,6 +60,11 @@ require('/modules/store.js').exec(function (ctx) {
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+
+    var isSite = 'true';//To get the sites tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/site';
+
 
     var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
     var SITE_OPTIONS = {
@@ -381,12 +387,16 @@ require('/modules/store.js').exec(function (ctx) {
 
         var isFavourite = false;
 
+        var navigationData = {
+            showAllAppsLink: true
+        };
+
         var hideAllAppsLink = false;
 
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-                isFavourite = isFavouriteApp(asset);
-                hideAllAppsLink = true;
+                navigationData.showAllAppsLink = false;
+                tagUrl = context + '/extensions/assets/site/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -396,6 +406,7 @@ require('/modules/store.js').exec(function (ctx) {
                 subscriptionInfo = getSubscriptionInfo(asset);
                 isEnterpriseSubscriptionAllowed = isStoreAdmin();
             }
+            isFavourite = isFavouriteApp(asset);
         }
 
         if (subscriptionInfo.individualSubscription) {
@@ -456,6 +467,20 @@ require('/modules/store.js').exec(function (ctx) {
             setDefaultThumbnail(recentAsset);
         }
 
+        var isSubscriptionAvailable = true;
+        var subAvailability = asset.attributes.overview_subscriptionAvailability;
+        if (subAvailability && currentTenant) {
+            if (subAvailability == "current_tenant") {
+                if (userTenant != currentTenant)
+                    isSubscriptionAvailable = false;
+
+            } else if (subAvailability == "specific_tenants") {
+                var tenants = stringify(asset.attributes.overview_tenants);
+                if ((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1))
+                    isSubscriptionAvailable = false;
+            }
+        }
+
         var subVisibility = true;
         var subAvailability = asset.attributes.overview_subscriptionAvailability;
         if (subAvailability && currentTenant) {
@@ -470,8 +495,6 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
 
-        var isSite = 'true';
-
         var headerData = site.header(tenantId, {
             sso: sso,
             user: user
@@ -481,18 +504,21 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
-        headerData.hideAllAppsLink = hideAllAppsLink;
-        headerData.appBarLink = caramel.configs().context + "/assets/site/" + aid;
-        headerData.appBarLinkText = "SITE OVERVIEW";
+
+        var metadata = {
+            appName: asset.attributes.overview_name,
+            appProvider: asset.attributes.overview_provider,
+            appVersion: asset.attributes.overview_version
+        };
 
         caramel.render({
-                           title: 'Store | ' + type,
+                           title: 'Site | Store',
                            user: user,
                            sso: sso,
 
                            header: headerData,
 
-                           navigation: site.navigation(tenantId),
+                           navigation: navigationData,
                            search: {
                                search: {title: type},
                                isTopAssets: false,
@@ -508,27 +534,21 @@ require('/modules/store.js').exec(function (ctx) {
                            webAppEndpoint: webAppEndpoint,
                            subscriptionInfo: subscriptionInfo,
                            isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
-                           isFavouriteApp: isFavourite,
+                           isFavourite: isFavourite,
                            asset: asset,
                            tenantId: tenantIdVal,
-                           tags: [
-                               {
-                                   url: '/assets/' + type + '/?page=1&tag=',
-                                   data: store.tags(type, isSite)
-                               }
-                           ],
+                           tags: {
+                               tagUrl: tagUrl,
+                               data: store.tags(type, isSite)
+                           },
                            myAssets: { user: user, type: type, title: title },
                            recentAssets: recentAssets,
                            assetsByProvider: assetsByProvider,
                            documentation: docs,
                            apiData: apiData,
-                           metadata: {
-                               myapps: myapps,
-                               tiers: availableTiers,
-                               api: apiData,
-                               apiAssetData: asset
-                           },
+                           metadata: metadata,
                            subVisibility: subVisibility,
+                           isSubscriptionAvailable: isSubscriptionAvailable,
                            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
                            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
                        });

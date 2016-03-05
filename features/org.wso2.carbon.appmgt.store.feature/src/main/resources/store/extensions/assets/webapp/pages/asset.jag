@@ -49,6 +49,7 @@ require('/modules/store.js').exec(function (ctx) {
             inDashboard = false,
             isSubscribed = false,
             skipGateway = false,
+            store = ctx.store,
             webAppEndpoint;
     var utility = require('/modules/util.js');
     var search = require('/modules/search.js');
@@ -58,6 +59,10 @@ require('/modules/store.js').exec(function (ctx) {
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+
+    var isSite = 'false';//To get the webapp tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -389,8 +394,8 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-                isFavourite = isFavouriteApp(asset);
                 navigationData.showAllAppsLink = false;
+                tagUrl = context + '/extensions/assets/webapp/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -400,6 +405,7 @@ require('/modules/store.js').exec(function (ctx) {
                 subscriptionInfo = getSubscriptionInfo(asset);
                 isEnterpriseSubscriptionAllowed = isStoreAdmin();
             }
+            isFavourite = isFavouriteApp(asset);
         }
 
         if (subscriptionInfo.individualSubscription) {
@@ -473,13 +479,6 @@ require('/modules/store.js').exec(function (ctx) {
             }
         }
 
-        var isSite;
-        if (customType == WEBAPP_TYPE) {
-            isSite = 'false';
-        } else if (customType == SITE_TYPE) {
-            isSite = 'true';
-        }
-
         var headerData = site.header(tenantId, {
             sso: sso,
             user: user,
@@ -491,8 +490,14 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
 
+        var metadata = {
+            appName: asset.attributes.overview_name,
+            appProvider: asset.attributes.overview_provider,
+            appVersion: asset.attributes.overview_version
+        };
+
         caramel.render({
-            title: 'Store | ' + type,
+            title: 'WebApp | Store',
             user: user,
             sso: sso,
             header: headerData,
@@ -509,23 +514,16 @@ require('/modules/store.js').exec(function (ctx) {
             isFavourite: isFavourite,
             asset: asset,
             tenantId: tenantIdVal,
-            tags: [
-                {
-                    url: '/assets/' + type + '/?page=1&tag=',
-                    data: store.tags(type, isSite)
-                }
-            ],
+            tags: {
+                   tagUrl: tagUrl,
+                   data: store.tags(type, isSite)
+            },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,
             assetsByProvider: assetsByProvider,
             documentation: docs,
             apiData: apiData,
-            metadata: {
-                myapps: myapps,
-                tiers: availableTiers,
-                api: apiData,
-                apiAssetData: asset
-            },
+            metadata: metadata,
             isSubscriptionAvailable: isSubscriptionAvailable,
             isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
             isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled

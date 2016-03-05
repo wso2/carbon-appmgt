@@ -1,19 +1,5 @@
 var render = function (theme, data, meta, require) {
 
-    var leftNavigationData = [{
-        active: true, partial: 'my-apps'
-    }];
-    if (data.user) {
-        leftNavigationData.push({
-            active: false, partial: 'my-favorites'
-        });
-    }
-    if (!data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-            active: false, partial: 'all-apps'
-        });
-    }
-
     var appUrl; // User is present here, so no need to check for user session.
     if (!data.isSelfSubscriptionEnabled && !data.isEnterpriseSubscriptionAllowed) {
         // Subscription model is inactive, so any user can access this app.
@@ -39,7 +25,7 @@ var render = function (theme, data, meta, require) {
         asset: data.asset,
         type: data.type,
         appUrl: appUrl,
-        isFavourite: data.isFavourite,
+        isFavouriteApp: data.isFavourite,
         isSocial: data.isSocial,
         documentation: data.documentation,
         skipGateway: data.skipGateway,
@@ -49,7 +35,8 @@ var render = function (theme, data, meta, require) {
         isSubscriptionAvailable: data.isSubscriptionAvailable,
         isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
         isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled,
-        isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed
+        isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
+        metadata:data.metadata
     };
 
     //var assetsByProvider = data.assetsByProvider;
@@ -68,7 +55,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'left-column',
                 context: {
-                    navigation: leftNavigationData,
+                    navigation: createLeftNavLinks(data),
                     tags: data.tags,
                     recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
                 }
@@ -100,4 +87,32 @@ var render = function (theme, data, meta, require) {
 
 function getAppUrl(data) {
     return (data.skipGateway) ? data.asset.attributes['overview_webAppUrl'] : data.apiData.serverURL.productionURL;
+}
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [
+
+    ];
+
+    if (data.navigation.showAllAppsLink) {
+        leftNavigationData.push({
+                                    active: true, partial: 'all-apps', url: context + "/assets/webapp"
+                                });
+        leftNavigationData.push({
+                                    active: false, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                });
+    } else {
+        leftNavigationData.push({
+                                    active: true, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                });
+    }
+
+    if (data.user) {
+        leftNavigationData.push({
+                                    active: false, partial: 'my-favorites', url: context
+                + "/assets/favouriteapps?type=webapp"
+                                });
+    }
+    return leftNavigationData;
 }
