@@ -47,99 +47,123 @@ header .header-action:active {
 
 /**/
 /*=========== nav CLASS ========*/
-.navbar-dark {
+.actions-bar {
     background: #2c313b;
 }
 
-.navbar-dark .navbar-nav > li a {
+.actions-bar .navbar-nav > li a {
     line-height: 50px;
 }
 
-.navbar-dark .navbar-nav > li a:hover,
-.navbar-dark .navbar-nav > li a:focus,
-.navbar-dark .navbar-nav > li a:active {
+.actions-bar .navbar-nav > li a:hover,
+.actions-bar .navbar-nav > li a:focus,
+.actions-bar .navbar-nav > li a:active {
     background: #4d5461;
     color: #ffffff;
 }
 
-.navbar-dark .navbar-nav > .active > a,
-.navbar-dark .navbar-nav > .active > a:hover,
-.navbar-dark .navbar-nav > .active > a:focus,
-.navbar-dark .navbar-nav > .active > a:active {
+.actions-bar .navbar-nav > .active > a,
+.actions-bar .navbar-nav > .active > a:hover,
+.actions-bar .navbar-nav > .active > a:focus,
+.actions-bar .navbar-nav > .active > a:active {
     background: #4d5461;
     color: #ffffff;
 }
 
-.navbar-dark .dropdown-menu {
+.actions-bar .dropdown-menu {
     background: #2c313b;
 }
 
-.navbar-dark .dropdown-menu > li a {
+.actions-bar .dropdown-menu > li a {
     line-height: 30px;
 }
 
 /**/
 /*========== SEARCH ==========*/
-.search-box .search-field {
+.search-bar {
+    background-color: #035A93;
+}
+
+.search-box .input-group, .search-box .input-group > input,
+.search-box .input-group-btn, .search-box .input-group-btn > button {
+    min-height: 40px;
     border: none;
+    margin: 0;
+    background-color: #004079;
+    color: #ffffff;
+}
+
+.search-box .input-group-btn > button {
+    opacity: 0.8;
+}
+
+.search-box .input-group-btn > button:hover,
+.search-box .input-group-btn > button:active,
+.search-box .input-group-btn > button:focus {
+    opacity: 1;
 }
 
 .search-box .search-field::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field:-moz-placeholder {
     /* Mozilla Firefox 4 to 18 */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field::-moz-placeholder {
     /* Mozilla Firefox 19+ */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field:-ms-input-placeholder {
     /* Internet Explorer 10-11 */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
-.search-box .search-btn {
-    opacity: 1;
+.search-box .search-by, .search-box .search-by-dropdown {
+    background-color: #002760 !important;
+    color: #fff !important;
 }
 
-.search-box .search-field, .search-box .search-btn {
-    background-color: #215080;
-    color: #ffffff;
-    border-style: solid;
-    border-color: #215080;
-    border-width: 2px 0 2px 0;
-}
-
-.search-box .search-category {
-    padding: 0 0 0 0;
-}
-
-.search-box .search-category > select {
-    padding-left: 5px;
-}
-
-.search-box .search-category, .search-box .search-category > select {
+.search-box .search-by-dropdown {
+    margin-top: 0;
     border: none;
-    background-color: #15304B;
-    color: #ffffff;
 }
 
-.search-box .search-field, .search-box .search-btn, .search-box .search-category {
-    min-height: 40px;
+.search-box .search-by-dropdown li a {
+    background-color: #002760 ;
+    color: #fff ;
+}
+
+.search-box .search-by-dropdown li a:hover,
+.search-box .search-by-dropdown li a:active,
+.search-box .search-by-dropdown li a:focus{
+    background-color: #004D86 !important;
+    color: #fff;
+}
+
+.search-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    bottom: auto;
+    left: auto;
+    float: right;
+    z-index: 1000;
+    margin: 0 15px 0 15px;
+    background-color: #002760;
+    color: #fff;
 }
 
 /**/
@@ -234,7 +258,8 @@ header .header-action:active {
 }
 
 .app-tile .summery {
-    padding: 10px;
+    padding: 10px 0 10px 10px;
+    max-width: 96%;
 }
 
 .app-tile .summery > h4 {
@@ -247,8 +272,11 @@ header .header-action:active {
 }
 
 .app-tile .summery > h4, .app-tile .summery > h5, .app-tile .summery > p {
+    text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
 }
 
 .app-tile .summery > .more-menu {
@@ -543,32 +571,4 @@ active: background 10% lighter, border 5% darker
 
 .background-color-windows {
     background-color: #00bcf2;
-}
-
-/**/
-/* ========= other unknown ========== */
-button.btn.btn-default.dropdown-toggle {
-    border: 1px solid #215080;
-}
-
-button.btn.btn-default.dropdown-toggle:hover {
-    background-color: #193C5F;
-    border: 1px solid #193C5F;
-}
-
-.open > .dropdown-toggle.btn-default:focus,
-.open > .dropdown-toggle.btn-default:active,
-.open > .dropdown-toggle.btn-default:hover {
-    background-color: #193C5F;
-    color: #fff;
-    border: 1px solid #193C5F;
-}
-
-ul.nav.nav-tabs {
-    background-color: #ddd;
-}
-
-a.btn .icon-caret, .btn .icon-caret {
-    margin-left: 49px;
-    border: none;
 }
