@@ -59,15 +59,17 @@ require('/modules/store.js').exec(function (ctx) {
     ];
 
     title = store.assetLinks(type).title;
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user
+    });
+    headerData.assetType = "mobileapp";
 
     caramel.render({
         'title': 'Store | My Items',
         user: user,
         sso: sso,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header: headerData,
         navigation: site.navigation(tenantId),
         devices: devices,
         search: {
