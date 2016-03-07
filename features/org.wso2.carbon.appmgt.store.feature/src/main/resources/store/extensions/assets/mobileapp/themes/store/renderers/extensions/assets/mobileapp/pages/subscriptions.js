@@ -126,8 +126,12 @@ var render = function (theme, data, meta, require) {
         ],
         leftColumn: [
             {
-                partial: 'tags',
-                context: data.tags
+                partial: 'left-column',
+                context: {
+                    navigation: createLeftNavLinks(data),
+                    tags: data.tags,
+                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                }
             }
         ],
         search: [
@@ -139,12 +143,15 @@ var render = function (theme, data, meta, require) {
         pageHeader: [
             {
                 partial: 'page-header',
-                context: {}
+                context: {
+                    title: "My Mobile Apps",
+                    sorting: createSortOptions(data.user, data.config)
+                }
             }
         ],
         pageContent: [
             {
-                partial: 'userAssets',
+                partial: 'page-content-userAssets',
                 context: {
                     'userAssets': data.userAssets,
                     'URL': data.URL,
@@ -156,3 +163,38 @@ var render = function (theme, data, meta, require) {
         ]
     });
 };
+
+
+function createSortOptions(data) {
+    var url = "/extensions/assets/mobileapp/subscriptions?sort=";
+    var sortOptions = {};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
+    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
+
+    var options = [];
+    options.push(sortByAlphabet);
+    options.push(sortByRecent);// recently created
+    sortOptions["options"] = options;
+    return sortOptions;
+}
+
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [];
+    var isAllAppsActive = true;
+
+    if (data.user) {
+        leftNavigationData.push({
+                                    active: true, partial: 'my-apps', url: context
+                                                                           + "/extensions/assets/mobileapp/subscriptions"
+                                });
+        isAllAppsActive = false;
+    }
+
+    leftNavigationData.push({
+                                active: isAllAppsActive, partial: 'all-apps', url: context + "/assets/mobileapp"
+                            });
+
+    return leftNavigationData;
+}

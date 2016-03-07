@@ -245,8 +245,11 @@ require('/modules/store.js').exec(function (ctx) {
                                 var asset = store.asset(type, aid);
                                 asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
-                                        >= 0) {
-                                    assets.push(asset);
+                                    >= 0) {
+                                    //filter web apps
+                                    if (asset.attributes.overview_treatAsASite != "TRUE") {
+                                        assets.push(asset);
+                                    }
                                 }
                             } catch (e) {
                                 log.warn("error retrieving asset from store ,information might be stale in table. id=" +
