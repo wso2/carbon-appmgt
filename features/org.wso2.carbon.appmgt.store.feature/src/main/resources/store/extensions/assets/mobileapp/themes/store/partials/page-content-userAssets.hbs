@@ -1,0 +1,133 @@
+{{!-- page content - mobile apps my subscriptions page --}}
+
+<div class="row">
+
+    {{#if userAssets.mobileapp}}
+
+        {{#itr userAssets}}
+
+            {{#each value}}
+
+                <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+                    <div class="app-tile">
+                        <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
+                            <div class="ratio-responsive-4by3">
+                                {{#if attributes.images_thumbnail}}
+                                    <div class="ratio-responsive-img">
+                                        <img src="{{attributes.images_thumbnail}}" />
+                                    </div>
+                                {{/if}}
+                                {{> overlays/view}}
+                            </div>
+                        </a>
+
+                        <div class="summery">
+                            <h4>{{attributes.overview_displayName}}</h4>
+
+                            <p>{{attributes.overview_provider}}</p>
+
+                            <div class="app-assets-icon-info">
+                                <i title="{{attributes.overview_platform}}"
+                                   class="fw {{iconImage attributes.overview_platform}} fw-1_5x fw-inverse"></i>
+                                <i title="{{attributes.overview_type}}"
+                                   class="fw {{iconImageType attributes.overview_type}} fw-1_5x fw-inverse"></i>
+                            </div>
+
+                            <span class="rating">
+                                {{assetRating rating}}
+                            </span>
+
+
+                            <div class="more-menu pull-right pull-right">
+                                <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                                   title="Click for more options">
+                                    <i class="fw fw-ellipsis fw-rotate-90"></i>
+                                </a>
+                                <ul class="more-menu-items dropdown-menu">
+                                    <li><a href="{{tenantedUrl "/assets/mobileapp"}}{{../../assetType}}/{{id}}">More
+                                                                                                                Details</a>
+                                    </li>
+
+                                    {{#if isDeviceSubscriptionEnabled}}
+                                        <li>
+                                            <a class="btn btn-info asset-reinstall-btn" href="#modalDevices"
+                                               type="{{../key}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
+                                               data-toggle="modal" title="{{t "Reinstall"}} {{../key}}">
+                                                <i class="icon-mobile-phone"></i> Reinstall
+                                            </a>
+                                        </li>
+                                    {{else}}
+                                        <li>
+                                            <a class="btn btn-info asset-reinstall-btn-direct" type="{{../key}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
+                                               title="{{t "Reinstall"}} {{../key}}">
+                                                <i class="icon-mobile-phone"></i> Reinstall
+                                            </a>
+                                        </li>
+                                    {{/if}}
+                                    {{#if ../../selfUnsubscription}}
+                                        <li>
+                                            <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}"
+                                               data-name="{{attributes.overview_name}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}">
+                                                <i class="icon-remove"></i> Uninstall
+                                            </a>
+                                        </li>
+                                    {{/if}}
+
+                                </ul>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+            {{/each}}
+
+        {{/itr}}
+
+
+    {{else}}
+
+        <div class="well-large col-md-12 no-apps-box">
+            Sorry! You do not have any subscribed mobile apps.
+        </div>
+
+
+    {{/if}}
+
+</div>
+
+
+<div class="modal fade" id="modalDevices">
+    <div class="modal-dialog-devices">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class="carousel slide media-carousel" id="media">
+                            <div class="carousel-inner" id="devicesList">
+
+
+                            </div>
+                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
+                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div><!-- /.modal -->
