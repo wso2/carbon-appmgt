@@ -1,0 +1,206 @@
+{{!-- page content - app details page --}}
+<div class="page-content">
+    {{!--banner content--}}
+    <div class="app-details row remove-margin-left remove-margin-right">
+        <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
+            <div class="ratio-responsive-16by9 hover-overlay-container">
+                <div class="ratio-responsive-img">
+                    <img src="{{#if asset.attributes.images_banner}}{{ asset.attributes.images_banner}}{{/if}}">
+                </div>
+            </div>
+        </div>
+        {{!--thumbnail content--}}
+        <div class="col-xs-12 col-sm-5 col-md-6 col-lg-6">
+            <div class="row">
+                <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
+                    <div class="ratio-responsive-4by3">
+                        <div class="ratio-responsive-img">
+                            <img src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}" />
+                        </div>
+                        <div class="app-thumbnail-type background-color-android col-xs-2 col-sm-3 col-md-3 col-lg-3">
+                            <span><i class="fw {{iconImage asset.attributes.overview_platform}}"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {{!--app detail content--}}
+                <div class="summery col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <h4>{{asset.attributes.overview_displayName}}</h4>
+
+                    <p>
+                        Version : {{ asset.attributes.overview_version}}<br>
+                        By : {{asset.attributes.overview_provider}}<br>
+                        Type : {{asset.attributes.overview_type}}
+                    </p>
+
+                                    <span class="rating">
+                                        {{assetRating rating}}
+                                    </span>
+                    {{!--buttons --}}
+                    <div class="actions">
+                        {{#if user}}
+                            {{#if inDashboard}}
+                                {{#if isDeviceSubscriptionEnabled}}
+                                    <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                       data-target="#modalDevices"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                                {{else}}
+                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
+                                {{/if}}
+                            {{else}}
+                                {{#if isDeviceSubscriptionEnabled}}
+                                    <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                       data-target="#modalDevices"
+                                       class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
+                                {{else}}
+                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}"
+                                       class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
+                                {{/if}}
+                            {{/if}}
+                        {{else}}
+                            <a id="btn-add-gadget-install"href="{{tenantedUrl "/login"}}"
+                               class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
+                        {{/if}}
+
+                        {{#if isEnterpriseInstallEnabled}}
+                            <a href="#" id="btn-ent-install" data-aid="{{asset.id}}" data-toggle="modal"
+                               data-target="#modalEnterpriseInstall"
+                               class="btn btn-subscribe"><i class="fw fw-enterprise"></i>Ent. Install</a>
+                            <input id="isEnterpriseInstallEnabled" type="hidden" value="true">
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{!--tabs--}}
+    <div class="app-details-tabs row">
+        <ul class="nav nav-tabs add-margin-top-5x">
+            <li class="active"><a data-toggle="tab" href="#menu1">Overview</a></li>
+            <li><a data-toggle="tab" href="#menu2">Screenshots</a></li>
+            <li><a data-toggle="tab" href="#menu3">User Reviews</a></li>
+        </ul>
+        {{!--tab contents--}}
+        <div class="tab-content">
+            {{!--overview tab content--}}
+            <div id="menu1" class="tab-pane fade in active">
+                <h3>Description</h3>
+
+                <p>{{#if asset.attributes.overview_displayName}}{{ asset.attributes.overview_description}}{{/if}}</p>
+                {{#compare asset.attributes.overview_recentchanges "-" operator="!="}}
+                    <h3>Recent Changes</h3>
+
+                    <p>{{ asset.attributes.overview_recentchanges}}</p>
+                {{/compare}}
+            </div>
+            {{!--screen shot tab content--}}
+            <div id="menu2" class="tab-pane fade">
+                <div class="row">
+                    {{#asset.attributes.images_screenshots}}
+                        {{#if this}}
+                            <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                                <div class="thumbnail">
+                                    <img class="img-responsive" src="{{this}}" />
+                                </div>
+                            </div>
+                        {{/if}}
+                    {{/asset.attributes.images_screenshots}}
+                </div>
+            </div>
+            {{!--user review tab content--}}
+            <div id="menu3" class="tab-pane fade">
+                <div class="row">
+                    <iframe name="socialIfr" id="socialIfr" class="col-lg-12 col-md-12 col-sm-12 "
+                            style="border: none;"
+                            src="{{socialURL}}/?target={{type}}:{{asset.id}}&user={{user.username}}">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{!-- modal section--}}
+<div class="modal fade" id="modalDevices">
+    <div class="modal-dialog-devices">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class="carousel slide media-carousel" id="media">
+                            <div class="carousel-inner" id="devicesList">
+
+
+                            </div>
+                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
+                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="modal fade" id="modalEnterpriseInstall">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Enterprise Install</h4>
+            </div>
+            <div class="modal-body">
+
+                <ul class="nav nav-tabs" id="ent-install-tabs">
+                    <li class="active"><a data-toggle="tab" data-name="roles" href="#ent-roles">Roles</a></li>
+                    <li><a data-toggle="tab" data-name="users" href="#ent-users">Users</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="ent-roles" class="tab-pane fade in active">
+                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="roles-table">
+                            <thead>
+                            <tr>
+                                <th>Role name</th>
+                                <th>#</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="ent-users" class="tab-pane fade">
+                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="users-table">
+                            <thead>
+                            <tr>
+                                <th>User name</th>
+                                <th>#</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button id="btn-apps-ent-install" class="btn btn-primary">Install</button>
+                <button id="btn-apps-ent-uninstall" class="btn btn-danger">Uninstall</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
