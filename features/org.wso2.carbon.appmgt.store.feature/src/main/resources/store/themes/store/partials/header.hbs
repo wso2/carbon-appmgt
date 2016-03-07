@@ -15,9 +15,8 @@
         <div class="auth remove-margin-right pull-right float-remove-xs text-center-xs">
             {{#if user}}
                 {{#if myFav}}
-                    <div class="col-md-3">
-                        <div style="cursor:pointer">
-                            <span class="glyphicon glyphicon-globe gi-5x"></span>
+                    <a href="#">
+                    <span class="icon fw-stack fw-lg"  style="cursor:pointer">
                             {{#if isHomePage}}
                                 <i title="Remove from home page"
                                    class="fw fw-home fw-2_0x fw-inverse home-icon background-color-favorite fw-stack-1x   "
@@ -34,9 +33,8 @@
                                    class="fw fw-home  fw-2_0x fw-inverse home-icon background-color-favorite fw-stack-1x "
                                    id="rmv-home" style="display: none"></i>
                             {{/if}}
-
-                        </div>
-                    </div>
+                    </span>
+                    </a>
                 {{/if}}
 
                 <a href="#" class="dropdown" data-toggle="dropdown">
