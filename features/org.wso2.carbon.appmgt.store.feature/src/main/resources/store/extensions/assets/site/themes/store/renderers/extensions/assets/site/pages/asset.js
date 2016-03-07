@@ -27,7 +27,6 @@ var render = function (theme, data, meta, require) {
         appUrl: appUrl,
         isFavouriteApp: data.isFavourite,
         isSocial: data.isSocial,
-        documentation: data.documentation,
         skipGateway: data.skipGateway,
         apiData: data.apiData,
         isSubscribed: data.isSubscribed,
@@ -36,7 +35,13 @@ var render = function (theme, data, meta, require) {
         isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
         isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled,
         isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
-        metadata:data.metadata
+        metadata:data.metadata,
+        tabs:{
+            documentation:{
+                data:data.documentation,
+                assetType:"site"
+            }
+        }
     };
 
     //var assetsByProvider = data.assetsByProvider;
