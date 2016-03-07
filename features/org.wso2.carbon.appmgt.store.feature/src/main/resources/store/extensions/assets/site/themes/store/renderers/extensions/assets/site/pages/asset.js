@@ -64,7 +64,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {}
+                context: {searchQuery:data.search.query,searchUrl:data.search.searchUrl}
             }
         ],
         pageHeader: [

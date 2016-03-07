@@ -153,6 +153,10 @@ $(function () {
         $('#search').trigger('click');
     });
 
+    $('#searchBy li').click(function(e){
+        $('#searchSelect').val($(this).data('value'));
+    });
+
     $('#searchTxt').keypress(function (e) {
         if (e.keyCode == 13) {  // detect the enter key
             var searchTerm = $(this).val();
@@ -163,16 +167,16 @@ $(function () {
                 if (searchSelect !== "App") {
                     searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
                 }
-                var currentUrl = window.location.href;
-                if (currentUrl.indexOf('type=webapp') > -1) {
+                var searchUrl = $('#searchUrl').val();
+                if (searchUrl.indexOf('type=webapp') > -1) {
                     location.href =
-                    location.protocol + '//' + location.host + location.pathname + '?type=webapp&query=' + searchTerm;
-                } else if (currentUrl.indexOf('type=site') > -1) {
+                    location.protocol + '//' + location.host + searchUrl + '&query=' + searchTerm;
+                } else if (searchUrl.indexOf('type=site') > -1) {
                     location.href =
-                    location.protocol + '//' + location.host + location.pathname + '?type=site&query=' + searchTerm;
+                    location.protocol + '//' + location.host + searchUrl + '&query=' + searchTerm;
                 } else {
                     location.href =
-                    location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
+                    location.protocol + '//' + location.host + searchUrl + '?query=' + searchTerm;
                 }
             }
         }
