@@ -416,7 +416,8 @@ require('/modules/store.js').exec(function (ctx) {
                        sso: sso,
                        header: headerData,
                        search: {
-                           query: query
+                           query: query,
+                           searchUrl:tagUrl
                        },
                        type: type,
                        tags: {

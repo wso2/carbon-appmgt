@@ -511,18 +511,17 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
+        var searchQuery = { search: "", searchTerm: ""};
+
         caramel.render({
                            title: 'Site | Store',
                            user: user,
                            sso: sso,
-
                            header: headerData,
-
                            navigation: navigationData,
                            search: {
-                               search: {title: type},
-                               isTopAssets: false,
-                               searchFields: search.fields()
+                               query: searchQuery,
+                               searchUrl: tagUrl
                            },
                            isSocial: configs.socialCommentsEnable,
 

@@ -66,6 +66,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
     var tagUrl = context;
+    var searchUrl = context + '/extensions/assets/site/myapps';
     url =
     '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
@@ -467,7 +468,8 @@ require('/modules/store.js').exec(function (ctx) {
                        header: headerData,
                        navigation: navigationData,
                        search: {
-                           query: query
+                           query: query,
+                           searchUrl: searchUrl
                        },
                        type: type,
                        tags: {

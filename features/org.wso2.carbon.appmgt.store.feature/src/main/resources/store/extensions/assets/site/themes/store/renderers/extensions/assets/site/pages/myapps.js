@@ -38,7 +38,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: searchQuery
+                context: {searchQuery:searchQuery,searchUrl:data.search.searchUrl}
             }
         ],
         pageHeader: [
@@ -62,7 +62,7 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(user, config) {
     var isSelfSubscriptionEnabled = config.isSelfSubscriptionEnabled;
     var isEnterpriseSubscriptionEnabled = config.isEnterpriseSubscriptionEnabled;
-    var url = "/extensions/assets/webapp/myapps?sort=";
+    var url = "/extensions/assets/site/myapps?sort=";
     var sortOptions = {};
     var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
