@@ -106,7 +106,7 @@ function urlExists(url){
 
 
 
-$(document).on('click', '.app-assets .asset-unsubscribe-btn', function() {
+$(document).on('click', '.app-tile .asset-unsubscribe-btn', function() {
 	appToUninstall = $(this).data("aid");
     appName = $(this).data("name");
     noty({
@@ -149,7 +149,7 @@ $(document).on('click', '.app-assets .asset-unsubscribe-btn', function() {
     });
 });
 
-$(document).on('click', '.app-assets .asset-reinstall-btn', function() {
+$(document).on('click', '.app-tile .asset-reinstall-btn', function() {
 
 	appToInstall = $(this).data("aid");
 
@@ -159,7 +159,7 @@ $(document).on('click', '.app-assets .asset-reinstall-btn', function() {
 		
 });
 
-	$(document).on('click', '.app-assets .asset-reinstall-btn-direct', function() {
+	$(document).on('click', '.app-tile .asset-reinstall-btn-direct', function() {
 		appToInstall = $(this).data("aid");
 		performInstalltionUser(appToInstall);
 	});

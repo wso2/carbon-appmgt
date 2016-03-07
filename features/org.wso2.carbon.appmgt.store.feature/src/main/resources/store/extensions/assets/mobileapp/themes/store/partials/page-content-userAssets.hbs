@@ -38,31 +38,47 @@
                             </span>
 
 
-                        </div>
-
-
-                        <div class="my-apps-actions">
-
-                            {{#if isDeviceSubscriptionEnabled}}
-                                <a class="btn btn-info asset-reinstall-btn" href="#modalDevices" type="{{../key}}"
-                                   data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
-                                   data-toggle="modal" title="{{t "Reinstall"}} {{../key}}">
-                                    <i class="icon-mobile-phone"></i> Reinstall
+                            <div class="more-menu pull-right pull-right">
+                                <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                                   title="Click for more options">
+                                    <i class="fw fw-ellipsis fw-rotate-90"></i>
                                 </a>
-                            {{else}}
-                                <a class="btn btn-info asset-reinstall-btn-direct" type="{{../key}}"
-                                   data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
-                                   title="{{t "Reinstall"}} {{../key}}">
-                                    <i class="icon-mobile-phone"></i> Reinstall
-                                </a>
-                            {{/if}}
-                            {{#if ../../selfUnsubscription}}
-                                <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}"
-                                   data-name="{{attributes.overview_name}}"
-                                   data-platform="{{attributes.overview_platform}}" data-aid="{{id}}">
-                                    <i class="icon-remove"></i> Uninstall
-                                </a>
-                            {{/if}}
+                                <ul class="more-menu-items dropdown-menu">
+                                    <li><a href="{{tenantedUrl "/assets/mobileapp"}}{{../../assetType}}/{{id}}">More
+                                                                                                                Details</a>
+                                    </li>
+
+                                    {{#if isDeviceSubscriptionEnabled}}
+                                        <li>
+                                            <a class="btn btn-info asset-reinstall-btn" href="#modalDevices"
+                                               type="{{../key}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
+                                               data-toggle="modal" title="{{t "Reinstall"}} {{../key}}">
+                                                <i class="icon-mobile-phone"></i> Reinstall
+                                            </a>
+                                        </li>
+                                    {{else}}
+                                        <li>
+                                            <a class="btn btn-info asset-reinstall-btn-direct" type="{{../key}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}"
+                                               title="{{t "Reinstall"}} {{../key}}">
+                                                <i class="icon-mobile-phone"></i> Reinstall
+                                            </a>
+                                        </li>
+                                    {{/if}}
+                                    {{#if ../../selfUnsubscription}}
+                                        <li>
+                                            <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}"
+                                               data-name="{{attributes.overview_name}}"
+                                               data-platform="{{attributes.overview_platform}}" data-aid="{{id}}">
+                                                <i class="icon-remove"></i> Uninstall
+                                            </a>
+                                        </li>
+                                    {{/if}}
+
+                                </ul>
+                            </div>
+
                         </div>
 
 
