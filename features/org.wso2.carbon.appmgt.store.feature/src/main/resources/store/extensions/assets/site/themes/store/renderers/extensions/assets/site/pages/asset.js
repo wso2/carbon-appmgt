@@ -76,7 +76,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "Web App",
+                    title: "Site",
                     sorting: null
                 }
             }
