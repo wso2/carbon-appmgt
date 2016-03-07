@@ -7,55 +7,6 @@ var render = function(theme, data, meta, require) {
 		
 	data.header.config = data.config;
 
-	/*
-	theme('2-column-right', {
-		title : data.title,
-
-		header: [
-					{
-						partial: 'header',
-						context: data.header
-					}
-				],
-				navigation: [
-					{
-						partial: 'navigation',
-						context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-					}
-				],
-
-        body : [{
-            partial : 'asset',
-            context : require('/helpers/asset.js').format({
-                user : data.user,
-                sso : data.sso,
-                asset : data.asset,
-                type : data.type,
-                inDashboard : data.inDashboard,
-                isEnterpriseInstallEnabled : data.isEnterpriseInstallEnabled,
-                isDeviceSubscriptionEnabled : data.isDeviceSubscriptionEnabled,
-                isDirectDownloadEnabled : data.isDirectDownloadEnabled,
-                embedURL : data.embedURL,
-                isSocial : data.isSocial,
-                devices : data.devices,
-                config: data.config
-            })
-        }],
-		right : [
-			{
-                partial: 'my-assets-link',
-                context: data.myAssets
-            },
-			{
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            }, {
-				partial : 'tags',
-				context : data.tags
-			}
-		]
-	});
-	*/
 
     theme('2-column-left', {
         title: data.title,
@@ -67,17 +18,18 @@ var render = function(theme, data, meta, require) {
         ],
         leftColumn: [
             {
-                partial: 'my-assets-link',
-                context: data.myAssets
-            }, {
-                partial: 'tags',
-                context: data.tags
+                partial: 'left-column',
+                context: {
+                    navigation: createLeftNavLinks(data),
+                    tags: null,
+                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                }
             }
         ],
         search: [
             {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
+                partial: 'search',
+                context: {}
             }
         ],
         pageHeader: [
@@ -90,7 +42,7 @@ var render = function(theme, data, meta, require) {
             }
         ],
         pageContent: [{
-                          partial: 'asset',
+                          partial: 'page-content-app-details',
                           context: require('/helpers/asset.js').format({
                                                                            user: data.user,
                                                                            sso: data.sso,
@@ -109,3 +61,22 @@ var render = function(theme, data, meta, require) {
     });
 
 };
+
+
+function createLeftNavLinks(data) {
+    var context = caramel.configs().context;
+    var leftNavigationData = [
+        {
+            active: true, partial: 'all-apps', url: context + "/assets/mobileapp"
+        }
+    ];
+
+    if (data.user) {
+        leftNavigationData.push({
+                                    active: false, partial: 'my-apps',
+                                    url: context + "/extensions/assets/mobileapp/subscriptions"
+                                });
+    }
+
+    return leftNavigationData;
+}
