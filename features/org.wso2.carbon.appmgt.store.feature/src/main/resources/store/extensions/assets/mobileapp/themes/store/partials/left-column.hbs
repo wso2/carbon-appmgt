@@ -1,5 +1,3 @@
-{{!--This partial is used by webapps and sits , mobile apps has
-its own partion sinceit does not support tags--}}
 {{!-- navigation --}}
 <nav class="navigation">
     {{#each navigation}}
@@ -34,18 +32,10 @@ its own partion sinceit does not support tags--}}
 </nav>
 
 {{!-- left-column - tags --}}
+{{!--currently mobile apps doesnot support tags--}}
 <div class="add-margin-top-3x hidden-xs hidden-sm">
-    <div class="tags-title"> {{t "Tags"}}</div>
-    {{#if tags}}
-        <ul class="tag-content">
-            {{#each tags.data}}
-                <li><a href="{{../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
-            {{/each}}
-        </ul>
-    {{else}}
-        <p>No Tags Found</p>
-    {{/if}}
-
+    <div class="tags-title" style="background-color: #EFEFEF !important;
+    border: #EFEFEF !important;"></div>
 </div>
 
 {{!-- left-column - recent apps --}}
