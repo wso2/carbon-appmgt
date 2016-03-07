@@ -47,99 +47,123 @@ header .header-action:active {
 
 /**/
 /*=========== nav CLASS ========*/
-.navbar-dark {
+.actions-bar {
     background: #2c313b;
 }
 
-.navbar-dark .navbar-nav > li a {
+.actions-bar .navbar-nav > li a {
     line-height: 50px;
 }
 
-.navbar-dark .navbar-nav > li a:hover,
-.navbar-dark .navbar-nav > li a:focus,
-.navbar-dark .navbar-nav > li a:active {
+.actions-bar .navbar-nav > li a:hover,
+.actions-bar .navbar-nav > li a:focus,
+.actions-bar .navbar-nav > li a:active {
     background: #4d5461;
     color: #ffffff;
 }
 
-.navbar-dark .navbar-nav > .active > a,
-.navbar-dark .navbar-nav > .active > a:hover,
-.navbar-dark .navbar-nav > .active > a:focus,
-.navbar-dark .navbar-nav > .active > a:active {
+.actions-bar .navbar-nav > .active > a,
+.actions-bar .navbar-nav > .active > a:hover,
+.actions-bar .navbar-nav > .active > a:focus,
+.actions-bar .navbar-nav > .active > a:active {
     background: #4d5461;
     color: #ffffff;
 }
 
-.navbar-dark .dropdown-menu {
+.actions-bar .dropdown-menu {
     background: #2c313b;
 }
 
-.navbar-dark .dropdown-menu > li a {
+.actions-bar .dropdown-menu > li a {
     line-height: 30px;
 }
 
 /**/
 /*========== SEARCH ==========*/
-.search-box .search-field {
+.search-bar {
+    background-color: #035A93;
+}
+
+.search-box .input-group, .search-box .input-group > input,
+.search-box .input-group-btn, .search-box .input-group-btn > button {
+    min-height: 40px;
     border: none;
+    margin: 0;
+    background-color: #004079;
+    color: #ffffff;
+}
+
+.search-box .input-group-btn > button {
+    opacity: 0.8;
+}
+
+.search-box .input-group-btn > button:hover,
+.search-box .input-group-btn > button:active,
+.search-box .input-group-btn > button:focus {
+    opacity: 1;
 }
 
 .search-box .search-field::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field:-moz-placeholder {
     /* Mozilla Firefox 4 to 18 */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field::-moz-placeholder {
     /* Mozilla Firefox 19+ */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
 .search-box .search-field:-ms-input-placeholder {
     /* Internet Explorer 10-11 */
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.8;
     font-weight: 100;
 }
 
-.search-box .search-btn {
-    opacity: 1;
+.search-box .search-by, .search-box .search-by-dropdown {
+    background-color: #002760 !important;
+    color: #fff !important;
 }
 
-.search-box .search-field, .search-box .search-btn {
-    background-color: #215080;
-    color: #ffffff;
-    border-style: solid;
-    border-color: #215080;
-    border-width: 2px 0 2px 0;
-}
-
-.search-box .search-category {
-    padding: 0 0 0 0;
-}
-
-.search-box .search-category > select {
-    padding-left: 5px;
-}
-
-.search-box .search-category, .search-box .search-category > select {
+.search-box .search-by-dropdown {
+    margin-top: 0;
     border: none;
-    background-color: #15304B;
-    color: #ffffff;
 }
 
-.search-box .search-field, .search-box .search-btn, .search-box .search-category {
-    min-height: 40px;
+.search-box .search-by-dropdown li a {
+    background-color: #002760 ;
+    color: #fff ;
+}
+
+.search-box .search-by-dropdown li a:hover,
+.search-box .search-by-dropdown li a:active,
+.search-box .search-by-dropdown li a:focus{
+    background-color: #004D86 !important;
+    color: #fff;
+}
+
+.search-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    bottom: auto;
+    left: auto;
+    float: right;
+    z-index: 1000;
+    margin: 0 15px 0 15px;
+    background-color: #002760;
+    color: #fff;
 }
 
 /**/
@@ -179,18 +203,8 @@ header .header-action:active {
 }
 
 /**/
-/*========== APP TILE ==========*/
-.app-tile {
-    background-color: #ffffff;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.app-tile-thumbnail {
-    position: relative;
-}
-
-.app-tile-thumbnail .thumbnail-ribbon {
+/*========== APP THUMBNAIL ITEMS==========*/
+.app-thumbnail-ribbon {
     display: block;
     position: absolute;
     top: 0;
@@ -206,215 +220,117 @@ header .header-action:active {
     border-top-width: 0;
 }
 
-.app-tile-thumbnail .thumbnail-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 75% 0 0 0;
-    overflow: hidden;
-}
-
-.app-tile-thumbnail .thumbnail-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-tile-thumbnail .thumbnail-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 75% 0;
-}
-
-.app-tile-thumbnail .thumbnail-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-tile-thumbnail .thumbnail-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    color: #FFF;
-}
-
-.app-tile-thumbnail:hover .thumbnail-overlay {
+.app-thumbnail-type {
     display: block;
-    background: rgba(0, 0, 0, .6);
-    cursor: pointer;
-}
-
-.app-tile-thumbnail > .thumbnail-overlay > span {
     position: absolute;
-    top: 0;
-    left: 0;
     bottom: 0;
-    right: 0;
-    margin: auto;
-    font-size: 250%;
+    left: 0;
+    height: 30%;
+    color: #ffffff;
+    z-index: 500;
+    border: 1px solid rgb(255, 255, 255);
+    border: 1px solid rgba(255, 255, 255, .5);
+    /* for Safari */
+    -webkit-background-clip: padding-box;
+    /* for IE9+, Firefox 4+, Opera, Chrome */
+    background-clip: padding-box;
+    border-left-width: 0;
+    border-bottom-width: 0;
+    font-size: 2em;
 }
 
-.app-tile-details {
-    padding: 10px;
+.app-thumbnail-ribbon > span, .app-thumbnail-type > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
 }
 
-.app-tile-details > h4 {
+/**/
+/*========== APP TILE ==========*/
+.app-tile {
+    background-color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.app-tile .summery {
+    padding: 10px 0 10px 10px;
+    max-width: 96%;
+}
+
+.app-tile .summery > h4 {
+    margin-top: 5px;
     margin-bottom: 0;
 }
 
-.app-tile-details > h5 {
+.app-tile .summery > h5 {
     margin-top: 0;
 }
 
-.app-tile-details .more-menu {
+.app-tile .summery > h4, .app-tile .summery > h5, .app-tile .summery > p {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+.app-tile .summery > .more-menu {
     position: relative;
 }
 
-.more-menu .more-menu-btn {
+.app-tile .summery > .more-menu .more-menu-btn {
     float: right;
-    height: Auto;
-    opacity: .5;
+    height: auto;
     background-color: #F7F7F7;
+    color: #838383;
     padding: 10px;
     margin-right: -10px;
     margin-top: -10px;
 }
 
-.more-menu .more-menu-btn:hover {
-    background-color: #333;
-    color: #fff;
+.app-tile .summery > .more-menu.open .more-menu-btn {
+    background-color: #D2D2D2;
 }
 
-.more-menu .more-menu-items {
+.app-tile .summery > .more-menu .more-menu-btn:hover {
+    background-color: #e4e4e4;
+}
+
+.app-tile .summery > .more-menu .more-menu-items {
     margin-right: -10px;
+    margin-top: 0;
 }
 
+/**/
 /*========== APP DETAILS ==========*/
 .app-details {
     background-color: #ffffff;
 }
 
-.app-details-banner {
-    position: relative;
-}
-
-.app-details-banner .banner-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 56.25% 0 0 0;
+.app-details .summery > h4, .app-details .summery > p {
+    white-space: nowrap;
     overflow: hidden;
 }
 
-.app-details-banner .banner-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-details-banner .banner-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 56.25% 0;
-}
-
-.app-details-banner .banner-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-details-banner .banner-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 20%;
-    display: none;
-    color: #FFF;
-}
-
-.app-details-banner:hover .banner-overlay {
-    display: block;
-    background: rgba(0, 0, 0, .6);
-    cursor: pointer;
-    -webkit-transition: opacity .15s linear;
-    -o-transition: opacity .15s linear;
-    transition: opacity .15s linear
-}
-
-.app-details-banner > .banner-overlay > span {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-    font-size: 250%;
-}
-
-.app-details-thumbnail {
-    position: relative;
-}
-
-.app-details-thumbnail .thumbnail-image {
-    /*display: block;*/
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding: 75% 0 0 0;
-    overflow: hidden;
-}
-
-.app-details-thumbnail .thumbnail-image > img {
-    /*display: block;*/
-    position: absolute;
-    max-height: 100%;
-    max-width: 100%;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-}
-
-.app-details-thumbnail .thumbnail-default {
-    position: relative;
-    width: 100%;
-    padding: 0 0 75% 0;
-}
-
-.app-details-thumbnail .thumbnail-default > div {
-    color: #ffffff;
-    font-size: 666%;
-}
-
-.app-details-actions {
+.app-details .summery > .actions {
     margin: 10px 0 0 0;
 }
 
-.app-details-actions > a {
+.app-details .summery > .actions > a {
     margin: 5px 5px 5px 0;
 }
 
-.app-details-actions > a > i {
+.app-details .summery > .actions > a > i {
     padding-right: 5px;
+}
+
+.app-details-tabs {
+    padding: 0 15px 0 15px;
 }
 
 .app-details-tabs > .nav-tabs > li > a {
@@ -422,20 +338,43 @@ header .header-action:active {
 }
 
 .app-details-tabs > .nav-tabs > li.active > a,
+.app-details-tabs > .nav-tabs > li.active > a:hover,
+.app-details-tabs > .nav-tabs > li.active > a:focus,
+.app-details-tabs > .nav-tabs > li.active > a:active {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 0;
+}
+
 .app-details-tabs > .nav-tabs > li > a:hover,
 .app-details-tabs > .nav-tabs > li > a:focus,
 .app-details-tabs > .nav-tabs > li > a:active {
-    background-color: #fff;
-    border: 1px solid #FFF;
+    background-color: #E8E8E8;
+    border: 1px solid #E8E8E8;
     border-radius: 0;
 }
 
 .app-details-tabs > .tab-content {
     padding: 20px 17px;
+    background-color: #fff;
 }
 
 .app-details-tabs > .tab-content > h3 {
     margin-top: 0;
+}
+
+/**/
+/*========== DEFAULT THUMBNAIL & BANNER ==========*/
+.default-thumbnail, .default-banner {
+    color: #ffffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
 }
 
 /**/
@@ -450,47 +389,81 @@ header .header-action:active {
 
 /**/
 /*========== UTILS ==========*/
-.text-center-force {
+a.disabled {
+    cursor: default;
+}
+
+.absolute-center {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%) translateY(-50%);
     -webkit-transform: translate(-50%, -50%);
     -moz-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     -o-transform: translate(-50%, -50%);
 }
 
-a.disabled {
-    cursor: default;
+.ratio-responsive-1by1 {
+    padding: 100% 0 0 0;
 }
 
-/**/
-/* ========= other unknown ========== */
-button.btn.btn-default.dropdown-toggle {
-    border: 1px solid #215080;
+.ratio-responsive-4by3 {
+    padding: 75% 0 0 0;
 }
 
-button.btn.btn-default.dropdown-toggle:hover {
-    background-color: #193C5F;
-    border: 1px solid #193C5F;
+.ratio-responsive-16by9 {
+    padding: 56.25% 0 0 0;
 }
 
-.open > .dropdown-toggle.btn-default:focus,
-.open > .dropdown-toggle.btn-default:active,
-.open > .dropdown-toggle.btn-default:hover {
-    background-color: #193C5F;
-    color: #fff;
-    border: 1px solid #193C5F;
+.ratio-responsive-1by1, .ratio-responsive-4by3, .ratio-responsive-16by9 {
+    width: 100%;
+    position: relative;
 }
 
-ul.nav.nav-tabs {
-    background-color: #ddd;
+.ratio-responsive-item {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
 }
 
-a.btn .icon-caret, .btn .icon-caret {
-    margin-left: 49px;
-    border: none;
+.ratio-responsive-item:after {
+    content: ' ';
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.ratio-responsive-img > img {
+    display: block;
+    position: absolute;
+    max-height: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.hover-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    color: #FFF;
+}
+
+.hover-overlay-container:hover .hover-overlay {
+    display: block;
+    background: rgba(0, 0, 0, .6);
+    cursor: pointer;
 }
 
 /**/
@@ -514,10 +487,6 @@ active: background 10% lighter, border 5% darker
     background-color: #603cba;
 }
 
-.color-subscribe {
-    color: #603cba;
-}
-
 .btn-subscribe {
     color: #fff;
     background-color: #603cba;
@@ -539,9 +508,9 @@ active: background 10% lighter, border 5% darker
     border-color: #532FAD;
 }
 
-/* favorite  - main color: #c0392b */
+/* favorite  - main color: #810847 */
 .background-color-favorite {
-    background-color: #c0392b;
+    background-color: #810847;
 }
 
 .background-color-on-hover-favorite {
@@ -549,37 +518,33 @@ active: background 10% lighter, border 5% darker
 }
 
 .background-color-on-hover-favorite:hover {
-    background-color: #c0392b;
-}
-
-.color-favorite {
-    color: #c0392b;
+    background-color: #810847;
 }
 
 .btn-favorite {
     color: #fff;
-    background-color: #c0392b;
-    border-color: #c0392b;
+    background-color: #810847;
+    border-color: #810847;
 }
 
 .btn-favorite:focus,
 .btn-favorite.focus {
     color: #fff;
-    background-color: #CD4638;
-    border-color: #B32C1E;
+    background-color: #8E1554;
+    border-color: #75003B;
 }
 
 .btn-favorite:hover,
 .btn-favorite:active,
 .btn-favorite.active {
     color: #fff;
-    background-color: #DA5345;
-    border-color: #B32C1E;
+    background-color: #9B2261;
+    border-color: #75003B;
 }
 
-/* all apps  - main color: #27ae60 */
+/* all apps  - main color: #007A5F */
 .background-color-all-apps {
-    background-color: #27ae60;
+    background-color: #007A5F;
 }
 
 .background-color-on-hover-all-apps {
@@ -587,18 +552,23 @@ active: background 10% lighter, border 5% darker
 }
 
 .background-color-on-hover-all-apps:hover {
-    background-color: #27ae60;
+    background-color: #007A5F;
 }
 
-.color-all-apps {
-    color: #27ae60;
-}
-
-/* advertised  - main color: #d35400 */
+/* advertised  - main color: #C64700 */
 .background-color-ad {
-    background-color: #d35400;
+    background-color: #C64700;
 }
 
-.color-ad {
-    color: #d35400;
+/*========== MOBILE PLATFORM COLORS ========*/
+.background-color-android {
+    background-color: #a4c639;
+}
+
+.background-color-apple {
+    background-color: #CCCCCC;
+}
+
+.background-color-windows {
+    background-color: #00bcf2;
 }

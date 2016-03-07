@@ -43,7 +43,7 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(data) {
     var url = "/assets/favouriteapps?type=" + data.assetType + "&sort=";
     var sortOptions = {};
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
+    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
     var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
     var options = [];
     options.push(sortByAlphabet);

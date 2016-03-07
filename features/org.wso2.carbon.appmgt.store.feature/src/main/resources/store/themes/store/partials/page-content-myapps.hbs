@@ -2,12 +2,11 @@
 <div class="row">
     {{#each assets}}
         <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-
             <div class="app-tile">
                 <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
                    data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
-                   data-context="{{attributes.overview_context}}" class="accessUrl">
-                    <div class="app-tile-thumbnail">
+                   data-context="{{attributes.overview_context}}" class="hover-overlay-container">
+                    <div class="ratio-responsive-4by3">
                         {{#if isFavourite}}
                             {{> ribbons/favorite}}
                         {{else}}
@@ -17,25 +16,25 @@
                         {{/if}}
 
                         {{#if defaultThumbnail}}
-                            <div class="thumbnail-default" style="background-color: #{{defaultThumbnail.color}};">
-                                <div class="text-center-force">{{defaultThumbnail.text}}</div>
+                            <div class="ratio-responsive-item responsive-text"
+                                 style="background-color: #{{defaultThumbnail.color}};">
+                                <span class="default-thumbnail">{{defaultThumbnail.text}}</span>
                             </div>
                         {{else}}
-                            <div class="thumbnail-image">
+                            <div class="ratio-responsive-img">
                                 <img src="{{attributes.images_thumbnail}}" />
                             </div>
                         {{/if}}
 
-                        <div class="thumbnail-overlay" title="Click to launch app">
-                        <span class="fw-stack">
-                            <i class="fw fw-circle-outline fw-stack-2x"></i>
-                            <i class="fw fw-deploy fw-stack-1x"></i>
-                        </span>
-                        </div>
+                        {{#if accessUrl}}
+                            {{> overlays/launch}}
+                        {{else}}
+                            {{> overlays/view}}
+                        {{/if}}
                     </div>
                 </a>
 
-                <div class="app-tile-details">
+                <div class="summery">
                     <h4>{{attributes.overview_displayName}}</h4>
                     <h5>{{attributes.overview_version}}</h5>
 
@@ -45,7 +44,8 @@
                     </span>
 
                     <div class="more-menu pull-right">
-                        <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown">
+                        <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                           title="Click for more options">
                             <i class="fw fw-ellipsis fw-rotate-90"></i>
                         </a>
                         <ul class="more-menu-items dropdown-menu">
@@ -86,17 +86,7 @@
 </div>
 
 {{#unless assets}}
-    <div class="no-apps">
-        <div class="jumbotron">
-            <h1>
-                <span class="fw fw-warning"></span> No Apps Here!
-            </h1>
-
-            <p class="lead add-padding-top-3x text-muted">
-                Sorry, We could not find any apps for you.
-            </p>
-        </div>
-    </div>
+    {{> no-apps-found}}
 {{/unless}}
 
 {{#unless config.isSelfSubscriptionEnabled}}

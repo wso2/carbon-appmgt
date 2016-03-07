@@ -1,26 +1,24 @@
-{{!-- page content - app details page of webapp and site--}}
+{{!-- page content - app details page --}}
 <div class="app-details row remove-margin-left remove-margin-right">
     <input type="hidden" id="metadata-app-name" value="{{metadata.appName}}">
     <input type="hidden" id="metadata-app-provider" value="{{metadata.appProvider}}">
     <input type="hidden" id="metadata-app-version" value="{{metadata.appVersion}}">
+
     <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
-        <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}} target="_blank">
-            <div class="app-details-banner">
+        <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch" class="hover-overlay-container"{{else}} class="disabled"{{/if}} target="_blank">
+            <div class="ratio-responsive-16by9">
                 {{#if asset.defaultBanner}}
-                    <div class="banner-default" style="background-color: #{{asset.defaultBanner.color}};">
-                        <div class="text-center-force">{{asset.defaultBanner.text}}</div>
+                    <div class="ratio-responsive-item responsive-text" style="background-color: #{{asset.defaultBanner.color}};">
+                        <span class="default-banner">{{asset.defaultBanner.text}}</span>
                     </div>
                 {{else}}
-                    <div class="banner-image">
+                    <div class="ratio-responsive-img">
                         <img src="{{asset.attributes.images_banner}}" />
                     </div>
                 {{/if}}
-                <div class="banner-overlay" {{#unless appUrl}}style="display: none;"{{/unless}}>
-                    <span class="fw-stack">
-                        <i class="fw fw-circle-outline fw-stack-2x"></i>
-                        <i class="fw fw-deploy fw-stack-1x"></i>
-                    </span>
-                </div>
+                {{#if appUrl}}
+                    {{> overlays/launch-banner}}
+                {{/if}}
             </div>
         </a>
     </div>
@@ -30,13 +28,13 @@
             <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
                 <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch"{{else}} class="disabled"{{/if}}
                    target="_blank">
-                    <div class="app-details-thumbnail">
+                    <div class="ratio-responsive-4by3">
                         {{#if asset.defaultThumbnail}}
-                            <div class="thumbnail-default" style="background-color: #{{asset.defaultThumbnail.color}};">
-                                <div class="text-center-force">{{asset.defaultThumbnail.text}}</div>
+                            <div class="ratio-responsive-item responsive-text" style="background-color: #{{asset.defaultThumbnail.color}};">
+                                <div class="default-thumbnail">{{asset.defaultThumbnail.text}}</div>
                             </div>
                         {{else}}
-                            <div class="thumbnail-image">
+                            <div class="ratio-responsive-img">
                                 <img src="{{asset.attributes.images_thumbnail}}" />
                             </div>
                         {{/if}}
@@ -45,7 +43,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="summery col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <h4>{{asset.attributes.overview_displayName}}</h4>
 
                 <p>
@@ -57,7 +55,7 @@
                     {{assetRating rating}}
                 </span>
 
-                <div class="app-details-actions">
+                <div class="actions">
                     {{#if appUrl}}
                     {{!-- user can access this app --}}
                         <a id="btnLaunch" href="{{appUrl}}" class="btn btn-primary" target="_blank">
@@ -116,42 +114,39 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+<div class="app-details-tabs row">
+    <ul class="nav nav-tabs add-margin-top-5x">
+        <li class="active"><a data-toggle="tab" href="#menu1">Overview</a></li>
+        <li><a data-toggle="tab" href="#menu2">Documentation</a></li>
+        <li><a data-toggle="tab" href="#menu3">User Reviews</a></li>
+    </ul>
 
-        <div class="app-details-tabs add-margin-top-5x">
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#menu1">Overview</a></li>
-                <li><a data-toggle="tab" href="#menu2">Documentation</a></li>
-                <li><a data-toggle="tab" href="#menu3">User Reviews</a></li>
-            </ul>
-
-            <div class="tab-content" style="background-color: white;">
-                <div id="menu1" class="tab-pane fade in active">
-                    {{#ifCond asset.attributes.overview_description "!=" " "}}
-                        <p>{{asset.attributes.overview_description}}</p>
-                    {{else}}
-                        <p class="text-muted">No description found.</p>
-                    {{/ifCond}}
-                </div>
-                <div id="menu2" class="tab-pane fade">
-                    {{#if tabs.documentation.data.availability}}
-                        <p>{{> documentation .}}</p>
-                    {{else}}
-                        <p class="text-muted">No documentations found.</p>
-                    {{/if}}
-                </div>
-                <div id="menu3" class="tab-pane fade">
-                    <div class="row">
-                        <iframe name="socialIfr" id="socialIfr" class="col-lg-12 col-md-12 col-sm-12 "
-                                style="border: none;"
-                                src="{{socialURL}}/?target={{type}}:{{asset.id}}&user={{user.username}}">
-                        </iframe>
-                    </div>
-                </div>
+    <div class="tab-content">
+        <div id="menu1" class="tab-pane fade in active">
+            {{#ifCond asset.attributes.overview_description "!=" " "}}
+                <p>{{asset.attributes.overview_description}}</p>
+            {{else}}
+                <p class="text-muted">No description found.</p>
+            {{/ifCond}}
+        </div>
+        <div id="menu2" class="tab-pane fade">
+            {{#if tabs.documentation.data.availability}}
+                <p>{{> documentation .}}</p>
+            {{else}}
+                <p class="text-muted">No documentations found.</p>
+            {{/if}}
+        </div>
+        <div id="menu3" class="tab-pane fade">
+            <div class="row">
+                <iframe name="socialIfr" id="socialIfr" class="col-lg-12 col-md-12 col-sm-12 "
+                        style="border: none;"
+                        src="{{socialURL}}/?target={{type}}:{{asset.id}}&user={{user.username}}">
+                </iframe>
             </div>
         </div>
     </div>
+
+
 </div>
 
 <div class="modal fade" id="messageModal2" style="display: none"></div>

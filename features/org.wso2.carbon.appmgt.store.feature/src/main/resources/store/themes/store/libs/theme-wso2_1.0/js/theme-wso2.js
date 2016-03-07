@@ -22,8 +22,8 @@ if (typeof(jQuery) === 'undefined') {
     throw 'jQuery is required.';
 }
 
-var responsiveTextRatio = 0.2,
-    responsiveTextSleector = ".icon .text";
+var responsiveTextRatio = 0.4,
+    responsiveTextSleector = ".ratio-responsive-item";
 
 (function($) {
 

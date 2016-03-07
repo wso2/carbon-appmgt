@@ -1,29 +1,32 @@
 {{!-- search --}}
-<div class="navbar-wrapper">
-    <nav class="navbar navbar-default">
-        <div class="form-group">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
-                <div class="search-box input-group">
-                    <input id="searchTxt" type="text" value="{{search}}" class="search-field form-control"
-                           placeholder="Search..." />
+<nav class="search-bar navbar navbar-default">
+    <div class="search-box col-xs-12 col-sm-12 col-md-12 col-lg-6">
+        <div class="input-group">
+            <input type="text" id="searchTxt" value="{{search}}" class="search-field form-control"
+                   placeholder="Search for web apps" />
 
-                    <div class="input-group-btn">
-                        <button class="search-btn form-control-btn" type="button" title="Search">
-                            <i class="fw fw-search" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    <span class="search-category input-group-addon">
-                        <select id="searchSelect">
-                            <option {{#ifCond searchTerm "==" "overview_name"}}selected{{/ifCond}} value="Name">
-                                By Name
-                            </option>
-                            <option {{#ifCond searchTerm "==" "overview_provider"}}selected{{/ifCond}} value="Provider">
-                                By Provider
-                            </option>
-                        </select>
-                    </span>
-                </div>
+            <div class="input-group-btn">
+                <button type="button" class="btn">
+                    <i class="fw fw-search"></i>
+                </button>
+                <button type="button" id="searchSelect" class="btn dropdown-toggle search-by" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false"
+                        {{#ifCond searchTerm "==" "overview_name"}}data-value="Name"{{/ifCond}}
+                        {{#ifCond searchTerm "==" "overview_provider"}}data-value="Provider"{{/ifCond}}>
+                    {{#ifCond searchTerm "==" "overview_name"}}
+                        By Name
+                    {{/ifCond}}
+                    {{#ifCond searchTerm "==" "overview_provider"}}
+                        By Provider
+                    {{/ifCond}}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right dropdown-selectable search-by-dropdown"
+                    data-target="#searchSelect">
+                    <li data-value="Name"><a>By Name</a></li>
+                    <li data-value="Provider"><a>By Provider</a></li>
+                </ul>
             </div>
         </div>
-    </nav>
-</div>
+    </div>
+</nav>
