@@ -23,7 +23,7 @@ package org.wso2.carbon.appmgt.mdm.wso2mdm;
 public class Constants {
 
     public static final String MDM_NAME = "WSO2MDM";
-    public static final String API_DEVICE_LIST = "/mdm-admin/devices/user/%s/%s";
+    public static final String API_DEVICE_LIST = "/mdm-admin/devices?status=ACTIVE&user=%s";
     public static final String API_INSTALL_APP = "/mdm-admin/operations/installApp/%s";
     public static final String API_UNINSTALL_APP = "/mdm-admin/operations/uninstallApp/%s";
 
@@ -33,5 +33,6 @@ public class Constants {
     public static final String PROPERTY_CLIENT_SECRET = "ClientSecret";
     public static final String PROPERTY_AUTH_USER = "AuthUser";
     public static final String PROPERTY_AUTH_PASS = "AuthPass";
+    public static final String PROPERTY_IS_REMOTE = "IsRemote";
 
 }
