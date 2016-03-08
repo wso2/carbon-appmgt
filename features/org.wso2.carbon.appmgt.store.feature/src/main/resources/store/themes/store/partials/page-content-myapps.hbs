@@ -77,6 +77,20 @@
                             {{else}}
                                 <li><a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">More Details</a></li>
                             {{/ifCond}}
+
+                            {{#if ../user}}
+                                {{#if ../../config.isSelfSubscriptionEnabled}}
+                                    {{#if ../../../config.isEnterpriseSubscriptionEnabled}}
+                                        <li>
+                                            <a href="#" class="btnUnsubscribe" data-name="{{attributes.overview_name}}"
+                                               data-provider="{{attributes.overview_provider}}"
+                                               data-version="{{attributes.overview_version}}">
+                                                {{t "Un-Subscribe"}}
+                                            </a>
+                                        </li>
+                                    {{/if}}
+                                {{/if}}
+                            {{/if}}
                         </ul>
                     </div>
                 </div>

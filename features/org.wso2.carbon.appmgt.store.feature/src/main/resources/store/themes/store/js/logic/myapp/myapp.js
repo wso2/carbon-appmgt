@@ -2,10 +2,13 @@ $( document ).ready(function() {
 
     var API_ADD_TO_FAVOURITE = caramel.context + '/apis/favourite/add-favourite-app';
     var API_REMOVE_FROM_FAVOURITE = caramel.context + '/apis/favourite/remove-favourite-app';
+    var API_UNSUBSCRIPTION_URL = caramel.context + '/resources/webapp/v1/unsubscription/app';
 
     var storeTenantDomain = $('#store-tenant-domain').val();
     var loggedInUserName = $('#user-name').val();
     var loggedInUserTenantId = $('#user-tenant-id').val();
+
+
 
     var jsonObj = {
         "isActive": "1",
@@ -180,4 +183,43 @@ $( document ).ready(function() {
             window.event.cancelBubble = true;
         }
     }
+
+    $('.btnUnsubscribe').on('click', function (e) {
+        var subscription = {};
+        subscription['apiName'] = $(this).data("name");
+        subscription['apiVersion'] = $(this).data("version");
+        subscription['apiProvider'] = $(this).data("provider");
+        subscription['apiTier'] = "Unlimited";
+        subscription['appName'] = "DefaultApplication";
+
+        unsubscribeToApp(subscription);
+    });
+
+
+    var unsubscribeToApp = function (subscription) {
+        $.ajax({
+                   url: API_UNSUBSCRIPTION_URL,
+                   type: 'POST',
+                   data: subscription,
+                   success: function (response) {
+                       if (response.error == false) {
+                           noty({
+                                    text: 'You have successfully unsubscribed from the <b>' + subscription.apiName
+                                          + '</b>',
+                                    'layout': 'center',
+                                    'timeout': 1500,
+                                    'modal': true,
+                                    'onClose': function () {
+                                        location.reload();
+                                    }
+                                });
+                       } else {
+                           alert('Error occured in unsubscribe to web app: ' + subscription.apiName);
+                       }
+                   },
+                   error: function (response) {
+                       alert('Error occured in unsubscribe');
+                   }
+               });
+    };
 });
