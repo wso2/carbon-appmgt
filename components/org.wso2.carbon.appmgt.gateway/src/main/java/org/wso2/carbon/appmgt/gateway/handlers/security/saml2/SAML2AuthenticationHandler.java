@@ -33,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.synapse.*;
-import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
@@ -48,8 +47,29 @@ import org.json.simple.JSONValue;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
-import org.opensaml.saml2.core.*;
-import org.opensaml.saml2.core.impl.*;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.Attribute;
+import org.opensaml.saml2.core.AttributeStatement;
+import org.opensaml.saml2.core.AuthnContextClassRef;
+import org.opensaml.saml2.core.AuthnContextComparisonTypeEnumeration;
+import org.opensaml.saml2.core.AuthnRequest;
+import org.opensaml.saml2.core.AuthnStatement;
+import org.opensaml.saml2.core.Issuer;
+import org.opensaml.saml2.core.LogoutRequest;
+import org.opensaml.saml2.core.NameID;
+import org.opensaml.saml2.core.NameIDPolicy;
+import org.opensaml.saml2.core.RequestAbstractType;
+import org.opensaml.saml2.core.RequestedAuthnContext;
+import org.opensaml.saml2.core.Response;
+import org.opensaml.saml2.core.SessionIndex;
+import org.opensaml.saml2.core.impl.AuthnContextClassRefBuilder;
+import org.opensaml.saml2.core.impl.AuthnRequestBuilder;
+import org.opensaml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.saml2.core.impl.LogoutRequestBuilder;
+import org.opensaml.saml2.core.impl.NameIDBuilder;
+import org.opensaml.saml2.core.impl.NameIDPolicyBuilder;
+import org.opensaml.saml2.core.impl.RequestedAuthnContextBuilder;
+import org.opensaml.saml2.core.impl.SessionIndexBuilder;
 import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Marshaller;
@@ -90,7 +110,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpCookie;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -237,7 +263,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     //and we need to drop the SAMLResponse goes in the request body as well. Bellow code
                     //segment is to set the HTTP_METHOD as GET and set empty body in request.
 
-                	getAxis2MessageContext(messageContext).setProperty("HTTP_METHOD", "GET");
+                    getAxis2MessageContext(messageContext).setProperty("HTTP_METHOD", "GET");
                     try {
                         SOAPEnvelope env = OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope();
                         env.addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
@@ -251,7 +277,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
                     }
                 }
             }
-
             if (isAuthorized) {
             	if (!isLogoutRequest(messageContext)) {
 
@@ -342,7 +367,6 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         }
         
         return false;
-        
     }
     
     public boolean handleResponse(MessageContext messageContext) {
@@ -365,6 +389,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
 	                getAxis2MessageContext();
 
             addAppmSamlCookieToResponse(axis2MC, appmSamlSsoCookie);
+
 	
 	        return true;
     	} catch (AppManagementException e) {
@@ -379,30 +404,26 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         List<HttpCookie> allSetCookies = HttpCookieUtil.getAllHttpSetCookies(axis2MC);
 
         //Search for the cookie containing APPM_SAML2_COOKIE
-        HttpCookie samleSsoCookie = null;
+        HttpCookie samlSsoCookie = null;
         for(HttpCookie cookie: allSetCookies) {
             if(AppMConstants.APPM_SAML2_COOKIE.equals(cookie.getName())) {
-                samleSsoCookie = cookie;
+                samlSsoCookie = cookie;
                 //Update the value
-                samleSsoCookie.setValue(appmSamlSsoCookie);
+                samlSsoCookie.setValue(appmSamlSsoCookie);
                 break;
             }
         }
-        if(samleSsoCookie == null) {
-            samleSsoCookie = new HttpCookie(AppMConstants.APPM_SAML2_COOKIE, appmSamlSsoCookie);
-            allSetCookies.add(samleSsoCookie);
+        if(samlSsoCookie == null) {
+            samlSsoCookie = new HttpCookie(AppMConstants.APPM_SAML2_COOKIE, appmSamlSsoCookie);
+            allSetCookies.add(samlSsoCookie);
         }
-        samleSsoCookie.setHttpOnly(true);
-        samleSsoCookie.setPath("/");
+        samlSsoCookie.setHttpOnly(true);
+        samlSsoCookie.setPath("/");
         if (log.isDebugEnabled()) {
             log.debug("Updated set cookie string in transport headers : " + appmSamlSsoCookie);
         }
 
         HttpCookieUtil.writeSetCookieHeaders(axis2MC, allSetCookies);
-    }
-
-    private HttpCookie parseSetCookieHeader(String cookieString) {
-        return HttpCookieUtil.parseSetCookieHeader(cookieString);
     }
 
     public void destroy() {
@@ -1512,7 +1533,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         if(cookieString == null || cookieString.isEmpty()) {
             return null;
         }
-        List<HttpCookie> httpCookies = HttpCookie.parse(cookieString);
+        List<HttpCookie> httpCookies = HttpCookieUtil.parseRequestCookie(cookieString);
         if(httpCookies != null) {
             for (HttpCookie httpCookie : httpCookies) {
                 if (cookieName.equals(httpCookie.getName())) {
@@ -1733,7 +1754,7 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
         Map<String, Object> headers = (Map<String, Object>) axis2MC.getProperty(
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         String cookieString = (String) headers.get(HTTPConstants.HEADER_COOKIE);
-        List<HttpCookie> allSetCookies = HttpCookie.parse(cookieString);
+        List<HttpCookie> allSetCookies = HttpCookieUtil.parseRequestCookie(cookieString);
 
         //Search for the cookie containing APPM_SAML2_COOKIE
         HttpCookie samleSsoCookie = null;
@@ -1747,8 +1768,13 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             allSetCookies.remove(samleSsoCookie);
         }
 
-        HttpCookieUtil.writeRequestCookieHeaders(((Axis2MessageContext) messageContext).
+        String newCookieString = HttpCookieUtil.formatRequestCookieHeader(((Axis2MessageContext) messageContext).
                 getAxis2MessageContext(), allSetCookies);
+        if(newCookieString != null) {
+            headers.put(HTTPConstants.HEADER_COOKIE, newCookieString);
+        } else {
+            headers.remove(HTTPConstants.HEADER_COOKIE);
+        }
     }
 
     /**

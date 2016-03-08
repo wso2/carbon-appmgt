@@ -23,6 +23,7 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import java.net.HttpCookie;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -53,23 +54,6 @@ public class HttpCookieUtil {
         return null;
     }
 
-    /**
-     * Parses the  cookie header.
-     * "Cookie"
-     *
-     * There is a single cookie string containing multiple name-value pair..
-     *
-     * @param cookieString
-     * @return The parsed HTTP Cookie or null if there is no cookies.
-     */
-    public static List<HttpCookie> parseRequestCookieHeader(String cookieString) {
-        if (cookieString != null) {
-            List<HttpCookie> cookies = HttpCookie.parse(cookieString);
-            return cookies;
-        }
-        return null;
-    }
-
     /*
      *  Converts the HttpCookie into the header string in the format conforming to "Set-Cookie"
      */
@@ -94,29 +78,28 @@ public class HttpCookieUtil {
     }
 
     /**
-     * Writes the cookie value into the request headers in proper format.
+     * Formats the cookies to the header format suitable for HTTP request.
      *
-     * @param axis2MC Axis2 Message Context
-     * @param cookies List of HTTP Cookies
+     * @param axis2MC Axis2 Message Context.
+     * @param cookies List of HTTP Cookies.
+     * @return Cookie String in header. null if the cookies list is empty.
      */
-    public static void writeRequestCookieHeaders(org.apache.axis2.context.MessageContext axis2MC,
+    public static String formatRequestCookieHeader(org.apache.axis2.context.MessageContext axis2MC,
             List<HttpCookie> cookies) {
-        Map<String, Object> headers = (Map<String, Object>) axis2MC
-                .getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
-        if (cookies.isEmpty()) {
-            headers.remove(HTTPConstants.HEADER_COOKIE);
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < cookies.size(); i++) {
-                if (i > 0) {
-                    sb.append(" ;");
-                }
-                HttpCookie httpCookie = cookies.get(i);
-                sb.append(httpCookie.getName()).append("=").append(httpCookie.getValue());
-            }
-            headers.put(HTTPConstants.HEADER_COOKIE, sb.toString());
+        if (cookies == null || cookies.isEmpty()) {
+            return null;
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < cookies.size(); i++) {
+            if (i > 0) {
+                sb.append("; ");
+            }
+            HttpCookie httpCookie = cookies.get(i);
+            sb.append(httpCookie.getName()).append("=").append(httpCookie.getValue());
+        }
+        return sb.toString();
     }
 
     /**
@@ -132,10 +115,10 @@ public class HttpCookieUtil {
         Map<String, Object> excessHeaders = (Map<String, Object>) axis2MC
                 .getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
 
+        excessHeaders.remove(HTTPConstants.HEADER_SET_COOKIE);
         if (setCookies.size() > 0) {
             headers.put(HTTPConstants.HEADER_SET_COOKIE, HttpCookieUtil.formatSetCookieHeader((setCookies.get(0))));
             if (setCookies.size() > 1) {
-                excessHeaders.remove(HTTPConstants.HEADER_SET_COOKIE);
                 for (int i = 1; i < setCookies.size(); i++) {
                     excessHeaders.put(HTTPConstants.HEADER_SET_COOKIE,
                             HttpCookieUtil.formatSetCookieHeader((setCookies.get(i))));
@@ -176,5 +159,27 @@ public class HttpCookieUtil {
             }
         }
         return allSetCookies;
+    }
+
+    /**
+     * Parses the cookie string to list of cookies
+     * @param cookieString
+     * @return
+     */
+    public static List<HttpCookie> parseRequestCookie(String cookieString) {
+        if(cookieString == null || cookieString.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<HttpCookie> result = new ArrayList<>();
+        String[] parts = cookieString.split(";");
+        for(String part: parts) {
+            String[] nameValue = part.split("=");
+            if(nameValue.length ==2) {
+                HttpCookie httpCookie = new HttpCookie(nameValue[0].trim(), nameValue[1].trim());
+                result.add(httpCookie);
+            }
+        }
+
+        return result;
     }
 }
