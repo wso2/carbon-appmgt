@@ -6694,7 +6694,7 @@ public class AppMDAO {
                     + "WHERE HIT.USER_ID=? GROUP BY HIT.UUID "
                     + "UNION ALL "
                     + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME, CONTEXT FROM APM_APP "
-                    + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS  WHERE USER_ID=? )) "
+                    + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS  WHERE USER_ID=? )) A "
                     + "ORDER BY HIT_COUNT DESC,APP_NAME ASC LIMIT ? , ?";
 
             if (conn.getMetaData().getDriverName().contains("Oracle")) {
@@ -6703,7 +6703,7 @@ public class AppMDAO {
                         + "WHERE HIT.USER_ID=? "
                         + "GROUP BY HIT.UUID, HIT.APP_NAME, HIT.VERSION UNION ALL "
                         + "SELECT UUID ,0 AS HIT_COUNT, UPPER(APP_NAME) AS APP_NAME FROM APM_APP "
-                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? ))  "
+                        + "WHERE UUID NOT IN (SELECT UUID FROM APM_APP_HITS WHERE USER_ID=? )) A  "
                         + "WHERE ROWNUM >= ? AND ROWNUM <= ? "
                         + "ORDER BY HIT_COUNT DESC,APP_NAME ASC ";
             }
