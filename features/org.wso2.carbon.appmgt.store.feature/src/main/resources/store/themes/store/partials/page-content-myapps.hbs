@@ -1,55 +1,57 @@
 {{!-- page content - my apps page --}}
 <div class="row">
     {{#each assets}}
-        <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
-            <div class="app-tile">
-                <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
-                   data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
-                   data-context="{{attributes.overview_context}}" class="hover-overlay-container">
-                    <div class="ratio-responsive-4by3">
-                        {{#if isFavourite}}
-                            {{> ribbons/favorite}}
-                        {{else}}
-                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                                {{> ribbons/advertise}}
+        {{#if isActive}}
+            <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+                <div class="app-tile">
+                    <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
+                       data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
+                       data-context="{{attributes.overview_context}}" class="hover-overlay-container">
+                        <div class="ratio-responsive-4by3">
+                            {{#if isFavourite}}
+                                {{> ribbons/favorite}}
+                            {{else}}
+                                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                    {{> ribbons/advertise}}
+                                {{/ifCond}}
+                            {{/if}}
+                            {{#ifCond lifecycleState "==" "DEPRECATED"}}
+                                {{> ribbons/deprecated}}
                             {{/ifCond}}
-                        {{/if}}
+                            {{#if defaultThumbnail}}
+                                <div class="ratio-responsive-item responsive-text"
+                                     style="background-color: #{{defaultThumbnail.color}};">
+                                    <span class="default-thumbnail">{{defaultThumbnail.text}}</span>
+                                </div>
+                            {{else}}
+                                <div class="ratio-responsive-img">
+                                    <img src="{{attributes.images_thumbnail}}" />
+                                </div>
+                            {{/if}}
 
-                        {{#if defaultThumbnail}}
-                            <div class="ratio-responsive-item responsive-text"
-                                 style="background-color: #{{defaultThumbnail.color}};">
-                                <span class="default-thumbnail">{{defaultThumbnail.text}}</span>
-                            </div>
-                        {{else}}
-                            <div class="ratio-responsive-img">
-                                <img src="{{attributes.images_thumbnail}}" />
-                            </div>
-                        {{/if}}
+                            {{#if accessUrl}}
+                                {{> overlays/launch}}
+                            {{else}}
+                                {{> overlays/view}}
+                            {{/if}}
+                        </div>
+                    </a>
 
-                        {{#if accessUrl}}
-                            {{> overlays/launch}}
-                        {{else}}
-                            {{> overlays/view}}
-                        {{/if}}
-                    </div>
-                </a>
+                    <div class="summery">
+                        <h4>{{attributes.overview_displayName}}</h4>
+                        <h5>{{attributes.overview_version}}</h5>
 
-                <div class="summery">
-                    <h4>{{attributes.overview_displayName}}</h4>
-                    <h5>{{attributes.overview_version}}</h5>
-
-                    <p>{{attributes.overview_provider}}</p>
+                        <p>{{attributes.overview_provider}}</p>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
 
-                    <div class="more-menu pull-right">
-                        <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
-                           title="Click for more options">
-                            <i class="fw fw-ellipsis fw-rotate-90"></i>
-                        </a>
-                        <ul class="more-menu-items dropdown-menu">
-                            {{#if ../user}}
+                        <div class="more-menu pull-right">
+                            <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                               title="Click for more options">
+                                <i class="fw fw-ellipsis fw-rotate-90"></i>
+                            </a>
+                            <ul class="more-menu-items dropdown-menu">
                                 {{#if isFavourite}}
                                     <li>
                                         <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
@@ -67,21 +69,79 @@
                                         </a>
                                     </li>
                                 {{/if}}
-                            {{/if}}
-                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                                <li>
-                                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
-                                        More Details
-                                    </a>
-                                </li>
-                            {{else}}
-                                <li><a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">More Details</a></li>
-                            {{/ifCond}}
-                        </ul>
+                                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                    <li>
+                                        <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
+                                            More Details
+                                        </a>
+                                    </li>
+                                {{else}}
+                                    <li><a href="{{tenantedUrl "/assets/"}}{{../../../assetType}}/{{id}}">More Details</a>
+                                    </li>
+                                {{/ifCond}}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {{else}}
+            <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+                <div class="app-tile">
+                    <a href="#" class="hover-overlay-inactive-container" title="{{lifecycleState}}">
+                        <div class="ratio-responsive-4by3">
+                            {{> ribbons/inactive}}
+                            {{#if defaultThumbnail}}
+                                <div class="ratio-responsive-item responsive-text"
+                                     style="background-color: #{{defaultThumbnail.color}};">
+                                    <span class="default-thumbnail">{{defaultThumbnail.text}}</span>
+                                </div>
+                            {{else}}
+                                <div class="ratio-responsive-img">
+                                    <img src="{{attributes.images_thumbnail}}" />
+                                </div>
+                            {{/if}}
+                            {{> overlays/inactive}}
+                        </div>
+                    </a>
+
+                    <div class="summery">
+                        <h4>{{attributes.overview_displayName}}</h4>
+                        <h5>{{attributes.overview_version}}</h5>
+
+                        <p>{{attributes.overview_provider}}</p>
+                    <span class="rating">
+                        {{assetRating rating}}
+                    </span>
+
+                        <div class="more-menu pull-right">
+                            <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
+                               title="Click for more options">
+                                <i class="fw fw-ellipsis fw-rotate-90"></i>
+                            </a>
+                            <ul class="more-menu-items dropdown-menu">
+                                    {{#if isFavourite}}
+                                        <li>
+                                            <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
+                                               data-provider="{{attributes.overview_provider}}"
+                                               data-version="{{attributes.overview_version}}" class="remove-from-fav">
+                                                Remove from Favorites
+                                            </a>
+                                        </li>
+                                    {{else}}
+                                        <li>
+                                            <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
+                                               data-provider="{{attributes.overview_provider}}"
+                                               data-version="{{attributes.overview_version}}" class="add-to-fav">
+                                                Add to Favorites
+                                            </a>
+                                        </li>
+                                    {{/if}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/if}}
     {{/each}}
 </div>
 

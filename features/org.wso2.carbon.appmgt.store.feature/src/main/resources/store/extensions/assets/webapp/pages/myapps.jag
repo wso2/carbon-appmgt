@@ -356,7 +356,8 @@ require('/modules/store.js').exec(function (ctx) {
                                assets[i].attributes.overview_provider)) {
                 assets[i].isFavourite = true;
             }
-
+            //check active or not
+            assets[i].isActive = isActive(assets[i]);
             //set thumbnail
             setDefaultThumbnail(assets[i]);
         }
@@ -427,6 +428,28 @@ require('/modules/store.js').exec(function (ctx) {
                                             tenantDomain).status;
         }
         return status;
+    };
+
+    /**
+     * check whether asset has an active life cycle.
+     * return true if published/deprecated else false
+     */
+    var isActive = function (asset) {
+        var active = false;
+        if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            var lifeCycleState = asset.lifecycleState.toUpperCase();
+            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+                active = true;
+            }
+            asset.lifecycleState = lifeCycleState;
+        } else {
+            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+                active = true;
+            }
+            //when getting asset from apm db attribute name is different.
+            asset.lifecycleState = asset.lifeCycleStatus;
+        }
+        return active
     };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
