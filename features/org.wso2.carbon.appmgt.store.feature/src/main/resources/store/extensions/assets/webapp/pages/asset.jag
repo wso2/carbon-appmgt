@@ -496,12 +496,18 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
+        var searchQuery = { search: "", searchTerm: ""};
+
         caramel.render({
             title: 'WebApp | Store',
             user: user,
             sso: sso,
             header: headerData,
             navigation: navigationData,
+            search: {
+                query: searchQuery,
+                searchUrl: tagUrl
+            },
             isSocial: configs.socialCommentsEnable,
             type: type,
             embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,

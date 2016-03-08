@@ -1,59 +1,81 @@
 <%
-
 include('../modules/jagg/jagg.jag');
+require('/modules/store.js').exec(function (ctx) {
+    var store = ctx.store,
+        user = ctx.user;
+    var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
-var parameters = request.getQueryString().split("&");
+    var parameters = decodeURIComponent(request.getQueryString()).split("&");
 
-AuthService = require(getServiceDir('authentication.js')).serviceModule;
-authenticator = new AuthService.Authenticator();
-authenticator.init(jagg, session);
+    AuthService = require(getServiceDir('authentication.js')).serviceModule;
+    authenticator = new AuthService.Authenticator();
+    authenticator.init(jagg, session);
 
-var docName = parameters[0];
-var webappProvider = parameters[1];
-var webappName = parameters[3];
-var webappVersion = parameters[2];
-var username = parameters[4];
+    var docName = parameters[0];
+    var webappProvider = parameters[1];
+    var webappName = parameters[3];
+    var webappVersion = parameters[2];
+    var username = parameters[4];
+    var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
+    var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
 
-var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
-var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
-
-var APIProviderImpl = Packages.org.wso2.carbon.appmgt.impl.APIProviderImpl;
+    var APIProviderImpl = Packages.org.wso2.carbon.appmgt.impl.APIProviderImpl;
 
 //In annonymous mode username = "". 
 //APIProviderImpl initializes annonymous registry if the username is null. 
 //Hence assigning username = null. 
-if ("".equals(username)) {
-	username = null;
-}
+    if ("".equals(username)) {
+        username = null;
+    }
 
-var APIProviderImplObj = new APIProviderImpl(username);
+    var navigationData = {
+        showAllAppsLink: true
+    };
 
-var find = '%20';
-var regExp = new RegExp(find, 'g');
-var docNameWithoutSpace = docName.replace(regExp, ' ');
-var content = APIProviderImplObj.getDocumentationContent(apiIdentifierObj, docNameWithoutSpace);
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        navigationData.showAllAppsLink = false;
+        tagUrl = context + '/extensions/assets/webapp/myapps';
+    }
 
-var docData = {};
-docData.webappName = webappName;
-docData.docName = decodeURI(docName);
-docData.docContent = content;
-
-var userData = authenticator.getLoggedInUser();
-
-
-caramel.render({
-		header: {
-	            user: userData
-	    },
-        data:docData
-       
-    });
+    var APIProviderImplObj = new APIProviderImpl(username);
 
 
+    var content = APIProviderImplObj.getDocumentationContent(apiIdentifierObj, docName);
+
+    var docData = {};
+    docData.webappName = webappName;
+    docData.docName = decodeURI(docName);
+    docData.docContent = content;
+
+    var userData = authenticator.getLoggedInUser();
+    var searchQuery = { search: "", searchTerm: ""};
+    var isSite = 'false';//To get the webapp tags
+
+    caramel.render({
+                       title: 'Inline Doc | Store',
+                       user: user,
+                       header: {
+                           user: userData
+                       },
+                       navigation: navigationData,
+                       data: docData,
+                       search: {
+                           query: searchQuery,
+                           searchUrl: tagUrl
+                       },
+                       tags: {
+                           tagUrl: tagUrl,
+                           data: store.tags(type, isSite)
+                       }
+
+                   });
+
+}, request, response, session);
 function getServiceDir(serviceName) {
-	return '../services/' + serviceName;
+    return '../services/' + serviceName;
 }
-	
-
-
 %>

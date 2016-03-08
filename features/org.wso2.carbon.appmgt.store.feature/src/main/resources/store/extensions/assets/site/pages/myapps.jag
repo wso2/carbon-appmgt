@@ -66,6 +66,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
     var tagUrl = context;
+    var searchUrl = context + '/extensions/assets/site/myapps';
     url =
     '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
                                                                                    '');
@@ -360,7 +361,8 @@ require('/modules/store.js').exec(function (ctx) {
                                assets[i].attributes.overview_provider)) {
                 assets[i].isFavourite = true;
             }
-
+            //Check the active or not
+            assets[i].isActive = isActive(assets[i]);
             //set thumbnail
             setDefaultThumbnail(assets[i]);
         }
@@ -433,7 +435,27 @@ require('/modules/store.js').exec(function (ctx) {
         }
         return status;
     };
-
+    /**
+     * check whether asset has an active life cycle.
+     * return true if published/deprecated else false
+     */
+    var isActive = function (asset) {
+        var active = false;
+        if(!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            var lifeCycleState = asset.lifecycleState.toUpperCase();
+            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+                active = true;
+            }
+            asset.lifecycleState = lifeCycleState;
+        } else {
+            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+                active = true;
+            }
+            //when getting asset from apm db attribute name is different.
+            asset.lifecycleState = asset.lifeCycleStatus;
+        }
+        return active
+    };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
         //In this case all the apps in the store are accessible by user without any subscriptions
@@ -470,7 +492,8 @@ require('/modules/store.js').exec(function (ctx) {
                        header: headerData,
                        navigation: navigationData,
                        search: {
-                           query: query
+                           query: query,
+                           searchUrl: searchUrl
                        },
                        type: type,
                        tags: {

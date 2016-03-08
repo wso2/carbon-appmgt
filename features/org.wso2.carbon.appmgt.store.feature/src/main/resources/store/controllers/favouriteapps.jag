@@ -50,6 +50,7 @@ require('/modules/store.js').exec(function (ctx) {
     caramel = require('caramel');
     var context = caramel.configs().context;
     var tagUrl = context;
+    var searchUrl = context;
     //Get subscription configuration options
     var favourites = jagg.module("favourites");
     var subscriptionUtil = require('/themes/store/js/subscription-config.js');
@@ -70,14 +71,18 @@ require('/modules/store.js').exec(function (ctx) {
         navigationData.showAllAppsLink = false;
         if(assetType == "webapp") {
             tagUrl = tagUrl + '/extensions/assets/webapp/myapps';
+            searchUrl = searchUrl + '/assets/favouriteapps?type=webapp';
         } else {
             tagUrl = tagUrl + '/extensions/assets/site/myapps';
+            searchUrl = searchUrl + '/assets/favouriteapps?type=site';
         }
     } else {
         if(assetType == "webapp") {
             tagUrl = tagUrl + '/assets/webapp';
+            searchUrl = searchUrl + '/assets/favouriteapps?type=webapp';
         } else {
             tagUrl = tagUrl + '/assets/site';
+            searchUrl = searchUrl + '/assets/favouriteapps?type=site';
         }
 
     }
@@ -148,7 +153,10 @@ require('/modules/store.js').exec(function (ctx) {
                            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
                        },
                        navigation: navigationData,
-                       searchQuery: searchQuery,
+                       search: {
+                           query: searchQuery,
+                           searchUrl: searchUrl
+                       },
                        sso: sso,
                        sortOptions: sortOptions,
                        favouriteApps: apps
@@ -183,6 +191,7 @@ function filterAssets(assets,type) {
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
             asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.appDisplayName);
         }
+        asset.isActive = isActive(asset);
         // categorize asset either as webapp or site
         if (asset.treatAsSite == "TRUE") {
             sites.push(asset);
@@ -242,6 +251,18 @@ function createSortOptions() {
     options.push(sortByRecent);
     sortOptions["options"] = options;
     return sortOptions;
+}
+/**
+ * check whether asset has an active life cycle.
+ * return true if published/deprecated else false
+ */
+function isActive(asset) {
+    var active = false;
+    if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+        active = true;
+    }
+    asset.lifecycleState = asset.lifeCycleStatus;
+    return active;
 }
 %>
 
