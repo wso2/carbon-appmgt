@@ -435,7 +435,27 @@ require('/modules/store.js').exec(function (ctx) {
         }
         return status;
     };
-
+    /**
+     * check whether asset has an active life cycle.
+     * return true if published/deprecated else false
+     */
+    var isActive = function (asset) {
+        var active = false;
+        if(!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            var lifeCycleState = asset.lifecycleState.toUpperCase();
+            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+                active = true;
+            }
+            asset.lifecycleState = lifeCycleState;
+        } else {
+            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+                active = true;
+            }
+            //when getting asset from apm db attribute name is different.
+            asset.lifecycleState = asset.lifeCycleStatus;
+        }
+        return active
+    };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
         //In this case all the apps in the store are accessible by user without any subscriptions
@@ -506,14 +526,4 @@ function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
-/**
- * check whether asset has an active life cycle.
- * return true if published/deprecated else false
- */
-function isActive(asset) {
-    if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
-        return true;
-    }
-    return false
-}
 %>

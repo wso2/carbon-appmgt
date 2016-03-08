@@ -15,7 +15,7 @@
                                     {{> ribbons/advertise}}
                                 {{/ifCond}}
                             {{/if}}
-                            {{#ifCond lifeCycleStatus "==" "DEPRECATED"}}
+                            {{#ifCond lifecycleState "==" "DEPRECATED"}}
                                 {{> ribbons/deprecated}}
                             {{/ifCond}}
                             {{#if defaultThumbnail}}
@@ -87,7 +87,7 @@
         {{else}}
             <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
                 <div class="app-tile">
-                    <a href="#" class="hover-overlay-inactive-container" title="{{lifeCycleStatus}}">
+                    <a href="#" class="hover-overlay-inactive-container" title="{{lifecycleState}}">
                         <div class="ratio-responsive-4by3">
                             {{> ribbons/inactive}}
                             {{#if defaultThumbnail}}

@@ -257,10 +257,12 @@ function createSortOptions() {
  * return true if published/deprecated else false
  */
 function isActive(asset) {
+    var active = false;
     if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
-        return true;
+        active = true;
     }
-    return false
+    asset.lifecycleState = asset.lifeCycleStatus;
+    return active;
 }
 %>
 
