@@ -356,7 +356,8 @@ require('/modules/store.js').exec(function (ctx) {
                                assets[i].attributes.overview_provider)) {
                 assets[i].isFavourite = true;
             }
-
+            //check active or not
+            assets[i].isActive = isActive(assets[i]);
             //set thumbnail
             setDefaultThumbnail(assets[i]);
         }
@@ -497,5 +498,15 @@ function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
+/**
+ * check whether asset has an active life cycle.
+ * return true if published/deprecated else false
+ */
+function isActive(asset) {
+    if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+        return true;
+    }
+    return false
+}
 %>
 

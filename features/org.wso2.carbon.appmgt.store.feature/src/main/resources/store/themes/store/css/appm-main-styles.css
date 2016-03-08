@@ -466,6 +466,11 @@ a.disabled {
     cursor: pointer;
 }
 
+.hover-overlay-inactive-container:hover .hover-overlay {
+    display: block;
+    background: rgba(0, 0, 0, .6);
+    cursor: not-allowed;
+}
 /**/
 /*========== COLORS ==========*/
 /*
@@ -571,4 +576,12 @@ active: background 10% lighter, border 5% darker
 
 .background-color-windows {
     background-color: #00bcf2;
+}
+
+.background-color-inactive {
+    background-color: #C10D15;
+}
+
+.background-color-deprecated {
+    background-color: #FFCC00;
 }

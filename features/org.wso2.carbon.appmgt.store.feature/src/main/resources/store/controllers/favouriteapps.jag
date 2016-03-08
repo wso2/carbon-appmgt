@@ -191,6 +191,7 @@ function filterAssets(assets,type) {
         if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
             asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.appDisplayName);
         }
+        asset.isActive = isActive(asset);
         // categorize asset either as webapp or site
         if (asset.treatAsSite == "TRUE") {
             sites.push(asset);
@@ -250,6 +251,16 @@ function createSortOptions() {
     options.push(sortByRecent);
     sortOptions["options"] = options;
     return sortOptions;
+}
+/**
+ * check whether asset has an active life cycle.
+ * return true if published/deprecated else false
+ */
+function isActive(asset) {
+    if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
+        return true;
+    }
+    return false
 }
 %>
 
