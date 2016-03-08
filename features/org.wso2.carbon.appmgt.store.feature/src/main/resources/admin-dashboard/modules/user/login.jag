@@ -1,7 +1,7 @@
 <%
 
 var login = function (username, password,tenantMode) {
-    var result, isSuperTenant, message,
+    var result, isSuperTenant, action,
             log = new Log();
 
 try{
@@ -11,7 +11,7 @@ try{
      return {
              error:true,
             cookie:null,
-            message:"Authentication failed."+username.split("@")[0]+" is not from the tenant domain " + tenantMode
+            action:"Authentication failed."+username.split("@")[0]+" is not from the tenant domain " + tenantMode
         };
     }
     }
@@ -38,12 +38,12 @@ try{
             log.debug("Error while authenticating user : " + username);
         }
 
-        message = username+" Login Failed.";
+        action = username+" Login Failed.";
 
         return {
             error:true,
             cookie:null,
-            message:message
+            action:action
         };
     }else{
     isSuperTenant =tenantMode;
@@ -60,15 +60,15 @@ try{
      return {
             error:true,
             cookie:null,
-            message:username+" Login Failed."
+            action:username+" Login Failed."
         };
 
 }}
 catch (e) {
-        log.error(e.message);
+        log.error(e.action);
  return {
         error:true,
-        message:e.message.split("Exception:")[2]
+        action:e.action.split("Exception:")[2]
     };
 }
 };
@@ -144,7 +144,7 @@ var getWorkflowCookie = function(username,password) {
 			session.put("workflowCookie",cookie.split(";")[0].split(":")[1]);
 		}
 	}catch (e) {
-		log.error(e.message);
+		log.error(e.action);
 
 	}
 };
@@ -172,7 +172,7 @@ var isUserAllowed = function (username, password) {
 
         return parseRolesResponse(result);
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return false;
 
     }

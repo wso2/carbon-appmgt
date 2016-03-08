@@ -160,7 +160,7 @@
 <div id="wizard-step-2" class="content-div" style="display: none;">
 
     <div class="row-fluid">
-        <form id="wizard-step-2-form" action="/publisher/api/asset/version/{{op}}/{{shortName}}/{{artifact.id}}"
+        <form id="wizard-step-2-form" action="{{url "/api/asset/version/"}}{{op}}/{{shortName}}/{{artifact.id}}"
               method="post" enctype="multipart/form-data" class="form-horizontal">
 
             {{#ifCond artifact.attributes.overview_platform "==" "webapp"}}
@@ -327,7 +327,7 @@
                 <div class="col-sm-10 col-sm-offset-2">
                     <input type="submit" id="btnCreateNewVersion" value="Create New Version"
                            class="btn btn-primary" />
-                    <a href="/publisher/assets/mobileapp/" class="btn btn-mob-cancel">Cancel</a>
+                    <a href="{{url "/assets/mobileapp/"}}" class="btn btn-mob-cancel">Cancel</a>
                 </div>
             </div>
 
@@ -336,7 +336,7 @@
 
 </div>
 
-<div id="message-modal" class="modal fade" tabindex="-1" role="dialog"
+<div id="action-modal" class="modal fade" tabindex="-1" role="dialog"
      aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -348,7 +348,7 @@
             </div>
             <div class="modal-body">Modal body</div>
             <div class="modal-footer">
-                <button type="button" id="message-modal-button" class="btn btn-default"
+                <button type="button" id="action-modal-button" class="btn btn-default"
                         data-dismiss="modal">
                     Close
                 </button>

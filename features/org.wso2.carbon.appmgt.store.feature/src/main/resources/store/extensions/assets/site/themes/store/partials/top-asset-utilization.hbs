@@ -1,0 +1,15 @@
+{{#if thisAsset.indashboard}}
+    <a href="#" class="btn btn-primary btn-added">{{>process-asset-text}}</a>
+{{else}}
+	hello
+    {{# if ssoParam}}
+        <a href="{{tenantedUrl "/login"}}"
+           class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
+    {{else}}
+
+        <a href="#" class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
+    {{/if}}
+    {{# if userParam.username}}
+        <a href="#" class="btn btn-primary asset-add-btn">{{>process-asset-text}}</a>
+    {{/if}}
+{{/if}}

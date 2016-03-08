@@ -56,7 +56,7 @@ var matcher = new URIMatcher(request.getRequestURI()),
 			body = request.getParameter('body');
 			replies = {};
 			rating ={};
-	
+
 			databridge.initPublisher(activity_type, asset, parent_id, parent_type, user, body, replies, rating);
 			
         	return;

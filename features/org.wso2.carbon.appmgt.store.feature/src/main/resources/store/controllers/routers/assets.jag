@@ -1,5 +1,8 @@
 <%
 var type;
+var customType;
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
 (function () {
     var prefix, pages, path, suffix, theme, links, link, i, length, elements, mapper,
             store = require('/modules/store.js'),
@@ -10,18 +13,23 @@ var type;
             matcher = new URIMatcher(request.getRequestURI()),
             tenant = server.tenant(request, session),
             configs = store.configs(tenant.tenantId);
+
     mapper = function (path) {
         return function () {
             return path;
         };
     };
 
+    var tenantedPrefix = '/{context}/t/{domain}' + config.assetsUrlPrefix;
+    var tenantedAssetsEndpoint = tenantedPrefix + '/{type}';
+    var tenantedAssetEndpoint = tenantedPrefix + '/{type}/{id}';
 
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/')) {
-    	
+    //Check whether the assets endpoint URI is tenanted or not
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/') || matcher.match(tenantedAssetsEndpoint)) {
+
         elements = matcher.elements();
         type = elements.type;
-        
+
         if (type == "all") {
             path = '/controllers/top-assets.jag';
             request.getMappedPath = mapper(path);
@@ -31,17 +39,27 @@ var type;
         if (configs.assets.indexOf(type) === -1) {
             response.sendError(404, 'Request Resource cannot be found');
             return;
-        } 
+        }
         path = store.ASSETS_EXT_PATH + type + '/pages/' + 'assets.jag';
         if (!new File(path).isExists()) {
             path = '/controllers/assets.jag';
         }
         request.getMappedPath = mapper(path);
+
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
         include(path);
         return;
     }
-    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}')) {
+
+    //Check whether the asset endpoint URI is tenanted or not
+    if (matcher.match('/{context}' + config.assetsUrlPrefix + '/{type}/{id}') || matcher.match(tenantedAssetEndpoint)) {
         elements = matcher.elements();
+
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
             response.sendError(404, 'Request Resource cannot be found');
@@ -52,6 +70,10 @@ var type;
             path = '/controllers/asset.jag';
         }
         request.getMappedPath = mapper(path);
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
         include(path);
         return;
     }

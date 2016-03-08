@@ -1,18 +1,31 @@
-
 <div class="assets-wrapper">
-
 	{{#if assets}}
 
 		{{#each assets}}
 
             <div class="col-xs-6 col-md-4 col-lg-1-5 app-assets-wrapper">
+                {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
+                    <div class="ribbon-wrapper-orange"><div class="ribbon-orange">Advertised</div></div>
+                {{/compare}}
+
                 {{#if isSubscribed}}
                     <div class="ribbon-wrapper-green"><div class="ribbon-green">Subscribed</div></div>
                 {{/if}}
                 <div class="app-assets">
-                    <a href="{{url "/assets"}}/{{type}}/{{id}}">
-                        <img class="app-assets-icon"
-                             src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                    {{#compare  attributes.overview_advertiseOnly "true" operator="=="}}
+                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{type}}/{{attributes.overview_advertisedAppUuid}}">
+                    {{else}}
+                    <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
+                    {{/compare}}
+                    {{#if defaultThumbnail}}
+                        <div class="app-assets-default-icon" style="background: #{{defaultThumbnail.color}};">
+                            {{defaultThumbnail.text}}
+                        </div>
+                    {{else}}
+                        <div class="app-assets-icon">
+                            <img src="{{attributes.images_thumbnail}}" />
+                        </div>
+                    {{/if}}
                     </a>
                     <div class="app-assets-info">
                         <div class="app-assets-name">
@@ -43,10 +56,10 @@
     <div class="row">
     <ul class="pager">
         {{#if leftNav}}
-            <li><a href="{{url "/assets/webapp?page="}}{{this.leftNav}}">Previous</a></li>
+            <li><a href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
         {{/if}}
         {{#if rightNav}}
-            <li><a  href="{{url "/assets/webapp?page="}}{{this.rightNav}}">Next</a></li>
+            <li><a  href="{{tenantedUrl "/assets/webapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}">Next</a></li>
         </ul>
         {{/if}}
     </div>

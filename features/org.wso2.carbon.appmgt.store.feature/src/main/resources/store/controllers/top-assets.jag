@@ -3,6 +3,7 @@
 //response.sendRedirect('.' + require('/store.js').config().assetsUrlPrefix + '/gadget');
 
 var caramel;
+var customType;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 
@@ -15,7 +16,8 @@ require('/modules/store.js').exec(function (ctx) {
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = ctx.tenantId,
+            tenantId = ctx.tenant.tenantId || -1234,
+            tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
             matcher = ctx.matcher,
@@ -35,7 +37,10 @@ require('/modules/store.js').exec(function (ctx) {
     process = require('process'),
     localIP = "https://" + process.getProperty('server.host'),
     httpsPort = process.getProperty('https.port');
-    
+
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+
     length = types.length;
     recent = Math.floor(recentCount / length);
     recentDiff = recentCount - recent * length;
@@ -43,6 +48,12 @@ require('/modules/store.js').exec(function (ctx) {
     popularDiff = popularCount - popular * length;
     paging = store.assetsPaging(request);
     query = query ? search.build(String(query)) : null;
+
+    var SITE_TYPE = 'site';
+    var WEBAPP_TYPE = 'webapp';
+    var MOBILEAPP_TYPE = 'mobileapp';
+    var siteAttribute;
+    var RECENT_APP_COUNT =  Math.floor(store.getRecentAppCount().topAssetPage / length);
 
     // Init subscription service.
     var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
@@ -98,7 +109,18 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     types.forEach(function (type) {
-        manager = store.rxtManager(type, session);
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
+        manager = store.rxtManager(customType, session);
+
+        var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
+        if (log.isDebugEnabled()) {
+            log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
+        }
         if (query) {
             assets = store.search({
                 attributes: query,
@@ -108,19 +130,51 @@ require('/modules/store.js').exec(function (ctx) {
         } else if (tag) {
             assets = store.tagged(type, tag, paging);
         } else {
-            assets = store.assets(type, paging);
+            if (customType == MOBILEAPP_TYPE) {
+                assets = store.assets(customType, paging);
+            } else {
+                if (customType == SITE_TYPE) {
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "TRUE"};
+                    } else {
+                        siteAttribute = {
+                            //if multiple versions to be displayed do consider default version
+                            "overview_treatAsASite": "TRUE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
+                } else if (customType == WEBAPP_TYPE) {
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "FALSE"};
+                    } else {
+                        //if multiple versions to be displayed do consider default version
+                        siteAttribute = {
+                            "overview_treatAsASite": "FALSE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
+                }
+                var siteOption = {
+                    type: type,
+                    attributes: siteAttribute
+                };
+                assets = store.search(siteOption, paging);
+            }
         }
 
 
         var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
 
-        if(type == "webapp") {
+        if(type == WEBAPP_TYPE) {
 
             var subscriptionInfo;
             assets.forEach(function (asset) {
+                // set default thumbnail
+                setDefaultThumbnail(asset);
 
                 //set rating
-                
                 if(JSON.parse(social.getRating("webapp:" + asset.id))){
                     asset.rating = Math.floor(JSON.parse(social.getRating("webapp:" + asset.id)).rating);
                 }else{
@@ -153,26 +207,51 @@ require('/modules/store.js').exec(function (ctx) {
 
             });
         }
-
         items.push({
             assets: assets,
             plural: manager.pluralLabel,
             singular: manager.singularLabel,
             type: manager.shortName
         });
-        popularItems = popularItems.concat(store.popularAssets(type, first ? (popular + popularDiff) : popular));
-        recentItems = recentItems.concat(store.recentAssets(type, first ? (recent + recentDiff) : recent));
+
+        //Top asset recent app populating logic.
+        if (customType == MOBILEAPP_TYPE) {
+            popularItems = popularItems.concat(store.popularAssets(type, RECENT_APP_COUNT));
+            recentItems = recentItems.concat(store.recentAssets(type, RECENT_APP_COUNT));
+        } else {
+            popularItems = popularItems.concat(store.popularAssets(type, RECENT_APP_COUNT, siteAttribute));
+            recentItems = recentItems.concat(store.recentAssets(type, RECENT_APP_COUNT, siteAttribute));
+        }
+
+        for (var i = 0; i < recentItems.length; i++) {
+            var recentItem = recentItems[i];
+            // set default thumbnail
+            setDefaultThumbnail(recentItem);
+            // set ratings
+            var appRatingRecentAssets = JSON.parse(social.getRating(WEBAPP_TYPE + ':' + recentItem.id));
+            if (appRatingRecentAssets) {
+                recentItem.rating = Math.floor(appRatingRecentAssets.rating);
+            } else {
+                recentItem.rating = 0;
+            }
+        }
+
         first = false;
     });
 
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+    });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.domain = tenantDomain;
+
     caramel.render({
-        title: 'Store | WSO2 Enterprise Store',
+        title: 'Store | WSO2 App Manager',
         user: user,
         sso: sso,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header: headerData,
         navigation: site.navigation(tenantId),
         search: {
             title: "Top Assets",
@@ -198,5 +277,16 @@ require('/modules/store.js').exec(function (ctx) {
 
 function getServiceDir(serviceName) {
     return '/extensions/assets/webapp/services/' + serviceName;
+}
+
+/**
+ * Sets the default thumbnail of the specified asset.
+ * @param asset {Object} asset
+ */
+function setDefaultThumbnail(asset) {
+    var assetThumbnail = asset.attributes.images_thumbnail;
+    if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+        asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+    }
 }
 %>

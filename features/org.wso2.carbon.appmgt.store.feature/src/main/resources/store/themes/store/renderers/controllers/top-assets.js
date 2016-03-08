@@ -1,6 +1,6 @@
 var render = function (theme, data, meta, require) {
    
-    theme('1-column', {
+    theme('2-column-right', {
         title: data.title,
         header: [
             {

@@ -3,7 +3,6 @@ var addSubscription = function (api, tier, applicationId, username) {
     var status,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
-
     try {
         status = store.addSubscription(api.provider, api.name, api.version, tier, applicationId, username);
         
@@ -15,11 +14,11 @@ var addSubscription = function (api, tier, applicationId, username) {
             status:status
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             status:false,
-            message:e.message
+            action:e.action
         };
     }
 };
@@ -40,11 +39,11 @@ var updateAPPVisibility = function (api, username) {
             status:status
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             status:false,
-            message:e.message
+            action:e.action
         };
     }
 };
@@ -53,8 +52,11 @@ var addAPISubscription = function (api, subscriptionType, tier, applicationName,
     var status,
             log = new Log(),
             store = jagg.module("manager").getAPIStoreObj();
-
     try {
+        if (username.indexOf("@carbon.super") > -1) {
+            username= username.replace("@carbon.super","");
+        }
+        username = String(username);
         status = store.addAPISubscription(api.provider, api.name, api.version, subscriptionType, tier, applicationName, username, enterprises);
         if (log.isDebugEnabled()) {
             log.debug("addAPISubscription");
@@ -64,11 +66,12 @@ var addAPISubscription = function (api, subscriptionType, tier, applicationName,
             status:status
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             status:false
         };
     }
 };
+
 %>

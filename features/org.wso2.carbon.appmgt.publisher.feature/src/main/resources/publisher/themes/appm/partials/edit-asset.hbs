@@ -19,6 +19,19 @@
         {{{ form_render "overview_context" data.fields }}}
         {{{ form_render "overview_version" data.fields }}}
 
+        <div class="form-group">
+            <label class="control-label col-sm-2">Make As Default Version: </label>
+
+            <div class="col-sm-10">
+                <label>
+                    <input type="checkbox" class="makeAsDefaultVersion_checkbox" />
+                    <label id="lblDefaultVersion"></label>
+                </label>
+            </div>
+        </div>
+        <input type="hidden"
+               class="col-lg-6 col-sm-12 col-xs-12" name="overview_makeAsDefaultVersion"
+               id="overview_makeAsDefaultVersion">
 
         <div class="form-group">
             <label class="control-label col-sm-2">Transports: <span
@@ -47,6 +60,20 @@
                class="col-lg-6 col-sm-12 col-xs-12" name="overview_transports"
                id="overview_transports">
 
+        <div class="form-group">
+            <label class="control-label col-sm-2">Treat as a Site: </label>
+
+            <div class="col-sm-10">
+                <label>
+                    <input type="checkbox" class="treatAsASite_checkbox"
+                    value="{{{snoop "fields(name=overview_treatAsASite).value" data}}}">
+                </label>
+            </div>
+        </div>
+        <input type="hidden" required=""
+               value="{{snoop "fields(name=overview_treatAsASite).value" data}}"
+               class="col-lg-6 col-sm-12 col-xs-12" name="overview_treatAsASite"
+               id="overview_treatAsASite">
 
         {{{ form_render "overview_webAppUrl" data.fields }}}
         {{{ form_render "overview_description" data.fields }}}
@@ -59,7 +86,17 @@
                name="overview_trackingCode" id="overview_trackingCode"/>
         <input type='hidden' value="{{{snoop "fields(name=sso_ssoProvider).value" data}}}"
                name="sso_ssoProvider" id="sso_ssoProvider"/>
-
+        <input type='hidden' value="{{{snoop "fields(name=overview_appOwner).value" data}}}"
+               name="overview_appOwner" id="app_owner"/>
+        <input type='hidden' value="{{{snoop "fields(name=overview_appTenant).value" data}}}"
+               name="overview_appTenant" id="app_tenant"/>
+        <input type='hidden' value="{{{snoop "fields(name=overview_advertiseOnly).value" data}}}"
+               name="overview_advertiseOnly" id="advertise_only"/>
+        <input type='hidden' value="{{{snoop "fields(name=overview_redirectUrl).value" data}}}"
+               name="overview_redirectUrl" id="redirect_url"/>
+        <input type='hidden' value="{{{snoop "fields(name=overview_subscriptionAvailability).value" data}}}"
+               name="overview_subscriptionAvailability" id="subscription_availability"/>
+        <input type='hidden' value="" name="overview_visibleRoles" id="visible_roles"/>
         <div class="form-group">
             <b><label class="control-label col-sm-2">Tags: </label></b>
 
@@ -142,7 +179,31 @@
                 <div id="divJavaPolicies">
 
                 </div>
+{{#if isSubscriptionEnabled}}
+                <div class="form-group" id="sub-group">
+                    <label class="control-label col-sm-4 col-md-4">Subscription Availability: </label>
 
+                    <div class="col-md-2">
+                        <select id="sub-availability">
+                            <option value="current_tenant">Current tenant only</option>
+                            <option value="all_tenants">Allow all tenants</option>
+                            <option value="specific_tenants">Specific tenants</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+
+                        {{#compare artifact.attributes.overview_subscriptionAvailability "specific_tenants" operator="=="}}
+                            <input type="text" id="tenant-list" name="overview_tenants" class='col-md-6 col-lg-6 col-sm-8 col-xs-6'
+                                   placeholder="e.g teant1.com,tenat2.com" value="{{artifact.attributes.overview_tenants}}"/>
+                        {{else}}
+                            <input type="text" id="tenant-list" name="overview_tenants" class='col-md-6 col-lg-6 col-sm-8 col-xs-6'
+                                   placeholder="e.g teant1.com,tenat2.com" style="display: none"/>
+                        {{/compare}}
+
+                    </div>
+                </div>
+{{/if}}
             </div>
 
         </div>

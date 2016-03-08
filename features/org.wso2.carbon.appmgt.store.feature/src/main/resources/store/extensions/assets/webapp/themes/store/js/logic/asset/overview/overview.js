@@ -23,7 +23,7 @@ $(function () {
     var loggedUser = $("#hdnUsertId").val();
     var allowAnonymous = $("#allowAnonymous").val();
     var skipGateway = $("#skipGateway").val();
-
+    var subscriptionOff = $("#subscription-off").val();
     //hide html body when loading
     $('#wrap').css('visibility', 'hidden');
 
@@ -44,11 +44,14 @@ $(function () {
 
     var jsonObj = {
         "isActive": "1",
-        "path": "/store/apis/eventpublish/",
+        "path": caramel.context + "/apis/eventpublish/",
         "appData": {
             "appId": $('#hdnAssetId').val(),
             "userId": $('#hdnUsertId').val(),
-            "tenantId": $('#hdnTenantId').val()
+            "tenantId": $('#hdnTenantId').val(),
+            "appName": $('#hdnOverviewName').val(),
+            "appVersion": $("#hdnOverviewVersion").val(),
+            "context": $("#hdnOverviewContext").val()
         },
         "appControls": {"0": "a"},
         "publishedPeriod": "1200000",
@@ -60,18 +63,21 @@ $(function () {
         //check if subscribed only if skip gateway disabled
         if ((skipGateway == "false")) {
             if ($('#hdnUsertId').val() != "" && (allowAnonymous != "TRUE")) {
-                var isSubscribed = $('#subscribed').val();
-                if (isSubscribed.toLowerCase() === 'false') {
-                    noty({
-                        text : 'You have not subscribed to this app',
-                        'layout' : 'center',
-                        'timeout': 1500,
-                        'modal' : true
+                if(subscriptionOff != "true") {
+                    var isSubscribed = $('#subscribed').val();
+                    if (isSubscribed.toLowerCase() === 'false') {
+                        noty({
+                                 text : 'You have not subscribed to this app',
+                                 'layout' : 'center',
+                                 'timeout': 1500,
+                                 'modal' : true
 
-                    });
-                    e.preventDefault();
-                    e.stopPropagation();
+                             });
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 }
+
             }
         }
     });

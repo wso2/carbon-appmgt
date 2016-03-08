@@ -2,7 +2,10 @@
 (function(){
 	var mam_config = require('/extensions/mobileapp/config/mam-config.json');
 	var log=new Log();
-	var makeid= function()
+    var caramel = require('caramel');
+    var contextPath = caramel.configs().context;
+
+    var makeid= function()
 	{
 	    var text = "";
 	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -79,7 +82,7 @@
 		response.sendError(500);
 	}else{
         var fileName =  saveFile(file);
-		meta.path = "/publisher"+ mam_config.fileAPILocation + fileName;
+        meta.path = contextPath + mam_config.fileAPILocation + fileName;
 
 		//add leading '/' if missing
  		meta.path = meta.path.charAt(0) === '/' ? meta.path : '/'+meta.path;
@@ -113,14 +116,17 @@
 					var information = JSON.parse(d);
 					mergeRecursive(meta,information);
 				}
+                response.contentType = "application/json";
 				print(meta);
 				log.debug("Successfully discovered");
 			}catch(e){
 				log.debug("Uploaded file is corrupted");
-				print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Uploaded file is corrupted"]}})
+                response.contentType = "application/json";
+				print({"ok" : false, "action" : "Validation failure", "report" : {"failed" : true, "name" : ["Uploaded file is corrupted"]}})
 			}
 		}else{
-			print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Invalid Filetype - Uploaded file is not an archive"]}})
+            response.contentType = "application/json";
+			print({"ok" : false, "action" : "Validation failure", "report" : {"failed" : true, "name" : ["Invalid Filetype - Uploaded file is not an archive"]}})
 			return;
 		}
 	}

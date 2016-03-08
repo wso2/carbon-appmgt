@@ -16,7 +16,7 @@
 		
 		var log =  new Log();
 	
-		var MSG_404='Asset not found';	//Eror 404 message
+		var MSG_404='Asset not found';	//Eror 404 action
 
         var securityModule=require('/modules/security/security.manager.js').securityManagementModule();
 
@@ -67,7 +67,6 @@
 			var type=params.type;
 			var extLocation='/'+type+EXT_ROUTER_NAME;
 			var path=EXT_PATH+extLocation; //Assume there is an extension
-			
 
 			//Check if an extension asset router exists			
 			var fileTester=new File(path);

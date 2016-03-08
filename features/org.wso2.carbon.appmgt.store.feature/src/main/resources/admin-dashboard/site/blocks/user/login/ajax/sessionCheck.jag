@@ -11,13 +11,13 @@ include("/jagg/jagg.jag");
          if(jagg.getUser() == null){
             print({
                 error:true,
-                message:'timeout'
+                action:'timeout'
             });
         }
     } else {
         print({
             error:true,
-            message:msg.error.invalidAction(action)
+            action:msg.error.invalidAction(action)
         });
     }
 }());

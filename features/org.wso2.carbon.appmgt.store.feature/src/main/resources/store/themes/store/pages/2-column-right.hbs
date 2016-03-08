@@ -23,7 +23,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WSO2 App Manager</title>
 
-    <link rel="icon" href="favicon.png" type="image/x-icon" />
+    <link rel="icon" href="/favicon.png" type="image/x-icon" />
 
 
     <link href="{{url "/themes/store/css/jquery-ui.css"}}" rel="stylesheet">
@@ -58,7 +58,7 @@
     <!-- /header -->
 
 
-
+{{include navigation}}
     <!-- content/body -->
     <div class="row">
         <div class="col-md-12">
@@ -95,7 +95,6 @@
 <script src="{{url "/themes/store/js/noty/jquery.noty.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/layouts/center.js"}}"></script>
 <script src="{{url "/themes/store/js/noty/themes/default.js"}}"></script>
-<script src="{{url "/themes/store/js/writeToPublisher.js"}}"></script>
 <script src="{{url "/themes/store/js/selectpicker.js"}}"></script>
 <script src="{{url "/themes/store/js/jquery.ext.min.js"}}"></script>
 
@@ -104,8 +103,10 @@
 <script src="{{url "/themes/store/js/jquery.event.mousestop.js"}}"></script>
 
 {{js}}
-
+<script src="{{url "/themes/store/js/handlebars.js"}}"></script>
 <script src="{{url "/themes/store/js/caramel-client.js"}}"></script>
+<script src="{{url "/themes/store/js/writeToPublisher.js"}}"></script>
+<script src="{{url "/themes/store/js/caramel.handlebars.client.js"}}"></script>
 
 {{code}}
 

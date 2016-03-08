@@ -20,7 +20,7 @@ include("/jagg/jagg.jag");
         if (result.error) {
             obj = {
                 error:result.error,
-                message:result.message
+                action:result.action
             };
         } else {
             obj = {
@@ -45,7 +45,7 @@ include("/jagg/jagg.jag");
         if (result.error) {
             obj = {
                 error:result.error,
-                message:result.message
+                action:result.action
             };
         } else {
             obj = {
@@ -61,7 +61,7 @@ include("/jagg/jagg.jag");
     } else {
         print({
             error:true,
-            message:msg.error.invalidAction(action)
+            action:msg.error.invalidAction(action)
         });
     }
 }());

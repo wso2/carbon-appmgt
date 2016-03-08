@@ -15,7 +15,7 @@ var log = new Log();
             print({
                 "workflowCallbackResponse" : {
                     "error":"true",
-                    "message":"Required Credentials Not Provided"
+                    "action":"Required Credentials Not Provided"
                 }
             });
             return;
@@ -36,7 +36,7 @@ var log = new Log();
                 print({
                     "workflowCallbackResponse" : {
                         "error":"true",
-                        "message":msg.error.workflowRequired(workflowReference).trim()
+                        "action":msg.error.workflowRequired(workflowReference).trim()
                     }
                 });
                 return;
@@ -48,7 +48,7 @@ var log = new Log();
                 obj = {
                     "workflowCallbackResponse" : {
                         "error":"true",
-                        "message":result.message
+                        "action":result.action
                     }
                 };
             } else {
@@ -64,7 +64,7 @@ var log = new Log();
             obj = {
                 "workflowCallbackResponse" : {
                     "error":"true",
-                    "message":result.message
+                    "action":result.action
                 }
             };
             response.status = result.statusCode;

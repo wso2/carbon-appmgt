@@ -1,5 +1,9 @@
 <%
 var type;
+var customType;
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
+var MOBILEAPP_TYPE = 'mobileapp';
 (function () {
     var path, elements, theme, mapper, suffix, pages, links, length, link, i, mod,
             log = new Log(),
@@ -16,7 +20,10 @@ var type;
             return path;
         };
     };
-    if (matcher.match('/{context}' + prefix + '{type}/themes/{+file}')) {
+
+    var tenantedEndpoint = '/{context}/t/{domain}' + prefix;
+    if (matcher.match('/{context}' + prefix + '{type}/themes/{+file}') ||
+            matcher.match(tenantedEndpoint + '{type}/themes/{+file}')) {
         elements = matcher.elements();
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
@@ -24,10 +31,17 @@ var type;
             return;
         }
         prefix = store.ASSETS_EXT_PATH + type;
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
         file.send(prefix + '/themes/' + elements.file);
         return;
     }
-    if (matcher.match('/{context}' + prefix + '{type}/resources/{+file}')) {
+    if (matcher.match('/{context}' + prefix + '{type}/resources/{+file}') ||
+            matcher.match(tenantedEndpoint + '{type}/resources/{+file}')) {
         elements = matcher.elements();
         type = elements.type;
         if (configs.assets.indexOf(type) === -1) {
@@ -35,16 +49,22 @@ var type;
             return;
         }
         prefix = store.ASSETS_EXT_PATH + type;
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
         file.send(prefix + '/resources/' + elements.file);
         return;
     }
-    if (matcher.match('/{context}' + prefix + '{type}/{+suffix}')) {
+    if (matcher.match('/{context}' + prefix + '{type}/{+suffix}') ||
+            matcher.match(tenantedEndpoint + '{type}/{+suffix}')) {
         mod = require('/modules/store.js');
         elements = matcher.elements();
         type = elements.type;
         suffix = elements.suffix;
         pages = store.ASSETS_EXT_PATH + type + '/pages/';
-
         if (suffix) {
             links = mod.store(request, session).assetLinks(type).links;
             length = links.length;
@@ -62,19 +82,13 @@ var type;
                 path = new File(path).isExists() ? path : '/controllers/process.jag';
             }
 
-
-            if((type === "webapp") || (type === "mobileapp")) {
-                path = pages + 'subscriptions.jag';
-
-                if (suffix === 'process') {
-                    path = pages + 'process.jag';
-                    path = new File(path).isExists() ? path : '/controllers/process.jag';
-                }
-            }
-
-
             request.getMappedPath = mapper(path);
-
+            //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+            //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+            customType = type;
+            if (type == SITE_TYPE) {
+                type = WEBAPP_TYPE;
+            }
             include(path);
             return;
         }

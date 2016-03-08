@@ -14,7 +14,7 @@ var generateAPIKey = function (api, context, application, username, keyType, cal
             key:key
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             key:null
@@ -36,7 +36,7 @@ var generateApplicationKey = function (application, username, keyType, callbackU
             key:key
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             key:null
@@ -61,11 +61,11 @@ var refreshToken = function (username,application, keyType ,oldAccessToken, acce
             key:key
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             key:null,
-            message:e.message.split("Exception:")[1]
+            action:e.action.split("Exception:")[1]
         };
     }
 };
@@ -84,10 +84,10 @@ try {
         error:false
     };
 } catch (e) {
-    log.error(e.message);
+    log.error(e.action);
     return {
         error:true,
-        message:e.message.split(":")[1]
+        action:e.action.split(":")[1]
     };
 }
 };

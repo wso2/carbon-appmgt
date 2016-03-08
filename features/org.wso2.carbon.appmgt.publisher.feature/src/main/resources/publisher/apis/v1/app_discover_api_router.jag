@@ -31,7 +31,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
        if (result.success) {
            response = responseProcessor.buildSuccessResponse(response, result.code, result.data);
        } else {
-           response = responseProcessor.buildErrorResponse(response, result.code, result.message);
+           response = responseProcessor.buildErrorResponse(response, result.code, result.action);
        }
 }, request, response, session);
 

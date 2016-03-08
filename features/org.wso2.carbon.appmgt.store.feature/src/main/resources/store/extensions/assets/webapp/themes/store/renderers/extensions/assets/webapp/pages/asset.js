@@ -3,8 +3,8 @@ var render = function(theme, data, meta, require) {
 
 	var assetsByProvider=data.assetsByProvider;
     assetsByProvider['assets']=require('/helpers/rating-provider.js').ratingProvider.formatRating(data.assetsByProvider.assets);
-  
-	theme('2-column-right', {
+
+    theme('2-column-right', {
 		title : data.title,
 		metadata:data.metadata,
 		header: [
@@ -33,6 +33,7 @@ var render = function(theme, data, meta, require) {
                 skipGateway: data.skipGateway,
                 subscriptionInfo : data.subscriptionInfo,
                 isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
+                isFavouriteApp: data.isFavouriteApp,
                 embedURL : data.embedURL,
                 isSocial : data.isSocial,
                 tabs:{
@@ -42,7 +43,10 @@ var render = function(theme, data, meta, require) {
                 },
                 apiData:data.apiData,
                 myapps:data.metadata.myapps,
-                tiers:data.metadata.tiers
+                tiers:data.metadata.tiers,
+                subVisibility:data.subVisibility,
+                isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled
             })
         }],
 		right : [

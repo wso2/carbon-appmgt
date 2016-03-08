@@ -14,7 +14,7 @@ var logout = function () {
                 location.href = 'site/pages/login.jag'+queryParam;
             }
         } else {
-            jagg.message({content:result.message,type:"error"});
+            jagg.action({content:result.action,type:"error"});
         }
     }, "json");
 };

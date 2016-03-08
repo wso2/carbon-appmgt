@@ -22,7 +22,7 @@
  * Description: The API accepts a set of credentials which it attempts to verify.If the
  provided credentials are authenticated , the logged in user is set to the provided
  username and the session id is returned.If the authentication fails then the
- a message indicating the failure is returned.
+ a action indicating the failure is returned.
 
  E.g. invocation
  POST /api/authenticate
@@ -94,7 +94,7 @@ switch (METHOD) {
                 var isAuthenticated = user.login(credentials.username, credentials.password, session);//authenticate the user
                 if (isAuthenticated) {
                     session.put("LOGGED_IN_USER", credentials.username);
-                    session.put("logged.user", credentials.username);
+                    jagg.setUser({username:credentials.username});
                     session.put("Logged", "true");
                     
                     //Add to the session map as it is required by the session listener
@@ -111,7 +111,7 @@ switch (METHOD) {
                 var user = require('store').user;//get current user
                 user.logout();
                 session.invalidate();
-                response =  buildSuccessResponse(response, constants.STATUS_CODES.OK, {'message': 'User Logged out successfully'});
+                response =  buildSuccessResponse(response, constants.STATUS_CODES.OK, {'action': 'User Logged out successfully'});
             }
             catch (e) {
                 response =  buildErrorResponse(response, constants.STATUS_CODES.INTERNAL_SERVER_ERROR, 'Unable to logout user!');
@@ -128,12 +128,12 @@ switch (METHOD) {
      * Build Error response
      * @param  resp     jaggery-response object to retrieve to client
      * @param  code     status code
-     * @param  message  message to the client side
+     * @param  action  action to the client side
      * @return return   response
      */
-    function buildErrorResponse(resp,code,message) {
+    function buildErrorResponse(resp,code,action) {
         var content={};
-        content.error = message;
+        content.error = action;
         resp = processResponse(resp,code,content);
         return resp;
     };

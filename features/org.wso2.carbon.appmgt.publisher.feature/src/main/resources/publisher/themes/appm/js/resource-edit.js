@@ -10,7 +10,7 @@ $( document ).ready(function() {
 
     //get Tier details from tier.xml
     $.ajax({
-        url: '/publisher/api/entitlement/get/Tiers',
+        url: caramel.context + '/api/entitlement/get/Tiers',
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
@@ -20,6 +20,55 @@ $( document ).ready(function() {
             throttlingTierControlBlock = drawThrottlingTiersDynamically();
         },
         error: function () {
+        }
+    });
+
+    //Load default version details
+    var isDefaultVersion = "false";
+    var appName = $('#overview_name').val();
+    var providerName = $('#overview_provider').val();
+    var appVersion = $('#overview_version').val();
+    var appStatus = "APP_IS_PUBLISHED";
+
+    $.ajax({
+               url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
+               type: 'GET',
+               async: false,
+               success: function (data) {
+                   if (data == appVersion) {
+                       isDefaultVersion = "true";
+                       $('#lblDefaultVersion').html("(This is the current default version)");
+                   } else {
+                       $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
+                   }
+               },
+               error: function (data) {
+               }
+           });
+
+    $('#overview_makeAsDefaultVersion').val(isDefaultVersion);
+
+    $(".makeAsDefaultVersion_checkbox").click(function () {
+        var output = [];
+        $(".makeAsDefaultVersion_checkbox").each(function (index) {
+            if ($(this).is(':checked')) {
+                output.push("true");
+            }
+            else {
+                output.push("false");
+            }
+        });
+        $('#overview_makeAsDefaultVersion').val(output);
+    });
+
+    var makeAsDefaultVal = $('#overview_makeAsDefaultVersion').val();
+    $(".makeAsDefaultVersion_checkbox").each(function (index) {
+        if (makeAsDefaultVal == "true") {
+            $(this).prop('checked', true);
+            $(this).prop('disabled', true);
+        }
+        else {
+            $(this).prop('checked', false);
         }
     });
 
@@ -45,6 +94,15 @@ $( document ).ready(function() {
             $(this).prop('checked', true);
         }
 
+    });
+
+    var siteValue = $('#overview_treatAsASite').val();
+    $(".treatAsASite_checkbox").each(function (index) {
+        if (siteValue == "TRUE") {
+            $(this).prop('checked', true);
+        } else {
+            $(this).prop('checked', false);
+        }
     });
 
     $(".anonymous_checkbox").click(function(){
@@ -85,7 +143,7 @@ $( document ).ready(function() {
 
     // Get shared partials
     $.ajax({
-        url: '/publisher/api/entitlement/get/shared/policy/partial/list',
+        url: caramel.context + '/api/entitlement/get/shared/policy/partial/list',
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
@@ -301,14 +359,14 @@ function setPolicyGroupValue() {
  */
 function loadPolicyGroupData(uuid) {
     $.ajax({
-        url: '/publisher/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
+        url: caramel.context + '/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
         type: 'GET',
         async: false,
         contentType: 'application/json',
         success: function (id) {
             // get the entitlement policy groups
             $.ajax({
-                url: '/publisher/api/entitlement/get/policy/Group/by/appId/' + id,
+                url: caramel.context + '/api/entitlement/get/policy/Group/by/appId/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 dataType: 'json',
@@ -319,7 +377,7 @@ function loadPolicyGroupData(uuid) {
                             policyGroupId: data[i].policyGroupId,
                             policyGroupName: data[i].policyGroupName,
                             throttlingTier: data[i].throttlingTier,
-                            anonymousAccessToUrlPattern: data[i].allowAnonymous,
+                            anonymousAccessToUrlPattern: JSON.stringify(data[i].allowAnonymous)     ,
                             userRoles: data[i].userRoles,
                             policyPartials: data[i].policyPartials,
                             policyGroupDesc: data[i].policyGroupDesc

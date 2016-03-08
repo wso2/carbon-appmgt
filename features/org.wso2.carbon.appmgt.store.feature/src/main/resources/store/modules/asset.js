@@ -1,7 +1,7 @@
 var Manager,
     ASSETS_NS = 'http://www.wso2.org/governance/metadata';
 
-var log = new Log();
+var log = new Log('Module asset :');
 
 var ASSET_LCSTATE_PROP = 'lifecycleState';
 var DEFAULT_ASSET_VIEW_STATE = 'published';
@@ -268,9 +268,10 @@ var DEFAULT_ASSET_VIEW_STATE = 'published';
      * Assets matching the filter
      */
     Manager.prototype.get = function (id) {
-        var asset=this.manager.get(id);
-
-        dataInjector.cached().inject(asset,DataInjectorModes.DISPLAY);
+        var asset = this.manager.get(id);
+        if (asset) {
+            dataInjector.cached().inject(asset, DataInjectorModes.DISPLAY);
+        }
 
         return asset;
     };

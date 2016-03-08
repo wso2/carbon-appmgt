@@ -20,7 +20,7 @@ $(function () {
     var assetType = comps[comps.length - 2];
 
     var TAG_CONTAINER = '#tag-test';
-    var TAG_API = '/publisher/api/tag/'
+    var TAG_API = caramel.context +'/api/tag/';
     var TAG_THEME = 'facebook';
     var ERROR_CSS='alert alert-error';
     var MSG_CONTAINER='#msg-container-recent-activity';
@@ -43,7 +43,7 @@ $(function () {
             type: 'GET',
             success: function (response) {
 
-                var tags = JSON.parse(response);
+                var tags = response;
                 console.log('obtaining tags of type.');
 
                 fetchTagsOfAsset(assetType, assetId, tags);
@@ -66,13 +66,13 @@ $(function () {
             url: TAG_API + assetType + '/' + assetId,
             type: 'GET',
             success: function (response) {
-                var tags = JSON.parse(response);
-
                 //Initialize the tag container
-                $(TAG_CONTAINER).tokenInput(masterTags, {theme: TAG_THEME, prePopulate: tags, preventDuplicates: false,
+                $(TAG_CONTAINER).tokenInput(masterTags, {
+                    theme: TAG_THEME, prePopulate: response, preventDuplicates: false,
                     onAdd: onAdd,
                     allowFreeTagging: true,
-                    onDelete: onRemove});
+                    onDelete: onRemove
+                });
 
             }
         });

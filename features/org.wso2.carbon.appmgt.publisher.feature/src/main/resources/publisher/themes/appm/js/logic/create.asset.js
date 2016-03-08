@@ -7,7 +7,7 @@ $(function() {
 	//var id=$('#meta-asset-id').html();
 	var type = $('#meta-asset-type').val();
 
-	var TAG_API_URL = '/publisher/api/tag/';
+	var TAG_API_URL = caramel.context +'/api/tag/';
 	var tagType = $('#meta-asset-type').val();
 
 	var tagUrl = TAG_API_URL + tagType;
@@ -26,8 +26,7 @@ $(function() {
 		url : tagUrl,
 		type : 'GET',
 		success : function(response) {
-			var tags = JSON.parse(response);
-			$(TAG_CONTAINER).tokenInput(tags, {
+			$(TAG_CONTAINER).tokenInput(response, {
 				theme : THEME,
 				allowFreeTagging : true
 			});
@@ -54,7 +53,7 @@ $(function() {
 			context = context.indexOf('/') == 0 ? context : '/' + context;
 			//check if the asset name available as user types in
 			$.ajax({
-				url: '/publisher/api/validations/assets/webapp/overview_context',
+				url: caramel.context + '/api/validations/assets/webapp/overview_context',
 				type: 'POST',
 				contentType: 'application/x-www-form-urlencoded',
 				data: {"overview_context": context},
@@ -151,6 +150,11 @@ $(function() {
 
 
 	$('#btn-create-asset').on('click', function(e) {
+        var subAvailability = $('#sub-availability').val();
+        $('#subscription_availability').val(subAvailability);
+
+        var visibleRoles = $('#roles').val();
+        $('#visible_roles').val(visibleRoles);
         //trim the value of all the text field and text area
         var fields = $('#form-asset-create :input');
         fields.each(function () {
@@ -208,6 +212,19 @@ $(function() {
 			return;
 		}
 
+        var subscribeAvailability = $('#sub-availability').val();
+        if (subscribeAvailability == 'specific_tenants') {
+            var tenantList = $('#tenant-list');
+            var tenantListValue = tenantList.val();
+            if(tenantListValue == null || tenantListValue == '') {
+                showAlert('Please enter the specific tenant list.', 'error');
+                tenantList.focus();
+                this.disabled = false;
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                return;
+            }
+        }
+
 		//Check illegal characters in tags
 		var tags = $('#tag-test').tokenInput('get');
 		for (var index in tags) {
@@ -235,7 +252,7 @@ $(function() {
         var tracking_code_id = "AM_"+code;
 
 		$('#tracking_code').val(tracking_code_id);
-		
+
 		 if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
 			$('#sso_ssoProvider').val(selectedProvider);
@@ -243,11 +260,11 @@ $(function() {
 
 		// AJAX request options.
  		var options = {
-      
+
 			success: function(response) {
                 var result = {};
                 try {
-                    result = JSON.parse(response);
+                    result = (typeof response == "string") ? JSON.parse(response) : response;
                 }
                 catch (e) {
                     //It always returns a malformed json when the session is expired
@@ -257,19 +274,19 @@ $(function() {
 
 				//Check if the asset was added
 				if (result.ok) {
-					
+
 					showAlert('Asset added successfully.', 'success');
-				    
+
 				    	(function setupPermissions() {
 
                     				var rolePermissions = [];
-                        			
+
 			    			// 'GET' permission to be applied to the selected roles.
 			    			var readPermission = new Array();
 			    			readPermission.push("GET");
 
 			    			// Get roles from the UI
-			    			var rolesInUI = $('#roles').tokenInput("get");	
+			    			var rolesInUI = $('#roles').tokenInput("get");
 
 			    			for(var i = 0; i < rolesInUI.length; i++){
 			    				rolePermissions.push({
@@ -280,23 +297,23 @@ $(function() {
 
 			    			if (rolePermissions.length > 0) {
 							$.ajax({
-				    				url: '/publisher/asset/' + type + '/id/' + result.id + '/permissions',
+				    				url: caramel.context +'/asset/' + type + '/id/' + result.id + '/permissions',
 				    				type: 'POST',
 				    				processData: false,
 				    				contentType: 'application/json',
 				    				data: JSON.stringify(rolePermissions),
 				    				success: function(response) {
-									window.location = '/publisher/assets/' + type + '/';
+									window.location = caramel.context + '/assets/' + type + '/';
 				    				},
 				    				error: function(response) {
 									showAlert('Error adding permissions.', 'error');
 				    				}
 								});
 			    			} else {
-								window.location = '/publisher/assets/' + type + '/';
+								window.location = caramel.context + '/assets/' + type + '/';
 			    			}
                     			})();
-                    
+
 					/**adding tags**/
 
 					var data = {};
@@ -321,8 +338,8 @@ $(function() {
                             					showAlert('Unable to add the selected tag.', 'error');
                             				}
                         			});
-                    			}		
-					
+                    			}
+
 					if($('#autoConfig').is(':checked')){
 						createServiceProvider();
 					}
@@ -337,24 +354,24 @@ $(function() {
                     }
 				}
 
-			},  // post-submit callback 
- 		
+			},  // post-submit callback
+
 			error : function(response) {
 				showAlert('Failed to add asset.', 'error');
 			},
-		 
-        		url: '/publisher/asset/' + type, 
+
+        		url: caramel.context + '/asset/' + type,
         		type : 'POST'
-        	
-		}; 
-    
+
+		};
+
     	$('#form-asset-create').ajaxSubmit(options);
 
 	});
 
 
 	// Visibility roles
-	$('#roles').tokenInput('/publisher/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
+	$('#roles').tokenInput(caramel.context + '/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
     	theme: 'facebook',
     	preventDuplicates: true,
     	hintText: "Type in a user role"
@@ -371,7 +388,7 @@ $(function() {
 		}
 		$('.' + CHARS_REM).text('Characters left: ' + left);
 	});
-	
+
 	$('#autoConfig').click(function () {
 		if($('#autoConfig').is(':checked')){
 			$('#provider-table').show();
@@ -382,65 +399,65 @@ $(function() {
 			var rows = $('table.sso tr');
 			var provider =  rows.filter('.provider-table');
 			provider.hide();
-									
+
 			var claims = rows.filter('.claims-table');
 			claims.hide();
 			removeClaimTable();
 
 		}
 	});
-	
+
 	$("#providers").change(function () {
 		var value = $('#providers').val();
         	loadClaims(value)
     	});
-	
+
 	$.ajax({
-          url: '/publisher/api/sso/providers',
+          url: caramel.context + '/api/sso/providers',
           type: 'GET',
           contentType: 'application/json',
           success: function(response) {
         	 
-        	  var providers_data = JSON.parse(response);
+        	  var providers_data = response;
               	  if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
 			loadProviders(providers_data.response);
               	  } else {
 			$("#ssoTable").remove();
               	  }
-  			
+
           },
           error: function(response) {
               showAlert('Error adding providers.', 'error');
           }
     	});
-	
-	
+
+
 	function loadProviders(providers_data){
 		 for(var i=0;i<providers_data.length;i++){
 			  var x = providers_data[i];
 			  $("#providers").append($("<option></option>").val(x).text(x));
 		  }
-		 
+
 		 var value = $('#providers').val();
 		 loadClaims(value);
 
         var roleClaim = "http://wso2.org/claims/role";
         addToClaimsTable(roleClaim,false);
 	}
-	
+
 	function loadClaims (provider){
 		 var sso_values = provider.split("-");
 		 $.ajax({
-             		url: '/publisher/api/sso/claims?idp='+sso_values[0] +"&version="+sso_values[1],
+             		url: caramel.context + '/api/sso/claims?idp='+sso_values[0] +"&version="+sso_values[1],
              		type: 'GET',
              		contentType: 'application/json',
              		success: function(response) {
-           	  		var claims = JSON.parse(response).response;
+           	  		var claims = response.response;
            	 		for(var i=0;i<claims.length;i++){
            		 		var y = claims[i];
            		 		$("#claims").append($("<option></option>").val(y).text(y));
            	 		}
-     			
+
              		},
              		error: function(response) {
                  		showAlert('Error adding claims.', 'error');
@@ -448,12 +465,12 @@ $(function() {
          	});
 	}
 
-	
+
 	$('#addClaims').click(function () {
 		var claim  = $("#claims").val();
 		addToClaimsTable(claim,true);
 	});
-	
+
 	function addToClaimsTable(claim,clickable){
         var isAlreadyExist = $.inArray(claim, addedClaimList);
         if(isAlreadyExist == -1) {
@@ -490,8 +507,8 @@ $(function() {
             $('#claimTableTbody').parent().show();
         }
 	}
-	
-	
+
+
 
 	function createServiceProvider(){
 	    var sso_config = {};
@@ -501,10 +518,12 @@ $(function() {
 	    var app_name = $('#overview_name').val();
 	    var app_version = $('#overview_version').val();
 	    var app_transport = $('#overview_transports').val();
+	    var app_treatAsASite = $('#overview_treatAsASite').val();
 	    var app_context = $('#overview_context').val();
 	    var app_provider = $('#overview_provider').val();
 	    var app_allowAnonymous=$('#overview_allowAnonymous').val();
 	    var app_acsURL = $('#overview_acsUrl').val();
+        var app_isDefaultVersion = $('#overview_makeAsDefaultVersion').val();
 
 	    var claims = [];
 	    var index=0;
@@ -523,13 +542,16 @@ $(function() {
 	    sso_config.app_name = app_name;
 	    sso_config.app_verison = app_version;
 	    sso_config.app_transport = app_transport;
+	    sso_config.app_treatAsASite = app_treatAsASite;
 	    sso_config.app_context = app_context;
 	    sso_config.app_provider = app_provider;
 	    sso_config.app_allowAnonymous=app_allowAnonymous;
 	    sso_config.app_acsURL = app_acsURL;
+        sso_config.app_isDefaultVersion = app_isDefaultVersion;
+
 
         $.ajax({
-            url: '/publisher/api/sso/addConfig',
+            url: caramel.context + '/api/sso/addConfig',
             type: 'POST',
             contentType: 'application/json',
             data:JSON.stringify(sso_config),
@@ -542,8 +564,8 @@ $(function() {
         });
 	}
 
-	
-	
+
+
 	/*
 	 The function is used to build a report message indicating the errors in the form
 	 @report: The report to be processed

@@ -12,21 +12,22 @@ var user=server.current(session);
 var um=server.userManager(user.tenantId);
 var publisher = require('/modules/publisher.js').publisher(request, session);
 var rxtManager = publisher.rxtManager;
+var appmPublisher = require('appmgtpublisher');
 
 var render = function (theme, data, meta, require) {
     var log = new Log();
-
 
     var lifecycleColors = {"Create": "btn-green", "Recycle": "btn-blue", "Re-Publish": "btn-blue", "Submit for Review": "btn-blue", "Unpublish": "btn-orange", "Deprecate": "btn-danger", "Retire": "btn-danger", "Publish": "btn-blue", "Approve": "btn-blue", "Reject": "btn-orange"};
     //Check whether the app publish workflow is enabled
     appPublishWFExecutor = org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_APPLICATION_PUBLISH");
     var isAsynchronousFlow = appPublishWFExecutor.isAsynchronus();
-
+    var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
     if(data.artifacts){
 
         var deleteButtonAvailability = false;
         var pubActions = config.publisherActions;
         var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
+        var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
 
         var shortName = "webapp";
         var artifactManager = rxtManager.getArtifactManager(shortName);
@@ -52,14 +53,21 @@ var render = function (theme, data, meta, require) {
                                 }
                             }
 
+                            // To Send an app to submit for review, created permission is required.
+                            if (createActionAuthorized) {
+                                if (name == "Submit for Review") {
+                                    lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
+                                    if(skipFlag) {
+                                        break;
+                                    }
+                                }
+                            }
+
                             if(!skipFlag) {
                                 if (name == "Publish") {
                                     lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
                                 }
                                 if (name == "Reject" && isAsynchronousFlow) {
-                                    lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
-                                }
-                                if (name == "Submit for Review") {
                                     lifecycleAvailableActionsButtons.push({name: name, style: lifecycleColors[name]});
                                 }
                                 if (name == "Recycle") {
@@ -110,7 +118,7 @@ var render = function (theme, data, meta, require) {
                     for (key in lcComments) {
                         if (lcComments.hasOwnProperty(key)) {
                             notifyObject = {
-                                'url': '/publisher/asset/webapp/' + data.artifacts[i].id,
+                                'url': caramel.configs().context +'/asset/webapp/' + data.artifacts[i].id,
                                 'notification': lcComments[key],
                                 'appname': data.artifacts[i].attributes.overview_displayName
                             }
@@ -118,13 +126,20 @@ var render = function (theme, data, meta, require) {
                     }
                 }else{
                     notifyObject = {
-                        'url': '/publisher/asset/webapp/' + data.artifacts[i].id,
+                        'url': caramel.configs().context + '/asset/webapp/' + data.artifacts[i].id,
                         'notification': 'Rejected reason is not defined',
                         'appname': data.artifacts[i].attributes.overview_displayName
                     }
 
                 }
                 notifications.push(notifyObject);
+            }
+
+            // set default thumbnail
+            var asset = data.artifacts[i];
+            var assetThumbnail = asset.attributes.images_thumbnail;
+            if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+                asset.defaultThumbnail = appMgtProviderObj.getDefaultThumbnail(asset.attributes.overview_displayName);
             }
         }
         //handle asset based notification - bind with session
@@ -175,6 +190,9 @@ var render = function (theme, data, meta, require) {
         case 'app-by-endpoint':
             listPartial = 'app-by-endpoint';
             break;
+        case 'app-by-popularity-over-time':
+             listPartial = 'app-by-popularity-over-time';
+             break;
 
         default:
             break;

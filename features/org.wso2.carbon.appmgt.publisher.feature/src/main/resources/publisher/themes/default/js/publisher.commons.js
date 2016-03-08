@@ -80,19 +80,15 @@ $(document).ready(function() {
 
 		//alert('id: '+assetId+' version: '+userProvidedVersion);
 
-		var path = '/publisher/api/version/' + assetType + '/' + assetId;
+		var path = caramel.context + '/api/version/' + assetType + '/' + assetId;
 
 		//Make a call an obtain the existing asset versions
 		$.ajax({
 			url : path,
 			type : 'GET',
 			success : function(response) {
-				// alert(response);
-
-				var versionList = JSON.parse(response);
-
 				//Check if the version entered by the user is an existing one
-				var existingVersion = checkIfExisting(versionList, userProvidedVersion);
+				var existingVersion = checkIfExisting(response, userProvidedVersion);
 
 				//Display a message to the user indicating the version exists
 				if (existingVersion) {
@@ -151,7 +147,7 @@ $(document).ready(function() {
 	 @newVersion: The new version of the asset to be created
 	 */
 	function createNewVersion(newVersion, assetId, assetType) {
-		var path = '/publisher/api/version/' + assetType + '/' + assetId + '/' + newVersion;
+		var path = caramel.context + '/api/version/' + assetType + '/' + assetId + '/' + newVersion;
 
 		$.ajax({
 			url : path,
@@ -159,8 +155,7 @@ $(document).ready(function() {
 			success : function(response) {
 				$('#modal-redirect').modal('show');
 				setTimeout(function() {
-					var newVersionDetails = JSON.parse(response);
-					window.location = newVersionDetails.url;
+					window.location = response.url;
 				}, 2000);
 
 			},
@@ -232,7 +227,7 @@ $(document).ready(function() {
 		var searchPrefix = $('#search-prefix').val();
 
 		if (searchAssetString != "") {
-			var link = '/publisher/assets/' + searchPrefix + '/?query=' + searchAssetString;
+			var link = caramel.context + '/assets/' + searchPrefix + '/?query=' + searchAssetString;
 			window.location = link;
 		}
 	}

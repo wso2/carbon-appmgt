@@ -22,7 +22,7 @@ var policyGroupsArray = new Array(); //policy group related details array
 var policyGroupBlock; //contains html formatted options list of Policy Groups
 var policyPartialsArray = new Array();
 
-$('#userRoles').tokenInput('/publisher/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
+$('#userRoles').tokenInput(caramel.context + '/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
     theme: 'facebook',
     preventDuplicates: true
 });
@@ -55,7 +55,7 @@ function insertPolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
 
     $.ajax({
         async: false,
-        url: '/publisher/api/entitlement/policy/partial/policyGroup/save',
+        url: caramel.context + '/api/entitlement/policy/partial/policyGroup/save',
         type: 'POST',
         data: {
             "policyGroupName": policyGroupName,
@@ -66,7 +66,7 @@ function insertPolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
             "policyGroupDesc" :policyGroupDesc
         },
         success: function (data) {
-            editedPolicyGroup = JSON.parse(data).response.id;
+            editedPolicyGroup = data.response.id;
             var policyPartialsMapping = [];
             
             for(var i=0; i < appliedXacmlRules.length; i++){
@@ -116,7 +116,7 @@ function updatePolicyGroup(policyGroupName, throttlingTier, anonymousAccessToUrl
                            isSaveAndClose, policyGroupDesc) {
     $.ajax({
         async: false,
-        url: '/publisher/api/entitlement/policy/partial/policyGroup/details/update',
+        url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/update',
         type: 'POST',
         data: {
             "policyGroupName": policyGroupName,
@@ -224,7 +224,7 @@ $(document).on("click", ".policy-group-edit-button", function () {
             $('#policy-group-editor #policyGroupName').val(obj.policyGroupName);
             $('#policy-group-editor #policyGroupDescription').val(obj.policyGroupDesc);
             $("#policy-group-editor #throttlingTier").val(obj.throttlingTier);
-            $("#policy-group-editor #anonymousAccessToUrlPattern").val(JSON.stringify(obj.anonymousAccessToUrlPattern));
+            $("#policy-group-editor #anonymousAccessToUrlPattern").val(obj.anonymousAccessToUrlPattern);
             $('#policy-group-editor #userRoles').val(obj.userRoles);
             //clear all checkbox
             $('.policy-group-xacml-rule').each(function () {
@@ -384,7 +384,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
 
     $.ajax({
         async: true,
-        url: '/publisher/api/entitlement/policyGroup/associate/url/pattern/list/to/avoid/delete/' + policyGroupId,
+        url: caramel.context + '/api/entitlement/policyGroup/associate/url/pattern/list/to/avoid/delete/' + policyGroupId,
         type: 'GET',
         contentType: 'application/json',
         dataType: 'json',
@@ -423,7 +423,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
         });
 
         $.ajax({
-            url: '/publisher/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId,
+            url: caramel.context + '/api/entitlement/policy/partial/policyGroup/details/delete/' + applicationId + '/' + policyGroupId,
             type: 'DELETE',
             success: function (data) {
                 //to remove index and value from policy array
@@ -450,7 +450,7 @@ function deletePolicyGroup(applicationId, policyGroupId, policyGroupName) {
 function getApplicationId(uuid) {
     var appid = "-1";
     $.ajax({
-        url: '/publisher/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
+        url: caramel.context + '/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
         type: 'GET',
         contentType: 'application/json',
         async: false,
@@ -471,9 +471,9 @@ function getApplicationId(uuid) {
 function drawThrottlingTiersDynamically() {
     var strContent = "";
     tiers.sort(function(tiersA, tiersB) {
-        return parseFloat(tiersA.tireSortKey) - parseFloat(tiersB.tireSortKey);
+        return parseFloat(tiersA.tierSortKey) - parseFloat(tiersB.tierSortKey);
     });
-    for (var i = 0; i < tiers.length; i++) {
+    for (var i = tiers.length - 1; i >=  0; i--) {
         strContent += "<option title='" + tiers[i].tierDescription + "' value='" + tiers[i].tierName + "' id='" + tiers[i].tierName + "'>" + tiers[i].tierDisplayName + "</option>";
     }
     return strContent;
@@ -494,14 +494,14 @@ function drawPolicyGroupsDynamically() {
 function updatePolicyGroupPartialXACMLPolicies(uuid){
     var policyGroupsArrayTemp = [];
     $.ajax({
-        url: '/publisher/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
+        url: caramel.context + '/api/entitlement/get/webapp/id/from/entitlements/uuid/' + uuid,
         type: 'GET',
         async: false,
         contentType: 'application/json',
         success: function (id) {
             // get the entitlement policy groups
             $.ajax({
-                url: '/publisher/api/entitlement/get/policy/Group/by/appId/' + id,
+                url: caramel.context + '/api/entitlement/get/policy/Group/by/appId/' + id,
                 type: 'GET',
                 contentType: 'application/json',
                 dataType: 'json',

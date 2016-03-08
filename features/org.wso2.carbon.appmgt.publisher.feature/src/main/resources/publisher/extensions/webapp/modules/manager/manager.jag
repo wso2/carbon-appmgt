@@ -47,7 +47,7 @@ var loadTenantRegistry = function (tenantDomain) {
     } catch (e) {
         return {
             error:true,
-            message:e.message
+            action:e.action
         };
     }    
 };

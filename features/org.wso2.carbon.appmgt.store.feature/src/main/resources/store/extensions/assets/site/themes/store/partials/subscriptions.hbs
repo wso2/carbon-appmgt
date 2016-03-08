@@ -1,0 +1,77 @@
+
+<div class="col-md-12">
+
+    {{#if subscriptions}}
+        {{#each subscriptions}}
+
+            <div class="col-xs-6 col-md-4 col-lg-2 app-assets-wrapper">
+                <div class="app-assets">
+                    <a href="{{productionURL}}" target="_blank">
+                        <img class="icon" src="{{url "/storage/webapp/"}}{{uuid}}/{{thumbnail}}">
+                    </a>
+                    <div class="app-assets-info">
+                        <div class="app-assets-name">
+                            {{name}}
+                        </div>
+                        <div class="app-assets-provider">
+                            {{provider}}
+                        </div>
+                    </div>
+
+                    <div class="my-apps-actions">
+                        <a class="btn btn-info asset-myapps-btn"  href="{{tenantedUrl "/assets/site"}}/{{uuid}}">
+                            <i class="icon-mobile-phone"></i> View App
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
+    {{else}}
+
+        <div class="well-large col-md-12 no-apps-box">
+            Sorry! You do not have any subscribed web apps.
+        </div>
+
+    {{/if}}
+
+</div>
+
+<div class="modal fade" id="modalDevices">
+    <div class="modal-dialog-devices">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <div class="carousel slide media-carousel" id="media">
+                            <div class="carousel-inner" id="devicesList">
+
+
+                            </div>
+                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
+                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{{#if subscriptions}}
+    <div class="row">
+    <ul class="pager">
+        {{#if leftNav}}
+            <li><a href="{{tenantedUrl "/extensions/assets/site/subscriptions?"}}{{t "page="}}{{this.leftNav}}">Previous</a></li>
+        {{/if}}
+        {{#if rightNav}}
+            <li><a  href="{{tenantedUrl "/extensions/assets/site/subscriptions?"}}{{t "page="}}{{this.rightNav}}">Next</a></li>
+        </ul>
+        {{/if}}
+    </div>
+{{/if}}

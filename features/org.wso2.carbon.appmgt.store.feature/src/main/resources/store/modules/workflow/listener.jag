@@ -20,11 +20,11 @@ var resumeWorkflow = function (workflowReference, status, description) {
         //    error:false
         //};
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:true,
             statusCode:500,
-            message:e.message
+            action:e.action
         };
     }
 };

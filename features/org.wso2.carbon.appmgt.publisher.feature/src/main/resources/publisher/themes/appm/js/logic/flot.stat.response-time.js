@@ -19,7 +19,7 @@ function drawGraphs() {
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type
+        url: caramel.context + '/api/assets/' + operation + '/' + type
             + '/getAPIResponseTime/',
         type: 'POST',
         data: {
@@ -38,8 +38,7 @@ function drawGraphs() {
 
 }
 var labelarray=[];
-var drawAPIResponseTime = function (response) {
-    var parsedResponse = JSON.parse(response);
+var drawAPIResponseTime = function (parsedResponse) {
     var length = parsedResponse.webapps.length;
 
     $('#placeholder41').empty();

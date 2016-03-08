@@ -73,7 +73,76 @@ var engine = caramel.engine('handlebars', (function () {
                 }
             });
 
+            /**
+             * Registers  'tenantedUrl' handler for resolving tenanted urls '{context}/t/{domain}/
+             */
+            Handlebars.registerHelper('tenantedUrl', function (path) {
 
+                var log = new Log();
+                var uri = request.getRequestURI();//current page path
+                var context, domain, output;
+                var matcher = new URIMatcher(uri);
+                var storageMatcher = new URIMatcher(path);
+                var mobileApiMatcher = new URIMatcher(path);
+                var caramel = require('caramel');
+                var context = caramel.configs().context;
+                var pattern = context + '/storage/{+any}';
+                //Resolving tenanted storage URI for webapps
+                if (storageMatcher.match(pattern)) {
+                    path = "/storage/" + storageMatcher.elements().any;
+                }
+                //TODO: This url pattern has been hard coded due to pattern mismatch in between mobile and webapp image urls
+
+                //Resolving mobile app image urls
+                if (mobileApiMatcher.match('/publisher/api/{+any}')) {
+                    return path;
+                }
+                if (matcher.match('/{context}/t/{domain}/') || matcher.match('/{context}/t/{domain}/{+any}')) {
+                    domain = matcher.elements().domain;
+                    output = context + '/t/' + domain;
+                    return output + path;
+                } else {
+                    if (path.indexOf('http://') === 0 || path.indexOf('https://') === 0) {
+                        return path;
+                    }
+                    return caramel.url(path);
+                }
+
+            });
+
+            Handlebars.registerHelper('isTenanted', function (path) {
+                var uri = request.getRequestURI();//current page path
+                var matcher = new URIMatcher(uri);
+
+                if (matcher.match('/{context}/t/{domain}/') || matcher.match('/{context}/t/{domain}/{+any}')) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            });
+
+            Handlebars.registerHelper('socialURL', function (path) {
+                var socialAppContext = caramel.configs().socialAppContext;
+                var reverseProxyEnabled = caramel.configs().reverseProxyEnabled;
+                var reverseProxyHost = caramel.configs().reverseProxyHost;
+                var ip = process.getProperty('server.host');
+                var https = process.getProperty('https.port');
+                var http = process.getProperty('http.port');
+                var url = ip + ":" + https + socialAppContext;
+                if (reverseProxyEnabled) {
+                    url = reverseProxyHost + socialAppContext;
+                } else {
+                    var isSecure = request.isSecure();
+                    if (isSecure) {
+                        url = "https://" + ip + ":" + https + socialAppContext
+                    } else {
+                        url = "http://" + ip + ":" + https + socialAppContext
+                    }
+                }
+                return url;
+
+            });
 
             Handlebars.registerHelper('compare', function (lvalue, rvalue, options) {
 
@@ -152,6 +221,28 @@ var engine = caramel.engine('handlebars', (function () {
                     };
                 partials(new File(resolve('partials')));
                 return options.fn(this);
+            });
+
+            Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
+
+                switch (operator) {
+                    case '==':
+                        return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                    case '!=':
+                        return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                    case '===':
+                        return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                    case '<':
+                        return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                    case '<=':
+                        return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                    case '>':
+                        return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                    case '>=':
+                        return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                    default:
+                        return options.inverse(this);
+                }
             });
         },
         render: function (data, meta) {

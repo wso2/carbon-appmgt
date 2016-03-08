@@ -49,7 +49,7 @@ $(function() {
 
 		// console.log(JSON.stringify(formData));
 
-		var url = '/publisher/api/asset/' + type + '/' + id;
+		var url = caramel.context + '/api/asset/' + type + '/' + id;
 
 		var options = {
 
@@ -86,7 +86,7 @@ $(function() {
 			},
 			success : function(response) {
 
-				var result = JSON.parse(response);
+				var result = response;
 
 				if (result.ok) {
 					var asset = result.asset;

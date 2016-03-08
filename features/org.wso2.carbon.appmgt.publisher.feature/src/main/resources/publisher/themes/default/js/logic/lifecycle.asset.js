@@ -143,7 +143,7 @@ $(function() {
 	function buildLCGraph() {
 		//alert(id);
 		$.ajax({
-			url : '/publisher/api/lifecycle/' + asset + '/' + id + '?t=' + new Date().getTime(),
+			url : caramel.context + '/api/lifecycle/' + asset + '/' + id + '?t=' + new Date().getTime(),
 			type : 'GET',
 			success : function(response) {
 				var element = $('#canvas');
@@ -159,7 +159,7 @@ $(function() {
 					 graph.Renderer.initRaphael();
 					 graph.Renderer.render(graph.NMap);
 					 }       */
-					var statInfo = JSON.parse(response);
+					var statInfo = response;
 					sugyama.init(statInfo.lifecycle, paper);
 					var START_X = 10;
 					var START_Y = 50;
@@ -192,18 +192,18 @@ $(function() {
 	 */
 	function buttonClickLogic(action) {
 		$.ajax({
-			url : '/publisher/api/lifecycle/' + action + '/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/' + action + '/' + asset + '/' + id,
 			type : 'PUT',
 			success : function(response) {
 				var actionName = action.toLowerCase();
 				actionName += 'd';
 				showAlert('Asset was ' + actionName + ' successfully.', 'success');
 				$.ajax({
-					url : '/publisher/api/lifecycle/' + asset + '/' + id,
+					url : caramel.context + '/api/lifecycle/' + asset + '/' + id,
 					type : 'GET',
 					success : function(response) {
 						//Convert the response to a JSON object
-						var statInfo = JSON.parse(response);
+						var statInfo = response;
 
 						$('#state').html(statInfo.state);
 						$('#view-lifecyclestate').html(statInfo.state);
@@ -292,13 +292,13 @@ $(function() {
 
 		//Make a call to the lifecycle check list
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklist/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklist/' + asset + '/' + id,
 			type : 'GET',
 			success : function(response) {
 
 				var out = '<ul>';
 
-				var obj = JSON.parse(response);
+				var obj = response;
 
 				for (var index in obj.checkListItems) {
 
@@ -327,14 +327,13 @@ $(function() {
 	function buildHistory(asset, id) {
 		var version = '1.0.0';
 		//Make a call to the api to obtain the history
-		var path = '/publisher/api/lifecycle/information/history/' + asset + '/' + id + '/' + version;
+		var path = caramel.context + '/api/lifecycle/information/history/' + asset + '/' + id + '/' + version;
 		$.ajax({
 			url : path,
 			type : 'GET',
 			success : function(response) {
 				//console.log(response);
-				var obj = JSON.parse(response);
-				var out = createHistoryEntry(obj.item);
+				var out = createHistoryEntry(response.item);
 				$('#lc-history').html(out);
 			},
 			error : function(response) {
@@ -373,7 +372,7 @@ $(function() {
 	 */
 	function callCheckListItem(checkbox, checkListItemIndex) {
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
 			type : 'POST',
 			success : function(response) {
 				alert('Item checked successfully');
@@ -391,7 +390,7 @@ $(function() {
 	 */
 	function callUncheckListItem(checkbox, checkListItemIndex) {
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
 			type : 'DELETE',
 			success : function(response) {
 				alert('Item unchecked successfully');

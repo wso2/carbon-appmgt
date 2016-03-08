@@ -119,7 +119,7 @@ var cookie=session.get("workflowCookie");
 if (cookie==null) {
             print({
                 error:true,
-                message:msg.error.loginRequired(action)
+                action:msg.error.loginRequired(action)
             });
             return;
 }else{

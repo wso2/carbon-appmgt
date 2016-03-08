@@ -1,6 +1,6 @@
 <%
 var caramel;
-
+include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title,
             log = ctx.log,
@@ -8,6 +8,7 @@ require('/modules/store.js').exec(function (ctx) {
             store = ctx.store,
             user = ctx.user,
             tenantId = ctx.tenantId,
+            tenantDomain = ctx.tenant.domain,
             configs = ctx.configs,
             site = ctx.site,
             matcher = ctx.matcher,
@@ -19,10 +20,18 @@ require('/modules/store.js').exec(function (ctx) {
 
         caramel = require('caramel');
 
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(tenantDomain);
+
     var isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
 
         var mdmUIConfig  = {enabled : isNotCatalog};
+        var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}'
 
+        if(matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}') || matcher.match(tenantedUrl)){
+            aid = matcher.elements().aid;
+            title = store.assetLinks(type).title;
+        }
 
     var isEnterpriseInstallEnabled = false;
 
@@ -43,11 +52,6 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
-
-
-    matcher.match('/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}');
-    aid = matcher.elements().aid;
-    title = store.assetLinks(type).title;
     try {
         asset = store.asset(type, aid);
     } catch (e) {
@@ -66,20 +70,24 @@ require('/modules/store.js').exec(function (ctx) {
                 devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
         }
 
+        var headerData = site.header(tenantId, {
+            sso: sso,
+            user: user,
+            isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
+        });
+        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+        headerData.domain = tenantDomain;
 
 
     caramel.render({
-        title: 'Store | ' + type,
+        title: asset.attributes.overview_name + ' | Store | WSO2 App Manager',
         user: user,
         sso: sso,
         devices: devices,
         isEnterpriseInstallEnabled: isEnterpriseInstallEnabled,
         isDeviceSubscriptionEnabled : isDeviceSubscriptionEnabled,
         isDirectDownloadEnabled :isDirectDownloadEnabled,
-        header: site.header(tenantId, {
-            sso: sso,
-            user: user
-        }),
+        header: headerData,
 
         navigation: site.navigation(tenantId),
         search: {

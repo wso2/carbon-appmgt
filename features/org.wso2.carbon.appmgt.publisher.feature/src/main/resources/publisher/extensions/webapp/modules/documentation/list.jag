@@ -14,11 +14,11 @@ var getAllDocumentation = function (api) {
             docs:docs
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             docs:null,
-            message:e.message.split(":")[1]
+            action:e.action.split(":")[1]
         };
     }
 
@@ -46,11 +46,11 @@ var getInlineContent = function (api, docName) {
             doc:doc
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             doc:null,
-            message:e.message.split(":")[1]
+            action:e.action.split(":")[1]
         };
     }
 };

@@ -2,7 +2,7 @@
     <img src="{{this.attributes.images_thumbnail}}" />
 </td>
 <td data-column="displayName" class="asset-listing-name">
-    <a href='/publisher/asset/mobileapp/{{this.id}}'>
+    <a href='{{url "/asset/mobileapp/"}}{{this.id}}'>
         {{this.attributes.overview_displayName}}
     </a>
 </td>
@@ -20,7 +20,7 @@
     </td>
 {{/if}}
 <td data-column="platform">
-    <img src="/publisher/themes/mobileapp/img/mobileapps/{{this.attributes.overview_platform}}.png">
+    <img src="{{url "/themes/mobileapp/img/mobileapps/"}}{{this.attributes.overview_platform}}.png">
 </td>
 <td data-column="type">
     {{this.attributes.overview_type}}

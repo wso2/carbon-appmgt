@@ -18,14 +18,14 @@ var getAPIDescription = function (api, username) {
             api:api,
             uriTemplates:uriTemplates,
            //discoveryURL:discoveryURL,
-            message:null
+            action:null
         };
     } catch (e) {
-        //log.error(e.message);
+        //log.error(e.action);
         return {
             error:true,
             api:null,
-            message:e.message
+            action:e.action
         };
     }
 };
@@ -53,7 +53,7 @@ var getTiers = function () {
             tiers:list
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             tiers:null

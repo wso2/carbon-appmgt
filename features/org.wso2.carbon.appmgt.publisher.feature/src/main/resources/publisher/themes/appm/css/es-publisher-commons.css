@@ -1773,3 +1773,10 @@ background-color:red;
 .alert-dismissable .close, .alert-dismissible .close:hover {
     opacity: 0.8;
 }
+
+.app-default-thumbnail {
+    color: white;
+    font-size: 10em;
+    text-align: center;
+    min-height: 210px;
+}

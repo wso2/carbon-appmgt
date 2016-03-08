@@ -5,6 +5,9 @@ var removeAPISubscription = function (api,tier,applicationName,username) {
     
 
     try {
+        if (username.indexOf("@carbon.super") > -1) {
+            username= username.replace("@carbon.super","");
+        }
         status = store.removeAPISubscription(api,tier,applicationName, username);
         if (log.isDebugEnabled()) {
             log.debug("removeAPISubscription");
@@ -22,11 +25,12 @@ var removeAPISubscription = function (api,tier,applicationName,username) {
         }
 
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e
 
         };
     }
 };
+
 %>

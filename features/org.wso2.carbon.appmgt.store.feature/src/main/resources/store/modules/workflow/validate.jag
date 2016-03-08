@@ -11,14 +11,14 @@ var validatePermission = function (encryptedHeader) {
         return {
             error:result.error,
             statusCode:result.statusCode,
-            message:result.message
+            action:result.action
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:result.error,
             statusCode:result.statusCode,
-            message:result.message
+            action:result.action
         };
     }
 };

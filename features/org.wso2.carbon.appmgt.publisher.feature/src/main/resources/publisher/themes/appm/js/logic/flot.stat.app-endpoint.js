@@ -9,16 +9,13 @@ function drawGraphs() {
     var comps = url.split('/');
     var type = comps[comps.length - 2];
     var operation = comps[comps.length - 3];
-    var action = 'getSubscriberCountByAPIs';
     var dateRange = $('#date-range').val();
     var from = dateRange.split('to')[0].trim() + ":00";
     var to = dateRange.split('to')[1].trim() + ":00";
-    var userParsedResponse;
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type
-            + '/getAppsByEndPoint/',
+        url: caramel.context + '/api/assets/' + operation + '/' + type + '/getAppsForTenantDomain/',
         type: 'POST',
         data: {
             'startDate': from,
@@ -26,18 +23,12 @@ function drawGraphs() {
         },
 
         success: function (response) {
-
-//            drawSubscribedAPIsByUsers('[["wso1", "1.0.0", "http://localhost:8280/wso1/1.0.0"],' +
-//                '["wso2", "1.0.0", "http://localhost:8280/wso2/1.0.0"],' +
-//                '["wso3", "1.0.0", "http://localhost:8280/wso3/1.0.0"]]', usageByContext);
-            drawSubscribedAPIsByUsers(response, usageByContext);
+            drawApplicationEndpointGraph(response, usageByContext);
             $('#spinner').hide();
         },
         error: function (response) {
-
         }
     });
-
 
     $('.btn-remove').on('click', function () {
         $(this).parents('.graph-maximized').removeClass('graph-maximized');
@@ -45,26 +36,23 @@ function drawGraphs() {
     });
 }
 
-
-var drawSubscribedAPIsByUsers = function (response, usageByContext) {
-
-    var parsedResponse = JSON.parse(response);
+var drawApplicationEndpointGraph = function (parsedResponse, usageByContext) {
 
     var substringMatcher = function (strs) {
         return function findMatches(q, cb) {
             var matches, substringRegex;
 
-            // an array that will be populated with substring matches
+            // An array that will be populated with substring matches.
             matches = [];
 
-            // regex used to determine if a string contains the substring `q`
+            // Regex used to determine if a string contains the substring `q`.
             substrRegex = new RegExp(q, 'i');
 
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
+            // Iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array.
             $.each(strs, function (i, str) {
                 if (substrRegex.test(str)) {
-                    // the typeahead jQuery plugin expects suggestions to a
+                    // The typeahead jQuery plugin expects suggestions to a
                     // JavaScript object, refer to typeahead docs for more info
                     matches.push({
                         value: str
@@ -79,7 +67,7 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
         states.push(parsedResponse[i][0]);
     }
 
-    $('input.type-ahead').typeahead({
+    $('input.type-ahead').typeahead( {
         hint: true,
         highlight: true,
         minLength: 1
@@ -92,15 +80,14 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
 
     tableStatement = '';
     rawStatement = '';
-    /* Overall Web Application Usage Graph */
     $("#target").click(function () {
-        getWebAppUsage();
+        drawWebAppEndpointGraph();
     });
 
     /**
-     * Get Web Application Usage
+     * Application with endpoints graph.
      */
-    function getWebAppUsage() {
+    function drawWebAppEndpointGraph() {
         $('div#webAppTable2_wrapper.dataTables_wrapper.no-footer').remove();
 
         var $dataTable = $('<table class="display" width="100%" cellspacing="0" id="webAppTable2" ></table>');
@@ -111,24 +98,23 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
             + '<th >Statistics</th>'
             + '</tr></thead>'));
 
-
         var detailNumber = 0;
         var rawNumber = 0;
         for (var i = 0; i < parsedResponse.length; i++) {
             for (var j = 0; j < 1; j++) {
                 $dataTable.append(
-                    $('<tr id=' + rawNumber + '><td id="appName">' + parsedResponse[i][0] +
-                        '</td><td id="appVersion">' + parsedResponse[i][1]
-                        + '</td><td>' + parsedResponse[i][2] +
-                        '</td><td><a  href="/publisher/assets/apps/webapp/" id=' + detailNumber + '>Show Statistics</a>'
-                        + '</td></tr>'));
+                    $('<tr id=' + rawNumber + '>' +
+                        '<td id="appName">' + parsedResponse[i][0] + '</td>' +
+                        '<td id="appVersion">' + parsedResponse[i][1] + '</td>' +
+                        '<td>' + parsedResponse[i][2] + '</td>' +
+                        '<td><a  href=' + caramel.context + '/assets/apps/webapp/'+ ' id=' + detailNumber + '>Show Statistics</a>' +
+                        '</td></tr>'));
                 detailNumber++;
                 rawNumber++;
             }
         }
 
         if (parsedResponse.length == 0) {
-
             $('#webAppTable2').hide();
             $('#placeholder2').html('<h1 class="no-data-heading">No data available</h1>');
 
@@ -141,7 +127,7 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
     }
 
     //init deafult
-    getWebAppUsage();
+    drawWebAppEndpointGraph();
 
     //ajax call to get hits
     $("#placeholder2").on("click", ".trigger-ajax", function () {
@@ -171,7 +157,6 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
 
     });
 
-
     var onDateSelected = function () {
         clearTables();
         drawGraphs();
@@ -184,5 +169,4 @@ var drawSubscribedAPIsByUsers = function (response, usageByContext) {
         $('#webAppTable4').remove();
         $('#webAppTable5').remove();
     }
-
 }

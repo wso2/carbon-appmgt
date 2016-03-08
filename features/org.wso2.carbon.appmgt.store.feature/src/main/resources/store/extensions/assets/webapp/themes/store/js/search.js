@@ -236,7 +236,7 @@ $(function () {
                         });
 
 //                        $('#search-dropdown-cont').children('div').find('#'+qarray[i].split(':')[0].toLowerCase()).val(qarray[i].split(':')[1]);
-//                        $('#'+qarray[i].split(':')[0]).val(qarray[i].split(':')[1]);
+// $('#'+qarray[i].split(':')[0]).val(qarray[i].split(':')[1]);
                     }
 
                 }
@@ -247,19 +247,25 @@ $(function () {
     });
 
 
-    $('#searchTxt').keypress(function(e) {
-        if ( e.keyCode == 13 ) {  // detect the enter key
+    $('#searchTxt').keypress(function (e) {
+        if (e.keyCode == 13) {  // detect the enter key
             var searchTerm = $(this).val();
-            var searchSelect = $('#searchSelect').val();
-            e.stopPropagation();
-            e.preventDefault();
-            if(searchSelect !== "App"){
-                searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
+            if (checkNonSpecial(searchTerm)) {
+                var searchSelect = $('#searchSelect').val();
+                e.stopPropagation();
+                e.preventDefault();
+                if (searchSelect !== "App") {
+                    searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
+                }
+                location.href = location.protocol + '//' + location.host + location.pathname + '?query=' + searchTerm;
             }
-            location.href="/store/assets/" + store.asset.type + "?query=" + searchTerm;
         }
     });
 
+    function checkNonSpecial(value){
+        var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
+        return non_special_regex.test(value);
+    }
 
 
     $('#search-dropdown-close').click(function (e) {

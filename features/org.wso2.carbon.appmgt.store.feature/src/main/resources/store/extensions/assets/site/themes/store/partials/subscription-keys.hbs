@@ -1,0 +1,42 @@
+<div>
+
+    <div class='row-fluid'>
+        <legend>Keys {{environment}}</legend>
+    </div>
+    <div class='row-fluid'>
+        <div class='span7 well'>
+
+            <!--View # 1: Token generation view -->
+            <form>
+                <fieldset>
+                    <span class='help-block'>{{environment}} keys are not yet generated for this app </span>
+                    <input type='button' class='btn btn-primary' value='Generate '/>
+                </fieldset>
+            </form>
+
+        </div>
+
+        <div class='span5 well'>
+
+            <form>
+                <fieldset>
+                    <h5>{{t "Allowed Domains"}}</h5>
+                    <textarea class='input-xlarge'></textarea>
+                    <span class='help-block'>{{t "Leaving empty or filling with ALL will allow all domains"}}</span>
+                </fieldset>
+            </form>
+
+            <!--View # 1: Token data-->
+            <h5>Token Validity</h5>
+            <form class='form form-inline'>
+                <fieldset>
+                    <input type='text' class='input-small' />
+                    <label>{{t "seconds"}}</label>
+                </fieldset>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

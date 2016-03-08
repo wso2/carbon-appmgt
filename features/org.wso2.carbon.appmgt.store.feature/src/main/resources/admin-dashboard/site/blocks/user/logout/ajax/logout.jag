@@ -15,7 +15,7 @@ include("/jagg/jagg.jag");
     } else {
         print({
             error:true,
-            message:msg.error.invalidAction(action)
+            action:msg.error.invalidAction(action)
         });
     }
 }());

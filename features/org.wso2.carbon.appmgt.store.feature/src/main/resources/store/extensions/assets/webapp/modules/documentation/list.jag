@@ -15,7 +15,7 @@ var getAllDocumentations = function (api,user) {
             documentations:documentations
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             documentations:null
@@ -37,7 +37,7 @@ var getInlineContent = function (provider,name, version, docName) {
             doc:result
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             doc:null

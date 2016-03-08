@@ -10,7 +10,7 @@
                     <div class="app-assets">
                         <a href="{{productionURL}}" target="_blank">
                             <img class="app-assets-icon"
-                                 src="/store/storage/webapp/{{uuid}}/{{thumbnail}}">
+                            <img class="icon" src="{{url "/storage/webapp/"}}{{uuid}}/{{thumbnail}}">
                         </a>
                         <div class="app-assets-info">
                             <div class="app-assets-name">
@@ -24,7 +24,7 @@
 
                         <div class="my-apps-actions">
 
-                                <a class="btn btn-info asset-myapps-btn"  href="{{url "/assets/webapp"}}/{{uuid}}">
+                                <a class="btn btn-info asset-myapps-btn"  href="{{tenantedUrl "/assets/webapp"}}/{{uuid}}">
                                     <i class="icon-mobile-phone"></i> View App
                                 </a>
 

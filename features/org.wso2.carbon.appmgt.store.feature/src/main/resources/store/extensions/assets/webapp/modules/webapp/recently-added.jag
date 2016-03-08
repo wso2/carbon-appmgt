@@ -15,7 +15,7 @@ var getRecentlyAddedAPIs = function (limit,tenant) {
             apis:apis
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             apis:null

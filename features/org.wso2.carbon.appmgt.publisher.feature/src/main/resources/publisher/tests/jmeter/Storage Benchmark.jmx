@@ -71,7 +71,7 @@
               <success>true</success>
               <label>true</label>
               <code>true</code>
-              <message>true</message>
+              <action>true</action>
               <threadName>true</threadName>
               <dataType>true</dataType>
               <encoding>false</encoding>

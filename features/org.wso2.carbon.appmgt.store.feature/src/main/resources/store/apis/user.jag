@@ -7,19 +7,20 @@ var storeHostObj = jagg.module("manager").getAPIStoreObj();
 var AuthService=require('../extensions/assets/webapp/services/authentication.js').serviceModule;
 
 require('/modules/store.js').exec(function (ctx) {
-    var action, data, message, exists, showWorkflowTip,
+    var action, data, action, exists, showWorkflowTip,
     error = false,
     log = new Log(),
     user = require('store').user,
     matcher = new URIMatcher(request.getRequestURI()),
-    userDetails={},
+    userDetails = {},
     parameters,
     isEmailUsername = false;
 
-    var authenticator=new AuthService.Authenticator();
+    var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg,session);
 
     if (matcher.match('/{context}/apis/user/{action}')) {
+        response.contentType = "application/json";
         action = matcher.elements().action;
         switch (action) {
             case 'login':
@@ -55,22 +56,22 @@ require('/modules/store.js').exec(function (ctx) {
                     }
 
                     if (error) {
-                        //If user does not have subscriber permission, return error message
+                        //If user does not have subscriber permission, return error action
                         if(!isPermitted){
-                            message = 'Insufficient Privileges.';
+                            action = 'Insufficient Privileges.';
                         }else{
-                            message = 'Invalid username or password.';
+                            action = 'Invalid username or password.';
                         }
                     }
                 } catch (e) {
                     log.error(e);
                     error = true;
-                    message = e;
+                    action = e;
                 }
 
                 print({
                     error: error,
-                    message: message
+                    action: action
                 });
                 return;
             case 'logout':
@@ -83,20 +84,21 @@ require('/modules/store.js').exec(function (ctx) {
                 } catch (e) {
                     log.error(e);
                     error = true;
-                    message = e.message;
+                    action = e.action;
                 }
                 print({
                     error: error,
-                    message: message
+                    action: action
                 });
                 return;
             case 'register':
                 try {
                     data = request.getContent();
+                    log.info(stringify(data));
                     //user.register(data.username, data.password);
                     exists = user.userExists(data.username);
                     if (exists) {
-                        message = 'Username ' + data.username + ' has already taken.';
+                        action = 'Username ' + data.username + ' has already taken.';
                         error = true;
                     }else {
                         storeHostObj.addUser(data.username, data.password);
@@ -111,13 +113,13 @@ require('/modules/store.js').exec(function (ctx) {
                 } catch (e) {
                     log.error(e);
                     error = true;
-                    message = e.message;
+                    action = e.action;
                     showWorkflowMsg = showWorkflowTip;
                 }
 
                 print({
                     error: error,
-                    message: message,
+                    action: action,
                     showWorkflowMsg:showWorkflowTip
                 });
                 return;
@@ -126,35 +128,35 @@ require('/modules/store.js').exec(function (ctx) {
                     data = request.getContent();
                     exists = user.userExists(data.username);
                     if (exists) {
-                        message = 'Username ' + data.username + ' has already taken.';
+                        action = 'Username ' + data.username + ' has already taken.';
                     }
                 } catch (e) {
                     log.error(e);
                     error = true;
-                    message = e.message;
+                    action = e.action;
                 }
                 print({
                     error: error,
                     exists: exists,
-                    message: message
+                    action: action
                 });
                 return;
 
             case 'emailLogin':
                 try {
-                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername(null);
+                    var isEnableEmailUsername = storeHostObj.isEnableEmailUsername();
                     if (isEnableEmailUsername) {
                         isEmailUsername = true;
                     }
                 } catch (e) {
                     log.error(e);
                     error = true;
-                    message = e.message;
+                    action = e.action;
                 }
                 print({
                     error: error,
                     isEmailUsername: isEmailUsername,
-                    message: message
+                    action: action
                 });
                 return;
         }

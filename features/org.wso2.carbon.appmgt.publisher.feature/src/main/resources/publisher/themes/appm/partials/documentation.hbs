@@ -40,7 +40,7 @@
 				</div>
 				
 				
-				<form id="addNewDoc" enctype="multipart/form-data"  action="/publisher/api/doc" method="POST">
+				<form id="addNewDoc" enctype="multipart/form-data"  action="{{url "/api/doc"}}" method="POST">
 					<div class="container-fluid">
 						<div class="row-fluid" id="newDoc" style="display: none;">
 							<div class="col-md-12 name-column">
@@ -80,7 +80,7 @@
 												name="optionsRadios" id="optionsRadios4"
 												value="support forum" onChange="disableInline('forum')" />Support Forum
 											</label> <label class="radio"> <input type="radio"
-												name="optionsRadios" id="optionsRadios6" value="other"
+												name="optionsRadios" id="optionsRadios5" value="other"
 												onChange="disableInline()"
 												onclick="javascript:$('#otherTypeDiv').toggle('slow')" />Other (specify)
 											</label>

@@ -1,6 +1,6 @@
 <%
 var login = function (username, password,tenantMode) {
-    var result, isSuperTenant, message,
+    var result, isSuperTenant, action,
             log = new Log(),
             manager = jagg.module("manager"),
             store = manager.getAPIStoreObj();
@@ -14,7 +14,7 @@ var login = function (username, password,tenantMode) {
 	    	return {
 	            error:true,
 	            cookie:null,
-	            message:"Authentication failed."+username.split("@")[0]+" is not from the tenant domain " + tenantMode
+	            action:"Authentication failed."+username.split("@")[0]+" is not from the tenant domain " + tenantMode
 	        };
     	}
     }
@@ -25,14 +25,14 @@ var login = function (username, password,tenantMode) {
         if (log.isDebugEnabled()) {
             log.debug("Error while authenticating user : " + username);
         }
-        message = result.detail.split('!')[1];
-        if (message == null) {
-        	message = result.detail;
+        action = result.detail.split('!')[1];
+        if (action == null) {
+        	action = result.detail;
         }
         return {
             error:result.error,
             cookie:null,
-            message:message
+            action:action
         };
     }
     var subscriber = store.getSubscriber(username);

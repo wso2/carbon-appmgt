@@ -143,7 +143,7 @@ $(function() {
 	function buildLCGraph() {
 		//alert(id);
 		$.ajax({
-			url : '/publisher/api/lifecycle/' + asset + '/' + id + '?t=' + new Date().getTime(),
+			url : caramel.context + '/api/lifecycle/' + asset + '/' + id + '?t=' + new Date().getTime(),
 			type : 'GET',
 			success : function(response) {
 				var element = $('#canvas');
@@ -151,7 +151,7 @@ $(function() {
 				if (element) {
 					var paper = new Raphael('canvas', 600, 700);
 				
-					var statInfo = JSON.parse(response);
+					var statInfo = response;
 					sugyama.init(statInfo.lifecycle, paper);
 					var isAsynch = statInfo.asynch;
 					
@@ -211,34 +211,34 @@ $(function() {
 	function buttonClickLogic(action) {
 
 		$.ajax({
-			url : '/publisher/api/lifecycle/subscribe/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/subscribe/' + asset + '/' + id,
 			type : 'GET',
 			success : function(response) {
 				//Convert the response to a JSON object
-				var statInfo = JSON.parse(response);
+				var statInfo = response;
 				var subscribed = statInfo.subscribed;
 				var state= statInfo.state;
 				if((state == 'Published' && subscribed && action == 'Unpublish') || (state == 'Deprecated' && subscribed && action == 'Retire')){
 					    $('#messageModal').html($('#confirmation-data').html());
 					    $('#messageModal h3.modal-title').html(('APP Publisher - Error'));
 					    $('#messageModal a.btn-primary').html('OK');
-					    var img = $('<img  src="/publisher/themes/appm/img/error.png" /> \nCannot ' + action + ' the App. Active Subscriptions Exist !</p>');
+					    var img = $('<img  src=caramel.context + "/themes/appm/img/error.png" /> \nCannot ' + action + ' the App. Active Subscriptions Exist !</p>');
 					    $('#messageModal div.modal-body').html(img);
 					    $('#messageModal').modal();
 				}else{
 					$.ajax({
-						url : '/publisher/api/lifecycle/' + action + '/' + asset + '/' + id,
+						url : caramel.context + '/api/lifecycle/' + action + '/' + asset + '/' + id,
 						type : 'PUT',
 						success : function(response) {
 							var actionName = action.toLowerCase();
 							actionName += 'd';
 							showAlert('Asset was ' + actionName + ' successfully.', 'success');
 							$.ajax({
-								url : '/publisher/api/lifecycle/' + asset + '/' + id,
+								url : caramel.context + '/api/lifecycle/' + asset + '/' + id,
 								type : 'GET',
 								success : function(response) {
-									//Convert the response to a JSON object
-									var statInfo = JSON.parse(response);
+									// Response is a JSON object
+									var statInfo = response;
 
 									$('#state').html(statInfo.state);
 									$('#view-lifecyclestate').html(statInfo.state);
@@ -338,13 +338,13 @@ $(function() {
 
 		//Make a call to the lifecycle check list
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklist/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklist/' + asset + '/' + id,
 			type : 'GET',
 			success : function(response) {
 
 				var out = '<ul>';
 
-				var obj = JSON.parse(response);
+				var obj = response;
 
 				for (var index in obj.checkListItems) {
 
@@ -373,14 +373,12 @@ $(function() {
 	function buildHistory(asset, id) {
 		var version = '1.0.0';
 		//Make a call to the api to obtain the history
-		var path = '/publisher/api/lifecycle/information/history/' + asset + '/' + id + '/' + version;
+		var path = caramel.context + '/api/lifecycle/information/history/' + asset + '/' + id + '/' + version;
 		$.ajax({
 			url : path,
 			type : 'GET',
 			success : function(response) {
-				//console.log(response);
-				var obj = JSON.parse(response);
-				var out = createHistoryEntry(obj.item);
+				var out = createHistoryEntry(response.item);
 				$('#lc-history').html(out);
 			},
 			error : function(response) {
@@ -419,7 +417,7 @@ $(function() {
 	 */
 	function callCheckListItem(checkbox, checkListItemIndex) {
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
 			type : 'POST',
 			success : function(response) {
 				alert('Item checked successfully');
@@ -437,7 +435,7 @@ $(function() {
 	 */
 	function callUncheckListItem(checkbox, checkListItemIndex) {
 		$.ajax({
-			url : '/publisher/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
+			url : caramel.context + '/api/lifecycle/checklistitem/' + checkListItemIndex + '/' + asset + '/' + id,
 			type : 'DELETE',
 			success : function(response) {
 				alert('Item unchecked successfully');

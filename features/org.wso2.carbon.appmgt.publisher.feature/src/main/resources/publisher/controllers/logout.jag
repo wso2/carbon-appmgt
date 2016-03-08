@@ -3,8 +3,13 @@
     include("/extensions/webapp/modules/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIProviderObj();
     var currentSession = require('store').server.current(session);
+    var caramel = require('caramel');
+    var contextPath = caramel.configs().context;
+    var audutLog = require('/modules/auditLog/logger.js');
+
     if(currentSession) {
         var user = currentSession.username;//session.get("LOGGED_IN_USER");
+        var tenantId = currentSession.tenantId;
         if (user === null) {
             response.sendRedirect('/store');
         } else {
@@ -15,17 +20,17 @@
                 sessionId = session.getId(),
                 encodedSAMLLogoutRequest = sso.client.getEncodedSAMLLogoutRequest(user, sso_sessions[session.getId()],
                     config.ssoConfiguration.issuer),
-                relayState = '/publisher',
+                relayState = contextPath,
                 serverHost = process.getProperty('server.host'),
                 postUrl = ssoIdpProvider.getIdentityProviderUrl();
 
             var log = new Log();
 
             log.debug("portal session index : " + sso_sessions[session.getId()]);
-
+            audutLog.writeLog(tenantId, user, "UserSignedOut","Logout","", "", "");
             %>
                 <div>
-                    <p>You are now redirected to Stratos Identity. If the
+                    <p>You are now redirected to Identity Server. If the
                     redirection fails, please click the post button.</p>
 
                     <form id="logoutForm" method="post" action="<%=postUrl%>">
@@ -44,7 +49,7 @@
         }
     } else {
         //this block executes when the session is expired so redirect user to login page
-        response.sendRedirect('/publisher');
+        response.sendRedirect(contextPath);
     }
 }());
 %>

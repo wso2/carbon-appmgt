@@ -17,10 +17,10 @@ var removeDocumentation = function (api, doc) {
             };
         }
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
-            message:e.message.split(":")[1]
+            action:e.action.split(":")[1]
         };
     }
 };

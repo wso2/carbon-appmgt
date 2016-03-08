@@ -15,7 +15,7 @@
     var DEFAULT_PATH = config.paths.ASSETS_DEFAULT_PATH;
     var URL = config.urls.ASSETS;
 
-    var MSG_404 = 'Assets not found';	//Eror 404 message
+    var MSG_404 = 'Assets not found';	//Eror 404 action
 
     var securityModule=require('/modules/security/security.manager.js').securityManagementModule();
 

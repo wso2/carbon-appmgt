@@ -29,12 +29,19 @@ require('/modules/publisher.js').exec(function (ctx) {
 	var routeManager = new router.Router();
 	var log = new Log();
 	var permissions = require('/modules/permissions.js').permissions;
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
+    var audutLog = require('/modules/auditLog/logger.js');
+
 
 	routeManager.register('POST', 'publisher', '/publisher/api/lifecycle/{type}/{id}', function (context) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var lifecycle = context.post.lifecycle;
 		var invokeAction = '';
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 		//Check the config for a lifeCycleBehaviour block
 		utility.isPresent(config, 'lifeCycleBehaviour', function (lifeCycleBehaviour) {
 			utility.isPresent(lifeCycleBehaviour, lifeCycle, function (lifeCycleData) {
@@ -57,11 +64,12 @@ require('/modules/publisher.js').exec(function (ctx) {
 			//Perform the action if the user has specified an action
 			if (invokeAction != '') {
 				artifactManager.promoteLifecycleState(invokeAction, artifact);
+                audutLog.writeLog(tenantId, username, "LifeStyleStateChanged", shortName, id, artifact, "");
 			}
 
 			var msg = {};
 			msg['status'] = 'ok';
-
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -78,11 +86,15 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var artifactManager = rxtManager.getArtifactManager(shortName);
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
 		try {
 			var artifact = artifactManager.get(id);
 			artifactManager.checkItem(checkListItemIndex, artifact);
 			var msg = {};
+            audutLog.writeLog(tenantId, username, "Ticks The Check List", shortName, id, artifact, "");
 			msg['status'] = 'ok';
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -101,7 +113,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
 			var msg = {};
 			msg['status'] = 'ok';
-
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -118,12 +130,16 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var artifactManager = rxtManager.getArtifactManager(shortName);
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
 		try {
 			var artifact = artifactManager.get(id);
 			artifactManager.uncheckItem(checkListItemIndex, artifact);
 			var msg = {};
 			msg['status'] = 'ok';
+            audutLog.writeLog(tenantId, username, "Ticks The Unheck List", shortName, id, artifact, "");
 		} catch (e) {
 			log.debug('The lifecyle check list item at index ' + checkListItemIndex + ' of asset id: ' + id + ' could not be unticked' + 'The following exception was thrown: ' + e);
 			response.sendError(404, 'The lifecycle check list item at index ' + checkListItemIndex + ' of asset id: ' + id + ' could not be unchecked' + '.Please refer to the server log');
@@ -137,14 +153,15 @@ require('/modules/publisher.js').exec(function (ctx) {
      * @returns {{status: string, messages: string[], artifacts: Object[]}}
      */
     routeManager.register('PUT', 'publisher', '/publisher/api/lifecycle/{action}/{type}/{id}', function (context) {
-
         var appType = context.params.type; // webapp or mobileapp
         var action = context.params.action; // see '/config/publisher.json' --> publisherActions
         var uuid = context.params.id; // UUID
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
         /** @type {{status: string, messages: string[], artifacts: Object[]}} */
         var content = {status: "", messages: [], artifacts: []};
-
         // validating action
         if (config.publisherActions.indexOf(action) == -1) {
             log.error("Invalid action '" + action + "' invoked on a " + appType
@@ -161,14 +178,70 @@ require('/modules/publisher.js').exec(function (ctx) {
         var userManager = server.userManager(server.current(session).tenantId);
         var user = server.current(session);
         var permission = null;
-        if (appType == 'webapp') {
-            permission = config.permissions.webapp_publish;
-        } else if (appType == 'mobileapp') {
-            permission = config.permissions.mobileapp_publish;
+        //check if its the default version and if it has any other versions when deprecating
+        if (action == "Deprecate") {
+            var webApp;
+            try {
+                webApp = apiProvider.getAppDetailsFromUUID(uuid);
+            } catch (e) {
+                log.error("The asset with UUID " + uuid + " could not be retrieved.");
+                log.error(e);
+                response.status = 404;
+                response.contentType = "application/json";
+                content.status = "Not Found";
+                content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
+                response.content = stringify(content);
+                return;
+            }
+            var appProvider = webApp.provider;
+            var appName = webApp.name;
+            var appVersion = webApp.version;
+            var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
+
+            try {
+                if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
+                    log.error("Insufficient permissions to perform '" + action + "' on " + appType);
+                    response.status = 401;
+                    response.contentType = "application/json";
+                    content.status = "Access Denied";
+                    content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
+                                          + appType + "'. Please select other version of this '" + appType
+                                          + "' as the default version and proceed.");
+                    response.content = stringify(content);
+                    return;
+                }
+            } catch (e) {
+                log.error("Error while retrieving default version details related to App Name: " + appName
+                          + ", Provider: " + appProvider + ", Version: " + appVersion);
+                log.error(e);
+                response.status = 404;
+                response.contentType = "application/json";
+                content.status = "Not Found";
+                content.messages.push("Error while retrieving default version details related to App Name: " + appName
+                                      + ", Provider: " + appProvider + ", Version: " + appVersion);
+                response.content = stringify(content);
+                return;
+            }
         }
-        // check whether current user has publisher permissions
-        var hasPublisherPermission = permissions.isAuthorized(user.username, permission, userManager);
-        if (!hasPublisherPermission) {
+
+        // To Send an app to submit for review, created permission is required.
+        if (action != "Submit for Review") {
+            if (appType == 'webapp') {
+                permission = config.permissions.webapp_publish;
+            } else if (appType == 'mobileapp') {
+                permission = config.permissions.mobileapp_publish;
+            }
+        } else {
+            if (appType == 'webapp') {
+                permission = config.permissions.webapp_create;
+            } else if (appType == 'mobileapp') {
+                permission = config.permissions.mobileapp_create;
+            }
+        }
+
+        // check whether current user has enough permission to change the life cycle
+        var hasPermission = permissions.isAuthorized(user.username, permission, userManager);
+        if (!hasPermission) {
             log.error("Insufficient permissions to perform '" + action + "' on " + appType);
             response.status = 401;
             response.contentType = "application/json";
@@ -273,11 +346,12 @@ require('/modules/publisher.js').exec(function (ctx) {
             // continue work flow
         }
 
-        /** @type {{isSuccess: boolean, message: string}} */
+        /** @type {{isSuccess: boolean, action: string}} */
         var operationResult;
 
         // For all previously published apps when publishing or re-publishing current app,
         // unpublish previously published version of this app.
+        /*
         if (((action == "Publish") || (action == "Re-Publish"))
             && (previousArtifacts.length > 0)) {
             var i;
@@ -285,7 +359,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 operationResult = promoteArtifactLifeCycle(artifactManager, previousArtifacts[i],
                                                            appType, "Unpublish");
                 if (operationResult.isSuccess) {
-                    content.messages.push(operationResult.message);
+                    content.messages.push(operationResult.action);
                 } else {
                     // some error occurred in promoteArtifactLifeCycle function,
                     // abort further unpublishing previousArtifacts
@@ -302,17 +376,18 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.status = 500;
                 response.contentType = "application/json";
                 content.status = "Error";
-                content.messages.push(operationResult.message); // error message from last operation
+                content.messages.push(operationResult.action); // error action from last operation
                 response.content = stringify(content);
                 return;
             }
         }
+        */
 
         // promote lifecycle of this app (current artifact)
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
                                                    appType, action);
         if (operationResult.isSuccess) {
-            content.messages.push(operationResult.message);
+            content.messages.push(operationResult.action);
         } else {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
@@ -324,7 +399,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 500;
             response.contentType = "application/json";
             content.status = "Error";
-            content.messages.push(operationResult.message); // error message from last operation
+            content.messages.push(operationResult.action); // error action from last operation
             response.content = stringify(content);
             return;
         }
@@ -341,6 +416,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 var commentHandler = require('/modules/comment.js');
                 commentHandler.addLifecycleComment(artifactManager, currentArtifact.path, comment,
                                                    newChangeOrder);
+
             }
         } catch (e) {
             log.error("Cannot add comment '" + comment + " for action '" + action + "' on "
@@ -350,7 +426,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
 
         // only when publishing
-        if (action == "Publish") {
+        if ((action=="Publish") || ((action=="Re-Publish"))) {
             //Enforcing restrict visibility logic
             var registry = new carbon.registry.Registry(server, {
                 username: server.current(session).username,
@@ -375,18 +451,25 @@ require('/modules/publisher.js').exec(function (ctx) {
         // For all previously published web apps when publishing or re-publishing current web app,
         // move subscriptions of that web app version to this web app version.
         if ((appType == "webapp") && (previousArtifacts.length > 0)
-            && ((action == "Publish") || (action == "Re-Publish"))) {
+            && ((action == "Publish") || (action == "Re-Publish"))
+            && (currentArtifact.attributes.overview_makeAsDefaultVersion.equals("true"))) {
+
 
             for (i = 0; i < previousArtifacts.length; i++) {
-                operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
-                if (operationResult.isSuccess) {
-                    content.messages.push(operationResult.message);
-                } else {
-                    // some error occurred in moveSubscriptions function
-                    // abort further subscription moving
-                    break;
+                //Move subscriptions only from the original older version which this web app was created
+                if (previousArtifacts[i].attributes.overview_version
+                    == currentArtifact.attributes.overview_oldVersion) {
+                    operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
+                    if (operationResult.isSuccess) {
+                        content.messages.push(operationResult.action);
+                    } else {
+                        // some error occurred in moveSubscriptions function
+                        // abort further subscription moving
+                        break;
+                    }
                 }
             }
+
             if (!operationResult.isSuccess) {
                 // something went wrong in the above loop, revert subscription moving
                 if (previousArtifacts.length == 1) {
@@ -406,20 +489,28 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.status = 500;
                 response.contentType = "application/json";
                 content.status = "Error";
-                content.messages.push(operationResult.message); // error message from last operation
+                content.messages.push(operationResult.action); // error action from last operation
                 response.content = stringify(content);
                 return;
             }
 
         }
 
+        var originalArtifact = artifactManager.get(uuid);
+        var attributes = originalArtifact.attributes;
+
         // everything went great
+        audutLog.writeLog(tenantId, username, action, appType, "{" +
+                                                                         "providerName='" + attributes["overview_provider"] + '\'' +
+                                                                         ", apiName='" + attributes["overview_name"]+ '\'' +
+                                                                         ", version='" + attributes["overview_version"] + '\'' +
+                                                                         '}'+""+"");
         response.status = 200;
         response.contentType = "application/json";
         content.status = "Success";
         content.artifacts = [currentArtifact].concat(previousArtifacts);
         content.artifacts.forEach(function (artifact) {
-            artifact.isDownloadable = hasPublisherPermission;
+            artifact.isDownloadable = hasPermission;
             artifact.attributes.overview_createdtime =
                 new Date(parseInt(artifact.attributes.overview_createdtime)).toUTCString();
             artifact.lifecycleState = artifactManager.getLifecycleState(artifact);
@@ -436,32 +527,32 @@ require('/modules/publisher.js').exec(function (ctx) {
      * @param artifact {Object} artifact to be promoted
      * @param artifactType {string} type of the artifact (e.g. webapp, mobileapp)
      * @param action {string} action to be perform; see '/config/publisher.json'.publisherActions
-     * @returns {{isSuccess: boolean, message: string}} status of the operation with a message
+     * @returns {{isSuccess: boolean, action: string}} status of the operation with a action
      */
     function promoteArtifactLifeCycle(artifactManager, artifact, artifactType, action) {
-        var result = {isSuccess: false, message: ""};
+        var result = {isSuccess: false, action: ""};
         try {
             artifactManager.promoteLifecycleState(action, artifact);
             result.isSuccess = true;
-            result.message = getMessageForLifeCyclePromotion(artifact, artifactType, action, true);
+            result.action = getMessageForLifeCyclePromotion(artifact, artifactType, action, true);
         } catch (e) {
             // this exception is thrown by
             // GovernanceArtifactImpl.invokeAction(action) throws GovernanceException
             result.isSuccess = false;
-            result.message = getMessageForLifeCyclePromotion(artifact, artifactType, action, false);
-            log.error(result.message);
+            result.action = getMessageForLifeCyclePromotion(artifact, artifactType, action, false);
+            log.error(result.action);
             log.error(e);
         }
         return result;
     }
 
     /**
-     * Returns a human readable message for a life cycle promotion done for a artifact.
+     * Returns a human readable action for a life cycle promotion done for a artifact.
      * @param artifact {Object} promoted artifact
      * @param artifactType {string} type of the artifact (e.g. webapp, mobileapp)
      * @param action {string} performed action; see '/config/publisher.json'.publisherActions
      * @param isSuccess {boolean} whether the operation is a success or not
-     * @returns {string} a human readable message
+     * @returns {string} a human readable action
      */
     function getMessageForLifeCyclePromotion(artifact, artifactType, action, isSuccess) {
         // Submit for Review, Approve , Reject, Publish, Unpublish, Re-Publish, Deprecate, Retire,
@@ -493,10 +584,10 @@ require('/modules/publisher.js').exec(function (ctx) {
      * @param fromAsset {Object} source asset
      * @param toAsset {Object} destination asset
      * @param assetType {string} type of the asset (e.g. webapp, mobileapp)
-     * @returns {{isSuccess: boolean, message: string}} status of the moving with a message
+     * @returns {{isSuccess: boolean, action: string}} status of the moving with a action
      */
     function moveSubscriptions(fromAsset, toAsset, assetType) {
-        var result = {isSuccess: false, message: ""};
+        var result = {isSuccess: false, action: ""};
         try {
             var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
             var apiProviderImpl = Packages.org.wso2.carbon.appmgt.impl.APIProviderImpl;
@@ -511,7 +602,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             var count = provider.moveSubscriptions(fromIdentifier, toIdentifier);
             result.isSuccess = true;
-            result.message = count + " subscription(s) moved from version " +
+            result.action = count + " subscription(s) moved from version " +
                              fromAsset.attributes.overview_version + " to " +
                              toAsset.attributes.overview_version + " of '" +
                              fromAsset.attributes.overview_name + "' " + assetType + ".";
@@ -520,12 +611,12 @@ require('/modules/publisher.js').exec(function (ctx) {
             // APIProviderImpl.moveSubscriptions(fromIdentifier, toIdentifier) throws
             //														AppManagementException
             result.isSuccess = false;
-            result.message = "Cannot move subscriptions from version " +
+            result.action = "Cannot move subscriptions from version " +
                              fromAsset.attributes.overview_version + " of '" +
                              fromAsset.attributes.overview_name + "' " + assetType + " to " +
                              toAsset.attributes.overview_version + " of '" +
                              toAsset.attributes.overview_name + "' " + assetType;
-            log.error(result.message);
+            log.error(result.action);
             log.error(e);
         }
         return result;
@@ -578,6 +669,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['asynch'] = isAsynchronousFlow;
 
 			log.debug(msg);
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -612,6 +704,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['state'] = state;
 
 			log.debug(msg);
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
@@ -723,6 +816,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			var msg = {};
 			msg['status'] = 'ok';
 			msg['checkListItems'] = checkListItems;
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The check list names were not retrieved for artifact: ' + id + ' .The following exception was thrown: ' + e);
@@ -748,6 +842,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			msg['status'] = 'ok';
 			msg['index'] = checkListItemIndex;
 			msg['isChecked'] = isChecked;
+            response.contentType = "application/json";
 			print(msg);
 		} catch (e) {
 			log.debug('The check list item index state could not be  retrieved for aritfact: ' + id + ' .The following exception was thrown: ' + e);
@@ -769,6 +864,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 				var xml = new XML(historyRes.content);
 				json = utility.xml.convertE4XtoJSON(xml);
 			}
+            response.contentType = "application/json";
 			print(json);
 		} catch (e) {
 			log.debug('The lifecycle history for artifact: ' + id + ' could not be found.The following exception was thrown: ' + e);

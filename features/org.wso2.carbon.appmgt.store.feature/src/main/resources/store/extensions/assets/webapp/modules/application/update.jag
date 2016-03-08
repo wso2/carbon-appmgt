@@ -12,7 +12,7 @@ var updateApplication = function (applicationNew,applicationOld,username,tier,ca
             error:false
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e
         };

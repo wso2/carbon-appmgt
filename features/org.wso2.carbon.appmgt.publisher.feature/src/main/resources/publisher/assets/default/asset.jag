@@ -14,8 +14,11 @@
 include("/extensions/webapp/modules/jagg/jagg.jag");
 var permissions=require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
-
-
+var SITE_TYPE = 'site';
+var WEBAPP_TYPE = 'webapp';
+var MOBILEAPP_TYPE = 'mobileapp';
+var assetType;
+var audutLog = require('/modules/auditLog/logger.js');
 require('/modules/publisher.js').exec(function(ctx) {
 
     var config = require('/config/publisher.json');
@@ -23,6 +26,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var server = require('store').server;
     var storeUser=require('store').user;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var appmgtPublisher = require('appmgtpublisher');
     var utility = require('/modules/utility.js').rxt_utility();
     var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
     var publisher = require('/modules/publisher.js').publisher(request, session);
@@ -76,8 +80,16 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var output = model.export('form');
         var title = shortName;
+        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var isSubscriptionEnabled;
+        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+            isSubscriptionEnabled = false;
+        }else{
+            isSubscriptionEnabled = true;
+        }
         output.sso_provider = getIdentityProviderUrl();
         caramel.render({
+            isSubscriptionEnabled:isSubscriptionEnabled,
             op: operation,
             cuser: server.current(session),
             shortName: shortName,
@@ -145,6 +157,12 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         apiData.version = model.get('overview.version').value;
         var result = mod.getAllDocumentation(apiData);
 
+        //get external store details
+        var externalAppStores = getExternalAppStores(apiData);
+        var appStoresDetail = {};
+        appStoresDetail.app = apiData;
+        appStoresDetail.externalStores = externalAppStores;
+
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);
@@ -165,10 +183,11 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             tags:tags,
             title:title,
             docs: result.docs,
+            appStores:appStoresDetail,
             permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
         });
     } catch (e) {
-        log.debug('The asset with id ' + id + ' could not be found due to : ' + e);
+        log.error('The asset with id ' + id + ' could not be found due to : ' + e);
         response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');
     }
 
@@ -182,6 +201,14 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         if (shortName === "mobileapp") {
             editMobileApp(context, rxtManager, modelManager, dataInjector, DataInjectorModes);
             return;
+        }
+
+        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var isSubscriptionEnabled;
+        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+            isSubscriptionEnabled = false;
+        }else{
+            isSubscriptionEnabled = true;
         }
 
         //print(context.params);
@@ -290,6 +317,7 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                 });
             } else {
                 caramel.render({
+                    isSubscriptionEnabled: isSubscriptionEnabled,
                     op: operation,
                     cuser: user,
                     shortName: shortName,
@@ -321,8 +349,10 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
     var server = require('store').server;
     var user=server.current(session);
     var um = server.userManager(server.current(session).tenantId);
+    var tenantId = server.current(session).tenantId
+    var username = user.username;
 
-    if (permissions.isAuthorized(user.username, config.permissions.webapp_create, um)) {
+    if (permissions.isAuthorized(username, config.permissions.webapp_create, um)) {
 
         var shortName = context.params.type;
         var artifactManager = rxtManager.getArtifactManager(shortName);
@@ -333,22 +363,25 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
         //Check if the type is valid
         try {
-
             //Process and add any files in the request if the application is not in the copy mode
-            if(oldVersion == null || oldVersion == '') {
+            if (context.post["overview_treatAsASite"].toLowerCase() == 'true') {
+                assetType = SITE_TYPE;
+            } else {
+                assetType = WEBAPP_TYPE;
+            }
+            if (oldVersion == null || oldVersion == '') {
                 inspectFiles(request, context.post);
             }
 
             model.import('form.importer', context.post);
 
-
             //Perform validation on the model
-
             var report = model.validate();
 
             if ((report) && (report.failed)) {
 
-                print({ok: false, message: 'Validation failure', report: report});
+                response.contentType = "application/json";
+                print({ok: false, action: 'Validation failure', report: report});
                 return;
             }
 
@@ -357,17 +390,24 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var version = model.get('overview.version').value;
 
             if (context.post['overview_context'].length > 200) {
-                print({ok: false, message: 'Context value length is more than 200', report: report});
+                response.contentType = "application/json";
+                print({ok: false, action: 'Context value length is more than 200', report: report});
                 return;
             }
 
             //Check whether duplicate webapp exists
             var isexists = isWebappExists(name, provider, version);
 
-            //If exists, return an error message
+            //If exists, return an error action
             if (isexists == true) {
-                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
-                                                       name + "' and version - '" + version +"'"});
+                response.contentType = "application/json";
+                print({
+                          ok: false,
+                          isexists: true,
+                          action: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '"
+                                  +
+                                  name + "' and version - '" + version + "'"
+                      });
                 return;
             }
 
@@ -375,13 +415,14 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
             model.save();
 
+
             //Obtain the asset id in order to retrieve the asset again
             var assetId = model.get('*.id').value;
-
-            try{
+            try {
                 social.warmUpRatingCache(shortName + ':' + assetId);
-            }catch(e) {
-                log.warn("Unable to publish the asset: " + shortName + ":" + assetId + " to social cache. This may affect on sort by popularity function.");
+            } catch (e) {
+                log.warn("Unable to publish the asset: " + shortName + ":" + assetId
+                         + " to social cache. This may affect on sort by popularity function.");
             }
 
             //Convert the model to an artifact
@@ -399,15 +440,32 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             webappId.provider = model.get('overview.provider').value;
             webappId.name = model.get('overview.name').value;
             webappId.version = model.get('overview.version').value;
-            if(oldVersion != null && oldVersion != '') {
+            if (oldVersion != null && oldVersion != '') {
                 webappId.oldVersion = oldVersion;
                 //Copy web app documentation
                 copyDocuments(webappId);
-                copyRolePermissions(assetId,artifactManager);
+                copyRolePermissions(assetId, artifactManager);
             }
-            generateEntitlementPolicies(webappId);
-
-            print({ok: true, message: 'asset added', id: assetId});
+            var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            username = username + "@" + tenantDomain;
+            var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
+            appMgtProviderObj.generateEntitlementPolicies(webappId);
+            if (oldVersion == null || oldVersion == '') {
+                audutLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                                                                                   "providerName='" + webappId.provider + '\'' +
+                                                                                   ", apiName='" +  webappId.name + '\'' +
+                                                                                   ", version='" + webappId.version + '\'' +
+                                                                                   '}', "", "");
+        }
+        else{
+            audutLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                                                                                "providerName='" + webappId.provider + '\'' +
+                                                                                ", apiName='" +  webappId.name + '\'' +
+                                                                                ", version='" + webappId.version + '\'' +
+                                                                                '}', "", "");
+        }
+            response.contentType = "application/json";
+            print({ok: true, action: 'asset added', id: assetId});
         }
         catch (e) {
             log.error(e);
@@ -415,7 +473,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             response.sendError(500, 'The asset instance could not be created.Please check the server log.');
         }
     }else{
-        print({ok: false, message: 'Failed to add Asset. Insufficient privileges.'});
+        response.contentType = "application/json";
+        print({ok: false, action: 'Failed to add Asset. Insufficient privileges.'});
         return;
         //response.sendError(401, 'Failed to add Asset : Insufficient Privilages.');
     }
@@ -439,13 +498,20 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
         return apiProvider.getIdentityProviderUrl();
     }
 
-/**
-* Generates entitlement policies.
-*/
-function generateEntitlementPolicies(webappId){
-    apiProvider.generateEntitlementPolicies(webappId);
-}
+    /**
+     * Get external app store details
+     * @param apiData
+     * @returns {*}
+     */
+    function getExternalAppStores(apiData){
+        try{
+            var externalAppStores = apiProvider.getExternalAppStoresList(apiData.provider, apiData.name, apiData.version);
+            return externalAppStores;
+        } catch(e) {
+            log.error("Error while getting external app store details : " +e);
+        }
 
+    }
 /**
 * Check whether the application already exists
 */
@@ -698,64 +764,51 @@ function addTags(params,assetId,artifactManager,reg){
         return filteredActions;
     }
 
-/*
- The function inspects the files sent with a request.If files are found
- they are added to Storage and then the generated uuids are added to
- the POST parameter object
- @req: A request object
- @params: The POST parameters
- */
-function inspectFiles(req, params) {
-    var files = req.getAllFiles();
-    var fileName;
-    var file;
-    var uuid = '';
-    var extension;
-    var thumbnail;
-    var banner;
+    /*
+     The function inspects the files sent with a request.If files are found
+     they are added to Storage and then the generated uuids are added to
+     the POST parameter object
+     @req: A request object
+     @params: The POST parameters
+     */
+    function inspectFiles(req, params) {
+        var files = req.getAllFiles();
 
-    //setting default img if no images given for a webapp
-    if(files == null){
-        var files = {};
-        var thumbnail = new File("/config/defaults/img/thumbnail.jpg");
-        var banner = new File("/config/defaults/img/banner.jpg");
-
-        files["images_thumbnail"]= thumbnail;
-        files["images_banner"]= banner;
-    }else if(files.images_thumbnail == null){
-        thumbnail = new File("/config/defaults/img/thumbnail.jpg");
-        files["images_thumbnail"]= thumbnail;
-    }else if(files.images_banner == null){
-        var banner = new File("/config/defaults/img/banner.jpg");
-        files["images_banner"]= banner;
-    }
-
-    var storageManager = new storageModule.StorageManager({
-        context: 'storage',
-        isCached: false,
-        connectionInfo: {
-            dataSource: storageConfig.dataSource
+        // For thumbnail & banner: if not uploaded then set the POST parameter to empty string
+        if (files == null) {
+            params["images_thumbnail"] = "";
+            params["images_banner"] = "";
+            return;
+        } else if (files.images_thumbnail == null) {
+            params["images_thumbnail"] = "";
+        } else if (files.images_banner == null) {
+            params["images_banner"] = "";
         }
-    });
 
-    for (var index in files) {
+        var storageManager = new storageModule.StorageManager({
+            context: 'storage',
+            isCached: false,
+            connectionInfo: {
+                dataSource: storageConfig.dataSource
+            }
+        });
 
-        file = files[index];
+        for (var index in files) {
+            if (!files.hasOwnProperty(index)) {
+                continue;
+            }
+            var file = files[index];
+            //Put the file in storage and get a uuid as a reference
+            var resource = {};
+            resource['file'] = file;
+            var extension = utility.fileio.getExtension(file);
+            resource['contentType'] = utility.fileio.getContentType(extension);
+            var uuid = storageManager.put(resource);
 
-        //log.debug('file: ' + index);
-
-        //Put the file in storage and get a uuid as a reference
-        var resource = {};
-        resource['file'] = file;
-        extension = utility.fileio.getExtension(file);
-        resource['contentType'] = utility.fileio.getContentType(extension);
-
-        uuid=storageManager.put(resource);
-
-        //Add a new  entry into the POST parameters containing the uuid
-        params[index] = uuid;
+            //Add a new  entry into the POST parameters containing the uuid
+            params[index] = uuid;
+        }
     }
-}
 
 routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{value}', function (context) {
     log.debug('Unsupported method PUT for /asset called.');
@@ -784,12 +837,16 @@ routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{
 routeManager.register('DELETE', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
     var shortName = context.params.type;
     var id = context.params.id;
+    var server = require('store').server;
+    var user=server.current(session);
+    var um = server.userManager(server.current(session).tenantId);
+    var tenantId = server.current(session).tenantId
+    var username = user.username;
 
     var artifactManager = rxtManager.getArtifactManager(shortName);
 
     try {
         artifactManager.remove(id);
-
     } catch (e) {
         log.debug('Asset id: ' + id + 'was not removed.Due to exception: ' + e);
         response.sendError(404, 'Asset with id: ' + id + 'was not removed.Please check the server log for more details.');

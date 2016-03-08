@@ -5,7 +5,7 @@ Filename: asset.tag.add.js
  */
 $(function(){
 
-    var TAG_API_URL='/publisher/api/tag/';
+    var TAG_API_URL= caramel.context +'/api/tag/';
     var type=$('#meta-asset-type').val()+'s';
 
     var url=TAG_API_URL+type;
@@ -17,9 +17,7 @@ $(function(){
         url:url,
         type:'GET',
         success:function(response){
-            var tags=JSON.parse(response);
-            $(TAG_CONTAINER).tokenInput(tags,{theme:THEME, allowFreeTagging: true});
-
+            $(TAG_CONTAINER).tokenInput(response, {theme: THEME, allowFreeTagging: true});
         },
         error:function(){
             console.log('unable to fetch tag cloud for '+type);

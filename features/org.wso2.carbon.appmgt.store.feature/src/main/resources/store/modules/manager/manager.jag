@@ -62,7 +62,7 @@ var loadTenantRegistry = function (tenantDomain) {
     } catch (e) {
         return {
             error:true,
-            message:e.message
+            action:e.action
         };
     }    
 };
@@ -85,13 +85,17 @@ var getActiveTenantDomains=function(){
             tenantDomains:tenantDomains
         };
     } catch (e) {
-        //log.error(e.message);
+        //log.error(e.action);
         return {
             error:true,
             tenantDomains:null,
-            message:e.message
+            action:e.action
         };
     }
 
+};
+
+var getSubscriptionConfiguration = function() {
+    return getAPIStoreObj().getSubscriptionConfiguration();
 };
 %>

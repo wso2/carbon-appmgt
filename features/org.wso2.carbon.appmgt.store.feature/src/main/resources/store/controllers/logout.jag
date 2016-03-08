@@ -3,6 +3,7 @@
     include("/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
     var user = session.get("LOGGED_IN_USER");
+    var audutLog = require('/modules/auditLog/logger.js');
     if(user === null) {
         response.sendRedirect('/store');
     } else {
@@ -17,12 +18,20 @@
             serverHost = process.getProperty('server.host'),
             postUrl = ssoIdpProvider.getIdentityProviderUrl();
 
+        caramel = require('caramel');
+        var contextPath = caramel.configs().context;
+        var reversProxyEnabled = caramel.configs().reverseProxyEnabled;
+        var reverseProxyHost = caramel.configs().reverseProxyHost;
+        if(reversProxyEnabled) {
+            relayState = reverseProxyHost+contextPath;
+        }
+        var tenantId = currentSession.tenantId;
         var log = new Log();
         log.debug("store session index : " + sso_sessions[session.getId()]);
-
+        audutLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
         %>
             <div>
-                <p>You are now redirected to Stratos Identity. If the
+                <p>You are now redirected to Identity Server. If the
                 redirection fails, please click the post button.</p>
 
                 <form id="logoutForm" method="post" action="<%=postUrl%>">

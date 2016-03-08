@@ -1,0 +1,69 @@
+<%
+var a;
+include('/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var favourites = jagg.module("favourites");
+var tenantDomains = manager.getActiveTenantDomains().tenantDomains;
+var caramel = require('caramel'),
+        contextPath = caramel.configs().context,
+        reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+        reverseProxyHost = caramel.configs().reverseProxyHost;
+var config = require("/config/store.json");
+
+var userName = session.get("LOGGED_IN_USER");
+var userTenantId = session.get("tenantId");
+var log = new Log();
+
+if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
+    require('/modules/store.js').exec(function (ctx) {
+        var PAGE_SIZE = 10;
+        var pageParam = parseInt(request.getParameter("page"));
+        var currentPageNumber = (isNaN(pageParam) || (pageParam < 1)) ? 1 : pageParam;
+        //tenantDomains.sort();
+        var numberOfTenantDomains = tenantDomains.length;
+        var stores = [];
+        for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
+
+            var landingPage = config.pages.landingPage;
+            if (userName) {
+                var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
+                if (isFavouritePageSelected) {
+                    landingPage = configs.pages.favouritePage;
+                }
+            }
+
+            var store ={};
+            store['name'] = tenantDomains[i];
+            store['storeUrl'] = tenantDomains[i]+ landingPage;
+            stores.push(store);
+        }
+
+        caramel.render({
+            title: 'Stores | WSO2 App Manager',
+            user: ctx.user,
+            sso: ctx.sso,
+            header: ctx.site.header(ctx.tenantId, {
+                sso: ctx.sso,
+                user: ctx.user
+            }),
+            currentPage: currentPageNumber,
+            stores: stores,
+            type: "webapps"
+        });
+    }, request, response, session);
+} else {
+    var landingPage = config.pages.landingPage;
+    if (userName != null) {
+        var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
+        if (isFavouritePageSelected) {
+            landingPage = configs.pages.favouritePage;
+        }
+    }
+    var redirectURl = contextPath + landingPage;
+    if (reversProxyEnabled) {
+        redirectURl = reverseProxyHost + redirectURl;
+    }
+    response.sendRedirect(redirectURl);
+}
+
+%>

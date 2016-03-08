@@ -42,6 +42,7 @@ var manager = jagg.module("manager").getAPIStoreObj();
         var role;
         for (var index in roles) {
             role=roles[index];
+            role = modify(role);
             var isAuthorized = userManager.isAuthorized(role, resourcePath, action);
             log.debug('Role: '+role+' resource: '+resourcePath+'action: '+action);
             if (isAuthorized) {
@@ -66,6 +67,7 @@ var manager = jagg.module("manager").getAPIStoreObj();
         var role;
         for (var index in roles) {
             role=roles[index];
+            role = modify(role);
             var isAuthorized = userManager.isAuthorized(role, resourcePath, action);
             log.debug('Role: '+role+' resource: '+resourcePath+'action: '+action);
             if (isAuthorized) {
@@ -75,6 +77,16 @@ var manager = jagg.module("manager").getAPIStoreObj();
         return false;
     };
 
+    function modify(role) {
+        var index = role.indexOf("/");
+        if (index > -1) {
+            var array = role.split("/");
+            var domain = array[0];
+            var nameWithoutDomain = array[1];
+            role = domain.toUpperCase() + "/" + nameWithoutDomain;
+        }
+        return role;
+    }
     /**
      * The function checks whether a user can delete an asset
      * @param  {[type]}  username     The name of the user for which the check must be performed
@@ -101,3 +113,4 @@ var manager = jagg.module("manager").getAPIStoreObj();
     permissions.isDeletePermitted = isDeletePermitted;
 
 }());
+

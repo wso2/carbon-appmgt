@@ -54,11 +54,11 @@ $(function() {
     	$('#provider-table').show();
 	$('#claims-table').show();
 	$.ajax({
-		url: '/publisher/api/sso/providers',
+		url: caramel.context + '/api/sso/providers',
 	        type: 'GET',
 	        contentType: 'application/json',
 	        success: function(response) {
-			var providers_data = JSON.parse(response);
+			var providers_data = response;
                   	if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
  				loadSelectedProviders(providers_data.response);
                   	} else {
@@ -72,11 +72,11 @@ $(function() {
 		
     } else{
 	$.ajax({
-		url: '/publisher/api/sso/providers',
+		url: caramel.context + '/api/sso/providers',
 	        type: 'GET',
 	        contentType: 'application/json',
 	        success: function(response) {
-	      		var providers_data = JSON.parse(response);
+	      		var providers_data = response;
                 	if((providers_data.success === true) && (!$.isEmptyObject(providers_data.response))) {
 				loadProviders(providers_data.response);
                 	} else {
@@ -123,12 +123,12 @@ $(function() {
     	var appVersion = $("#overview_version").val();
 
     	$.ajax({
-	          url: '/publisher/api/sso/'+ y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion ,
+	          url: caramel.context + '/api/sso/'+ y[0] + '/' + y[1] + '/' + appProvider + '/' + appName + '/' + appVersion ,
 	          type: 'GET',
 	          contentType: 'application/json',
 	          success: function(response) {
 	        	 
-	        	  var provider_data = JSON.parse(response).response;
+	        	  var provider_data = response.response;
 	        	  var selected_claims = provider_data.claims;
 	        	  for(n=0;n<selected_claims.length;n++){
 	        		  var claim = selected_claims[n];
@@ -153,11 +153,11 @@ $(function() {
     function loadClaims (provider){
     	var sso_values = provider.split("-");
     	$.ajax({
-            url: '/publisher/api/sso/claims?idp='+sso_values[0] +"&version="+sso_values[1],
+            url: caramel.context + '/api/sso/claims?idp='+sso_values[0] +"&version="+sso_values[1],
             type: 'GET',
             contentType: 'application/json',
             success: function(response) {
-          	  var claims = JSON.parse(response).response;
+          	  var claims = response.response;
           	 for(var i=0;i<claims.length;i++){
           		 var y = claims[i];
           		 console.log("y:"+y);
@@ -246,7 +246,11 @@ $(function() {
     
 
 	$('#editAssetButton').on('click', function() {
+        var subAvailability = $('#sub-availability').val();
+        $('#subscription_availability').val(subAvailability);
 
+        var visibleRoles = $('#roles').val();
+        $('#visible_roles').val(visibleRoles);
 		//check if there are any url which doesn't have a policy group
 		var countResourcePolicies = 0;
 		var result = true;
@@ -304,14 +308,14 @@ $(function() {
 
 		// console.log(JSON.stringify(formData));
 
-		var url = '/publisher/api/asset/' + type + '/' + id;
+		var url = caramel.context + '/api/asset/' + type + '/' + id;
 
 		var options = {
 
 			beforeSubmit : function(arr, $form, options) {
 			},
 			success : function(response) {
-				var result = JSON.parse(response);
+				var result = response;
 				
 				if (result.ok) {
 					var asset = result.asset;
@@ -335,7 +339,7 @@ $(function() {
 
                         	if (rolePermissions.length > 0) {
                             		$.ajax({
-                                		url: '/publisher/asset/' + type + '/id/' + id + '/permissions',
+                                		url: caramel.context + '/asset/' + type + '/id/' + id + '/permissions',
                                 		type: 'POST',
                                 		processData: false,
                                 		contentType: 'application/json',
@@ -357,7 +361,6 @@ $(function() {
 
 
 				} else {
-                    var result = JSON.parse(response);
                     alert(result.message);
 					var report = processErrorReport(result.report);
 					createMessage(MSG_CONTAINER, ERROR_CSS, report);
@@ -401,7 +404,7 @@ $(function() {
 	});
 	
 	// Visibility roles.
-	$('#roles').tokenInput('/publisher/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
+	$('#roles').tokenInput(caramel.context + '/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
 		theme: 'facebook',
         preventDuplicates: true,
         hintText: "Type in a user role"
@@ -503,6 +506,7 @@ $(function() {
         var app_name = $('#overview_name').val();
         var app_version = $('#overview_version').val();
         var app_transport = $('#overview_transports').val();
+        var app_treatAsASite = $('#overview_treatAsASite').val();
         var app_context = $('#overview_context').val();
         var app_allowAnonymous = $('#overview_allowAnonymous').val();
         var app_provider = $('#overview_provider').val();
@@ -527,19 +531,20 @@ $(function() {
 		sso_config.app_name = app_name;
 		sso_config.app_verison = app_version;
 		sso_config.app_transport = app_transport;
+		sso_config.app_treatAsASite = app_treatAsASite;
 		sso_config.app_context = app_context;
 		sso_config.app_allowAnonymous = app_allowAnonymous;
 		sso_config.app_provider = app_provider;
 		sso_config.app_acsURL = app_acsURL;
 
         $.ajax({
-            url: '/publisher/api/sso/editConfig',
+            url: caramel.context + '/api/sso/editConfig',
             type: 'POST',
             contentType: 'application/json',
             data:JSON.stringify(sso_config),
             success: function(response) {
                 console.log("Added SSO config successfully");
-                window.location = "/publisher/assets/webapp/";
+                window.location = caramel.context + "/assets/webapp/";
             },
             error: function(response) {
                 showAlert('Error adding service provider.', 'error');
@@ -590,7 +595,7 @@ $(function() {
 		$('#messageModal1 a.btn-other').html('OK');
 		$('#messageModal1').modal();
 		$("#messageModal1").on('hidden.bs.modal', function(){
-			window.location = '/publisher/asset/' + type + '/'+id;
+			window.location = caramel.context + '/asset/' + type + '/'+id;
 		});
 
 	};
@@ -654,3 +659,20 @@ function isValidURL(url) {
     }
 }
 
+window.onload = function updateSubsVisibility() {
+    var restricted = $('.controll_visibility').is(":checked");
+    var anonymous = $('.anonymous_checkbox').is(":checked");
+    if (restricted || anonymous) {
+        $('#sub-group').hide();
+    } else {
+        var subscription_availability = $('#subscription_availability').val();
+        if (subscription_availability == 'all_tenants') {
+            $("#sub-availability").val("all_tenants");
+        } else if (subscription_availability == 'current_tenant') {
+            $("#sub-availability").val("current_tenant");
+        } else if (subscription_availability == 'specific_tenants') {
+            $("#sub-availability").val("specific_tenants");
+        }
+        $('#sub-group').show();
+    }
+}

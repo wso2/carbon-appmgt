@@ -8,10 +8,10 @@ var checkSubscriptionWorkflow = function () {
 	            status:isAsynchronousFlow
 	        };
 	}catch(e){
-		log.error(e.message);
+		log.error(e.action);
 		return {
 		            error:e,
-		            message:e.message
+		            action:e.action
 		        };
         }
 

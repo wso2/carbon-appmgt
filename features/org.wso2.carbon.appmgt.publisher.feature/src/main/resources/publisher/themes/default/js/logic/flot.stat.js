@@ -12,7 +12,7 @@ $(function() {
 
 	$.ajax({
 		/*  Web Application Last Access Time Graph  */
-		url : '/publisher/api/assets/' + operation + '/' + type + '/' + action + '/' ,
+		url : caramel.context + '/api/assets/' + operation + '/' + type + '/' + action + '/' ,
 		type : 'POST',
 		data : {
 			'startDate' : from,
@@ -28,7 +28,7 @@ $(function() {
 
 	$.ajax({
 		/* Overall Web Application Usage Graph */
-		url : '/publisher/api/assets/' + operation + '/' + type + '/getProviderAPIUsage/',
+		url : caramel.context + '/api/assets/' + operation + '/' + type + '/getProviderAPIUsage/',
 		type : 'POST',
 		data : {
 			'startDate' : from,
@@ -43,8 +43,7 @@ $(function() {
 	});
 });
 
-var drawProviderAPIVersionUserLastAccess = function(response){
-	var parsedResponse = JSON.parse(response);
+var drawProviderAPIVersionUserLastAccess = function (parsedResponse) {
 	/*  Web Application Last Access Time Graph  */
 	$('#placeholder1').append($('<table class="table table-condensed" id="webAppTable">' +
 					'<tr>' +
@@ -60,8 +59,7 @@ var drawProviderAPIVersionUserLastAccess = function(response){
         } 
 }
 
-var drawProviderAPIUsage = function(response){
-	var parsedResponse = JSON.parse(response);
+var drawProviderAPIUsage = function (parsedResponse) {
 	/* Overall Web Application Usage Graph */
 	$('#placeholder2').append($('<table class="table table-condensed" id="webAppTable2">' +
 					'<tr>' +
@@ -86,7 +84,7 @@ var onDateSelected = function(from, to) {
 	var type = comps[comps.length - 2];
 	var operation = comps[comps.length - 3];
 	$.ajax({
-		url : '/publisher/api/assets/' + operation + '/' + type + '/',
+		url : caramel.context + '/api/assets/' + operation + '/' + type + '/',
 		type : 'POST',
 		data : {
 			'startDate' : from,
@@ -94,7 +92,7 @@ var onDateSelected = function(from, to) {
 			'isOnChoice' : true
 		},
 		success : function(response) {
-			var parsedResponse = JSON.parse(response);
+			var parsedResponse = response;
 			
 			
 			/* Hot assets stats graph */

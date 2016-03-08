@@ -19,16 +19,18 @@ var meta = {
 var module = function () {
 
     var configs = require('/config/publisher.json');
+    var dataConfigs = require('/config/publisher.js').config()
     var log = new Log();
 
     function trim (str) {
         return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
-    //TODO: Change this method to take WebAppObj as argument instead of passing properties separately.
+    //TODO: Change this method to take WebAppObj as argument instead of passing properties
+    // separately.
     function addToWebApp(uuid, webappProvider, webappName, webappVersion, webappContext,
                          webappTrackingCode, asset, ssoEnabled, idpProviderUrl, saml2SsoIssuer,
-                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint) {
+                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint, isDefaultVersion) {
 
         var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
         var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
@@ -46,6 +48,8 @@ var module = function () {
         webAppObj.setUrl(webAppEndpoint);
         webAppObj.setAllowAnonymous(allowAnonymous == "TRUE");
         webAppObj.setSkipGateway(skipGateway == "true");
+        webAppObj.setDefaultVersion(isDefaultVersion == "true");
+
 
         var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
         var appMDAOObj = new appMDAO();
@@ -122,6 +126,9 @@ var module = function () {
             var provider = model.getField('overview.provider').value;
             var name = model.getField('overview.name').value;
             var version = model.getField('overview.version').value;
+            var isDefaultVersion = model.getField('overview.makeAsDefaultVersion').value; //when a new app is created
+                                                                                          // it is always the default
+                                                                                          // version.
             var contextname = model.getField('overview.context').value;
             var allowAnonymous=model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;
@@ -163,6 +170,41 @@ var module = function () {
             //Export the model to an asset
             var asset = context.parent.export('asset.exporter');
 
+            //set sso details
+            var idpProviderUrl = dataConfigs.ssoConfiguration.identityProviderURL;
+            var ssoEnabled = dataConfigs.ssoConfiguration.enabled;
+            asset.attributes.sso_idpProviderUrl = idpProviderUrl;
+            asset.attributes.sso_saml2SsoIssuer = saml2SsoIssuer;
+            if(ssoEnabled) {
+                asset.attributes.sso_singleSignOn = "Enabled";
+            } else {
+                asset.attributes.sso_singleSignOn = "Disabled";
+            }
+
+            var appOwner = (asset.attributes.overview_appOwner).trim();
+            if (appOwner.length == 0) {
+                asset.attributes.overview_appOwner = provider;
+            }
+            var appTenant = (asset.attributes.overview_appTenant).trim();
+            if (appTenant.length == 0) {
+                asset.attributes.overview_appTenant = tenantDomain;
+            }
+
+            var isAdvertiseOnly = (asset.attributes.overview_advertiseOnly).trim();
+            if (isAdvertiseOnly.toLowerCase() != "true") {
+                asset.attributes.overview_advertiseOnly = "false";
+            }
+
+            var subscriptionAvailability = (asset.attributes.overview_subscriptionAvailability).trim();
+            if(subscriptionAvailability == "current_tenant") {
+                asset.attributes.overview_tenants = tenantDomain;
+            }
+
+            if(subscriptionAvailability == "all_tenants") {
+                asset.attributes.overview_tenants = "";
+            }
+
+
             log.debug('Finished exporting model to an artifact');
 
             //Save the artifact
@@ -189,7 +231,6 @@ var module = function () {
             };
             var artifact = artifactManager.find(function (adapter) {
                 //Check if the name and version are the same
-                //return ((adapter.attributes.overview_name==name)&&(adapter.attributes.overview_version==version))?true:false;
                 return utility.assertEqual(adapter, predicate);
             }, null);
 
@@ -203,10 +244,12 @@ var module = function () {
             var attributes = artifact1.attributes;
 
 
-            //adding to database
-            addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
-                attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
-                saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL);
+            if (attributes.overview_advertiseOnly.toLowerCase() != "true") {
+                //adding to database
+                addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
+                    attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
+                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL, isDefaultVersion);
+            }
 
             //Save the id data to the model
             model.setField('*.id', id);

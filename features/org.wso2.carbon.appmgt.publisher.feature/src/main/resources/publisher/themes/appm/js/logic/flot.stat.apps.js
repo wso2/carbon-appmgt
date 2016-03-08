@@ -19,7 +19,7 @@ function drawGraphs() {
     $.ajax({
             /* Web Application Last Access Time Graph */
             async: false,
-            url: '/publisher/api/assets/' + operation + '/' + type + '/' + action
+            url: caramel.context + '/api/assets/' + operation + '/' + type + '/' + action
                 + '/',
             type: 'POST',
             data: {
@@ -27,10 +27,8 @@ function drawGraphs() {
                 'endDate': to
             },
             success: function (response) {
-
-                usageByContext = JSON.parse(response);
+                usageByContext = response;
                 $('#spinner').hide();
-
             },
             error: function (response) {
                 alert('Error occured at statistics graph rendering');
@@ -40,7 +38,7 @@ function drawGraphs() {
 
     $.ajax({
         async: false,
-        url: '/publisher/api/assets/' + operation + '/' + type
+        url: caramel.context + '/api/assets/' + operation + '/' + type
             + '/getAPIUsageByUser/',
         type: 'POST',
         data: {
@@ -59,8 +57,7 @@ function drawGraphs() {
 
 }
 
- var parsedResponse;
-var drawAPIUsageByUser = function (response,usageByContext) {
+var drawAPIUsageByUser = function (parsedResponse, usageByContext) {
     var dataStructure = [];
     for (var i = 0; i < usageByContext.length; i++) {
         var Num =0;
@@ -74,9 +71,6 @@ var drawAPIUsageByUser = function (response,usageByContext) {
             "checked" : false
         });
     }
-
-
-    parsedResponse = JSON.parse(response);
 
     length = parsedResponse.length;
     $("#tooltipTable").find("tr:gt(0)").remove();

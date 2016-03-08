@@ -2,7 +2,7 @@
 
 /*
  Description: The class is used to perform validations on a field name value pair
-    GET /api/validations/assets/{type}/{fieldName}/{fieldValue}     Returns a message object indicating whether the field is correct
+    GET /api/validations/assets/{type}/{fieldName}/{fieldValue}     Returns a action object indicating whether the field is correct
  Filename: validations_api_router.jag
  Created Date: 8/10/2013
  */
@@ -33,7 +33,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
                 response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
                 response.contentType = "application/json";
-                var content = {status: "Validation Error", message: result.message};
+                var content = {status: "Validation Error", action: result.action};
                 response.content = stringify(content);
                 return;
             }

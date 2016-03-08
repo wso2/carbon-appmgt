@@ -31,7 +31,7 @@ var getTopRatedAPIs = function (limit) {
             apis:list
         };
     } catch (e) {
-        log.error(e.message);
+        log.error(e.action);
         return {
             error:e,
             apis:null

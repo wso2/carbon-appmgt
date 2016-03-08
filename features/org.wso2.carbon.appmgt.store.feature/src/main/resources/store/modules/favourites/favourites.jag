@@ -1,0 +1,201 @@
+<%
+var isFavouriteApp = function (provider, name, version, userName, tenantIdOfUser, storeTenantDomain) {
+    var status,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain);
+        status = store.isFavouriteApp(provider, name, version, userName, tenantIdOfUser, storeTenantDomain);
+
+        if (log.isDebugEnabled()) {
+            log.debug("isFavouriteApp : " + status);
+        }
+
+        return {
+            error: false,
+            isFavouriteApp: status
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            action: e.action
+        };
+    }
+};
+
+var getAllFavouriteApps = function (userName, tenantIdOfUser, storeTenantDomain) {
+    var data,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain);
+        data = store.getAllFavouriteApps(userName, tenantIdOfUser, storeTenantDomain);
+        if (log.isDebugEnabled()) {
+            log.debug("getAllFavouriteApps : " + stringify(data));
+        }
+        return {
+            error: false,
+            apps: data
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            action: e.action
+        };
+    }
+};
+
+var addToFavouriteApps = function (provider, name, version, userName, tenantIdOfUser, storeTenantDomain) {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain);
+        store.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser, storeTenantDomain);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Add to Favourite");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            status: false,
+            action: e.action
+        };
+    }
+};
+
+var removeFromFavouriteApps = function (provider, name, version, userName, tenantIdOfUser, storeTenantDomain) {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain)
+        store.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser, storeTenantDomain);
+
+        if (log.isDebugEnabled()) {
+            log.debug("remove from favourite apps");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            status: false,
+            action: e.action
+        };
+    }
+};
+
+var setFavouritePage = function (userName, tenantIdOfUser, tenantDomainOfStore) {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        tenantDomainOfStore = String(tenantDomainOfStore);
+        store.setFavouritePage(userName, tenantIdOfUser, tenantDomainOfStore);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Set favourite pages as default landing page");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            status: false,
+            action: e.action
+        };
+    }
+};
+
+var removeFavouritePage = function (userName, tenantIdOfUser, storeTenantDomain) {
+    var log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        storeTenantDomain = String(storeTenantDomain)
+        store.removeFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
+
+        if (log.isDebugEnabled()) {
+            log.debug("remove favourite pages from defualt landing page");
+        }
+        return {
+            error: false,
+            status: true
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            status: false,
+            action: e.action
+        };
+    }
+};
+
+var hasFavouritePage = function (userName, tenantIdOfUser, tenantDomainOfStore) {
+    var status,
+            log = new Log(),
+            store = jagg.module("manager").getAPIStoreObj();
+
+    try {
+        if (userName.indexOf("@carbon.super") > -1) {
+            userName = userName.replace("@carbon.super", "");
+        }
+        userName = String(userName);
+        tenantDomainOfStore = String(tenantDomainOfStore);
+        status = store.hasFavouritePage(userName, tenantIdOfUser, tenantDomainOfStore);
+        if (log.isDebugEnabled()) {
+            log.debug("isFavouriteApp : " + stringify(data));
+        }
+
+        return {
+            error: false,
+            status: status
+        };
+    } catch (e) {
+        log.error(e.action);
+        return {
+            error: true,
+            action: e.action
+        };
+    }
+};
+%>

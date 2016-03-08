@@ -55,7 +55,7 @@
 <div class="main-login-container">
 	<button style="float:right" onclick="onButtonLogoutClick()">Logout</button>
 	<h2>No Privileges to login</h2>
-	<div class="message">You do not have permission to login to this application.Please contact your administrator and request permission.</div>
+	<div class="action">You do not have permission to login to this application.Please contact your administrator and request permission.</div>
 </div>
 
 

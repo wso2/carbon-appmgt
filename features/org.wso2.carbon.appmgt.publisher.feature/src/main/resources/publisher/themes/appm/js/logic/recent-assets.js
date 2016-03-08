@@ -8,7 +8,7 @@ $(function () {
 
     var RECENT_ASSET_CONTAINER = '#recent-assets-container';
     var REFRESH_TIMER = 4000;
-    var CACHE_URL = '/publisher/api/cache/';
+    var CACHE_URL = caramel.context + '/api/cache/';
 
     //Get the details of the page
     var context = obtainMetaInformation();
@@ -38,7 +38,7 @@ $(function () {
             type: 'GET',
             success: function (response) {
 
-                var respObj=JSON.parse(response);
+                var respObj = response;
                	
                	if(respObj.cachedAssets.length){
                		var recentTmplComp =  Handlebars.compile(recentTmpl);
@@ -47,7 +47,7 @@ $(function () {
 				
                 if(respObj.cachedAssetsBefore!=respObj.cachedAssetsAfter){
 
-                    window.location='/publisher/assets/'+context.type+'/';
+                    window.location= caramel.context + '/assets/'+context.type+'/';
                 }
             },
             error: function (e) {

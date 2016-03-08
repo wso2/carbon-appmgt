@@ -13,8 +13,8 @@ var resource = (function () {
     var AuthService = require('/extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg, session);
+    var audutLog = require('/modules/auditLog/logger.js');
 
-    
 
     /*
      Subscribes the given application to an API with the provided details
@@ -22,12 +22,15 @@ var resource = (function () {
     var addSubscription = function (context) {
 
         if(authenticator.getLoggedInUser() == null){
-            response.sendRedirect("/store/login");
+            response.sendRedirect(caramel.tenantedUrl('/login'));
             return;
         }
 
         var parameters = context.request.getAllParameters();
         var subscription = {};
+        var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
+        var tenantId = session.get("tenantId");
+        var userName = session.get("LOGGED_IN_USER");
         subscription['apiName'] = parameters.apiName;
         subscription['apiVersion'] = parameters.apiVersion;
         subscription['apiTier'] = parameters.apiTier;
@@ -49,6 +52,11 @@ var resource = (function () {
         if(result){
             subscription['op_type'] = 'ALLOW';
             result = subsApi.updateVisibility(subscription);
+            audutLog.writeLog(tenantId, userName, "UserSubscribed","Webapp","{" +
+                                                                            "providerName='" +  subscription['apiProvider'] + '\'' +
+                                                                            ", apiName='" +  subscription['apiName'] + '\'' +
+                                                                            ", version='" +  subscription['apiVersion'] + '\'' +
+                                                                            '}' , "", "");
         }
         return result;
     };

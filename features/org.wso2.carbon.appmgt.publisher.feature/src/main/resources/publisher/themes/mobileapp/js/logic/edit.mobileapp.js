@@ -6,7 +6,7 @@ $('#application-tab a').click(function(e) {
 });
 
 
-$('#txtVisibility').tokenInput('/publisher/api/lifecycle/information/meta/webapp/roles', {
+$('#txtVisibility').tokenInput(caramel.context +'/api/lifecycle/information/meta/webapp/roles', {
 	theme: 'facebook',
 	preventDuplicates: true,
 	hintText: "Type in a user role"
@@ -86,9 +86,9 @@ $('#txtMarket').on("change",function() {
             $('#form-asset-create').ajaxForm(function(data) { 
             
             	try{
-            		data = JSON.parse(data);
+                    data = (typeof data == "string") ? JSON.parse(data) : data;
             	}catch(e){
-            		window.location.replace("/publisher/assets/mobileapp/");
+            		window.location.replace(caramel.context +"/assets/mobileapp/");
                		return;
             	}
                
@@ -116,7 +116,7 @@ $('#txtMarket').on("change",function() {
                		
                		
                	}else{
-               		window.location.replace("/publisher/assets/mobileapp/");
+               		window.location.replace(caramel.context +"/assets/mobileapp/");
                	}
                
 				
@@ -164,7 +164,7 @@ $('#btn-create-asset-mobile').click(function(e) {
 	
 	$.ajax({
       type: "POST",
-      url: "/publisher/api/asset/mobileapp",
+      url: caramel.context +"/api/asset/mobileapp",
       contentType: "application/json",
       data: JSON.stringify(params),
       success: function () {

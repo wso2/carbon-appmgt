@@ -11,30 +11,52 @@
             </div>
             <div class="widget-content">
                <form class="form-horizontal" id='form-asset-copy'>
-                  <fiedlset>
-                      <b><label class="control-label">New Version : </label></b>
-                      <span class="label-required">*</span>
-                      <div class="control-group">
-                          <input type="text" name="overview_version" id="overview_version" class="form-control">
-                      </div>
-                      <b><label class="control-label">New Display Name : </label></b>
-                      <div class="control-group">
-                          <input type="text" name="newDisplayName" id="newDisplayName" class="form-control">
-                      </div>
-                  <fieldset/>
+                   <div>
+                       <b><label class="control-label">New Version : </label></b>
+                       <span class="label-required">*</span>
+
+                       <div class="control-group">
+                           <input type="text" name="overview_version" id="overview_version" class="form-control">
+                       </div>
+                       <b><label class="control-label">New Display Name : </label></b>
+
+                       <div class="control-group">
+                           <input type="text" name="newDisplayName" id="newDisplayName" class="form-control">
+                       </div>
+
+                       <b><label class="control-label">Make As Default Version : </label></b>
+                       <input type="checkbox" class="makeAsDefaultVersion_checkbox" />
+                       <input type="hidden" value="FALSE"
+                              class="col-lg-6 col-sm-12 col-xs-12" name="overview_makeAsDefaultVersion"
+                              id="overview_makeAsDefaultVersion">
+
+                       <div />
                   <fieldset style="display:none;">
-                     <input type="hidden" value="{{{snoop "fields(name=overview_version).value" data}}}" name="oldversion" id="oldversion"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_version).value" data}}}" name="overview_oldVersion" id="overview_oldVersion"/>
                      <input type='text' value="{{{snoop "fields(name=overview_provider).value" data}}}" name="overview_provider" id="overview_provider"/>
                      <input type='text' value="{{{snoop "fields(name=overview_name).value" data}}}" name="overview_name" id="overview_name"/>
                       <input type='text' value="{{{snoop "fields(name=overview_displayName).value" data}}}" name="overview_displayName" id="overview_displayName"/>
                      <input type='text' value="{{{snoop "fields(name=overview_context).value" data}}}" name="overview_context" id="overview_context"/>
                      <input type='text' value="{{{snoop "fields(name=overview_transports).value" data}}}" name="overview_transports" id="overview_transports"/>
+                     <input type='text' value="{{{snoop "fields(name=overview_treatAsASite).value" data}}}" name="overview_treatAsASite" id="overview_treatAsASite"/>
                      <input type='text' value="{{{snoop "fields(name=overview_webAppUrl).value" data}}}" name="overview_webAppUrl" id="overview_webAppUrl"/>
                      <input type='text' value="{{{snoop "fields(name=overview_description).value" data}}}" name="overview_description" id="overview_description"/>
                      <input type='text' value="{{{snoop "fields(name=images_thumbnail).value" data}}}" name="images_thumbnail" id="images_thumbnail"/>
                      <input type='text' value="{{{snoop "fields(name=images_banner).value" data}}}" name="images_banner" id="images_banner"/>
-                      <input type='text' value="{{{snoop "fields(name=overview_allowAnonymous).value" data}}}" name="overview_allowAnonymous" id="overview_allowAnonymous"/>
-                     <input type='hidden' id="uuid" value="{{data.info.id}}"/>               
+                     <input type='text' value="{{{snoop "fields(name=overview_allowAnonymous).value" data}}}" name="overview_allowAnonymous" id="overview_allowAnonymous"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_appOwner).value" data}}}"
+                             name="overview_appOwner" id="app_owner"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_appTenant).value" data}}}"
+                             name="overview_appTenant" id="app_tenant"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_subscriptionAvailability).value" data}}}"
+                             name="overview_subscriptionAvailability" id="subscription_availability"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_visibleRoles).value" data}}}"
+                             name="overview_visibleRoles" id="visible_roles"/>
+                     <input type='hidden' value="{{{snoop "fields(name=overview_tenants).value" data}}}"
+                             name="overview_tenants" id="tenant-list"/>
+                     <input type='text' value="{{{snoop "fields(name=overview_acsUrl).value" data}}}" name="overview_acsUrl" id="overview_acsUrl"/>
+                     <input type="hidden" value="{{{snoop "fields(name=overview_skipGateway).value" data}}}" name="overview_skipGateway" id="overview_skipGateway">
+                     <input type='hidden' id="uuid" value="{{data.info.id}}"/>
                      <input type='hidden' value="" name="overview_trackingCode" id="tracking_code" />
                      <input type='hidden' value="{{{snoop "fields(name=sso_ssoProvider).value" data}}}" name="sso_ssoProvider" id="sso_ssoProvider"/>
                      <div class="control-group" >

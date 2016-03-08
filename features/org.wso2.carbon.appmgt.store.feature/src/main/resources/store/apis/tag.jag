@@ -16,6 +16,7 @@ require('/modules/store.js').exec(function (ctx) {
             store = require('/modules/store.js').store(tenantId, session),
             matcher = new URIMatcher(request.getRequestURI());
 
+    response.contentType = "application/json";
     if (matcher.match('/{context}/apis/tag')) {
         print(store.tags());
     } else if (matcher.match('/{context}/apis/tag/{type}')) {
