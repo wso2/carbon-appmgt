@@ -28,7 +28,6 @@ import org.wso2.carbon.appmgt.gateway.handlers.Utils;
 import org.wso2.carbon.appmgt.gateway.handlers.security.*;
 import org.wso2.carbon.appmgt.gateway.handlers.security.keys.APIKeyDataStore;
 import org.wso2.carbon.appmgt.gateway.handlers.security.keys.JDBCAPIKeyDataStore;
-import org.wso2.carbon.appmgt.gateway.handlers.security.keys.WSAPIKeyDataStore;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -41,7 +40,6 @@ public class SAML2Authenticator implements Authenticator{
     private static final Log log = LogFactory.getLog(SAML2Authenticator.class);
 
     private APIKeyDataStore dataStore;
-    private AuthenticationContext authenticationContext;
 
     public void init(SynapseEnvironment env) {
 
@@ -112,7 +110,10 @@ public class SAML2Authenticator implements Authenticator{
         if(!tenantDomain.equalsIgnoreCase("carbon.super")){
             String tenantedSubscriber = subscriber+'@'+tenantDomain;
             info = dataStore.getAPPData(appContext, appVersion, tenantedSubscriber, authenticatedIDPs);
-        }else{
+        } else {
+            if(subscriber.contains("@carbon.super")) {
+                subscriber = subscriber.substring(0, subscriber.length() - "@carbon.super".length());
+            }
             info = dataStore.getAPPData(appContext, appVersion, subscriber, authenticatedIDPs);
         }
 
