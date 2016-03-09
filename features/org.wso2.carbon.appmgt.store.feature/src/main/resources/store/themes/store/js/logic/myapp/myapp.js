@@ -222,4 +222,34 @@ $( document ).ready(function() {
                    }
                });
     };
+
+    // My Apps the tour
+    var myAppsTour = new Tour({
+        storage: false,
+        steps: [
+            {
+                element: "#all-apps-link",
+                title: "Checkout new applications",
+                placement: "right",
+                content: "You can go to App Store from this link, search and subscribe to new applications"
+            },
+            {
+                element: "#my-apps-link",
+                title: "Select apps as Favourite",
+                placement: "right",
+                content: "You can mark or unmark your favourite apps in My Apps page"
+            },
+            {
+                element: "#my-favorites-link",
+                title: "Add to your favourites",
+                placement: "right",
+                content: "The subscribed application can be marked as your Favourites and make it your default home page."
+            }
+        ]
+    });
+
+    $('.no-apps').on('click', function(e){
+        myAppsTour.init(true);
+        myAppsTour.start(false);
+    });
 });
