@@ -1,21 +1,26 @@
 <%
 include("/extensions/webapp/modules/jagg/jagg.jag");
 
+
 (function () {
     var mod, obj, result, username,
-            action = request.getParameter("action");
-            //site = require("/site/conf/site.json");
-           // msg = require("/site/conf/ui-messages.jag");
-           
+        action = request.getParameter("action");
+    //site = require("/site/conf/site.json");
+    // msg = require("/site/conf/ui-messages.jag");
+
     var log = new Log();
     response.contentType = "application/json";
     if (jagg.getUser() == null) {
         print({
                   error:true,
-                  message:'AuthenticateError'
+                  action: 'AuthenticateError'
               });
     } else {
-	if (action === "addDocumentation") {
+        var audutLog = require('/modules/auditLog/logger.js');
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId
+        var username = server.current(session).username;
+        if (action === "addDocumentation") {
             mod = jagg.module("documentation");
             var apiData = {};
             var docData = {};
@@ -30,18 +35,29 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             docData.summary = request.getParameter("summary","UTF-8");
             docData.fileContent = request.getFile("docLocation");
             docData.content = "";
-	    docData.otherTypeName = request.getParameter("newType");
-		    	
+            docData.otherTypeName = request.getParameter("newType");
+
             if (mode == "Update") {
                 result = mod.updateDocumentation(apiData, docData);
+                audutLog.writeLog(tenantId, username, "DocumentUpdated", apiData.name,
+                                  "{" + "providerName='" + apiData.provider + '\'' +
+                                  ", apiName='" + apiData.name + '\'' +
+                                  ", version='" + apiData.version + '\'' +
+                                  '}', "", "");
             } else {
                 result = mod.addDocumentation(apiData, docData);
+                audutLog.writeLog(tenantId, username, "NewDocumentAdded", apiData.name,
+                                  "{" + "providerName='" + apiData.provider + '\'' +
+                                  ", apiName='" + apiData.name + '\'' +
+                                  ", version='" + apiData.version + '\'' +
+                                  '}', "", "");
+
             }
 
             if (result.error == "true") {
                 obj = {
                     error:result.error,
-                   // message:result.message
+                    // action:result.action
                 };
             } else {
                 obj = {
@@ -62,9 +78,18 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             if (result.error) {
                 obj = {
                     error:result.error,
-                    message:result.message
+                    action: result.action
                 };
             } else {
+                var apiData = {};
+                apiData.provider = request.getParameter("provider","UTF-8");
+                apiData.name = request.getParameter("apiName","UTF-8");
+                apiData.version = request.getParameter("version");
+                audutLog.writeLog(tenantId, username, "DocumentEdited", apiData.name,
+                                  "{" + "providerName='" + apiData.provider + '\'' +
+                                  ", apiName='" + apiData.name + '\'' +
+                                  ", version='" + apiData.version + '\'' +
+                                  '}', "", "");
                 obj = {
                     error:false
                 }
@@ -81,7 +106,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             if (result.error) {
                 obj = {
                     error:result.error,
-                    message:result.message
+                    action: result.action
                 };
             } else {
                 obj = {
@@ -99,41 +124,49 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             apiInfo.version = request.getParameter("version");
             docInfo.name = request.getParameter("docName");
             docInfo.type = request.getParameter("docType");
+
             result = mod.removeDocumentation(apiInfo, docInfo);
             if (result.error) {
                 obj = {
                     error:result.error,
-                    message:result.message
+                    action: result.action
                 };
             } else {
+                audutLog.writeLog(tenantId, username, "DocumentRemoved", apiInfo.name,
+                                  "{" +
+                                  "providerName='" + apiInfo.provider + '\'' +
+                                  ", apiName='" + apiInfo.name + '\'' +
+                                  ", version='" + apiInfo.version + '\'' +
+                                  '}', "", "");
+
                 obj = {
                     error:false
                 }
             }
             print(obj);
         } else if (action === "getAllDocumentation") {
-	    mod = jagg.module("documentation");
-	    var app = {};
-	    app.provider = request.getParameter("provider");
-	    app.name = request.getParameter("apiName");
-	    app.version = request.getParameter("version");
-	    result = mod.getAllDocumentation(app);
-	    if (result.error) {
-	        obj = {
-		    error:result.error,
-		    message:result.message
-		};
-	    } else {
-	        obj = {
-	            error:false,
-		    docs:result.docs
-		}
-	    }
+            mod = jagg.module("documentation");
+            var app = {};
+            app.provider = request.getParameter("provider");
+            app.name = request.getParameter("apiName");
+            app.version = request.getParameter("version");
+            result = mod.getAllDocumentation(app);
+            if (result.error) {
+                obj = {
+                    error:result.error,
+                    action: result.action
+                };
+            } else {
+                obj = {
+                    error:false,
+                    docs:result.docs
+                }
+            }
             print(obj);
         } else {
             print({
                       error:true,
-                      //message:msg.error.invalidAction(action)
+                      //action:msg.error.invalidAction(action)
                   });
         }
     }

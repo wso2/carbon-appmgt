@@ -3,6 +3,7 @@
     include("/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
     var user = session.get("LOGGED_IN_USER");
+    var audutLog = require('/modules/auditLog/logger.js');
     if(user === null) {
         response.sendRedirect('/store');
     } else {
@@ -12,7 +13,7 @@
             sso_sessions = application.get('sso_sessions'),
             sessionId = session.getId(),
             encodedSAMLLogoutRequest = sso.client.getEncodedSAMLLogoutRequest(user, sso_sessions[session.getId()],
-                config.ssoConfiguration.issuer),
+                                                                              config.ssoConfiguration.issuer),
             relayState = '/store',
             serverHost = process.getProperty('server.host'),
             postUrl = ssoIdpProvider.getIdentityProviderUrl();
@@ -24,29 +25,29 @@
         if(reversProxyEnabled) {
             relayState = reverseProxyHost+contextPath;
         }
-
+        var tenantId = currentSession.tenantId;
         var log = new Log();
         log.debug("store session index : " + sso_sessions[session.getId()]);
+        audutLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
+    %>
+    <div>
+     <p>You are now redirected to Identity Server. If the
+        redirection fails, please click the post button.</p>
 
-        %>
-            <div>
-                <p>You are now redirected to Identity Server. If the
-                redirection fails, please click the post button.</p>
+                                                 <form id="logoutForm" method="post" action="<%=postUrl%>">
+                                                                                            <p>
+                                                                                            <input type="hidden" name="SAMLRequest"value="<%= encodedSAMLLogoutRequest %>"/>
+                                                                                                                                         <input type="hidden" name="RelayState" value="<%= relayState %>"/>
+                                                                                                                                                                                      <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
+                                                                                                                                                                                                                                         <button type="submit">POST</button>
+                                                                                                                                                                                                                                                      </p>
+                                                                                                                                                                                                                                                      </form>
+                                                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                                                      <script type = "text/javascript" >
+                                                                                                                                                                                                                                                                     document.forms[0].submit();
+    </script>
 
-                <form id="logoutForm" method="post" action="<%=postUrl%>">
-                    <p>
-                        <input type="hidden" name="SAMLRequest"value="<%= encodedSAMLLogoutRequest %>"/>
-                        <input type="hidden" name="RelayState" value="<%= relayState %>"/>
-                        <input type="hidden" name="SSOAuthSessionID" value="<%= sessionId %>"/>
-                        <button type="submit">POST</button>
-                    </p>
-                </form>
-            </div>
-            <script type = "text/javascript" >
-                document.forms[0].submit();
-            </script>
-
-        <%
+      <%
     }
 }());
 %>

@@ -12,7 +12,9 @@ require('/modules/publisher.js').exec(function(ctx) {
     var log= new Log();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
+    var audutLog = require('/modules/auditLog/logger.js');
 
+//api/entitlement/policy/partial/policyGroup/save
     routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/Tiers', function (context) {
         var tiers = getTiers();
         response.contentType = "application/json";
@@ -73,9 +75,9 @@ require('/modules/publisher.js').exec(function(ctx) {
         print(isSuccess);
     });
 
-     routeManager.register('POST', 'publisher', '/publisher/api/entitlement/partials', function (context) {
+    routeManager.register('POST', 'publisher', '/publisher/api/entitlement/partials', function (context) {
 
-       saveApplicationPolicyPartialMapping(context.post.applicationId,context.post['partialIdList[]']);
+        saveApplicationPolicyPartialMapping(context.post.applicationId,context.post['partialIdList[]']);
 
     });
 
@@ -84,6 +86,11 @@ require('/modules/publisher.js').exec(function(ctx) {
         var policyGroupId = savePolicyGroup(context.post.policyGroupName, context.post.throttlingTier, context.post.userRoles, context.post.anonymousAccessToUrlPattern, context.post.objPartialMappings, context.post.policyGroupDesc);
         var response = {"id": policyGroupId};
         print(createResponseObject(response));
+        //
+        // everything went great
+        audutLog.writeLog(session.get("tenantId"), session.get("LOGGED_IN_USER"), "NewPolicyCreated","" , ""+""+"");
+
+
     });
 
     routeManager.register('POST', 'publisher', '/publisher/api/entitlement/policy/partial/policyGroup/details/update', function (context) {
@@ -115,8 +122,8 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
     /**
-    * Validates the given policy content
-    */
+     * Validates the given policy content
+     */
     function validateEntitlementPolicyPartial(policyContent){
         return apiProvider.validateEntitlementPolicyPartial(policyContent);
     }
@@ -136,17 +143,17 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
     /**
-    * Get the given policy partial Content
-    */
+     * Get the given policy partial Content
+     */
     function getEntitlementPolicyPartial(policyPartialId){
-       return apiProvider.getEntitlementPolicyPartial(policyPartialId);
+        return apiProvider.getEntitlementPolicyPartial(policyPartialId);
     }
 
     /**
-    * Get the given webapp id
-    */
+     * Get the given webapp id
+     */
     function getWebAppId(uuid){
-       return apiProvider.getWebAppId(uuid);
+        return apiProvider.getWebAppId(uuid);
     }
 
     /**
@@ -154,7 +161,7 @@ require('/modules/publisher.js').exec(function(ctx) {
      * @param applicationId : Application Id
      */
     function  getPolicyGroupListByApplication(applicationId){
-         return apiProvider.getPolicyGroupListByApplication(applicationId);
+        return apiProvider.getPolicyGroupListByApplication(applicationId);
     }
 
     /**
@@ -169,8 +176,8 @@ require('/modules/publisher.js').exec(function(ctx) {
         return apiProvider.getAssociatedAppsNameList(policyPartialId);
     }
     /**
-    * Delete the given policy partial
-    */
+     * Delete the given policy partial
+     */
     function deleteEntitlementPolicyPartial(policyPartialId){
         return apiProvider.deleteEntitlementPolicyPartial(policyPartialId);
     }

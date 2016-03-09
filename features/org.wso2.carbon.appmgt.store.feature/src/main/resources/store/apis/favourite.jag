@@ -1,18 +1,17 @@
 <%
 include('/jagg/jagg.jag');
 var favourites = jagg.module("favourites");
+var audutLog = require('/modules/auditLog/logger.js');
 
 require('/modules/store.js').exec(function (ctx) {
     var log = new Log();
     var matcher = new URIMatcher(request.getRequestURI());
     var user = user = ctx.user;
-    var requestMethod =  request.getMethod();
-    var HTTP_POST = "POST";
 
     if (!user) {
         response.status = 401;
         response.contentType = "application/json";
-        response.content = {"message": "Login required"};
+        response.content = {"action": "Login required"};
         return;
     }
 
@@ -47,6 +46,11 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                     storeTenantDomain);
+        audutLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite","Webapp",  "{" +
+                                                                                  "providerName='" + provider + '\'' +
+                                                                                  ", apiName='" + name + '\'' +
+                                                                                  ", version='" +version + '\'' +
+                                                                                  '}' , "", "");
         return content;
     };
 
@@ -61,6 +65,12 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                          storeTenantDomain);
+        audutLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite","Webapp", "{" +
+                                                                                    "providerName='" + provider + '\'' +
+                                                                                    ", apiName='" +  name + '\'' +
+                                                                                    ", version='" + version + '\'' +
+                                                                                    '}' , "", "");
+
         return content
     };
 
@@ -74,17 +84,23 @@ require('/modules/store.js').exec(function (ctx) {
         return content;
     };
 
-    if (requestMethod == HTTP_POST && matcher.match('/{context}/apis/favourite/{action}')) {
+    if (matcher.match('/{context}/apis/favourite/{action}')) {
         var action = matcher.elements().action;
         response.status = 200;
         response.contentType = "application/json";
+        var parameters = request.getAllParameters();
+        var storeTenantDomain = parameters.storeTenantDomain;
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
 
         switch (action) {
             case "set-favourite-page":
                 response.content = setFavouritePage();
+                audutLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage","", "" , "", "");
                 return;
             case "remove-favourite-page":
                 response.content = removeFavouritePage();
+                audutLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage","", "" , "", "");
                 return;
             case "add-favourite-app":
                 response.content = addToFavouriteApps();
@@ -100,7 +116,7 @@ require('/modules/store.js').exec(function (ctx) {
     //if no cases matched
     response.status = 404;
     response.contentType = "application/json";
-    response.content = {"message": "API endpoint not found"};
+    response.content = {"action": "API endpoint not found"};
 }, request, response, session);
 
 %>
