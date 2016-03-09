@@ -913,7 +913,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 
     //get uuid of given asset for-> provider,name,lifecycle state
-    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/uuid/list/{type}/{provider}/{name}/{lifecyclestate}',
+    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/uuid/list/state/{type}/{provider}/{name}/{lifecyclestate}',
                           function (context) {
                               var assetProvider = context.params.provider;
                               var assetName = context.params.name;
