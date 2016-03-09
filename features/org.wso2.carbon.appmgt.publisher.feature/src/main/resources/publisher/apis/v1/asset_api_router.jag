@@ -911,6 +911,43 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             });
 
+
+    //get uuid of given asset for-> provider,name,lifecycle state
+    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/uuid/list/{type}/{provider}/{name}/{lifecyclestate}',
+                          function (context) {
+                              var assetProvider = context.params.provider;
+                              var assetName = context.params.name;
+                              var lifecycleState = context.params.lifecyclestate;
+                              var shortName = context.params.type;
+                              var artifactManager = rxtManager.getArtifactManager(shortName);
+
+                              var fn = function (asset) {
+                                  var cond1 = (asset.attributes.overview_provider == assetProvider ) ? true : false;
+                                  var cond2 = (asset.attributes.overview_name == assetName ) ? true : false;
+                                  var cond3 = (asset.lifecycleState == lifecycleState ) ? true : false;
+                                  return (cond1 && cond2 && cond3);
+                              }
+
+                              var artifacts = artifactManager.find(fn, null);
+                              var noOfArtifacts = 0;
+                              var UUIDs = [];
+                              for (noOfArtifacts = 0; noOfArtifacts < artifacts.length; noOfArtifacts++) {
+                                  var artifactId = artifacts[noOfArtifacts].id;
+                                  UUIDs.push(artifactId);
+                              }
+                              if (UUIDs.length > 0) {
+                                  var res = {error: false, uuids: UUIDs, count: noOfArtifacts};
+                                  response.contentType = "application/json";
+                                  print(res);
+                              } else {
+                                  var res = {error: false, uuids: UUIDs, message: 'Could not find UUID for given webapp'};
+                                  response.contentType = "application/json";
+                                  print(res);
+                              }
+
+
+                          });
+
     //Get external
     routeManager.register('GET', 'publisher', '/publisher/api/asset/get/external/stores/{type}/{provider}/{name}/{version}',
             function (context) {

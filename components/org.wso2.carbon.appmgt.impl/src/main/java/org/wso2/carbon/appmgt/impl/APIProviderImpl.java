@@ -843,13 +843,29 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 String gatewayType = config.getFirstProperty(AppMConstants.API_GATEWAY_TYPE);
                 if (!api.isAdvertiseOnly()) { // no need to publish to gateway if webb is only for advertising
                     if (updateGatewayConfig) {
+
+                        if (api.isDefaultVersion()) {
+                            if (status.equals(APIStatus.UNPUBLISHED)) {
+                                //when un-publishing default version, reset the default published version as null in table
+                                APIIdentifier identifier = new APIIdentifier(api.getId().getProviderName(),
+                                                                             api.getId().getApiName(),
+                                                                             null);
+                                WebApp webApp = new WebApp(identifier);
+                                appMDAO.updatePublishedDefaultVersion(webApp);
+
+
+                                //update the registry and reset default version
+                                identifier = new APIIdentifier(api.getId().getProviderName(),
+                                                               api.getId().getApiName(),
+                                                               api.getId().getVersion());
+                                webApp = getAPI(identifier);
+                                webApp.setDefaultVersion(false);
+                                updateApiArtifact(webApp, false, false);
+                            }
+                        }
+
                         if (status.equals(APIStatus.PUBLISHED) || status.equals(APIStatus.DEPRECATED) ||
                                 status.equals(APIStatus.BLOCKED)) {
-
-                            //publish to gateway if skipGateway is disabled only
-                            if (!api.getSkipGateway()) {
-                                publishToGateway(api);
-                            }
 
                             //update version
                             if (status.equals(APIStatus.PUBLISHED)) {
@@ -863,8 +879,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                     if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
                                         appMDAO.updatePublishedDefaultVersion(api);
                                         removeDefaultVersionFromNonPublishedApps(api);
+                                        api.setDefaultVersion(true);
                                     }
                                 }
+                            }
+
+                            //publish to gateway if skipGateway is disabled only
+                            if (!api.getSkipGateway()) {
+                                publishToGateway(api);
                             }
                         } else {
                             removeFromGateway(api);

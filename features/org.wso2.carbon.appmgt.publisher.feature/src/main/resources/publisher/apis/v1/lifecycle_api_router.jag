@@ -376,11 +376,18 @@ require('/modules/publisher.js').exec(function (ctx) {
         } else {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
+
+            /*
             for (i = 0; i < previousArtifacts.length; i++) {
                 promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
                                          "Re-Publish");
-                // ignore errors when reverting changes
             }
+            */
+
+            // ignore errors when reverting changes
+            promoteArtifactLifeCycle(artifactManager, currentArtifact, appType,
+                                     "Re-Publish");
+
             response.status = 500;
             response.contentType = "application/json";
             content.status = "Error";
@@ -465,8 +472,11 @@ require('/modules/publisher.js').exec(function (ctx) {
                 promoteArtifactLifeCycle(artifactManager, currentArtifact, appType, "Unpublish");
                 // revert previously unpublished artifacts to Publish state
                 for (i = 0; i < previousArtifacts.length; i++) {
-                    promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
-                                             "Re-Publish");
+                    if (previousArtifacts[i].attributes.overview_version
+                        == currentArtifact.attributes.overview_oldVersion) {
+                        promoteArtifactLifeCycle(artifactManager, previousArtifacts[i], appType,
+                                                 "Re-Publish");
+                    }
                     // ignore errors when reverting changes
                 }
                 response.status = 500;

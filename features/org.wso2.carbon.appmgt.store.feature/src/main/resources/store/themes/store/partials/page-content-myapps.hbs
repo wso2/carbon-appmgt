@@ -6,15 +6,12 @@
                 <div class="app-tile">
                     <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
                        data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
-                       data-context="{{attributes.overview_context}}" class="hover-overlay-container accessUrl">
+                       data-context="{{attributes.overview_context}}" class="hover-overlay-container">
                         <div class="ratio-responsive-4by3">
-                            {{#if isFavourite}}
-                                {{> ribbons/favorite}}
-                            {{else}}
-                                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                                    {{> ribbons/advertise}}
-                                {{/ifCond}}
-                            {{/if}}
+                            {{> ribbons/favorite}}
+                            {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                {{> ribbons/advertise}}
+                            {{/ifCond}}
                             {{#ifCond lifecycleState "==" "DEPRECATED"}}
                                 {{> ribbons/deprecated}}
                             {{/ifCond}}
@@ -53,28 +50,38 @@
                             </a>
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
-                                    {{#if isFavourite}}
-                                        <li>
-                                            <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
-                                               data-provider="{{attributes.overview_provider}}"
-                                               data-version="{{attributes.overview_version}}" class="remove-from-fav">
-                                                Remove from Favorites
-                                            </a>
-                                        </li>
-                                    {{else}}
-                                        <li>
-                                            <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
-                                               data-provider="{{attributes.overview_provider}}"
-                                               data-version="{{attributes.overview_version}}" class="add-to-fav">
-                                                Add to Favorites
-                                            </a>
-                                        </li>
-                                    {{/if}}
+                                    <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
+                                        class="display-none-lg" {{/unless}}>
+                                        <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
+                                           data-provider="{{attributes.overview_provider}}"
+                                           data-version="{{attributes.overview_version}}" class="remove-from-fav">
+                                            Remove from Favorites
+                                        </a>
+                                    </li>
+                                    <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
+                                        class="display-none-lg" {{/if}}>
+                                        <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
+                                           data-provider="{{attributes.overview_provider}}"
+                                           data-version="{{attributes.overview_version}}" class="add-to-fav">
+                                            Add to Favorites
+                                        </a>
+                                    </li>
+                                {{/if}}
+                                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                                    <li>
+                                        <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
+                                            More Details
+                                        </a>
+                                    </li>
+                                {{else}}
+                                    <li><a href="{{tenantedUrl "/assets/"}}{{../../../assetType}}/{{id}}">More Details</a>
+                                    </li>
+                                {{/ifCond}}
+                                {{#if ../../user}}
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
                                         {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
-                                                <a href="#" class="btnUnsubscribe"
-                                                   data-name="{{attributes.overview_name}}"
+                                                <a href="#" class="btnUnsubscribe" data-name="{{attributes.overview_name}}"
                                                    data-provider="{{attributes.overview_provider}}"
                                                    data-version="{{attributes.overview_version}}">
                                                     {{t "Un-Subscribe"}}
@@ -83,18 +90,6 @@
                                         {{/if}}
                                     {{/if}}
                                 {{/if}}
-
-                                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                                    <li>
-                                        <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
-                                            More Details
-                                        </a>
-                                    </li>
-                                {{else}}
-                                    <li><a href="{{tenantedUrl "/assets/"}}{{../../../assetType}}/{{id}}">More
-                                                                                                          Details</a>
-                                    </li>
-                                {{/ifCond}}
                             </ul>
                         </div>
                     </div>
@@ -136,23 +131,22 @@
                             </a>
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
-                                    {{#if isFavourite}}
-                                        <li>
-                                            <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
-                                               data-provider="{{attributes.overview_provider}}"
-                                               data-version="{{attributes.overview_version}}" class="remove-from-fav">
-                                                Remove from Favorites
-                                            </a>
-                                        </li>
-                                    {{else}}
-                                        <li>
-                                            <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
-                                               data-provider="{{attributes.overview_provider}}"
-                                               data-version="{{attributes.overview_version}}" class="add-to-fav">
-                                                Add to Favorites
-                                            </a>
-                                        </li>
-                                    {{/if}}
+                                    <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
+                                        class="display-none-lg" {{/unless}}>
+                                        <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
+                                           data-provider="{{attributes.overview_provider}}"
+                                           data-version="{{attributes.overview_version}}" class="remove-from-fav">
+                                            Remove from Favorites
+                                        </a>
+                                    </li>
+                                    <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
+                                        class="display-none-lg" {{/if}}>
+                                        <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
+                                           data-provider="{{attributes.overview_provider}}"
+                                           data-version="{{attributes.overview_version}}" class="add-to-fav">
+                                            Add to Favorites
+                                        </a>
+                                    </li>
 
 
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}

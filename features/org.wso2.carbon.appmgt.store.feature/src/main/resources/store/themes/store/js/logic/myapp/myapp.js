@@ -57,7 +57,6 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        $(this).hide();
         var waitIconId = '#wait-' + appId;
         $(waitIconId).show();
 
@@ -77,7 +76,6 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        $(this).hide();
         var waitIconId = '#wait-' + appId;
         $(waitIconId).show();
 
@@ -87,8 +85,6 @@ $( document ).ready(function() {
 
     var addToFavourite = function (data, appId) {
         var waitIconId = '#wait-' + appId;
-        var rmvIconId = '#rmv-' + appId;
-        var addIconId = '#add-' + appId;
         $.ajax({
                    url: API_ADD_TO_FAVOURITE,
                    dataType: 'JSON',
@@ -97,13 +93,17 @@ $( document ).ready(function() {
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            $(waitIconId).hide();
-                           $(rmvIconId).show();
                            var message = 'You have successfully added  <b>' + data.name +
                                          '</b> to your favourite apps';
                            notify(message);
+
+                           document.getElementById("favRibbon-" + appId).style.visibility = "visible";
+                           document.getElementById("listItemAddFavorite-" + appId).className = "";
+                           document.getElementById("listItemAddFavorite-" + appId).classList.add("display-none-lg");
+                           document.getElementById("listItemRmvFavorite-" + appId).className = "";
+                           document.getElementById("listItemRmvFavorite-" + appId).classList.add("display-block-lg");
                        } else {
                            $(waitIconId).hide();
-                           $(addIconId).show();
                            var message = 'Error occured in while adding  web app: ' + data.name +
                                          ' to my favourite web apps';
                            notify(message);
@@ -112,7 +112,6 @@ $( document ).ready(function() {
                    },
                    error: function (response) {
                        $(waitIconId).hide();
-                       $(addIconId).show();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
@@ -127,9 +126,6 @@ $( document ).ready(function() {
 
     var removeFromFavourite = function (data, appId) {
         var waitIconId = '#wait-' + appId;
-        var rmvIconId = '#rmv-' + appId;
-        var addIconId = '#add-' + appId;
-
         $.ajax({
                    url: API_REMOVE_FROM_FAVOURITE,
                    type: 'POST',
@@ -137,29 +133,30 @@ $( document ).ready(function() {
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            $(waitIconId).hide();
-                           $(addIconId).show();
                            var message = 'You have successfully removed  <b>' + data.name
-                               + '</b> from your favourite apps';
+                                         + '</b> from your favourite apps';
                            notify(message);
-                           $('#btnRemoveFromFav').hide();
-                           $('#btnAddToFav').show();
+
+                           document.getElementById("favRibbon-" + appId).style.visibility = "hidden";
+                           document.getElementById("listItemRmvFavorite-" + appId).className = "";
+                           document.getElementById("listItemRmvFavorite-" + appId).classList.add("display-none-lg");
+                           document.getElementById("listItemAddFavorite-" + appId).className = "";
+                           document.getElementById("listItemAddFavorite-" + appId).classList.add("display-block-lg");
                        } else {
                            $(waitIconId).hide();
-                           $(rmvIconId).show();
                            var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                                         + ' from my favourite web apps';
                            notify(message);
                        }
                    },
                    error: function (response) {
                        $(waitIconId).hide();
-                       $(rmvIconId).show();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
                            var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                                         + ' from my favourite web apps';
                            notify(message);
                        }
                    }
