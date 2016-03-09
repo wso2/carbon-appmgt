@@ -1,4 +1,3 @@
-
 /*
  *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -16,12 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-function writeLog(tenantID, userName, action, subject, subjectID, beforeChange, afterChange)
-{
-    var auditLog = Packages.org.wso2.carbon.appmgt.core.auditLog.AuditLogEvent;
+function writeLog(tenantID, userName, action, subject, subjectID, beforeChange, afterChange) {
     var auditLogger = Packages.org.wso2.carbon.appmgt.core.auditLog.AuditLogger;
+    var auditLogEvent = new Packages.org.wso2.carbon.appmgt.core.auditLog.AuditLogEvent(tenantID, userName, action,
+                                                                                        subject, subjectID,
+                                                                                        beforeChange, afterChange);
 
-    var auditLogEvent = new  Packages.org.wso2.carbon.appmgt.core.auditLog.AuditLogEvent(tenantID, userName, action, subject, subjectID, beforeChange, afterChange);
     auditLogger.writeLog(auditLogEvent);
 }
