@@ -846,18 +846,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                         if (api.isDefaultVersion()) {
                             if (status.equals(APIStatus.UNPUBLISHED)) {
+                                //when un-publishing default version, reset the default published version as null in table
                                 APIIdentifier identifier = new APIIdentifier(api.getId().getProviderName(),
                                                                              api.getId().getApiName(),
                                                                              null);
-
                                 WebApp webApp = new WebApp(identifier);
                                 appMDAO.updatePublishedDefaultVersion(webApp);
 
+
+                                //update the registry and reset default version
                                 identifier = new APIIdentifier(api.getId().getProviderName(),
                                                                api.getId().getApiName(),
                                                                api.getId().getVersion());
-
-
                                 webApp = getAPI(identifier);
                                 webApp.setDefaultVersion(false);
                                 updateApiArtifact(webApp, false, false);
