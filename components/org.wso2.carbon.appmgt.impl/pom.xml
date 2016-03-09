@@ -243,6 +243,7 @@
                             org.wso2.carbon.registry.ws.client.*,
                             org.wso2.carbon.appmgt.api.model.*,
                             org.wso2.carbon.appmgt.api.*,
+                            org.wso2.carbon.user.mgt.stub.*;version="${carbon.user.mgt.pkg.version}",
                             org.wso2.carbon.governance.registry.extensions.aspects.*;version="${governance.registry.extensions.imp.pkg.version}",
                             javax.servlet;version="${javax.servlet.imp.pkg.version}",
                             javax.servlet.http;version="${javax.servlet.imp.pkg.version}",
