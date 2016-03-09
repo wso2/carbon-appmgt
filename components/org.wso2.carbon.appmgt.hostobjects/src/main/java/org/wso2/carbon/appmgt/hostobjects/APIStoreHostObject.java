@@ -1128,11 +1128,6 @@ public class APIStoreHostObject extends ScriptableObject {
             row.put("context", row, api.getContext());
             row.put("status", row, api.getStatus().getStatus());
 
-            String user = getUsernameFromObject(thisObj);
-            if(user!=null){
-            int userRate = apiConsumer.getUserRating(apiIdentifier, user);
-            row.put("userRate", row, userRate);
-            }
             AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
             List<Environment> environments = config.getApiGatewayEnvironments();
             String envDetails = "";
