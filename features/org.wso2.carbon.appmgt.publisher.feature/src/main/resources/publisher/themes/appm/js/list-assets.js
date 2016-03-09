@@ -23,6 +23,7 @@ $(".btn-action").click(function (e) {
     var name = $(this).data("name");
     var version = $(this).data("version");
 	var action = $(this).data("action");
+    var isDefault = Boolean($(this).data("isdefault"));
 
     var status = isPublishedToExternalStore(action, provider, name, version);
 
@@ -37,8 +38,19 @@ $(".btn-action").click(function (e) {
 
 	if (action == "Reject") {
 		showCommentModel("Reason for Rejection", action, app, "webapp");
-	} else {
-		jQuery.ajax({
+    } else {
+        if (action == "Unpublish" && isDefault) {
+            var publishedVersionsAvailable = isPublishedVersionsAvailable(provider, name);
+            if (publishedVersionsAvailable) {
+                var faultMsg = "'" + action + "' is not permitted as this is the default version of the WebApp. "
+                               + "Please select other version of this WebApp as the default version and proceed.";
+                var status = "Not Allowed";
+                showMessageModel(faultMsg, status, 'webapp');
+                $(parent).children().attr('disabled', false);
+                return false;
+            }
+        }
+        jQuery.ajax({
 			url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
 			type: 'PUT',
 			success: function (data, text) {
@@ -220,4 +232,24 @@ function isPublishedToExternalStore(action, provider, name, version) {
 
     }
     return publishedInExternalStores;
+}
+
+
+function isPublishedVersionsAvailable(provider, name) {
+    var result;
+    $.ajax({
+               url: caramel.context + '/api/asset/get/uuid/list/' + 'webapp' + '/' + provider + '/' + name + '/'
+                    + 'Published',
+               type: 'GET',
+               async: false,
+               contentType: 'application/json',
+               dataType: 'json', // the type of data that you're expecting back from the server
+               success: function (responseData, status, xhr) {
+                   result = (parseInt(responseData.count) > 1);
+               },
+               error: function () {
+                   result = false;
+               }
+           });
+    return result;
 }
