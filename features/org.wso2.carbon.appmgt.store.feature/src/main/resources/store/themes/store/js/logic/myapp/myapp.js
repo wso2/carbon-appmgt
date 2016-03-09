@@ -248,8 +248,32 @@ $( document ).ready(function() {
         ]
     });
 
-    $('.no-apps').on('click', function(e){
+    var myAppsSearchTour = new Tour({
+
+        storage: false,
+        steps: [
+            {
+                element: ".input-group",
+                title: "Change the Search term",
+                placement: "bottom",
+                content: "Change the search term here"
+            },
+            {
+                element: ".input-group-btn",
+                title: "Change the query type",
+                placement: "bottom",
+                content: "You can change what you want to search by selecting one of \"App Name\" or \"the App Provider\""
+            }
+        ]
+    });
+
+    $('#no-apps-default-jumbotron').on('click', function(e){
         myAppsTour.init(true);
         myAppsTour.start(false);
+    });
+
+    $('#no-apps-search-jumbotron').on('click', function(e){
+        myAppsSearchTour.init(true);
+        myAppsSearchTour.start(false);
     });
 });

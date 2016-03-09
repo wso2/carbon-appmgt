@@ -1,11 +1,17 @@
 <div class="no-apps">
-    <div class="jumbotron">
+    {{#if searchQuery}}
+    <div class="jumbotron" id="no-apps-search-jumbotron">
+        <h2>
+            <span class="fw fw-warning"></span> Sorry, We could not find any app for your search!
+        </h2>
+        <p class="lead add-padding-top-3x text-muted">Your search filter was, {{searchQuery.search}}. What can I do now?.<p>
+    </div>
+    {{else}}
+        <div class="jumbotron" id="no-apps-default-jumbotron">
         <h2>
             <span class="fw fw-warning"></span> Sorry, We could not find any apps for you!
         </h2>
-
-        <p class="lead add-padding-top-3x text-muted">
-            What can I do now?.
-        </p>
-    </div>
+        <p class="lead add-padding-top-3x text-muted">What can I do now?.<p>
+        </div>
+    {{/if}}
 </div>
