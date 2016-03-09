@@ -229,10 +229,10 @@ public class ProxyApplicationCreator {
                 (trackingID, ipAddress, Configuration.getGatewayPort("http"));
         if (webAppDetail.getWebAppName().equals("PlanYourTrip_" + currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
-                    "/repository/deployment/server/webapps/plan-your-trip-1.0");
+                    "/repository/deployment/server/webapps/plan-your-trip-1.2.0");
         } else if (webAppDetail.getWebAppName().equals("TravelBooking_" + currentUserName)) {
             invokeStatistcsJavascriptBuilder.buildInvokeStaticsJavascriptFile(appmHomePath +
-                    "/repository/deployment/server/webapps/travel-booking-1.0/js");
+                    "/repository/deployment/server/webapps/travel-booking-1.2.0/js");
         }
         log.info(webAppDetail.getWebAppName() + " created and UUID is : " + UUID);
         return UUID;

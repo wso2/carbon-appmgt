@@ -3,7 +3,7 @@
         "displayname": "Plan Your Trip",
         "context": "/planYourTrip",
         "version": "1.0.0",
-        "warfilename": "plan-your-trip-1.0",
+        "warfilename": "plan-your-trip-1.2.0",
         "treatAsASite": false,
         "claims": {
             "FrequentFlyerID": {
@@ -30,7 +30,7 @@
         "displayname": "Travel Booking",
         "context": "/travel",
         "version": "1.0.0",
-        "warfilename": "travel-booking-1.0",
+        "warfilename": "travel-booking-1.2.0",
         "treatAsASite": false,
         "claims": {
             "FirstName": {

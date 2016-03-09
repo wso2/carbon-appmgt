@@ -200,6 +200,11 @@ header .header-action:active {
 .no-apps, .no-apps div, .no-apps p {
     background-color: #ffffff;
     text-align: center;
+    cursor: help;
+}
+
+.no-apps p {
+    cursor: help;
 }
 
 /**/

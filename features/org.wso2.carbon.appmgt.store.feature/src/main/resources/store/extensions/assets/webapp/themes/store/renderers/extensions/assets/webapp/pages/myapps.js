@@ -18,6 +18,7 @@ var render = function (theme, data, meta, require) {
             }
         }
     }
+    bodyContext.searchQuery =searchQuery;
 
     var leftNavigationData = [{
         active: true, partial: 'my-apps'

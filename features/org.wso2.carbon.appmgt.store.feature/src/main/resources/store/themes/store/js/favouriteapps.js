@@ -200,4 +200,64 @@ $(function () {
                  }
              });
     };
+
+    // Instance the tour
+    var favouritesTour = new Tour({
+        storage: false,
+        steps: [
+            {
+                element: "#my-apps-link",
+                title: "Select apps as Favourite",
+                placement: "right",
+                content: "You can mark or unmark your favourite apps in My Apps page"
+            },
+            {
+                element: "#set-home",
+                title: "Set the default page",
+                placement: "left",
+                content: "My Favourites page can be set/reset as your default page with the configuration option here."
+            },
+            {
+                element: "#all-apps-link",
+                title: "Checkout new applications",
+                placement: "right",
+                content: "You can go to App Store from this link, search and subscribe to new applications"
+            },
+            {
+                element: "#my-favorites-link",
+                title: "Add to your favourites",
+                placement: "right",
+                content: "The subscribed application can be marked as your Favourites and make it your default home page."
+            }
+        ]
+    });
+
+    var favouritesSearchTour = new Tour({
+
+        storage: false,
+        steps: [
+            {
+                element: ".input-group",
+                title: "Change the Search term",
+                placement: "bottom",
+                content: "Change the search term here"
+            },
+            {
+                element: ".input-group-btn",
+                title: "Change the query type",
+                placement: "bottom",
+                content: "You can change what you want to search by selecting one of \"App Name\" or \"the App Provider\""
+            }
+        ]
+    });
+
+    $('#no-apps-default-jumbotron').on('click', function(e){
+        favouritesTour.init(true);
+        favouritesTour.start(false);
+    });
+
+    $('#no-apps-search-jumbotron').on('click', function(e){
+        favouritesSearchTour.init(true);
+        favouritesSearchTour.start(false);
+    });
 });
