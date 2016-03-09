@@ -401,7 +401,15 @@ jQuery("#form-asset-create").submit(function(e) {
         $('#wizard_step2').hide();
 		e.preventDefault();
 	}
-   //alert($('#appmeta').val());
+
+    /**
+     * For store type = 'enterprise' and OS type != web app ,version is taken from
+     * uploaded binary and field is disabled.When do a form submission to send the version
+     * value need to enable the field.
+     */
+    if($('#txtVersion').prop("disabled")){
+        $('#txtVersion').prop("disabled",false);
+    }
 });
 
 $( document ).ajaxComplete(function( event, xhr, settings ) {
