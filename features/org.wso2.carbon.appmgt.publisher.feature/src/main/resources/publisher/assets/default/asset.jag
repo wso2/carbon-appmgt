@@ -12,19 +12,19 @@
  Created Date: 29/7/2013
  */
 include("/extensions/webapp/modules/jagg/jagg.jag");
-var permissions=require('/modules/permissions.js').permissions;
+var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var SITE_TYPE = 'site';
 var WEBAPP_TYPE = 'webapp';
 var MOBILEAPP_TYPE = 'mobileapp';
 var assetType;
 var audutLog = require('/modules/auditLog/logger.js');
-require('/modules/publisher.js').exec(function(ctx) {
+require('/modules/publisher.js').exec(function (ctx) {
 
     var config = require('/config/publisher.json');
     caramel = require('caramel');
     var server = require('store').server;
-    var storeUser=require('store').user;
+    var storeUser = require('store').user;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var appmgtPublisher = require('appmgtpublisher');
     var utility = require('/modules/utility.js').rxt_utility();
@@ -46,11 +46,11 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     mod = jagg.module("documentation");
 
-    routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
+    routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function (context) {
 
         var shortName = (context.params.type) || '';
         var operation = 'create';
-        var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
+        var rxtTemplate = rxtManager.findAssetTemplate(function (template) {
             return (template.shortName == shortName) ? true : false;
         });
 
@@ -68,10 +68,10 @@ require('/modules/publisher.js').exec(function(ctx) {
             var tenantDomain = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
             var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
             var provider = "";
-            if(tenantIdVal=='-1234'){
+            if (tenantIdVal == '-1234') {
                 provider = storeUser.cleanUsername(username);
-            }else {
-                provider = storeUser.cleanUsername(username)+'-AT-'+tenantDomain;
+            } else {
+                provider = storeUser.cleanUsername(username) + '-AT-' + tenantDomain;
             }
 
             model.set('overview.provider', provider);
@@ -82,20 +82,22 @@ require('/modules/publisher.js').exec(function(ctx) {
             var title = shortName;
             var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
             var isSubscriptionEnabled;
-            if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+            if (!subscriptionConfiguration.EnableSelfSubscription
+                && !subscriptionConfiguration.EnableEnterpriseSubscription) {
                 isSubscriptionEnabled = false;
-            }else{
+            } else {
                 isSubscriptionEnabled = true;
             }
             output.sso_provider = getIdentityProviderUrl();
             caramel.render({
-                               isSubscriptionEnabled:isSubscriptionEnabled,
+                               isSubscriptionEnabled: isSubscriptionEnabled,
                                op: operation,
                                cuser: server.current(session),
                                shortName: shortName,
                                rxtTemplate: rxtTemplate,
                                data: output,
-                               title: title}
+                               title: title
+                           }
             );
         }
     });
@@ -112,7 +114,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         //TODO: Return an empty artifact or null
         try {
 
-            log.debug('look for '+id);
+            log.debug('look for ' + id);
 
             var artifact = artifactManager.get(id);
 
@@ -130,11 +132,11 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 
             //Perform filtering logic on the artifact
-            artifact=filterManager.filter(artifact,session);
+            artifact = filterManager.filter(artifact, session);
 
             //If there is no data after the filtering step we need to send an error
-            if(!artifact){
-                response.sendError(401,'You do not have viewing permissions to the requested asset');
+            if (!artifact) {
+                response.sendError(401, 'You do not have viewing permissions to the requested asset');
                 return;
             }
 
@@ -180,11 +182,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                                rxtTemplate: rxtTemplate,
                                data: output,
                                versions: versionList,
-                               tags:tags,
-                               title:title,
+                               tags: tags,
+                               title: title,
                                docs: result.docs,
-                               appStores:appStoresDetail,
-                               permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                               appStores: appStoresDetail,
+                               permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete: docDeleteAuth}
                            });
         } catch (e) {
             log.error('The asset with id ' + id + ' could not be found due to : ' + e);
@@ -205,9 +207,10 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
         var isSubscriptionEnabled;
-        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+        if (!subscriptionConfiguration.EnableSelfSubscription
+            && !subscriptionConfiguration.EnableEnterpriseSubscription) {
             isSubscriptionEnabled = false;
-        }else{
+        } else {
             isSubscriptionEnabled = true;
         }
 
@@ -262,10 +265,10 @@ require('/modules/publisher.js').exec(function(ctx) {
             });
 
             var path = artifact.attributes.overview_permissions;
-            log.debug("Path of permission resource : "+path);
+            log.debug("Path of permission resource : " + path);
             var permissionSet = null;
             var overridenPermissions = null;
-            if(path && (path != "null")){
+            if (path && (path != "null")) {
                 permissionSet = registry.get(path);
 
                 var content = '' + permissionSet.content;
@@ -313,7 +316,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                                    tags: tags,
                                    title: title,
                                    docs: result.docs,
-                                   permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                                   permissions: {
+                                       canCreate: docCreateAuth,
+                                       canEdit: docEditAuth,
+                                       canDelete: docDeleteAuth
+                                   }
                                });
             } else {
                 caramel.render({
@@ -345,9 +352,8 @@ require('/modules/publisher.js').exec(function(ctx) {
         var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
 
-
         var server = require('store').server;
-        var user=server.current(session);
+        var user = server.current(session);
         var um = server.userManager(server.current(session).tenantId);
         var tenantId = server.current(session).tenantId
         var username = user.username;
@@ -452,16 +458,22 @@ require('/modules/publisher.js').exec(function(ctx) {
                 appMgtProviderObj.generateEntitlementPolicies(webappId);
                 if (oldVersion == null || oldVersion == '') {
                     audutLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
-                                                                                       "providerName='" + webappId.provider + '\'' +
-                                                                                       ", apiName='" +  webappId.name + '\'' +
-                                                                                       ", version='" + webappId.version + '\'' +
+                                                                                       "providerName='"
+                                                                                       + webappId.provider + '\'' +
+                                                                                       ", apiName='" + webappId.name
+                                                                                       + '\'' +
+                                                                                       ", version='" + webappId.version
+                                                                                       + '\'' +
                                                                                        '}', "", "");
                 }
-                else{
+                else {
                     audutLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
-                                                                                        "providerName='" + webappId.provider + '\'' +
-                                                                                        ", apiName='" +  webappId.name + '\'' +
-                                                                                        ", version='" + webappId.version + '\'' +
+                                                                                        "providerName='"
+                                                                                        + webappId.provider + '\'' +
+                                                                                        ", apiName='" + webappId.name
+                                                                                        + '\'' +
+                                                                                        ", version='" + webappId.version
+                                                                                        + '\'' +
                                                                                         '}', "", "");
                 }
                 response.contentType = "application/json";
@@ -469,10 +481,11 @@ require('/modules/publisher.js').exec(function(ctx) {
             }
             catch (e) {
                 log.error(e);
-                log.debug('An instance could not be created for asset with type :' + shortName + '.The following exception was recorded: ' + e);
+                log.debug('An instance could not be created for asset with type :' + shortName
+                          + '.The following exception was recorded: ' + e);
                 response.sendError(500, 'The asset instance could not be created.Please check the server log.');
             }
-        }else{
+        } else {
             response.contentType = "application/json";
             print({ok: false, action: 'Failed to add Asset. Insufficient privileges.'});
             return;
@@ -481,7 +494,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     });
 
-    routeManager.register('POST', 'publisher', '/publisher/asset/{type}/id/{assetId}/permissions', function(context) {
+    routeManager.register('POST', 'publisher', '/publisher/asset/{type}/id/{assetId}/permissions', function (context) {
 
         var assetId = context.params.assetId;
 
@@ -503,39 +516,41 @@ require('/modules/publisher.js').exec(function(ctx) {
      * @param apiData
      * @returns {*}
      */
-    function getExternalAppStores(apiData){
-        try{
-            var externalAppStores = apiProvider.getExternalAppStoresList(apiData.provider, apiData.name, apiData.version);
+    function getExternalAppStores(apiData) {
+        try {
+            var externalAppStores = apiProvider.getExternalAppStoresList(apiData.provider, apiData.name,
+                                                                         apiData.version);
             return externalAppStores;
-        } catch(e) {
-            log.error("Error while getting external app store details : " +e);
+        } catch (e) {
+            log.error("Error while getting external app store details : " + e);
         }
 
     }
+
     /**
      * Check whether the application already exists
      */
-    function isWebappExists(webappName,provider,version){
-        return apiProvider.isWebappExists(webappName,provider,version);
+    function isWebappExists(webappName, provider, version) {
+        return apiProvider.isWebappExists(webappName, provider, version);
     }
 
-    function copyDocuments(webappId){
+    function copyDocuments(webappId) {
         apiProvider.copyWebappDocumentations(webappId);
     }
 
-    function copyRolePermissions(webappId,artifactManager){
+    function copyRolePermissions(webappId, artifactManager) {
         var registry = new carbon.registry.Registry(server, {
             username: server.current(session).username,
             tenantId: server.current(session).tenantId
         });
         var artifact = artifactManager.get(webappId);
         var permPath = artifact.path + "role_restrictions";
-        var resource ={
+        var resource = {
             content: JSON.stringify(permissions),
             mediaType: 'text/plain'
         };
 
-        registry.put(permPath,resource);
+        registry.put(permPath, resource);
     }
 
     /*
@@ -545,26 +560,26 @@ require('/modules/publisher.js').exec(function(ctx) {
      @artifactManager: An artifact manager instance
      @reg: A registry instance
      */
-    function addTags(params,assetId,artifactManager,reg){
+    function addTags(params, assetId, artifactManager, reg) {
 
         //Obtain the tags parameter
         // var tags=params['tags']||[];
-        var tags=params['tag-container']||[];
+        var tags = params['tag-container'] || [];
 
         //Only proceed if there are any tags
-        if(tags.length==0){
-            log.debug('no tags to add to '+assetId);
+        if (tags.length == 0) {
+            log.debug('no tags to add to ' + assetId);
             return;
         }
 
         //Obtain the artifact
-        var asset=artifactManager.get(assetId);
+        var asset = artifactManager.get(assetId);
 
-        var path=asset.path;
+        var path = asset.path;
         tags = tags.split(',');
 
         //Attach the tags
-        reg.tag(path,tags);
+        reg.tag(path, tags);
 
     }
 
@@ -587,15 +602,15 @@ require('/modules/publisher.js').exec(function(ctx) {
         // artifactManager.detachLifecycle(artifact);
 
         var lifecycle = require('lifecycle').api;
-        var lc = lifecycle.getLifecycle(artifact.lifecycle,server.current(session).tenantId);
+        var lc = lifecycle.getLifecycle(artifact.lifecycle, server.current(session).tenantId);
 
         var currentState = artifact.lifecycleState;
         var transitionExecution = [];
-        if(currentState=="Created") {
+        if (currentState == "Created") {
             transitionExecution = lc.transitionExecution("Initial", "Create");
-        }else if(currentState=="In-Review"){
+        } else if (currentState == "In-Review") {
             transitionExecution = lc.transitionExecution("Created", "Submit for Review");
-        }else if(currentState=="Rejected"){
+        } else if (currentState == "Rejected") {
             transitionExecution = lc.transitionExecution("In-Review", "Reject");
         }
 
@@ -608,13 +623,14 @@ require('/modules/publisher.js').exec(function(ctx) {
         var permissionDeny = [];
 
         //Build roles with denied permission
-        transitionExecution.forEach(function(element) {
+        transitionExecution.forEach(function (element) {
             var name = element.name;
-            if(name.indexOf("STATE_RULE")===0){
-                if(filterActions(element.value.split(":")[1],"deny").length > 0) {
+            if (name.indexOf("STATE_RULE") === 0) {
+                if (filterActions(element.value.split(":")[1], "deny").length > 0) {
                     permissionDeny.push({
-                                            role: constructDynamicRoles(element.value.split(":")[0], tenantId, artifact),
-                                            permissions: filterActions(element.value.split(":")[1],"deny")
+                                            role: constructDynamicRoles(element.value.split(":")[0], tenantId,
+                                                                        artifact),
+                                            permissions: filterActions(element.value.split(":")[1], "deny")
                                         });
                 }
             }
@@ -631,7 +647,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             });
         });
 
-        if(denyEveryone){
+        if (denyEveryone) {
             um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
         }
 
@@ -649,7 +665,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         <!--}-->
         <!--});-->
 
-        if(denyEveryone){
+        if (denyEveryone) {
             um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
         }
 
@@ -664,13 +680,14 @@ require('/modules/publisher.js').exec(function(ctx) {
             if (permissions[i].role === currentUserRole || permissions[i].role === 'admin') {
                 permissions.splice(i, 1);
             }
-        };
+        }
+        ;
 
         //Build Permissions to be added.
-        transitionExecution.forEach(function(element) {
+        transitionExecution.forEach(function (element) {
             var name = element.name;
-            if(name.indexOf("STATE_RULE")===0){
-                if(filterActions(element.value.split(":")[1]).length > 0) {
+            if (name.indexOf("STATE_RULE") === 0) {
+                if (filterActions(element.value.split(":")[1]).length > 0) {
                     permissions.push({
                                          role: constructDynamicRoles(element.value.split(":")[0], tenantId, artifact),
                                          permissions: filterActions(element.value.split(":")[1])
@@ -691,10 +708,10 @@ require('/modules/publisher.js').exec(function(ctx) {
         });*/
 
             // add the permissions as passed
-        permissions.forEach(function(rolePermissions) {
+        permissions.forEach(function (rolePermissions) {
             var role = rolePermissions.role;
 
-            rolePermissions.permissions.forEach(function(permission) {
+            rolePermissions.permissions.forEach(function (permission) {
 
                 permission = carbon.registry.actions[permission];
 
@@ -711,12 +728,12 @@ require('/modules/publisher.js').exec(function(ctx) {
         artifact.name = artifact.attributes.overview_name;
         var permPath = artifact.path + "role_restrictions";
 
-        var resource ={
+        var resource = {
             content: JSON.stringify(permissions),
             mediaType: 'text/plain'
         };
 
-        registry.put(permPath,resource);
+        registry.put(permPath, resource);
 
         artifact.attributes.overview_permissions = permPath;
         delete artifact.content;
@@ -724,10 +741,10 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
 
-    function constructDynamicRoles(role,tenantId,item){
+    function constructDynamicRoles(role, tenantId, item) {
         var revisedRole;
         var overviewProvider = item.attributes.overview_provider;
-        if(tenantId == '-1234') {
+        if (tenantId == '-1234') {
             revisedRole = role.replace('{asset_author}', overviewProvider);
         } else {
             var providerDetails = overviewProvider.split("-AT-");
@@ -736,26 +753,26 @@ require('/modules/publisher.js').exec(function(ctx) {
         return revisedRole;
     }
 
-    function filterActions(actions,operation){
+    function filterActions(actions, operation) {
         var symbol = "+";
-        if(operation=="deny"){
+        if (operation == "deny") {
             symbol = "-";
         }
         var actions = actions.split(",");
         var filteredActions = [];
         actions.forEach(function (value) {
-            if(value.indexOf(symbol)===0){
-                switch(value){
-                    case symbol+"get" :
+            if (value.indexOf(symbol) === 0) {
+                switch (value) {
+                    case symbol + "get" :
                         filteredActions.push("GET");
                         break;
-                    case symbol+"add" :
+                    case symbol + "add" :
                         filteredActions.push("PUT");
                         break;
-                    case symbol+"delete" :
+                    case symbol + "delete" :
                         filteredActions.push("DELETE");
                         break;
-                    case symbol+"authorize" :
+                    case symbol + "authorize" :
                         filteredActions.push("AUTHORIZE");
                         break;
                 }
@@ -838,7 +855,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var shortName = context.params.type;
         var id = context.params.id;
         var server = require('store').server;
-        var user=server.current(session);
+        var user = server.current(session);
         var um = server.userManager(server.current(session).tenantId);
         var tenantId = server.current(session).tenantId
         var username = user.username;
@@ -849,7 +866,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             artifactManager.remove(id);
         } catch (e) {
             log.debug('Asset id: ' + id + 'was not removed.Due to exception: ' + e);
-            response.sendError(404, 'Asset with id: ' + id + 'was not removed.Please check the server log for more details.');
+            response.sendError(404, 'Asset with id: ' + id
+                                    + 'was not removed.Please check the server log for more details.');
         }
 
 
@@ -859,13 +877,11 @@ require('/modules/publisher.js').exec(function(ctx) {
 }, request, response, session);
 
 
-
-
 /*************************************************MOBILEAPP*******************************************************/
 
 
 
-function editMobileApp(context, rxtManager, modelManager, dataInjector, DataInjectorModes){
+function editMobileApp(context, rxtManager, modelManager, dataInjector, DataInjectorModes) {
 
     var server = require('store').server;
 
@@ -904,7 +920,17 @@ function editMobileApp(context, rxtManager, modelManager, dataInjector, DataInje
         var tags = rxtManager.registry.tags(path);
         var title = assetName;
 
-        caramel.render({op: operation, cuser: server.current(session), shortName: shortName, artifact: artifact, rxtTemplate: rxtTemplate, data: output, versions: versionList, tags:tags, title:title});
+        caramel.render({
+                           op: operation,
+                           cuser: server.current(session),
+                           shortName: shortName,
+                           artifact: artifact,
+                           rxtTemplate: rxtTemplate,
+                           data: output,
+                           versions: versionList,
+                           tags: tags,
+                           title: title
+                       });
     } catch (e) {
         log.info(e);
         log.debug('The asset with id ' + id + ' could not be found due to : ' + e);
@@ -913,9 +939,6 @@ function editMobileApp(context, rxtManager, modelManager, dataInjector, DataInje
 
 
 }
-
-
-
 
 
 %>

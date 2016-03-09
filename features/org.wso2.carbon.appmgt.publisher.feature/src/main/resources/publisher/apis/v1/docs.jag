@@ -12,7 +12,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
     response.contentType = "application/json";
     if (jagg.getUser() == null) {
         print({
-                  error:true,
+                  error: true,
                   action: 'AuthenticateError'
               });
     } else {
@@ -25,14 +25,14 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             var apiData = {};
             var docData = {};
             var mode = request.getParameter("mode");
-            apiData.provider = request.getParameter("provider","UTF-8");
-            apiData.name = request.getParameter("apiName","UTF-8");
+            apiData.provider = request.getParameter("provider", "UTF-8");
+            apiData.name = request.getParameter("apiName", "UTF-8");
             apiData.version = request.getParameter("version");
-            docData.name = request.getParameter("docName","UTF-8");
+            docData.name = request.getParameter("docName", "UTF-8");
             docData.type = request.getParameter("docType");
             docData.sourceType = request.getParameter("sourceType");
             docData.sourceUrl = request.getParameter("docUrl");
-            docData.summary = request.getParameter("summary","UTF-8");
+            docData.summary = request.getParameter("summary", "UTF-8");
             docData.fileContent = request.getFile("docLocation");
             docData.content = "";
             docData.otherTypeName = request.getParameter("newType");
@@ -56,12 +56,12 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 
             if (result.error == "true") {
                 obj = {
-                    error:result.error,
+                    error: result.error,
                     // action:result.action
                 };
             } else {
                 obj = {
-                    error:false
+                    error: false
                 }
             }
             print(obj);
@@ -77,13 +77,13 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             result = mod.addInlineContent(apiDetails, docDetails);
             if (result.error) {
                 obj = {
-                    error:result.error,
+                    error: result.error,
                     action: result.action
                 };
             } else {
                 var apiData = {};
-                apiData.provider = request.getParameter("provider","UTF-8");
-                apiData.name = request.getParameter("apiName","UTF-8");
+                apiData.provider = request.getParameter("provider", "UTF-8");
+                apiData.name = request.getParameter("apiName", "UTF-8");
                 apiData.version = request.getParameter("version");
                 audutLog.writeLog(tenantId, username, "DocumentEdited", apiData.name,
                                   "{" + "providerName='" + apiData.provider + '\'' +
@@ -91,7 +91,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                                   ", version='" + apiData.version + '\'' +
                                   '}', "", "");
                 obj = {
-                    error:false
+                    error: false
                 }
             }
             print(obj);
@@ -105,13 +105,13 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             result = mod.getInlineContent(api, docName);
             if (result.error) {
                 obj = {
-                    error:result.error,
+                    error: result.error,
                     action: result.action
                 };
             } else {
                 obj = {
-                    doc:result.doc,
-                    error:false
+                    doc: result.doc,
+                    error: false
                 }
             }
             print(obj);
@@ -128,7 +128,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             result = mod.removeDocumentation(apiInfo, docInfo);
             if (result.error) {
                 obj = {
-                    error:result.error,
+                    error: result.error,
                     action: result.action
                 };
             } else {
@@ -140,7 +140,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                                   '}', "", "");
 
                 obj = {
-                    error:false
+                    error: false
                 }
             }
             print(obj);
@@ -153,19 +153,19 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
             result = mod.getAllDocumentation(app);
             if (result.error) {
                 obj = {
-                    error:result.error,
+                    error: result.error,
                     action: result.action
                 };
             } else {
                 obj = {
-                    error:false,
-                    docs:result.docs
+                    error: false,
+                    docs: result.docs
                 }
             }
             print(obj);
         } else {
             print({
-                      error:true,
+                      error: true,
                       //action:msg.error.invalidAction(action)
                   });
         }

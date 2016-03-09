@@ -14,7 +14,7 @@
 
 include("/extensions/webapp/modules/jagg/jagg.jag");
 
-require('/modules/publisher.js').exec(function(ctx) {
+require('/modules/publisher.js').exec(function (ctx) {
 
     var config = require('/config/publisher.json');
     var dataConfigs = require('/config/publisher.js').config();
@@ -31,68 +31,70 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     var mam_config = require('/extensions/mobileapp/config/mam-config.json');
     var server = require('store').server;
-    var utility=require('/modules/utility.js').rxt_utility();
-    var permissions=require('/modules/permissions.js').permissions;
+    var utility = require('/modules/utility.js').rxt_utility();
+    var permissions = require('/modules/permissions.js').permissions;
     var contextPath = caramel.configs().context;
 
-    var checkNonSpecial = function(value){
+    var checkNonSpecial = function (value) {
         var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
         return non_special_regex.test(value);
     };
 
-    var makeid= function(){
+    var makeid = function () {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        for( var i=0; i < 15; i++ )
+        for (var i = 0; i < 15; i++) {
             text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
 
         return text;
     };
 
-    var getExtensionText = function(extension){
+    var getExtensionText = function (extension) {
         var index = extension.lastIndexOf('.');
         var ext = index < extension.length ? extension.substring(index + 1) : '';
         return ext;
     };
 
-    var getExtension = function(file){
+    var getExtension = function (file) {
         var path = file.getName();
         var index = path.lastIndexOf('.');
         var ext = index < path.length ? path.substring(index + 1) : '';
         return ext;
     };
 
-    var getFileOnly = function(file){
+    var getFileOnly = function (file) {
         var path = file.getName();
         var index = path.lastIndexOf('.');
-        var name = index < path.length ? path.substring(0,index) : '';
+        var name = index < path.length ? path.substring(0, index) : '';
         return name;
     };
 
-    var saveFile = function(file){
-        if(file!=undefined){
-            var file_n= file.getName();
+    var saveFile = function (file) {
+        if (file != undefined) {
+            var file_n = file.getName();
             file_n = "." + file_n.split('.').pop();
-            if(file_n==""){
+            if (file_n == "") {
                 return "";
             }
-            var uid= makeid();
+            var uid = makeid();
 
-            if(mam_config.filePreciseLocation.substring(0, 1) === "/"){
-                var file_name = mam_config.filePreciseLocation+uid+file_n;
-            }else{
-                var file_name = Packages.java.lang.System.getProperty("carbon.home") + "/" + mam_config.filePreciseLocation+uid+file_n;
+            if (mam_config.filePreciseLocation.substring(0, 1) === "/") {
+                var file_name = mam_config.filePreciseLocation + uid + file_n;
+            } else {
+                var file_name = Packages.java.lang.System.getProperty("carbon.home") + "/"
+                                + mam_config.filePreciseLocation + uid + file_n;
             }
 
 
-            var fileTemp=new File( 'file://' + file_name);
-            try{
+            var fileTemp = new File('file://' + file_name);
+            try {
                 fileTemp.open('w');
                 fileTemp.write(file.getStream());
-            }catch(e){
+            } catch (e) {
                 print(e);
-            } finally{
+            } finally {
                 fileTemp.close();
             }
 
@@ -102,38 +104,46 @@ require('/modules/publisher.js').exec(function(ctx) {
         return "";
     };
 
-    var getBundleID = function(appid){
-        try{
-            var result =  get('https://itunes.apple.com/lookup?id='+appid).data;
-            if(result!=null){
+    var getBundleID = function (appid) {
+        try {
+            var result = get('https://itunes.apple.com/lookup?id=' + appid).data;
+            if (result != null) {
                 log.debug(result);
                 result = parse(result);
-                if(result.resultCount==1){
-                    var appinfo =  result.results[0];
+                if (result.resultCount == 1) {
+                    var appinfo = result.results[0];
                     var bundleId = appinfo.bundleId;
                     return bundleId;
                 }
             }
-        }catch(e){
+        } catch (e) {
             return null;
         }
     };
 
-    var validateAppIdentifier = function(attributes, display_attribute){
+    var validateAppIdentifier = function (attributes, display_attribute) {
         var artifactManager = rxtManager.getArtifactManager('mobileapp');
 
-        var predicate={}
-        predicate['attributes']=attributes;
+        var predicate = {}
+        predicate['attributes'] = attributes;
 
         //Perform a search for an asset with the provided name
-        var matches=artifactManager.find(function(asset){
-            var equal=utility.assertEqualCaseSensitive(asset,predicate);
+        var matches = artifactManager.find(function (asset) {
+            var equal = utility.assertEqualCaseSensitive(asset, predicate);
             return equal;
-        },null);
+        }, null);
 
-        if(matches.length>0){
+        if (matches.length > 0) {
             response.contentType = "application/json";
-            print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["App with identifer "+display_attribute+" and version "+attributes.overview_version+" already exists"]}})
+            print({
+                      "ok": false,
+                      "message": "Validation failure",
+                      "report": {
+                          "failed": true,
+                          "name": ["App with identifer " + display_attribute + " and version "
+                                   + attributes.overview_version + " already exists"]
+                      }
+                  })
             return true;
         }
     };
@@ -157,9 +167,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             var model = modelManager.getModel(shortName);
             //Obtain the username from the session and populate the provider field
 
-            var username=require('store').server.current(session).username;//.get('LOGGED_IN_USER');
-            model.set('overview.provider',username);
-            var output=model.export('form');
+            var username = require('store').server.current(session).username;//.get('LOGGED_IN_USER');
+            model.set('overview.provider', username);
+            var output = model.export('form');
 
             response.contentType = "application/json";
             print(output);
@@ -169,7 +179,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('GET', 'publisher', '/publisher/api/asset/{type}/trackingid/{uuid}', function (context) {
         var output = {};
         var uuid = context.params.uuid;
-        var trackinID= apiProvider.getTrackingID(uuid);
+        var trackinID = apiProvider.getTrackingID(uuid);
         output["TrackingID"] = trackinID;
         response.contentType = "application/json";
         print(output);
@@ -177,30 +187,30 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     routeManager.register('PUT', 'publisher', '/publisher/api/asset/{type}/deploySample', function (context) {
         var webapps = require('/config/SampleWebappConfiguration.json');
-        var sessionID=session.getId();
-        var username=require('store').server.current(session).username;
-        var request = {} ;
+        var sessionID = session.getId();
+        var username = require('store').server.current(session).username;
+        var request = {};
         request["username"] = stringify(username);
         request["creatorSession"] = sessionID;
         request["webapps"] = stringify(webapps);
         var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer;
         var deployerObj = new deployerClass();
-        var msg={};
+        var msg = {};
         msg["isSampleDeployed"] = true;
         msg["isError"] = "true";
         msg["isNew"] = "true";
         try {
             var result = deployerObj.deploySample(request);
-            if(result){
+            if (result) {
                 msg["response"] = "Samples deployed succesfully. " +
                                   "You can login to store using UserName : subscriber_" + username +
                                   " Password : subscriber"
                 msg["isError"] = "false";
-            }else{
-                msg["response"] = username+" has already created a sample web application"
+            } else {
+                msg["response"] = username + " has already created a sample web application"
                 msg["isError"] = "true";
             }
-        } catch (error){
+        } catch (error) {
             msg["response"] = error.message;
             msg["isError"] = "true";
         }
@@ -210,7 +220,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         print(msg);
     });
 
-    routeManager.register('POST', 'publisher', '/publisher/api/asset/version/copyapp/{type}/{id}', function (context){
+    routeManager.register('POST', 'publisher', '/publisher/api/asset/version/copyapp/{type}/{id}', function (context) {
         var appType = context.params.type;
         var parentAppId = context.params.id;
         var content = {status: "", message: []};
@@ -243,9 +253,9 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('POST', 'publisher', '/publisher/api/asset/delete/{type}/{id}', function (context) {
         var shortName = context.params.type;
         var id = context.params.id;
-        var msg={};
+        var msg = {};
         var artifactManager = rxtManager.getArtifactManager(shortName);
-        var server  = require('store').server;
+        var server = require('store').server;
         var username = jagg.getUser().username;
         var tenantId = server.current(session).tenantId;
 
@@ -254,7 +264,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         log.debug("## Delete Authorized Check : " + deleteAuthorized);
 
         var isDeleted = false;
-        if(deleteAuthorized) {
+        if (deleteAuthorized) {
             try {
                 //Get the original artifact
                 var originalArtifact = artifactManager.get(id);
@@ -323,9 +333,15 @@ require('/modules/publisher.js').exec(function(ctx) {
                     msg['message'] = 'Web Application is successfully deleted';
                     print(msg);
                     audutLog.writeLog(tenantId, username, "AssetDeleted", shortName, "{" +
-                                                                                     "providerName='" + attributes["overview_provider"] + '\'' +
-                                                                                     ", apiName='" + attributes["overview_name"]+ '\'' +
-                                                                                     ", version='" + attributes["overview_version"] + '\'' +
+                                                                                     "providerName='"
+                                                                                     + attributes["overview_provider"]
+                                                                                     + '\'' +
+                                                                                     ", apiName='"
+                                                                                     + attributes["overview_name"]
+                                                                                     + '\'' +
+                                                                                     ", version='"
+                                                                                     + attributes["overview_version"]
+                                                                                     + '\'' +
                                                                                      '}', originalArtifact);
                 } else if (isDeleted == false) {
                     msg['isDeleted'] = false;
@@ -341,7 +357,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 log.debug('The asset ' + id + ' could not be deleted.The following exception was thrown: ' + e);
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
             }
-        }else{
+        } else {
             msg['isDeleted'] = false;
             msg['message'] = 'Delete is not permitted due to insufficient privileges';
             msg['ok'] = false;
@@ -366,21 +382,22 @@ require('/modules/publisher.js').exec(function(ctx) {
             var artifact = artifactManager.get(id);
 
             //Perform some filerting logic
-            artifact=filterManager.filter(artifact,session);
+            artifact = filterManager.filter(artifact, session);
 
-            if(!artifact){
-                response.sendError(401,'You do not have viewing rights for this asset');
+            if (!artifact) {
+                response.sendError(401, 'You do not have viewing rights for this asset');
                 return;
             }
 
             //Customize the resource for the current app
-            dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
+            dataInjector.inject(artifact, DataInjectorModes.DISPLAY);
 
             response.contentType = "application/json";
             print(artifact);
         } catch (e) {
 
-            log.debug('The asset type: ' + shortName + ' with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
+            log.debug('The asset type: ' + shortName + ' with id: ' + id
+                      + ' could not be found.The following exception was thrown: ' + e);
             response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check the server logs.');
         }
 
@@ -397,7 +414,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 
         //check for mobile
-        if(shortName === "mobileapp"){
+        if (shortName === "mobileapp") {
             audutLog.writeLog(tenantId, username, "MobileAppCreated", shortName, "id", "", "");
             addNewMobileApp(context, rxtManager);
             return;
@@ -407,27 +424,26 @@ require('/modules/publisher.js').exec(function(ctx) {
         //Check if the type is valid
         try {
 
-            var model=modelManager.getModel(shortName);
+            var model = modelManager.getModel(shortName);
 
             //assigning default thumbnail and banner if not provided.
-            if(context.post['images_thumbnail'] == '') {
+            if (context.post['images_thumbnail'] == '') {
                 context.post['images_thumbnail'] = contextPath + '/config/defaults/img/thumbnail.jpg';
             }
-            if(context.post['images_banner'] == '') {
+            if (context.post['images_banner'] == '') {
                 context.post['images_banner'] = contextPath + '/config/defaults/img/banner.jpg';
             }
 
 
-
-            model.import('form.importer',context.post);
+            model.import('form.importer', context.post);
 
             //Perform validations on the asset
-            var report=model.validate();
+            var report = model.validate();
 
             //If the report indicates the model has failed validations send an error
-            if((report)&&(report.failed)){
+            if ((report) && (report.failed)) {
                 response.contentType = "application/json";
-                print({ok:false,message:'Validation failure',report:report});
+                print({ok: false, message: 'Validation failure', report: report});
                 return;
             }
 
@@ -440,10 +456,11 @@ require('/modules/publisher.js').exec(function(ctx) {
             //Get the model id
             var idField = model.get('*.id');
 
-            try{
+            try {
                 social.warmUpRatingCache(shortName + ':' + idField.value);
-            }catch(e) {
-                log.warn("Unable to publish the asset: " + shortName + ":" + idField.value + " to social cache. This may affect on sort by popularity function.");
+            } catch (e) {
+                log.warn("Unable to publish the asset: " + shortName + ":" + idField.value
+                         + " to social cache. This may affect on sort by popularity function.");
             }
 
 
@@ -452,20 +469,21 @@ require('/modules/publisher.js').exec(function(ctx) {
                 print({ok: 'true', message: 'Asset created.', id: idField.value});
             }
             else {
-                log.debug('An asset of type: ' + shortName + ' could not be created.Probably a fault with publisher logic!');
+                log.debug('An asset of type: ' + shortName
+                          + ' could not be created.Probably a fault with publisher logic!');
             }
 
         }
         catch (e) {
-            log.debug('An asset of type: ' + shortName + ' could not be created.The following exception was thrown: ' + e);
-            response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
+            log.debug('An asset of type: ' + shortName + ' could not be created.The following exception was thrown: '
+                      + e);
+            response.sendError(500, 'An asset of type: ' + shortName
+                                    + ' could not be created.Please check the server logs.');
         }
 
     });
 
     routeManager.register('GET', 'publisher', '/publisher/api/asset/userRoles/{type}/{id}', function (context) {
-
-
 
 
         var type = context.params.type;
@@ -495,30 +513,30 @@ require('/modules/publisher.js').exec(function(ctx) {
     //update asset
     routeManager.register('POST', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
         var shortName = context.params.type;
-        if(shortName === "mobileapp"){
+        if (shortName === "mobileapp") {
 
             editMobileApp(context, rxtManager);
             return;
         }
         var id = context.params.id;
-        var msg={};
+        var msg = {};
         var artifactManager = rxtManager.getArtifactManager(shortName);
 
-        var server  = require('store').server;
+        var server = require('store').server;
         var username = server.current(session).username;
 
         var user = server.current(session);
         var um = server.userManager(server.current(session).tenantId);
         var updateAuthorized = permissions.isAuthorized(username, config.permissions.webapp_update, um);
 
-        if(context.post['images_thumbnail'] instanceof Array){
+        if (context.post['images_thumbnail'] instanceof Array) {
             context.post['images_thumbnail'] = context.post['images_thumbnail'][0];
         }
-        if(context.post['images_banner'] instanceof Array){
+        if (context.post['images_banner'] instanceof Array) {
             context.post['images_banner'] = context.post['images_banner'][0];
         }
 
-        if(updateAuthorized) {
+        if (updateAuthorized) {
             try {
                 var originalArtifact = artifactManager.get(id);
                 var editEnabled = permissions.isEditPermitted(username, originalArtifact.path, um);
@@ -706,9 +724,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
 
                 audutLog.writeLog(tenantId, username, "AssetUpdated", shortName, "{" +
-                                                                                 "providerName='" + attributes["overview_provider"] + '\'' +
-                                                                                 ", apiName='" + attributes["overview_name"]+ '\'' +
-                                                                                 ", version='" + attributes["overview_version"] + '\'' +
+                                                                                 "providerName='"
+                                                                                 + attributes["overview_provider"]
+                                                                                 + '\'' +
+                                                                                 ", apiName='"
+                                                                                 + attributes["overview_name"] + '\'' +
+                                                                                 ", version='"
+                                                                                 + attributes["overview_version"] + '\''
+                                                                                 +
                                                                                  '}', originalArtifact, artifact);
                 msg['message'] = 'asset updated';
                 msg['asset'] = artifact;
@@ -721,7 +744,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 log.debug('The asset ' + id + ' could not be updated.The following exception was thrown: ' + e);
                 response.sendError(404, 'The asset ' + id + ' could not be updated.Please check the server logs.');
             }
-        }else{
+        } else {
             msg['ok'] = false;
             msg['message'] = 'Update Failed. Insufficient privilages.';
             response.contentType = "application/json";
@@ -733,16 +756,16 @@ require('/modules/publisher.js').exec(function(ctx) {
     /**
      * Saves external entitlement policies.
      */
-    function saveExternalEntitlementPolicies(params){
+    function saveExternalEntitlementPolicies(params) {
 
         var policies = parse(params['entitlementPolicies']);
         var policiesToBeSaved = new Array();
 
         var EntitlementPolicy = Packages.org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
         var entitlementPolicy;
-        for(var i = 0; i < policies.length; i++){
-            if(policies[i]){
-                entitlementPolicy  = new EntitlementPolicy();
+        for (var i = 0; i < policies.length; i++) {
+            if (policies[i]) {
+                entitlementPolicy = new EntitlementPolicy();
                 entitlementPolicy.setPolicyId(policies[i]['id']);
                 entitlementPolicy.setPolicyContent(policies[i]['content']);
                 policiesToBeSaved.push(entitlementPolicy);
@@ -750,7 +773,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
 
-        if(policiesToBeSaved.length > 0){
+        if (policiesToBeSaved.length > 0) {
             apiProvider.saveEntitlementPolicies(policiesToBeSaved);
         }
 
@@ -759,13 +782,13 @@ require('/modules/publisher.js').exec(function(ctx) {
     /**
      * Update entitlement policies.
      */
-    function updateEntitlementPolicies(overviewProvider,overviewName,overviewVersion){
+    function updateEntitlementPolicies(overviewProvider, overviewName, overviewVersion) {
 
         // Save external entitlement policies
-        var webappId={};
-        webappId.provider= overviewProvider;
-        webappId.name= overviewName;
-        webappId.version= overviewVersion;
+        var webappId = {};
+        webappId.provider = overviewProvider;
+        webappId.name = overviewName;
+        webappId.version = overviewVersion;
         apiProvider.generateEntitlementPolicies(webappId);
     }
 
@@ -806,9 +829,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             extension = utility.fileio.getExtension(file);
             resource['contentType'] = utility.fileio.getContentType(extension);
 
-            uuid=storageManager.put(resource);
+            uuid = storageManager.put(resource);
 
-            log.debug('uuid added: '+uuid);
+            log.debug('uuid added: ' + uuid);
 
             //Add a new  entry into the POST parameters containing the uuid
             params[index] = uuid;
@@ -819,7 +842,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('PUT', 'publisher', '/publisher/api/asset/{type}/{id}', function (context) {
         var shortName = context.params.type;
         var id = context.params.id;
-        var msg={};
+        var msg = {};
         var artifactManager = rxtManager.getArtifactManager(shortName);
 
 
@@ -833,15 +856,15 @@ require('/modules/publisher.js').exec(function(ctx) {
             modelA.import('form.importer', context.content);
 
             //Validation requires the lifecycle state
-            modelA.set('*.lifecycleState',originalArtifact.lifecycleState);
+            modelA.set('*.lifecycleState', originalArtifact.lifecycleState);
 
-            var report=modelA.validate();
+            var report = modelA.validate();
 
             //Check if the validation check has failed
-            if((report)&&(report.failed)){
+            if ((report) && (report.failed)) {
 
-                msg['ok']=false;
-                msg['report']=report;
+                msg['ok'] = false;
+                msg['report'] = report;
                 response.contentType = "application/json";
                 print(msg);
                 return;
@@ -852,26 +875,27 @@ require('/modules/publisher.js').exec(function(ctx) {
             modelB.import('asset', originalArtifact);
 
             //Checks whether two models are equal
-            var reqProps=['overview.name', 'overview.provider', 'overview.version']
+            var reqProps = ['overview.name', 'overview.provider', 'overview.version']
 
-            var isEqual = modelManager.assertEqual(modelA, modelB,reqProps);
+            var isEqual = modelManager.assertEqual(modelA, modelB, reqProps);
 
             //If they are not equal,abort the operation
             if (!isEqual) {
                 log.debug('trying to get fields which are different');
-                var diff=modelManager.diff(modelA,modelB,reqProps);
-                response.sendError(406, 'The name,provider and version of an asset cannot be changed.The following fields'
-                                        + ' were modified: ' + diff);
+                var diff = modelManager.diff(modelA, modelB, reqProps);
+                response.sendError(406,
+                                   'The name,provider and version of an asset cannot be changed.The following fields'
+                                   + ' were modified: ' + diff);
                 return;
             }
-            modelA.set("overview.createdtime",modelB.get("overview.createdtime").value);
+            modelA.set("overview.createdtime", modelB.get("overview.createdtime").value);
             var artifact = modelA.export('asset.exporter');
 
-            log.debug('not updating'+artifact);
+            log.debug('not updating' + artifact);
             //artifactManager.update(artifact);
 
-            msg['ok']=true;
-            msg['message']='asset updated';
+            msg['ok'] = true;
+            msg['message'] = 'asset updated';
             response.contentType = "application/json";
             print(msg);
 
@@ -933,7 +957,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                           });
 
     //Get external
-    routeManager.register('GET', 'publisher', '/publisher/api/asset/get/external/stores/{type}/{provider}/{name}/{version}',
+    routeManager.register('GET', 'publisher',
+                          '/publisher/api/asset/get/external/stores/{type}/{provider}/{name}/{version}',
                           function (context) {
                               var appProvider = context.params.provider;
                               var appName = context.params.name;
@@ -962,7 +987,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                           });
 
     //update external app stores
-    routeManager.register('POST', 'publisher', '/publisher/api/asset/{type}/update/external/stores/{provider}/{name}/{version}',
+    routeManager.register('POST', 'publisher',
+                          '/publisher/api/asset/{type}/update/external/stores/{provider}/{name}/{version}',
                           function (context) {
                               var provider = context.params.provider;
                               var name = context.params.name;
@@ -993,11 +1019,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                           });
 
 
-    routeManager.register('GET', 'publisher', '/publisher/api/asset/default/version/{appName}/{providerName}/{appStatus}', function (context) {
-        var defaultVersion = getDefaultVersion(context.params.appName, context.params.providerName,
-                                               context.params.appStatus);
-        print(defaultVersion);
-    });
+    routeManager.register('GET', 'publisher',
+                          '/publisher/api/asset/default/version/{appName}/{providerName}/{appStatus}',
+                          function (context) {
+                              var defaultVersion = getDefaultVersion(context.params.appName,
+                                                                     context.params.providerName,
+                                                                     context.params.appStatus);
+                              print(defaultVersion);
+                          });
 
 
     //check if the default version
@@ -1023,10 +1052,9 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
 
-
     /**************** MOBILE APP *********************************************************/
 
-    function addNewMobileApp(context, rxtManager){
+    function addNewMobileApp(context, rxtManager) {
 
 
         var shortName = context.params.type;
@@ -1035,27 +1063,25 @@ require('/modules/publisher.js').exec(function(ctx) {
         var artifactManager = rxtManager.getArtifactManager(shortName);
 
 
-
-
         //Check if the type is valid
         try {
 
-            var model=modelManager.getModel(shortName);
+            var model = modelManager.getModel(shortName);
 
             //assigning default thumbnail and banner if not provided.
-            if(context.post['images_thumbnail'] == '') {
+            if (context.post['images_thumbnail'] == '') {
                 context.post['images_thumbnail'] = contextPath + '/config/defaults/img/thumbnail.jpg';
             }
-            if(context.post['images_banner'] == '') {
+            if (context.post['images_banner'] == '') {
                 context.post['images_banner'] = contextPath + '/config/defaults/img/banner.jpg';
             }
 
-            if(shortName !="mobileapp"){
-                model.import('form.importer',context.post);
+            if (shortName != "mobileapp") {
+                model.import('form.importer', context.post);
             }
 
-            if(shortName =="mobileapp"){
-                var username= server.current(session).username.replace('@', '-AT-');
+            if (shortName == "mobileapp") {
+                var username = server.current(session).username.replace('@', '-AT-');
                 var ctx = context.post;
                 log.debug(ctx);
                 var files = request.getAllFiles();
@@ -1074,17 +1100,21 @@ require('/modules/publisher.js').exec(function(ctx) {
                 var screenshot3 = files['screenshot3File'];
                 screenshot3 = saveFile(screenshot3);
 
-                var screenshots = screenshot1+","+screenshot2+","+screenshot3;
+                var screenshots = screenshot1 + "," + screenshot2 + "," + screenshot3;
                 log.debug(screenshots);
 
-                if(screenshots==",,"){
+                if (screenshots == ",,") {
                     response.contentType = "application/json";
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Screenshots not added"]}})
+                    print({
+                              "ok": false,
+                              "message": "Validation failure",
+                              "report": {"failed": true, "name": ["Screenshots not added"]}
+                          })
                     return;
                 }
                 var meta = ctx['appmeta'];
                 log.debug(stringify(meta));
-                if(meta == undefined || meta==""){
+                if (meta == undefined || meta == "") {
                     log.debug("Application meta data was not found");
                     response.sendError(500, 'Application meta data was not found');
                     return;
@@ -1093,83 +1123,106 @@ require('/modules/publisher.js').exec(function(ctx) {
                 var version = ctx.version;
                 model.set('overview.bundleversion', version);
                 model.set('overview.packagename', meta.package);
-                if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
+                if (ctx.markettype != 'enterprise' && ctx.platform.toUpperCase() == "IOS") {
                     var bundleId = getBundleID(meta.package);
-                    if(bundleId==null){
+                    if (bundleId == null) {
                         response.contentType = "application/json";
-                        print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["App ID is invalid"]}})
+                        print({
+                                  "ok": false,
+                                  "message": "Validation failure",
+                                  "report": {"failed": true, "name": ["App ID is invalid"]}
+                              })
                         return;
-                    }else{
-                        if(validateAppIdentifier({"overview_appid": meta.package, "overview_version":version},meta.package)){
+                    } else {
+                        if (validateAppIdentifier({"overview_appid": meta.package, "overview_version": version},
+                                                  meta.package)) {
                             return;
                         }
                         model.set('overview.packagename', bundleId);
                         model.set('overview.appid', meta.package);
                     }
-                }else if(ctx.platform.toUpperCase()=="ANDROID"){
-                    if(ctx.markettype=='enterprise' ){
-                        if(getExtensionText(meta.path)!="apk"){
+                } else if (ctx.platform.toUpperCase() == "ANDROID") {
+                    if (ctx.markettype == 'enterprise') {
+                        if (getExtensionText(meta.path) != "apk") {
                             response.contentType = "application/json";
-                            print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["File uploaded is not supported by Android"]}})
+                            print({
+                                      "ok": false,
+                                      "message": "Validation failure",
+                                      "report": {"failed": true, "name": ["File uploaded is not supported by Android"]}
+                                  })
                             return;
                         }
                     }
-                    if(validateAppIdentifier({"overview_packagename": meta.package, "overview_version":version}, meta.package)){
+                    if (validateAppIdentifier({"overview_packagename": meta.package, "overview_version": version},
+                                              meta.package)) {
                         return;
                     }
-                }else if(ctx.platform.toUpperCase()=="IOS" && ctx.markettype!='Market'){
-                    if(getExtensionText(meta.path)!="ipa"){
+                } else if (ctx.platform.toUpperCase() == "IOS" && ctx.markettype != 'Market') {
+                    if (getExtensionText(meta.path) != "ipa") {
                         response.contentType = "application/json";
-                        print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["File uploaded is not supported by iOS"]}})
+                        print({
+                                  "ok": false,
+                                  "message": "Validation failure",
+                                  "report": {"failed": true, "name": ["File uploaded is not supported by iOS"]}
+                              })
                         return;
                     }
                 }
-                if(!meta.weburl){
+                if (!meta.weburl) {
                     model.set('overview.url', meta.path);
-                }else{
+                } else {
 
-                    if(url_reg(meta.weburl)){
-                        if(validateAppIdentifier({"overview_url": meta.weburl, "overview_version":version},meta.weburl)){
+                    if (url_reg(meta.weburl)) {
+                        if (validateAppIdentifier({"overview_url": meta.weburl, "overview_version": version},
+                                                  meta.weburl)) {
                             return;
                         }
                         model.set('overview.url', meta.weburl);
-                    }else{
+                    } else {
                         response.contentType = "application/json";
-                        print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Invalid weburl"]}})
+                        print({
+                                  "ok": false,
+                                  "message": "Validation failure",
+                                  "report": {"failed": true, "name": ["Invalid weburl"]}
+                              })
                         return;
                     }
                 }
                 model.set('overview.version', version);
-                if(!checkNonSpecial(ctx.name)){
+                if (!checkNonSpecial(ctx.name)) {
                     response.contentType = "application/json";
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}})
+                    print({
+                              "ok": false,
+                              "message": "Validation failure",
+                              "report": {"failed": true, "name": ["Special characters found in name"]}
+                          })
                     return;
                 }
-                model.set('overview.name',ctx.name);
+                model.set('overview.name', ctx.name);
                 model.set('overview.displayName', ctx.displayName);
-                model.set('overview.category',ctx.category);
-                model.set('overview.platform',ctx.platform);
+                model.set('overview.category', ctx.category);
+                model.set('overview.platform', ctx.platform);
                 model.set('overview.provider', username);
-                model.set('overview.visibility',ctx.visibility);
-                model.set('overview.description',ctx.description);
-                model.set('overview.type',ctx.markettype);
-                if(ctx.recentChanges == ""){
+                model.set('overview.visibility', ctx.visibility);
+                model.set('overview.description', ctx.description);
+                model.set('overview.type', ctx.markettype);
+                if (ctx.recentChanges == "") {
                     ctx.recentChanges = "-";
                 }
-                model.set('overview.recentchanges',ctx.recentChanges);
-                model.set('images.thumbnail',icon);
-                model.set('images.banner',banner);
-                model.set('images.screenshots',screenshots);
+                model.set('overview.recentchanges', ctx.recentChanges);
+                model.set('images.thumbnail', icon);
+                model.set('images.banner', banner);
+                model.set('images.screenshots', screenshots);
 
             }
 
             //Perform validations on the asset
-            var report=model.validate();
+            var report = model.validate();
 
             //If the report indicates the model has failed validations send an error
-            if((report)&&(report.failed)){
+            if ((report) && (report.failed)) {
                 response.contentType = "application/json";
-                print({ok:false,message:'Validation failure',report:report});
+                print({ok: false, message: 'Validation failure', report: report});
                 return;
             }
 
@@ -1186,42 +1239,42 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             log.debug('obtained idField');
 
-            var asset=model.export('asset.exporter');
-            var assetCachingModule=require('/modules/cache/cache.manager.js').assetCachingModule();
-            var assetCacheManager=new assetCachingModule.AssetCacheManager(session);
-            assetCacheManager.add(asset,shortName);
+            var asset = model.export('asset.exporter');
+            var assetCachingModule = require('/modules/cache/cache.manager.js').assetCachingModule();
+            var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
+            assetCacheManager.add(asset, shortName);
 
             if (idField) {
                 response.contentType = "application/json";
                 print({ok: 'true', message: 'Asset created.', id: idField.value});
             }
             else {
-                log.debug('An asset of type: ' + shortName + ' could not be created.Probably a fault with publisher logic!');
+                log.debug('An asset of type: ' + shortName
+                          + ' could not be created.Probably a fault with publisher logic!');
             }
 
         }
         catch (e) {
             log.error(e);
             log.error('An asset of type: ' + shortName + ' could not be created.');
-            response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
+            response.sendError(500, 'An asset of type: ' + shortName
+                                    + ' could not be created.Please check the server logs.');
         }
-
-
 
 
     }
 
-    function editMobileApp(context, rxtManager){
+    function editMobileApp(context, rxtManager) {
 
         var shortName = context.params.type;
         var id = context.params.id;
-        var msg={};
+        var msg = {};
         var artifactManager = rxtManager.getArtifactManager(shortName);
 
-        if(context.post['images_thumbnail'] instanceof Array){
+        if (context.post['images_thumbnail'] instanceof Array) {
             context.post['images_thumbnail'] = context.post['images_thumbnail'][0];
         }
-        if(context.post['images_banner'] instanceof Array){
+        if (context.post['images_banner'] instanceof Array) {
             context.post['images_banner'] = context.post['images_banner'][0];
         }
 
@@ -1230,7 +1283,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             var modelB = modelManager.getModel(shortName);
 
             //Handle any files
-            inspectFiles(request,context.post);
+            inspectFiles(request, context.post);
 
             //Get the original artifact
             var originalArtifact = artifactManager.get(id);
@@ -1240,24 +1293,24 @@ require('/modules/publisher.js').exec(function(ctx) {
             modelA.set('*.lifecycleState', originalArtifact.lifecycleState);
 
 
-            if(shortName != "mobileapp"){
-                modelA.import('form.importer',context.post);
+            if (shortName != "mobileapp") {
+                modelA.import('form.importer', context.post);
             }
 
-            if(shortName =="mobileapp"){
+            if (shortName == "mobileapp") {
                 modelA.import('asset', originalArtifact);
-                var username= server.current(session).username.replace('@', '-AT-');
+                var username = server.current(session).username.replace('@', '-AT-');
                 var ctx = context.post;
                 var files = request.getAllFiles();
                 var banner = files['bannerFile'];
-                if(banner){
+                if (banner) {
                     banner = saveFile(banner);
-                    modelA.set('images.banner',banner);
+                    modelA.set('images.banner', banner);
                 }
                 var icon = files['iconFile'];
-                if(icon){
+                if (icon) {
                     icon = saveFile(icon);
-                    modelA.set('images.thumbnail',icon);
+                    modelA.set('images.thumbnail', icon);
                 }
 
                 var screenshot1 = files['screenshot1File'];
@@ -1270,39 +1323,49 @@ require('/modules/publisher.js').exec(function(ctx) {
                 screenshot3 = saveFile(screenshot3);
 
 
-                var screenshots = screenshot1+","+screenshot2+","+screenshot3;
+                var screenshots = screenshot1 + "," + screenshot2 + "," + screenshot3;
 
 
                 var ssValues = modelA.get('images.screenshots').value;
                 ssValues = ssValues.split(",");
-                if(screenshot1 != "") ssValues[0] = screenshot1;
-                if(screenshot2 != "" ) ssValues[1] = screenshot2;
-                if(screenshot3 != "") ssValues[2] = screenshot3;
-
-
-                if(screenshots!=",,"){
-                    modelA.set('images.screenshots',ssValues.join());
+                if (screenshot1 != "") {
+                    ssValues[0] = screenshot1;
                 }
-                if(!checkNonSpecial(ctx.name)){
+                if (screenshot2 != "") {
+                    ssValues[1] = screenshot2;
+                }
+                if (screenshot3 != "") {
+                    ssValues[2] = screenshot3;
+                }
+
+
+                if (screenshots != ",,") {
+                    modelA.set('images.screenshots', ssValues.join());
+                }
+                if (!checkNonSpecial(ctx.name)) {
                     response.contentType = "application/json";
-                    print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}});
+                    print({
+                              "ok": false,
+                              "message": "Validation failure",
+                              "report": {"failed": true, "name": ["Special characters found in name"]}
+                          });
                     return;
                 }
-                modelA.set('overview.name',originalArtifact.attributes.overview_name);
+                modelA.set('overview.name', originalArtifact.attributes.overview_name);
                 modelA.set('overview.displayName', ctx.displayName);
                 modelA.set('overview.version', originalArtifact.attributes.overview_version);
-                modelA.set('overview.visibility',ctx.visibility);
-                modelA.set('overview.category',ctx.category);
-                modelA.set('overview.description',ctx.description);
-                modelA.set('overview.recentchanges',ctx.recentChanges);
+                modelA.set('overview.visibility', ctx.visibility);
+                modelA.set('overview.category', ctx.category);
+                modelA.set('overview.description', ctx.description);
+                modelA.set('overview.recentchanges', ctx.recentChanges);
                 modelA.set('overview.provider', originalArtifact.attributes.overview_provider);
             }
-            var report=modelA.validate();
+            var report = modelA.validate();
 
             //Check if the validation check has failed
-            if((report)&&(report.failed)){
-                msg['ok']=false;
-                msg['report']=report;
+            if ((report) && (report.failed)) {
+                msg['ok'] = false;
+                msg['report'] = report;
                 response.contentType = "application/json";
                 print(msg);
                 log.debug(msg);
@@ -1315,30 +1378,31 @@ require('/modules/publisher.js').exec(function(ctx) {
             modelB.import('asset', originalArtifact);
 
             //Checks whether two models are equal
-            var reqProps=['overview.name', 'overview.provider', 'overview.version']
+            var reqProps = ['overview.name', 'overview.provider', 'overview.version']
 
-            var isEqual = modelManager.assertEqual(modelA, modelB,reqProps);
+            var isEqual = modelManager.assertEqual(modelA, modelB, reqProps);
 
             //If they are not equal,abort the operation
             if (!isEqual) {
                 log.debug('trying to get fields which are different');
-                var diff=modelManager.diff(modelA,modelB,reqProps);
-                response.sendError(406, 'The name,provider and version of an asset cannot be changed.The following fields'
-                                        + ' were modified: ' + diff);
+                var diff = modelManager.diff(modelA, modelB, reqProps);
+                response.sendError(406,
+                                   'The name,provider and version of an asset cannot be changed.The following fields'
+                                   + ' were modified: ' + diff);
                 return;
             }
-            modelA.set("overview.createdtime",modelB.get("overview.createdtime").value);
+            modelA.set("overview.createdtime", modelB.get("overview.createdtime").value);
             var artifact = modelA.export('asset.exporter');
 
-            dataInjector.inject(artifact,DataInjectorModes.UPDATE);
+            dataInjector.inject(artifact, DataInjectorModes.UPDATE);
 
             artifactManager.update(artifact);
 
             // dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
 
-            msg['ok']=true;
-            msg['message']='asset updated';
-            msg['asset']=artifact;
+            msg['ok'] = true;
+            msg['message'] = 'asset updated';
+            msg['asset'] = artifact;
             response.contentType = "application/json";
             print(msg);
 
@@ -1346,12 +1410,16 @@ require('/modules/publisher.js').exec(function(ctx) {
             log.error(e);
             log.error('The asset ' + id + ' could not be updated.');
             response.contentType = "application/json";
-            print({"ok" : false, "message" : "Permission denied", "report" : {"failed" : true, "name" : ["You are not allowed to edit at this stage"]}});
+            print({
+                      "ok": false,
+                      "message": "Permission denied",
+                      "report": {"failed": true, "name": ["You are not allowed to edit at this stage"]}
+                  });
         }
 
     }
 
-    function copyMobileApp(oldVersionArtifact, context){
+    function copyMobileApp(oldVersionArtifact, context) {
 
         var postContext = context.post;
         var appType = context.params.type;
@@ -1387,13 +1455,15 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         // handle images
         inspectFiles(request, postContext);
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER,
+                            postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
         var screenshots = oldVersionArtifact.attributes.images_screenshots.split(',');
         screenshots[0] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
         screenshots[1] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
         screenshots[2] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
         newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots.join(","));
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL,
+                            postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
 
         // validate model
         var mobileValidator = new mobileValidatorModule.Validator(null);
@@ -1512,14 +1582,9 @@ require('/modules/publisher.js').exec(function(ctx) {
 }, request, response, session);
 
 
-
-
-
-
-function url_reg(){
+function url_reg() {
     return /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url_reg.arguments[0]);
 }
-
 
 
 %>
