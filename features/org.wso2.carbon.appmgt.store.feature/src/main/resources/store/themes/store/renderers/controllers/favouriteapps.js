@@ -34,7 +34,7 @@ var render = function (theme, data, meta, require) {
         pageContent: [
             {
                 partial: 'page-content-favouriteapps',
-                context: {favouriteApps: data.favouriteApps}
+                context: {favouriteApps: data.favouriteApps, searchQuery: data.search.query}
             }
         ]
     });
