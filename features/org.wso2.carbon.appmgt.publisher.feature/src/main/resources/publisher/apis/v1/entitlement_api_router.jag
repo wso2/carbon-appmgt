@@ -12,6 +12,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var log= new Log();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
+    var audutLog = require('/modules/auditLog/logger.js');
 
     routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/Tiers', function (context) {
         var tiers = getTiers();
@@ -84,6 +85,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var policyGroupId = savePolicyGroup(context.post.policyGroupName, context.post.throttlingTier, context.post.userRoles, context.post.anonymousAccessToUrlPattern, context.post.objPartialMappings, context.post.policyGroupDesc);
         var response = {"id": policyGroupId};
         print(createResponseObject(response));
+        audutLog.writeLog(session.get("tenantId"), session.get("LOGGED_IN_USER"), "NewPolicyCreated","" , ""+""+"");
     });
 
     routeManager.register('POST', 'publisher', '/publisher/api/entitlement/policy/partial/policyGroup/details/update', function (context) {

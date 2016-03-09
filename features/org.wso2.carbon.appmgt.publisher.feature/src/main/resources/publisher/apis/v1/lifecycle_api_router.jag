@@ -31,12 +31,17 @@ require('/modules/publisher.js').exec(function (ctx) {
 	var permissions = require('/modules/permissions.js').permissions;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
+    var audutLog = require('/modules/auditLog/logger.js');
 
-	routeManager.register('POST', 'publisher', '/publisher/api/lifecycle/{type}/{id}', function (context) {
+
+    routeManager.register('POST', 'publisher', '/publisher/api/lifecycle/{type}/{id}', function (context) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var lifecycle = context.post.lifecycle;
 		var invokeAction = '';
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 		//Check the config for a lifeCycleBehaviour block
 		utility.isPresent(config, 'lifeCycleBehaviour', function (lifeCycleBehaviour) {
 			utility.isPresent(lifeCycleBehaviour, lifeCycle, function (lifeCycleData) {
@@ -59,6 +64,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 			//Perform the action if the user has specified an action
 			if (invokeAction != '') {
 				artifactManager.promoteLifecycleState(invokeAction, artifact);
+                audutLog.writeLog(tenantId, username, "LifeStyleStateChanged", shortName, id, artifact, "");
 			}
 
 			var msg = {};
@@ -80,12 +86,16 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var artifactManager = rxtManager.getArtifactManager(shortName);
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
 		try {
 			var artifact = artifactManager.get(id);
 			artifactManager.checkItem(checkListItemIndex, artifact);
 			var msg = {};
 			msg['status'] = 'ok';
+            audutLog.writeLog(tenantId, username, "Ticks The Check List", shortName, id, artifact, "");
 		} catch (e) {
 			log.debug('The asset with id: ' + id + ' could not be found.The following exception was thrown: ' + e);
 			response.sendError(404, 'The asset with id: ' + id + ' could not be found.Please refer to the server log.');
@@ -120,12 +130,16 @@ require('/modules/publisher.js').exec(function (ctx) {
 		var shortName = context.params.type;
 		var id = context.params.id;
 		var artifactManager = rxtManager.getArtifactManager(shortName);
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
 		try {
 			var artifact = artifactManager.get(id);
 			artifactManager.uncheckItem(checkListItemIndex, artifact);
 			var msg = {};
 			msg['status'] = 'ok';
+            audutLog.writeLog(tenantId, username, "Ticks The Unheck List", shortName, id, artifact, "");
 		} catch (e) {
 			log.debug('The lifecyle check list item at index ' + checkListItemIndex + ' of asset id: ' + id + ' could not be unticked' + 'The following exception was thrown: ' + e);
 			response.sendError(404, 'The lifecycle check list item at index ' + checkListItemIndex + ' of asset id: ' + id + ' could not be unchecked' + '.Please refer to the server log');
@@ -142,6 +156,9 @@ require('/modules/publisher.js').exec(function (ctx) {
         var appType = context.params.type; // webapp or mobileapp
         var action = context.params.action; // see '/config/publisher.json' --> publisherActions
         var uuid = context.params.id; // UUID
+        var server = require('store').server;
+        var tenantId = server.current(session).tenantId;
+        var username = server.current(session).username;
 
         /** @type {{status: string, messages: string[], artifacts: Object[]}} */
         var content = {status: "", messages: [], artifacts: []};
@@ -478,7 +495,13 @@ require('/modules/publisher.js').exec(function (ctx) {
             }
 
         }
-
+        var originalArtifact = artifactManager.get(uuid);
+        var attributes = originalArtifact.attributes;
+        audutLog.writeLog(tenantId, username, action, appType, "{" +
+                                                               "providerName='" + attributes["overview_provider"] + '\'' +
+                                                               ", apiName='" + attributes["overview_name"]+ '\'' +
+                                                               ", version='" + attributes["overview_version"] + '\'' +
+                                                               '}'+""+"");
         // everything went great
         response.status = 200;
         response.contentType = "application/json";

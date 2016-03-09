@@ -24,6 +24,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var routeManager = new router.Router();
     var log = new Log();
     var appmgtPublisher = require('appmgtpublisher');
+    var audutLog = require('/modules/auditLog/logger.js');
 
 
     /****************************MOBILE*******************************************/
@@ -320,6 +321,17 @@ require('/modules/publisher.js').exec(function(ctx) {
                     msg['isDeleted'] = true;
                     msg['message'] = 'Web Application is successfully deleted';
                     print(msg);
+                    audutLog.writeLog(tenantId, username, "AssetDeleted", shortName, "{" +
+                                                                                     "providerName='"
+                                                                                     + attributes["overview_provider"]
+                                                                                     + '\'' +
+                                                                                     ", apiName='"
+                                                                                     + attributes["overview_name"]
+                                                                                     + '\'' +
+                                                                                     ", version='"
+                                                                                     + attributes["overview_version"]
+                                                                                     + '\'' +
+                                                                                     '}', originalArtifact);
                 } else if (isDeleted == false) {
                     msg['isDeleted'] = false;
                     msg['message'] = 'Web Application delete failed due to active subscriptions';
@@ -390,6 +402,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         //check for mobile
         if(shortName === "mobileapp"){
+            audutLog.writeLog(tenantId, username, "MobileAppCreated", shortName, "id", "", "");
             addNewMobileApp(context, rxtManager);
             return;
         }
@@ -689,7 +702,16 @@ require('/modules/publisher.js').exec(function(ctx) {
                 var updateLCArtifact = artifactManager.get(id);
                 artifactManagerForUpdate.promoteLifecycleState("Revert", updateLCArtifact);
             }
-
+                audutLog.writeLog(tenantId, username, "AssetUpdated", shortName, "{" +
+                                                                                 "providerName='"
+                                                                                 + attributes["overview_provider"]
+                                                                                 + '\'' +
+                                                                                 ", apiName='"
+                                                                                 + attributes["overview_name"] + '\'' +
+                                                                                 ", version='"
+                                                                                 + attributes["overview_version"] + '\''
+                                                                                 +
+                                                                                 '}', originalArtifact, artifact);
             msg['ok']=true;
             msg['message']='asset updated';
             msg['asset']=artifact;

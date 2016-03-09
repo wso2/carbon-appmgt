@@ -2,6 +2,7 @@
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
+var audutLog = require('/modules/auditLog/logger.js');
 
 (function () {
     var log = new Log(),
@@ -114,6 +115,7 @@ var storeHostObj = manager.getAPIStoreObj();
                             if (log.isDebugEnabled()) {
                                 log.debug('User has been set to : ' + sessionObj.loggedInUser);
                             }
+                            audutLog.writeLog(tenantId, username, "UserSignedIn","Login","", "", "");
                             //check whether login request came by clicking the login url and do redirect
                             // to myfavourites page if user has already selected it as homepage.
                             //in store login url is in the format of /login?header=true
