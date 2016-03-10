@@ -166,6 +166,52 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+        <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.osgi</groupId>
+        <artifactId>org.eclipse.osgi</artifactId>
+        <version>${eclipse.osgi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.osgi</groupId>
+        <artifactId>org.eclipse.osgi.services</artifactId>
+        <version>3.3.100.v20120522-1822</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
+        <version>${carbon.device.mgt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.policy.mgt.core</artifactId>
+        <version>${carbon.device.mgt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.device.mgt.common</artifactId>
+        <version>${carbon.device.mgt.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.googlecode.json-simple.wso2</groupId>
         <artifactId>json-simple</artifactId>
         <version>${json-simple.wso2.version}</version>
@@ -467,6 +513,11 @@
         <version>${identity.oauth.common.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.wso2.carbon.identity</groupId>
+        <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
+        <version>${identity.oauth.common.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>org.wso2.carbon.appmgt.gateway</artifactId>
         <version>${carbon.appmgt.version}</version>
@@ -595,6 +646,14 @@
 
     <!-- SCM Server -->
     <project.scm.id>github-scm</project.scm.id>
+
+    <!-- Carbon Device Management -->
+    <carbon.device.mgt.version>1.0.3</carbon.device.mgt.version>
+    <carbon.device.mgt.version.range>[0.8.0, 2.0.0)</carbon.device.mgt.version.range>
+
+    <junit.version>4.8.2</junit.version>
+    <cxf.version>2.7.16</cxf.version>
+    <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
 
     <!-- AppM Component Version -->
     <carbon.appmgt.version>1.1.2-SNAPSHOT</carbon.appmgt.version>
