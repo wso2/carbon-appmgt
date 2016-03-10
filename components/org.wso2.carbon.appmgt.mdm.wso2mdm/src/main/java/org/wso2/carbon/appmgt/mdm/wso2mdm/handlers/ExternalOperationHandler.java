@@ -153,7 +153,7 @@ public class ExternalOperationHandler implements OperationHandler {
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().
                 getTenantDomain(true);
-        String actionURL = null;
+        String actionURL;
         if ("install".equals(action)) {
             actionURL = String.format(Constants.API_INSTALL_APP, tenantDomain);
         } else {
@@ -187,7 +187,7 @@ public class ExternalOperationHandler implements OperationHandler {
         JSONArray jsonArray = null;
         HttpClient httpClient = new HttpClient();
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().
+        String tenaxntDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().
                 getTenantDomain(true);
         String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0]);
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
@@ -306,7 +306,7 @@ public class ExternalOperationHandler implements OperationHandler {
         String authKey = getAPIToken(tokenApiURL, clientKey, clientSecret, authUser,
                                      authPass, false);
         if (log.isDebugEnabled()) {
-            log.debug("Access token received : " + authKey);
+            log.debug("Access token received.");
         }
         try {
             int statusCode = 401;
@@ -332,8 +332,7 @@ public class ExternalOperationHandler implements OperationHandler {
                     authKey = getAPIToken(tokenApiURL, clientKey, clientSecret,
                                           authUser, authPass, true);
                     if (log.isDebugEnabled()) {
-                        log.debug("Access token getting again, Access token received :  "
-                                  + authKey + " in  try " + tries);
+                        log.debug("retrying generation access token. no of tries " + tries);
                     }
                 }
             }

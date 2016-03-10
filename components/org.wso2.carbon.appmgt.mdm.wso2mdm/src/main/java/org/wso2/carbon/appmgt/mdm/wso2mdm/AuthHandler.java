@@ -21,7 +21,7 @@
 package org.wso2.carbon.appmgt.mdm.wso2mdm;
 
 /**
- * Created by dilan on 3/26/15.
+ * This Class Holds the authKey for recurrent service calls.
  */
 public class AuthHandler {
 

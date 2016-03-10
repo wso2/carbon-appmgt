@@ -135,6 +135,9 @@ $('#btn-create-asset-mobile').click(function(e) {
 	
 	var name = $("#txtName").val();
 	var description = $("#txtDescription").val();
+	if (description) {
+		description = " ";
+	}
 	var category = $("#txtCategory").val();
 	var recentChanges = $("#txtRecentChanges").val();
 	var banner = $("#txtbanner").val();

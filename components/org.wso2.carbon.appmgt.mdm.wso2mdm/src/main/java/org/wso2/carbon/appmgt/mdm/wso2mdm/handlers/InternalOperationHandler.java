@@ -176,7 +176,7 @@ public class InternalOperationHandler implements OperationHandler {
                                    HashMap<String, String> configProperties) {
 
         List<Device> devices = null;
-        Device device = null;
+        Device device ;
         try {
             List<org.wso2.carbon.device.mgt.common.Device> deviceList =
                     MDMServiceAPIUtils.getDeviceManagementService(tenantId).
@@ -198,7 +198,8 @@ public class InternalOperationHandler implements OperationHandler {
                 }
             }
         } catch (DeviceManagementException e) {
-            e.printStackTrace();
+            log.error("Error While retrieving Device List", e);
+
         }
         return devices;
     }
