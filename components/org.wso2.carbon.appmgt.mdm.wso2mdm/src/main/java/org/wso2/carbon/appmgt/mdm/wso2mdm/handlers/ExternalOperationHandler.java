@@ -74,7 +74,7 @@ public class ExternalOperationHandler implements OperationHandler {
             for (String param : params) {
                 resources.add(param);
             }
-            requestObj.put("userList", resources);
+            requestObj.put("roleList", resources);
         } else {
             JSONArray resources = new JSONArray();
             for (String param : params) {
