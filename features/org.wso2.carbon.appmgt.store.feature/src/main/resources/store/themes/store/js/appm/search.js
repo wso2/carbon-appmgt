@@ -106,10 +106,6 @@ $(function () {
         }
 
     })
-        .click(function (e) {
-                   $(this).animate({width: '500px'}, 100);
-                   e.stopPropagation();
-               });
 
     $(document).click(function () {
         $('#search').animate({width: '100%'});

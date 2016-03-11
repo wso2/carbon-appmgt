@@ -203,22 +203,7 @@ $(function () {
         $('#sso-login-form').submit();
     });
 
-    $('.store-menu > li > a').click(function () {
-        var url = $(this).attr('href');
-        window.location = url;
-    });
-
-    $('.store-menu > li > ul > li > a').click(function () {
-        var url = $(this).attr('href');
-        window.location = url;
-    });
-
-
-    $('.dropdown-toggle').click(function () {
-        window.location = $(this).attr('href');
-    });
-
-    $('#btn-register-close').click(function () {
+    $('.modal-header .close').click(function () {
         clearFields();
     });
 
