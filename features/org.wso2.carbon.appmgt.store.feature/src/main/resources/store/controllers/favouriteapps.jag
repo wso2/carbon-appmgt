@@ -149,7 +149,8 @@ require('/modules/store.js').exec(function (ctx) {
                            isHomePage: hasFavouritePage,
                            myFav: true,
                            storeTenantDomain: storeTenantDomain,
-                           assetType : assetType
+                           assetType : assetType,
+                           enabledTypeList: enabledTypeList
                        },
                        assetType : assetType,
                        tags: {
