@@ -47,14 +47,17 @@ var navigation = function (tenantId) {
 
 var header = function (tenantId, options) {
 
+    var storeObj = jagg.module("manager").getAPIStoreObj();
 
+    var enabledTypeList = storeObj.getEnabledTypeList();
     var user = require('store').user;
 
    
     return {
         login: loginLinks(tenantId),
         sso: options.sso,
-        user: options.user
+        user: options.user,
+        enabledTypeList:enabledTypeList
     };
 };
 

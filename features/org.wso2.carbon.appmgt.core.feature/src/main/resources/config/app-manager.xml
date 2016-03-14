@@ -452,5 +452,10 @@
     <ServicesAPI>
         <AuthorizedRole>admin</AuthorizedRole>
     </ServicesAPI>
+    <EnabledAssetTypeList>
+        <Type>webapp</Type>
+        <Type>mobileapp</Type>
+        <Type>site</Type>
+    </EnabledAssetTypeList>
 
 </AppManager>

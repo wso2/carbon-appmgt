@@ -24,6 +24,10 @@
 
 var render = function (theme, data, meta, require) {
 
+    var storeObj = jagg.module("manager").getAPIStoreObj();
+
+    var enabledTypeList = storeObj.getEnabledTypeList();
+
     if(data.userAssets){
 
 
@@ -116,52 +120,62 @@ var render = function (theme, data, meta, require) {
     });
     */
 
-    theme('2-column-left', {
-        title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data.header
-            }
-        ],
-        leftColumn: [
-            {
-                partial: 'left-column',
-                context: {
-                    navigation: createLeftNavLinks(data),
-                    tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
-                }
-            }
-        ],
-        search: [
-            {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-            }
-        ],
-        pageHeader: [
-            {
-                partial: 'page-header',
-                context: {
-                    title: "My Mobile Apps",
-                    sorting: createSortOptions(data.user, data.config)
-                }
-            }
-        ],
-        pageContent: [
-            {
-                partial: 'page-content-userAssets',
-                context: {
-                    'userAssets': data.userAssets,
-                    'URL': data.URL,
-                    'devices': data.devices,
-                    'selfUnsubscription': data.selfUnsubscription,
-                    'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
-                }
-            }
-        ]
-    });
+
+    var typeIsEnabled = false;
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if ("mobileapp" == enabledTypeList[i]) {
+            typeIsEnabled = true;
+            theme('2-column-left', {
+                title: data.title,
+                header: [
+                    {
+                        partial: 'header',
+                        context: data.header
+                    }
+                ],
+                leftColumn: [
+                    {
+                        partial: 'left-column',
+                        context: {
+                            navigation: createLeftNavLinks(data),
+                            tags: data.tags,
+                            recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                        }
+                    }
+                ],
+                search: [
+                    {
+                        partial: 'navigation',
+                        context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
+                    }
+                ],
+                pageHeader: [
+                    {
+                        partial: 'page-header',
+                        context: {
+                            title: "My Mobile Apps",
+                            sorting: createSortOptions(data.user, data.config)
+                        }
+                    }
+                ],
+                pageContent: [
+                    {
+                        partial: 'page-content-userAssets',
+                        context: {
+                            'userAssets': data.userAssets,
+                            'URL': data.URL,
+                            'devices': data.devices,
+                            'selfUnsubscription': data.selfUnsubscription,
+                            'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
+                        }
+                    }
+                ]
+            });
+        }
+    }
+    if (!typeIsEnabled) {
+        theme(null);
+    }
 };
 
 

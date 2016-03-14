@@ -28,6 +28,7 @@ var dataInjector=publisher.dataInjector;
 var DataInjectorModes=publisher.DataInjectorModes;
 var filterManager=publisher.filterManager;
 var permissions=require('/modules/permissions.js').permissions;
+var typeList = apiProvider.getEnabledTypeList();
 
 var log=new Log();
 
@@ -225,11 +226,23 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{type}/', function(co
         var sortOpposite = (sort == 'asc'? 'desc': 'asc');
         var sortIcon = (sort == 'asc'? 'down': 'up');
 
-		caramel.render({op : 'list',cuser : server.current(session), roles : server.current(session).getRoles(),
+        var appTypeFound = false;
+        for(var i = 0; i< typeList.length; i++){
+        if(typeList[i] == type) {
+        appTypeFound = true;
+                        caramel.render({op : 'list',cuser : server.current(session), roles : server.current(session).getRoles(),
 		shortName : type,artifacts : artifactsInPage,query : query,title : type, pageIndices:pageIndices,
 		leftNav:leftnav, rightNav:rightnav, createPermission:createActionAuthorized, mobileAppCreatePermission:createMobileAppAuthorized,
-		sortOptions:{sortBy: sortby, sort: sortOpposite, icon: sortIcon}
+		sortOptions:{sortBy: sortby, sort: sortOpposite, icon: sortIcon}, typeList: typeList
 		});
+
+        }
+        }
+        if(!appTypeFound){
+            caramel.render(null);
+        }
+
+
 	} catch (e) {
 		response.sendError(400, "Your request is malformed");
 		log.error(e.message);

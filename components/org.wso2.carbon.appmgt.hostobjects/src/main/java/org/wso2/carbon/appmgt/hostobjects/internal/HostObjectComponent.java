@@ -18,17 +18,15 @@ package org.wso2.carbon.appmgt.hostobjects.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.hostobjects.HostObjectUtils;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-import java.io.File;
+import java.util.List;
 
 /**
  * @scr.component name="org.wso2.appmgt.hostobjects" immediate="true"
@@ -119,5 +117,9 @@ public class HostObjectComponent {
     public static boolean isDisplayMultipleVersionsEnabled() {
         return Boolean.parseBoolean(getAPIManagerConfiguration().getFirstProperty(
                 AppMConstants.STORE_DISPLAY_MULTIPLE_VERSIONS));
+    }
+
+    public static List<String> getEnabledTypeList() {
+        return getAPIManagerConfiguration().getProperty(AppMConstants.TYPE);
     }
 }

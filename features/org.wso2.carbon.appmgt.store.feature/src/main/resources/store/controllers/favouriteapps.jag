@@ -34,6 +34,10 @@ require('/modules/store.js').exec(function (ctx) {
             store = ctx.store,
             query = ctx.params.query;
 
+    var storeObj = jagg.module("manager").getAPIStoreObj();
+
+    var enabledTypeList = storeObj.getEnabledTypeList();
+
     //Favourite app page can be accessed from web app or site
     //this query parameter indicates,where request came from.
     var  assetType = "webapp";
@@ -133,34 +137,45 @@ require('/modules/store.js').exec(function (ctx) {
 
     var sortOptions = createSortOptions();
 
-    caramel.render({
-                       title: 'Favourite Apps | Store',
-                       header: {
-                           user: user,
-                           sso: sso,
-                           isHomePage: hasFavouritePage,
-                           myFav: true,
-                           storeTenantDomain: storeTenantDomain,
-                           assetType : assetType
-                       },
-                       assetType : assetType,
-                       tags: {
-                           tagUrl: tagUrl,
-                           data: store.tags("webapp", isSite)
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                       },
-                       navigation: navigationData,
-                       search: {
-                           query: searchQuery,
-                           searchUrl: searchUrl
-                       },
-                       sso: sso,
-                       sortOptions: sortOptions,
-                       favouriteApps: apps
-                   }, request, response, session);
+    var typeIsEnabled = false;
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (assetType == enabledTypeList[i]) {
+            typeIsEnabled = true;
+            caramel.render({
+                title: 'Favourite Apps | Store',
+                header: {
+                    user: user,
+                    sso: sso,
+                    isHomePage: hasFavouritePage,
+                    myFav: true,
+                    storeTenantDomain: storeTenantDomain,
+                    assetType: assetType,
+                    enabledTypeList: enabledTypeList
+
+                },
+                assetType: assetType,
+                tags: {
+                    tagUrl: tagUrl,
+                    data: store.tags("webapp", isSite)
+                },
+                config: {
+                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                },
+                navigation: navigationData,
+                search: {
+                    query: searchQuery,
+                    searchUrl: searchUrl
+                },
+                sso: sso,
+                sortOptions: sortOptions,
+                favouriteApps: apps
+            }, request, response, session);
+        }
+    }
+    if (!typeIsEnabled) {
+        caramel.render(null);
+    }
 
 }, request, response, session);
 

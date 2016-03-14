@@ -7,6 +7,7 @@ var server = require('store').server;
 var permissions=require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
+var apiProvider = jagg.module('manager').getAPIProviderObj();
 
 var render=function(theme,data,meta,require){
 
@@ -24,6 +25,7 @@ var render=function(theme,data,meta,require){
     var newViewData;
     var notifications = session.get('notifications');
     var notificationCount = session.get('notificationCount');
+    var typeList = apiProvider.getEnabledTypeList();
     //Determine what view to show
     switch(data.op){
 
@@ -33,6 +35,7 @@ var render=function(theme,data,meta,require){
             break;
         case 'view':
             data = require('/helpers/view-asset.js').merge(data);
+            data.typeList  =typeList;
             listPartial='view-asset';
             var copyOfData = parse(stringify(data));
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
@@ -101,7 +104,8 @@ var render=function(theme,data,meta,require){
                         createPermission : createActionAuthorized,
                         viewStats : viewStatsAuthorized,
                         notifications : notifications,
-                        notificationCount: notificationCount
+                        notificationCount: notificationCount,
+                        typeList: typeList
                     }
                 }
             ],

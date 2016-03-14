@@ -46,14 +46,22 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     mod = jagg.module("documentation");
 
+    var typeList = apiProvider.getEnabledTypeList();
+
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
     var shortName = (context.params.type) || '';
     var operation = 'create';
-    var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
-        return (template.shortName == shortName) ? true : false;
-    });
 
+        var rxtTemplate;
+        for(var i = 0; i < typeList.length ; i++){
+            if(typeList[i] == shortName){
+                var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
+                    return (template.shortName == shortName) ? true : false;
+                });
+
+            }
+        }
 
     var model = modelManager.getModel(shortName);
 
@@ -95,7 +103,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             shortName: shortName,
             rxtTemplate: rxtTemplate,
             data: output,
-            title: title}
+            title: title,
+            typeList: typeList
+            }
         );
     }
 });
@@ -171,21 +181,31 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var docCreateAuth = permissions.isAuthorized(user.username, config.permissions.document_add, um);
         var docEditAuth = permissions.isAuthorized(user.username, config.permissions.document_edit, um);
         var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
+        var appTypeFound = false;
+        for(var i = 0; i < typeList.length ; i++){
+            if(typeList[i] == shortName){
+                appTypeFound = true;
+                caramel.render({
+                    op: operation,
+                    cuser: server.current(session),
+                    shortName: shortName,
+                    artifact: artifact,
+                    rxtTemplate: rxtTemplate,
+                    data: output,
+                    versions: versionList,
+                    tags:tags,
+                    title:title,
+                    docs: result.docs,
+                    appStores:appStoresDetail,
+                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                });
+            }
+        }
+        if(!appTypeFound){
+            caramel.render(null);
+        }
 
-        caramel.render({
-            op: operation,
-            cuser: server.current(session),
-            shortName: shortName,
-            artifact: artifact,
-            rxtTemplate: rxtTemplate,
-            data: output,
-            versions: versionList,
-            tags:tags,
-            title:title,
-            docs: result.docs,
-            appStores:appStoresDetail,
-            permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
-        });
+
     } catch (e) {
         log.error('The asset with id ' + id + ' could not be found due to : ' + e);
         response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');

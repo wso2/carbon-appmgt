@@ -3830,6 +3830,17 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         return defaultThumbnail;
     }
+
+    public static NativeArray jsFunction_getEnabledTypeList(Context cx, Scriptable thisObj,
+                                                            Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray typeArray = new NativeArray(0);
+        List<String> typeList = HostObjectComponent.getEnabledTypeList();
+        for (int i = 0; i < typeList.size(); i++) {
+            typeArray.put(i, typeArray, typeList.get(i));
+        }
+        return typeArray;
+    }
 }
 
 

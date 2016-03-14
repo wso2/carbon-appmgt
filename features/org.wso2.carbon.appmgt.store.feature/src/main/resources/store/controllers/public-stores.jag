@@ -13,6 +13,17 @@ var config = require("/config/store.json");
 var userName = session.get("LOGGED_IN_USER");
 var userTenantId = session.get("tenantId");
 var log = new Log();
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+var enabledTypeList = storeHostObj.getEnabledTypeList();
+var dynamicLandingPage;
+if ("mobileapp" === enabledTypeList[0]) {
+    dynamicLandingPage = "/assets/mobileapp";
+}
+else {
+    dynamicLandingPage = "/extensions/assets/" + enabledTypeList[0] + "/myapps";
+}
+
 
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     require('/modules/store.js').exec(function (ctx) {
@@ -24,7 +35,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
 
-            var landingPage = config.pages.landingPage;
+            var landingPage = dynamicLandingPage;
             if (userName) {
                 var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
                 if (isFavouritePageSelected) {
@@ -52,7 +63,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
-    var landingPage = config.pages.landingPage;
+    var landingPage = dynamicLandingPage;
     if (userName != null) {
         var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
         if (isFavouritePageSelected) {
