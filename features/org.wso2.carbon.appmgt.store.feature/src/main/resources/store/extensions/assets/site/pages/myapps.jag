@@ -52,7 +52,6 @@ require('/modules/store.js').exec(function (ctx) {
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
-    var enabledTypeList = storeHostObj.getEnabledTypeList();
 
     //Get the subscription configuration options
     var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
@@ -490,41 +489,33 @@ require('/modules/store.js').exec(function (ctx) {
     for (var i = 0; i < enabledTypeList.length; i++) {
         if ("site" == enabledTypeList[i]) {
             typeIsEnabled = true;
-            caramel.render({
-                title: 'Sites | Store ',
-                user: user,
-                sso: sso,
-                header: headerData,
-                navigation: navigationData,
-                search: {
-                    query: query,
-                    searchUrl: searchUrl
-                },
-                type: type,
-                tags: {
-                    tagUrl: tagUrl,
-                    data: store.tags(type, isSite)
-                },
-                config: {
-                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                },
-                assets: assets,
-                assetType: 'site',
-                paging: {
-                    url: url + 'sort=' + paging.sort + '&page=',
-                    sort: paging.sort,
-                    tag: tag,
-                    size: assets.length
-                },
-                pagination: {
-                    leftNav: leftnav,
-                    rightNav: rightnav,
-                    urlQuery: urlQuery
-                },
-                recentAssets: webAppRecentAssets
+    caramel.render({
+                       title: 'Sites | Store ',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       navigation: navigationData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           data: store.tags(type, isSite)
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                       },
+                       assets: assets,
+                       assetType: 'site',
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
 
-            });
+                   });
         }
     }
     if (!typeIsEnabled) {

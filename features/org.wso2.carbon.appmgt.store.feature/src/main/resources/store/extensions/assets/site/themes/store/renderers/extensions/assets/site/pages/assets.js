@@ -18,6 +18,8 @@ var render = function (theme, data, meta, require) {
     }
 
     data.header.searchQuery = searchQuery;
+    data.tags.tagUrl = "/assets/site";
+    var searchUrl = "/assets/site";
 
     theme('2-column-left', {
         title: data.title,
@@ -40,7 +42,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:searchQuery,searchUrl:data.search.searchUrl}
+                context: {searchQuery:searchQuery,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -82,20 +84,18 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'all-apps', url: context + "/assets/site"
+            active: true, partial: 'all-apps', url: "/assets/site"
         }
     ];
 
     leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: context + "/extensions/assets/site/myapps"
+                                active: false, partial: 'my-apps', url: "/extensions/assets/site/myapps"
                             });
     if (data.user) {
         leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: context
-                + "/assets/favouriteapps?type=site"
+                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=site"
                                 });
     }
     return leftNavigationData;

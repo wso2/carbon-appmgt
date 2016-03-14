@@ -57,7 +57,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledTypeList();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -428,47 +427,36 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.domain = tenantDomain;
     headerData.assetType = "webapp";
-
     var typeIsEnabled = false;
     for (var i = 0; i < enabledTypeList.length; i++) {
         if ("webapp" == enabledTypeList[i]) {
             typeIsEnabled = true;
-            caramel.render({
-                title: 'Web Apps | Store',
-                user: user,
-                sso: sso,
-                header: headerData,
-                search: {
-                    query: query,
-                    searchUrl: tagUrl
-                },
-                type: type,
-                tags: {
-                    tagUrl: tagUrl,
-                    data: store.tags(type, isSite)
-                },
-                assets: assets,
-                assetType: 'webapp',
-                paging: {
-                    url: url + 'sort=' + paging.sort + '&page=',
-                    sort: paging.sort,
-                    tag: tag,
-                    size: assets.length
-                },
-                pagination: {
-                    leftNav: leftnav,
-                    rightNav: rightnav,
-                    urlQuery: urlQuery
-                },
-                recentAssets: webAppRecentAssets
-
-            });
+    caramel.render({
+                       title: 'Web Apps | Store',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           data: store.tags(type, isSite)
+                       },
+                       assets: assets,
+                       assetType: 'webapp',
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
+                   });
         }
     }
     if (!typeIsEnabled) {
         caramel.render(null);
     }
-
 }, request, response, session);
 
 function getServiceDir(serviceName) {

@@ -1,4 +1,7 @@
 var render = function (theme, data, meta, require) {
+    data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
+    var searchUrl = getTagAndSearchUrl(data).searchUrl;
+
     theme('2-column-left', {
         title: data.title,
         header: [
@@ -19,7 +22,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:data.search.query,searchUrl:data.search.searchUrl}
+                context: {searchQuery:data.search.query,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -59,21 +62,44 @@ function createLeftNavLinks(data) {
     var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'my-favorites', url: context + "/assets/favouriteapps?type=" +data.assetType
+            active: true, partial: 'my-favorites', url: "/assets/favouriteapps?type=" + data.assetType
         }
     ];
 
     leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: context + "/extensions/assets/" + data.assetType
+                                active: false, partial: 'my-apps', url: "/extensions/assets/" + data.assetType
             + "/myapps"
                             });
 
     if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url: context + "/assets/"
-                + data.assetType
+                                    active: false, partial: 'all-apps', url: "/assets/" + data.assetType
                                 });
     }
 
     return leftNavigationData;
+}
+
+function getTagAndSearchUrl(data) {
+    var URLs = {}
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        if (data.assetType == "webapp") {
+            URLs.tagUrl = '/extensions/assets/webapp/myapps';
+            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
+        } else {
+            URLs.tagUrl = '/extensions/assets/site/myapps';
+            URLs.searchUrl = '/assets/favouriteapps?type=site';
+        }
+    } else {
+        if (data.assetType == "webapp") {
+            URLs.tagUrl = '/assets/webapp';
+            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
+        } else {
+            URLs.tagUrl = '/assets/site';
+            URLs.searchUrl = '/assets/favouriteapps?type=site';
+        }
+    }
+    return URLs;
 }

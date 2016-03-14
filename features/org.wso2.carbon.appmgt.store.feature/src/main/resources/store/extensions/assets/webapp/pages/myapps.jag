@@ -52,7 +52,6 @@ require('/modules/store.js').exec(function (ctx) {
     //Check whether to show register link in myapps page
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledTypeList();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     //Get the subscription configuration options
@@ -484,48 +483,39 @@ require('/modules/store.js').exec(function (ctx) {
     for(var i = 0; i < enabledTypeList.length; i++){
         if("webapp" == enabledTypeList[i]){
             typeIsEnabled = true;
-            caramel.render({
-                title: 'Web Apps | Store',
-                user: user,
-                sso: sso,
-                header: headerData,
-                navigation: navigationData,
-                search: {
-                    query: query,
-                    searchUrl: searchUrl
-                },
-                type: type,
-                tags: {
-                    tagUrl: tagUrl,
-                    data: store.tags(type, isSite)
-                },
-                config: {
-                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                },
-                assets: assets,
-                assetType: 'webapp',
-                paging: {
-                    url: url + 'sort=' + paging.sort + '&page=',
-                    sort: paging.sort,
-                    tag: tag,
-                    size: assets.length
-                },
-                pagination: {
-                    leftNav: leftnav,
-                    rightNav: rightnav,
-                    urlQuery: urlQuery
-                },
-                recentAssets: webAppRecentAssets
+    caramel.render({
+                       title: 'Web Apps | Store',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       navigation: navigationData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           data: store.tags(type, isSite)
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                       },
+                       assets: assets,
+                       assetType: 'webapp',
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
 
-            });
+                   });
         }
     }
 
     if(!typeIsEnabled){
         caramel.render(null);
     }
-
 }, request, response, session);
 
 function getServiceDir(serviceName) {
