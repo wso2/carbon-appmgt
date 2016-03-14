@@ -21,7 +21,6 @@ package org.wso2.carbon.appmgt.gateway.handlers.common;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
 
 import java.util.Map;
 
@@ -35,8 +34,12 @@ public class SynapsePropertiesHandler extends AbstractHandler {
 		Map<String, String> headers = (Map<String, String>) axis2MC.getProperty(
 				org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 		String ipWithPort = headers.get("HOST");
-		String ip = ipWithPort.substring(0, ipWithPort.indexOf(':'));
-
+        String ip;
+        if (ipWithPort.indexOf(':') != -1) {
+            ip = ipWithPort.substring(0, ipWithPort.indexOf(':'));
+        } else {
+            ip = ipWithPort;
+        }
 		String httpPort = System.getProperty("http.nio.port");
 		String httpsPort = System.getProperty("https.nio.port");
 
