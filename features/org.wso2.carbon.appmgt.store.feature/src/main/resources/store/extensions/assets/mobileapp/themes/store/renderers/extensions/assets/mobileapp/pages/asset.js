@@ -67,14 +67,14 @@ function createLeftNavLinks(data) {
     var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'all-apps', url: context + "/assets/mobileapp"
+            active: true, partial: 'all-apps', url: "/assets/mobileapp"
         }
     ];
 
     if (data.user) {
         leftNavigationData.push({
                                     active: false, partial: 'my-apps',
-                                    url: context + "/extensions/assets/mobileapp/subscriptions"
+                                    url: "/extensions/assets/mobileapp/subscriptions"
                                 });
     }
 

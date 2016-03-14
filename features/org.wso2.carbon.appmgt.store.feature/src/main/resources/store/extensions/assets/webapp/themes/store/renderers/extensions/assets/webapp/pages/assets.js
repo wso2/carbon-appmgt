@@ -18,7 +18,8 @@ var render = function (theme, data, meta, require) {
     }
 
     data.header.searchQuery = searchQuery;
-
+    data.tags.tagUrl = "/assets/webapp";
+    var searchUrl = "/assets/webapp";
 
     theme('2-column-left', {
         title: data.title,
@@ -41,7 +42,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:searchQuery,searchUrl:data.search.searchUrl}
+                context: {searchQuery:searchQuery,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -83,20 +84,18 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'all-apps', url: context + "/assets/webapp"
+            active: true, partial: 'all-apps', url: "/assets/webapp"
         }
     ];
 
     leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                active: false, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
                             });
     if (data.user) {
         leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: context
-                + "/assets/favouriteapps?type=webapp"
+                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
                                 });
     }
     return leftNavigationData;

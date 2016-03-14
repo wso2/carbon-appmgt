@@ -3,8 +3,6 @@ var render = function (theme, data, meta, require) {
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.config, data.pagination.leftNav,
                                          data.pagination.rightNav, data.pagination.urlQuery, data.user, data.assetType);
 
-    var hasApps = (data.assets.length > 0);
-
     var searchQuery = data.search.query;
     if (typeof(searchQuery) != typeof({})) {
         searchQuery = {overview_name: searchQuery, searchTerm: 'overview_name', search: searchQuery};
@@ -20,19 +18,8 @@ var render = function (theme, data, meta, require) {
     }
     bodyContext.searchQuery =searchQuery;
 
-    var leftNavigationData = [{
-        active: true, partial: 'my-apps'
-    }];
-    if(data.user){
-        leftNavigationData.push({
-            active: false, partial: 'my-favorites'
-        });
-    }
-    if(!data.navigation.showAllAppsLink){
-        leftNavigationData.push({
-            active: false, partial: 'all-apps'
-        });
-    }
+    data.tags.tagUrl = getTagUrl(data);
+    var searchUrl = '/extensions/assets/webapp/myapps';
 
     theme('2-column-left', {
         title: data.title,
@@ -55,7 +42,7 @@ var render = function (theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:searchQuery,searchUrl:data.search.searchUrl}
+                context: {searchQuery:searchQuery,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -107,24 +94,34 @@ function createSortOptions(user, config) {
 }
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'my-apps', url : context+"/extensions/assets/webapp/myapps"
+            active: true, partial: 'my-apps', url :"/extensions/assets/webapp/myapps"
         }
     ];
 
     if(data.user) {
         leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: context
-                + "/assets/favouriteapps?type=webapp"
+                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
                                 });
     }
     if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url : context + "/assets/webapp"
+                                    active: false, partial: 'all-apps', url :  "/assets/webapp"
                                 });
     }
 
     return leftNavigationData;
+}
+
+function getTagUrl(data) {
+    var tagUrl;
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        tagUrl = '/extensions/assets/webapp/myapps';
+    } else {
+        tagUrl = '/assets/webapp';
+    }
+    return tagUrl;
 }
