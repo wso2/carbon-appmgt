@@ -62,8 +62,6 @@ require('/modules/store.js').exec(function (ctx) {
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var isSite = 'true';//To get the sites tags
-    var context = caramel.configs().context;
-    var tagUrl = context + '/assets/site';
 
 
     var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
@@ -396,7 +394,6 @@ require('/modules/store.js').exec(function (ctx) {
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 navigationData.showAllAppsLink = false;
-                tagUrl = context + '/extensions/assets/site/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -520,8 +517,7 @@ require('/modules/store.js').exec(function (ctx) {
                            header: headerData,
                            navigation: navigationData,
                            search: {
-                               query: searchQuery,
-                               searchUrl: tagUrl
+                               query: searchQuery
                            },
                            isSocial: configs.socialCommentsEnable,
 
@@ -537,7 +533,6 @@ require('/modules/store.js').exec(function (ctx) {
                            asset: asset,
                            tenantId: tenantIdVal,
                            tags: {
-                               tagUrl: tagUrl,
                                data: store.tags(type, isSite)
                            },
                            myAssets: { user: user, type: type, title: title },
@@ -548,8 +543,10 @@ require('/modules/store.js').exec(function (ctx) {
                            metadata: metadata,
                            subVisibility: subVisibility,
                            isSubscriptionAvailable: isSubscriptionAvailable,
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                           config: {
+                               isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                               isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                           }
                        });
     }
 

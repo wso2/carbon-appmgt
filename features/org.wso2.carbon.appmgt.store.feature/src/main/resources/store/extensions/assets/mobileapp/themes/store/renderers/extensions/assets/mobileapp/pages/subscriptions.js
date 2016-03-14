@@ -180,20 +180,18 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
     var leftNavigationData = [];
     var isAllAppsActive = true;
 
     if (data.user) {
         leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: context
-                                                                           + "/extensions/assets/mobileapp/subscriptions"
+                                    active: true, partial: 'my-apps', url: "/extensions/assets/mobileapp/subscriptions"
                                 });
         isAllAppsActive = false;
     }
 
     leftNavigationData.push({
-                                active: isAllAppsActive, partial: 'all-apps', url: context + "/assets/mobileapp"
+                                active: isAllAppsActive, partial: 'all-apps', url: "/assets/mobileapp"
                             });
 
     return leftNavigationData;

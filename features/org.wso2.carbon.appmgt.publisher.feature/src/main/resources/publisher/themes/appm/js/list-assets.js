@@ -238,7 +238,7 @@ function isPublishedToExternalStore(action, provider, name, version) {
 function isPublishedVersionsAvailable(provider, name) {
     var result;
     $.ajax({
-               url: caramel.context + '/api/asset/get/uuid/list/state/' + 'webapp' + '/' + provider + '/' + name + '/'
+               url: caramel.context + '/api/asset/get/uuid/list/statepp/' + 'webapp' + '/' + provider + '/' + name + '/'
                     + 'Published',
                type: 'GET',
                async: false,

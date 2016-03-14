@@ -61,8 +61,6 @@ require('/modules/store.js').exec(function (ctx) {
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var isSite = 'false';//To get the webapp tags
-    var context = caramel.configs().context;
-    var tagUrl = context + '/assets/webapp';
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -395,7 +393,6 @@ require('/modules/store.js').exec(function (ctx) {
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 navigationData.showAllAppsLink = false;
-                tagUrl = context + '/extensions/assets/webapp/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -505,8 +502,7 @@ require('/modules/store.js').exec(function (ctx) {
             header: headerData,
             navigation: navigationData,
             search: {
-                query: searchQuery,
-                searchUrl: tagUrl
+                query: searchQuery
             },
             isSocial: configs.socialCommentsEnable,
             type: type,
@@ -521,7 +517,6 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
-                   tagUrl: tagUrl,
                    data: store.tags(type, isSite)
             },
             myAssets: { user: user, type: type, title: title },
@@ -531,8 +526,10 @@ require('/modules/store.js').exec(function (ctx) {
             apiData: apiData,
             metadata: metadata,
             isSubscriptionAvailable: isSubscriptionAvailable,
-            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            }
         });
     }
 

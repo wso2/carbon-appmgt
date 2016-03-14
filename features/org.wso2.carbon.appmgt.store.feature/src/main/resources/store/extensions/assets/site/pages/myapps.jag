@@ -33,7 +33,7 @@ if (user) {
 var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging, url,
+    var options, assets, paging,
             log = ctx.log,
             sso = ctx.sso,
             query = ctx.params.query,
@@ -65,11 +65,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
-    var tagUrl = context;
-    var searchUrl = context + '/extensions/assets/site/myapps';
-    url =
-    '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
-                                                                                   '');
+
     var leftnav, rightnav, urlQuery;//For pagination
     
     var headerData = site.header(tenantId, {
@@ -470,12 +466,10 @@ require('/modules/store.js').exec(function (ctx) {
 
         // hide all apps link in header
         navigationData.showAllAppsLink = false;
-        tagUrl = tagUrl + '/extensions/assets/site/myapps';
     } else {
         //show anonymous + subscribed apps for logged in user.
         //show anonymous apps for anonymous user.
         getAssetsFromDB();
-        tagUrl = tagUrl + '/assets/site';
     }
 
     // add rating,access url etc to retrieved webapps
@@ -492,12 +486,10 @@ require('/modules/store.js').exec(function (ctx) {
                        header: headerData,
                        navigation: navigationData,
                        search: {
-                           query: query,
-                           searchUrl: searchUrl
+                           query: query
                        },
                        type: type,
                        tags: {
-                           tagUrl: tagUrl,
                            data: store.tags(type, isSite)
                        },
                        config: {
@@ -506,12 +498,6 @@ require('/modules/store.js').exec(function (ctx) {
                        },
                        assets: assets,
                        assetType: 'site',
-                       paging: {
-                           url: url + 'sort=' + paging.sort + '&page=',
-                           sort: paging.sort,
-                           tag: tag,
-                           size: assets.length
-                       },
                        pagination: {
                            leftNav: leftnav,
                            rightNav: rightnav,

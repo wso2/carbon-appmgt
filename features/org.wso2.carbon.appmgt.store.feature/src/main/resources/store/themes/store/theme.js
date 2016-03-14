@@ -128,6 +128,18 @@ var engine = caramel.engine('handlebars', (function () {
 
             });
 
+            Handlebars.registerHelper('currentTenant', function (path) {
+                var uri = request.getRequestURI();//current page path
+                var matcher = new URIMatcher(uri);
+
+                if (matcher.match('/{context}/t/{domain}/') || matcher.match('/{context}/t/{domain}/{+any}')) {
+                    return matcher.elements().domain;
+                } else {
+                    return 'carbon.super';
+                }
+
+            });
+
             Handlebars.registerHelper('socialURL', function (path) {
                 var socialAppContext = caramel.configs().socialAppContext;
                 var reverseProxyEnabled = caramel.configs().reverseProxyEnabled;
