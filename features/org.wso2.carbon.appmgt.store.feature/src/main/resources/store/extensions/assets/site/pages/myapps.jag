@@ -52,6 +52,7 @@ require('/modules/store.js').exec(function (ctx) {
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+    var enabledTypeList = storeHostObj.getEnabledTypeList();
 
     //Get the subscription configuration options
     var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');

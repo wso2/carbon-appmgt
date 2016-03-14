@@ -34,6 +34,10 @@ require('/modules/store.js').exec(function (ctx) {
             store = ctx.store,
             query = ctx.params.query;
 
+    var storeObj = jagg.module("manager").getAPIStoreObj();
+
+    var enabledTypeList = storeObj.getEnabledTypeList();
+
     //Favourite app page can be accessed from web app or site
     //this query parameter indicates,where request came from.
     var  assetType = "webapp";
