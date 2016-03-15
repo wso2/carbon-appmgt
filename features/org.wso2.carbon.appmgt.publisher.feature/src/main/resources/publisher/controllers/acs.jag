@@ -4,6 +4,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 (function () {
 	    var log = new Log(),
             configs = require('/config/publisher.js').config(),
+            auditLog = require('/modules/auditLog/logger.js'),
             samlResponse = request.getParameter('SAMLResponse'),
             sessionId = session.getId(),
             samlRequest = request.getParameter('SAMLRequest'),
@@ -55,14 +56,19 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                             }
 
                     		jagg.setUser({username:sessionObj.loggedInUser});
-                    	 	session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
-                        	session.put("Loged", "true");
+                var tenantId = carbon.server.tenantId({
+                                                          domain: domainName
+                                                      });
+
+                session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
+                session.put("Loged", "true");
+                session.put("tenantId", tenantId);
+                log.info(stringify(sessionObj.loggedInUser));
 
                         	//sso_sessions[sessionObj.sessionIndex] = sessionObj.sessionId;
 
                         	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
-				            var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
-
+                            var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
 				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
 				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
 				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
