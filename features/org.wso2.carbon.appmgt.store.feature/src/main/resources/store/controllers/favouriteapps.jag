@@ -141,32 +141,32 @@ require('/modules/store.js').exec(function (ctx) {
     for (var i = 0; i < enabledTypeList.length; i++) {
         if (assetType == enabledTypeList[i]) {
             typeIsEnabled = true;
-    caramel.render({
-                       title: 'Favourite Apps | Store',
-                       header: {
-                           user: user,
-                           sso: sso,
-                           isHomePage: hasFavouritePage,
-                           myFav: true,
-                           storeTenantDomain: storeTenantDomain,
-                           assetType : assetType,
-                           enabledTypeList: enabledTypeList
-                       },
-                       assetType : assetType,
-                       tags: {
-                           data: store.tags("webapp", isSite)
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                       },
-                       navigation: navigationData,
-                       search: {
-                           query: searchQuery
-                       },
-                       sso: sso,
-                       favouriteApps: apps
-                   }, request, response, session);
+            caramel.render({
+                title: 'Favourite Apps | Store',
+                header: {
+                    user: user,
+                    sso: sso,
+                    isHomePage: hasFavouritePage,
+                    myFav: true,
+                    storeTenantDomain: storeTenantDomain,
+                    assetType: assetType,
+                    enabledTypeList: enabledTypeList
+                },
+                assetType: assetType,
+                tags: {
+                    data: store.tags("webapp", isSite)
+                },
+                config: {
+                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                },
+                navigation: navigationData,
+                search: {
+                    query: searchQuery
+                },
+                sso: sso,
+                favouriteApps: apps
+            }, request, response, session);
         }
     }
     if (!typeIsEnabled) {

@@ -490,33 +490,33 @@ require('/modules/store.js').exec(function (ctx) {
     for (var i = 0; i < enabledTypeList.length; i++) {
         if ("site" == enabledTypeList[i]) {
             typeIsEnabled = true;
-    caramel.render({
-                       title: 'Sites | Store ',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       navigation: navigationData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: store.tags(type, isSite)
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                       },
-                       assets: assets,
-                       assetType: 'site',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
+            caramel.render({
+                title: 'Sites | Store ',
+                user: user,
+                sso: sso,
+                header: headerData,
+                navigation: navigationData,
+                search: {
+                    query: query
+                },
+                type: type,
+                tags: {
+                    data: store.tags(type, isSite)
+                },
+                config: {
+                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                },
+                assets: assets,
+                assetType: 'site',
+                pagination: {
+                    leftNav: leftnav,
+                    rightNav: rightnav,
+                    urlQuery: urlQuery
+                },
+                recentAssets: webAppRecentAssets
 
-                   });
+            });
         }
     }
     if (!typeIsEnabled) {

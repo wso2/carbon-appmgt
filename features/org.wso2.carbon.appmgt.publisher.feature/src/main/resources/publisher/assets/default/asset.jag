@@ -54,9 +54,9 @@ require('/modules/publisher.js').exec(function(ctx) {
     var operation = 'create';
 
         var rxtTemplate;
-        for(var i = 0; i < typeList.length ; i++){
-            if(typeList[i] == shortName){
-                var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
+        for (var i = 0; i < typeList.length; i++) {
+            if (typeList[i] == shortName) {
+                var rxtTemplate = rxtManager.findAssetTemplate(function (template) {
                     return (template.shortName == shortName) ? true : false;
                 });
 
@@ -182,8 +182,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var docEditAuth = permissions.isAuthorized(user.username, config.permissions.document_edit, um);
         var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
         var appTypeFound = false;
-        for(var i = 0; i < typeList.length ; i++){
-            if(typeList[i] == shortName){
+        for (var i = 0; i < typeList.length; i++) {
+            if (typeList[i] == shortName) {
                 appTypeFound = true;
                 caramel.render({
                     op: operation,
@@ -193,15 +193,19 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     rxtTemplate: rxtTemplate,
                     data: output,
                     versions: versionList,
-                    tags:tags,
-                    title:title,
+                    tags: tags,
+                    title: title,
                     docs: result.docs,
-                    appStores:appStoresDetail,
-                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                    appStores: appStoresDetail,
+                    permissions: {
+                        canCreate: docCreateAuth,
+                        canEdit: docEditAuth,
+                        canDelete: docDeleteAuth
+                    }
                 });
             }
         }
-        if(!appTypeFound){
+        if (!appTypeFound) {
             caramel.render(null);
         }
 

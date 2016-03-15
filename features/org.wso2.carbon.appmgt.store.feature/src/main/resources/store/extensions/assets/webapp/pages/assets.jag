@@ -432,27 +432,27 @@ require('/modules/store.js').exec(function (ctx) {
     for (var i = 0; i < enabledTypeList.length; i++) {
         if ("webapp" == enabledTypeList[i]) {
             typeIsEnabled = true;
-    caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: store.tags(type, isSite)
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
-                   });
+            caramel.render({
+                title: 'Web Apps | Store',
+                user: user,
+                sso: sso,
+                header: headerData,
+                search: {
+                    query: query
+                },
+                type: type,
+                tags: {
+                    data: store.tags(type, isSite)
+                },
+                assets: assets,
+                assetType: 'webapp',
+                pagination: {
+                    leftNav: leftnav,
+                    rightNav: rightnav,
+                    urlQuery: urlQuery
+                },
+                recentAssets: webAppRecentAssets
+            });
         }
     }
     if (!typeIsEnabled) {

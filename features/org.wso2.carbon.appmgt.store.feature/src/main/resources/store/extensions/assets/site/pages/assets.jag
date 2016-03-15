@@ -415,27 +415,27 @@ require('/modules/store.js').exec(function (ctx) {
     for (var i = 0; i < enabledTypeList.length; i++) {
         if ("site" == enabledTypeList[i]) {
             typeIsEnabled = true;
-    caramel.render({
-                       title: 'Sites | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: store.tags(type, isSite)
-                       },
-                       assets: assets,
-                       assetType : 'site',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: siteRecentAssets
-                   });
+            caramel.render({
+                title: 'Sites | Store',
+                user: user,
+                sso: sso,
+                header: headerData,
+                search: {
+                    query: query
+                },
+                type: type,
+                tags: {
+                    data: store.tags(type, isSite)
+                },
+                assets: assets,
+                assetType: 'site',
+                pagination: {
+                    leftNav: leftnav,
+                    rightNav: rightnav,
+                    urlQuery: urlQuery
+                },
+                recentAssets: siteRecentAssets
+            });
         }
     }
     if (!typeIsEnabled) {
