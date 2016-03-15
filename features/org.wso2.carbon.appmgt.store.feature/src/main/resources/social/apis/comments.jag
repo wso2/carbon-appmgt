@@ -19,6 +19,7 @@
  */
 response.addHeader("Content-Type", "application/json");
 var matcher = new URIMatcher(request.getRequestURI()), method = request.getMethod();
+var audutLog = require('/modules/auditLog/logger.js');
 
 (function () {
     var userModule = require('/modules/user.js');
@@ -40,7 +41,18 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
                 success: Boolean(id),
                 id: id
             };
-
+            //TODO get api verifier
+            var parameters = request.getAllParameters();
+            var name = parameters.name;
+            var version = parameters.version;
+            var provider = parameters.provider;
+            var storeTenantDomain = parameters.storeTenantDomain;
+            var userName = user.username;
+            audutLog.writeLog(logged.tenantDomain.tenantId, username, "UserReviewedAnApplication","Webapp", "{" +
+                                                                                                            "providerName='" + provider + '\'' +
+                                                                                                            ", apiName='" +  name + '\'' +
+                                                                                                            ", version='" + version + '\'' +
+                                                                                                            '}' , "", "");
             print(result);
         } else {
             var carbon = require('carbon');
