@@ -19,8 +19,6 @@ var render = function(theme, data, meta, require) {
     }
 
     var categories = data.navigation.assets[data.type].categories;
-    var selectedPlatform = data.selectedPlatform;
-    var selectedCategory = data.selectedCategory;
 
 	data.header.config = data.config;
     var searchUrl = "/assets/mobileapp";
@@ -46,8 +44,7 @@ var render = function(theme, data, meta, require) {
         search: [
             {
                 partial: 'search',
-                context: {searchQuery: searchQuery, categories: categories, selectedPlatform: selectedPlatform,
-                    selectedCategory: selectedCategory,searchUrl:searchUrl}
+                context: {searchQuery: searchQuery, categories: categories, searchUrl: searchUrl}
             }
         ],
         pageHeader: [
