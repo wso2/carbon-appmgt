@@ -54,7 +54,6 @@ public abstract class ISBaseSAMLSSOConfigurator {
         }
 
         dto.setDoSingleLogout(true);
-        dto.setSloResponseURL(provider.getLogoutUrl());
         dto.setRequestedClaims(provider.getClaims());
         dto.setEnableAttributesByDefault(true);
 
