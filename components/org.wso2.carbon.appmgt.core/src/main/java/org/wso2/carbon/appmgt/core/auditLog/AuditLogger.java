@@ -19,7 +19,7 @@
 package org.wso2.carbon.appmgt.core.auditLog;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,7 +28,7 @@ import java.util.Date;
  * Write logs to the audit Log.
  */
 public class AuditLogger {
-    private static final Log auditLogger = LogFactory.getLog("AUDIT_LOG");
+    private static final Log auditLogger = CarbonConstants.AUDIT_LOG;
 
     /**
      * Get a auditLogEvent as parameters and write details to the audit Log.
@@ -39,7 +39,6 @@ public class AuditLogger {
         SimpleDateFormat format;
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
         String dateAndTime = format.format(curDate);
-
         String log = "\"Time\" : \"" + dateAndTime + " \", \"Action\" : \"" + auditLogEvent.getAction() +
                 " \",\"TenantID\" : \"" + auditLogEvent.getTenantId() + "\",\"UserName\" : \"" +
                 auditLogEvent.getUsername() + " \", \"Subject\" : \"" +

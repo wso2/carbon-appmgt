@@ -69,8 +69,6 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 
                         	var identityUtil = Packages.org.wso2.carbon.identity.core.util.IdentityTenantUtil;
                             var tenantId = identityUtil.getTenantIdOfUser(sessionObj.loggedInUser);
-                            auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
-
 				            var registryService = server.osgiService('org.wso2.carbon.registry.core.service.RegistryService');
 				            var commonUtil = Packages.org.wso2.carbon.governance.lcm.util.CommonUtil;
 				            commonUtil.addDefaultLifecyclesIfNotAvailable(registryService.getConfigSystemRegistry(tenantId),
