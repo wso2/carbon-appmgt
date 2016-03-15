@@ -82,6 +82,7 @@ import org.opensaml.xml.util.Base64;
 import org.opensaml.xml.util.XMLHelper;
 import org.w3c.dom.Element;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.handlers.Utils;
@@ -99,9 +100,12 @@ import org.wso2.carbon.appmgt.impl.dto.WebAppInfoDTO;
 import org.wso2.carbon.appmgt.impl.token.JWTGenerator;
 import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
 import org.wso2.carbon.appmgt.impl.utils.AppContextCacheUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.NamedMatchList;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.sso.saml.util.SAMLSSOUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -1739,15 +1743,14 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
     private String constructAssertionConsumerUrl(MessageContext messageContext) {
         org.apache.axis2.context.MessageContext axis2MC = ((Axis2MessageContext) messageContext).
                 getAxis2MessageContext();
-        Map<String, String> headers = (Map<String, String>) axis2MC.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 
         String servicePrefix = axis2MC.getProperty("SERVICE_PREFIX").toString();
-        //Note: Do not change to construct the assertionConsumerUrl directly using servicePrefix instead of headers.get("HOST").
-        //It always gives IP for host which cause invalid assertionConsumerUrl
-        String assertionConsumerUrl = servicePrefix.substring(0, servicePrefix.indexOf("/") + 2) +
-                headers.get("HOST") + messageContext.getProperty("REST_API_CONTEXT") + "/" + messageContext.getProperty(
-                RESTConstants.SYNAPSE_REST_API_VERSION) + "/";
+        //Get assertion consumer url transport type : http/https
+        String assertionConsumerUrlTransport = servicePrefix.substring(0, servicePrefix.indexOf("/") - 1);
+        //Construct the assertion consumer url by appending gateway endpoint as the host
+        String assertionConsumerUrl = getGatewayUrl(assertionConsumerUrlTransport) +
+                messageContext.getProperty("REST_API_CONTEXT") + "/" +
+                messageContext.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION) + "/";
 
         return assertionConsumerUrl;
     }
@@ -1792,5 +1795,21 @@ public class SAML2AuthenticationHandler extends AbstractHandler implements Manag
             return tokenGeneratorFromService;
         }
         return defaultTokenGenerator;
+    }
+
+    /**
+     * Extracts the relevant gateway endpoint url from the app manager Gateway config
+     *
+     * @param appTransport required transport
+     * @return gateway endpoint url
+     */
+    public static String getGatewayUrl(String appTransport) {
+        String url;
+        if (appTransport.equals("http")) {
+            url = AppManagerUtil.getGatewayendpoints().split(",")[0];
+        } else {
+            url = AppManagerUtil.getGatewayendpoints().split(",")[1];
+        }
+        return url;
     }
 }
