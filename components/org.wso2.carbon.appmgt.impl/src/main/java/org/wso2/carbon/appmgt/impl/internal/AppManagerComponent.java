@@ -27,11 +27,9 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.impl.APIManagerFactory;
-import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
-import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
-import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
+import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
+import org.wso2.carbon.appmgt.impl.*;
+import org.wso2.carbon.appmgt.impl.idp.sso.configurator.IS510IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.listners.UserAddListener;
 import org.wso2.carbon.appmgt.impl.observers.APIStatusObserverList;
 import org.wso2.carbon.appmgt.impl.observers.SignupObserver;
@@ -99,6 +97,9 @@ import java.io.InputStream;
  * @scr.reference name="identity.application.management.component"
  * interface="org.wso2.carbon.identity.application.mgt.ApplicationManagementService" cardinality="1..1" policy="dynamic"
  * bind="setApplicationMgtService" unbind="unsetApplicationMgtService"
+ * @scr.reference name="identity.application.management.adapter"
+ * interface="org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory" cardinality="0..n" policy="dynamic"
+ * bind="setIdentityApplicationManagementFactory" unbind="unsetIdentityApplicationManagementFactory"
  */
 public class AppManagerComponent {
     //TODO refactor caching implementation
@@ -117,7 +118,7 @@ public class AppManagerComponent {
         }
 
         apimgtSampleService = new APIMGTSampleService();
-        
+
         try {
             BundleContext bundleContext = componentContext.getBundleContext();
             bundleContext.registerService(APIMGTSampleService.class.getName(),apimgtSampleService, null);
@@ -138,19 +139,19 @@ public class AppManagerComponent {
             AppManagerUtil.loadTenantSelfSignUpConfigurations(tenantId);
             SignupObserver signupObserver = new SignupObserver();
             bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), signupObserver,null);
-            
+
             AppManagerConfigurationServiceImpl configurationService =
                     new AppManagerConfigurationServiceImpl(configuration);
 
             //ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(configurationService);
             registration = componentContext.getBundleContext().registerService(
-                    AppManagerConfigurationService.class.getName(),
-                    configurationService, null);
+                    AppManagerConfigurationService.class.getName(), configurationService, null);
             APIStatusObserverList.getInstance().init(configuration);
 
             AuthorizationUtils.addAuthorizeRoleListener(AppMConstants.AM_CREATOR_APIMGT_EXECUTION_ID,
                                                         RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                                                                                      RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
+                                                                RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH
+                                                                        + AppMConstants.APPMGT_APPLICATION_DATA_LOCATION),
                                                         AppMConstants.Permissions.WEB_APP_CREATE,
                                                         UserMgtConstants.EXECUTE_ACTION, null);
 
@@ -196,18 +197,23 @@ public class AppManagerComponent {
             authorizationManager.init();
             APIMgtDBUtil.initialize();
             //Check User add listener enabled or not
-            boolean selfSignInProcessEnabled = Boolean.parseBoolean(configuration.getFirstProperty("WorkFlowExtensions.SelfSignIn.ProcessEnabled"));
+            boolean selfSignInProcessEnabled = Boolean.parseBoolean(
+                    configuration.getFirstProperty("WorkFlowExtensions.SelfSignIn.ProcessEnabled"));
             if (selfSignInProcessEnabled) {
                 if (bundleContext != null) {
-                    bundleContext.registerService(UserStoreManagerListener.class.getName(),
-                            new UserAddListener(), null);
+                    bundleContext.registerService(UserStoreManagerListener.class.getName(), new UserAddListener(), null);
                 }
             }
 
-            new AppManagerUtil().setupSelfRegistration(configuration,MultitenantConstants.SUPER_TENANT_ID);
-            
+            new AppManagerUtil().setupSelfRegistration(configuration, MultitenantConstants.SUPER_TENANT_ID);
+
             //create mobileapps directory if it does not exists
             AppManagerUtil.createMobileAppsDirectory();
+
+            if(ServiceReferenceHolder.getInstance().getIdentityApplicationManagementFactory() == null) {
+                //Sets the default adapter
+                unsetIdentityApplicationManagementFactory(null);
+            }
         } catch (AppManagementException e) {
             log.error("Error while initializing the WebApp manager component", e);
         }
@@ -476,5 +482,17 @@ public class AppManagerComponent {
 
     public static TenantRegistryLoader getTenantRegistryLoader(){
         return tenantRegistryLoader;
+    }
+
+    public void setIdentityApplicationManagementFactory(
+            IdentityApplicationManagementFactory identityApplicationManagementFactory) {
+        ServiceReferenceHolder.getInstance()
+                .setIdentityApplicationManagementFactory(identityApplicationManagementFactory);
+    }
+
+    public void unsetIdentityApplicationManagementFactory(
+            IdentityApplicationManagementFactory identityApplicationManagementFactory) {
+        ServiceReferenceHolder.getInstance()
+                .setIdentityApplicationManagementFactory(new IS510IdentityApplicationManagementFactory());
     }
 }
