@@ -220,11 +220,7 @@ require('/modules/store.js').exec(function (ctx) {
         header: headerData,
         navigation: site.navigation(tenantId),
         search: {
-            mainPage: mainPage,
-            subPage: subPage,
-            query:query,
-            isTopAssets: false,
-            searchFields: rxtAttributes
+            query: query
         },
         type: type,
         selectedCategory: selectedCategory,

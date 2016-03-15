@@ -26,6 +26,7 @@ var render = function (theme, data, meta, require) {
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.paging, data.config,
                                          data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
 
+    var searchUrl = "/assets/mobileapp";
 
     theme('2-column-left', {
         title: data.title,
@@ -49,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'search',
                 context: {searchQuery: searchQuery, categories: categories, selectedPlatform: selectedPlatform,
-                    selectedCategory: selectedCategory}
+                    selectedCategory: selectedCategory,searchUrl:searchUrl}
             }
         ],
         pageHeader: [

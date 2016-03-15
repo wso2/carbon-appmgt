@@ -70,14 +70,15 @@ require('/modules/store.js').exec(function (ctx) {
                 devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
         }
 
-        var headerData = site.header(tenantId, {
-            sso: sso,
-            user: user,
-            isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
-        });
-        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
-        headerData.domain = tenantDomain;
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
+    });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.domain = tenantDomain;
 
+    var searchQuery = { search: "", searchTerm: "overview_name"};
 
     caramel.render({
         title: asset.attributes.overview_name + ' | Store | WSO2 App Manager',
@@ -91,9 +92,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         navigation: site.navigation(tenantId),
         search: {
-            search: {title: type},
-            isTopAssets: false,
-            searchFields: rxtAttributes
+                query: searchQuery
         },
         isSocial: configs.socialCommentsEnable,
 

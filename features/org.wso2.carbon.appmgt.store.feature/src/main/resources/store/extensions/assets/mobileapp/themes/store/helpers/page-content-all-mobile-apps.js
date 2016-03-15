@@ -14,7 +14,7 @@ for (name in hps) {
 
 var resources=function(page,meta){
     return{
-        js:['search.js','devices.js','assets.js']
+        js:['devices.js','assets.js']
     };
 };
 
