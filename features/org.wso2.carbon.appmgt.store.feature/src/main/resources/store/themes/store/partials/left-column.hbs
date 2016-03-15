@@ -31,13 +31,16 @@ its own partion sinceit does not support tags--}}
             </a>
         {{/ifCond}}
     {{/each}}
+    {{#if navigation}}
+        <div class="hidden-xs" style="width: 200px; height: 0;"></div>
+    {{/if}}
 </nav>
 
 {{!-- left-column - tags --}}
 <div class="add-margin-top-3x hidden-xs hidden-sm">
-    <div class="tags-title"> {{t "Tags"}}</div>
+    <div class="section-title"> {{t "Tags"}}</div>
     {{#if tags}}
-        <ul class="tag-content">
+        <ul class="tags">
             {{#each tags.data}}
                 <li><a href="{{tenantedUrl ../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
             {{/each}}
@@ -49,4 +52,27 @@ its own partion sinceit does not support tags--}}
 </div>
 
 {{!-- left-column - recent apps --}}
-<!--goes here {recentApps}-->
+{{#if recentApps}}
+    <div class="add-margin-top-3x hidden-xs hidden-sm">
+        <div class="section-title">{{t "Recent Apps"}}</div>
+        <ul class="recent-app-items">
+            {{#each recentApps}}
+                <li>
+                    <a href="{{appUrl}}">
+                        <div class="recent-app-item-thumbnail">
+                            {{#if defaultThumbnail}}
+                                <div style="background-color: #{{defaultThumbnail.color}};"></div>
+                            {{else}}
+                                <img src="{{attributes.images_thumbnail}}" />
+                            {{/if}}
+                        </div>
+                        <div class="recent-app-item-summery">
+                            <h4 class="media-heading">{{attributes.overview_displayName}}</h4>
+                            {{attributes.overview_provider}}
+                        </div>
+                    </a>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+{{/if}}
