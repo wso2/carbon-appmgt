@@ -22,6 +22,9 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.IdentityApplicationManagementAdapter;
 import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
 
+/**
+ * WSO2 Identity server v 5.0.0 based adapter factory.
+ */
 public class IdentityApplicationManagementFactoryImpl implements IdentityApplicationManagementFactory {
 
     @Override

@@ -40,6 +40,10 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * WSO2 Identity server v 5.0.0 based adapter.
+ *
+ */
 public class IS500IdentityApplicationManagementAdapter implements IdentityApplicationManagementAdapter {
 
     private static Log log = LogFactory.getLog(IS500IdentityApplicationManagementAdapter.class);
