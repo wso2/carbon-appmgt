@@ -4,7 +4,7 @@ var render = function (theme, data, meta, require) {
         header: [
             {
                 partial: 'header',
-                context: {hideNavBar: true}
+                context: {hideNavBar: true, hideLogin: true}
             }
         ],
         leftColumn: [
