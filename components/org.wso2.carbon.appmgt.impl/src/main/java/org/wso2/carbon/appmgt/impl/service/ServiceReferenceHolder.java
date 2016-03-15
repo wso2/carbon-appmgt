@@ -16,6 +16,8 @@
 
 package org.wso2.carbon.appmgt.impl.service;
 
+import org.wso2.carbon.appmgt.api.IdentityApplicationManagementAdapter;
+import org.wso2.carbon.appmgt.api.IdentityApplicationManagementFactory;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppMgtXACMLPolicyTemplateReader;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -34,6 +36,7 @@ public class ServiceReferenceHolder {
     private static UserRealm userRealm;
     private TenantIndexingLoader indexLoader;
     private AppMgtXACMLPolicyTemplateReader xacmlPolicyTemplateReader;
+    private IdentityApplicationManagementFactory identityApplicationManagementFactory;
 
     public static ConfigurationContextService getContextService() {
         return contextService;
@@ -44,6 +47,7 @@ public class ServiceReferenceHolder {
     }
 
     private static ConfigurationContextService contextService;
+
     private ServiceReferenceHolder() {
 
     }
@@ -64,8 +68,7 @@ public class ServiceReferenceHolder {
         return amConfigurationService;
     }
 
-    public void setAPIManagerConfigurationService(
-            AppManagerConfigurationService amConfigurationService) {
+    public void setAPIManagerConfigurationService(AppManagerConfigurationService amConfigurationService) {
         this.amConfigurationService = amConfigurationService;
     }
 
@@ -76,6 +79,7 @@ public class ServiceReferenceHolder {
     public void setRealmService(RealmService realmService) {
         this.realmService = realmService;
     }
+
     public static void setUserRealm(UserRealm realm) {
         userRealm = realm;
     }
@@ -88,7 +92,7 @@ public class ServiceReferenceHolder {
         this.indexLoader = indexLoader;
     }
 
-    public TenantIndexingLoader getIndexLoaderService(){
+    public TenantIndexingLoader getIndexLoaderService() {
         return indexLoader;
     }
 
@@ -98,5 +102,14 @@ public class ServiceReferenceHolder {
 
     public AppMgtXACMLPolicyTemplateReader getAppMgtXACMLPolicyTemplateReader() {
         return xacmlPolicyTemplateReader;
+    }
+
+    public IdentityApplicationManagementFactory getIdentityApplicationManagementFactory() {
+        return identityApplicationManagementFactory;
+    }
+
+    public void setIdentityApplicationManagementFactory(
+            IdentityApplicationManagementFactory identityApplicationManagementFactory) {
+        this.identityApplicationManagementFactory = identityApplicationManagementFactory;
     }
 }
