@@ -383,6 +383,7 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
             }
+            query = require('/modules/search.js').build(query);
             if (user) {
                 assets = subsApp.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);

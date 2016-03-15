@@ -23,6 +23,9 @@
 
 
 var render = function (theme, data, meta, require) {
+    var categories = data.navigation.assets[data.type].categories;
+    var searchUrl = "/assets/mobileapp";
+    var searchQuery =  data.search.query
 
     if(data.userAssets){
 
@@ -74,47 +77,6 @@ var render = function (theme, data, meta, require) {
     }
 
 
-    data.header.myApps = true;
-
-    /*
-    theme('2-column-right', {
-        title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data.header
-            }
-        ],
-        navigation: [
-            {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-            }
-        ],
-        body: [
-            {
-                partial: 'userAssets',
-                context: {
-                    'userAssets': data.userAssets,
-                    'URL': data.URL,
-                    'devices': data.devices,
-                    'selfUnsubscription' : data.selfUnsubscription,
-                    'isDeviceSubscriptionEnabled' : data.isDeviceSubscriptionEnabled
-                }
-            }
-        ],
-        right: [
-            {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
-            {
-                partial: 'tags',
-                context: data.tags
-            }
-        ]
-    });
-    */
 
     theme('2-column-left', {
         title: data.title,
@@ -136,8 +98,8 @@ var render = function (theme, data, meta, require) {
         ],
         search: [
             {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
+                partial: 'search',
+                context: {searchQuery: searchQuery, categories: categories,searchUrl:searchUrl}
             }
         ],
         pageHeader: [

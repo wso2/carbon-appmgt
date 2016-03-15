@@ -8,21 +8,6 @@
 var opened = false, currentPage = 1, infiniteScroll = null;
 
 $(function() {
-
-
-
-	$('#category-select').on('change', function(){
-		var selected = $(this).find("option:selected").val();
-		location.href = caramel.tenantedUrl("/assets/mobileapp?query=category:\"" + selected + "\"");
-	});
-
-	$('#platform-select').on('change', function(){
-		var selected = $(this).find("option:selected").val();
-		location.href = caramel.tenantedUrl("/assets/mobileapp?query=platform:\"" + selected + "\"");
-	});
-
-
-
 	var visibleToDevices = function(){
 		var ua = navigator.userAgent;
 		var checker = {

@@ -2,16 +2,21 @@
 <nav class="search-bar navbar navbar-default">
     <div class="search-box col-xs-12 col-sm-12 col-md-12 col-lg-6">
         <div class="input-group">
-            <input type="text" id="searchTxt" value="{{search}}" class="search-field form-control"
+            <input type="hidden" value="{{tenantedUrl searchUrl}}" id="searchUrl">
+            <input type="text" id="searchTxt" value="{{searchQuery.search}}" class="search-field form-control"
                    placeholder="Search for mobile apps" />
 
             <div class="input-group-btn">
-                <button type="button" class="btn">
+                <button type="button" class="btn" id="searchBtn">
                     <i class="fw fw-search"></i>
                 </button>
                 <button type="button" class="btn search-by" data-toggle="collapse"
                         data-target="#searchPane">
-                    By <span class="caret"></span>
+                    {{#compare "overview_platform" searchQuery.searchTerm}}By Platform{{/compare}}
+                    {{#compare "overview_category" searchQuery.searchTerm}}By Category{{/compare}}
+                    {{#compare "overview_provider" searchQuery.searchTerm}}By Provider{{/compare}}
+                    {{#compare "overview_name" searchQuery.searchTerm}}By Name{{/compare}}
+                    <span class="caret"></span>
                 </button>
 
             </div>
@@ -22,7 +27,7 @@
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="radio">
                             <label>
-                                <input type="radio" name="optionsRadios" value="App"
+                                <input type="radio" name="optionsRadios" value="Name"
                                        {{#compare "overview_name" searchQuery.searchTerm}}checked{{/compare}} />
                                 By Name
                             </label>
