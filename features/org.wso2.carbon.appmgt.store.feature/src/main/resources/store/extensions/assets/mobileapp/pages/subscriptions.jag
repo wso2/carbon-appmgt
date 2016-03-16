@@ -1,7 +1,7 @@
 <%
 var caramel;
 
-include('../modules/jagg/jagg.jag');
+include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
     var count, tags, title,
             log = ctx.log,
