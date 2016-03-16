@@ -23,7 +23,7 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
 (function () {
     var userModule = require('/modules/user.js');
     var logged = userModule.current(session);
-    var audutLog = require('/modules/auditLog/logger.js');
+    var auditLog = require('/modules/auditLog/logger.js');
 
     if (logged) {
         var username = String(logged.username) + '@' + logged.tenantDomain;
@@ -47,7 +47,7 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
                 success: Boolean(id),
                 id: id
             };
-            audutLog.writeLog(logged.tenantDomain.tenantId, username, "UserReviewedAnApplication", "Webapp", "{" +
+            auditLog.writeLog(logged.tenantDomain.tenantId, username, "UserReviewedAnApplication", "Webapp", "{" +
                                                                                                              "providerName='"
                                                                                                              + provider
                                                                                                              + '\'' +
