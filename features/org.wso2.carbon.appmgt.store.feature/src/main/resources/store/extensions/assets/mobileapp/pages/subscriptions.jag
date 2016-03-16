@@ -65,6 +65,7 @@ require('/modules/store.js').exec(function (ctx) {
         user: user
     });
     headerData.assetType = "mobileapp";
+    var searchQuery = { search: "", searchTerm: "overview_name"};
 
     caramel.render({
         'title': 'Store | My Items',
@@ -73,10 +74,9 @@ require('/modules/store.js').exec(function (ctx) {
         header: headerData,
         navigation: site.navigation(tenantId),
         devices: devices,
+        type: type,
         search: {
-            search: {title: type},
-            isTopAssets: false,
-            searchFields: rxtAttributes
+            query: searchQuery
         },
         userAssets: count > 0 ? subscriptions : null,
         recentAssets: recentAssets,

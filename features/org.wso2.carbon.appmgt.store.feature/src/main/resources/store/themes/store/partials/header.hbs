@@ -48,24 +48,26 @@
                     <li><a href="{{url "/logout"}}">{{t "Sign Out"}}</a></li>
                 </ul>
             {{else}}
-                {{#if sso}}
-                    <a href="{{tenantedUrl "/login?header=true"}}" class="header-action">
-                        <span class="icon"><i class="glyphicon glyphicon-off add-padding-right-1x"></i></span>
-                        <span class="text-uppercase">{{t "Sign In"}}</span>
-                    </a>
-                {{else}}
-                    <a href="#" class="header-action" data-toggle="modal" data-target="#modal-login">
-                        <span class="icon"><i class="glyphicon glyphicon-off add-padding-right-1x"></i></span>
-                        <span class="text-uppercase">{{t "Sign In"}}</span>
-                    </a>
-                {{/if}}
-                {{#if isSelfSignUpEnabledForTenant}}
-                    <a href="#" class="header-action" data-toggle="modal" data-target="#register-modal">
-                        <span class="icon"><i class="fw fw-sign-up add-padding-right-1x"></i></span>
-                        <span class="text-uppercase">register</span>
-                    </a>
-                    {{>register}}
-                {{/if}}
+                {{#unless hideLogin}}
+                    {{#if sso}}
+                        <a href="{{tenantedUrl "/login?header=true"}}" class="header-action">
+                            <span class="icon"><i class="glyphicon glyphicon-off add-padding-right-1x"></i></span>
+                            <span class="text-uppercase">{{t "Sign In"}}</span>
+                        </a>
+                    {{else}}
+                        <a href="#" class="header-action" data-toggle="modal" data-target="#modal-login">
+                            <span class="icon"><i class="glyphicon glyphicon-off add-padding-right-1x"></i></span>
+                            <span class="text-uppercase">{{t "Sign In"}}</span>
+                        </a>
+                    {{/if}}
+                    {{#if isSelfSignUpEnabledForTenant}}
+                        <a href="#" class="header-action" data-toggle="modal" data-target="#register-modal">
+                            <span class="icon"><i class="fw fw-sign-up add-padding-right-1x"></i></span>
+                            <span class="text-uppercase">register</span>
+                        </a>
+                        {{>register}}
+                    {{/if}}
+                {{/unless}}
             {{/if}}
         </div>
     </div>

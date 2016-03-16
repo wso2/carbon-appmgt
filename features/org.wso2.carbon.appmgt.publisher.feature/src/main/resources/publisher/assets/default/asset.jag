@@ -18,6 +18,7 @@ var SITE_TYPE = 'site';
 var WEBAPP_TYPE = 'webapp';
 var MOBILEAPP_TYPE = 'mobileapp';
 var assetType;
+var audutLog = require('/modules/auditLog/logger.js');
 
 require('/modules/publisher.js').exec(function(ctx) {
 
@@ -468,6 +469,26 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
             appMgtProviderObj.generateEntitlementPolicies(webappId);
 
+            if (oldVersion == null || oldVersion == '') {
+                audutLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                                                                                   "providerName='" + webappId.provider
+                                                                                   + '\'' +
+                                                                                   ", apiName='" + webappId.name + '\''
+                                                                                   +
+                                                                                   ", version='" + webappId.version
+                                                                                   + '\'' +
+                                                                                   '}', "", "");
+            }
+            else {
+                audutLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                                                                                    "providerName='" + webappId.provider
+                                                                                    + '\'' +
+                                                                                    ", apiName='" + webappId.name + '\''
+                                                                                    +
+                                                                                    ", version='" + webappId.version
+                                                                                    + '\'' +
+                                                                                    '}', "", "");
+            }
             response.contentType = "application/json";
             print({ok: true, message: 'asset added', id: assetId});
         }
