@@ -4,7 +4,7 @@ var resource = (function () {
     var subsApi;
 
     var log = new Log('unsubscription-api');
-    var audutLog = require('/modules/auditLog/logger.js');
+    var auditLog = require('/modules/auditLog/logger.js');
 
     SubscriptionService = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
     subsApi = new SubscriptionService.SubscriptionService();
@@ -37,7 +37,7 @@ var resource = (function () {
         if(result){
             subscription['op_type'] = 'DENY';
             result = subsApi.updateVisibility(subscription);
-            audutLog.writeLog(tenantId, userName, "UserUnSubscribed", "Webapp", "{" +
+            auditLog.writeLog(tenantId, userName, "UserUnSubscribed", "Webapp", "{" +
                                                                                 "providerName='"
                                                                                 + subscription['apiProvider'] + '\'' +
                                                                                 ", apiName='" + subscription['apiName']
