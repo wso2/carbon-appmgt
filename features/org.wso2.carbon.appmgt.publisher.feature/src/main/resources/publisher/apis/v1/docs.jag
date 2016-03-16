@@ -15,7 +15,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                   message:'AuthenticateError'
               });
     } else {
-        var audutLog = require('/modules/auditLog/logger.js');
+        var auditLog = require('/modules/auditLog/logger.js');
         var server = require('store').server;
         var tenantId = server.current(session).tenantId
         var username = server.current(session).username;
@@ -38,12 +38,12 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
 		    	
             if (mode == "Update") {
                 result = mod.updateDocumentation(apiData, docData);
-                audutLog.writeLog(tenantId, username, "DocumentUpdated", apiData.name,
+                auditLog.writeLog(tenantId, username, "DocumentUpdated", apiData.name,
                                   "{" + "providerName='" + apiData.provider + '\'' + ", apiName='" + apiData.name + '\''
                                   + ", version='" + apiData.version + '\'' + '}', "", "");
             } else {
                 result = mod.addDocumentation(apiData, docData);
-                audutLog.writeLog(tenantId, username, "NewDocumentAdded", apiData.name,
+                auditLog.writeLog(tenantId, username, "NewDocumentAdded", apiData.name,
                                   "{" + "providerName='" + apiData.provider + '\'' + ", apiName='" + apiData.name + '\''
                                   + ", version='" + apiData.version + '\'' + '}', "", "");
             }
@@ -79,7 +79,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                 apiData.provider = request.getParameter("provider","UTF-8");
                 apiData.name = request.getParameter("apiName","UTF-8");
                 apiData.version = request.getParameter("version");
-                audutLog.writeLog(tenantId, username, "DocumentEdited", apiData.name,
+                auditLog.writeLog(tenantId, username, "DocumentEdited", apiData.name,
                                   "{" + "providerName='" + apiData.provider + '\'' + ", apiName='" + apiData.name + '\''
                                   + ", version='" + apiData.version + '\'' + '}', "", "");
                 obj = {
@@ -123,7 +123,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                     message:result.message
                 };
             } else {
-                audutLog.writeLog(tenantId, username, "DocumentRemoved", apiInfo.name,
+                auditLog.writeLog(tenantId, username, "DocumentRemoved", apiInfo.name,
                                   "{" + "providerName='" + apiInfo.provider + '\'' + ", apiName='" + apiInfo.name + '\''
                                   + ", version='" + apiInfo.version + '\'' + '}', "", "");
                 obj = {
