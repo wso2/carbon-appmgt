@@ -36,9 +36,6 @@ require('/modules/store.js').exec(function (ctx) {
     paging = store.assetsPagingOverrided(request);
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
-
-
 
     mainPage = type;
 
@@ -216,59 +213,55 @@ require('/modules/store.js').exec(function (ctx) {
         user: user
     });
     headerData.assetType = "mobileapp";
-    var typeIsEnabled = false;
-    for (var i = 0; i < enabledTypeList.length; i++) {
-        if ("mobileapp" == enabledTypeList[i]) {
-            typeIsEnabled = true;
-            caramel.render({
-                title: 'Store | Assets',
+    if(storeHostObj.isAssetTypeEnabled("mobileapp")) {
+        caramel.render({
+            title: 'Store | Assets',
+            user: user,
+            sso: sso,
+            devices: devices,
+            header: headerData,
+            navigation: site.navigation(tenantId),
+            search: {
+                query: query
+            },
+            type: type,
+            selectedCategory: selectedCategory,
+            selectedPlatform: selectedPlatform,
+            tags: function () {
+                return [
+                    {
+                        url: '/assets/' + type + '/?tag=',
+                        data: store.tags(type)
+                    }
+                ];
+            },
+            assets: assets,
+            paging: {
+                url: url + 'sort=' + paging.sort + '&page=',
+                sort: paging.sort,
+                tag: tag,
+                size: assets.length
+            },
+            sorting: {
+                url: url + 'sort='
+            },
+            config: mdmUIConfig,
+            myAssets: {
                 user: user,
-                sso: sso,
-                devices: devices,
-                header: headerData,
-                navigation: site.navigation(tenantId),
-                search: {
-                    query: query
-                },
                 type: type,
-                selectedCategory: selectedCategory,
-                selectedPlatform: selectedPlatform,
-                tags: function () {
-                    return [
-                        {
-                            url: '/assets/' + type + '/?tag=',
-                            data: store.tags(type)
-                        }
-                    ];
-                },
-                assets: assets,
-                paging: {
-                    url: url + 'sort=' + paging.sort + '&page=',
-                    sort: paging.sort,
-                    tag: tag,
-                    size: assets.length
-                },
-                sorting: {
-                    url: url + 'sort='
-                },
-                config: mdmUIConfig,
-                myAssets: {
-                    user: user,
-                    type: type,
-                    title: title,
-                    subscriptions: subscriptions[type],
-                    subscription: subscription,
-                    pageIndices: pageIndices,
-                    leftNav: leftnav,
-                    rightNav: rightnav
-                },
-                recentAssets: store.recentAssets(type)
+                title: title,
+                subscriptions: subscriptions[type],
+                subscription: subscription,
+                pageIndices: pageIndices,
+                leftNav: leftnav,
+                rightNav: rightnav
+            },
+            recentAssets: store.recentAssets(type)
 
-            });
-        }
+        });
     }
-    if (!typeIsEnabled) {
-        caramel.render(null);
+    else {
+        response.sendError(404, 'Resource does not exist');
     }
 }, request, response, session);
 %>

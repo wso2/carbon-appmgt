@@ -122,64 +122,61 @@ var render = function (theme, data, meta, require) {
         ]
     });
     */
-    var typeIsEnabled = false;
-    for (var i = 0; i < enabledTypeList.length; i++) {
-        if ("mobileapp" == enabledTypeList[i]) {
-            typeIsEnabled = true;
-            theme('2-column-left', {
-                title: data.title,
-                header: [
-                    {
-                        partial: 'header',
-                        context: data.header
+    if(storeObj.isAssetTypeEnabled("mobileapp")) {
+        theme('2-column-left', {
+            title: data.title,
+            header: [
+                {
+                    partial: 'header',
+                    context: data.header
+                }
+            ],
+            leftColumn: [
+                {
+                    partial: 'left-column',
+                    context: {
+                        navigation: createLeftNavLinks(data),
+                        tags: data.tags,
+                        recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
                     }
-                ],
-                leftColumn: [
-                    {
-                        partial: 'left-column',
-                        context: {
-                            navigation: createLeftNavLinks(data),
-                            tags: data.tags,
-                            recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
-                        }
+                }
+            ],
+            search: [
+                {
+                    partial: 'search',
+                    context: {
+                        searchQuery: searchQuery,
+                        categories: categories,
+                        searchUrl: searchUrl
                     }
-                ],
-                search: [
-                    {
-                        partial: 'search',
-                        context: {
-                            searchQuery: searchQuery,
-                            categories: categories,
-                            searchUrl: searchUrl
-                        }
+                }
+            ],
+            pageHeader: [
+                {
+                    partial: 'page-header',
+                    context: {
+                        title: "My Mobile Apps",
+                        sorting: createSortOptions(data.user, data.config)
                     }
-                ],
-                pageHeader: [
-                    {
-                        partial: 'page-header',
-                        context: {
-                            title: "My Mobile Apps",
-                            sorting: createSortOptions(data.user, data.config)
-                        }
+                }
+            ],
+            pageContent: [
+                {
+                    partial: 'page-content-userAssets',
+                    context: {
+                        'userAssets': data.userAssets,
+                        'URL': data.URL,
+                        'devices': data.devices,
+                        'selfUnsubscription': data.selfUnsubscription,
+                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
                     }
-                ],
-                pageContent: [
-                    {
-                        partial: 'page-content-userAssets',
-                        context: {
-                            'userAssets': data.userAssets,
-                            'URL': data.URL,
-                            'devices': data.devices,
-                            'selfUnsubscription': data.selfUnsubscription,
-                            'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
-                        }
-                    }
-                ]
-            });
-        }
+                }
+            ]
+        });
+
     }
-    if (!typeIsEnabled) {
-        theme(null);
+    else {
+        response.sendError(404, 'Resource does not exist');
     }
 };
 

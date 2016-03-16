@@ -52,7 +52,6 @@ require('/modules/store.js').exec(function (ctx) {
     //Check whether to show register link in myapps page
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     //Get the subscription configuration options
@@ -480,42 +479,37 @@ require('/modules/store.js').exec(function (ctx) {
     getRecentAssetsFromRegistry();
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
-    var typeIsEnabled = false;
-    for (var i = 0; i < enabledTypeList.length; i++) {
-        if ("webapp" == enabledTypeList[i]) {
-            typeIsEnabled = true;
-            caramel.render({
-                title: 'Web Apps | Store',
-                user: user,
-                sso: sso,
-                header: headerData,
-                navigation: navigationData,
-                search: {
-                    query: query
-                },
-                type: type,
-                tags: {
-                    data: store.tags(type, isSite)
-                },
-                config: {
-                    isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                    isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                },
-                assets: assets,
-                assetType: 'webapp',
-                pagination: {
-                    leftNav: leftnav,
-                    rightNav: rightnav,
-                    urlQuery: urlQuery
-                },
-                recentAssets: webAppRecentAssets
+    if(storeHostObj.isAssetTypeEnabled("webapp")) {
+        caramel.render({
+            title: 'Web Apps | Store',
+            user: user,
+            sso: sso,
+            header: headerData,
+            navigation: navigationData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            },
+            assets: assets,
+            assetType: 'webapp',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: webAppRecentAssets
 
-            });
-        }
+        });
     }
-
-    if (!typeIsEnabled) {
-        caramel.render(null);
+    else{
+        response.sendError(404,'Resource does not exist');
     }
 }, request, response, session);
 
