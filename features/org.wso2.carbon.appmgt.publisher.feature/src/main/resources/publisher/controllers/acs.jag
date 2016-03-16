@@ -85,6 +85,7 @@ include("/extensions/webapp/modules/jagg/jagg.jag");
                        		var role = require('/modules/role.js').checkeRole(username, session);
 
                         	if(role){
+                                auditLog.writeLog(tenantId, sessionObj.loggedInUser, "User SignedIn", "", "", "", "");
                         		var user = require('store').user;
 					log.debug('user is set :::' + sessionObj.loggedInUser);
                                 response.sendRedirect(contextPath);
