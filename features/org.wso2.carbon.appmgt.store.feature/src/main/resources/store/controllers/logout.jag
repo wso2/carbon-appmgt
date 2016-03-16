@@ -3,7 +3,7 @@
     include("/jagg/jagg.jag");
     var ssoIdpProvider = jagg.module('manager').getAPIStoreObj();
     var user = session.get("LOGGED_IN_USER");
-    var audutLog = require('/modules/auditLog/logger.js');
+    var auditLog = require('/modules/auditLog/logger.js');
     if(user === null) {
         response.sendRedirect('/store');
     } else {
@@ -25,10 +25,10 @@
         if(reversProxyEnabled) {
             relayState = reverseProxyHost+contextPath;
         }
-        var tenantId = currentSession.tenantId;
+        var tenantId = session.get("tenantId");
         var log = new Log();
         log.debug("store session index : " + sso_sessions[session.getId()]);
-        audutLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
+        auditLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
 
         %>
             <div>

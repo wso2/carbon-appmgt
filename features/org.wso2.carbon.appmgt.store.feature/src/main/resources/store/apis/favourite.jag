@@ -1,7 +1,7 @@
 <%
 include('/jagg/jagg.jag');
 var favourites = jagg.module("favourites");
-var audutLog = require('/modules/auditLog/logger.js');
+var auditLog = require('/modules/auditLog/logger.js');
 
 require('/modules/store.js').exec(function (ctx) {
     var log = new Log();
@@ -48,7 +48,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                     storeTenantDomain);
-        audutLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite","Webapp",  "{" +
+        auditLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite","Webapp",  "{" +
                                                                                   "providerName='" + provider + '\'' +
                                                                                   ", apiName='" + name + '\'' +
                                                                                   ", version='" +version + '\'' +
@@ -67,7 +67,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                          storeTenantDomain);
-        audutLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite","Webapp", "{" +
+        auditLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite","Webapp", "{" +
                                                                                     "providerName='" + provider + '\'' +
                                                                                     ", apiName='" +  name + '\'' +
                                                                                     ", version='" + version + '\'' +
@@ -95,11 +95,11 @@ require('/modules/store.js').exec(function (ctx) {
         switch (action) {
             case "set-favourite-page":
                 response.content = setFavouritePage();
-                audutLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage","", "" , "", "");
+                auditLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage","", "" , "", "");
                 return;
             case "remove-favourite-page":
                 response.content = removeFavouritePage();
-                audutLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage","", "" , "", "");
+                auditLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage","", "" , "", "");
                 return;
             case "add-favourite-app":
                 response.content = addToFavouriteApps();

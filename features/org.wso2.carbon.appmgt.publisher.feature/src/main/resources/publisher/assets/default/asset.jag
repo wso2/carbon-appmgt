@@ -18,7 +18,7 @@ var SITE_TYPE = 'site';
 var WEBAPP_TYPE = 'webapp';
 var MOBILEAPP_TYPE = 'mobileapp';
 var assetType;
-var audutLog = require('/modules/auditLog/logger.js');
+var auditLog = require('/modules/auditLog/logger.js');
 
 require('/modules/publisher.js').exec(function(ctx) {
 
@@ -368,6 +368,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
     var user=server.current(session);
     var um = server.userManager(server.current(session).tenantId);
     var username = user.username;
+    var tenantId = server.current(session).tenantId;
 
     if (permissions.isAuthorized(username, config.permissions.webapp_create, um)) {
 
@@ -463,7 +464,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             appMgtProviderObj.generateEntitlementPolicies(webappId);
 
             if (oldVersion == null || oldVersion == '') {
-                audutLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
                                                                                    "providerName='" + webappId.provider
                                                                                    + '\'' +
                                                                                    ", apiName='" + webappId.name + '\''
@@ -473,7 +474,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                                                                                    '}', "", "");
             }
             else {
-                audutLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
                                                                                     "providerName='" + webappId.provider
                                                                                     + '\'' +
                                                                                     ", apiName='" + webappId.name + '\''
