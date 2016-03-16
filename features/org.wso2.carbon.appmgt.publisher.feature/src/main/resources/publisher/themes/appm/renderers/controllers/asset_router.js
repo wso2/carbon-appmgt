@@ -7,14 +7,13 @@ var server = require('store').server;
 var permissions=require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
-var apiProvider = jagg.module('manager').getAPIProviderObj();
-var user = server.current(session);
-var um = server.userManager(user.tenantId);
 
 var render=function(theme,data,meta,require){
 
     var log = new Log();
-
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var user = server.current(session);
+    var um = server.userManager(user.tenantId);
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
