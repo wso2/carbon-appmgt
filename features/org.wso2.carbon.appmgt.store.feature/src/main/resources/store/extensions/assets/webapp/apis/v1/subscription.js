@@ -13,7 +13,7 @@ var resource = (function () {
     var AuthService = require('/extensions/assets/webapp/services/authentication.js').serviceModule;
     var authenticator = new AuthService.Authenticator();
     authenticator.init(jagg, session);
-    var audutLog = require('/modules/auditLog/logger.js');
+    var auditLog = require('/modules/auditLog/logger.js');
 
     
 
@@ -52,7 +52,7 @@ var resource = (function () {
         if(result){
             subscription['op_type'] = 'ALLOW';
             result = subsApi.updateVisibility(subscription);
-            audutLog.writeLog(tenantId, userName, "UserSubscribed", "Webapp", "{" +
+            auditLog.writeLog(tenantId, userName, "UserSubscribed", "Webapp", "{" +
                                                                               "providerName='"
                                                                               + subscription['apiProvider'] + '\'' +
                                                                               ", apiName='" + subscription['apiName']
