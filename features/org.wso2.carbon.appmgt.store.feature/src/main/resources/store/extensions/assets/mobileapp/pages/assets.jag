@@ -36,7 +36,7 @@ require('/modules/store.js').exec(function (ctx) {
     paging = store.assetsPagingOverrided(request);
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledTypeList();
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
 
 
 

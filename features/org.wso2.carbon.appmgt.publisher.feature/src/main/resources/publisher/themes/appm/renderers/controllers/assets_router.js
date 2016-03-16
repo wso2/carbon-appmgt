@@ -23,7 +23,7 @@ var render = function (theme, data, meta, require) {
     appPublishWFExecutor = org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_APPLICATION_PUBLISH");
     var isAsynchronousFlow = appPublishWFExecutor.isAsynchronus();
     var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
-    var typeList = apiProvider.getEnabledTypeList();
+    var typeList = apiProvider.getEnabledAssetTypeList();
     if(data.artifacts){
 
         var deleteButtonAvailability = false;

@@ -26,7 +26,7 @@ var render = function (theme, data, meta, require) {
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
-    var enabledTypeList = storeObj.getEnabledTypeList();
+    var enabledTypeList = storeObj.getEnabledAssetTypeList();
 
     if(data.userAssets){
 

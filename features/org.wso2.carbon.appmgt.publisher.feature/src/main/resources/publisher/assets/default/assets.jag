@@ -28,7 +28,7 @@ var dataInjector=publisher.dataInjector;
 var DataInjectorModes=publisher.DataInjectorModes;
 var filterManager=publisher.filterManager;
 var permissions=require('/modules/permissions.js').permissions;
-var typeList = apiProvider.getEnabledTypeList();
+var typeList = apiProvider.getEnabledAssetTypeList();
 
 var log=new Log();
 

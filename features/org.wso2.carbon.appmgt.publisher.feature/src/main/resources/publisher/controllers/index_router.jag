@@ -9,7 +9,7 @@ var caramel = require('caramel');
 var config = require('/config/publisher.json');
 var server = require('store').server;
 var apiProvider = jagg.module('manager').getAPIProviderObj();
-var typeList = apiProvider.getEnabledTypeList();
+var typeList = apiProvider.getEnabledAssetTypeList();
 var gadgetCount = 0,
         siteCount = 0;
 var caramel = require('caramel'),
@@ -24,7 +24,7 @@ if (server.current(session) == null) {
     }
     response.sendRedirect(redirectURl);
 } else {
-    var redirectURl = contextPath + '/assets/'+typeList[0]+'/';
+    var redirectURl = contextPath + '/assets/' + typeList[0] + '/';
     if (reversProxyEnabled) {
         redirectURl = reverseProxyHost + redirectURl;
     }

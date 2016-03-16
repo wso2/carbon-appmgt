@@ -36,7 +36,7 @@ require('/modules/store.js').exec(function (ctx) {
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
-    var enabledTypeList = storeObj.getEnabledTypeList();
+    var enabledTypeList = storeObj.getEnabledAssetTypeList();
 
     //Favourite app page can be accessed from web app or site
     //this query parameter indicates,where request came from.

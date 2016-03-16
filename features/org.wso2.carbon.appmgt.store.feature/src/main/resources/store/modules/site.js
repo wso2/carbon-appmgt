@@ -49,7 +49,7 @@ var header = function (tenantId, options) {
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
-    var enabledTypeList = storeObj.getEnabledTypeList();
+    var enabledTypeList = storeObj.getEnabledAssetTypeList();
     var user = require('store').user;
 
    

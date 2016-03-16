@@ -119,7 +119,7 @@ public class HostObjectComponent {
                 AppMConstants.STORE_DISPLAY_MULTIPLE_VERSIONS));
     }
 
-    public static List<String> getEnabledTypeList() {
-        return getAPIManagerConfiguration().getProperty(AppMConstants.TYPE);
+    public static List<String> getEnabledAssetTypeList() {
+        return getAPIManagerConfiguration().getProperty(AppMConstants.ENABLED_ASSET_TYPE);
     }
 }

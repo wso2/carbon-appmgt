@@ -46,7 +46,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     mod = jagg.module("documentation");
 
-    var typeList = apiProvider.getEnabledTypeList();
+    var typeList = apiProvider.getEnabledAssetTypeList();
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
@@ -56,7 +56,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var rxtTemplate;
         for (var i = 0; i < typeList.length; i++) {
             if (typeList[i] == shortName) {
-                var rxtTemplate = rxtManager.findAssetTemplate(function (template) {
+                rxtTemplate = rxtManager.findAssetTemplate(function (template) {
                     return (template.shortName == shortName) ? true : false;
                 });
 

@@ -52,7 +52,7 @@ require('/modules/store.js').exec(function (ctx) {
     //Check whether to show register link in myapps page
     var manager = jagg.module("manager");
     var storeHostObj = manager.getAPIStoreObj();
-    var enabledTypeList = storeHostObj.getEnabledTypeList();
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     //Get the subscription configuration options
