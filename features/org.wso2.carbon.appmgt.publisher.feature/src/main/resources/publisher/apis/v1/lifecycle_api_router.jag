@@ -31,7 +31,7 @@ require('/modules/publisher.js').exec(function (ctx) {
     var permissions = require('/modules/permissions.js').permissions;
     var apiProvider = jagg.module('manager').getAPIProviderObj();
     var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
-    var audutLog = require('/modules/auditLog/logger.js');
+    var auditLog = require('/modules/auditLog/logger.js');
 
 
     routeManager.register('POST', 'publisher', '/publisher/api/lifecycle/{type}/{id}', function (context) {
@@ -64,7 +64,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             //Perform the action if the user has specified an action
             if (invokeAction != '') {
                 artifactManager.promoteLifecycleState(invokeAction, artifact);
-                audutLog.writeLog(tenantId, username, "LifeStyleStateChanged", shortName, id, artifact, "");
+                auditLog.writeLog(tenantId, username, "LifeStyleStateChanged", shortName, id, artifact, "");
             }
 
             var msg = {};
@@ -97,7 +97,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                   artifactManager.checkItem(checkListItemIndex, artifact);
                                   var msg = {};
                                   msg['status'] = 'ok';
-                                  audutLog.writeLog(tenantId, username, "Ticks The Check List", shortName, id, artifact,
+                                  auditLog.writeLog(tenantId, username, "Ticks The Check List", shortName, id, artifact,
                                                     "");
                               } catch (e) {
                                   log.debug('The asset with id: ' + id
@@ -145,7 +145,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                   artifactManager.uncheckItem(checkListItemIndex, artifact);
                                   var msg = {};
                                   msg['status'] = 'ok';
-                                  audutLog.writeLog(tenantId, username, "Ticks The Unheck List", shortName, id,
+                                  auditLog.writeLog(tenantId, username, "Ticks The Unheck List", shortName, id,
                                                     artifact, "");
                               } catch (e) {
                                   log.debug('The lifecyle check list item at index ' + checkListItemIndex
@@ -508,7 +508,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         }
         var originalArtifact = artifactManager.get(uuid);
         var attributes = originalArtifact.attributes;
-        audutLog.writeLog(tenantId, username, action, appType, "{" +
+        auditLog.writeLog(tenantId, username, action, appType, "{" +
                                                                "providerName='" + attributes["overview_provider"] + '\''
                                                                +
                                                                ", apiName='" + attributes["overview_name"] + '\'' +
