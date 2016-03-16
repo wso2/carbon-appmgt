@@ -25,7 +25,7 @@
         if(reversProxyEnabled) {
             relayState = reverseProxyHost+contextPath;
         }
-        var tenantId = currentSession.tenantId;
+        var tenantId = session.get("tenantId");
         var log = new Log();
         log.debug("store session index : " + sso_sessions[session.getId()]);
         auditLog.writeLog(tenantId, user, "UserIgnedOut","Logout","", "", "");
