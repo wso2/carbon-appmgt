@@ -150,7 +150,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
             }
 
             var manyOne = rolesSelected.length > 1 ? 's' : '';
-
+            $('#modalEnterpriseInstall').modal('hide');
             noty({
                 text : 'Are you sure you want to install this app to "' + rolesString + '" role' +  manyOne +'?',
                 'layout' : 'center',
@@ -187,6 +187,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         text : 'No',
                         onClick : function($noty) {
                             $noty.close();
+                            $('#modalEnterpriseInstall').modal('show');
                         }
                     }]
             });
@@ -198,6 +199,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                 'modal' : true,
                 timeout: 1000
             });
+            $('#modalEnterpriseInstall').modal('show');
         }
 
     }
@@ -220,7 +222,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
             }
 
             var manyOne = rolesSelected.length > 1 ? 's' : '';
-
+            $('#modalEnterpriseInstall').modal('hide');
             noty({
                 text : 'Are you sure you want to uninstall this app from "' + rolesString + '" role' +  manyOne +'?',
                 'layout' : 'center',
@@ -256,6 +258,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         text : 'No',
                         onClick : function($noty) {
                             $noty.close();
+                            $('#modalEnterpriseInstall').modal('show');
                         }
                     }]
             });
@@ -289,7 +292,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
             }
 
             var manyOne = usersSelected.length > 1 ? 's' : '';
-
+            $('#modalEnterpriseInstall').modal('hide');
             noty({
                 text : 'Are you sure you want to install this app to "' + usersString + '" user' +  manyOne +'?',
                 'layout' : 'center',
@@ -322,6 +325,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         text : 'No',
                         onClick : function($noty) {
                             $noty.close();
+                            $('#modalEnterpriseInstall').modal('show')
                         }
                     }]
             });
@@ -356,7 +360,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
             }
 
             var manyOne = usersSelected.length > 1 ? 's' : '';
-
+            $('#modalEnterpriseInstall').modal('hide');
             noty({
                 text : 'Are you sure you want to uninstall this app from "' + usersString + '" user' +  manyOne +'?',
                 'layout' : 'center',
@@ -389,6 +393,7 @@ if($('#isEnterpriseInstallEnabled').val() === 'true'){
                         text : 'No',
                         onClick : function($noty) {
                             $noty.close();
+                            $('#modalEnterpriseInstall').modal('show');
                         }
                     }]
             });
