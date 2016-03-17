@@ -590,3 +590,47 @@ active: background 10% lighter, border 5% darker
 .background-color-deprecated {
     background-color: #FFCC00;
 }
+
+/*===============MOBILE ENTERPRISE INSTALL MODAL=========*/
+.ep-install-modal {
+    background: white !important;
+    color: black !important;
+}
+
+.ep-install-modal .dataTables_filter label {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.ep-install-modal .dataTables_filter label input {
+    margin: 0 0 0 0px !important;
+    min-width: auto !important;
+}
+
+#modalEnterpriseInstall .dataTables_info {
+    float: none !important;
+}
+
+#modalEnterpriseInstall .dataTables_paginate {
+    float: none !important;
+}
+
+#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_next{
+    color: #1b63ff;
+    margin-left: 5px;
+}
+
+#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_previous{
+    color: #1b63ff;
+}
+
+#modalEnterpriseInstall .dataTables_paginate .paginate_disabled_next{
+    margin-left: 5px;
+}
+
+#modalEnterpriseInstall .modal-header button {
+    color: #000000;
+}
+
+#noty_center_layout_container {
+    z-index: 100000001 !important;
+}
