@@ -11,9 +11,9 @@ var appmPublisher = require('appmgtpublisher');
 var render=function(theme,data,meta,require){
 
     var log = new Log();
-
-    var user=server.current(session);
-    var um=server.userManager(user.tenantId);
+    var apiProvider = jagg.module('manager').getAPIProviderObj();
+    var user = server.current(session);
+    var um = server.userManager(user.tenantId);
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var publishActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_publish, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
@@ -24,6 +24,7 @@ var render=function(theme,data,meta,require){
     var newViewData;
     var notifications = session.get('notifications');
     var notificationCount = session.get('notificationCount');
+    var typeList = apiProvider.getEnabledAssetTypeList();
     //Determine what view to show
     switch(data.op){
 
@@ -33,7 +34,8 @@ var render=function(theme,data,meta,require){
             break;
         case 'view':
             data = require('/helpers/view-asset.js').merge(data);
-            listPartial='view-asset';
+            data.typeList = typeList;
+            listPartial = 'view-asset';
             var copyOfData = parse(stringify(data));
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             var assetThumbnail = data.newViewData.images.images_thumbnail;
@@ -100,8 +102,10 @@ var render=function(theme,data,meta,require){
                         active:listPartial,
                         createPermission : createActionAuthorized,
                         viewStats : viewStatsAuthorized,
+                        um : um,
                         notifications : notifications,
-                        notificationCount: notificationCount
+                        notificationCount: notificationCount,
+                        typeList: typeList
                     }
                 }
             ],

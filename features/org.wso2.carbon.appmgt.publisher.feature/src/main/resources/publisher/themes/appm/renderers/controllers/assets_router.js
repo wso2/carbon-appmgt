@@ -13,6 +13,7 @@ var um=server.userManager(user.tenantId);
 var publisher = require('/modules/publisher.js').publisher(request, session);
 var rxtManager = publisher.rxtManager;
 var appmPublisher = require('appmgtpublisher');
+var apiProvider = jagg.module('manager').getAPIProviderObj();
 
 var render = function (theme, data, meta, require) {
     var log = new Log();
@@ -22,6 +23,7 @@ var render = function (theme, data, meta, require) {
     appPublishWFExecutor = org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_APPLICATION_PUBLISH");
     var isAsynchronousFlow = appPublishWFExecutor.isAsynchronus();
     var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
+    var typeList = apiProvider.getEnabledAssetTypeList();
     if(data.artifacts){
 
         var deleteButtonAvailability = false;
@@ -220,7 +222,8 @@ var render = function (theme, data, meta, require) {
                         viewStats : viewStatsAuthorized,
                         notifications : notifications,
                         um : um,
-                        notificationCount: notificationCount
+                        notificationCount: notificationCount,
+                        typeList: typeList
                 }
             }
         ],
