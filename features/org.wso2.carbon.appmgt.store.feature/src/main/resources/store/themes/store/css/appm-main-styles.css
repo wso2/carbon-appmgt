@@ -611,7 +611,7 @@ active: background 10% lighter, border 5% darker
     background-color: #00bcf2;
 }
 
-/*===============MOBILE ENTERPRISE INSTALL MODAL=========*/
+/*=============== MOBILE ENTERPRISE INSTALL MODAL =========*/
 .ep-install-modal {
     background: white !important;
     color: black !important;
@@ -622,10 +622,10 @@ active: background 10% lighter, border 5% darker
     margin-bottom: 5px;
 }
 .ep-install-modal .dataTables_filter label input {
-    margin: 0 0 0 0px !important;
-    /*min-width: auto !important;*/
+    margin: 0 0 0 0 !important;
 }
 
+/*TODO: Remove following ID selectors*/
 #modalEnterpriseInstall .dataTables_info {
     float: none !important;
 }
@@ -654,3 +654,5 @@ active: background 10% lighter, border 5% darker
 #noty_center_layout_container {
     z-index: 100000001 !important;
 }
+/*---*/
+
