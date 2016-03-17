@@ -610,15 +610,6 @@ active: background 10% lighter, border 5% darker
 .background-color-windows {
     background-color: #00bcf2;
 }
-<<<<<<< HEAD
-
-.background-color-inactive {
-    background-color: #C10D15;
-}
-
-.background-color-deprecated {
-    background-color: #FFCC00;
-}
 
 /*===============MOBILE ENTERPRISE INSTALL MODAL=========*/
 .ep-install-modal {
@@ -632,7 +623,7 @@ active: background 10% lighter, border 5% darker
 }
 .ep-install-modal .dataTables_filter label input {
     margin: 0 0 0 0px !important;
-    min-width: auto !important;
+    /*min-width: auto !important;*/
 }
 
 #modalEnterpriseInstall .dataTables_info {
@@ -663,5 +654,3 @@ active: background 10% lighter, border 5% darker
 #noty_center_layout_container {
     z-index: 100000001 !important;
 }
-=======
->>>>>>> appm styles update
