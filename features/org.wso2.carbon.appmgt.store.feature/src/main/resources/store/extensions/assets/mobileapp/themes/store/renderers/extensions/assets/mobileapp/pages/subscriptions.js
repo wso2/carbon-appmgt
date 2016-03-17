@@ -27,6 +27,10 @@ var render = function (theme, data, meta, require) {
     var searchUrl = "/assets/mobileapp";
     var searchQuery =  data.search.query
 
+    var storeObj = jagg.module("manager").getAPIStoreObj();
+
+    var enabledTypeList = storeObj.getEnabledAssetTypeList();
+
     if(data.userAssets){
 
 
@@ -77,8 +81,10 @@ var render = function (theme, data, meta, require) {
     }
 
 
+    data.header.myApps = true;
 
-    theme('2-column-left', {
+    /*
+    theme('2-column-right', {
         title: data.title,
         header: [
             {
@@ -86,44 +92,92 @@ var render = function (theme, data, meta, require) {
                 context: data.header
             }
         ],
-        leftColumn: [
+        navigation: [
             {
-                partial: 'left-column',
-                context: {
-                    navigation: createLeftNavLinks(data),
-                    tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
-                }
+                partial: 'navigation',
+                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
             }
         ],
-        search: [
+        body: [
             {
-                partial: 'search',
-                context: {searchQuery: searchQuery, categories: categories,searchUrl:searchUrl}
-            }
-        ],
-        pageHeader: [
-            {
-                partial: 'page-header',
-                context: {
-                    title: "My Mobile Apps",
-                    sorting: createSortOptions(data.user, data.config)
-                }
-            }
-        ],
-        pageContent: [
-            {
-                partial: 'page-content-userAssets',
+                partial: 'userAssets',
                 context: {
                     'userAssets': data.userAssets,
                     'URL': data.URL,
                     'devices': data.devices,
-                    'selfUnsubscription': data.selfUnsubscription,
-                    'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
+                    'selfUnsubscription' : data.selfUnsubscription,
+                    'isDeviceSubscriptionEnabled' : data.isDeviceSubscriptionEnabled
                 }
+            }
+        ],
+        right: [
+            {
+                partial: 'recent-assets',
+                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
+            },
+            {
+                partial: 'tags',
+                context: data.tags
             }
         ]
     });
+    */
+    if(storeObj.isAssetTypeEnabled("mobileapp")) {
+        theme('2-column-left', {
+            title: data.title,
+            header: [
+                {
+                    partial: 'header',
+                    context: data.header
+                }
+            ],
+            leftColumn: [
+                {
+                    partial: 'left-column',
+                    context: {
+                        navigation: createLeftNavLinks(data),
+                        tags: data.tags,
+                        recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    }
+                }
+            ],
+            search: [
+                {
+                    partial: 'search',
+                    context: {
+                        searchQuery: searchQuery,
+                        categories: categories,
+                        searchUrl: searchUrl
+                    }
+                }
+            ],
+            pageHeader: [
+                {
+                    partial: 'page-header',
+                    context: {
+                        title: "My Mobile Apps",
+                        sorting: createSortOptions(data.user, data.config)
+                    }
+                }
+            ],
+            pageContent: [
+                {
+                    partial: 'page-content-userAssets',
+                    context: {
+                        'userAssets': data.userAssets,
+                        'URL': data.URL,
+                        'devices': data.devices,
+                        'selfUnsubscription': data.selfUnsubscription,
+                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
+                    }
+                }
+            ]
+        });
+
+    }
+    else {
+        response.sendError(404, 'Resource does not exist');
+    }
 };
 
 

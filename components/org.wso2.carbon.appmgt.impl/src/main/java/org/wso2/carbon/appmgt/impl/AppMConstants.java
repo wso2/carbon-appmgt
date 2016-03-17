@@ -120,6 +120,10 @@ public final class AppMConstants {
 
     public static final String SITE_ASSET_TYPE = "site";
 
+    public static final String ENABLED_TYPE_LIST = "EnabledAssetTypeList.";
+
+    public static final String ENABLED_ASSET_TYPE = ENABLED_TYPE_LIST + "Type";
+
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
     public static final String API_OVERVIEW_DISPLAY_NAME = "overview_displayName";

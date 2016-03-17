@@ -34,7 +34,7 @@ var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging, current, total, mainPage, subPage, title, selectedCategory, key,
+    var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
             log = ctx.log,
             sso = ctx.sso,
             isAnonymousTenantStore = ctx.isAnonymousTenantStore,
@@ -88,7 +88,9 @@ require('/modules/store.js').exec(function (ctx) {
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var isSite = 'false';//To get the webapp tags
-
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
+    url = '/assets/' + type + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request,avaliablePages);
 
@@ -426,27 +428,32 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.domain = tenantDomain;
     headerData.assetType = "webapp";
 
-    caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: store.tags(type, isSite)
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
-                   });
+    if (storeHostObj.isAssetTypeEnabled("webapp")) {
+        caramel.render({
+            title: 'Web Apps | Store',
+            user: user,
+            sso: sso,
+            header: headerData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            assets: assets,
+            assetType: 'webapp',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: webAppRecentAssets
+        });
+    }
+    else {
+        response.sendError(404, 'Resource does not exist');
+    }
 }, request, response, session);
 
 function getServiceDir(serviceName) {
