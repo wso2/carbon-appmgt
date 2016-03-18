@@ -28,6 +28,7 @@ var dataInjector=publisher.dataInjector;
 var DataInjectorModes=publisher.DataInjectorModes;
 var filterManager=publisher.filterManager;
 var permissions=require('/modules/permissions.js').permissions;
+var typeList = apiProvider.getEnabledAssetTypeList();
 
 var log=new Log();
 
@@ -225,11 +226,31 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{type}/', function(co
         var sortOpposite = (sort == 'asc'? 'desc': 'asc');
         var sortIcon = (sort == 'asc'? 'down': 'up');
 
-		caramel.render({op : 'list',cuser : server.current(session), roles : server.current(session).getRoles(),
-		shortName : type,artifacts : artifactsInPage,query : query,title : type, pageIndices:pageIndices,
-		leftNav:leftnav, rightNav:rightnav, createPermission:createActionAuthorized, mobileAppCreatePermission:createMobileAppAuthorized,
-		sortOptions:{sortBy: sortby, sort: sortOpposite, icon: sortIcon}
-		});
+        if(apiProvider.isAssetTypeEnabled(type)) {
+           caramel.render({
+                op : 'list',cuser : server.current(session),
+                roles : server.current(session).getRoles(),
+		        shortName : type,
+		        artifacts : artifactsInPage,
+		        query : query,
+		        title : type,
+		        pageIndices:pageIndices,
+		        leftNav:leftnav,
+		        rightNav:rightnav,
+		        createPermission:createActionAuthorized,
+		        mobileAppCreatePermission:createMobileAppAuthorized,
+		        sortOptions:{
+		            sortBy: sortby,
+		            sort: sortOpposite,
+		            icon: sortIcon
+		            },
+		        typeList: typeList
+		    });
+        }
+        else {
+            response.sendError(404, 'Resource does not exist');
+        }
+
 	} catch (e) {
 		response.sendError(400, "Your request is malformed");
 		log.error(e.message);

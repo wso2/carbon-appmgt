@@ -47,14 +47,19 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     mod = jagg.module("documentation");
 
+    var typeList = apiProvider.getEnabledAssetTypeList();
+
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
     var shortName = (context.params.type) || '';
     var operation = 'create';
-    var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
-        return (template.shortName == shortName) ? true : false;
-    });
 
+    var rxtTemplate;
+    if (apiProvider.isAssetTypeEnabled(shortName)) {
+        rxtTemplate = rxtManager.findAssetTemplate(function (template) {
+            return (template.shortName == shortName) ? true : false;
+        });
+    }
 
     var model = modelManager.getModel(shortName);
 
@@ -96,7 +101,9 @@ require('/modules/publisher.js').exec(function(ctx) {
             shortName: shortName,
             rxtTemplate: rxtTemplate,
             data: output,
-            title: title}
+            title: title,
+            typeList: typeList
+            }
         );
     }
 });
@@ -173,20 +180,30 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var docEditAuth = permissions.isAuthorized(user.username, config.permissions.document_edit, um);
         var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
 
-        caramel.render({
-            op: operation,
-            cuser: server.current(session),
-            shortName: shortName,
-            artifact: artifact,
-            rxtTemplate: rxtTemplate,
-            data: output,
-            versions: versionList,
-            tags:tags,
-            title:title,
-            docs: result.docs,
-            appStores:appStoresDetail,
-            permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
-        });
+        if (apiProvider.isAssetTypeEnabled(shortName)) {
+            caramel.render({
+                op: operation,
+                cuser: server.current(session),
+                shortName: shortName,
+                artifact: artifact,
+                rxtTemplate: rxtTemplate,
+                data: output,
+                versions: versionList,
+                tags: tags,
+                title: title,
+                docs: result.docs,
+                appStores: appStoresDetail,
+                permissions: {
+                    canCreate: docCreateAuth,
+                    canEdit: docEditAuth,
+                    canDelete: docDeleteAuth
+                }
+            });
+        }
+        else {
+            response.sendError(404, 'Resource does not exist');
+        }
+
     } catch (e) {
         log.error('The asset with id ' + id + ' could not be found due to : ' + e);
         response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');

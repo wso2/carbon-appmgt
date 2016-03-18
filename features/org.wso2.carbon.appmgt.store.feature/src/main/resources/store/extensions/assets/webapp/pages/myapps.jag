@@ -33,7 +33,7 @@ if (user) {
 var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging,
+    var options, assets, paging, url,
             log = ctx.log,
             sso = ctx.sso,
             query = ctx.params.query,
@@ -66,6 +66,11 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSite = 'false';//To get the webapp tags
     var context = caramel.configs().context;
+    var tagUrl = context;
+    var searchUrl = context + '/extensions/assets/webapp/myapps';
+    url =
+    '/extensions/assets/' + type + '/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
+                                                                                   '');
     var leftnav, rightnav, urlQuery;//For pagination
     
     var headerData = site.header(tenantId, {
@@ -118,7 +123,7 @@ require('/modules/store.js').exec(function (ctx) {
             var displayName = String(asset.attributes.overview_displayName);
             asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(displayName);
         } else if (!(assetThumbnail.indexOf(asset.id) > -1)) {
-            //when getting subscribed apps from appm db it doesn't give full url of thumbnail
+            //when getting subscribed apps from appm db it doesn't give full url of thubnail
             asset.attributes.images_thumbnail = context + "/storage/webapp/" + asset.id + "/" + assetThumbnail;
         }
     };
@@ -460,10 +465,12 @@ require('/modules/store.js').exec(function (ctx) {
 
         // hide all apps link in header
         navigationData.showAllAppsLink = false;
+        tagUrl = tagUrl + '/extensions/assets/webapp/myapps';
     } else {
         //show anonymous + subscribed apps for logged in user.
         //show anonymous apps for anoymous user.
         getAssetsFromDB();
+        tagUrl = tagUrl +  '/assets/webapp';
     }
 
     // add rating,access url etc to retrieved webapps
@@ -472,33 +479,38 @@ require('/modules/store.js').exec(function (ctx) {
     getRecentAssetsFromRegistry();
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
-    caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       navigation: navigationData,
-                       search: {
-                           query: query
-                       },
-                       type: type,
-                       tags: {
-                           data: store.tags(type, isSite)
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
+    if(storeHostObj.isAssetTypeEnabled("webapp")) {
+        caramel.render({
+            title: 'Web Apps | Store',
+            user: user,
+            sso: sso,
+            header: headerData,
+            navigation: navigationData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            },
+            assets: assets,
+            assetType: 'webapp',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: webAppRecentAssets
 
-                   });
+        });
+    }
+    else{
+        response.sendError(404,'Resource does not exist');
+    }
 }, request, response, session);
 
 function getServiceDir(serviceName) {

@@ -3830,6 +3830,60 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         return defaultThumbnail;
     }
+
+	/**
+     * Returns the enabled asset type list in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getEnabledAssetTypeList(Context cx, Scriptable thisObj,
+                                                                 Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray availableAssetTypes = new NativeArray(0);
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        for (int i = 0; i < typeList.size(); i++) {
+            availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
+        }
+        return availableAssetTypes;
+    }
+
+    /**
+     * Returns asset type enabled or not in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isAssetTypeEnabled(Context cx, Scriptable thisObj,
+                                                        Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        String assetType = (String) args[0];
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+
+        for (String type : typeList) {
+            if (assetType.equals(type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
 
 
