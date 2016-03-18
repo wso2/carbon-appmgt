@@ -51,7 +51,7 @@
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
-                                        class="display-none-lg" {{/unless}}>
+                                        style="display: none" {{/unless}}>
                                         <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="remove-from-fav">
@@ -59,7 +59,7 @@
                                         </a>
                                     </li>
                                     <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
-                                        class="display-none-lg" {{/if}}>
+                                        style="display: none" {{/if}}>
                                         <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="add-to-fav">
@@ -132,7 +132,7 @@
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
-                                        class="display-none-lg" {{/unless}}>
+                                        style="display: none" {{/unless}}>
                                         <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="remove-from-fav">
@@ -140,7 +140,7 @@
                                         </a>
                                     </li>
                                     <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
-                                        class="display-none-lg" {{/if}}>
+                                        style="display: none" {{/if}}>
                                         <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="add-to-fav">

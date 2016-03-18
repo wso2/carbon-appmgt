@@ -98,10 +98,8 @@ $( document ).ready(function() {
                            notify(message);
 
                            document.getElementById("favRibbon-" + appId).style.visibility = "visible";
-                           document.getElementById("listItemAddFavorite-" + appId).className = "";
-                           document.getElementById("listItemAddFavorite-" + appId).classList.add("display-none-lg");
-                           document.getElementById("listItemRmvFavorite-" + appId).className = "";
-                           document.getElementById("listItemRmvFavorite-" + appId).classList.add("display-block-lg");
+                           document.getElementById("listItemAddFavorite-" + appId).style.display= "none";
+                           document.getElementById("listItemRmvFavorite-" + appId).style.display= "block";
                        } else {
                            $(waitIconId).hide();
                            var message = 'Error occured in while adding  web app: ' + data.name +
@@ -138,10 +136,8 @@ $( document ).ready(function() {
                            notify(message);
 
                            document.getElementById("favRibbon-" + appId).style.visibility = "hidden";
-                           document.getElementById("listItemRmvFavorite-" + appId).className = "";
-                           document.getElementById("listItemRmvFavorite-" + appId).classList.add("display-none-lg");
-                           document.getElementById("listItemAddFavorite-" + appId).className = "";
-                           document.getElementById("listItemAddFavorite-" + appId).classList.add("display-block-lg");
+                           document.getElementById("listItemAddFavorite-" + appId).style.display= "block";
+                           document.getElementById("listItemRmvFavorite-" + appId).style.display= "none";
                        } else {
                            $(waitIconId).hide();
                            var message = 'Error occured  when remove  web app: ' + data.name
