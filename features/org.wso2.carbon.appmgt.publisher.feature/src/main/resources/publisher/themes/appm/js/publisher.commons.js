@@ -182,8 +182,7 @@ $(document).ready(function() {
 			success : function(response) {
 				$('#modal-redirect').modal('show');
 				setTimeout(function() {
-					var newVersionDetails = response;
-					window.location = newVersionDetails.url;
+					window.location = response.url;
 				}, 2000);
 
 			},
