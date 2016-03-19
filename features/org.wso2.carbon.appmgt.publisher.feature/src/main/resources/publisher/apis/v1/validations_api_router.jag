@@ -93,7 +93,7 @@ require('/modules/publisher.js').exec(function (ctx) {
     routeManager.register('GET', 'publisher', '/publisher/api/validations/assets/{type}/{fieldName}/{fieldValue}', function (context) {
 
         if (context.params) {
-            var shortName = context.params.type;
+            var appType = context.params.type;
             var fieldName = context.params.fieldName;
             var fieldValue = context.params.fieldValue;
         }
@@ -105,10 +105,10 @@ require('/modules/publisher.js').exec(function (ctx) {
             print(isContextExists);
 
         } catch (e) {
-            log.error('An asset of type: ' + shortName
+            log.error('An asset of type: ' + appType
                       + ' could not be created.The following exception was thrown');
             log.error(e);
-            response.sendError(500, 'An asset of type: ' + shortName
+            response.sendError(500, 'An asset of type: ' + appType
                                     + ' could not be created.Please check the server logs.');
         }
 
