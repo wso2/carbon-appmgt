@@ -168,19 +168,24 @@ public class HostObjectUtils {
             throw new IllegalArgumentException("Invalid argument. App name cannot be empty.");
         }
 
-        String[] wordsInAppName = StringUtils.split(appName);
-        int firstCodePoint, secondCodePoint;
-        if (wordsInAppName.length == 1) {
-            // one word
-            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
-            secondCodePoint = wordsInAppName[0].codePointAt(Character.charCount(firstCodePoint));
-        } else {
-            // two or more words
-            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
-            secondCodePoint = wordsInAppName[1].codePointAt(0);
-        }
-        String defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
-                Character.toChars(secondCodePoint)).toString();
+        String defaultThumbnailText;
+        if (appName.length() == 1) {
+            defaultThumbnailText = appName;
+        }else {
+            String[] wordsInAppName = StringUtils.split(appName);
+            int firstCodePoint, secondCodePoint;
+            if (wordsInAppName.length == 1) {
+                // one word
+                firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+                secondCodePoint = wordsInAppName[0].codePointAt(Character.charCount(firstCodePoint));
+            } else {
+                // two or more words
+                firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+                secondCodePoint = wordsInAppName[1].codePointAt(0);
+            }
+            defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
+                    Character.toChars(secondCodePoint)).toString();
+         }
         String defaultThumbnailColor = DEFAULT_THUMBNAIL_COLORS[Math.abs(appName.hashCode()) %
                 DEFAULT_THUMBNAIL_COLORS.length];
 
