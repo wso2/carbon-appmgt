@@ -170,8 +170,10 @@ public class HostObjectUtils {
 
         String defaultThumbnailText;
         if (appName.length() == 1) {
+            // only one character in the app name
             defaultThumbnailText = appName;
-        }else {
+        } else {
+            // there are more than one character in the app name
             String[] wordsInAppName = StringUtils.split(appName);
             int firstCodePoint, secondCodePoint;
             if (wordsInAppName.length == 1) {
@@ -185,7 +187,7 @@ public class HostObjectUtils {
             }
             defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
                     Character.toChars(secondCodePoint)).toString();
-         }
+        }
         String defaultThumbnailColor = DEFAULT_THUMBNAIL_COLORS[Math.abs(appName.hashCode()) %
                 DEFAULT_THUMBNAIL_COLORS.length];
 
