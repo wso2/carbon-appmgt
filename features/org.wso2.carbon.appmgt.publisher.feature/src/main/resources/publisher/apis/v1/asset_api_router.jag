@@ -25,7 +25,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var log = new Log();
     var appmgtPublisher = require('appmgtpublisher');
     var auditLog = require('/modules/auditLog/logger.js');
-
+    var CONTENT_TYPE_JSON = "application/json";
 
     /****************************MOBILE*******************************************/
 
@@ -132,7 +132,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         },null);
 
         if(matches.length>0){
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["App with identifer "+display_attribute+" and version "+attributes.overview_version+" already exists"]}})
             return true;
         }
@@ -161,7 +161,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             model.set('overview.provider',username);
             var output=model.export('form');
 
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(output);
         }
     });
@@ -171,7 +171,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var uuid = context.params.uuid;
         var trackinID= apiProvider.getTrackingID(uuid);
         output["TrackingID"] = trackinID;
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         print(output);
     });
 
@@ -206,7 +206,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
 
         session.put("deploysample", msg);
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         print(msg);
     });
 
@@ -226,7 +226,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             log.error("The copying " + appType + " with UUID " + parentAppId + " could not be retrieved.");
             log.error(e);
             response.status = 404;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content.status = "Not Found";
             content.message.push("The copying " + appType + " with UUID " + parentAppId
                                  + " could not be retrieved.");
@@ -295,7 +295,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     msg['message'] =
                     'Delete is not permitted as this is the default version of the application. '
                     + 'Please select other version of this application as the default version and proceed.';
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print(msg);
                     return;
                 }
@@ -316,7 +316,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     isDeleted = apiProvider.deleteApp(apiIdentifierObj, String(username), ssoProviderObj);
                 }
 
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 if (isDeleted == true) {
                     msg['isDeleted'] = true;
                     msg['message'] = 'Web Application is successfully deleted';
@@ -352,7 +352,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             msg['message'] = 'Delete is not permitted due to insufficient privileges';
             msg['ok'] = false;
             msg['message'] = 'Delete not permitted. Insufficient privilages.';
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(msg);
         }
     });
@@ -381,7 +381,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             //Customize the resource for the current app
             dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
 
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(artifact);
         } catch (e) {
 
@@ -429,7 +429,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //If the report indicates the model has failed validations send an error
             if((report)&&(report.failed)){
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok:false,message:'Validation failure',report:report});
                 return;
             }
@@ -451,7 +451,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 
             if (idField) {
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok: 'true', message: 'Asset created.', id: idField.value});
             }
             else {
@@ -491,7 +491,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         for (var index in tags) {
             tagArray.push({id: counter, name: tags[index]});
         }
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         print(tagArray);
     });
 
@@ -529,7 +529,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 response.contentType = 'application/json';
                 msg['ok'] = false;
                 msg['message'] = 'Update Failed. Can not update in ' + originalArtifact.lifecycleState + ' state.';
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print(msg);
                 return;
             }
@@ -564,7 +564,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
                 msg['ok']=false;
                 msg['report']=report;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print(msg);
                 log.debug(msg);
                 return;
@@ -714,7 +714,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             msg['ok']=true;
             msg['message']='asset updated';
             msg['asset']=artifact;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(msg);
 
 
@@ -726,7 +726,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }else{
             msg['ok'] = false;
             msg['message'] = 'Update Failed. Insufficient privilages.';
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(msg);
             return;
         }
@@ -844,7 +844,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
                 msg['ok']=false;
                 msg['report']=report;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print(msg);
                 return;
             }
@@ -874,7 +874,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             msg['ok']=true;
             msg['message']='asset updated';
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(msg);
 
         } catch (e) {
@@ -891,7 +891,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         try {
             artifactManager.remove(id);
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print({ok: 'true', message: 'Asset deleted'});
         } catch (e) {
             log.debug('Asset ' + id + 'could not be removed.An exception was thrown: ' + e);
@@ -921,11 +921,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                 if (artifact && artifact != null && artifact.length > 0) {
                     var artifactId = artifact[0].id;
                     var res = {error: false, uuid: artifactId};
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print(res);
                 } else {
                     var res = {error: false, uuid: null , message :'Could not find UUID for given webapp'};
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print(res);
                 }
 
@@ -958,11 +958,11 @@ require('/modules/publisher.js').exec(function(ctx) {
                               }
                               if (UUIDs.length > 0) {
                                   var res = {error: false, uuids: UUIDs, count: noOfArtifacts};
-                                  response.contentType = "application/json";
+                                  response.contentType = CONTENT_TYPE_JSON;
                                   print(res);
                               } else {
                                   var res = {error: false, uuids: UUIDs, message: 'Could not find UUID for given webapp'};
-                                  response.contentType = "application/json";
+                                  response.contentType = CONTENT_TYPE_JSON;
                                   print(res);
                               }
 
@@ -982,7 +982,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                         var res = {};
                         res.error = false;
                         res.appStores = externalAppStores;
-                        response.contentType = "application/json";
+                        response.contentType = CONTENT_TYPE_JSON;
                         print(res);
                     }
                 } catch (e) {
@@ -990,7 +990,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                         log.debug('Could not get external app store details for app:' + appProvider + '-' + appName + '' +
                                 '-' + appVersion + "->" + e);
                     }
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     var res = {error: true, appStores: null}
                 }
 
@@ -1009,7 +1009,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     apiProvider.updateExternalAppStores(provider, name, version, data);
                     var res = {};
                     res.success = true;
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print(res);
                 } catch (e) {
                     var errorMsg = 'Could not update the external stores for app : ' + provider + '-' + name + '' +
@@ -1020,7 +1020,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     var res = {};
                     res.success = false;
                     res.message = errorMsg;
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print(res);
                 }
 
@@ -1112,7 +1112,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 log.debug(screenshots);
 
                 if(screenshots==",,"){
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Screenshots not added"]}})
                     return;
                 }
@@ -1130,7 +1130,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 if(ctx.markettype!='enterprise' && ctx.platform.toUpperCase()=="IOS"){
                     var bundleId = getBundleID(meta.package);
                     if(bundleId==null){
-                        response.contentType = "application/json";
+                        response.contentType = CONTENT_TYPE_JSON;
                         print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["App ID is invalid"]}})
                         return;
                     }else{
@@ -1143,7 +1143,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }else if(ctx.platform.toUpperCase()=="ANDROID"){
                     if(ctx.markettype=='enterprise' ){
                         if(getExtensionText(meta.path)!="apk"){
-                            response.contentType = "application/json";
+                            response.contentType = CONTENT_TYPE_JSON;
                             print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["File uploaded is not supported by Android"]}})
                             return;
                         }
@@ -1153,7 +1153,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     }
                 }else if(ctx.platform.toUpperCase()=="IOS" && ctx.markettype!='Market'){
                     if(getExtensionText(meta.path)!="ipa"){
-                        response.contentType = "application/json";
+                        response.contentType = CONTENT_TYPE_JSON;
                         print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["File uploaded is not supported by iOS"]}})
                         return;
                     }
@@ -1168,14 +1168,14 @@ require('/modules/publisher.js').exec(function(ctx) {
                         }
                         model.set('overview.url', meta.weburl);
                     }else{
-                        response.contentType = "application/json";
+                        response.contentType = CONTENT_TYPE_JSON;
                         print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Invalid weburl"]}})
                         return;
                     }
                 }
                 model.set('overview.version', version);
                 if(!checkNonSpecial(ctx.name)){
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}})
                     return;
                 }
@@ -1202,7 +1202,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //If the report indicates the model has failed validations send an error
             if((report)&&(report.failed)){
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok:false,message:'Validation failure',report:report});
                 return;
             }
@@ -1226,7 +1226,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             assetCacheManager.add(asset,shortName);
 
             if (idField) {
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok: 'true', message: 'Asset created.', id: idField.value});
             }
             else {
@@ -1318,7 +1318,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     modelA.set('images.screenshots',ssValues.join());
                 }
                 if(!checkNonSpecial(ctx.name)){
-                    response.contentType = "application/json";
+                    response.contentType = CONTENT_TYPE_JSON;
                     print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Special characters found in name"]}});
                     return;
                 }
@@ -1337,7 +1337,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             if((report)&&(report.failed)){
                 msg['ok']=false;
                 msg['report']=report;
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print(msg);
                 log.debug(msg);
                 return;
@@ -1373,13 +1373,13 @@ require('/modules/publisher.js').exec(function(ctx) {
             msg['ok']=true;
             msg['message']='asset updated';
             msg['asset']=artifact;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print(msg);
 
         } catch (e) {
             log.error(e);
 			log.error('The asset ' + id + ' could not be updated.');
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print({"ok" : false, "message" : "Permission denied", "report" : {"failed" : true, "name" : ["You are not allowed to edit at this stage"]}});
         }
 
@@ -1434,7 +1434,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         var result = mobileValidator.validateModel(newVersionModel, false);
         if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             content = {status: 'Validation Error', validationResults: result.validationResults};
             response.content = stringify(content);
             return;
@@ -1443,7 +1443,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         result = newVersionModel.validate();
         if (result && result.failed) {
             response.status = 422;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             response.content = stringify({status: "Validation Error", message: result});
             return;
         }
@@ -1469,7 +1469,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
         if (previousVersions.length > 1) {
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             var validationResults = {};
             validationResults[mobileValidatorModule.Field.OVERVIEW_VERSION] =
                 "Version '" + version + "' of mobile app '"
@@ -1487,7 +1487,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                       + oldVersionArtifact.attributes.overview_version + "'.");
             log.error(e);
             response.status = 500;
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             var content = {};
             content.status = "Error";
             content.message = "Cannot create new version '" + version + "' of mobile app '"
@@ -1511,7 +1511,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         // everything went great
         response.status = 200;
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         response.content = stringify({status: "Success"});
 
     }

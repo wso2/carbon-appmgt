@@ -18,6 +18,7 @@ require('/modules/publisher.js').exec(function (ctx) {
     var router = require('/modules/router-g.js').router();
     var routeManager = new router.Router();
     var log = new Log();
+    var CONTENT_TYPE_JSON = "application/json";
 
     routeManager.register('GET', 'publisher', '/publisher/api/validate/{appType}/field/{fieldName}', function (context) {
 
@@ -32,7 +33,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                                                            queryParams);
             if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
                 response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 var content = {status: "Validation Error", message: result.message};
                 response.content = stringify(content);
                 return;
@@ -59,7 +60,7 @@ require('/modules/publisher.js').exec(function (ctx) {
 
             if (result.status != mobileValidatorModule.ValidationStatus.VALID) {
                 response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 var content = {
                     status: "Validation Error",
                     validationResults: result.validationResults
