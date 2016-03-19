@@ -49,7 +49,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Adds versioned web app configuration to the gateway
+	 * Adds versioned web app configuration to the gateway.
 	 *
 	 * @param builder gateway configuration builder
 	 * @param tenantDomain tenant domain of the web app
@@ -79,7 +79,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Returns versioned web app configuration from the gateway
+	 * Returns versioned web app configuration from the gateway.
 	 *
 	 * @param tenantDomain tenant domain of the web app
 	 * @return web app gateway endpoint data
@@ -106,7 +106,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Updates versioned web app configuration in the gateway
+	 * Updates versioned web app configuration in the gateway.
 	 *
 	 * @param builder gateway configuration builder
      * @param tenantDomain tenant domain of the web app
@@ -136,7 +136,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Deletes versioned web app configuration from the gateway
+	 * Deletes versioned web app configuration from the gateway.
 	 *
 	 * @param tenantDomain tenant domain of the web app
 	 * @throws AxisFault if an error occurred when deleting
@@ -160,7 +160,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Adds non-versioned web app configuration to the gateway
+	 * Adds non-versioned web app configuration to the gateway.
 	 *
 	 * @param builder gateway configuration builder
      * @param tenantDomain tenant domain of the web app
@@ -190,7 +190,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Updates non-versioned web app configuration in the gateway
+	 * Updates non-versioned web app configuration in the gateway.
 	 *
 	 * @param builder gateway configuration builder
      * @param tenantDomain tenant domain of the web app
@@ -221,7 +221,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Deletes non-versioned web app configuration form the gateway
+	 * Deletes non-versioned web app configuration form the gateway.
 	 *
 	 * @param tenantDomain tenant domain of the web app
      * @throws AxisFault if an error occurred when deleting
@@ -245,7 +245,7 @@ public class RESTAPIAdminClient extends AbstractAPIGatewayAdminClient {
 	}
 
 	/**
-	 * Returns the non-versioned web app configuration from the gateway
+	 * Returns the non-versioned web app configuration from the gateway.
 	 *
 	 * @param tenantDomain tenant domain of the web app
      * @return web app gateway endpoint data
