@@ -38,13 +38,11 @@ $(function () {
             url: context.url,
             type: 'GET',
             success: function (response) {
-               	if(response.cachedAssets.length){
+                if (response.cachedAssets.length) {
                		var recentTmplComp =  Handlebars.compile(recentTmpl);
 					$('.asset-being-added').html(recentTmplComp(response)).slideDown();
                	}
-				
-                if(response.cachedAssetsBefore!=response.cachedAssetsAfter){
-
+                if (response.cachedAssetsBefore != response.cachedAssetsAfter) {
                     window.location= caramel.context +'/assets/'+context.type+'/';
                 }
             },
