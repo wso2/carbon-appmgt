@@ -353,7 +353,6 @@ require('/modules/publisher.js').exec(function(ctx) {
             msg['ok'] = false;
             msg['message'] = 'Delete not permitted. Insufficient privilages.';
             response.contentType = "application/json";
-            response.contentType = "application/json";
             print(msg);
         }
     });
