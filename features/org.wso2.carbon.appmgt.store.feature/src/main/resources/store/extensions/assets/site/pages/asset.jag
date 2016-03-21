@@ -89,6 +89,15 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (asset) {
+        var assetLifecycleState = asset.lifecycleState;
+        //If the asset is not in "Published" or "Deprecated" state, webapp overview page should not be accessible
+        if (assetLifecycleState != "Published" && assetLifecycleState != "Deprecated") {
+            response.sendError(404, 'Requested asset with assset is : ' + asset.id + 'cannot be found. It is in ' +
+            assetLifecycleState + 'state.');
+        }
+    }
+
     /**
      * Sets the default thumbnail of the specified asset.
      * @param asset {Object} asset
