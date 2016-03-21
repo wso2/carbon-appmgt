@@ -28,6 +28,7 @@ var  caramel = require('caramel');
 var context = caramel.configs().context;
 var log = new Log('favouriteapps');
 
+
 require('/modules/store.js').exec(function (ctx) {
     var sso = ctx.sso,
             store = ctx.store,
@@ -46,6 +47,10 @@ require('/modules/store.js').exec(function (ctx) {
     var  assetType = "webapp";
     if(request.getParameter('type') == "site") {
         assetType = "site"
+    }
+
+    if (!storeObj.isAssetTypeEnabled(assetType)) {
+        response.sendError(404, 'Resource does not exist');
     }
     //if user not logged in redirect to login page
     if (!user) {
@@ -121,7 +126,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var recentAssets = getRecentAssetsFromRegistry(store,assetType);
 
-    if (storeObj.isAssetTypeEnabled(assetType)) {
         caramel.render({
             title: 'Favourite Apps | Store',
             header: {
@@ -148,12 +152,6 @@ require('/modules/store.js').exec(function (ctx) {
             recentAssets: recentAssets,
             isHomePage: hasFavouritePage
         }, request, response, session);
-
-    }
-    else {
-        response.sendError(404, 'Resource does not exist');
-    }
-
 }, request, response, session);
 
 
@@ -172,8 +170,6 @@ function filterAssets(assets,type) {
     var sites = [];
     var webApps = [];
     var apps = [];
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
 
     var numberOfAssets = assets.length;
     for (var i = 0; i < numberOfAssets; i++) {
