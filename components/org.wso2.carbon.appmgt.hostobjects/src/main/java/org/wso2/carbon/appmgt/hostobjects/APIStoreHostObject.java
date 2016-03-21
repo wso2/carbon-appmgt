@@ -30,12 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
@@ -1601,28 +1596,8 @@ public class APIStoreHostObject extends ScriptableObject {
         }
 
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        Subscriber subscriber = apiConsumer.getSubscriber(userId);
-        if (subscriber == null) {
-            subscriber = new Subscriber(userId);
-            subscriber.setSubscribedDate(new Date());
-            //TODO : need to set the proper email
-            subscriber.setEmail("");
-            try {
-                int tenantId =
-                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
-                                              .getTenantId(
-                                                      MultitenantUtils.getTenantDomain(userId));
-                subscriber.setTenantId(tenantId);
-                apiConsumer.addSubscriber(subscriber);
-            } catch (AppManagementException e) {
-                handleException("Error while adding the subscriber" + subscriber.getName(), e);
-                return false;
-            } catch (Exception e) {
-                handleException("Error while adding the subscriber" + subscriber.getName(), e);
-                return false;
-            }
 
-        }
+        addSubscriber(userId, thisObj);
 
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
@@ -2185,6 +2160,35 @@ public class APIStoreHostObject extends ScriptableObject {
             }
         }
         return null;
+    }
+
+    private static boolean addSubscriber(String userId, Scriptable thisObj)
+            throws ScriptException, AppManagementException, UserStoreException {
+
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        Subscriber subscriber = apiConsumer.getSubscriber(userId);
+        if (subscriber == null) {
+            subscriber = new Subscriber(userId);
+            subscriber.setSubscribedDate(new Date());
+            //TODO : need to set the proper email
+            subscriber.setEmail("");
+            try {
+                int tenantId =
+                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                              .getTenantId(
+                                                      MultitenantUtils.getTenantDomain(userId));
+                subscriber.setTenantId(tenantId);
+                apiConsumer.addSubscriber(subscriber);
+            } catch (AppManagementException e) {
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                return false;
+            } catch (Exception e) {
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 
