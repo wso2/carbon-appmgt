@@ -15,7 +15,9 @@ var render = function (theme, data, meta, require) {
                 partial: 'left-column',
                 context: {
                     navigation: createLeftNavLinks(data),
-                    tags: data.tags
+                    tags: data.tags,
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
@@ -30,7 +32,9 @@ var render = function (theme, data, meta, require) {
                 partial: 'page-header',
                 context: {
                     title: "Favourite Apps",
-                    sorting: createSortOptions(data)
+                    sorting: createSortOptions(data),
+                    myFav: true,
+                    isHomePage: data.isHomePage
                 }
             }
         ],

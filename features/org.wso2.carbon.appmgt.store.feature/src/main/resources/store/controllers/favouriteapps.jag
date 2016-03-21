@@ -16,14 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var caramel;
+include('/jagg/jagg.jag');
+
 var SubscriptionService;
 var subsApi;
 var AuthService;
 var authenticator;
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+var  caramel = require('caramel');
+var context = caramel.configs().context;
 var log = new Log('favouriteapps');
 
-include('/jagg/jagg.jag');
 
 require('/modules/store.js').exec(function (ctx) {
     var sso = ctx.sso,
@@ -44,6 +48,10 @@ require('/modules/store.js').exec(function (ctx) {
     if(request.getParameter('type') == "site") {
         assetType = "site"
     }
+
+    if (!storeObj.isAssetTypeEnabled(assetType)) {
+        response.sendError(404, 'Resource does not exist');
+    }
     //if user not logged in redirect to login page
     if (!user) {
         var referer = store.getReferer(request);
@@ -51,7 +59,7 @@ require('/modules/store.js').exec(function (ctx) {
         response.sendRedirect(redirectUrl);
         return;
     }
-    caramel = require('caramel');
+
     //Get subscription configuration options
     var favourites = jagg.module("favourites");
     var subscriptionUtil = require('/themes/store/js/subscription-config.js');
@@ -116,16 +124,13 @@ require('/modules/store.js').exec(function (ctx) {
         hasFavouritePage = result.status;
     }
 
-    var sortOptions = createSortOptions();
+    var recentAssets = getRecentAssetsFromRegistry(store,assetType);
 
-    if (storeObj.isAssetTypeEnabled(assetType)) {
         caramel.render({
             title: 'Favourite Apps | Store',
             header: {
                 user: user,
                 sso: sso,
-                isHomePage: hasFavouritePage,
-                myFav: true,
                 storeTenantDomain: storeTenantDomain,
                 assetType: assetType,
                 enabledTypeList: enabledTypeList
@@ -143,14 +148,10 @@ require('/modules/store.js').exec(function (ctx) {
                 query: searchQuery
             },
             sso: sso,
-            favouriteApps: apps
+            favouriteApps: apps,
+            recentAssets: recentAssets,
+            isHomePage: hasFavouritePage
         }, request, response, session);
-
-    }
-    else {
-        response.sendError(404, 'Resource does not exist');
-    }
-
 }, request, response, session);
 
 
@@ -169,8 +170,6 @@ function filterAssets(assets,type) {
     var sites = [];
     var webApps = [];
     var apps = [];
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
 
     var numberOfAssets = assets.length;
     for (var i = 0; i < numberOfAssets; i++) {
@@ -226,21 +225,7 @@ function filterAssets(assets,type) {
     return apps;
 }
 
-/**
- * Decides which sorting options should be shown in my favourite page.
- * @returns {{}}
- */
-function createSortOptions() {
-    var url = "/assets/favouriteapps?sort="
-    var sortOptions = {};
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-sort"};
-    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
-    var options = [];
-    options.push(sortByAlphabet);
-    options.push(sortByRecent);
-    sortOptions["options"] = options;
-    return sortOptions;
-}
+
 /**
  * check whether asset has an active life cycle.
  * return true if published/deprecated else false
@@ -253,5 +238,55 @@ function isActive(asset) {
     asset.lifecycleState = asset.lifeCycleStatus;
     return active;
 }
+
+/**
+ * Retrieve the recently added assets from registry when both subscriptions are disabled.
+ */
+function getRecentAssetsFromRegistry(store, assetType, type) {
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
+    var SITE_QUERY = getSiteQuery(assetType);
+    var recentAssets = store.recentAssets('webapp', RECENT_ASSET_COUNT, SITE_QUERY);
+
+    for (var i = 0; i < recentAssets.length; i++) {
+        // set default thumbnail of 'recentAsset'
+        setDefaultThumbnail(recentAssets[i]);
+    }
+    return recentAssets;
+};
+
+function getSiteQuery(assetType) {
+    var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
+    var SITE_QUERY;
+    var treatAsASite = "TRUE";
+    if (assetType == 'webapp') {
+        treatAsASite = "FALSE"
+    }
+    if (isMultipleVersionDisplayEnabled) {
+        //if multiple versions to be displayed don't consider default version
+        SITE_QUERY =
+        {"overview_treatAsASite": treatAsASite};
+    } else {
+        //if multiple versions to be displayed don consider default version
+        SITE_QUERY =
+        {"overview_treatAsASite": treatAsASite, "overview_makeAsDefaultVersion": "true"};
+    }
+    return SITE_QUERY
+}
+
+
+/**
+ * Sets the default thumbnail of the specified asset.
+ * @param asset {Object} asset
+ */
+function setDefaultThumbnail(asset) {
+    var assetThumbnail = asset.attributes.images_thumbnail;
+    if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+        var displayName = String(asset.attributes.overview_displayName);
+        asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(displayName);
+    } else if (!(assetThumbnail.indexOf(asset.id) > -1)) {
+        //when getting subscribed apps from appm db it doesn't give full url of thubnail
+        asset.attributes.images_thumbnail = context + "/storage/webapp/" + asset.id + "/" + assetThumbnail;
+    }
+};
 %>
 
