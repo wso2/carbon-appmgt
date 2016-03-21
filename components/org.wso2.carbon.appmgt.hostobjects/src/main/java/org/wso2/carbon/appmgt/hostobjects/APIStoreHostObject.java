@@ -1582,7 +1582,8 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static boolean jsFunction_addAPISubscription(Context cx,
-                            Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+                            Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException, ScriptException, UserStoreException {
         if (!isStringArray(args)) {
             return false;
         }
@@ -1599,6 +1600,30 @@ public class APIStoreHostObject extends ScriptableObject {
             trustedIdp = args[7].toString();
         }
 
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        Subscriber subscriber = apiConsumer.getSubscriber(userId);
+        if (subscriber == null) {
+            subscriber = new Subscriber(userId);
+            subscriber.setSubscribedDate(new Date());
+            //TODO : need to set the proper email
+            subscriber.setEmail("");
+            try {
+                int tenantId =
+                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                              .getTenantId(
+                                                      MultitenantUtils.getTenantDomain(userId));
+                subscriber.setTenantId(tenantId);
+                apiConsumer.addSubscriber(subscriber);
+            } catch (AppManagementException e) {
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                return false;
+            } catch (Exception e) {
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                return false;
+            }
+
+        }
+
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
 
@@ -1612,7 +1637,6 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             WebApp api = apiConsumer.getAPI(apiIdentifier);
 
 	    	/* Tenant based validation for subscription*/
@@ -2163,31 +2187,6 @@ public class APIStoreHostObject extends ScriptableObject {
         return null;
     }
 
-    public static boolean jsFunction_addSubscriber(Context cx,
-                                                   Scriptable thisObj, Object[] args, Function funObj)
-            throws ScriptException, AppManagementException, UserStoreException {
-
-        if (args!=null && isStringArray(args)) {
-            Subscriber subscriber = new Subscriber((String) args[0]);
-            subscriber.setSubscribedDate(new Date());
-            //TODO : need to set the proper email
-            subscriber.setEmail("");
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
-            try {
-                int tenantId=ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(MultitenantUtils.getTenantDomain((String) args[0]));
-                subscriber.setTenantId(tenantId);
-                apiConsumer.addSubscriber(subscriber);
-            } catch (AppManagementException e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
-                return false;
-            } catch (Exception e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
 
     public static boolean jsFunction_sleep(Context cx,
                                            Scriptable thisObj, Object[] args, Function funObj){
