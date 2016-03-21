@@ -83,7 +83,8 @@ require('/modules/store.js').exec(function (ctx) {
         myAssets: { user: user, type: type, title: title},
         selfUnsubscription : selfUnsubscription,
         isDeviceSubscriptionEnabled : isDeviceSubscriptionEnabled,
-        tags: tags
+        tags: tags,
+        assetType: "mobileapp"
     });
 }, request, response, session);
 %>

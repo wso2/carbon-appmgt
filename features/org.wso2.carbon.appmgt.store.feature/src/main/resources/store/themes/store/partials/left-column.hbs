@@ -58,17 +58,23 @@ its own partion sinceit does not support tags--}}
         <ul class="recent-app-items">
             {{#each recentApps}}
                 <li>
-                    <a href="{{appUrl}}">
+                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                            <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
+                {{else}}
+                    <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
+                {{/ifCond}}
                         <div class="recent-app-item-thumbnail">
                             {{#if defaultThumbnail}}
-                                <div style="background-color: #{{defaultThumbnail.color}};"></div>
+                                <div style="background-color: #{{defaultThumbnail.color}};">
+                                    <span>{{defaultThumbnail.text}}</span>
+                                </div>
                             {{else}}
                                 <img src="{{attributes.images_thumbnail}}" />
                             {{/if}}
                         </div>
                         <div class="recent-app-item-summery">
-                            <h4 class="media-heading">{{attributes.overview_displayName}}</h4>
-                            {{attributes.overview_provider}}
+                            <h4 class="media-heading">{{attributes.overview_displayName}} </h4>
+                            {{attributes.overview_version}}
                         </div>
                     </a>
                 </li>

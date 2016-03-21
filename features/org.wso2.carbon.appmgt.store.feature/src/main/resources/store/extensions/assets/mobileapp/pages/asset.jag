@@ -86,6 +86,7 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
     headerData.domain = tenantDomain;
+    headerData.assetType = "mobileapp";
 
     var searchQuery = { search: "", searchTerm: "overview_name"};
 
@@ -117,7 +118,8 @@ require('/modules/store.js').exec(function (ctx) {
             }
         ],
         myAssets: { user: user, type: type, title: title },
-        recentAssets: store.recentAssets(type)
+        recentAssets: store.recentAssets(type),
+        assetType: "mobileapp"
     });
 }, request, response, session);
 %>

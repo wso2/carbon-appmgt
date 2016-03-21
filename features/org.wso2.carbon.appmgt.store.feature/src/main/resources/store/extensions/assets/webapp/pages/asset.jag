@@ -495,6 +495,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
+        headerData.assetType = "webapp";
 
         var metadata = {
             appName: asset.attributes.overview_name,
@@ -538,7 +539,8 @@ require('/modules/store.js').exec(function (ctx) {
             config: {
                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
                 isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-            }
+            },
+            assetType : 'webapp'
         });
     }
 

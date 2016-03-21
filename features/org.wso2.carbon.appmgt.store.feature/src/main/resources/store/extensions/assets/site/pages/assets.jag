@@ -401,6 +401,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             recentAssets[i].rating = 0;
         }
+        setDefaultThumbnail(recentAssets[i]);
         siteRecentAssets.push(recentAssets[i]);
     }
 

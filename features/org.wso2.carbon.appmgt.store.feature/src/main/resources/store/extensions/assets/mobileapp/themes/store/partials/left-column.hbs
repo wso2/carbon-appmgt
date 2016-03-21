@@ -31,12 +31,32 @@
     {{/each}}
 </nav>
 
-{{!-- left-column - tags --}}
-{{!--currently mobile apps doesnot support tags--}}
-<div class="add-margin-top-3x hidden-xs hidden-sm">
-    <div class="tags-title" style="background-color: #EFEFEF !important;
-    border: #EFEFEF !important;"></div>
-</div>
+
 
 {{!-- left-column - recent apps --}}
-<!--goes here {recentApps}-->
+{{#if recentApps}}
+    <div class="add-margin-top-3x hidden-xs hidden-sm">
+        <div class="section-title">{{t "Recent Apps"}}</div>
+        <ul class="recent-app-items">
+            {{#each recentApps}}
+                <li>
+                    <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
+                    <div class="recent-app-item-thumbnail">
+                        {{#if defaultThumbnail}}
+                            <div style="background-color: #{{defaultThumbnail.color}};">
+                                <span>{{defaultThumbnail.text}}</span>
+                            </div>
+                        {{else}}
+                            <img src="{{attributes.images_thumbnail}}" />
+                        {{/if}}
+                    </div>
+                    <div class="recent-app-item-summery">
+                        <h4 class="media-heading">{{attributes.overview_displayName}}</h4>
+                        {{attributes.overview_version}}
+                    </div>
+                </a>
+                </li>
+            {{/each}}
+        </ul>
+    </div>
+{{/if}}
