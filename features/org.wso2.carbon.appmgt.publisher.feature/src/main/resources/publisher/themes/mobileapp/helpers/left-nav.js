@@ -41,14 +41,13 @@ var generateLeftNavJson = function (data, listPartial) {
     }
 
     var user = server.current(session);
-    var um = server.userManager(user.tenantId);
-    var createActionAuthorized = permissions.isAuthorized(user.username,
-                                                          config.permissions.webapp_create, um);
+    var userManager = server.userManager(user.tenantId);
+    var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, userManager);
     if (!createActionAuthorized) {
         return leftNavItems;
     }
 
-    var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
+    var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, userManager);
     if (user.hasRoles(["admin"])) {
         editEnabled = true;
     }

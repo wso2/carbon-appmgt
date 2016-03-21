@@ -1,7 +1,7 @@
 var resources=function(page,meta){
     return{
-        js:['logic/myapp/myapp.js', 'bootstrap-tour.min.js'],
-        css: ['bootstrap-tour.css']
+        js:['logic/myapp/myapp.js', '../libs/bootstrap-tour-0.10.1/bootstrap-tour.min.js'],
+        css: ['../libs/bootstrap-tour-0.10.1/bootstrap-tour.css']
     };
 };
 
