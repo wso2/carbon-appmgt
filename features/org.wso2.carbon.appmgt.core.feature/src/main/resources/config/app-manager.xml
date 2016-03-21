@@ -11,12 +11,12 @@
     <APPStoreConfiguration>
         <!--
     This parameter specifies whether to display multiple versions of same
-    API or only showing the latest version of an API.
+    APP or only showing the latest version of an APP.
         -->
         <DisplayMultipleVersions>true</DisplayMultipleVersions>
     </APPStoreConfiguration>
 
-    <!--subscription configuration is used by gateway-->
+    <!--subscription configuration is used by gateway,store,publisher-->
     <SubscriptionConfiguration>
         <EnableSelfSubscription>false</EnableSelfSubscription>
         <EnableEnterpriseSubscription>false</EnableEnterpriseSubscription>

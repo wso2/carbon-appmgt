@@ -21,11 +21,9 @@ $(function () {
     });
 
     function searchAsset(searchTerm) {
-        if (checkNonSpecial(searchTerm)) {
+        if (!checkIllegalChars(searchTerm)) {
             var searchSelect = $('#searchSelect').val();
-            if (searchSelect !== "App") {
-                searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
-            }
+            searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
             var searchUrl = $('#searchUrl').val();
             if (searchUrl.indexOf('type=webapp') > -1) {
                 location.href =
@@ -37,13 +35,16 @@ $(function () {
                 location.href =
                 location.protocol + '//' + location.host + searchUrl + '?query=' + searchTerm;
             }
+        } else {
+            alert("Search value  contains one or more illegal characters : [~!@#;%^*()+={}|\\<>\"\',]");
         }
 
     }
 
-    function checkNonSpecial(value) {
-        var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
-        return non_special_regex.test(value);
+    function checkIllegalChars(value) {
+        // registry doesn't allow following illegal charecters
+        var special_regex = /[~!@#;%^*()+={}|\\<>"',]/;
+        return special_regex.test(value);
     }
 
 });

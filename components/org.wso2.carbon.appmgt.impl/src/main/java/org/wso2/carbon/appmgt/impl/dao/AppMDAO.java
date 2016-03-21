@@ -8567,6 +8567,7 @@ public class AppMDAO {
 
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
                 query = query + " AND  APP.APP_PROVIDER LIKE ?";
+                searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
                 query = query + " AND  APP.APP_NAME LIKE ?";
             }
@@ -8699,6 +8700,7 @@ public class AppMDAO {
 
             if (searchOption == WebAppSearchOption.SEARCH_BY_APP_PROVIDER) {
                 query = query + " AND  APM_APP.APP_PROVIDER LIKE ?";
+                searchValue = AppManagerUtil.replaceEmailDomainBack(searchValue);
             } else {
                 query = query + " AND  APM_APP.APP_NAME LIKE ?";
             }

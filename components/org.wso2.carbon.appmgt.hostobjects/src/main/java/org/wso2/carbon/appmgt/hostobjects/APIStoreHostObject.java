@@ -3436,7 +3436,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject row = new NativeObject();
                 row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, identifier.getProviderName());
+                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
                 row.put("version", row, identifier.getVersion());
                 row.put("context", row, app.getContext());
                 row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
@@ -3594,7 +3594,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 NativeObject attributes = new NativeObject();
                 attributes.put("overview_name", attributes, identifier.getApiName());
                 attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, identifier.getProviderName());
+                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                        identifier.getProviderName()));
                 attributes.put("overview_context", attributes, app.getContext());
                 attributes.put("overview_version", attributes, identifier.getVersion());
                 attributes.put("overview_appTenant", attributes, app.getAppTenant());
@@ -3606,7 +3607,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject asset = new NativeObject();
                 asset.put("id", asset, app.getUUID());
-                asset.put("lifeCycleStatus", asset, lifeCycleStatus);
+                asset.put("lifecycleState", asset, lifeCycleStatus);
                 asset.put("accessUrl", asset, accessUrl);
                 asset.put("attributes", asset, attributes);
 
