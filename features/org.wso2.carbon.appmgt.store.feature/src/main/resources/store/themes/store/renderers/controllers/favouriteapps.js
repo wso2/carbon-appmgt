@@ -32,7 +32,9 @@ var render = function (theme, data, meta, require) {
                 partial: 'page-header',
                 context: {
                     title: "Favourite Apps",
-                    sorting: createSortOptions(data)
+                    sorting: createSortOptions(data),
+                    myFav: true,
+                    isHomePage: data.isHomePage
                 }
             }
         ],

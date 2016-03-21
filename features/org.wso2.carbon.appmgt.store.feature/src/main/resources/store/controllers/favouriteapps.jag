@@ -127,8 +127,6 @@ require('/modules/store.js').exec(function (ctx) {
             header: {
                 user: user,
                 sso: sso,
-                isHomePage: hasFavouritePage,
-                myFav: true,
                 storeTenantDomain: storeTenantDomain,
                 assetType: assetType,
                 enabledTypeList: enabledTypeList
@@ -147,7 +145,8 @@ require('/modules/store.js').exec(function (ctx) {
             },
             sso: sso,
             favouriteApps: apps,
-            recentAssets: recentAssets
+            recentAssets: recentAssets,
+            isHomePage: hasFavouritePage
         }, request, response, session);
 
     }
