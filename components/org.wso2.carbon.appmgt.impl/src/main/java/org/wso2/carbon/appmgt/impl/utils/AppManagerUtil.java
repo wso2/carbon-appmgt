@@ -3178,5 +3178,23 @@ public final class AppManagerUtil {
         return path;
     }
 
+	/**
+	 * This get the basic authentication header as a input and decode it and gives username, password in return
+	 *
+	 * @param basicAuthHeader
+	 * @return
+	 */
+	public static String[] getCredentialsFromBasicAuthHeader(String basicAuthHeader) {
+		if (basicAuthHeader != null) {
+			String base64Credentials = basicAuthHeader.substring("Basic".length()).trim();
+			String credentialsString = new String(org.apache.commons.ssl.Base64.decodeBase64(base64Credentials.getBytes()));
+			final String[] credentials = credentialsString.split(":", 2);
+			if (credentials.length == 2) {
+				return credentials;
+			}
+		}
+
+		return null;
+	}
 
 }
