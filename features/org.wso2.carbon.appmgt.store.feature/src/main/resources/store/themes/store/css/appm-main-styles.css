@@ -211,6 +211,9 @@ header .header-action:active {
     padding: 0 5px 0 5px;
 }
 
+.page-content .page-title {
+    margin-left: 0px;
+}
 /**/
 /*========== NO APPS ==========*/
 .no-apps {

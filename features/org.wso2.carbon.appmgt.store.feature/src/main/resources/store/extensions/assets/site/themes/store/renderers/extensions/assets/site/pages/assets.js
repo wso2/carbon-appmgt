@@ -50,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Web Apps",
+                    title: "All Sites",
                     sorting: createSortOptions(data)
                 }
             }
