@@ -35,7 +35,8 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],

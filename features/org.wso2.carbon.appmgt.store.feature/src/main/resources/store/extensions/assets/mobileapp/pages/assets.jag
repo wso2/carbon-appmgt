@@ -256,7 +256,8 @@ require('/modules/store.js').exec(function (ctx) {
                 leftNav: leftnav,
                 rightNav: rightnav
             },
-            recentAssets: store.recentAssets(type)
+            recentAssets: store.recentAssets(type),
+            assetType: "mobileapp"
 
         });
     }

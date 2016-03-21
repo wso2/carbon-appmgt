@@ -15,7 +15,9 @@ var render = function (theme, data, meta, require) {
                 partial: 'left-column',
                 context: {
                     navigation: createLeftNavLinks(data),
-                    tags: data.tags
+                    tags: data.tags,
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
