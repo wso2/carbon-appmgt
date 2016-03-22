@@ -638,24 +638,18 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         apiPublished.setOldOutSequence(oldApi.getOutSequence());
 
                         //update version
-                        if (api.isDefaultVersion()) {
+                        if (api.isDefaultVersion() || oldApi.isDefaultVersion()) {
                             removeDefaultVersionFromNonPublishedApps(api);
-                            removeFromGateway(api);
+
+                            //remove both versioned/non versioned apis
+                            WebApp webApp = new WebApp(api.getId());
+                            webApp.setDefaultVersion(true);
+                            removeFromGateway(webApp);
                         }
 
                         //publish to gateway if skipGateway is disabled only
                         if (!api.getSkipGateway()) {
                             publishToGateway(apiPublished);
-                        }
-
-                    } else {
-                        //update version
-                        String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
-                                api.getId().getApiName(),
-                                api.getId().getProviderName(), AppDefaultVersion.APP_IS_PUBLISHED);
-                        if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
-                            appMDAO.updatePublishedDefaultVersion(api);
-                            removeDefaultVersionFromNonPublishedApps(api);
                         }
                     }
                 } else {
@@ -852,15 +846,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                                                              null);
                                 WebApp webApp = new WebApp(identifier);
                                 appMDAO.updatePublishedDefaultVersion(webApp);
-
-
-                                //update the registry and reset default version
-                                identifier = new APIIdentifier(api.getId().getProviderName(),
-                                                               api.getId().getApiName(),
-                                                               api.getId().getVersion());
-                                webApp = getAPI(identifier);
-                                webApp.setDefaultVersion(false);
-                                updateApiArtifact(webApp, false, false);
                             }
                         }
 
@@ -869,27 +854,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
                             //update version
                             if (status.equals(APIStatus.PUBLISHED)) {
-                                if (!api.isDefaultVersion()) {
-                                    String defaultPublishedAppVersion = AppMDAO.getDefaultVersion(
-                                            api.getId().getApiName(),
-                                            api.getId().getProviderName(), AppDefaultVersion.APP_IS_PUBLISHED);
-                                    if (defaultPublishedAppVersion == null || "".equals(defaultPublishedAppVersion)) {
-                                        //if there are no published default versions, make this as default
-                                        api.setDefaultVersion(true);
-                                    }
-                                }
-
                                 if (api.isDefaultVersion()) {
                                     appMDAO.updateDefaultVersionDetails(api);
                                     removeDefaultVersionFromNonPublishedApps(api);
-
-                                    //update current registry version as the default when publishing default app version
-                                    APIIdentifier appIdentifier = new APIIdentifier(api.getId().getProviderName(),
-                                                                                    api.getId().getApiName(),
-                                                                                    api.getId().getVersion());
-                                    WebApp webApp = getAPI(appIdentifier);
-                                    webApp.setDefaultVersion(true);
-                                    updateApiArtifact(webApp, false, false);
                                 }
                             }
 

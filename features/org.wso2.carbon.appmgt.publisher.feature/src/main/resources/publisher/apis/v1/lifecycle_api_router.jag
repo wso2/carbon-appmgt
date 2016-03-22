@@ -210,31 +210,6 @@ require('/modules/publisher.js').exec(function (ctx) {
             var appName = webApp.name;
             var appVersion = webApp.version;
             var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
-
-            try {
-                if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
-                    log.error("Insufficient permissions to perform '" + action + "' on " + appType);
-                    response.status = 401;
-                    response.contentType = "application/json";
-                    content.status = "Access Denied";
-                    content.messages.push("'" + action + "' is not permitted as this is the default version of the '"
-                                          + appType + "'. Please select other version of this '" + appType
-                                          + "' as the default version and proceed.");
-                    response.content = stringify(content);
-                    return;
-                }
-            } catch (e) {
-                log.error("Error while retrieving default version details related to App Name: " + appName
-                          + ", Provider: " + appProvider + ", Version: " + appVersion);
-                log.error(e);
-                response.status = 404;
-                response.contentType = "application/json";
-                content.status = "Not Found";
-                content.messages.push("Error while retrieving default version details related to App Name: " + appName
-                                      + ", Provider: " + appProvider + ", Version: " + appVersion);
-                response.content = stringify(content);
-                return;
-            }
         }
 
         // To Send an app to submit for review, created permission is required.
