@@ -126,9 +126,7 @@ var module = function () {
             var provider = model.getField('overview.provider').value;
             var name = model.getField('overview.name').value;
             var version = model.getField('overview.version').value;
-            var isDefaultVersion = model.getField('overview.makeAsDefaultVersion').value; //when a new app is created
-                                                                                          // it is always the default
-                                                                                          // version.
+            var isDefaultVersion = model.getField('overview.makeAsDefaultVersion').value;
             var contextname = model.getField('overview.context').value;
             var allowAnonymous=model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;

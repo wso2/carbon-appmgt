@@ -286,6 +286,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
 
                 var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
+
+                /*
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
                     msg['isDeleted'] = false;
                     msg['message'] =
@@ -299,7 +301,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print(msg);
                     return;
                 }
-
+                */
 
                 if (ssoProvider != " ") {
                     ssoProviderObj.setProviderName(ssoProvider.split("-")[0]);

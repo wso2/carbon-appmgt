@@ -316,7 +316,7 @@ public final class AppManagerUtil {
 
             String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
                                                               AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
-            api.setDefaultVersion(defaultVersion.equals(apiVersion));
+            api.setDefaultVersion(apiVersion.equals(defaultVersion));
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp fro artifact ";
