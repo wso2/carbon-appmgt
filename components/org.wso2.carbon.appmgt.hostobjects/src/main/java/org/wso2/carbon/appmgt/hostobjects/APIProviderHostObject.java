@@ -661,6 +661,39 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Saves the given entitlement policy partial in database
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return entitlement policy partial id
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     */
+    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
+                                                              Object[] args,
+                                                              Function funObj) throws
+                                                                               AppManagementException {
+        if (args == null || args.length != 6) {
+            handleException("Invalid number of input parameters.");
+        }
+        if (args[0] == null || args[1] == null ) {
+            handleException("Error while saving business owner. Owner content is null");
+        }
+
+        String ownerName = args[0].toString();
+        String ownerMail = args[1].toString();
+        String description = args[2].toString();
+        String sitelink = args[3].toString();
+        String keys = args[4].toString();
+        String values = args[5].toString();
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
+    }
+
+
+    /**
      * Update a given entitlement policy partial with the given partial name and partial content
      *
      * @param context Rhino context

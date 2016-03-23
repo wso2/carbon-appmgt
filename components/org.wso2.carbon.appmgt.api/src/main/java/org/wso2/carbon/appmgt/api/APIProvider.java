@@ -18,10 +18,23 @@
 package org.wso2.carbon.appmgt.api;
 
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -187,6 +200,19 @@ public interface APIProvider extends APIManager {
     int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
                                      String policyAuthor,String policyPartialDescription) throws AppManagementException;
 
+    /**
+     * Save a Business Owner.
+     * @param ownerName Name of the business owner.
+     * @param ownerMail Email address of the business owner.
+     * @param description Description about the owner.
+     * @param sitelink Link to the business website.
+     * @param keys key values of extra fields separated by / e.g phoneNumber/IDnumber/BankAccountNo
+     * @param values Values of respective keys separated by / e.g +94772345467/9223348543v/8239445323
+     * @return Integer
+     * @throws AppManagementException
+     */
+    int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+                          String values) throws AppManagementException;
     /**
      * Update the policy partial
      *

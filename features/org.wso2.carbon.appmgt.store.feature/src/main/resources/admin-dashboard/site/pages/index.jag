@@ -10,6 +10,7 @@ i18n.init(request,localeResourcesBasePath);
 var middlePage="signup-task";
 
 var pageName=request.getParameter("task");
+
 if(pageName=="subscription"){
 middlePage="subscription-task";
 }else if(pageName=="signup"){
@@ -20,8 +21,12 @@ middlePage="publishapp-task";
 middlePage="xacmlpolicy-task";
 }else if(pageName=="cacheHitMiss"){
   middlePage="cacheHitMiss-task";
-  }else if(pageName=="xacmlpolicy-new"){
+}else if(pageName=="xacmlpolicy-new"){
     middlePage="xacmlpolicy-new";
+}else if(pageName == "businessowners"){
+    middlePage = "businessowners-task";
+}else if(pageName == "businessowners-new"){
+    middlePage = "businessowners-new";
 }
 
 (function () {

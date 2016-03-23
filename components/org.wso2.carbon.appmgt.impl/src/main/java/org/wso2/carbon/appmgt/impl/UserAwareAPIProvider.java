@@ -184,4 +184,9 @@ public class UserAwareAPIProvider extends APIProviderImpl {
         return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
                 policyPartialDesc);
     }
+    @Override
+    public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+                                 String values) throws AppManagementException{
+        return super.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
+    }
 }

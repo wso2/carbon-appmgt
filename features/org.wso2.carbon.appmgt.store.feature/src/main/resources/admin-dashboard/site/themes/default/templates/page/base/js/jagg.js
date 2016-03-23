@@ -190,9 +190,9 @@ var jagg = jagg || {};
         return sessionExpired;
     };
 
-    jagg.sessionAwareJS = function(params){
+    jagg.sessionAwareJSsdsdsdsd = function(params){
 
-
+log.info("visithaa");
         if(jagg.sessionExpired()){
 		if(params.ssoEnabled != null && params.ssoEnabled === true){
 			return;		
