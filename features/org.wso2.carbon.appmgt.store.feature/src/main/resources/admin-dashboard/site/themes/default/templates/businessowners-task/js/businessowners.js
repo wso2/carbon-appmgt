@@ -33,7 +33,7 @@ var Showalert = function(msg, type, target) {
     }, 1000);
     ;
 }
-policyPartialsArray = new Array(); // xacml policy details array
+businessOwnerArray = new Array(); // xacml policy details array
 var editedpolicyPartialId = 0; //if 1 then edit else save
 var context = this.jagg.site.context;
 var tags =[];
@@ -67,30 +67,15 @@ function completeIfInTag(cm) {
 
 
 $(document).ready(function () {
-    editor = CodeMirror.fromTextArea(document.getElementById("policy-content"), {
-        mode: "xml",
-        lineNumbers: true,
-        lineWrapping:true,
-        extraKeys: {
-            "'<'": completeAfter,
-            "'/'": completeIfAfterLt,
-            "' '": completeIfInTag,
-            "'='": completeIfInTag,
-            "Ctrl-Space": "autocomplete"
-        },
-        hintOptions: {schemaInfo: tags}
-    });
-    //load default xacml policy condition
-    getXacmlPolicyTemplate();
     // Get shared partials
     $.ajax({
-        url: context + '/apis/xacmlpolicies/list',
+        url: context + '/apis/businessowners/list',
         type: 'GET',
         contentType: 'application/json',
-        dataType: 'json',
+        dataType: 'json',                        //heta karanna tiyenne me JS ekata data tika pass karala yanwada kiyala balanna
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
-                policyPartialsArray.push({
+                businessOwnerArray.push({
                     id: data[i].partialId,
                     policyPartialName: data[i].partialName,
                     policyPartial: data[i].partialContent,
@@ -251,9 +236,9 @@ function savePolicyPartial() {
     if (editedpolicyPartialId == 0) { //add
 
         //check if the name is already saved
-        if (policyPartialsArray.length > 0) {
-            for (var i = 0; i < policyPartialsArray.length; i++) {
-                if (policyPartialsArray[i].policyPartialName == policyPartialName) {
+        if (businessOwnerArray.length > 0) {
+            for (var i = 0; i < businessOwnerArray.length; i++) {
+                if (businessOwnerArray[i].policyPartialName == policyPartialName) {
                     //if policy group name is already saved show an warning and return
                     Showalert("Cannot save Policy Group Name " + policyPartialName + " as it is already been saved. " +
                     "Please select a different name", "alert-error", "statusError");
@@ -276,7 +261,7 @@ function savePolicyPartial() {
             success: function (data) {
                 var returnedId = JSON.parse(data).response.id;
                 editedpolicyPartialId = returnedId;
-                policyPartialsArray.push({
+                businessOwnerArray.push({
                     id: returnedId,
                     policyPartialName: policyPartialName,
                     policyPartial: ruleCondition,
@@ -297,7 +282,7 @@ function savePolicyPartial() {
     } else { // update
         var policyPartialObj;
 
-        $.each(policyPartialsArray, function (index, obj) {
+        $.each(businessOwnerArray, function (index, obj) {
             if (obj != null && obj.id == editedpolicyPartialId) {
                 policyPartialObj = obj;
                 return false; // break
@@ -362,13 +347,13 @@ function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, g
         },
         success: function (data) {
             if (JSON.parse(data)) {
-                $.each(policyPartialsArray, function (index, obj) {
+                $.each(businessOwnerArray, function (index, obj) {
                     if (obj != null && obj.id == editedpolicyPartialId) {
-                        policyPartialsArray[index].policyPartialName = policyPartialName;
-                        policyPartialsArray[index].policyPartial = ruleCondition;
-                        policyPartialsArray[index].ruleEffect = ruleEffect;
-                        policyPartialsArray[index].isShared = isSharedPartial;
-                        policyPartialsArray[index].description = policyPartialDesc
+                        businessOwnerArray[index].policyPartialName = policyPartialName;
+                        businessOwnerArray[index].policyPartial = ruleCondition;
+                        businessOwnerArray[index].ruleEffect = ruleEffect;
+                        businessOwnerArray[index].isShared = isSharedPartial;
+                        businessOwnerArray[index].description = policyPartialDesc
 
                     }
                 });
@@ -389,14 +374,14 @@ function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, g
 function updatePolicyPartial() {
     $('#policyPartialsTable tbody').html("");
     //show empty msg
-    if(policyPartialsArray.length > 0){
+    if(businessOwnerArray.length > 0){
         $('.no-policy').hide();
         $('.policy-list').show();
     }else{
         $('.no-policy').show();
         $('.policy-list').hide();
     }
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(businessOwnerArray, function (index, obj) {
         if (obj != null) {
 
             if (obj.isShared) {
@@ -456,7 +441,7 @@ $(document).on("click", ".policy-edit-button", function () {
     }, 1000);
     editor.setValue("");
 
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(businessOwnerArray, function (index, obj) {
         if (obj != null && obj.id == policyId) {
             $('#policy-name').val(obj.policyPartialName);
             $('#policy-name').prop("readonly", true);
@@ -480,7 +465,7 @@ $(document).on("click", ".policy-delete-button", function () {
     var policyPartial;
     var arrayIndex;
     var isConfirmed;
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(businessOwnerArray, function (index, obj) {
         if (obj != null && obj.id == policyId) {
             policyPartial = obj;
             arrayIndex = index;
@@ -539,7 +524,7 @@ $(document).on("click", ".policy-delete-button", function () {
 
                 var success = JSON.parse(response);
                 if (success) {
-                    delete policyPartialsArray[arrayIndex];
+                    delete businessOwnerArray[arrayIndex];
                     updatePolicyPartial();
                     Showalert("Policy Deleted Successfully ", "alert-success", "statusSuccess");
 

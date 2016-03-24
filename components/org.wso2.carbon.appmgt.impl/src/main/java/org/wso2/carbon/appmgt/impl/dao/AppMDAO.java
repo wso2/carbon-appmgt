@@ -38,6 +38,7 @@ import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.JavaPolicy;
@@ -5594,6 +5595,64 @@ public class AppMDAO {
         return entitlementPolicyPartialList;
     }
 
+    /**
+     * This methode is to return a List of existing business owners with their properties.
+     * @return
+     * @throws AppManagementException
+     */
+    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement statementToGetBusinessOwners = null;
+        PreparedStatement statementToGetBusinessOwnersExtraFields = null;
+        List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
+        ResultSet rs1 = null;
+        ResultSet rs2 = null;
+        boolean isShared = true;
+
+        String queryToGetBusinessOwner = "SELECT * FROM BUSINESS_OWNERS ";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
+
+            rs1 = statementToGetBusinessOwners.executeQuery();
+
+            while (rs1.next()) {
+                BusinessOwner businessOwner = new BusinessOwner();
+                int owner_id = rs1.getInt("OWNER_ID");
+
+                businessOwner.setOwner_id(owner_id);
+                businessOwner.setOwner_name(rs1.getString("OWNER_NAME"));
+                businessOwner.setOwner_desc(rs1.getString("OWNER_DESC"));
+                businessOwner.setOwner_mail(rs1.getString("OWNER_MAIL"));
+                businessOwner.setOwner_site(rs1.getString("OWNER_SITE"));
+
+                String queryToGetKeyValue = "SELECT KEY, VALUE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+                statementToGetBusinessOwnersExtraFields = connection.prepareStatement(queryToGetKeyValue);
+                statementToGetBusinessOwnersExtraFields.setInt(1, owner_id);
+
+                rs2 = statementToGetBusinessOwnersExtraFields.executeQuery();
+
+                String keys = "";
+                String values = "";
+                while(rs2.next()){
+                    keys = keys + "/" + rs2.getNString("KEY");
+                    values = values + "/" + rs2.getNString("VALUE");
+                }
+                businessOwner.setKeys(keys);
+                businessOwner.setValues(values);
+
+                businessOwnersList.add(businessOwner);
+            }
+
+        } catch (SQLException e) {
+            handleException("Failed to retrieve business owners.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, rs);
+        }
+        return businessOwnersList;
+    }
 	/**
 	 * Delete entitlement policy partial
 	 *

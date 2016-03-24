@@ -821,6 +821,42 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
+    /**
+     * Retrieve the shared policy partials
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+
+
+    public static NativeArray jsFunction_getBusinessOwnerList(Context cx, Scriptable thisObj,
+                                                                    Object[] args,
+                                                                    Function funObj) throws
+                                                                                     AppManagementException {
+
+        NativeArray myn = new NativeArray(0);
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        List<BusinessOwner> BusinessOwnerList = apiProvider.getBusinessOwnerList();
+        int count = 0;
+        for (BusinessOwner businessOwner : BusinessOwnerList) {
+            NativeObject row = new NativeObject();
+            row.put("owner_id", row, businessOwner.getOwner_id());
+            row.put("owner_name", row, businessOwner.getOwner_name());
+            row.put("owner_email", row, businessOwner.getOwner_mail());
+            row.put("owner_desc", row, businessOwner.getOwner_desc());
+            row.put("owner_site", row, businessOwner.getOwner_site());
+            row.put("keys", row, businessOwner.getKeys());
+            row.put("values", row, businessOwner.getValues());
+            count++;
+            myn.put(count, myn, row);
+        }
+
+        return myn;
+    }
 
     /**
      * Get application wise policy group list

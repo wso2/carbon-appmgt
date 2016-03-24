@@ -22,6 +22,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
@@ -265,6 +266,20 @@ public interface APIProvider extends APIManager {
      */
     public List<EntitlementPolicyPartial> getSharedPolicyPartialsList() throws
                                                                         AppManagementException;
+
+    /**
+     *
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwner() throws AppManagementException;
+
+    /**
+     *
+     * @return
+     * @throws AppManagementException
+     */
+    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException;
 
     /**
      * Validates the given entitlement policy partial.

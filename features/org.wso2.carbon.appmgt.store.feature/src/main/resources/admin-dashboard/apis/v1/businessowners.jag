@@ -24,6 +24,7 @@ var uriMatcher = new URIMatcher(request.getRequestURI());
 
 //POST patterns
 var saveOwner = '/{context}/apis/businessowners/save';
+var ownerList = '/{context}/apis/businessowners/list'
 
 
 if (method == 'POST') {
@@ -38,10 +39,14 @@ if (method == 'POST') {
         print(createResponseObject(ownerApi.saveOwner(ownerName, ownerMail, description, sitelink, keys, values)));
 
     }
-
 }
 
-
+f (method == 'GET'){
+    if (uriMatcher.match(ownerList)) {
+        ///get policy list
+        print(ownerApi.getOwnerList());
+    }
+}
 
 function createResponseObject(object) {
     if (object !== null) {
