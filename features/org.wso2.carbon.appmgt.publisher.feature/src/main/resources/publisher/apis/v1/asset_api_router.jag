@@ -1238,8 +1238,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         catch (e) {
-            log.error(e);
             log.error('An asset of type: ' + shortName + ' could not be created.');
+            log.error(e);
             response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
         }
 
@@ -1380,8 +1380,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(msg);
 
         } catch (e) {
-            log.error(e);
 			log.error('The asset ' + id + ' could not be updated.');
+            log.error(e);
             response.contentType = "application/json";
             print({"ok" : false, "message" : "Permission denied", "report" : {"failed" : true, "name" : ["You are not allowed to edit at this stage"]}});
         }
