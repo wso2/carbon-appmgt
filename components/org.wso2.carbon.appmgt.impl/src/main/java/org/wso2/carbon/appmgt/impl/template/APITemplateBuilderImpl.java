@@ -201,6 +201,7 @@ public class APITemplateBuilderImpl implements APITemplateBuilder {
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
 		} catch (Exception e) {
+            // Exception is caught here since VelocityEngine.getTemplate method throws it.
             String msg = "Cannot process Velocity template '" + templatePath + "'.";
 			log.error(msg, e);
 			throw new APITemplateException(msg, e);
