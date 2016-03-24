@@ -211,7 +211,7 @@ public interface APIProvider extends APIManager {
      * @return Integer
      * @throws AppManagementException
      */
-    int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+    public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
                           String values) throws AppManagementException;
     /**
      * Update the policy partial

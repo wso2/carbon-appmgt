@@ -503,7 +503,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
                                  String values) throws AppManagementException{
-        return appMDAO.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values, tenantId);
+        return appMDAO.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
 
     }
 

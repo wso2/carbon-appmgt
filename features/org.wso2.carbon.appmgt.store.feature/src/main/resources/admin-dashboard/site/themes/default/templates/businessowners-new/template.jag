@@ -11,15 +11,15 @@
           </div>
                                 <label>Name</label>
                                 <input id="owner-name" type="text" class="form-control" style="width: 30%"
-                                maxlength="256"/>
+                                maxlength="256"/ onchange="checkFilled();">
                                 <label>E-mail</label>
-                                          <input id="owner-email" type="text" class="form-control" style="width: 30%" maxlength="356"/>
+                                          <input id="owner-email" type="text" class="form-control" style="width: 30%" maxlength="356" onchange="checkFilled();"/>
                                 <label>Description</label>
                                 <textarea id="owner-desc" style="width:80%;height:100px;border: 1px solid #eee;"
-                                class="form-control" maxlength="1000"></textarea>
+                                class="form-control" maxlength="1000" onchange="checkFilled();"></textarea>
                                 <label>Site Link</label>
                                 <input id="owner-site" type="text" class="form-control" style="width: 30%"
-                                maxlength="500"/>
+                                maxlength="500" onchange="checkFilled();"/>
                                      <br>
                                           <div id="TextBoxContainer"> </div><br>
                              <a id="btn-owner-partial-new" class="btn  btn-success">Add New</a>

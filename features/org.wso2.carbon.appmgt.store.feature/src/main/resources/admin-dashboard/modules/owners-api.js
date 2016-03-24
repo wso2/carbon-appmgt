@@ -28,5 +28,5 @@ function saveOwner(ownerName, ownerMail, description, sitelink, keys, values) {
     return response;
 }
 function saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values) {
-    return apiProvider.saveEntitlementPolicyPartial(ownerName, ownerMail, description, sitelink, keys, values);
+    return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
 }

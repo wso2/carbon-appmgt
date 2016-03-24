@@ -40,8 +40,6 @@ import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
-import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.JavaPolicy;
 import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
 import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
@@ -50,6 +48,8 @@ import org.wso2.carbon.appmgt.api.model.Subscription;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.XACMLPolicyTemplateContext;
 import org.wso2.carbon.appmgt.impl.APIGatewayManager;
@@ -83,7 +83,6 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import scala.App;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -5151,9 +5150,67 @@ public class AppMDAO {
 	}
 
 
-    public void ge
-	public static boolean isContextExist(String context) {
-		Connection connection = null;
+    public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+                                 String values) {
+
+        Connection connection = null;
+        PreparedStatement statementToInsertRecord = null;
+        PreparedStatement statementToInsertRecordTwo = null;
+
+        String[] keysArray = keys.split("/");
+        String[] valuesArray = values.split("/");
+
+        try {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Added a Business Owner");
+            }
+            connection = APIMgtDBUtil.getConnection();
+            String queryToInsertRecord = "INSERT INTO "
+                    + "BUSINESS_OWNERS(OWNER_NAME,OWNER_EMAIL,OWNER_DESC,OWNER_SITE)"
+                    + " VALUES (?,?,?,?)";
+
+            statementToInsertRecord = connection.prepareStatement(queryToInsertRecord,
+                                                                  new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            statementToInsertRecord.setString(1, ownerName);
+            statementToInsertRecord.setString(2, ownerMail);
+            statementToInsertRecord.setString(3, description);
+            statementToInsertRecord.setString(4, sitelink);
+
+            statementToInsertRecord.executeUpdate();
+
+            String queryToInsertRecordTwo =
+                    "INSERT INTO " + "BUSINESS_OWNERS_EXTRA(OWNER_ID, KEY, VALUE)" + "VALUES(LAST_INSERT_ID(),?,?)";
+
+            statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo,
+                                                                     new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            if ((keysArray.length > 1 && valuesArray.length > 1) && (keysArray.length == valuesArray.length) ) {
+                for (int i = 1; i < keysArray.length; i++) {
+                    statementToInsertRecordTwo.setString(1, keysArray[i]);
+                    statementToInsertRecordTwo.setString(2, valuesArray[i]);
+                    statementToInsertRecordTwo.executeUpdate();
+                }
+            }
+
+            // Finally commit transaction.
+            connection.commit();
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback the add entitlement policy partial with name : ", e1);
+                }
+            }
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToInsertRecord, connection, null);
+        }
+        return 1;
+    }
+
+    public static boolean isContextExist(String context) {
+        Connection connection = null;
 		ResultSet resultSet = null;
 		PreparedStatement prepStmt = null;
 

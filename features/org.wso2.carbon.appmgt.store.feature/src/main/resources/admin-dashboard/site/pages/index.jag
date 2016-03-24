@@ -27,6 +27,8 @@ middlePage="xacmlpolicy-task";
     middlePage = "businessowners-task";
 }else if(pageName == "businessowners-new"){
     middlePage = "businessowners-new";
+}else if(pageName=="businessowners"){
+    middlePage="businessowners-task";
 }
 
 (function () {

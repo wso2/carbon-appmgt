@@ -15,8 +15,98 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+var Showalert = function(msg, type, target) {
+    type = type || 'info';
+    $('#'+ target)
+        .removeClass()
+        .addClass(type)
+        .addClass('alert')
+        .stop()
+        .fadeIn()
+        .delay(3000)
+        .fadeOut()
+        .find('#statusErrorSpan').html(msg);
+    var section=$('.title-section');
+    jQuery('html, body').animate({
+                                     scrollTop: section.offset().top
+                                 }, 1000);
+}
 
 
+var context = "/" + window.location.pathname.split("/")[1];  // default value is "/admin-dashboard"
+var fieldCount = 0;
+
+function completeAfter(cm, pred) {
+    var cur = cm.getCursor();
+    if (!pred || pred()) setTimeout(function() {
+        if (!cm.state.completionActive)
+            cm.showHint({completeSingle: false});
+    }, 30000);
+    return CodeMirror.Pass;
+}
+
+function completeIfAfterLt(cm) {
+    return completeAfter(cm, function() {
+        var cur = cm.getCursor();
+        return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
+    });
+}
+
+function completeIfInTag(cm) {
+    return completeAfter(cm, function() {
+        var tok = cm.getTokenAt(cm.getCursor());
+        if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+        var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
+        return inner.tagName;
+    });
+}
+
+
+//new button click event
+$(document).on("click", "#btn-policy-new", function () {
+    resetControls();
+});
+
+function isEmail(email) {
+    var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    return regex.test(email);
+}
+
+function checkFilled() {
+    var inputMail = document.getElementById("owner-email");
+    var inputName = document.getElementById("owner-name");
+    var inputSite = document.getElementById("owner-site");
+    var inputDesc = document.getElementById("owner-desc");
+
+    if (inputDesc.value != "") {
+        inputDesc.style.borderColor = "green";
+    }
+    else{
+        inputDesc.style.borderColor = "red";
+    };
+    if (inputSite.value != "") {
+        inputSite.style.borderColor = "green";
+    }
+    else{
+        inputSite.style.borderColor = "red";
+    };
+    if (inputName.value != "") {
+        inputName.style.borderColor = "green";
+    }
+    else{
+        inputName.style.borderColor = "red";
+    };
+
+
+    if (isEmail(inputMail.value)) {
+        inputMail.style.borderColor = "green";
+    }
+    else{
+        inputMail.style.borderColor = "red";
+    };
+}
+
+checkFilled();
 //add new fields
 $(document).on("click", "#btn-owner-partial-new", function () {
     var div = $("<div />");
@@ -62,6 +152,23 @@ $(document).on("click", "#btn-owner-save", function () {
         console.log(keys);
     }
 
+    if(!isEmail(ownerMail)){
+        alert("Enter a Valid E-mail address");
+        return;
+    }
+    if(ownerName == "" || ownerName == null){
+        alert("Enter a Valid Owner Name");
+        return;
+    }
+    if(description == "" || description == null){
+        alert("Enter a Owner Description");
+        return;
+    }
+    if(siteLink == "" || siteLink == null){
+        alert("Enter a Owner valid owner site");
+        return;
+    }
+
     $.ajax({
                url: context + '/apis/businessowners/save',
                type: 'POST',
@@ -77,32 +184,26 @@ $(document).on("click", "#btn-owner-save", function () {
                },
                success: function (data) {
                    Showalert("Business Owner Saved Successfully","alert-success", "statusError");
+                   sleep(10000);
                },
                error: function () {
                }
            });
 
+location.reload();
+   });
 
-    //var policyContent = editor.getValue();
-    //var policyName = $('#policy-name').val();
-    //
-    //if (policyName == "") {
-    //    Showalert("Policy name cannot be blank", "alert-error", "statusError");
-    //    return;
-    //}
-    //if (editor.getValue() == "") {
-    //    Showalert("Policy content cannot be blank", "alert-error", "statusError");
-    //    return;
-    //}
-    //
-    //validatePolicyPartial(policyContent, continueAddingEntitlementPolicyPartialAfterValidation, displayValidationRequestException);
-});
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+            break;
+        }
+    }
+}
 
-
-
-//delete event
-
-
+//validate the condition
+function wait(){}
 $(document).on("click", ".policy-delete-button", function () {
 
     var policyName = $(this).data("policyName");

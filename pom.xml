@@ -620,7 +620,7 @@
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
     <carbon.identity.oauth.version>${carbon.identity.version}</carbon.identity.oauth.version>
     <carbon.identity.pkg.version>[5.0.7, 5.1.0)</carbon.identity.pkg.version>
-    <carbon.user.mgt.pkg.version>[4.4.3, 4.5.0)</carbon.user.mgt.pkg.version>
+    <carbon.user.mgt.pkg.version>[5.0.7, 5.1.0)</carbon.user.mgt.pkg.version>
     <carbon.deployment.version>4.4.1</carbon.deployment.version>
     <carbon.commons.version>4.4.3</carbon.commons.version>
     <carbon.registry.version>4.4.8</carbon.registry.version>
