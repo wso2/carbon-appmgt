@@ -85,15 +85,12 @@ $(function() {
 
 			},
 			success : function(response) {
-
-				var result = response;
-
-				if (result.ok) {
-					var asset = result.asset;
+				if (response.ok) {
+					var asset = response.asset;
 					createMessage(MSG_CONTAINER, SUCCESS_CSS, 'Asset updated successfully');
 					updateFileFields(asset);
 				} else {
-					var report = processErrorReport(result.report);
+					var report = processErrorReport(response.report);
 					createMessage(MSG_CONTAINER, ERROR_CSS, report);
 				}
 
