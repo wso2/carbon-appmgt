@@ -272,13 +272,6 @@ public interface APIProvider extends APIManager {
      * @return
      * @throws AppManagementException
      */
-    public BusinessOwner getBusinessOwner() throws AppManagementException;
-
-    /**
-     *
-     * @return
-     * @throws AppManagementException
-     */
     public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException;
 
     /**

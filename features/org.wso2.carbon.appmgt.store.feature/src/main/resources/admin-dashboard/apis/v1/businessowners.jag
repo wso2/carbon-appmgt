@@ -26,7 +26,20 @@ var uriMatcher = new URIMatcher(request.getRequestURI());
 var saveOwner = '/{context}/apis/businessowners/save';
 var ownerList = '/{context}/apis/businessowners/list'
 
+if (method == 'GET') {
+    var log = new Log();
+    //console.log("API HITTED");
+    if (uriMatcher.match(ownerList)) {
+        log.info("This is an INFO level log");
+    //    ///get policy list
+       print(ownerApi.getOwnerList());
+    //
+    }
 
+
+
+
+}
 if (method == 'POST') {
     if (uriMatcher.match(saveOwner)) {
         var ownerName = request.getParameter("ownerName");
@@ -41,12 +54,6 @@ if (method == 'POST') {
     }
 }
 
-f (method == 'GET'){
-    if (uriMatcher.match(ownerList)) {
-        ///get policy list
-        print(ownerApi.getOwnerList());
-    }
-}
 
 function createResponseObject(object) {
     if (object !== null) {

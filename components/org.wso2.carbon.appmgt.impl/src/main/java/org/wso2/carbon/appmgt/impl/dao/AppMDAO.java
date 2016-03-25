@@ -5625,7 +5625,7 @@ public class AppMDAO {
                 businessOwner.setOwner_id(owner_id);
                 businessOwner.setOwner_name(rs1.getString("OWNER_NAME"));
                 businessOwner.setOwner_desc(rs1.getString("OWNER_DESC"));
-                businessOwner.setOwner_mail(rs1.getString("OWNER_MAIL"));
+                businessOwner.setOwner_mail(rs1.getString("OWNER_EMAIL"));
                 businessOwner.setOwner_site(rs1.getString("OWNER_SITE"));
 
                 String queryToGetKeyValue = "SELECT KEY, VALUE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
@@ -5649,7 +5649,8 @@ public class AppMDAO {
         } catch (SQLException e) {
             handleException("Failed to retrieve business owners.", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, rs);
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, rs1);
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersExtraFields, connection, rs2);
         }
         return businessOwnersList;
     }

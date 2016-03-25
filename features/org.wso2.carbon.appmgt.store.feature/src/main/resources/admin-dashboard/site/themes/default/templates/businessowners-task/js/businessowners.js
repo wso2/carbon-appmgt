@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -76,13 +76,13 @@ $(document).ready(function () {
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
                 businessOwnerArray.push({
-                    id: data[i].partialId,
-                    policyPartialName: data[i].partialName,
-                    policyPartial: data[i].partialContent,
-                    ruleEffect: data[i].ruleEffect,
-                    isShared: data[i].isShared,
-                    author: data[i].author,
-                    description: data[i].description
+                    owner_id: data[i].owner_id,
+                    owner_name: data[i].owner_name,
+                    owner_mail: data[i].owner_email,
+                    owner_desc: data[i].owner_desc,
+                    owner_site: data[i].owner_site,
+                    keys: data[i].keys,
+                    values: data[i].values
                 });
             }
             updatePolicyPartial();
@@ -372,34 +372,25 @@ function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, g
 
 
 function updatePolicyPartial() {
-    $('#policyPartialsTable tbody').html("");
+    $('#ownerPartialsTable tbody').html("");
     //show empty msg
     if(businessOwnerArray.length > 0){
-        $('.no-policy').hide();
-        $('.policy-list').show();
+        $('.no-owner').hide();
+        $('.owner-list').show();
     }else{
-        $('.no-policy').show();
-        $('.policy-list').hide();
+        $('.no-owner').show();
+        $('.owner-list').hide();
     }
     $.each(businessOwnerArray, function (index, obj) {
         if (obj != null) {
 
-            if (obj.isShared) {
-                var policyDesc = obj.description;
-                if (policyDesc == null) {
-                    policyDesc = "";
-                }
-
-                $('#policyPartialsTable tbody').append('<tr><td>' + obj.policyPartialName + '</td> <td>' +
-                policyDesc + '</td> <td><a data-target="#entitlement-policy-editor" ' +
+                $('#ownerPartialsTable tbody').append('<tr><td>' + obj.owner_id + '</td> <td>' +
+                obj.owner_name + '</td> <td>' + obj.owner_mail + '</td> <td>' + obj.owner_site + '</td> <td>' + obj.owner_desc + '</td> <td><a data-target="#entitlement-policy-editor" ' +
                 'data-toggle="modal" data-policy-id="' + obj.id + '" class="policy-edit-button">' +
-                '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="' + obj.policyPartialName +
+                '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="' + obj.owner_name +
                 '"  data-policy-id="' + obj.id + '" class="policy-delete-button"><i class="icon-trash"></i>' +
                 '</a></td></tr>');
-
             }
-
-        }
     });
 
 }

@@ -31,6 +31,6 @@ function saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, va
     return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
 }
 
-var ggetOwnerList = function () {
+var getOwnerList = function () {
     return apiProvider.getBusinessOwnerList();
 };
