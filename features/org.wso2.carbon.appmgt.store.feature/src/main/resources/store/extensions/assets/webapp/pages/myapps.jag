@@ -436,19 +436,11 @@ require('/modules/store.js').exec(function (ctx) {
      */
     var isActive = function (asset) {
         var active = false;
-        if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-            var lifeCycleState = asset.lifecycleState.toUpperCase();
-            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
-                active = true;
-            }
-            asset.lifecycleState = lifeCycleState;
-        } else {
-            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
-                active = true;
-            }
-            //when getting asset from apm db attribute name is different.
-            asset.lifecycleState = asset.lifeCycleStatus;
+        var lifeCycleState = asset.lifecycleState.toUpperCase();
+        if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+            active = true;
         }
+        asset.lifecycleState = lifeCycleState;
         return active
     };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/

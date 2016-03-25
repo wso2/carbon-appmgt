@@ -75,26 +75,22 @@ require('/modules/publisher.js').exec(function (ctx) {
 
     routeManager.register('POST', 'publisher', '/publisher/api/validations/assets/webapp/overview_context', function (context) {
         var contextVal = context.post.overview_context;
-        var shortName = context.params.type;
+        var appType = context.params.type;
 
         try {
             var oldContextVal = '';
             var isContextExists = isContextExist(contextVal, oldContextVal);
             print(isContextExists);
         } catch (e) {
-            log.error('An asset of type: ' + shortName
-                      + ' could not be created.The following exception was thrown');
+            log.error("An error occurred when validating context '" + contextVal + "' for '" + appType + "'.");
             log.error(e);
-            response.sendError(500, 'An asset of type: ' + shortName
-                                    + ' could not be created.Please check the server logs.');
+            response.sendError(500, "Could not validate specified context '" + contextVal + "'.");
         }
-
     });
 
     routeManager.register('GET', 'publisher', '/publisher/api/validations/assets/{type}/{fieldName}/{fieldValue}', function (context) {
-
         if (context.params) {
-            var shortName = context.params.type;
+            var appType = context.params.type;
             var fieldName = context.params.fieldName;
             var fieldValue = context.params.fieldValue;
         }
@@ -104,15 +100,11 @@ require('/modules/publisher.js').exec(function (ctx) {
             var oldContextVal = '';
             var isContextExists = isContextExist(contextVal, oldContextVal);
             print(isContextExists);
-
         } catch (e) {
-            log.error('An asset of type: ' + shortName
-                      + ' could not be created.The following exception was thrown');
+            log.error("An error occurred when validating context '" + fieldValue + "' for '" + appType + "'.");
             log.error(e);
-            response.sendError(500, 'An asset of type: ' + shortName
-                                    + ' could not be created.Please check the server logs.');
+            response.sendError(500, "Could not validate specified context '" + fieldValue + "'.");
         }
-
     });
 
     /**

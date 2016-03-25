@@ -39,29 +39,21 @@ require('/modules/store.js').exec(function (ctx) {
 
                             var tenant = ctx.tenant;
                             //parameters=request.getAllParameters();
-                            userDetails['username']=data.username;
-                            userDetails['password']=data.password;
-                            userDetails['tenantId']=tenant;
-                            userDetails['action']="login";
-                            authResult=authenticator.login(userDetails);
-
+                            userDetails['username'] = data.username;
+                            userDetails['password'] = data.password;
+                            userDetails['tenantId'] = tenant;
+                            userDetails['action'] = "login";
+                            authResult = authenticator.login(userDetails);
+                            message = "User " + data.username + " logged in successfully";
                         }else{
-
-                            error=true;
+                            error = true;
                             isPermitted = false;
-                        }
-
-                    }else{
-                        error=true;
-                    }
-
-                    if (error) {
-                        //If user does not have subscriber permission, return error message
-                        if(!isPermitted){
                             message = 'Insufficient Privileges.';
-                        }else{
-                            message = 'Invalid username or password.';
                         }
+
+                    } else {
+                        error = true;
+                        message = 'Invalid username or password.';
                     }
                 } catch (e) {
                     log.error(e);
@@ -77,10 +69,11 @@ require('/modules/store.js').exec(function (ctx) {
             case 'logout':
                 try {
                     user.logout();
-		    userlogged=authenticator.getLoggedInUser();
-		    if(userlogged){
-			authenticator.logout();
-		    }
+                    userlogged = authenticator.getLoggedInUser();
+                    if (userlogged) {
+                        authenticator.logout();
+                        message = "User " + userlogged.username + " logged out successfully";
+                    }
                 } catch (e) {
                     log.error(e);
                     error = true;

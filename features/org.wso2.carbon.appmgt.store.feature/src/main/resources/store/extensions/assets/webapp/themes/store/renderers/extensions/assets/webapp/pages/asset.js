@@ -1,7 +1,7 @@
 var render = function (theme, data, meta, require) {
 
     var appUrl; // User is present here, so no need to check for user session.
-    if (!data.isSelfSubscriptionEnabled && !data.isEnterpriseSubscriptionAllowed) {
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
         // Subscription model is inactive, so any user can access this app.
         appUrl = getAppUrl(data);
     } else {
@@ -61,7 +61,8 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],

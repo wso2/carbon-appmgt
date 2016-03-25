@@ -30,12 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
@@ -1582,7 +1577,8 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static boolean jsFunction_addAPISubscription(Context cx,
-                            Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+                            Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException, ScriptException, UserStoreException {
         if (!isStringArray(args)) {
             return false;
         }
@@ -1599,6 +1595,10 @@ public class APIStoreHostObject extends ScriptableObject {
             trustedIdp = args[7].toString();
         }
 
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+
+        addSubscriber(userId, thisObj);
+
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
 
@@ -1612,7 +1612,6 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             WebApp api = apiConsumer.getAPI(apiIdentifier);
 
 	    	/* Tenant based validation for subscription*/
@@ -2163,31 +2162,35 @@ public class APIStoreHostObject extends ScriptableObject {
         return null;
     }
 
-    public static boolean jsFunction_addSubscriber(Context cx,
-                                                   Scriptable thisObj, Object[] args, Function funObj)
+    private static boolean addSubscriber(String userId, Scriptable thisObj)
             throws ScriptException, AppManagementException, UserStoreException {
 
-        if (args!=null && isStringArray(args)) {
-            Subscriber subscriber = new Subscriber((String) args[0]);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        Subscriber subscriber = apiConsumer.getSubscriber(userId);
+        if (subscriber == null) {
+            subscriber = new Subscriber(userId);
             subscriber.setSubscribedDate(new Date());
             //TODO : need to set the proper email
             subscriber.setEmail("");
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             try {
-                int tenantId=ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(MultitenantUtils.getTenantDomain((String) args[0]));
+                int tenantId =
+                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                              .getTenantId(
+                                                      MultitenantUtils.getTenantDomain(userId));
                 subscriber.setTenantId(tenantId);
                 apiConsumer.addSubscriber(subscriber);
             } catch (AppManagementException e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
                 return false;
             } catch (Exception e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
                 return false;
             }
             return true;
         }
         return false;
     }
+
 
     public static boolean jsFunction_sleep(Context cx,
                                            Scriptable thisObj, Object[] args, Function funObj){
@@ -3436,7 +3439,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject row = new NativeObject();
                 row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, identifier.getProviderName());
+                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
                 row.put("version", row, identifier.getVersion());
                 row.put("context", row, app.getContext());
                 row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
@@ -3594,7 +3597,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 NativeObject attributes = new NativeObject();
                 attributes.put("overview_name", attributes, identifier.getApiName());
                 attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, identifier.getProviderName());
+                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                        identifier.getProviderName()));
                 attributes.put("overview_context", attributes, app.getContext());
                 attributes.put("overview_version", attributes, identifier.getVersion());
                 attributes.put("overview_appTenant", attributes, app.getAppTenant());
@@ -3606,7 +3610,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject asset = new NativeObject();
                 asset.put("id", asset, app.getUUID());
-                asset.put("lifeCycleStatus", asset, lifeCycleStatus);
+                asset.put("lifecycleState", asset, lifeCycleStatus);
                 asset.put("accessUrl", asset, accessUrl);
                 asset.put("attributes", asset, attributes);
 

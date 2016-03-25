@@ -286,6 +286,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                 }
 
                 var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
+
+                /*
                 if (apiProvider.isDefaultVersion(apiIdentifierObj) && apiProvider.hasMoreVersions(apiIdentifierObj)) {
                     msg['isDeleted'] = false;
                     msg['message'] =
@@ -299,7 +301,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                     print(msg);
                     return;
                 }
-
+                */
 
                 if (ssoProvider != " ") {
                     ssoProviderObj.setProviderName(ssoProvider.split("-")[0]);
@@ -1235,8 +1237,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         catch (e) {
-            log.error(e);
             log.error('An asset of type: ' + shortName + ' could not be created.');
+            log.error(e);
             response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
         }
 
@@ -1377,8 +1379,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             print(msg);
 
         } catch (e) {
-            log.error(e);
 			log.error('The asset ' + id + ' could not be updated.');
+            log.error(e);
             response.contentType = CONTENT_TYPE_JSON;
             print({"ok" : false, "message" : "Permission denied", "report" : {"failed" : true, "name" : ["You are not allowed to edit at this stage"]}});
         }
