@@ -1,9 +1,9 @@
-WSO2 Application Manager (Carbon Components)
+WSO2 App Manager (Carbon Components)
 ============================================
 [![Build Status](https://wso2.org/jenkins/job/carbon-appmgt/badge/icon)](https://wso2.org/jenkins/job/carbon-appmgt)
 
-WSO2 Application Manager (AppM) is a powerful platform for creating, managing,
-consuming and monitoring web Applications. It combines tried and tested SOA best practices
+WSO2 App Manager (AppM) is a powerful platform for creating, managing,
+consuming and monitoring web/mobile Applications. It combines tried and tested SOA best practices
 with modern day Application provisioning, management principles, governing and security
 to solve a wide range of enterprise challenges associated with managing many number of
 applications (Mobile and Web).
@@ -16,7 +16,7 @@ Documentation
 ==============
 
 On-line product documentation is available at:
-        <https://docs.wso2.com/display/APPM100/WSO2+App+Manager+Documentation>
+        <https://docs.wso2.com/display/APPM110/WSO2+App+Manager+Documentation>
 
 Support
 ==================================
@@ -29,12 +29,12 @@ For additional support information please refer to <http://wso2.com/support>
 
 For more information on WSO2 Application Manager please visit <http://wso2.com/products/app-manager>
 
-Known issues of WSO2 Application Manager
+Known issues of WSO2 App Manager
 ========================================
 
 All known issues of WSO2 Application Manager are filed at:
 
-    https://wso2.org/jira/secure/IssueNavigator.jspa?requestId=x
+<https://wso2.org/jira/issues/?jql=project%20%3D%20APPM>
 
 Issue Tracker
 ==================================
@@ -42,7 +42,7 @@ Issue Tracker
 Help us make our software better. Please submit any bug reports or feature
 requests through the WSO2 JIRA system:
 
-    <https://wso2.org/jira/browse/APPM>
+<https://wso2.org/jira/browse/APPM>
 
 
 Crypto Notice
@@ -70,11 +70,11 @@ Crypto Notice
    The following provides more details on the included cryptographic
    software:
 
-   Apache Rampart   : http://ws.apache.org/rampart/
-   Apache WSS4J     : http://ws.apache.org/wss4j/
-   Apache Santuario : http://santuario.apache.org/
-   Bouncycastle     : http://www.bouncycastle.org/
+   * Apache Rampart   : http://ws.apache.org/rampart/
+   * Apache WSS4J     : http://ws.apache.org/wss4j/
+   * Apache Santuario : http://santuario.apache.org/
+   * Bouncycastle     : http://www.bouncycastle.org/
 
 --------------------------------------------------------------------------------
-(c) Copyright 2015 WSO2 Inc.
+(c) Copyright 2016 WSO2 Inc.
 

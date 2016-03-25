@@ -26,6 +26,7 @@ import org.apache.synapse.endpoints.HTTPEndpoint;
 import org.apache.synapse.rest.AbstractHandler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.wso2.carbon.appmgt.gateway.handlers.common.HttpCookieUtil;
 
 import java.net.HttpCookie;
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class ReverseProxyHandler extends AbstractHandler {
 
 	private static final String URL_SEPERATOR = "/";
 	private static final String EMPTY_STRING = "";
-	private static final long MAX_AGE_UNSPECIFIED = -1;
 
 	public boolean handleRequest(MessageContext messageContext) {
 		return true;
@@ -123,7 +123,7 @@ public class ReverseProxyHandler extends AbstractHandler {
 			String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
 			httpCookie.setPath(newPath);
 			//Put the last cookie as the header cookie. This works as there is only one header cookie in the list.
-			headers.put(HTTPConstants.HEADER_SET_COOKIE, toHeaderString(httpCookie));
+			headers.put(HTTPConstants.HEADER_SET_COOKIE, HttpCookieUtil.formatSetCookieHeader(httpCookie));
 		}
 
 		//Now Fix the paths in Excess Cookies.
@@ -137,7 +137,7 @@ public class ReverseProxyHandler extends AbstractHandler {
 				for (HttpCookie httpCookie : httpExcessCookies) {
 					String newPath = replaceCookieContextPath(webContextWithVersion, httpCookie);
 					httpCookie.setPath(newPath);
-					fixedCookies.add(toHeaderString(httpCookie));
+					fixedCookies.add(HttpCookieUtil.formatSetCookieHeader(httpCookie));
 				}
 			}
 
@@ -164,28 +164,5 @@ public class ReverseProxyHandler extends AbstractHandler {
 			oldPath = oldPath.substring(firstSlashIndex, lastPosition);
 		}
 		return webContextWithVersion + oldPath;
-	}
-
-	/*
-	 *  Converts the HttpCookie into the header string
-     */
-	private String toHeaderString(HttpCookie cookie) {
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(cookie.getName()).append("=").append(cookie.getValue());
-		if (cookie.getPath() != null)
-			sb.append("; Path=").append(cookie.getPath());
-		if (cookie.getDomain() != null)
-			sb.append("; Domain=").append(cookie.getDomain());
-
-		if (cookie.getMaxAge() != MAX_AGE_UNSPECIFIED) {
-			sb.append("; Max-Age=").append(cookie.getMaxAge());
-		}
-		if (cookie.getSecure())
-			sb.append("; Secure");
-		if (cookie.isHttpOnly())
-			sb.append("; HttpOnly");
-
-		return sb.toString();
 	}
 }
