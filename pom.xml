@@ -44,6 +44,7 @@
   	<module>features/org.wso2.carbon.appmgt.mdm.wso2mdm.feature</module>
   	<module>features/org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
   	<module>features/org.wso2.carbon.appmgt.services.api.feature</module>
+    <module>features/categories</module>
   </modules>
 
   <build>
@@ -568,7 +569,7 @@
         <artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>
         <version>${bam.presentation.stub.version}</version>
       </dependency>
-      <dependency>
+       <dependency>
         <groupId>org.wso2.carbon.commons</groupId>
         <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         <version>${carbon.commons.version}</version>
@@ -605,6 +606,7 @@
     <carbon.appmgt.version>1.1.3-SNAPSHOT</carbon.appmgt.version>
     <carbon.appmgt.bundle.version>1.1.3</carbon.appmgt.bundle.version>
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
+    <carbon.appmgt.server.version>1.2.0-SNAPSHOT</carbon.appmgt.server.version>
 
 	<!-- Carbon kernel version -->
     <carbon.kernel.version>4.4.3</carbon.kernel.version>
@@ -613,6 +615,7 @@
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.6.0</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
+    <carbon.multitenancy.version>4.5.0</carbon.multitenancy.version>
     <carbon.identity.version>5.0.7</carbon.identity.version>
     <carbon.identity.base.version>5.0.7</carbon.identity.base.version>
     <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
@@ -622,13 +625,15 @@
     <carbon.identity.pkg.version>[5.0.7, 5.1.0)</carbon.identity.pkg.version>
     <carbon.user.mgt.pkg.version>[5.0.7, 5.1.0)</carbon.user.mgt.pkg.version>
     <carbon.deployment.version>4.4.1</carbon.deployment.version>
+    <carbon.deployment.version_4.6.0>4.6.0</carbon.deployment.version_4.6.0>
     <carbon.commons.version>4.4.3</carbon.commons.version>
+    <carbon.commons.version_4.4.8>4.4.8</carbon.commons.version_4.4.8>
     <carbon.registry.version>4.4.8</carbon.registry.version>
     <carbon.governance.version>4.5.8</carbon.governance.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
-    <carbon.store.version>1.4.0</carbon.store.version>
+    <carbon.store.version>1.4.2-SNAPSHOT</carbon.store.version>
     <carbon.device.mgt.version>0.9.1</carbon.device.mgt.version>
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
@@ -650,6 +655,7 @@
     <axis2.wso2.version>1.6.1.wso2v11</axis2.wso2.version>
     <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
     <axis2.osgi.version.range>[1.6.1.wso2v10, 1.7.0)</axis2.osgi.version.range>
+    <axis2.transport.version>1.1.0-wso2v15</axis2.transport.version>
 
     <!-- Apache Axiom -->
     <axiom.osgi.version.range>[1.2.11.wso2v4, 1.3.0)</axiom.osgi.version.range>
@@ -662,9 +668,20 @@
     <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
     <javax.servlet.imp.pkg.version>[2.6.0, 3.0.0)</javax.servlet.imp.pkg.version>
 
+    <es.feature.version>1.0.0</es.feature.version>
+
     <!-- Jaggery Version -->
+    <jaggery.js.version>0.12.2</jaggery.js.version>
     <jaggery.version>0.10.1</jaggery.version>
     <jaggery.scxml.executors.version>1.4.0</jaggery.scxml.executors.version>
+    <jaggeryjs.markdown.feature.version>1.0.0</jaggeryjs.markdown.feature.version>
+    <jaggeryjs.caramel.feature.version>1.0.1</jaggeryjs.caramel.feature.version>
+    <jaggeryjs.carbon.feature.version>1.5.2</jaggeryjs.carbon.feature.version>
+    <jaggeryjs.email.feature.version>1.0.0</jaggeryjs.email.feature.version>
+    <jaggeryjs.i18n.feature.version>1.5.2</jaggeryjs.i18n.feature.version>
+    <jaggeryjs.process.feature.version>1.5.2</jaggeryjs.process.feature.version>
+    <jaggeryjs.uuid.feature.version>1.5.2</jaggeryjs.uuid.feature.version>
+    <jaggeryjs.ws.feature.version>1.5.2</jaggeryjs.ws.feature.version>
 
 	<!-- Identity Version -->
 	<identity.sso.saml.version>${carbon.identity.version}</identity.sso.saml.version>
@@ -678,6 +695,8 @@
 
     <!-- Registry -->
     <governance.registry.extensions.imp.pkg.version>[4.5.8,4.6.0)</governance.registry.extensions.imp.pkg.version>
+
+    <handlebars.feature.version>1.0.0</handlebars.feature.version>
 
     <carbon.usage.agent.version>2.1.2</carbon.usage.agent.version>
     <carbon.sequences.stub.version>4.2.1</carbon.sequences.stub.version>
