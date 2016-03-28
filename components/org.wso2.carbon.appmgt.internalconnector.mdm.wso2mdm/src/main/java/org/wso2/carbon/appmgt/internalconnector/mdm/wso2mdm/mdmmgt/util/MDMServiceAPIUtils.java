@@ -195,10 +195,8 @@ public class MDMServiceAPIUtils {
 	public static TenantConfigurationManagementService getTenantConfigurationManagementService() {
 		PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		TenantConfigurationManagementService tenantConfigurationManagementService =
-				(TenantConfigurationManagementService) ctx.
-						                                          getOSGiService(
-								                                          TenantConfigurationManagementService.class,
-								                                          null);
+				(TenantConfigurationManagementService) ctx
+						.getOSGiService(TenantConfigurationManagementService.class, null);
 		if (tenantConfigurationManagementService == null) {
 			String msg = "Tenant configuration Management service not initialized.";
 			log.error(msg);

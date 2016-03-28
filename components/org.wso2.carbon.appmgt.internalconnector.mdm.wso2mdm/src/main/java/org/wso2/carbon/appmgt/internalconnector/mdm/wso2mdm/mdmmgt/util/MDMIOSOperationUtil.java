@@ -49,10 +49,10 @@ public class MDMIOSOperationUtil {
 				enterpriseApplication.setManifestURL(application.getLocation());
 
 				Properties properties = application.getProperties();
-				enterpriseApplication.setPreventBackupOfAppData((Boolean) properties.
-						                                                                    get(MDMAppConstants.IOSConstants.IS_PREVENT_BACKUP));
-				enterpriseApplication.setRemoveAppUponMDMProfileRemoval((Boolean) properties.
-						                                                                            get(MDMAppConstants.IOSConstants.IS_REMOVE_APP));
+				enterpriseApplication.setPreventBackupOfAppData(
+						(Boolean) properties.get(MDMAppConstants.IOSConstants.IS_PREVENT_BACKUP));
+				enterpriseApplication.setRemoveAppUponMDMProfileRemoval(
+						(Boolean) properties.get(MDMAppConstants.IOSConstants.IS_REMOVE_APP));
 				operation.setCode(
 						MDMAppConstants.IOSConstants.OPCODE_INSTALL_ENTERPRISE_APPLICATION);
 				operation.setPayLoad(enterpriseApplication.toJSON());
@@ -60,9 +60,9 @@ public class MDMIOSOperationUtil {
 				break;
 			case PUBLIC:
 				AppStoreApplication appStoreApplication = new AppStoreApplication();
-				appStoreApplication.setRemoveAppUponMDMProfileRemoval((Boolean) application.
-						                                                                           getProperties()
-				                                                                           .get(MDMAppConstants.IOSConstants.IS_REMOVE_APP));
+				appStoreApplication.setRemoveAppUponMDMProfileRemoval(
+						(Boolean) application.getProperties()
+						                     .get(MDMAppConstants.IOSConstants.IS_REMOVE_APP));
 				appStoreApplication.setIdentifier(application.getIdentifier());
 				appStoreApplication.setPreventBackupOfAppData((Boolean) application.getProperties().
 						get(MDMAppConstants.IOSConstants.IS_PREVENT_BACKUP));
@@ -89,6 +89,13 @@ public class MDMIOSOperationUtil {
 		return operation;
 	}
 
+	/**
+	 * This method is used to create uninstall operations
+	 *
+	 * @param application
+	 * @return Uninstall operation
+	 * @throws MDMException
+	 */
 	public static Operation createAppUninstallOperation(MobileApp application) throws MDMException {
 		ProfileOperation operation = new ProfileOperation();
 		operation.setCode(MDMAppConstants.IOSConstants.OPCODE_REMOVE_APPLICATION);
