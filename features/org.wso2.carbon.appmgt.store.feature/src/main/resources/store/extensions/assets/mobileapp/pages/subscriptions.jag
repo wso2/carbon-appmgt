@@ -3,7 +3,7 @@ var caramel;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
-    var count, tags, title,
+    var count, title,
             log = ctx.log,
             sso = ctx.sso,
             store = ctx.store,
@@ -52,12 +52,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     count = Object.keys(subscriptions).length;
 
-    tags = [
-        {
-            url: '/assets/' + type + '?page=1&tag=',
-            data: store.tags(type)
-        }
-    ];
 
     title = store.assetLinks(type).title;
     var headerData = site.header(tenantId, {
@@ -83,7 +77,9 @@ require('/modules/store.js').exec(function (ctx) {
         myAssets: { user: user, type: type, title: title},
         selfUnsubscription : selfUnsubscription,
         isDeviceSubscriptionEnabled : isDeviceSubscriptionEnabled,
-        tags: tags,
+        tags: {
+            data: store.tags(type, null)
+        },
         assetType: "mobileapp"
     });
 }, request, response, session);

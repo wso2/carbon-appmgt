@@ -30,7 +30,7 @@ var render = function (theme, data, meta, require) {
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
     var enabledTypeList = storeObj.getEnabledAssetTypeList();
-
+    data.tags.tagUrl = "/assets/mobileapp";
     if(data.userAssets){
 
 
@@ -83,45 +83,7 @@ var render = function (theme, data, meta, require) {
 
     data.header.myApps = true;
 
-    /*
-    theme('2-column-right', {
-        title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data.header
-            }
-        ],
-        navigation: [
-            {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-            }
-        ],
-        body: [
-            {
-                partial: 'userAssets',
-                context: {
-                    'userAssets': data.userAssets,
-                    'URL': data.URL,
-                    'devices': data.devices,
-                    'selfUnsubscription' : data.selfUnsubscription,
-                    'isDeviceSubscriptionEnabled' : data.isDeviceSubscriptionEnabled
-                }
-            }
-        ],
-        right: [
-            {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
-            {
-                partial: 'tags',
-                context: data.tags
-            }
-        ]
-    });
-    */
+
     if(storeObj.isAssetTypeEnabled("mobileapp")) {
         theme('2-column-left', {
             title: data.title,

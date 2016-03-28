@@ -22,23 +22,27 @@ var routeManager = new router.Router();
 
 var log = new Log('tags.api.router');
 
-var TAG_QUERY = '/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
-
-
-
 routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}', function (context) {
-
     var type = context.params.type;
+    var QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE = '/_system/config/repository/components/' +
+                                                'org.wso2.carbon.registry/queries/tagsByMediaTypeAndLifecycle';
+    var WEB_APP_MEDIA_TYPE = 'application/vnd.wso2-webapp+xml';
+    var MOBILE_APP_MEDIA_TYPE = 'application/vnd.wso2-mobileapp+xml';
+    var MOBILE_APP_LIFE_CYCLE= 'registry.lifecycle.MobileAppLifeCycle.state';
+    var WEB_APP_LIFE_CYCLE= 'registry.lifecycle.WebAppLifeCycle.state';
+    var LC_STATE= '%'; // get the tags of apps which are in any state.
+    var params;
 
-    var tags = rxtManager.registry.query(TAG_QUERY);
-
-    log.debug('tags retrieved: ' + tags);
-
-    var tagManager = new tagModule.TagManager();
-
-    tagManager.process(tags);
-
+    if(type=='mobileapp') {
+       params = {"1":MOBILE_APP_MEDIA_TYPE,"2":MOBILE_APP_LIFE_CYCLE,"3":LC_STATE};
+    } else {
+       params = {"1":WEB_APP_MEDIA_TYPE,"2":WEB_APP_LIFE_CYCLE,"3":LC_STATE};
+    }
+    var tags = rxtManager.registry.query(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE,params);
+    tagManager.process(tags,type);
     tags = tagManager.get(type);
+    log.info('tags retrieved: ' + stringify(tags));
+
     response.contentType = "application/json";
     print(tags);
 });

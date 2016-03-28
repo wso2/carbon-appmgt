@@ -481,7 +481,9 @@ Store.prototype.tags = function (type, isSite) {
         tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
         return tagz;
     } else if (type == RESOURCE_TYPE_MOBILEAPP) {
-        return tagz;
+        var tags = getTags(type, registry);
+
+        return  getVisibleTags(tags, this.assetManager(type));
     } else if (type) {
         log.warn("Retrieving tags : Type " + type + " is not supported.");
         return tagz;
@@ -532,67 +534,19 @@ Store.prototype.rate = function (aid, rating) {
  * @param paging
  */
 Store.prototype.assets = function (type, paging) {
-
-    //var type=(type=='null')?null:type;
-
-    //Check if a type has been provided
-    /*if(!type){
-     log.debug('Returning an empty [] for Store.assets.');
-     return [];
-     }*/
-
     var options = {};
     options = obtainViewQuery(options);
     options = {"attributes": options};
     var i;
     var newPaging = PaginationFormBuilder(paging);
-    //var assetz = this.assetManager(type).list(paging);
-
     var assetz = this.assetManager(type).search(options, newPaging);
-
     var assetszReturn = [];
-
 
     for (i = 0; i < assetz.length; i++) {
         assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
-
-
-        if(assetz[i].type == "mobileapp"){
-            if( assetz[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = assetz[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        assetszReturn.push(assetz[i]);
-                    }
-                }
-
-            }else{
-                assetszReturn.push(assetz[i]);
-            }
-        }else{
             if(assetszReturn.length == 0){
                 assetszReturn = assetz;
             }
-
-        }
-
-
-
-
-
-
-
-        //print(assetz);
-
-
     }
     return assetszReturn;
 };
@@ -649,7 +603,7 @@ Store.prototype.tagged = function (type, tag, paging) {
 
 
 Store.prototype.taggeds = function (type, options, paging) {
-
+    var log = new Log();
     var i, length, types, assets;
 
     options = obtainViewQuery(options);
@@ -791,38 +745,9 @@ Store.prototype.recentAssets = function (type, count, options) {
         recent[i].rating = this.rating(recent[i].path).average;
         recent[i].indashboard = this.isuserasset(recent[i].id, type);
 
-
-        if(recent[i].type == "mobileapp"){
-            if( recent[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = recent[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        recentReturn.push(recent[i]);
-                    }
-                }
-
-            }else{
-                recentReturn.push(recent[i]);
-            }
-        }else{
-            if(recentReturn.length == 0){
-                recentReturn = recent;
-            }
-
+        if (recentReturn.length == 0) {
+            recentReturn = recent;
         }
-
-
-
-
-
     }
     return recentReturn;
 };
@@ -1268,4 +1193,75 @@ Store.prototype.getReferer = function (request) {
     }
     return referer;
 };
+
+
+/**
+ * Return tags of apps which are in published state for given  app type
+ * @param type
+ * @param registry
+ * @returns {Array}
+ */
+function getTags(type,registry) {
+    var registry = registry;
+    var QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE = '/_system/config/repository/components/' +
+                                                'org.wso2.carbon.registry/queries/tagsByMediaTypeAndLifecycle';
+    var WEB_APP_MEDIA_TYPE = 'application/vnd.wso2-webapp+xml';
+    var MOBILE_APP_MEDIA_TYPE = 'application/vnd.wso2-mobileapp+xml';
+    var MOBILE_APP_LIFE_CYCLE = 'registry.lifecycle.MobileAppLifeCycle.state';
+    var WEB_APP_LIFE_CYCLE = 'registry.lifecycle.WebAppLifeCycle.state';
+    var LC_STATE = 'Published'; // get the tags of apps which are in Published.
+    var params;
+    if (type == RESOURCE_TYPE_MOBILEAPP) {
+        params = {"1": MOBILE_APP_MEDIA_TYPE, "2": MOBILE_APP_LIFE_CYCLE, "3": LC_STATE};
+    } else {
+        params = {"1": WEB_APP_MEDIA_TYPE, "2": WEB_APP_LIFE_CYCLE, "3": LC_STATE};
+    }
+    var tags = registry.query(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE, params);
+
+    var tempTags = {};
+    for (var i = 0; i < tags.length; i++) {
+        var tag = tags[i].split(';')[1].split(':')[1];
+        var count = tempTags[tag];
+        count = count ? count + 1 : 1;
+        tempTags[tag] = count;
+    }
+
+    var tags = [];
+    for (tag in tempTags) {
+        if (tempTags.hasOwnProperty(tag)) {
+            tags.push({
+                          name: String(tag),
+                          count: tempTags[tag]
+                      });
+        }
+    }
+
+    return tags;
+}
+
+/**
+ * Return tags based on visibility of apps. i.e returns on the tags of apps
+ * which are visible to user.
+ * @param tags Tags
+ * @param assetManager assetManager
+ * @returns {Array}
+ */
+function getVisibleTags(tags, assetManager) {
+    if (tags.length == 0) {
+        return;
+    }
+    var visibleTags = [];
+    var options = {}
+    var paging = {};
+    options = obtainViewQuery(options);
+    var builtPaging = PaginationFormBuilder(paging);
+    for (var i = 0; i < tags.length; i++) {
+        options['tag'] = tags[i].name;
+        var assets = assetManager.search(options, builtPaging);
+        if (assets && assets.length > 0) {
+            visibleTags.push(tags[i]);
+        }
+    }
+    return visibleTags;
+}
 

@@ -147,6 +147,7 @@ require('/modules/store.js').exec(function (ctx) {
             options.type = type;
             options.lifecycleState = ["published"];
             assets = store.taggeds(type, options, paging);
+            var tagAssets = getAssetsForTag(type,store);
         } else if (query) { // if search from search box
             urlQuery = 'query=' + query + '&';
             query = require('/modules/search.js').build(query);
@@ -517,4 +518,8 @@ function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
+function getTags(type, store) {
+    var paging = {"start": 0, "count": 120000,"paginationLimit":120000};
+    return store.taggeds(type, options, paging)
+};
 %>

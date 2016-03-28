@@ -14,41 +14,29 @@ var tagModule=function(){
 
     /*
     The method is used to process a list of tags
-    @tags: A tag array
+    @tags: A tag array e.g ["/_system/governance/appmgt/applicationdata/provider/admin/site1/1/webapp;tags:site:admin",
+     "/_system/governance/appmgt/applicationdata/provider/admin/site1/1/webapp;tags:site1:admin"]
+     @type: Type of the asset to which tags are associated
      */
-    TagManager.prototype.process=function(tags){
-        var tags=tags||[];
+    TagManager.prototype.process = function (tags, type) {
+        var tags = tags || [];
         var tag;
-        var tagIndex;
 
-        for(var index in tags){
-
-            tag=tags[index];
-
+        for (var index in tags) {
+            tag = tags[index];
             //Break by url
-            var components=tag.split(':');
-            var url=components[0]||'';
-            var tagComponent=components[1]||'';
-
-            //Obtain the type
-            var urlComponents=url.split('/');
-
-            //Get the type
-            var typeComponent=urlComponents[9] || '';
-            var type = typeComponent.substring(0, typeComponent.indexOf(';'));
-
-            //Get the tag name
-            var tagName=tagComponent;
+            var components = tag.split(':');
+            var tagComponent = components[1] || '';
+            var tagName = tagComponent;
 
             //Check if the tag cloud has the type
-            if(!this.tagCloud.hasOwnProperty(type)){
-
-                 this.tagCloud[type]={tags_val:{},totalTagCount:0};
+            if (!this.tagCloud.hasOwnProperty(type)) {
+                this.tagCloud[type] = {tags_val: {}, totalTagCount: 0};
             }
 
             //Check if the tag cloud has the tag name
-            if(!this.tagCloud[type].tags_val.hasOwnProperty(tagName)){
-                this.tagCloud[type].tags_val[tagName]={ count:1};
+            if (!this.tagCloud[type].tags_val.hasOwnProperty(tagName)) {
+                this.tagCloud[type].tags_val[tagName] = { count: 1};
                 this.tagCloud[type].totalTagCount++;
             }
 

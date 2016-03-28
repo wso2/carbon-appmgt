@@ -111,12 +111,9 @@ require('/modules/store.js').exec(function (ctx) {
         inDashboard: inDashboard,
         asset: asset,
         config : mdmUIConfig,
-        tags: [
-            {
-                url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
-            }
-        ],
+        tags: {
+             data: store.tags(type, null)
+        },
         myAssets: { user: user, type: type, title: title },
         recentAssets: store.recentAssets(type),
         assetType: "mobileapp"

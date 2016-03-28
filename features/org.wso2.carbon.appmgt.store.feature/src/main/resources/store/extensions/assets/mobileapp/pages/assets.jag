@@ -77,8 +77,11 @@ require('/modules/store.js').exec(function (ctx) {
     }
 
     if (tag) {
-        subPage = '/ Tag: "' + tag + '"';
-        assets = store.tagged(type, tag, paging);
+        var options= {};
+        options.tag = tag;
+        options.type = type;
+        options.lifecycleState = ["published"];
+        assets = store.taggeds(type, options, paging);
     } else if (query) {
         query = require('/modules/search.js').build(query);
         options = {
@@ -227,13 +230,8 @@ require('/modules/store.js').exec(function (ctx) {
             type: type,
             selectedCategory: selectedCategory,
             selectedPlatform: selectedPlatform,
-            tags: function () {
-                return [
-                    {
-                        url: '/assets/' + type + '/?tag=',
-                        data: store.tags(type)
-                    }
-                ];
+            tags: {
+                    data: store.tags(type, null)
             },
             assets: assets,
             paging: {
