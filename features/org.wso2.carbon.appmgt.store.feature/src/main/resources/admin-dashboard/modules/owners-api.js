@@ -22,6 +22,16 @@ var log = new Log();
 var appMDAOObj = new Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 var apiUtil = new Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 
+
+
+function deleteOwner(ownerId){
+    var partialId = deleteBusinessOwner(ownerId);
+    var response = {"id": partialId};
+    return response;
+}
+function deleteBusinessOwner(ownerId){
+    return apiProvider.deleteBusinessOwner(ownerId);
+}
 function saveOwner(ownerName, ownerMail, description, sitelink, keys, values) {
     var partialId = saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
     var response = {"id": partialId};
@@ -29,6 +39,15 @@ function saveOwner(ownerName, ownerMail, description, sitelink, keys, values) {
 }
 function saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values) {
     return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
+}
+
+function updateOwner(ownerID, ownerName, ownerMail, description, sitelink, keys, values) {
+    var partialId = updateBusinessOwner(ownerID,ownerName, ownerMail, description, sitelink, keys, values);
+    var response = {"id": partialId};
+    return response;
+}
+function updateBusinessOwner(ownerID, ownerName, ownerMail, description, sitelink, keys, values) {
+    return apiProvider.updateBusinessOwner(ownerID, ownerName, ownerMail, description, sitelink, keys, values);
 }
 
 var getOwnerList = function () {

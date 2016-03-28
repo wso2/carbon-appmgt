@@ -33,11 +33,12 @@ var Showalert = function(msg, type, target) {
     }, 1000);
     ;
 }
-businessOwnerArray = new Array(); // xacml policy details array
-var editedpolicyPartialId = 0; //if 1 then edit else save
+var businessOwnersArray = new Array(); // xacml policy details array
+var editedOwnerId = 0; //if 1 then edit else save
 var context = this.jagg.site.context;
 var tags =[];
 var editor;
+var extraFieldCount = 0;
 
 function completeAfter(cm, pred) {
     var cur = cm.getCursor();
@@ -75,7 +76,7 @@ $(document).ready(function () {
         dataType: 'json',                        //heta karanna tiyenne me JS ekata data tika pass karala yanwada kiyala balanna
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
-                businessOwnerArray.push({
+                businessOwnersArray.push({
                     owner_id: data[i].owner_id,
                     owner_name: data[i].owner_name,
                     owner_mail: data[i].owner_email,
@@ -93,354 +94,141 @@ $(document).ready(function () {
     $('#policy-name').select();
 });
 
-
-//clear and reset controls
-function resetControls() {
-    editedpolicyPartialId = 0;
-    getXacmlPolicyTemplate();
-    $('#policy-desc').val("");
-    $('#policy-name').prop("readonly", false);
-    $('#policy-name').val("");
-    $('#policy-name').select();
-    setSelectedRuleEffect('Deny');
-
-}
-
-//load XACML template
-function getXacmlPolicyTemplate() {
-    $.ajax({
-        url: context + '/apis/xacmlpolicies/template',
-        type: 'GET',
-
-        dataType: "text",
-        success: function (response) {
-            if (response != null) {
-                //editor.setValue(response);
-                $('#policy-content').val(response);
-            }
-        },
-        error: function (response) {
-            Showalert('Error occured while fetching entitlement policy content', "alert-error", "statusError");
-        }
-    });
-}
-
-//new button click event
-$(document).on("click", "#btn-policy-new", function () {
-    resetControls();
-});
-
-//validate event
-$(document).on("click", "#btn-policy-partial-validate", function () {
-    var policyContent = editor.getValue();
-    var policyName = $('#policy-name').val();
-
-    if (policyName == "") {
-        Showalert("Policy name cannot be blank", "alert-error", "statusError");
-        return;
-    }
-    if (policyContent == "") {
-        Showalert("Policy content cannot be blank", "alert-error", "statusError");
-        return;
-    }
-    validatePolicyPartial(policyContent, showMessageAfterValidation, displayValidationRequestException);
-
-});
-
 //save event
 $(document).on("click", "#btn-policy-save", function () {
-    var policyContent = editor.getValue();
-    var policyName = $('#policy-name').val();
 
-    if (policyName == "") {
-        Showalert("Policy name cannot be blank", "alert-error", "statusError");
-        return;
+    var ownerName = $('#owner-name').val();
+    var ownerMail = $('#owner-email').val();
+    var description = $('#owner-desc').val();
+    var siteLink = $('#owner-site').val();
+    var keys = "";
+    var values = "";
+
+    if(extraFieldCount > 0) {
+        var i = extraFieldCount;
+        while (i > 1) {
+            var key_id = "#key-".concat(i - 1);
+            var val_id = "#value-".concat(i - 1);
+            var key = $(key_id).val();
+            var value = $(val_id).val();
+            keys = keys.concat('/', key);
+            values = values.concat('/', value);
+            i--;
+        }
     }
-    if (editor.getValue() == "") {
-        Showalert("Policy content cannot be blank", "alert-error", "statusError");
-        return;
-    }
 
-    validatePolicyPartial(policyContent, continueAddingEntitlementPolicyPartialAfterValidation, displayValidationRequestException);
-});
-
-//validate the condition
-function validatePolicyPartial(policyPartial, onSuccess, onError) {
 
     $.ajax({
-        url: context + '/apis/xacmlpolicies/validate',
-        type: 'POST',
-        async: false,
-        contentType: 'application/x-www-form-urlencoded',
-        data: {"policyPartial": policyPartial},
-        success: onSuccess,
-        error: function (response) {
-            if (response.status == 500) {
-                Showalert('Sorry, your session has expired');
-                location.reload();
-            } else {
-                onError(respond);
-            }
-        }
+               url: context + '/apis/businessowners/update',
+               type: 'POST',
+               contentType: 'application/x-www-form-urlencoded',
+               async: false,
+               data: {
+                   "owner_id": editedOwnerId,
+                   "ownerName": ownerName,
+                   "ownerMail": ownerMail,
+                   "description": description,
+                   "sitelink": siteLink,
+                   "keys": keys,
+                   "values" : values
+               },
+               success: function (data) {
+
+                   Showalert("Business Owner Saved Successfully","alert-success", "statusError");
+                   location.reload();
+               },
+               error: function () {
+               }
+           });
     });
-}
 
-
-function continueAddingEntitlementPolicyPartialAfterValidation(response) {
-    var response = JSON.parse(response);
-    if (response.success) {
-        response = response.response;
-        if (response.isValid) {
-            savePolicyPartial();
-        } else {
-            Showalert("Policy is not valid.", "alert-error", "statusError");
-        }
-
-    } else {
-        Showalert("Could not complete validation.", "alert-error", "statusError");
-    }
-}
-
-
-function showMessageAfterValidation(response) {
-    var response = JSON.parse(response);
-    if (response.success) {
-        response = response.response;
-        if (response.isValid) {
-            Showalert("Policy is valid.", "alert-success", "statusError");
-        } else {
-            Showalert("Policy is not valid.", "alert-error", "statusError");
-        }
-
-    } else {
-        Showalert("Could not complete validation.", "alert-error", "statusError");
-    }
-}
-
-
-function displayValidationRequestException() {
-    Showalert('Error occured while validating the policy', "alert-error", "statusError");
-}
-
-
-function savePolicyPartial() {
-
-    var ruleCondition = editor.getValue();
-    var policyPartialName = $('#policy-name').val();
-    var policyPartialDesc = $('#policy-desc').val();
-    var ruleEffect = getSelectedRuleEffect();
-    var generatedRule = generatePolicyRule(ruleEffect, ruleCondition);
-
-    var provider = "";
-    var isSharedPartial = true;
-    if (editedpolicyPartialId == 0) { //add
-
-        //check if the name is already saved
-        if (businessOwnerArray.length > 0) {
-            for (var i = 0; i < businessOwnerArray.length; i++) {
-                if (businessOwnerArray[i].policyPartialName == policyPartialName) {
-                    //if policy group name is already saved show an warning and return
-                    Showalert("Cannot save Policy Group Name " + policyPartialName + " as it is already been saved. " +
-                    "Please select a different name", "alert-error", "statusError");
-                    return;
-                }
-            }
-        }
-
-        $.ajax({
-            url: context + '/apis/xacmlpolicies/save',
-            type: 'POST',
-            contentType: 'application/x-www-form-urlencoded',
-            async: false,
-            data: {
-                "policyPartialName": policyPartialName,
-                "policyPartial": generatedRule,
-                "isSharedPartial": isSharedPartial,
-                "policyPartialDesc": policyPartialDesc
-            },
-            success: function (data) {
-                var returnedId = JSON.parse(data).response.id;
-                editedpolicyPartialId = returnedId;
-                businessOwnerArray.push({
-                    id: returnedId,
-                    policyPartialName: policyPartialName,
-                    policyPartial: ruleCondition,
-                    ruleEffect: ruleEffect,
-                    isShared: isSharedPartial,
-                    author: provider,
-                    description: policyPartialDesc
-                });
-                updatePolicyPartial()
-                Showalert("Policy Saved Successfully", "alert-error", "statusError");
-                $('#policy-name').prop("readonly", true);
-            },
-            error: function (response) {
-                Showalert('Error occurred while saving entitlement policy content', "alert-error", "statusError");
-            }
-        });
-
-    } else { // update
-        var policyPartialObj;
-
-        $.each(businessOwnerArray, function (index, obj) {
-            if (obj != null && obj.id == editedpolicyPartialId) {
-                policyPartialObj = obj;
-                return false; // break
-            }
-
-        });
-
-        $.ajax({
-            async: false,
-            url: context + '/apis/xacmlpolicies/associated/apps',
-            data: {"policyId": editedpolicyPartialId},
-            type: 'GET',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-                SavePolicyPartialsOnSuccess(response, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
-            },
-            error: function (response) {
-                Showalert('Error occurred while updating entitlement policy content', "alert-error", "statusError");
-            }
-        });
-    }
-
-    resetControls();
-
-}
-
-function SavePolicyPartialsOnSuccess(response, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc) {
-    var apps = "";
-    if (response.length != 0) {
-        // construct and show the  the warning message with app names which use this partial before update
-        for (var i = 0; i < response.length; i++) {
-            var j = i + 1;
-            apps = apps + j + ". " + response[i].appName + "\n";
-        }
-
-        var msg = "policy " + policyPartialName + " is used in following apps " +
-            apps +
-            "Are you sure you want to modify the policy " + policyPartialName + "?";
-
-        var conf = confirm(msg);
-        if (conf == true) {
-            updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
-        }
-    }
-    else {
-        updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc);
-    }
-}
-
-function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, generatedRule, ruleCondition, ruleEffect, isSharedPartial, policyPartialDesc) {
-    $.ajax({
-        url: context + '/apis/xacmlpolicies/update',
-        type: 'POST',
-        contentType: 'application/x-www-form-urlencoded',
-        async: false,
-        data: {
-            "id": editedpolicyPartialId,
-            "policyPartial": generatedRule,
-            "isSharedPartial": isSharedPartial,
-            "policyPartialDesc": policyPartialDesc
-        },
-        success: function (data) {
-            if (JSON.parse(data)) {
-                $.each(businessOwnerArray, function (index, obj) {
-                    if (obj != null && obj.id == editedpolicyPartialId) {
-                        businessOwnerArray[index].policyPartialName = policyPartialName;
-                        businessOwnerArray[index].policyPartial = ruleCondition;
-                        businessOwnerArray[index].ruleEffect = ruleEffect;
-                        businessOwnerArray[index].isShared = isSharedPartial;
-                        businessOwnerArray[index].description = policyPartialDesc
-
-                    }
-                });
-                updatePolicyPartial();
-                Showalert("Policy Updated Successfully", "alert-success", "statusError");
-                resetControls();
-                $('.content-section').delay(3000).hide(0);
-            } else {
-                Showalert("Couldn't modify .This partial is being used by web apps ", "alert-error", "statusError");
-            }
-        },
-        error: function () {
-        }
-    });
-}
 
 
 function updatePolicyPartial() {
     $('#ownerPartialsTable tbody').html("");
     //show empty msg
-    if(businessOwnerArray.length > 0){
+    if(businessOwnersArray.length > 0){
         $('.no-owner').hide();
         $('.owner-list').show();
     }else{
         $('.no-owner').show();
         $('.owner-list').hide();
     }
-    $.each(businessOwnerArray, function (index, obj) {
+    $.each(businessOwnersArray, function (index, obj) {
         if (obj != null) {
 
                 $('#ownerPartialsTable tbody').append('<tr><td>' + obj.owner_id + '</td> <td>' +
                 obj.owner_name + '</td> <td>' + obj.owner_mail + '</td> <td>' + obj.owner_site + '</td> <td>' + obj.owner_desc + '</td> <td><a data-target="#entitlement-policy-editor" ' +
-                'data-toggle="modal" data-policy-id="' + obj.id + '" class="policy-edit-button">' +
+                'data-toggle="modal" data-policy-id="' + obj.owner_id + '" class="policy-edit-button">' +
                 '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="' + obj.owner_name +
-                '"  data-policy-id="' + obj.id + '" class="policy-delete-button"><i class="icon-trash"></i>' +
+                '"  data-policy-id="' + obj.owner_id + '" class="policy-delete-button"><i class="icon-trash"></i>' +
                 '</a></td></tr>');
             }
     });
 
 }
-
+function GetDynamicTextBox(index , key , value) {
+    var id_key = "key-".concat(index);
+    var id_val = "value-".concat(index);
+    var id_btn = "btn-".concat(index);
+    return '<input name = "key" type="text" id="'+id_key+'" value="'+key+'"/>&nbsp &nbsp &nbsp &nbsp' +
+           '<input name="value" type="text" id="'+id_val+'" value="'+value+'"/>&nbsp &nbsp &nbsp &nbsp<button id="'+index+'" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button>'
+}
 function getSelectedRuleEffect(){
     return $('#rule-effects .active').data('effect');
 }
 
-function setSelectedRuleEffect(effect){
-    if(effect == "Deny"){
-        $('#btn-rule-effect-permit').removeClass('active');
-        $('#btn-rule-effect-deny').addClass('active');
-    }else if(effect == "Permit"){
-        $('#btn-rule-effect-deny').removeClass('active');
-        $('#btn-rule-effect-permit').addClass('active');
-    }
+function removeFields(index){
+    var id_key = "#"+"key-".concat(index);
+    var id_val = "#"+"value-".concat(index);
+    var id_btn = "#"+index;
+    $(id_key).val("");
+    $(id_val).val("");
+    $(id_key).hide();
+    $(id_val).hide();
+    $(id_btn).hide();
 }
 
-/**
- * Generates a XACML rule using the effect and the condition.
- *
- */
-function generatePolicyRule(ruleEffect, ruleCondition){
-    var generatedRule = "<Rule Effect=\"" + ruleEffect + "\" RuleId=\"Rule001\">" + ruleCondition + "</Rule>";
-    return generatedRule;
-}
+$(document).on("click", "#btn-owner-add-field", function () {
+    var div = $("<div />");
+    div.html(GetDynamicTextBox(extraFieldCount, "", ""));
+    $("#owner-others").append(div);
+    extraFieldCount++;
+});
 
 //edit event
 $(document).on("click", ".policy-edit-button", function () {
     var policyId = $(this).data("policyId");
-    editedpolicyPartialId = policyId;
-    $('#policy-content').val("");
-    $('#policy-name').val("");
-    $('#policy-desc').val("");
+    editedOwnerId = policyId;
+    $('#owner_name').val("");
+    $('#owner-email').val("");
+    $('#owner_site').val("");
+    $('#owner_desc').val("");
     $('.content-section').show();
     var section=$('.title-section-edit');
     jQuery('html, body').animate({
         scrollTop: section.offset().top
     }, 1000);
-    editor.setValue("");
+   // editor.setValue("");
 
-    $.each(businessOwnerArray, function (index, obj) {
-        if (obj != null && obj.id == policyId) {
-            $('#policy-name').val(obj.policyPartialName);
-            $('#policy-name').prop("readonly", true);
-            $('#policy-desc').val(obj.description);
-            $('#policy-content').val(obj.policyPartial);
-            editor.setValue(obj.policyPartial);
-            setSelectedRuleEffect(obj.ruleEffect);
+    $.each( businessOwnersArray, function (index, obj) {
+        if (obj != null && obj.owner_id == policyId) {
+            $('#owner-name').val(obj.owner_name);
+            $('#owner-email').val(obj.owner_mail);
+            $('#owner-site').val(obj.owner_site);
+            $('#owner-desc').val(obj.owner_desc);
 
+            if(obj.keys != null && obj.values != null) {
+                var keySet = obj.keys.split("/");
+                var valueSet = obj.values.split("/");
+
+                for(var i = 1; i< keySet.length; i++){
+                    var div = $("<div />");
+                    div.html(GetDynamicTextBox(i, keySet[i], valueSet[i]));
+                    $("#owner-others").append(div);
+                }
+               extraFieldCount = keySet.length;
+            }
         }
     });
 });
@@ -451,63 +239,12 @@ $(document).on("click", ".policy-edit-button", function () {
 
 $(document).on("click", ".policy-delete-button", function () {
 
-    var policyName = $(this).data("policyName");
-    var policyId = $(this).data("policyId");
-    var policyPartial;
-    var arrayIndex;
-    var isConfirmed;
-    $.each(businessOwnerArray, function (index, obj) {
-        if (obj != null && obj.id == policyId) {
-            policyPartial = obj;
-            arrayIndex = index;
-            return false; // break
-        }
 
-    });
-
-    if (policyPartial.isShared) {
-        $.ajax({
-            async: false,
-            url: context + '/apis/xacmlpolicies/associated/apps',
-            data: {"policyId": policyId},
-            type: 'GET',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-                var apps = "";
-                if (response.length != 0) {
-                    // construct and show the  the warning message with app names which use this partial before delete
-                    for (var i = 0; i < response.length; i++) {
-                        var j = i + 1;
-                        apps = apps + j + ". " + response[i].appName + "\n";
-
-                    }
-                    var msg = "You cannot delete the policy " + policyName + " because it is been used in following apps\n\n" +
-                        apps;
-                    Showalert(msg, "alert-error", "statusError");
-                    return;
-
-                } else {
-                    $(".alert").alert();
-                    isConfirmed = confirm("Are you sure you want to delete the policy " + policyName + "?");
-                }
-
-            },
-            error: function (response) {
-                if (response.status == 500) {
-                    Showalert('Sorry, your session has expired', "alert-error", "statusError");
-                    location.reload();
-                }
-            }
-        });
-
-    }
-
-    if (isConfirmed == true) {
+    var ownerId = $(this).data("policyId");
 
         $.ajax({
 
-            url: context + '/apis/xacmlpolicies/delete/' + policyId,
+            url: context + '/apis/businessowners/delete/' + ownerId,
             type: 'DELETE',
             contentType: 'application/json',
             dataType: 'json',
@@ -515,25 +252,25 @@ $(document).on("click", ".policy-delete-button", function () {
 
                 var success = JSON.parse(response);
                 if (success) {
-                    delete businessOwnerArray[arrayIndex];
+                    delete  businessOwnersArray[arrayIndex];
                     updatePolicyPartial();
                     Showalert("Policy Deleted Successfully ", "alert-success", "statusSuccess");
 
                 } else {
-                    Showalert("Couldn't delete the policy '" + policyName + "'. This policy is being used by web apps.  ", "alert-error", "statusError");
+                    Showalert("Couldn't delete the policy. This policy is being used by web apps.  ", "alert-error", "statusError");
                 }
 
             },
             error: function (response) {
                 if (response.status == 403) {
-                    Showalert("Couldn't delete the policy '" + policyName + "'. This policy is being used by web apps.  ", "alert-error", "statusError");
+                    Showalert("Couldn't delete the policy . This policy is being used by web apps.  ", "alert-error", "statusError");
                 } else {
                     Showalert('Error occured while fetching entitlement policy content', "alert-error", "statusError");
                 }
             }
         });
 
-    }
+
 
 });
 

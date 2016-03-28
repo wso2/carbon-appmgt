@@ -37,8 +37,24 @@
          <div class="content-section shadow-up" style="display: none">
             <hr/>
             <div class="title-section-edit">
-                <h2>Edit Entitlement Policy</h2>
+                <h2>Edit Business Owner</h2>
             </div>
             <br/>
+
+                                <label>Name</label>
+                                <input id="owner-name" type="text" class="form-control" style="width: 30%"
+                                maxlength="256"/>
+                                <label>E-mail</label>
+                                <input id="owner-email" type="text" class="form-control" style="width: 30%" maxlength="256"/>
+                                                                                                                      <label>Site link</label>
+                                                                                                                      <input id="owner-site" type="text" class="form-control" style="width: 30%" maxlength="256"/>
+                                                                                                                                                                                                            <label>Description</label>
+                                                               <textarea id="owner-desc" style="width:80%;height:100px;border: 1px solid #eee;"
+    class="form-control" maxlength="1000"></textarea>
+                                <div id = "owner-others"></div>
+                                     <br>
+                            <a id="btn-owner-add-field" class="btn  btn-success">Add Field</a>
+                            <a id="btn-policy-save" class="btn btn-primary">Save</a>
+                            <a id="btn-policy-cancel" class="btn">Cancel</a>
         </div>
          <%}); %>

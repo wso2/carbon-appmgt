@@ -509,6 +509,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
+    public int updateBusinessOwner(String ownerId,String ownerName, String ownerMail, String description, String sitelink, String keys,
+                                 String values) throws AppManagementException{
+        return appMDAO.updateBusinessOwner(ownerId, ownerName, ownerMail, description, sitelink, keys, values);
+
+    }
+
+    @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
                                                   String author, boolean isShared,String policyPartialDesc) throws
                                                                                    AppManagementException {
@@ -2082,5 +2089,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
         return appMDAO.getAppDetailsFromUUID(uuid);
+    }
+
+    @Override
+    public int deleteBusinessOwner(String ownerId) throws
+                                        AppManagementException{
+
+        return appMDAO.deleteBusinessOwner(ownerId);
     }
 }

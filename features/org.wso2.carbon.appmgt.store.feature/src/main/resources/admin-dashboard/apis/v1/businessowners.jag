@@ -24,21 +24,26 @@ var uriMatcher = new URIMatcher(request.getRequestURI());
 
 //POST patterns
 var saveOwner = '/{context}/apis/businessowners/save';
-var ownerList = '/{context}/apis/businessowners/list'
+var ownerList = '/{context}/apis/businessowners/list';
+var ownerUpdate = '/{context}/apis/businessowners/update';
+var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
+
 
 if (method == 'GET') {
     var log = new Log();
     //console.log("API HITTED");
     if (uriMatcher.match(ownerList)) {
-        log.info("This is an INFO level log");
     //    ///get policy list
        print(ownerApi.getOwnerList());
     //
     }
+}
 
+if(method == 'DELETE'){
 
-
-
+    if (uriMatcher.match(ownerDelete)) {
+        print(ownerApi.deleteOwner(uriMatcher.elements().ownerId));
+    }
 }
 if (method == 'POST') {
     if (uriMatcher.match(saveOwner)) {
@@ -50,7 +55,18 @@ if (method == 'POST') {
         var values = request.getParameter("values");
 
         print(createResponseObject(ownerApi.saveOwner(ownerName, ownerMail, description, sitelink, keys, values)));
+    }
 
+    if(uriMatcher.match(ownerUpdate)) {
+        var ownerID = request.getParameter("owner_id");
+        var ownerName = request.getParameter("ownerName");
+        var ownerMail = request.getParameter("ownerMail");
+        var description = request.getParameter("description");
+        var sitelink = request.getParameter("sitelink");
+        var keys = request.getParameter("keys");
+        var values = request.getParameter("values");
+
+        print(createResponseObject(ownerApi.updateOwner(ownerID,ownerName, ownerMail, description, sitelink, keys, values)));
     }
 }
 

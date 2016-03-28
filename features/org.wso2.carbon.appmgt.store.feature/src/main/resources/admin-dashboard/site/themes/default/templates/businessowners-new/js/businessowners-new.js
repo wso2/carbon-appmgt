@@ -211,7 +211,7 @@ $(document).on("click", ".policy-delete-button", function () {
     var policyPartial;
     var arrayIndex;
     var conf;
-    $.each(businessOwnerArray, function (index, obj) {
+    $.each(xacmalPolicyPartialArray, function (index, obj) {
         if (obj != null && obj.id == policyId) {
             policyPartial = obj;
             arrayIndex = index;
@@ -269,7 +269,7 @@ $(document).on("click", ".policy-delete-button", function () {
 
                 var success = JSON.parse(response);
                 if (success) {
-                    delete businessOwnerArray[arrayIndex];
+                    delete xacmalPolicyPartialArray[arrayIndex];
                     updatePolicyPartial();
 
 

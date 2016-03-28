@@ -91,6 +91,8 @@ public interface APIProvider extends APIManager {
      */
     public Usage getUsageByAPI(APIIdentifier apiIdentifier);
 
+
+
     /**
      * Return Usage of given provider and WebApp
      *
@@ -228,6 +230,7 @@ public interface APIProvider extends APIManager {
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
                                                   String author, boolean isShared, String policyPartialDescription) throws
                                                                                    AppManagementException;
+
 
     /**
      *
@@ -438,6 +441,27 @@ public interface APIProvider extends APIManager {
      */
     public void updateTierPermissions(String tierName, String permissionType, String roles) throws
                                                                                             AppManagementException;
+
+    /**
+     * This methode is to update a given business owner
+     * @param ownerId ID of the owner.
+     * @param ownerName Edited name of the owner.
+     * @param ownerMail Edited E mail of the owner.
+     * @param description Description.
+     * @param sitelink Site Link of the owner.
+     * @param keys Set of keys for extra parameters.
+     * @param values Set of values for respective keys.
+     * @throws AppManagementException
+     */
+   public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description, String sitelink, String keys, String values) throws
+                                                                                                                                                        AppManagementException;
+    /**
+     * This methode is to update a given business owner
+     * @param ownerId ID of the owner.
+     * @throws AppManagementException
+     */
+    public int deleteBusinessOwner(String ownerId) throws
+                                                   AppManagementException;
 
     /**
      * Get the list of Tier Permissions

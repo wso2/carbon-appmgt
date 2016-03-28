@@ -5150,7 +5150,63 @@ public class AppMDAO {
 		return commentList.toArray(new Comment[commentList.size()]);
 	}
 
+    /**
+     *
+     * @param ownerId
+     * @return
+     */
+    public int deleteBusinessOwner(String ownerId) {
 
+        Connection connection = null;
+        PreparedStatement statementToDeleteRecord = null;
+        PreparedStatement statementToDeleteRecordTwo = null;
+        try {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Deleted a Business Owner");
+            }
+            connection = APIMgtDBUtil.getConnection();
+
+            String queryToDeleteRecordTwo = "DELETE FROM " + "BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+
+            statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo,
+                                                                     new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            statementToDeleteRecordTwo.setString(1, ownerId);
+            statementToDeleteRecordTwo.executeUpdate();
+
+            String queryToDeleteRecord = "DELETE FROM BUSINESS_OWNERS WHERE OWNER_ID = ?";
+
+            statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord,
+                                                                  new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            statementToDeleteRecord.setString(1, ownerId);
+            statementToDeleteRecord.executeUpdate();
+
+
+
+            // Finally commit transaction
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback the add entitlement policy partial with name : ", e1);
+                }
+            }
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
+        }
+        return 1;
+    }
+    /**
+     *
+     * @param ownerName
+     * @param ownerMail
+     * @param description
+     * @param sitelink
+     * @param keys
+     * @param values
+     * @return
+     */
     public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
                                  String values) {
 
@@ -5190,6 +5246,77 @@ public class AppMDAO {
                     statementToInsertRecordTwo.setString(1, keysArray[i]);
                     statementToInsertRecordTwo.setString(2, valuesArray[i]);
                     statementToInsertRecordTwo.executeUpdate();
+                }
+            }
+
+            // Finally commit transaction.
+            connection.commit();
+
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    log.error("Failed to rollback the add entitlement policy partial with name : ", e1);
+                }
+            }
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToInsertRecord, connection, null);
+        }
+        return 1;
+    }
+
+    public int  updateBusinessOwner(String ownerId,String ownerName, String ownerMail, String description, String sitelink, String keys,
+                                    String values) {
+
+
+        Connection connection = null;
+        PreparedStatement statementToInsertRecord = null;
+        PreparedStatement statementToInsertRecordTwo = null;
+        PreparedStatement statementToDelete = null;
+
+        String[] keysArray = keys.split("/");
+        String[] valuesArray = values.split("/");
+
+        try {
+
+            if (log.isDebugEnabled()) {
+                log.debug("Added a Business Owner");
+            }
+            connection = APIMgtDBUtil.getConnection();
+            String queryToInsertRecord = "UPDATE  "
+                    + "BUSINESS_OWNERS SET OWNER_NAME=?,OWNER_EMAIL=?,OWNER_DESC=?,OWNER_SITE=?"
+                    + " WHERE OWNER_ID=?";
+
+            statementToInsertRecord = connection.prepareStatement(queryToInsertRecord,
+                                                                  new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            statementToInsertRecord.setString(1, ownerName);
+            statementToInsertRecord.setString(2, ownerMail);
+            statementToInsertRecord.setString(3, description);
+            statementToInsertRecord.setString(4, sitelink);
+            statementToInsertRecord.setString(5, ownerId);
+
+            statementToInsertRecord.executeUpdate();
+            String queryToDelete = "DELETE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+
+            statementToDelete = connection.prepareStatement(queryToDelete,
+                                                            new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            statementToDelete.setString(1, ownerId);
+            statementToInsertRecord.executeUpdate();
+            int ownerID = Integer.parseInt(ownerId);
+            String queryToInsertRecordTwo =
+                    "INSERT INTO " + "BUSINESS_OWNERS_EXTRA(OWNER_ID, KEY, VALUE)" + "VALUES(?,?,?)";
+
+            statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo,
+                                                                     new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
+            if ((keysArray.length > 1 && valuesArray.length > 1) && (keysArray.length == valuesArray.length) ) {
+                for (int i = 1; i < keysArray.length; i++) {
+                    if( keysArray[i] != null &&  keysArray[i] != "") {
+                        statementToInsertRecordTwo.setInt(1, ownerID);
+                        statementToInsertRecordTwo.setString(2, keysArray[i]);
+                        statementToInsertRecordTwo.setString(3, valuesArray[i]);
+                        statementToInsertRecordTwo.executeUpdate();
+                    }
                 }
             }
 
