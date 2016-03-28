@@ -1,5 +1,4 @@
 <%
-var a;
 include('/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var favourites = jagg.module("favourites");
@@ -12,7 +11,21 @@ var config = require("/config/store.json");
 
 var userName = session.get("LOGGED_IN_USER");
 var userTenantId = session.get("tenantId");
-var log = new Log();
+var storeObj = jagg.module("manager").getAPIStoreObj();
+
+var enabledTypeList = storeObj.getEnabledAssetTypeList();
+
+var dynamicLandingPage;
+
+if(enabledTypeList[0] == "mobileapp"){
+    dynamicLandingPage = config.pages.mobileLandingPage;
+}
+else if(enabledTypeList[0] == "webapp"){
+    dynamicLandingPage = config.pages.webAppLandingPage;
+}
+else if(enabledTypeList[0] == "site"){
+    dynamicLandingPage = config.pages.siteLandingPage;
+}
 
 
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
@@ -25,11 +38,14 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
 
-            var landingPage = config.pages.landingPage;
+
+            var landingPage = dynamicLandingPage;
             if (userName) {
-                var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
-                if (isFavouritePageSelected) {
-                    landingPage = configs.pages.favouritePage;
+                if (!storeObj.isAssetTypeEnabled("mobileapp")) {
+                    var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
+                    if (isFavouritePageSelected) {
+                        landingPage = configs.pages.favouritePage;
+                    }
                 }
             }
 
@@ -53,7 +69,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
-    var landingPage = config.pages.landingPage;
+    var landingPage = dynamicLandingPage;
     if (userName != null) {
         var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
         if (isFavouritePageSelected) {

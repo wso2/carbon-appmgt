@@ -433,7 +433,7 @@
                 Internal MDM which dispatches the MDM calls as Java/OSGI calls. Use this when run Store/Publisher/MDM
                 in on single JVM.
             -->
-            <MDM name="WSO2MDM_INTERNAL" bundle="org.wso2.carbon.appmgt.mdm.wso2mdm.osgi">
+            <MDM name="WSO2MDM_INTERNAL" bundle="org.wso2.carbon.appmgt.internalconnector.mdm.wso2mdm">
                 <Property name="ImageURL">/store/extensions/assets/mobileapp/resources/models/%s.png</Property>
             </MDM>
 

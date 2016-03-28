@@ -87,7 +87,7 @@ var auditLog = require('/modules/auditLog/logger.js');
 
                         session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                         session.put("Loged", "true");
-                        session.put("tenantId",tenantId)
+                        session.put("tenantId",tenantId);
 
                         username = username + "";
                         var userDetails = {};
@@ -124,13 +124,15 @@ var auditLog = require('/modules/auditLog/logger.js');
                                 if(!urlTenantDomain){
                                     urlTenantDomain = "carbon.super";
                                 }
-                                var isFavouritePageSelected = manager.hasFavouritePage(username,tenantId,urlTenantDomain).status;
-                                if (isFavouritePageSelected) {
-                                    var favPage = configs.pages.favouritePage;
-                                    relayState = contextPath + favPage;
-                                } else {
-                                    //remove the query param
-                                    relayState.replace(queryParam, "");
+                                if (!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+                                    var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
+                                    if (isFavouritePageSelected) {
+                                        var favPage = configs.pages.favouritePage;
+                                        relayState = contextPath + favPage;
+                                    } else {
+                                        //remove the query param
+                                        relayState.replace(queryParam, "");
+                                    }
                                 }
                             }
 
