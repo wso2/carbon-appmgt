@@ -17,6 +17,7 @@ var config = require('/config/publisher.json');
 var SITE_TYPE = 'site';
 var WEBAPP_TYPE = 'webapp';
 var MOBILEAPP_TYPE = 'mobileapp';
+var CONTENT_TYPE_JSON = "application/json";
 var assetType;
 var auditLog = require('/modules/auditLog/logger.js');
 
@@ -398,7 +399,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
             if ((report) && (report.failed)) {
 
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok: false, message: 'Validation failure', report: report});
                 return;
             }
@@ -408,7 +409,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             var version = model.get('overview.version').value;
 
             if (context.post['overview_context'].length > 200) {
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok: false, message: 'Context value length is more than 200', report: report});
                 return;
             }
@@ -418,7 +419,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
 
             //If exists, return an error message
             if (isexists == true) {
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
                 print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
                                                        name + "' and version - '" + version +"'"});
                 return;
@@ -483,7 +484,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
                                                                                     + '\'' +
                                                                                     '}', "", "");
             }
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
             print({ok: true, message: 'asset added', id: assetId});
         }
         catch (e) {
@@ -492,7 +493,7 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
             response.sendError(500, 'The asset instance could not be created.Please check the server log.');
         }
     }else{
-        response.contentType = "application/json";
+        response.contentType = CONTENT_TYPE_JSON;
         print({ok: false, message: 'Failed to add Asset. Insufficient privileges.'});
         return;
         //response.sendError(401, 'Failed to add Asset : Insufficient Privilages.');

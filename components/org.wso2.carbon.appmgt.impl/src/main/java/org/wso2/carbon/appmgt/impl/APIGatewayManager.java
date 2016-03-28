@@ -165,7 +165,9 @@ public class APIGatewayManager {
 				}
 				String operation = "delete";
                 if (api.isDefaultVersion()) {
-                    client.deleteNonVersionedWebApp(tenantDomain);
+                    if (client.getNonVersionedWebAppData(tenantDomain) != null) {
+                        client.deleteNonVersionedWebApp(tenantDomain);
+                    }
                 }
                 client.deleteVersionedWebApp(tenantDomain);
 				undeployCustomSequences(api, tenantDomain, environment);

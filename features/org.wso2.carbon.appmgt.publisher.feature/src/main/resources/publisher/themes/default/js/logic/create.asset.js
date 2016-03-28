@@ -98,15 +98,12 @@ $(function() {
        // beforeSubmit:  showRequest,  // pre-submit callback 
       // data : {"tags":tags},
         success:       function(response) {
-
-				var result = response;
-
 				//Check if the asset was added
-				if (result.ok) {
+				if (response.ok) {
 					showAlert('Asset added successfully.', 'success');
 					window.location = caramel.context + '/assets/' + type + '/';
 				} else {
-					var msg = processErrorReport(result.report);
+					var msg = processErrorReport(response.report);
 					showAlert(msg, 'error');
 				}
 

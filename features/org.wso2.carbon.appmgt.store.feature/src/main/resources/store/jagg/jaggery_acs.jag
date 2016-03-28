@@ -54,14 +54,6 @@
                          if(!isUserPermitted.permitted ){
                          response.sendRedirect("../site/pages/logout.jag");
                          } else{
-			            var username = ssoRelyingParty.getLoggedInUser(sessionId);
-			            var manager = jagg.module("manager");
-          		        var  store = manager.getAPIStoreObj();
-			            var subscriber = store.getSubscriber(username);
-    			        if (!subscriber) {
-        			        store.addSubscriber(username);
-        			        subscriber = store.getSubscriber(username);
-    			        }
                         session.put("LOGGED_IN_USER",ssoRelyingParty.getLoggedInUser(sessionId));		
 						
                         response.sendRedirect(requestedURI);

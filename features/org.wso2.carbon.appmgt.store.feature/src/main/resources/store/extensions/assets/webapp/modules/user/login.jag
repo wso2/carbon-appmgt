@@ -35,11 +35,6 @@ var login = function (username, password,tenantMode) {
             message:message
         };
     }
-    var subscriber = store.getSubscriber(username);
-    if (!subscriber) {
-        store.addSubscriber(username);
-        subscriber = store.getSubscriber(username);
-    }
     cookie = result.sessionId;
     cookie = cookie.split(';')[0];
     isSuperTenant = result.isSuperTenant;
@@ -55,15 +50,8 @@ var login = function (username, password,tenantMode) {
 var loginWithSAMLToken = function (username) {
 	
     var result,
-            log = new Log(),
-            manager = jagg.module("manager"),
-            store = manager.getAPIStoreObj();
-   
-    var subscriber = store.getSubscriber(username);
-    if (!subscriber) {
-        store.addSubscriber(username);
-        subscriber = store.getSubscriber(username);
-    }
+            log = new Log()
+
     return {
         error:false,
         username:username,

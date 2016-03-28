@@ -147,7 +147,6 @@ require('/modules/store.js').exec(function (ctx) {
             options.type = type;
             options.lifecycleState = ["published"];
             assets = store.taggeds(type, options, paging);
-            var tagAssets = getAssetsForTag(type,store);
         } else if (query) { // if search from search box
             urlQuery = 'query=' + query + '&';
             query = require('/modules/search.js').build(query);

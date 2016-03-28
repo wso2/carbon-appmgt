@@ -22,6 +22,9 @@ var routeManager = new router.Router();
 
 var log = new Log('tags.api.router');
 
+var CONTENT_TYPE_JSON = "application/json";
+
+
 routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}', function (context) {
     var type = context.params.type;
     var QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE = '/_system/config/repository/components/' +
@@ -39,11 +42,13 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}', function 
        params = {"1":WEB_APP_MEDIA_TYPE,"2":WEB_APP_LIFE_CYCLE,"3":LC_STATE};
     }
     var tags = rxtManager.registry.query(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE,params);
+    log.debug('tags retrieved: ' + tags);
+
+    var tagManager = new tagModule.TagManager();
     tagManager.process(tags,type);
     tags = tagManager.get(type);
-    log.info('tags retrieved: ' + stringify(tags));
 
-    response.contentType = "application/json";
+    response.contentType = CONTENT_TYPE_JSON;
     print(tags);
 });
 
@@ -68,7 +73,7 @@ routeManager.register('GET', 'publisher', '/publisher/api/tag/{type}/{id}', func
     for (var i = 0; i < numberOfTags; i++) {
         tagsData.push({id: i, name: tags[i]});
     }
-    response.contentType = "application/json";
+    response.contentType = CONTENT_TYPE_JSON;
     print(tagsData);
 });
 
@@ -76,7 +81,7 @@ routeManager.register('PUT', 'publisher', '/publisher/api/tag/{type}/{id}', func
 
     var type = context.params.type;
     var id = context.params.id;
-    var contentType = "application/json";
+    var contentType = CONTENT_TYPE_JSON;
 
     log.debug(context.content);
 
@@ -176,7 +181,7 @@ routeManager.register('DELETE', 'publisher', '/publisher/api/tag/{type}/{id}/{ta
 
 
     rxtManager.registry.untag(artifact.path, tag);
-    response.contentType = "application/json";
+    response.contentType = CONTENT_TYPE_JSON;
     print(msg);
 });
 

@@ -92,12 +92,9 @@ var onDateSelected = function(from, to) {
 			'isOnChoice' : true
 		},
 		success : function(response) {
-			var parsedResponse = response;
-			
-			
 			/* Hot assets stats graph */
 			var data2 = [{
-				data : parsedResponse.hotAssetStats,
+				data : response.hotAssetStats,
 				color : '#FFC826',
 				label : 'Assets',
 				bars : {
@@ -115,7 +112,7 @@ var onDateSelected = function(from, to) {
 				},
 				xaxis : {
 					labelAngle : 90,
-					ticks : parsedResponse.hotAssetTicks
+					ticks : response.hotAssetTicks
 				}
 				
 			};

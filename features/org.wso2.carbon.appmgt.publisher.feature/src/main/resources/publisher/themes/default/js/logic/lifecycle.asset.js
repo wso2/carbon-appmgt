@@ -159,8 +159,7 @@ $(function() {
 					 graph.Renderer.initRaphael();
 					 graph.Renderer.render(graph.NMap);
 					 }       */
-					var statInfo = response;
-					sugyama.init(statInfo.lifecycle, paper);
+					sugyama.init(response.lifecycle, paper);
 					var START_X = 10;
 					var START_Y = 50;
 					var VERTEX_RADIUS = 15;
@@ -168,14 +167,14 @@ $(function() {
 					var LAYER_SPACE = 200;
 					//alert(statInfo.state);
 					//var curState = $('#state').text();
-					sugyama.draw(START_X, START_Y, VERTEX_RADIUS, LAYER_SPACE, LAYER_SEP, statInfo.state);
+					sugyama.draw(START_X, START_Y, VERTEX_RADIUS, LAYER_SPACE, LAYER_SEP, response.state);
 
-					actions = statInfo.lifecycle.configuration[0].lifecycle[0].scxml[0].state;
+					actions = response.lifecycle.configuration[0].lifecycle[0].scxml[0].state;
 					keys = sugyama.getKeys();
 					//graph.Renderer.setSelected(statInfo.state);
-					disableActions(statInfo.actions);
-					buildButtons(statInfo.actions);
-					highlightTransition(statInfo.state);
+					disableActions(response.actions);
+					buildButtons(response.actions);
+					highlightTransition(response.state);
 				}
 				//$('#canvas').html(response);
 			},
@@ -202,11 +201,8 @@ $(function() {
 					url : caramel.context + '/api/lifecycle/' + asset + '/' + id,
 					type : 'GET',
 					success : function(response) {
-						//Convert the response to a JSON object
-						var statInfo = response;
-
-						$('#state').html(statInfo.state);
-						$('#view-lifecyclestate').html(statInfo.state);
+						$('#state').html(response.state);
+						$('#view-lifecyclestate').html(response.state);
 						//disableActions(statInfo.actions);
 						buildCheckList(asset, id);
 						buildLCGraph();
@@ -298,11 +294,11 @@ $(function() {
 
 				var out = '<ul>';
 
-				var obj = response;
+				var checkListItems = response.checkListItems;
 
-				for (var index in obj.checkListItems) {
+				for (var index in checkListItems) {
 
-					var current = obj.checkListItems[index];
+					var current = checkListItems[index];
 
 					out += '<li><input type="checkbox" onclick="onCheckListItemClick(this,' + index + ')" ';
 
