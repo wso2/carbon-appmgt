@@ -86,6 +86,9 @@ public class IOSApplicationOperationUtil {
 				operation.setType(Operation.Type.PROFILE);
 				operation.setPayLoad(webClip.toJSON());
 				break;
+			default:
+				String errorMessage = "Invalid application type.";
+				throw new DeviceApplicationException(errorMessage);
 		}
 		return operation;
 	}
