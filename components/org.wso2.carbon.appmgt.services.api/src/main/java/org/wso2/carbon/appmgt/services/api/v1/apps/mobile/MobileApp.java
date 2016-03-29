@@ -39,7 +39,8 @@ public class MobileApp extends App {
     private String bundleVersion;
     private String appIdentifier;
     private String location;
-
+    private String visibility;
+    private String lifeCycleState;
 
     @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
     @XmlElement
@@ -153,5 +154,32 @@ public class MobileApp extends App {
     @XmlElement
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
+    public String getVisibility() {
+        return visibility;
+    }
+
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
+    public void setVisibility(String visibility) {
+        if(visibility == null) {
+            visibility = "";
+        }
+        this.visibility = visibility;
+    }
+
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
+    public String getLifeCycleState() {
+        return lifeCycleState;
+    }
+
+    @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+    @XmlElement
+    public void setLifeCycleState(String lcState) {
+        this.lifeCycleState = lcState;
     }
 }

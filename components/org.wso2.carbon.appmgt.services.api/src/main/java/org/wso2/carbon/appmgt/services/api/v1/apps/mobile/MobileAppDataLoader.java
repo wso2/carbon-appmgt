@@ -21,6 +21,8 @@ public class MobileAppDataLoader {
             mobileApp.setVersion(artifact.getAttribute("overview_version"));
             mobileApp.setType(artifact.getAttribute("overview_type"));
             mobileApp.setIconImage(HostResolver.getHostWithHTTP() + artifact.getAttribute("images_thumbnail"));
+            mobileApp.setVisibility(artifact.getAttribute("overview_visibility"));
+            mobileApp.setLifeCycleState(artifact.getLifecycleState());
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
                 mobileApp.setType(artifact.getAttribute("overview_type"));
