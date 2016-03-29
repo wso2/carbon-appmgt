@@ -131,7 +131,8 @@ var render = function (theme, data, meta, require) {
                         'URL': data.URL,
                         'devices': data.devices,
                         'selfUnsubscription': data.selfUnsubscription,
-                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
+                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled,
+                        'searchQuery':searchQuery
                     }
                 }
             ]

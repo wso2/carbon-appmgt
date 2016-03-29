@@ -25,7 +25,7 @@ var render = function (theme, data, meta, require) {
     var assets = require('/helpers/page-content-all-mobile-apps.js');
     var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.paging, data.config,
                                          data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
-
+    bodyContext.searchQuery =searchQuery;
     var searchUrl = "/assets/mobileapp";
     data.tags.tagUrl = "/assets/mobileapp";
 
