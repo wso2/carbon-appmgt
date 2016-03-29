@@ -429,6 +429,32 @@ Store.prototype.subscriptions = function (type) {
     return assetz;
 };
 
+
+Store.prototype.searchSubscriptions = function (type, searchAttribute, searchValue) {
+    var registry = this.registry,
+        that = this,
+        path = this.subscriptionSpace(type),
+        result = {},
+        apps = [];
+    if (!type) {
+        return;
+    }
+    var appIdPaths = registry.content(path);
+    appIdPaths.forEach(function (path) {
+        var app = that.asset(type, path.substr(path.lastIndexOf('/') + 1));
+        if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
+            if (app.lifecycleState == 'Published') {
+                app.isPublished = true;
+            } else {
+                app.isPublished = false;
+            }
+            apps.push(app);
+        }
+    });
+    result[type] = apps;
+    return result;
+};
+
 Store.prototype.configs = function () {
     return configs(this.tenantId);
 };

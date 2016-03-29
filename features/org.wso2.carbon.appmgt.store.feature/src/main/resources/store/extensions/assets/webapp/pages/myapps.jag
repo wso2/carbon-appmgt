@@ -473,7 +473,7 @@ require('/modules/store.js').exec(function (ctx) {
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     if(storeHostObj.isAssetTypeEnabled("webapp")) {
         caramel.render({
-            title: 'Web Apps | Store',
+            title: 'My Apps | Store',
             user: user,
             sso: sso,
             header: headerData,

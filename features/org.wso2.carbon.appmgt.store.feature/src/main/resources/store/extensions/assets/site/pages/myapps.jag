@@ -480,7 +480,7 @@ require('/modules/store.js').exec(function (ctx) {
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
     if (storeHostObj.isAssetTypeEnabled("site")) {
         caramel.render({
-            title: 'Sites | Store ',
+            title: 'My Apps | Store ',
             user: user,
             sso: sso,
             header: headerData,

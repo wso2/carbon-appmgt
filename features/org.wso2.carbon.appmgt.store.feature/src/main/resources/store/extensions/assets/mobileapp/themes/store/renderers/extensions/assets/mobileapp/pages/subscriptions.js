@@ -24,7 +24,7 @@
 
 var render = function (theme, data, meta, require) {
     var categories = data.navigation.assets[data.type].categories;
-    var searchUrl = "/assets/mobileapp";
+    var searchUrl = "/extensions/assets/mobileapp/subscriptions";
     var searchQuery =  data.search.query
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
@@ -119,7 +119,7 @@ var render = function (theme, data, meta, require) {
                     partial: 'page-header',
                     context: {
                         title: "My Mobile Apps",
-                        sorting: createSortOptions(data.user, data.config)
+                        sorting: null
                     }
                 }
             ],
