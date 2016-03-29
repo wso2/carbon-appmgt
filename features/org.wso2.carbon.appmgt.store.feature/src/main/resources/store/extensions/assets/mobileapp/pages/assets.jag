@@ -183,6 +183,12 @@ require('/modules/store.js').exec(function (ctx) {
             assets = store.assets(type, paging);
         }
     }
+
+    //add subscription detail
+    for (var i = 0; i < assets.length; i++) {
+        var uuid = assets[i].id;
+        assets[i].isSubscribed = store.isSubscribed(type, uuid);
+    }
     var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
     var devices = [];
     //devices = devicesClass.get

@@ -443,16 +443,19 @@ Store.prototype.searchSubscriptions = function (type, searchAttribute, searchVal
     appIdPaths.forEach(function (path) {
         var app = that.asset(type, path.substr(path.lastIndexOf('/') + 1));
         if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
-            if (app.lifecycleState == 'Published') {
-                app.isPublished = true;
-            } else {
-                app.isPublished = false;
-            }
             apps.push(app);
         }
     });
     result[type] = apps;
     return result;
+};
+
+Store.prototype.isSubscribed = function (type, id) {
+    var path = this.subscriptionSpace(type) + '/' + id;
+    if (this.registry.exists(path)) {
+        return true;
+    }
+    return false;
 };
 
 Store.prototype.configs = function () {

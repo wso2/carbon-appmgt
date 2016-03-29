@@ -48,36 +48,30 @@ var render = function (theme, data, meta, require) {
         var assets = [];
 
 
-        for( i = 0; i < data.userAssets.mobileapp.length; i++){
-
-            var platform = data.userAssets.mobileapp[i].attributes.overview_platform;
+        for(var i = 0; i < data.userAssets.mobileapp.length; i++){
+            var app = data.userAssets.mobileapp[i];
+            var platform = app.attributes.overview_platform;
             switch(userOS){
                 case "android":
                     if(platform === "android" || platform === "webapp"){
-                        assets.push(data.userAssets.mobileapp[i]);
+                        app.isActive = isActive(app);
+                        assets.push(app);
                     }
                     break;
                 case "ios":
                     if(platform === "ios" || platform === "webapp"){
-                        assets.push(data.userAssets.mobileapp[i]);
+                        app.isActive = isActive(app);
+                        assets.push(app);
                     }
                     break;
                 default:
-                    assets.push(data.userAssets.mobileapp[i]);
+                    app.isActive = isActive(app);
+                    assets.push(app);
             }
         }
 
         data.userAssets.mobileapp = assets;
 
-
-
-
-        for(i = 0; i < data.userAssets.mobileapp.length; i++){
-            //print(data.userAssets.mobileapp[i].lifecycleState);
-            if(data.userAssets.mobileapp[i].lifecycleState == 'Unpublished'){
-                delete data.userAssets.mobileapp.splice (i, 1);;
-            }
-        }
     }
 
 
@@ -125,7 +119,7 @@ var render = function (theme, data, meta, require) {
             ],
             pageContent: [
                 {
-                    partial: 'page-content-userAssets',
+                    partial: 'page-content-myapps',
                     context: {
                         'userAssets': data.userAssets,
                         'URL': data.URL,
@@ -176,3 +170,17 @@ function createLeftNavLinks(data) {
 
     return leftNavigationData;
 }
+
+/**
+ * check whether asset has an active life cycle.
+ * return true if published/deprecated else false
+ */
+function isActive(asset) {
+    var active = false;
+    var lifeCycleState = asset.lifecycleState.toUpperCase();
+    if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+        active = true;
+    }
+    asset.lifecycleState = lifeCycleState;
+    return active
+};
