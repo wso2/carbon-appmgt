@@ -1228,7 +1228,6 @@ require('/modules/publisher.js').exec(function(ctx) {
             //add tags
             var tags = context.post['tags'];
             addTags(tags,idField.value,rxtManager,shortName);
-            log.debug('Added tags');
 
             var asset=model.export('asset.exporter');
             var assetCachingModule=require('/modules/cache/cache.manager.js').assetCachingModule();
@@ -1384,7 +1383,6 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //Update tags
             var tags = context.post['tags'];
-            log.info("edit mobile app add tags " +stringify(tags));
             updateTags(tags,artifact.id,rxtManager,shortName);
 
             msg['ok']=true;
@@ -1608,6 +1606,7 @@ function updateTags(newTags, assetId, rxtManager, type) {
     rxtManager.registry.untag(path, oldTags);
     //add New Tags
     addTags(newTags, assetId, rxtManager, type);
+    log.debug("Tags added visibility");
 }
 
 
@@ -1631,6 +1630,7 @@ function updateVisibility(roles, assetId, rxtManager, type) {
     }
     var artifactManager = rxtManager.getArtifactManager(type);
     require("../../assets/default/asset.jag").overridePermissions(assetId, artifactManager, permissions);
+    log.debug("Updated role visibility");
 }
 
 function url_reg(){

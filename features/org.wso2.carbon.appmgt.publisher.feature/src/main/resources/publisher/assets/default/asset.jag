@@ -869,7 +869,6 @@ function overridePermissions(assetId, artifactManager, permissions) {
         rolePermissions.permissions.forEach(function(permission) {
 
             permission = carbon.registry.actions[permission];
-            log.info("444 add passed permission" + stringify(permission) +",role" +role );
             um.authorizeRole(role, artifact.path, permission);
         });
 
