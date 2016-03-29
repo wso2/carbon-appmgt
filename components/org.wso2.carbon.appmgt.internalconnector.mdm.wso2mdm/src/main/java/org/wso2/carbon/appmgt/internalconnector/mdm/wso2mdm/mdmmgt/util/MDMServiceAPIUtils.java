@@ -48,10 +48,8 @@ public class MDMServiceAPIUtils {
 		PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		ctx.setTenantId(tenantId, true);
 		DeviceManagementProviderService deviceManagementProviderService =
-				(DeviceManagementProviderService) ctx.
-						                                     getOSGiService(
-								                                     DeviceManagementProviderService.class,
-								                                     null);
+				(DeviceManagementProviderService) ctx
+						.getOSGiService(DeviceManagementProviderService.class, null);
 		if (deviceManagementProviderService == null) {
 			String msg = "Device Management provider service has not initialized.";
 			log.error(msg);
