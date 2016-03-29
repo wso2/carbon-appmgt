@@ -18,18 +18,18 @@
  * /
  */
 
-package org.wso2.carbon.appmgt.mdm.wso2emm.internal;
+package org.wso2.carbon.appmgt.mdm.restconnector.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mdm.wso2emm.ApplicationOperationImpl;
+import org.wso2.carbon.appmgt.mdm.restconnector.ApplicationOperationImpl;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.mdm.wso2emm.WSO2EMMMDMComponent" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.mdm.restconnector.WSO2MDMComponent" immediate="true"
  */
 
 public class MDMComponent {
@@ -41,7 +41,7 @@ public class MDMComponent {
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
         mdmServiceRegistration = bundleContext.registerService(ApplicationOperations.class.getName(), new ApplicationOperationImpl(), null);
-        if(log.isDebugEnabled()) log.debug("WSO2EMM MDM Component activated");
+        log.debug("WSO2MDM MDM Component activated");
     }
 
     protected void deactivate(ComponentContext context) {
@@ -49,7 +49,8 @@ public class MDMComponent {
             mdmServiceRegistration.unregister();
             mdmServiceRegistration = null;
         }
-        if(log.isDebugEnabled()) log.debug("WSO2EMM MDM Component deactivated");
+        log.debug("WSO2MDM MDM Component deactivated");
     }
 }
+
 

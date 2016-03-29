@@ -23,14 +23,14 @@ package org.wso2.carbon.appmgt.mobile.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 
 /**
  * @scr.component name="org.wso2.carbon.appmgt.mobile" immediate="true"
  * @scr.reference name="mdm.service"
- * interface="org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations" cardinality="1..n"
+ * interface="org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations" cardinality="1..n"
  * policy="dynamic" bind="setMDMService" unbind="unsetMDMService"
  */
 public class AppManagerMobileComponent {
@@ -46,7 +46,7 @@ public class AppManagerMobileComponent {
         log.info("App Manger Mobile Component deactivated");
     }
 
-    protected void setMDMService(MDMOperations operations) {
+    protected void setMDMService(ApplicationOperations operations) {
         if((MobileConfigurations.getInstance().getActiveMDMBundle() + "." + MDM_OPERATIONS_CLASS).equals(operations.getClass().getName())){
             MDMServiceReferenceHolder.getInstance().setMDMOperation(operations);
             log.info(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.ACTIVE_MDM) + " MDM is bound to App Manager");
@@ -54,7 +54,7 @@ public class AppManagerMobileComponent {
 
     }
 
-    protected void unsetMDMService(MDMOperations operations) {
+    protected void unsetMDMService(ApplicationOperations operations) {
         log.info("App Manger MDM is unbound");
     }
 

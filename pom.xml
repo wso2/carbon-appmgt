@@ -30,22 +30,22 @@
     <module>components/org.wso2.carbon.appmgt.core</module>
     <module>components/org.wso2.carbon.appmgt.oauth.endpoint</module>
     <module>components/org.wso2.carbon.appmgt.mobile</module>
-    <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm</module>
+    <module>components/org.wso2.carbon.appmgt.mdm.restconnector</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2emm</module>
     <module>components/org.wso2.carbon.appmgt.services.api</module>
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
-    <module>components/org.wso2.carbon.appmgt.internalconnector.mdm.wso2mdm</module>
+    <module>components/org.wso2.carbon.appmgt.mdm.osgiconnector</module>
     <module>features/org.wso2.carbon.appmgt.core.feature</module>
   	<module>features/org.wso2.carbon.appmgt.gateway.feature</module>
   	<module>features/org.wso2.carbon.appmgt.publisher.feature</module>
   	<module>features/org.wso2.carbon.appmgt.store.feature</module>
   	<module>features/org.wso2.carbon.appmgt.feature</module>
     <module>features/org.wso2.carbon.appmgt.mobile</module>
-  	<module>features/org.wso2.carbon.appmgt.mdm.wso2mdm.feature</module>
+  	<module>features/org.wso2.carbon.appmgt.mdm.restconnector.feature</module>
   	<module>features/org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
   	<module>features/org.wso2.carbon.appmgt.services.api.feature</module>
-    <module>features/org.wso2.carbon.appmgt.internalconnector.mdm.wso2mdm.feature</module>
+    <module>features/org.wso2.carbon.appmgt.mdm.osgiconnector.feature</module>
   </modules>
 
   <build>
@@ -168,27 +168,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <scope>test</scope>
-        <version>${junit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http</artifactId>
-        <version>${cxf.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.eclipse.osgi</groupId>
         <artifactId>org.eclipse.osgi</artifactId>
         <version>${eclipse.osgi.version}</version>
@@ -196,7 +175,7 @@
       <dependency>
         <groupId>org.eclipse.osgi</groupId>
         <artifactId>org.eclipse.osgi.services</artifactId>
-        <version>3.3.100.v20120522-1822</version>
+        <version>${eclipse.osgi.service.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon.devicemgt</groupId>
@@ -655,6 +634,7 @@
     <junit.version>4.8.2</junit.version>
     <cxf.version>2.7.16</cxf.version>
     <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
+    <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
 
 	<!-- Carbon kernel version -->
     <carbon.kernel.version>4.4.3</carbon.kernel.version>
