@@ -18,7 +18,8 @@ require('/modules/store.js').exec(function (ctx) {
             subscriptions = {},
             subscription = false,
             avaliablePages,
-            mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
+            mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs())),
+            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
             var  isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
 
@@ -184,11 +185,22 @@ require('/modules/store.js').exec(function (ctx) {
         }
     }
 
-    //add subscription detail
     for (var i = 0; i < assets.length; i++) {
         var uuid = assets[i].id;
-        assets[i].isSubscribed = store.isSubscribed(type, uuid);
+        if (user) {
+            //set subscription detail
+            assets[i].isSubscribed = store.isSubscribed(type, uuid);
+        }
+
+        //set rating
+        var ratings = JSON.parse(social.getRating("mobileapp:" + uuid));
+        if (ratings) {
+            assets[i].rating = Math.floor(ratings.rating);
+        } else {
+            assets[i].rating = 0;
+        }
     }
+
     var rxtAttributes = require('/modules/util.js').getRXTAttributes(tenantId, type);
     var devices = [];
     //devices = devicesClass.get
