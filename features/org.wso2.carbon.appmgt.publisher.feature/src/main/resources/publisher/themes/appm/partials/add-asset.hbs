@@ -10,11 +10,18 @@
 
     <div id="wr-overview" style="display:block">
         <fieldset>
+
+{{ dump ownerList}}
+          <input type='hidden' value="{{ownerList}}" name="ownerList" id="owner_list"/>
             {{{ form_render "overview_provider" data.fields }}}
             {{{ form_render "overview_name" data.fields }}}
             {{{ form_render "overview_displayName" data.fields }}}
             {{{ form_render "overview_context" data.fields }}}
             {{{ form_render "overview_version" data.fields }}}
+
+<label for="owners">Owner : *</label>
+  <input id="owner_input" style = "float : right; width : 778px; height : 30px; margin-bottom:10px"  placeholder=" Owner Name">
+
 
             <div class="form-group">
                 <label class="control-label col-sm-2">Make As Default Version: </label>
@@ -66,7 +73,7 @@
             {{{ form_render "overview_description" data.fields }}}
             {{{ form_render "images_thumbnail" data.fields }}}
             {{{ form_render "images_banner" data.fields }}}
-
+{{dump ownerList}}
             <input type='hidden' value="" name="context" id="context_id"/>
             <input type='hidden' value="" name="version" id="version_id"/>
             <input type='hidden' value="Unlimited" name="overview_tier"/>

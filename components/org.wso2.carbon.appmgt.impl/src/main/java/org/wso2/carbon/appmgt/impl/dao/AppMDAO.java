@@ -5302,7 +5302,7 @@ public class AppMDAO {
             statementToDelete = connection.prepareStatement(queryToDelete,
                                                             new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
             statementToDelete.setString(1, ownerId);
-            statementToInsertRecord.executeUpdate();
+            statementToDelete.executeUpdate();
             int ownerID = Integer.parseInt(ownerId);
             String queryToInsertRecordTwo =
                     "INSERT INTO " + "BUSINESS_OWNERS_EXTRA(OWNER_ID, KEY, VALUE)" + "VALUES(?,?,?)";

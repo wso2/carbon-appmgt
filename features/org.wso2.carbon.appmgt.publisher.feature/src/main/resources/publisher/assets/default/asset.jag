@@ -53,10 +53,11 @@ require('/modules/publisher.js').exec(function(ctx) {
     var operation = 'create';
     var rxtTemplate = rxtManager.findAssetTemplate(function(template) {
         return (template.shortName == shortName) ? true : false;
+
     });
 
 
-    var model = modelManager.getModel(shortName);
+        var model = modelManager.getModel(shortName);
 
     if (!rxtTemplate) {
         log.debug('The requested asset type: ' + shortName + ' was not found');
@@ -82,6 +83,21 @@ require('/modules/publisher.js').exec(function(ctx) {
         var output = model.export('form');
         var title = shortName;
         var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+        var businessOwnerList = apiProvider.getBusinessOwnerList();
+        var ownersList = JSON.parse(stringify(businessOwnerList));
+        var ownerNames ="";
+        for(var i = 0; i < ownersList.length ; i++){
+           // ownerNames[i] = ownersList[i].owner_name +"_"+ownersList[i].owner_id;
+            if(i==0){
+                ownerNames = ownerNames + "\'" + ownersList[i].owner_name +"_"+ownersList[i].owner_id;
+            } else {
+                ownerNames = ownerNames + "/" + ownersList[i].owner_name + "_" + ownersList[i].owner_id;
+            }
+
+        }
+        ownerNames = ownerNames + "\'";
+
+        log.info(ownerNames);
         var isSubscriptionEnabled;
         if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
             isSubscriptionEnabled = false;
@@ -96,7 +112,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             shortName: shortName,
             rxtTemplate: rxtTemplate,
             data: output,
-            title: title}
+            title: title,
+                           ownerList: JSON.stringify(ownerNames)}
         );
     }
 });

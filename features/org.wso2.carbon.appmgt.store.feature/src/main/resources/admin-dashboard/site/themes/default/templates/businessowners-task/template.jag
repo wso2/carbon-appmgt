@@ -2,7 +2,7 @@
     var tasks = outputs.tasks;
     %>
      <div class="title-section">
-        <h2>Business Owners</h2>
+        <h2>Business Owners</h2>  <a id="btn-owner-add-new" class="btn  btn-success" style = "float : right">Add New Owner</a><br><br>
      </div>
      <div class="alert alert-error" id="statusError" style="display:none">
         <span id="statusErrorSpan"></span>
@@ -54,7 +54,7 @@
                                 <div id = "owner-others"></div>
                                      <br>
                             <a id="btn-owner-add-field" class="btn  btn-success">Add Field</a>
-                            <a id="btn-policy-save" class="btn btn-primary">Save</a>
-                            <a id="btn-policy-cancel" class="btn">Cancel</a>
+                            <a id="btn-owner-save" class="btn btn-primary">Save</a>
+                            <a id="btn-owner-cancel" class="btn">Cancel</a>
         </div>
          <%}); %>

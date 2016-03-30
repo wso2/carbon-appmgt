@@ -16,9 +16,9 @@
  * under the License.
  */
 
-var Showalert = function(msg, type, target) {
+var Showalert = function (msg, type, target) {
     type = type || 'info';
-    $('#'+ target)
+    $('#' + target)
         .removeClass()
         .addClass(type)
         .addClass('alert')
@@ -27,75 +27,80 @@ var Showalert = function(msg, type, target) {
         .delay(3000)
         .fadeOut()
         .find('#statusErrorSpan').html(msg);
-    var section=$('.title-section');
+    var section = $('.title-section');
     jQuery('html, body').animate({
-        scrollTop: section.offset().top
-    }, 1000);
+                                     scrollTop: section.offset().top
+                                 }, 1000);
     ;
 }
 var businessOwnersArray = new Array(); // xacml policy details array
 var editedOwnerId = 0; //if 1 then edit else save
 var context = this.jagg.site.context;
-var tags =[];
+var tags = [];
 var editor;
 var extraFieldCount = 0;
 
 function completeAfter(cm, pred) {
     var cur = cm.getCursor();
-    if (!pred || pred()) setTimeout(function() {
-        if (!cm.state.completionActive)
-            cm.showHint({completeSingle: false});
-    }, 100);
+    if (!pred || pred()) {
+        setTimeout(function () {
+            if (!cm.state.completionActive) {
+                cm.showHint({completeSingle: false});
+            }
+        }, 100);
+    }
     return CodeMirror.Pass;
 }
 
 function completeIfAfterLt(cm) {
-    return completeAfter(cm, function() {
+    return completeAfter(cm, function () {
         var cur = cm.getCursor();
         return cm.getRange(CodeMirror.Pos(cur.line, cur.ch - 1), cur) == "<";
     });
 }
 
 function completeIfInTag(cm) {
-    return completeAfter(cm, function() {
+    return completeAfter(cm, function () {
         var tok = cm.getTokenAt(cm.getCursor());
-        if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length == 1)) return false;
+        if (tok.type == "string" && (!/['"]/.test(tok.string.charAt(tok.string.length - 1)) || tok.string.length
+                                                                                               == 1)) {
+            return false;
+        }
         var inner = CodeMirror.innerMode(cm.getMode(), tok.state).state;
         return inner.tagName;
     });
 }
 
 
-
 $(document).ready(function () {
     // Get shared partials
     $.ajax({
-        url: context + '/apis/businessowners/list',
-        type: 'GET',
-        contentType: 'application/json',
-        dataType: 'json',                        //heta karanna tiyenne me JS ekata data tika pass karala yanwada kiyala balanna
-        success: function (data) {
-            for (var i = 0; i < data.length; i++) {
-                businessOwnersArray.push({
-                    owner_id: data[i].owner_id,
-                    owner_name: data[i].owner_name,
-                    owner_mail: data[i].owner_email,
-                    owner_desc: data[i].owner_desc,
-                    owner_site: data[i].owner_site,
-                    keys: data[i].keys,
-                    values: data[i].values
-                });
-            }
-            updatePolicyPartial();
-        },
-        error: function () {
-        }
-    });
+               url: context + '/apis/businessowners/list',
+               type: 'GET',
+               contentType: 'application/json',
+               dataType: 'json',
+               success: function (data) {
+                   for (var i = 0; i < data.length; i++) {
+                       businessOwnersArray.push({
+                                                    owner_id: data[i].owner_id,
+                                                    owner_name: data[i].owner_name,
+                                                    owner_mail: data[i].owner_email,
+                                                    owner_desc: data[i].owner_desc,
+                                                    owner_site: data[i].owner_site,
+                                                    keys: data[i].keys,
+                                                    values: data[i].values
+                                                });
+                   }
+                   updatePolicyPartial();
+               },
+               error: function () {
+               }
+           });
     $('#policy-name').select();
 });
 
 //save event
-$(document).on("click", "#btn-policy-save", function () {
+$(document).on("click", "#btn-owner-save", function () {
 
     var ownerName = $('#owner-name').val();
     var ownerMail = $('#owner-email').val();
@@ -104,7 +109,7 @@ $(document).on("click", "#btn-policy-save", function () {
     var keys = "";
     var values = "";
 
-    if(extraFieldCount > 0) {
+    if (extraFieldCount > 0) {
         var i = extraFieldCount;
         while (i > 1) {
             var key_id = "#key-".concat(i - 1);
@@ -130,58 +135,61 @@ $(document).on("click", "#btn-policy-save", function () {
                    "description": description,
                    "sitelink": siteLink,
                    "keys": keys,
-                   "values" : values
+                   "values": values
                },
                success: function (data) {
 
-                   Showalert("Business Owner Saved Successfully","alert-success", "statusError");
+                   Showalert("Business Owner Saved Successfully", "alert-success", "statusError");
+                   location.reload();
                    location.reload();
                },
                error: function () {
                }
            });
-    });
-
-
+});
 
 function updatePolicyPartial() {
     $('#ownerPartialsTable tbody').html("");
     //show empty msg
-    if(businessOwnersArray.length > 0){
+    if (businessOwnersArray.length > 0) {
         $('.no-owner').hide();
         $('.owner-list').show();
-    }else{
+    } else {
         $('.no-owner').show();
         $('.owner-list').hide();
     }
     $.each(businessOwnersArray, function (index, obj) {
         if (obj != null) {
 
-                $('#ownerPartialsTable tbody').append('<tr><td>' + obj.owner_id + '</td> <td>' +
-                obj.owner_name + '</td> <td>' + obj.owner_mail + '</td> <td>' + obj.owner_site + '</td> <td>' + obj.owner_desc + '</td> <td><a data-target="#entitlement-policy-editor" ' +
-                'data-toggle="modal" data-policy-id="' + obj.owner_id + '" class="policy-edit-button">' +
-                '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="' + obj.owner_name +
-                '"  data-policy-id="' + obj.owner_id + '" class="policy-delete-button"><i class="icon-trash"></i>' +
-                '</a></td></tr>');
-            }
+            $('#ownerPartialsTable tbody').append('<tr><td>' + obj.owner_id + '</td> <td>' +
+                                                  obj.owner_name + '</td> <td>' + obj.owner_mail + '</td> <td>'
+                                                  + obj.owner_site + '</td> <td>' + obj.owner_desc
+                                                  + '</td> <td><a data-target="#entitlement-policy-editor" ' +
+                                                  'data-toggle="modal" data-policy-id="' + obj.owner_id
+                                                  + '" class="policy-edit-button">' +
+                                                  '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="'
+                                                  + obj.owner_name +
+                                                  '"  data-policy-id="' + obj.owner_id
+                                                  + '" class="policy-delete-button"><i class="icon-trash"></i>' +
+                                                  '</a></td></tr>');
+        }
     });
 
 }
-function GetDynamicTextBox(index , key , value) {
+function GetDynamicTextBox(index, key, value) {
     var id_key = "key-".concat(index);
     var id_val = "value-".concat(index);
     var id_btn = "btn-".concat(index);
-    return '<input name = "key" type="text" id="'+id_key+'" value="'+key+'"/>&nbsp &nbsp &nbsp &nbsp' +
-           '<input name="value" type="text" id="'+id_val+'" value="'+value+'"/>&nbsp &nbsp &nbsp &nbsp<button id="'+index+'" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button>'
-}
-function getSelectedRuleEffect(){
-    return $('#rule-effects .active').data('effect');
+    return '<input name = "key" type="text" id="' + id_key + '" value="' + key + '"/>&nbsp &nbsp &nbsp &nbsp' +
+           '<input name="value" type="text" id="' + id_val + '" value="' + value
+           + '"/>&nbsp &nbsp &nbsp &nbsp<button id="' + index
+           + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button>'
 }
 
-function removeFields(index){
-    var id_key = "#"+"key-".concat(index);
-    var id_val = "#"+"value-".concat(index);
-    var id_btn = "#"+index;
+function removeFields(index) {
+    var id_key = "#" + "key-".concat(index);
+    var id_val = "#" + "value-".concat(index);
+    var id_btn = "#" + index;
     $(id_key).val("");
     $(id_val).val("");
     $(id_key).hide();
@@ -205,29 +213,29 @@ $(document).on("click", ".policy-edit-button", function () {
     $('#owner_site').val("");
     $('#owner_desc').val("");
     $('.content-section').show();
-    var section=$('.title-section-edit');
+    var section = $('.title-section-edit');
     jQuery('html, body').animate({
-        scrollTop: section.offset().top
-    }, 1000);
-   // editor.setValue("");
+                                     scrollTop: section.offset().top
+                                 }, 1000);
+    // editor.setValue("");
 
-    $.each( businessOwnersArray, function (index, obj) {
+    $.each(businessOwnersArray, function (index, obj) {
         if (obj != null && obj.owner_id == policyId) {
             $('#owner-name').val(obj.owner_name);
             $('#owner-email').val(obj.owner_mail);
             $('#owner-site').val(obj.owner_site);
             $('#owner-desc').val(obj.owner_desc);
 
-            if(obj.keys != null && obj.values != null) {
+            if (obj.keys != null && obj.values != null) {
                 var keySet = obj.keys.split("/");
                 var valueSet = obj.values.split("/");
-
-                for(var i = 1; i< keySet.length; i++){
+                for (var i = 1; i < keySet.length; i++) {
                     var div = $("<div />");
                     div.html(GetDynamicTextBox(i, keySet[i], valueSet[i]));
                     $("#owner-others").append(div);
                 }
-               extraFieldCount = keySet.length;
+
+                extraFieldCount = keySet.length;
             }
         }
     });
@@ -238,42 +246,26 @@ $(document).on("click", ".policy-edit-button", function () {
 
 
 $(document).on("click", ".policy-delete-button", function () {
-
-
     var ownerId = $(this).data("policyId");
-
-        $.ajax({
-
-            url: context + '/apis/businessowners/delete/' + ownerId,
-            type: 'DELETE',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-
-                var success = JSON.parse(response);
-                if (success) {
-                    delete  businessOwnersArray[arrayIndex];
-                    updatePolicyPartial();
-                    Showalert("Policy Deleted Successfully ", "alert-success", "statusSuccess");
-
-                } else {
-                    Showalert("Couldn't delete the policy. This policy is being used by web apps.  ", "alert-error", "statusError");
-                }
-
-            },
-            error: function (response) {
-                if (response.status == 403) {
-                    Showalert("Couldn't delete the policy . This policy is being used by web apps.  ", "alert-error", "statusError");
-                } else {
-                    Showalert('Error occured while fetching entitlement policy content', "alert-error", "statusError");
-                }
-            }
-        });
-
-
-
+    $.ajax({
+               url: context + '/apis/businessowners/delete/' + ownerId,
+               type: 'DELETE',
+               contentType: 'application/json',
+               dataType: 'json',
+               success: function (response) {
+                   updatePolicyPartial();
+                   Showalert("Owner Deleted Successfully ", "alert-success", "statusSuccess");
+                   location.reload();
+               },
+               error: function (response) {
+                   Showalert('Error occured while deleting the business owner', "alert-error", "statusError");
+               }
+           });
 });
 
-$(document).on('click', '#btn-policy-cancel', function(){
+$(document).on('click', '#btn-owner-cancel', function(){
     $('.content-section').delay(300).hide(0);
+});
+$(document).on("click", "#btn-owner-add-new", function () {
+    location.replace(context + "/tasks?task=businessowners-new")
 });

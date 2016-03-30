@@ -190,7 +190,7 @@ $(document).on("click", "#btn-owner-save", function () {
                }
            });
 
-location.reload();
+location.replace(context + "/tasks?task=businessowners");
    });
 
 function sleep(milliseconds) {
