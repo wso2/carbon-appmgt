@@ -23,8 +23,7 @@ var render = function (theme, data, meta, require) {
     var selectedCategory = data.selectedCategory;
 
     var assets = require('/helpers/page-content-all-mobile-apps.js');
-    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.paging, data.config,
-                                         data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
+    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.pagination, data.config);
     bodyContext.searchQuery =searchQuery;
     var searchUrl = "/assets/mobileapp";
     data.tags.tagUrl = "/assets/mobileapp";
@@ -78,12 +77,14 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(data) {
     var url = "/assets/mobileapp?sort=";
     var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
     var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
 
     var options = [];
     options.push(sortByAlphabet);
     options.push(sortByRecent);// recently created
+    options.push(sortByPopularity);
     sortOptions["options"] = options;
     return sortOptions;
 }

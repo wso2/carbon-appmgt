@@ -65,11 +65,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
-    var tagUrl = context;
-    var searchUrl = context + '/extensions/assets/site/myapps';
-    url =
-    '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
-                                                                                   '');
     var leftnav, rightnav, urlQuery;//For pagination
     
     var headerData = site.header(tenantId, {
@@ -265,7 +260,9 @@ require('/modules/store.js').exec(function (ctx) {
                 });
             }
             else { //myapps page request
-                urlQuery = 'sort=' + paging.sort + '&';
+                if(paging.sort != "null") {
+                    urlQuery = 'sort=' + paging.sort + '&'
+                }
                 assets = store.search(SITE_OPTIONS, paging);
             }
         }
@@ -318,9 +315,6 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (currentPage - 1 > 0) {
             leftnav = currentPage - 1;
-        }
-        if (nextPageAvailable && (assets.length == PAGE_SIZE)) {
-            rightnav = currentPage + 1;
         }
     };
 
@@ -463,12 +457,10 @@ require('/modules/store.js').exec(function (ctx) {
 
         // hide all apps link in header
         navigationData.showAllAppsLink = false;
-        tagUrl = tagUrl + '/extensions/assets/site/myapps';
     } else {
         //show anonymous + subscribed apps for logged in user.
         //show anonymous apps for anonymous user.
         getAssetsFromDB();
-        tagUrl = tagUrl + '/assets/site';
     }
 
     // add rating,access url etc to retrieved webapps

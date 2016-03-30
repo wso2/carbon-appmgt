@@ -1229,6 +1229,15 @@ require('/modules/publisher.js').exec(function(ctx) {
             var tags = context.post['tags'];
             addTags(tags,idField.value,rxtManager,shortName);
 
+            try{
+                //add rating- 0.0 to newly created app otherwise this app will not be displayed when sort the app
+                //by popularity(ratings) in store.
+                var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+                social.warmUpRatingCache(shortName + ':' + idField.value);
+            }catch(e) {
+                log.warn("Unable to publish the asset: " + shortName + ":" + idField.value + " to social cache. This may affect on sort by popularity function.");
+            }
+
             var asset=model.export('asset.exporter');
             var assetCachingModule=require('/modules/cache/cache.manager.js').assetCachingModule();
             var assetCacheManager=new assetCachingModule.AssetCacheManager(session);
