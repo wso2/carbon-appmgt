@@ -502,17 +502,15 @@ Store.prototype.tags = function (type, isSite) {
 
     // Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
-
+    var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
+    var tenantdomain = carbonContext.getTenantDomain();
+    var storeObj = jagg.module("manager").getAPIStoreObj();
     if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
-        var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
-        var tenantdomain = carbonContext.getTenantDomain();
-        var storeObj = jagg.module("manager").getAPIStoreObj();
         tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
         return tagz;
     } else if (type == RESOURCE_TYPE_MOBILEAPP) {
-        var tags = getTags(type, registry);
-
-        return  getVisibleTags(tags, this.assetManager(type));
+        tagz = storeObj.getAllTags(String(tenantdomain), type);
+        return tagz
     } else if (type) {
         log.warn("Retrieving tags : Type " + type + " is not supported.");
         return tagz;

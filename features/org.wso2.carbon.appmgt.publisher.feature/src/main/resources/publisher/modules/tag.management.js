@@ -14,8 +14,9 @@ var tagModule=function(){
 
     /*
     The method is used to process a list of tags
-    @tags: A tag array e.g ["/_system/governance/appmgt/applicationdata/provider/admin/site1/1/webapp;tags:site:admin",
-     "/_system/governance/appmgt/applicationdata/provider/admin/site1/1/webapp;tags:site1:admin"]
+    @tags: A tag array e.g ["/_system/governance/repository/components/org.wso2.carbon.governance;tag1:1",
+     "/_system/governance/repository/components/org.wso2.carbon.governance;mytag:2"]
+
      @type: Type of the asset to which tags are associated
      */
     TagManager.prototype.process = function (tags, type) {
@@ -25,23 +26,19 @@ var tagModule=function(){
         for (var index in tags) {
             tag = tags[index];
             //Break by url
-            var components = tag.split(':');
+            var components = tag.split(';');
             var tagComponent = components[1] || '';
-            var tagName = tagComponent;
+            var tagDetail = tagComponent.split(':');
+            var tagName = tagDetail[0];
+            var tagCount = tagDetail[1];
 
             //Check if the tag cloud has the type
             if (!this.tagCloud.hasOwnProperty(type)) {
                 this.tagCloud[type] = {tags_val: {}, totalTagCount: 0};
             }
 
-            //Check if the tag cloud has the tag name
-            if (!this.tagCloud[type].tags_val.hasOwnProperty(tagName)) {
-                this.tagCloud[type].tags_val[tagName] = { count: 1};
-                this.tagCloud[type].totalTagCount++;
-            }
-
-            //Increase the tag count for tag
-            this.tagCloud[type].tags_val[tagName].count++;
+            this.tagCloud[type].tags_val[tagName] = tagCount;
+            this.tagCloud[type].totalTagCount++;
 
         }
     };

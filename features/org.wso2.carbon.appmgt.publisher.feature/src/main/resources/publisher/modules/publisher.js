@@ -264,18 +264,6 @@ var loadTagDependencies=function(registry){
 
     var TAGS_QUERY='SELECT RT.REG_TAG_ID FROM REG_RESOURCE_TAG RT ORDER BY RT.REG_TAG_ID';
     var TAGS_QUERY_PATH='/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
-    var QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE = '/_system/config/repository/components/org.wso2.carbon.registry/queries/tagsByMediaTypeAndLifecycle'
-    var TAGS_BY_TYPE_AND_LIFECYCLE_QUERY = 'SELECT RRT.REG_TAG_ID'
-                                         + ' FROM'
-                                         + ' REG_RESOURCE_TAG RRT, REG_TAG RT, REG_RESOURCE R, REG_RESOURCE_PROPERTY RRP, REG_PROPERTY RP'
-                                         + ' WHERE'
-                                         + ' RT.REG_ID = RRT.REG_TAG_ID'
-                                         + ' AND R.REG_VERSION = RRT.REG_VERSION'
-                                         + ' AND RP.REG_ID = RRP.REG_PROPERTY_ID'
-                                         + ' AND R.REG_VERSION = RRP.REG_VERSION'
-                                         + ' AND R.REG_MEDIA_TYPE = ?'
-                                         + ' AND RP.REG_NAME = ?'
-                                         + ' AND RP.REG_VALUE LIKE ?';
     //Check if the tag path exists
     var resource=registry.get(TAGS_QUERY_PATH);
 
@@ -295,20 +283,6 @@ var loadTagDependencies=function(registry){
         log.debug('tag query has been added.');
     }
 
-    resource = registry.get(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE);
-    if(!resource) {
-        log.debug('query -Tags by type and lifecycle does not exist.');
-
-        registry.put(QUERY_PATH_TAGS_BY_TYPE_AND_LIFECYCLE, {
-            content: TAGS_BY_TYPE_AND_LIFECYCLE_QUERY,
-            mediaType: 'application/vnd.sql.query',
-            properties: {
-                resultType: 'Tags'
-            }
-        });
-
-        log.debug('query -Tags by type and lifecycle  has been added.');
-    }
 };
 
 /*

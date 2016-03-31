@@ -203,7 +203,7 @@ require('/modules/store.js').exec(function (ctx) {
             selectedCategory: selectedCategory,
             selectedPlatform: selectedPlatform,
             tags: {
-                    data: store.tags(type, null)
+                    data: store.tags(type)
             },
             assets: assets,
             pagination: {
