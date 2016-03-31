@@ -32,6 +32,7 @@ var render=function(theme,data,meta,require){
             heading = "Create New Web Application";
             break;
         case 'view':
+            log.info(data);
             data = require('/helpers/view-asset.js').merge(data);
             listPartial='view-asset';
             var copyOfData = parse(stringify(data));

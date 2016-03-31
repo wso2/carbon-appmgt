@@ -3989,10 +3989,12 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
+        String ownerName = app.getBusinessOwner();
+        String[] ownerDetails = ownerName.split("_");
 
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, OWNER_ID ) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4028,6 +4030,7 @@ public class AppMDAO {
             prepStmt.setBoolean(10, app.getAllowAnonymous());
             prepStmt.setString(11, app.getUrl());
             prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
+            prepStmt.setString(13, ownerDetails[1]);
 
             prepStmt.execute();
 
@@ -4039,7 +4042,7 @@ public class AppMDAO {
             addURLTemplates(webAppId, app, connection);
             //Set default versioning details
             saveDefaultVersionDetails(app, connection);
-            recordAPILifeCycleEvent(app.getId(), null, APIStatus.CREATED,
+                recordAPILifeCycleEvent(app.getId(), null, APIStatus.CREATED,
                     AppManagerUtil.replaceEmailDomainBack(app.getId().getProviderName()),
                     connection);
             if (app.getPolicyPartials() != null && !app.getPolicyPartials().isEmpty()) {

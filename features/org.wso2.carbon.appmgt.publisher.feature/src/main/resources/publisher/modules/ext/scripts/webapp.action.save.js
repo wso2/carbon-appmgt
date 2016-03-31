@@ -30,7 +30,7 @@ var module = function () {
     // separately.
     function addToWebApp(uuid, webappProvider, webappName, webappVersion, webappContext,
                          webappTrackingCode, asset, ssoEnabled, idpProviderUrl, saml2SsoIssuer,
-                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint, isDefaultVersion, treatAsSite) {
+                         logoutURL, allowAnonymous, skipGateway, webAppEndpoint, isDefaultVersion, treatAsSite, businessOwner) {
 
         var apiIdentifier = Packages.org.wso2.carbon.appmgt.api.model.APIIdentifier;
         var apiIdentifierObj = new apiIdentifier(webappProvider, webappName, webappVersion);
@@ -50,6 +50,7 @@ var module = function () {
         webAppObj.setSkipGateway(skipGateway == "true");
         webAppObj.setDefaultVersion(isDefaultVersion == "true");
         webAppObj.setTreatAsASite(treatAsSite);
+        webAppObj.setBusinessOwner(businessOwner);
 
         var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
         var appMDAOObj = new appMDAO();
@@ -133,6 +134,8 @@ var module = function () {
             var allowAnonymous=model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;
             var treatAsSite = model.getField('overview.treatAsASite').value;
+            var ownerName = model.getField('overview.owner').value;
+
 
             if(contextname.charAt(0)!='/'){
                 contextname = '/'+contextname;
@@ -151,6 +154,7 @@ var module = function () {
             var webappURL = model.getField('overview.webAppUrl').value;
             var displayName = model.getField('overview.displayName').value;
             var revisedURL = logoutURL.replace(webappURL,"");
+            var businessOwner = model.getField('overview.owner').value;
 
             var result = null;
             var saml2SsoIssuer = null;
@@ -249,7 +253,7 @@ var module = function () {
                 //adding to database
                 addToWebApp(id, provider, name, version, contextname, tracking_code, asset,
                     attributes['sso_singleSignOn'], attributes['sso_idpProviderUrl'],
-                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL, isDefaultVersion, treatAsSite);
+                    saml2SsoIssuer, revisedURL, allowAnonymous, skipGateway, webappURL, isDefaultVersion, treatAsSite,businessOwner);
             }
 
             //Save the id data to the model

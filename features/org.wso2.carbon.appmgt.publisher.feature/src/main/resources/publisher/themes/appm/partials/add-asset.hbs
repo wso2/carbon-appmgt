@@ -19,8 +19,13 @@
             {{{ form_render "overview_context" data.fields }}}
             {{{ form_render "overview_version" data.fields }}}
 
-<label for="owners">Owner : *</label>
-  <input id="owner_input" style = "float : right; width : 778px; height : 30px; margin-bottom:10px"  placeholder=" Owner Name">
+<div class="form-group">
+    <label class="control-label col-sm-2">Owner :  <span class="label-required">*</span></label>
+    <div class="col-sm-10">
+                    <input id='overview_owner' name='overview_owner' class="col-lg-6 col-sm-12 col-xs-12" type='text' value=''  placeholder=" Owner Name"   required/>
+    </div>
+</div>
+
 
 
             <div class="form-group">
