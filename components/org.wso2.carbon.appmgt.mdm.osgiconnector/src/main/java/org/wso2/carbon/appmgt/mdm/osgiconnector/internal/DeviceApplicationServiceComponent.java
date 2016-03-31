@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mdm.osgiconnector.ApplicationOperationImpl;
+import org.wso2.carbon.appmgt.mdm.osgiconnector.ApplicationOperationsImpl;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 
 /**
@@ -37,7 +37,7 @@ public class DeviceApplicationServiceComponent {
 	protected void activate(ComponentContext context) {
 		BundleContext bundleContext = context.getBundleContext();
 		mdmServiceRegistration = bundleContext
-				.registerService(ApplicationOperations.class.getName(), new ApplicationOperationImpl(), null);
+				.registerService(ApplicationOperations.class.getName(), new ApplicationOperationsImpl(), null);
 		if (log.isDebugEnabled()) {
 			log.debug("Device Application Service Component activated");
 		}

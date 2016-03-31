@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.appmgt.mdm.restconnector.ApplicationOperationImpl;
+import org.wso2.carbon.appmgt.mdm.restconnector.ApplicationOperationsImpl;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 
 /**
@@ -40,7 +40,7 @@ public class MDMComponent {
 
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
-        mdmServiceRegistration = bundleContext.registerService(ApplicationOperations.class.getName(), new ApplicationOperationImpl(), null);
+        mdmServiceRegistration = bundleContext.registerService(ApplicationOperations.class.getName(), new ApplicationOperationsImpl(), null);
         log.debug("WSO2MDM MDM Component activated");
     }
 

@@ -82,7 +82,7 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            org.wso2.carbon.appmgt.internalconnector.mdm.wso2mdm.*,
+                            org.wso2.carbon.appmgt.mdm.osgiconnector.*,
                             !org.wso2.carbon.appmgt.mdm.osgiconnector.internal
                         </Export-Package>
                     </instructions>

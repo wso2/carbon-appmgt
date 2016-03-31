@@ -33,11 +33,12 @@ import org.apache.commons.ssl.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.Property;
-import org.wso2.carbon.appmgt.mobile.utils.User;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.io.IOException;
@@ -50,22 +51,18 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class ApplicationOperationImpl implements ApplicationOperations {
+public class ApplicationOperationsImpl implements ApplicationOperations {
 
-    private static final Log log = LogFactory.getLog(ApplicationOperationImpl.class);
+    private static final Log log = LogFactory.getLog(ApplicationOperationsImpl.class);
 
-    /**
-     * @param action action of the operation. Eg. install, uninstall, update
-     * @param app application object
-     * @param tenantId tenantId
-     * @param type type of the resource. Eg: role, user, device
-     * @param params ids of the resources which belong to type
+	/**
+     *
+     * @param applicationOperationAction holds the information needs to perform an action on mdm
      */
+    @Override
+    public void performAction(ApplicationOperationAction applicationOperationAction) {
 
-    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params,
-                              HashMap<String, String> configProperties) {
-
-
+        HashMap<String, String> configProperties = applicationOperationAction.getConfigParams();
 
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
@@ -73,36 +70,37 @@ public class ApplicationOperationImpl implements ApplicationOperations {
         String authUser = configProperties.get(Constants.PROPERTY_AUTH_USER);
         String authPass = configProperties.get(Constants.PROPERTY_AUTH_PASS);
 
-
-
         JSONObject requestObj = new JSONObject();
+        String type = applicationOperationAction.getType();
+        String[] params = applicationOperationAction.getParams();
 
-        if("user".equals(type)){
+        if(Constants.USER.equals(type)){
             JSONArray resources = new JSONArray();
             for(String param : params){
                 resources.add(param);
             }
-            requestObj.put("userList", resources);
-        }else if("role".equals(type)){
+            requestObj.put(Constants.USER_LIST, resources);
+        }else if(Constants.ROLE.equals(type)){
             JSONArray resources = new JSONArray();
             for(String param : params){
                 resources.add(param);
             }
-            requestObj.put("userList", resources);
+            requestObj.put(Constants.USER_LIST, resources);
         }else{
             JSONArray resources = new JSONArray();
             for(String param : params){
                 JSONObject obj =  new JSONObject();
                 String []paramDevices = param.split("---");
-                obj.put("id", paramDevices[0]);
-                obj.put("type", paramDevices[1]);
+                obj.put(Constants.ID, paramDevices[0]);
+                obj.put(Constants.TYPE, paramDevices[1]);
                 resources.add(obj);
             }
-            requestObj.put("deviceIdentifiers", resources);
+            requestObj.put(Constants.DEVICE_IDENTIFIERS, resources);
         }
 
 
         JSONObject requestApp = new JSONObject();
+        App app = applicationOperationAction.getApp();
 
         Method[] methods = app.getClass().getMethods();
 
@@ -134,34 +132,34 @@ public class ApplicationOperationImpl implements ApplicationOperations {
         }
 
 
-        if("ios".equals(requestApp.get("platform"))){
+        if(Constants.IOS.equals(requestApp.get(Constants.PLATFORM))){
 
             JSONObject iosProperties = new JSONObject();
-            if("enterprise".equals(requestApp.get("type"))){
-                iosProperties.put("isRemoveApp", true);
-                iosProperties.put("isPreventBackup", true);
-            }else if("public".equals(requestApp.get("type"))){
-                iosProperties.put("iTunesId", Integer.parseInt(requestApp.get("identifier").toString()));
-                iosProperties.put("isRemoveApp", true);
-                iosProperties.put("isPreventBackup", true);
-            }else if("webapp".equals(requestApp.get("type"))){
-                iosProperties.put("label", requestApp.get("name"));
-                iosProperties.put("isRemoveApp", true);
+            if(Constants.IOSConstants.ENTERPRISE.equals(requestApp.get(Constants.IOSConstants.TYPE))){
+                iosProperties.put(Constants.IOSConstants.IS_REMOVE_APP, true);
+                iosProperties.put(Constants.IOSConstants.IS_PREVENT_BACKUP, true);
+            }else if(Constants.IOSConstants.PUBLIC.equals(requestApp.get(Constants.IOSConstants.TYPE))){
+                iosProperties.put(Constants.IOSConstants.I_TUNES_ID, Integer.parseInt(requestApp.get("identifier").toString()));
+                iosProperties.put(Constants.IOSConstants.IS_REMOVE_APP, true);
+                iosProperties.put(Constants.IOSConstants.IS_PREVENT_BACKUP, true);
+            }else if("webapp".equals(requestApp.get(Constants.IOSConstants.TYPE))){
+                iosProperties.put(Constants.IOSConstants.LABEL, requestApp.get(Constants.IOSConstants.TYPE));
+                iosProperties.put(Constants.IOSConstants.IS_REMOVE_APP, true);
             }
-            requestApp.put("properties",  iosProperties);
+            requestApp.put(Constants.PROPERTIES,  iosProperties);
 
-        }else if("webapp".equals(requestApp.get("platform"))){
+        }else if("webapp".equals(requestApp.get(Constants.PLATFORM))){
 
             JSONObject webappProperties = new JSONObject();
             webappProperties.put("label", requestApp.get("name"));
             webappProperties.put("isRemoveApp", true);
-            requestApp.put("properties",  webappProperties);
+            requestApp.put(Constants.PROPERTIES,  webappProperties);
         }
 
         //make type to uppercase
-        requestApp.put("type",requestApp.get("type").toString().toUpperCase());
+        requestApp.put(Constants.TYPE,requestApp.get(Constants.TYPE).toString().toUpperCase());
 
-        requestObj.put("application", requestApp);
+        requestObj.put(Constants.APPLICATION, requestApp);
 
         HttpClient httpClient = new HttpClient();
         StringRequestEntity requestEntity = null;
@@ -176,22 +174,20 @@ public class ApplicationOperationImpl implements ApplicationOperations {
 
         String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);
 
-
+        int tenantId = applicationOperationAction.getTenantId();
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
 
-        String actionURL = null;
-        if("install".equals("install")){
+        String actionURL;
+        if("install".equals(applicationOperationAction.getAction())){
             actionURL = String.format(Constants.API_INSTALL_APP, tenantDomain);
         }else{
             actionURL = String.format(Constants.API_UNINSTALL_APP, tenantDomain);
         }
 
-
-
         PostMethod postMethod = new PostMethod(requestURL + actionURL);
         postMethod.setRequestEntity(requestEntity);
-
+        String action = applicationOperationAction.getAction();
         if(executeMethod(tokenApiURL, clientKey, clientSecret, authUser, authPass, httpClient, postMethod)){
             if(log.isDebugEnabled()) log.debug(action + " operation performed successfully on " + type + " " + params.toString());
         }else{
@@ -200,20 +196,15 @@ public class ApplicationOperationImpl implements ApplicationOperations {
 
     }
 
-    /**
+	/**
      *
-     * @param tenantId tenantId
-     * @param type type of the resource. Eg: role, user, device
-     * @param params ids of the resources which belong to type
-     * @param platform platform of the devices
-     * @param platformVersion platform version of the devices
-     * @param isSampleDevicesEnabled if MDM is not connected, enable this to display sample devices.
-     * @return
+     * @param applicationOperationDevice holds the information needs to retrieve device list
+     * @return List of devices
      */
+    @Override
+    public List<Device> getDevices(ApplicationOperationDevice applicationOperationDevice) {
 
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
-                                   String platformVersion, boolean isSampleDevicesEnabled,
-                                   HashMap<String, String> configProperties) {
+        HashMap<String, String> configProperties = applicationOperationDevice.getConfigParams();
 
         String tokenApiURL = configProperties.get(Constants.PROPERTY_TOKEN_API_URL);
         String clientKey = configProperties.get(Constants.PROPERTY_CLIENT_KEY);
@@ -223,53 +214,54 @@ public class ApplicationOperationImpl implements ApplicationOperations {
 
         JSONArray jsonArray = null;
 
-        if(isSampleDevicesEnabled){
-            return Sample.getSampleDevices();
-        }else{
+        HttpClient httpClient = new HttpClient();
+        int tenantId = applicationOperationDevice.getTenantId();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+        String tenantDomain =
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        String[] params = applicationOperationDevice.getParams();
+        String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0], tenantDomain);
+        String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
+        GetMethod getMethod = new GetMethod(requestURL);
 
-            HttpClient httpClient = new HttpClient();
+        List<NameValuePair> nameValuePairs = new ArrayList<>();
+        //nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
+        String platform = applicationOperationDevice.getPlatform();
+        if (platform != null)
+            nameValuePairs.add(new NameValuePair(Constants.PLATFORM, platform));
+        String platformVersion = applicationOperationDevice.getPlatformVersion();
+        if (platformVersion != null)
+            nameValuePairs.add(new NameValuePair(Constants.PLATFORM_VERSION, platform));
 
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
-            String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
+        getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
+        getMethod.setRequestHeader("Accept", "application/json");
 
-            String deviceListAPI = String.format(Constants.API_DEVICE_LIST, params[0], tenantDomain);
-            String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
-            GetMethod getMethod = new GetMethod(requestURL);
-
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-            //nameValuePairs.add(new NameValuePair("tenantId", String.valueOf(tenantId)));
-
-            if(platform != null) nameValuePairs.add(new NameValuePair("platform", platform));
-
-            if(platformVersion != null) nameValuePairs.add(new NameValuePair("platformVersion", platform));
-
-            getMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-            getMethod.setRequestHeader("Accept", "application/json");
-
-            if(executeMethod(tokenApiURL, clientKey, clientSecret, authUser, authPass, httpClient, getMethod)){
-                try {
-                    jsonArray = (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
-                    if(jsonArray != null){
-                        if(log.isDebugEnabled()) log.debug("Devices received from MDM: " + jsonArray.toJSONString());
-                    }
-                } catch (IOException e) {
-                    String errorMessage = "Invalid response from the devices API";
-                    if(log.isDebugEnabled()){
-                        log.error(errorMessage, e);
-                    }else{
-                        log.error(errorMessage);
-                    }
+        if (executeMethod(tokenApiURL, clientKey, clientSecret, authUser, authPass, httpClient,
+                          getMethod)) {
+            try {
+                jsonArray =
+                        (JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
+                if (jsonArray != null) {
+                    if (log.isDebugEnabled())
+                        log.debug("Devices received from MDM: " + jsonArray.toJSONString());
                 }
-            }else{
-                log.error("Getting devices from MDM API failed");
+            } catch (IOException e) {
+                String errorMessage = "Invalid response from the devices API";
+                if (log.isDebugEnabled()) {
+                    log.error(errorMessage, e);
+                } else {
+                    log.error(errorMessage);
+                }
             }
+        } else {
+            log.error("Getting devices from MDM API failed");
         }
 
-        if(jsonArray == null){
+        if (jsonArray == null) {
             jsonArray = (JSONArray) new JSONValue().parse("[]");
         }
 
-        List<Device> devices = new ArrayList<Device>();
+        List<Device> devices = new ArrayList<>();
 
         Iterator<JSONObject> iterator = jsonArray.iterator();
         while (iterator.hasNext()){
@@ -277,12 +269,12 @@ public class ApplicationOperationImpl implements ApplicationOperations {
 
 
             Device device = new Device();
-            device.setId(deviceObj.get("deviceIdentifier").toString()+ "---" + deviceObj.get("type").toString());
-            device.setName(deviceObj.get("name").toString());
-            device.setModel(deviceObj.get("name").toString());
+            device.setId(deviceObj.get(Constants.DEVICE_IDENTIFIER).toString()+ "---" + deviceObj.get(Constants.TYPE).toString());
+            device.setName(deviceObj.get(Constants.NAME).toString());
+            device.setModel(deviceObj.get(Constants.NAME).toString());
             device.setType("mobileDevice");
             device.setImage("/store/extensions/assets/mobileapp/resources/models/none.png");
-            device.setPlatform(deviceObj.get("type").toString());
+            device.setPlatform(deviceObj.get(Constants.TYPE).toString());
             devices.add(device);
 
         }
@@ -302,11 +294,11 @@ public class ApplicationOperationImpl implements ApplicationOperations {
         HttpClient httpClient = new HttpClient();
         PostMethod postMethod = new PostMethod(tokenApiURL);
 
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        List<NameValuePair> nameValuePairs = new ArrayList<>();
         nameValuePairs.add(new NameValuePair("grant_type", "password"));
         nameValuePairs.add(new NameValuePair("username", authUser));
         nameValuePairs.add(new NameValuePair("password", authPass));
-        postMethod.setQueryString((NameValuePair[]) nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
+        postMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
         postMethod.addRequestHeader("Authorization" , "Basic " +
                 new String(Base64.encodeBase64((clientKey + ":" + clientSecret).getBytes())));
         postMethod.addRequestHeader("Content-Type" , "application/x-www-form-urlencoded");
@@ -324,7 +316,7 @@ public class ApplicationOperationImpl implements ApplicationOperations {
             return null;
         }
 
-        String response = null;
+        String response;
         try {
             response = postMethod.getResponseBodyAsString();
         } catch (IOException e) {

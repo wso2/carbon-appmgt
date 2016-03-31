@@ -18,27 +18,25 @@
 
 package org.wso2.carbon.appmgt.mobile.mdm;
 
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
-import org.wso2.carbon.appmgt.mobile.utils.User;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * Class implements MDM operations in OSGI Service to WSO2 MDM
  */
-public class ApplicationOperationImpl implements ApplicationOperations {
+public class ApplicationOperationsImpl implements ApplicationOperations {
 
 
     @Override
-    public void performAction(User currentUser, String action, App app, int tenantId, String type, String[] params,
-            HashMap<String, String> configParams) {
+    public void performAction(ApplicationOperationAction applicationOperationAction) {
 
     }
 
     @Override
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
-            String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configParams) {
+    public List<Device> getDevices(ApplicationOperationDevice applicationOperationDevice) {
         return null;
     }
 }

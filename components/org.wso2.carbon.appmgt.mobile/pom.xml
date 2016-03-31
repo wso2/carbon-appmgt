@@ -77,10 +77,8 @@
                         </Import-Package>
                         <Export-Package>
                             org.wso2.mobile.utils.utilities.*,
-                            org.wso2.carbon.appmgt.mobile.mdm.*,
-                            org.wso2.carbon.appmgt.mobile.store.*,
-                            org.wso2.carbon.appmgt.mobile.utils.*,
-                            org.wso2.carbon.appmgt.mobile.interfaces.*
+                            org.wso2.carbon.appmgt.mobile.*,
+                            !org.wso2.carbon.appmgt.mobile.internal
                         </Export-Package>
                     </instructions>
                 </configuration>

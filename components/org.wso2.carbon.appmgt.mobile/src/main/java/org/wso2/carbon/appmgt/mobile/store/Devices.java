@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
@@ -58,10 +59,15 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         ApplicationOperations applicationOperations = getMDMOperationsInstance();
-        List<Device> devices =  applicationOperations
-                .getDevices(user, tenantId, type, params, platform, platformVersion,
-                            Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                            configurations.getActiveMDMProperties());
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setPlatform(platform);
+        applicationOperationDevice.setPlatformVersion(platformVersion);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -79,13 +85,16 @@ public class Devices {
 
         User user = setUserData(new User(), currentUser);
 
-
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        ApplicationOperations applicationOperations =  getMDMOperationsInstance();
-        List<Device> devices = applicationOperations
-                .getDevices(user, tenantId, type, params, platform, null,
-                            Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                            configurations.getActiveMDMProperties());
+        ApplicationOperations applicationOperations = getMDMOperationsInstance();
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setPlatform(platform);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -104,10 +113,13 @@ public class Devices {
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
         ApplicationOperations applicationOperations = getMDMOperationsInstance();
-        List<Device> devices = applicationOperations
-                .getDevices(user, tenantId, type, params, null, null,
-                            Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                            configurations.getActiveMDMProperties());
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 

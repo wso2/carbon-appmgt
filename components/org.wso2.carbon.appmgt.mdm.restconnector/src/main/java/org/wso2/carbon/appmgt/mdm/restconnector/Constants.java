@@ -34,4 +34,39 @@ public class Constants {
     public static final String PROPERTY_AUTH_USER = "AuthUser";
     public static final String PROPERTY_AUTH_PASS = "AuthPass";
 
+    public static final String USER = "user";
+    public static final String ROLE = "role";
+    public static final String IOS = "ios";
+    public static final String PLATFORM = "platform";
+    public static final String PLATFORM_VERSION = "platformVersion";
+    public static final String PROPERTIES = "properties";
+    public static final String TYPE = "type";
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String USER_LIST = "userList";
+    public static final String DEVICE_IDENTIFIER = "deviceIdentifier";
+    public static final String DEVICE_IDENTIFIERS = DEVICE_IDENTIFIER + "s";
+    public static final String APPLICATION = "application";
+
+
+    public class IOSConstants {
+
+        private IOSConstants() {
+            throw new AssertionError();
+        }
+
+        public static final String IS_REMOVE_APP = "isRemoveApp";
+        public static final String IS_PREVENT_BACKUP = "isPreventBackup";
+        public static final String I_TUNES_ID = "iTunesId";
+        public static final String LABEL = "label";
+        public static final String PUBLIC = "public";
+        public static final String ENTERPRISE = "enterprise";
+        public static final String TYPE = "type";
+        public static final String OPCODE_INSTALL_ENTERPRISE_APPLICATION =
+                "INSTALL_ENTERPRISE_APPLICATION";
+        public static final String OPCODE_INSTALL_STORE_APPLICATION = "INSTALL_STORE_APPLICATION";
+        public static final String OPCODE_INSTALL_WEB_APPLICATION = "WEB_CLIP";
+        public static final String OPCODE_REMOVE_APPLICATION = "REMOVE_APPLICATION";
+    }
+
 }

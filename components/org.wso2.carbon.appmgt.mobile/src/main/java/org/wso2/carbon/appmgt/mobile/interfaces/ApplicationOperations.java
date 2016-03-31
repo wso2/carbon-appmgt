@@ -20,12 +20,11 @@
 
 package org.wso2.carbon.appmgt.mobile.interfaces;
 
-import org.wso2.carbon.appmgt.mobile.mdm.App;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
-import org.wso2.carbon.appmgt.mobile.utils.User;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,34 +33,21 @@ import java.util.List;
  */
 public interface ApplicationOperations {
 
-    /**
+	/**
+     * This used to perform an action ex: install, uninstall, update apps on devices
      *
-     * @param currentUser User who perform the action
-     * @param action Name of the action
-     * @param app Instance of the mobile app
-     * @param tenantId Tenant Id
-     * @param type Type of the resource (device, user or role)
-     * @param params Collection of ids of the type
-     * @param configParams Configuration belongs to the MDM which is defined in app-manager.xml
+     * @param applicationOperationAction holds the information needs to perform an action on mdm
+     * @throws MobileApplicationException
      */
-    public void performAction(User currentUser,String action, App app, int tenantId, String type, String[] params,
-                              HashMap<String, String> configParams)
-            throws MobileApplicationException;
+    void performAction(ApplicationOperationAction applicationOperationAction) throws MobileApplicationException;
 
-    /**
+	/**
+     *  This used to get the device list from mdm
      *
-     * @param currentUser User who perform the action
-     * @param tenantId Tenant Id
-     * @param type Type of the resource (device, user or role)
-     * @param params Collection of ids of the type
-     * @param platform Platform of the devices
-     * @param platformVersion Platform version of the devices
-     * @param isSampleDevicesEnabled
-     * @param configParams
-     * @return List of devices
+     * @param applicationOperationDevice holds the information needs to retrieve device list
+     * @return Devices list
+     * @throws MobileApplicationException
      */
-    public List<Device> getDevices(User currentUser, int tenantId, String type, String[] params, String platform,
-                                   String platformVersion, boolean isSampleDevicesEnabled, HashMap<String, String> configParams)
-            throws MobileApplicationException;
+    List<Device> getDevices(ApplicationOperationDevice applicationOperationDevice) throws MobileApplicationException;
 
 }

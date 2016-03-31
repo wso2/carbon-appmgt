@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.AppDataLoader;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
@@ -62,12 +63,18 @@ public class Operations {
         if(log.isDebugEnabled()) log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();
 
+        ApplicationOperationAction applicationOperationAction = new ApplicationOperationAction();
         User user = new User();
         JSONObject userObj = (JSONObject) new JSONValue().parse(currentUser);
         user.setUsername((String) userObj.get("username"));
         user.setTenantDomain((String) userObj.get("tenantDomain"));
         user.setTenantId(Integer.valueOf(String.valueOf(userObj.get("tenantId"))));
-
+        applicationOperationAction.setUser(user);
+        applicationOperationAction.setAction(action);
+        applicationOperationAction.setTenantId(tenantId);
+        applicationOperationAction.setType(type);
+        applicationOperationAction.setParams(params);
+        applicationOperationAction.setConfigParams(configurations.getActiveMDMProperties());
 
         try {
 
@@ -85,7 +92,8 @@ public class Operations {
 
             ApplicationOperations applicationOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action, tenantId);
-            applicationOperations.performAction(user, action, appToInstall, tenantId, type, params, configurations.getActiveMDMProperties());
+            applicationOperationAction.setApp(appToInstall);
+            applicationOperations.performAction(applicationOperationAction);
 
 
         } catch (UserStoreException e) {
