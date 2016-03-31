@@ -86,7 +86,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 					deviceList = MDMServiceAPIUtils
 							.getDeviceManagementService(applicationOperationAction.getTenantId()).
-									getAllDevices();
+									getAllDevicesOfRole(userRole);
 
 					for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
 						deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
@@ -163,9 +163,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					}
 				}
 				MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
-				                  .
-						                  installApplicationForDevices(operation,
-						                                               deviceIdentifiers);
+				                  .installApplicationForDevices(operation, deviceIdentifiers);
 			}
 		} catch (DeviceApplicationException mdmExce) {
 			log.error("Error in creating operation object using app", mdmExce);
