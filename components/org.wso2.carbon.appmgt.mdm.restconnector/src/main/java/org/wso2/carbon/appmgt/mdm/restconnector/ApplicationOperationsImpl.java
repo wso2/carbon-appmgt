@@ -278,15 +278,18 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
             device.setModel(deviceObj.get(Constants.NAME).toString());
             device.setType("mobileDevice");
             String imgUrl;
-            if ("android".equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
-                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
-                                       "nexus");
-            } else if ("ios".equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
-                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
-                                       "iphone");
+            if (Constants.ANDROID.equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
+                imgUrl = String.format(
+                        applicationOperationDevice.getConfigParams().get(Constants.IMAGE_URL),
+                        Constants.NEXUS);
+            } else if (Constants.IOS.equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
+                imgUrl = String.format(
+                        applicationOperationDevice.getConfigParams().get(Constants.IMAGE_URL),
+                        Constants.IPHONE);
             } else {
-                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
-                                       "none");
+                imgUrl = String.format(
+                        applicationOperationDevice.getConfigParams().get(Constants.IMAGE_URL),
+                        Constants.NONE);
             }
             device.setImage(imgUrl);
             device.setPlatform(deviceObj.get(Constants.TYPE).toString());

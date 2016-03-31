@@ -37,6 +37,7 @@ public class Constants {
     public static final String USER = "user";
     public static final String ROLE = "role";
     public static final String IOS = "ios";
+    public static final String ANDROID = "android";
     public static final String PLATFORM = "platform";
     public static final String PLATFORM_VERSION = "platformVersion";
     public static final String PROPERTIES = "properties";
@@ -47,6 +48,10 @@ public class Constants {
     public static final String DEVICE_IDENTIFIER = "deviceIdentifier";
     public static final String DEVICE_IDENTIFIERS = DEVICE_IDENTIFIER + "s";
     public static final String APPLICATION = "application";
+    public static final String NEXUS = "nexus";
+    public static final String IPHONE = "iphone";
+    public static final String NONE = "none";
+    public static final String IMAGE_URL = "ImageURL";
 
 
     public class IOSConstants {

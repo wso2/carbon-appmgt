@@ -23,12 +23,17 @@ public class MDMAppConstants {
 	public static final String USER = "user";
 	public static final String ROLE = "role";
 	public static final String IOS = "ios";
+	public static final String ANDROID = "android";
 	public static final String WEBAPP = "webapp";
 	public static final String INSTALL = "install";
 	public static final String ACTIVE = "active";
 	public static final String ENTERPRISE = "enterprise";
 	public static final String DEVICE = "device";
 	public static final String MOBILE_DEVICE = "mobileDevice";
+	public static final String NEXUS = "nexus";
+	public static final String IPHONE = "iphone";
+	public static final String NONE = "none";
+	public static final String IMAGE_URL = "ImageURL";
 
 	public class IOSConstants {
 
