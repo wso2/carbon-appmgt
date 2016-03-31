@@ -16,6 +16,7 @@ var render = function (theme, data, meta, require) {
             }
         }
     }
+    bodyContext.searchQuery =searchQuery;
 
     data.tags.tagUrl = getTagUrl(data);
     var searchUrl = '/extensions/assets/site/myapps';

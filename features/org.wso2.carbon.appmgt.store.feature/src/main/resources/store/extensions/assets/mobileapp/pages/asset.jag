@@ -18,8 +18,8 @@ require('/modules/store.js').exec(function (ctx) {
             mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
             devicesClass = new Packages.org.wso2.carbon.appmgt.mobile.store.Devices();
 
-        caramel = require('caramel');
-
+    caramel = require('caramel');
+    var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
     var storeHostObj = jagg.module("manager").getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(tenantDomain);
 
@@ -90,6 +90,14 @@ require('/modules/store.js').exec(function (ctx) {
 
     var searchQuery = { search: "", searchTerm: "overview_name"};
 
+    //set rating
+    var ratings = JSON.parse(social.getRating("mobileapp:" + asset.id));
+    if (ratings) {
+        asset.rating = Math.floor(ratings.rating);
+    } else {
+        asset.rating = 0;
+    }
+
     caramel.render({
         title: asset.attributes.overview_name + ' | Store | WSO2 App Manager',
         user: user,
@@ -111,12 +119,9 @@ require('/modules/store.js').exec(function (ctx) {
         inDashboard: inDashboard,
         asset: asset,
         config : mdmUIConfig,
-        tags: [
-            {
-                url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
-            }
-        ],
+        tags: {
+             data: store.tags(type, null)
+        },
         myAssets: { user: user, type: type, title: title },
         recentAssets: store.recentAssets(type),
         assetType: "mobileapp"

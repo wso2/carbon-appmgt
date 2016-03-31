@@ -201,3 +201,76 @@ $( document ).ajaxComplete(function( event, xhr, settings ) {
        location.re
    }
 });
+
+/*=======Fetch the tags and populate the tags field=====*/
+var url = window.location.pathname;
+//Break the url into components
+var comps = url.split('/');
+
+//Given a url of the form /pub/api/asset/{asset-type}/{asset-id}
+//length=5
+//then: length-2 = {asset-type} length-1 = {asset-id}
+var assetId = comps[comps.length - 1];
+var assetType = comps[comps.length - 2];
+
+fetchTagsOfType(assetType);
+
+
+/*
+ The function is used to fetch the tags of the current asset type
+ @assetType: The asset type for which the tags must be fetched
+ */
+function fetchTagsOfType(assetType) {
+
+    $.ajax({
+               url: caramel.context + '/api/tag/' + assetType,
+               type: 'GET',
+               success: function (response) {
+                   var tags = response;
+                   fetchTagsOfAsset(assetType, assetId, tags);
+               },
+               error: function () {
+                   console.log('unable to retrieve tags for ' + assetType);
+               }
+           });
+}
+
+
+/*
+ The function is used to fetch the tags of the current asset
+ @assetType: The asset type for which the tags must be fetched
+ @assetId: The asset id of the asset for which the tags must be fetched
+ */
+function fetchTagsOfAsset(assetType, assetId, masterTags) {
+
+    $.ajax({
+               url: caramel.context + '/api/tag/' + assetType + '/' + assetId,
+               type: 'GET',
+               success: function (response) {
+                   //Initialize the tag container
+                   $('#txtTags').tokenInput(masterTags, {
+                       theme: "facebook",
+                       prePopulate: response,
+                       allowFreeTagging: true
+                   });
+               }
+           });
+
+}
+
+//obtain the selected tags{id,value} and send tags values in the form submission
+$('#submitButton').click(function(){
+    var selectedTags = $('#txtTags').tokenInput('get');
+    var tags = [];
+    for (var index in selectedTags) {
+        tags.push(selectedTags[index].name);
+    }
+    $('#txtTags').val(tags);
+});
+
+/*===============================================================================*/
+//prevent form submission by pressing enter key
+//because when adding tags need to press the etner key to add the tags
+$(document).on("keypress", "form", function(event) {
+    return event.keyCode != 13;
+});
