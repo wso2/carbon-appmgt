@@ -214,12 +214,29 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						.equals(commondevice.getEnrolmentInfo().getStatus().toString().
 								toLowerCase())) {
 					Device device = new Device();
-					device.setId(
-							commondevice.getDeviceIdentifier() + "---" + commondevice.getType());
+					org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier deviceIdentifier =
+							new org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier();
+					deviceIdentifier.setId(commondevice.getDeviceIdentifier());
+					deviceIdentifier.setType(commondevice.getType());
+					device.setDeviceIdentifier(deviceIdentifier);
 					device.setName(commondevice.getName());
 					device.setModel(commondevice.getName());
 					device.setType(MDMAppConstants.MOBILE_DEVICE);
-					device.setImage("/store/extensions/assets/mobileapp/resources/models/none.png");
+					String imgUrl;
+					if ("android".equalsIgnoreCase(commondevice.getType())) {
+						imgUrl = String.format(
+								applicationOperationDevice.getConfigParams().get("ImageURL"),
+								"nexus");
+					} else if ("ios".equalsIgnoreCase(commondevice.getType())) {
+						imgUrl = String.format(
+								applicationOperationDevice.getConfigParams().get("ImageURL"),
+								"iphone");
+					} else {
+						imgUrl = String.format(
+								applicationOperationDevice.getConfigParams().get("ImageURL"),
+								"none");
+					}
+					device.setImage(imgUrl);
 					device.setPlatform(commondevice.getType());
 					devices.add(device);
 				}

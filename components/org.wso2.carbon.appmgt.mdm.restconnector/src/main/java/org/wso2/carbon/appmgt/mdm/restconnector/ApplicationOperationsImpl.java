@@ -35,6 +35,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
+import org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
@@ -269,11 +270,25 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 
             Device device = new Device();
-            device.setId(deviceObj.get(Constants.DEVICE_IDENTIFIER).toString()+ "---" + deviceObj.get(Constants.TYPE).toString());
+            DeviceIdentifier deviceIdentifier = new DeviceIdentifier();
+            deviceIdentifier.setId(deviceObj.get(Constants.DEVICE_IDENTIFIER).toString());
+            deviceIdentifier.setType(deviceObj.get(Constants.TYPE).toString());
+            device.setDeviceIdentifier(deviceIdentifier);
             device.setName(deviceObj.get(Constants.NAME).toString());
             device.setModel(deviceObj.get(Constants.NAME).toString());
             device.setType("mobileDevice");
-            device.setImage("/store/extensions/assets/mobileapp/resources/models/none.png");
+            String imgUrl;
+            if ("android".equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
+                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
+                                       "nexus");
+            } else if ("ios".equalsIgnoreCase((deviceObj.get(Constants.TYPE).toString()))) {
+                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
+                                       "iphone");
+            } else {
+                imgUrl = String.format(applicationOperationDevice.getConfigParams().get("ImageURL"),
+                                       "none");
+            }
+            device.setImage(imgUrl);
             device.setPlatform(deviceObj.get(Constants.TYPE).toString());
             devices.add(device);
 

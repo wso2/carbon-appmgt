@@ -124,6 +124,7 @@ var auditLog = require('/modules/auditLog/logger.js');
                                 if(!urlTenantDomain){
                                     urlTenantDomain = "carbon.super";
                                 }
+                                var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
                                 //when only mobile app is enabled do not check for favourite home page
                                 if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
                                     var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
