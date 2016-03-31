@@ -50,46 +50,55 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	 */
 	public void performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
+		if (log.isDebugEnabled()) {
+			log.debug(applicationOperationAction.getAction() + " action is triggered for " +
+			          applicationOperationAction.getType());
+		}
 
 		Operation operation = null;
 		List<DeviceIdentifier> deviceIdentifiers = new ArrayList<>();
 		List<org.wso2.carbon.device.mgt.common.Device> deviceList;
 		if (MDMAppConstants.USER.equals(applicationOperationAction.getType())) {
-			String userName;
-			for (String param : applicationOperationAction.getParams()) {
-				userName = param;
-				try {
+			String userName = null;
+			try {
+				for (String param : applicationOperationAction.getParams()) {
+					userName = param;
+
 					deviceList = MDMServiceAPIUtils
 							.getDeviceManagementService(applicationOperationAction.getTenantId()).
 									getDevicesOfUser(userName);
-				} catch (DeviceManagementException devEx) {
-					String errorMsg = "Error occurred fetch device for user " + userName +
-					                  " at app installation";
-					log.error(errorMsg, devEx);
-					throw new MobileApplicationException(errorMsg, devEx);
+
+					for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
+						deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
+					}
 				}
-				for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
-					deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
-				}
+			} catch (DeviceManagementException devEx) {
+				String errorMsg = "Error occurred fetch device for user " + userName +
+				                  " at app installation";
+				log.error(errorMsg, devEx);
+				throw new MobileApplicationException(errorMsg, devEx);
 			}
 		} else if (MDMAppConstants.ROLE.equals(applicationOperationAction.getType())) {
-			String userRole;
-			for (String param : applicationOperationAction.getParams()) {
-				userRole = param;
-				try {
+			String userRole = null;
+			try {
+				for (String param : applicationOperationAction.getParams()) {
+					userRole = param;
+
 					deviceList = MDMServiceAPIUtils
 							.getDeviceManagementService(applicationOperationAction.getTenantId()).
 									getAllDevices();
-				} catch (DeviceManagementException devMgtEx) {
-					String errorMsg = "Error occurred fetch device for user role " + userRole +
-					                  " at app installation";
-					log.error(errorMsg, devMgtEx);
-					throw new MobileApplicationException(errorMsg, devMgtEx);
+
+					for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
+						deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
+					}
 				}
-				for (org.wso2.carbon.device.mgt.common.Device device : deviceList) {
-					deviceIdentifiers.add(getDeviceIdentifierByDevice(device));
-				}
+			} catch (DeviceManagementException devMgtEx) {
+				String errorMsg = "Error occurred fetch device for user role " + userRole +
+				                  " at app installation";
+				log.error(errorMsg, devMgtEx);
+				throw new MobileApplicationException(errorMsg, devMgtEx);
 			}
+
 		} else if (MDMAppConstants.DEVICE.equals(applicationOperationAction.getType())) {
 			DeviceIdentifier deviceIdentifier;
 			for (String param : applicationOperationAction.getParams()) {
@@ -168,6 +177,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 	}
 
+	/**
+	 * Create a new device identifier from Device object
+	 * @param device device which is to be retrieved type and id
+	 * @return created device identifier
+	 */
 	private static DeviceIdentifier getDeviceIdentifierByDevice(
 			org.wso2.carbon.device.mgt.common.Device device) {
 		DeviceIdentifier deviceIdentifier = new DeviceIdentifier();
@@ -192,6 +206,9 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 							getDevicesOfUser(
 									applicationOperationDevice.getCurrentUser().getUsername());
 			devices = new ArrayList<>(deviceList.size());
+			if(log.isDebugEnabled()){
+				log.debug("device list got from mdm "+ deviceList.toString());
+			}
 			for (org.wso2.carbon.device.mgt.common.Device commondevice : deviceList) {
 				if (MDMAppConstants.ACTIVE
 						.equals(commondevice.getEnrolmentInfo().getStatus().toString().

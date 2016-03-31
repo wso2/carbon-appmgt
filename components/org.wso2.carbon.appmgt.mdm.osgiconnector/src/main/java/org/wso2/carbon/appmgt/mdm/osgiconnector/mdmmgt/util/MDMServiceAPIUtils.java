@@ -29,6 +29,12 @@ public class MDMServiceAPIUtils {
 
 	private static Log log = LogFactory.getLog(MDMServiceAPIUtils.class);
 
+	/**
+	 * Returns the DeviceManagementProviderService osgi service
+	 *
+	 * @param tenantId tenant id
+	 * @return DeviceManagementProviderService
+	 */
 	public static DeviceManagementProviderService getDeviceManagementService(int tenantId) {
 		PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		ctx.setTenantId(tenantId, true);
@@ -43,6 +49,12 @@ public class MDMServiceAPIUtils {
 		return deviceManagementProviderService;
 	}
 
+	/**
+	 * Returns the ApplicationManagementProviderService osgi service
+	 *
+	 * @param tenantId tenant id
+	 * @return ApplicationManagementProviderService
+	 */
 	public static ApplicationManagementProviderService getAppManagementService(int tenantId) {
 		PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		ctx.setTenantId(tenantId, true);
