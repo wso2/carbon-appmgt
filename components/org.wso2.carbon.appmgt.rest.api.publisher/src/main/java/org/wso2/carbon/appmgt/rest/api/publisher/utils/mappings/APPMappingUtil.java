@@ -1,0 +1,121 @@
+/*
+ *
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * /
+ */
+
+package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
+import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class APPMappingUtil {
+
+    private static final Log log = LogFactory.getLog(APPMappingUtil.class);
+
+    /**
+     * Converts a List object of APIs into a DTO
+     *
+     * @param apiList List of APIs
+     * @param limit   maximum number of APIs returns
+     * @param offset  starting index
+     * @return APIListDTO object containing APIDTOs
+     */
+    public static AppListDTO fromAPIListToDTO(List<WebApp> apiList, int offset, int limit) {
+        AppListDTO apiListDTO = new AppListDTO();
+        List<AppInfoDTO> apiInfoDTOs = apiListDTO.getList();
+        if (apiInfoDTOs == null) {
+            apiInfoDTOs = new ArrayList<>();
+            apiListDTO.setList(apiInfoDTOs);
+        }
+
+        //add the required range of objects to be returned
+        int start = offset < apiList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
+        int end = offset + limit - 1 <= apiList.size() - 1 ? offset + limit - 1 : apiList.size() - 1;
+        for (int i = start; i <= end; i++) {
+            apiInfoDTOs.add(fromAPIToInfoDTO(apiList.get(i)));
+        }
+        apiListDTO.setCount(apiInfoDTOs.size());
+        return apiListDTO;
+    }
+
+    /**
+     * Creates a minimal DTO representation of an API object
+     *
+     * @param api API object
+     * @return a minimal representation DTO
+     */
+    public static AppInfoDTO fromAPIToInfoDTO(WebApp api) {
+        AppInfoDTO apiInfoDTO = new AppInfoDTO();
+        apiInfoDTO.setDescription(api.getDescription());
+        String context = api.getContext();
+        if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
+            context = context.replace("/" + RestApiConstants.API_VERSION_PARAM, "");
+        }
+        apiInfoDTO.setContext(context);
+        apiInfoDTO.setId(api.getUUID());
+        APIIdentifier apiId = api.getId();
+        apiInfoDTO.setName(apiId.getApiName());
+        apiInfoDTO.setVersion(apiId.getVersion());
+        String providerName = api.getId().getProviderName();
+        apiInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+        apiInfoDTO.setStatus(api.getStatus().toString());
+        return apiInfoDTO;
+    }
+
+    /**
+     * Sets pagination urls for a APIListDTO object given pagination parameters and url parameters
+     *
+     * @param apiListDTO a APIListDTO object
+     * @param query      search condition
+     * @param limit      max number of objects returned
+     * @param offset     starting index
+     * @param size       max offset
+     */
+    public static void setPaginationParams(AppListDTO apiListDTO, String query, int offset, int limit, int size) {
+
+        //acquiring pagination parameters and setting pagination urls
+        Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
+        String paginatedPrevious = "";
+        String paginatedNext = "";
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
+            paginatedPrevious = RestApiUtil
+                    .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
+                                        paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), query);
+        }
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
+            paginatedNext = RestApiUtil
+                    .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
+                                        paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
+        }
+
+        apiListDTO.setNext(paginatedNext);
+        apiListDTO.setPrevious(paginatedPrevious);
+    }
+
+}
