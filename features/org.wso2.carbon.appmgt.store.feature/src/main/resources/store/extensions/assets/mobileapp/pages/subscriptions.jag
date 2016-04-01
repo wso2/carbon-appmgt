@@ -3,8 +3,9 @@ var caramel;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 require('/modules/store.js').exec(function (ctx) {
-    var count, tags, title,
+    var count, title,
             log = ctx.log,
+            query = ctx.params.query,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
@@ -46,29 +47,43 @@ require('/modules/store.js').exec(function (ctx) {
         response.sendRedirect(caramel.configs().context);
         return;
     }
+    var RECENT_ASSET_COUNT = store.getRecentAppCount().assetsPage;
+    var recentAssets = store.recentAssets(type, RECENT_ASSET_COUNT);
 
-    var recentAssets = store.recentAssets(type, 3);
-    var subscriptions = store.subscriptions(type);
+    var subscriptions = {mobileapp: []};
+    var searchQuery = {search: "", searchTerm: "overview_name"};
+    if (query) {
+        var array = query.split(":");
+        var searchOption = array[0];
+        var searchValue = array[1].replace(/\"/g, "");// replace all the occurrences of double quote with empty
+        var searchAttribute = "overview_name";
+
+        if (searchOption.toLowerCase() == "category") {
+            searchAttribute = "overview_category";
+            searchQuery.searchTerm = "overview_category";
+        } else if (searchOption.toLowerCase() == "platform") {
+            searchAttribute = "overview_platform";
+            searchQuery.searchTerm = "overview_platform";
+        } else if (searchOption.toLowerCase() == "provider") {
+            searchAttribute = "overview_provider"
+            searchQuery.searchTerm = "overview_provider";
+        }
+        searchQuery.search = searchValue;
+        subscriptions = store.searchSubscriptions(type, searchAttribute, searchValue);
+    } else {
+        subscriptions = store.subscriptions(type);
+    }
 
     count = Object.keys(subscriptions).length;
-
-    tags = [
-        {
-            url: '/assets/' + type + '?page=1&tag=',
-            data: store.tags(type)
-        }
-    ];
-
     title = store.assetLinks(type).title;
     var headerData = site.header(tenantId, {
         sso: sso,
         user: user
     });
     headerData.assetType = "mobileapp";
-    var searchQuery = { search: "", searchTerm: "overview_name"};
 
     caramel.render({
-        'title': 'Store | My Items',
+        'title': 'My Apps | Store',
         user: user,
         sso: sso,
         header: headerData,
@@ -83,7 +98,9 @@ require('/modules/store.js').exec(function (ctx) {
         myAssets: { user: user, type: type, title: title},
         selfUnsubscription : selfUnsubscription,
         isDeviceSubscriptionEnabled : isDeviceSubscriptionEnabled,
-        tags: tags,
+        tags: {
+            data: store.tags(type, null)
+        },
         assetType: "mobileapp"
     });
 }, request, response, session);
