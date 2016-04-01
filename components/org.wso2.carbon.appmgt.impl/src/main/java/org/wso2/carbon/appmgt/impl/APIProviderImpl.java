@@ -184,6 +184,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
+
     /**
      * Get a list of all the consumers for all APIs
      *
@@ -1688,6 +1689,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Collections.sort(apiSortedList, new APINameComparator());
         return apiSortedList;
     }
+
 
     /**
      * Update the Tier Permissions

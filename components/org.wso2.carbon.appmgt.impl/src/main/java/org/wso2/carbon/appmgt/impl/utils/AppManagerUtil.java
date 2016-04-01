@@ -373,6 +373,16 @@ public final class AppManagerUtil {
 			api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
 			api.setSubscriptionAvailableTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
 
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+
+
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp from artifact ";
 			throw new AppManagementException(msg, e);

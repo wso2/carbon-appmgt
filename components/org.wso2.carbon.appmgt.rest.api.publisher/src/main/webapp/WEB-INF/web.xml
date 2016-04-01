@@ -21,8 +21,8 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
-    <display-name>WSO2 APIM REST API</display-name>
-    <description>WSO2 API Manager REST API</description>
+    <display-name>WSO2 APP REST API</display-name>
+    <description>WSO2 App Manager REST API</description>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/beans.xml</param-value>

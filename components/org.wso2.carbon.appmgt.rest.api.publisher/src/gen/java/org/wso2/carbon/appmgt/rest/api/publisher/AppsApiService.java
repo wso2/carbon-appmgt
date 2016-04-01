@@ -5,7 +5,6 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T12:45:14.954Z")
 public abstract class AppsApiService {
   
       public abstract Response appsAppIdDelete(String appId,String ifMatch,String ifUnmodifiedSince,SecurityContext securityContext)
