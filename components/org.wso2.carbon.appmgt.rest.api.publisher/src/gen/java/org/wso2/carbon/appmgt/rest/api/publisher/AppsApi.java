@@ -25,8 +25,6 @@ import javax.ws.rs.core.SecurityContext;
 @Consumes({"application/json"})
 @Produces({"application/json"})
 @io.swagger.annotations.Api(description = "the apps API")
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen",
-                            date = "2016-03-31T12:45:14.954Z")
 public class AppsApi {
     private final AppsApiService delegate = AppsApiServiceFactory.getAppsApi();
 
