@@ -17,9 +17,33 @@
 
 package org.wso2.carbon.appmgt.rest.api.util.exception;
 
-public class GlobalThrowableMapper  {
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.interceptor.security.AuthenticationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
+import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
-/*
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import java.io.EOFException;
+
+public class GlobalThrowableMapper implements ExceptionMapper<Throwable> {
+
+    private static final Log log = LogFactory.getLog(GlobalThrowableMapper.class);
+
+    private ErrorDTO e500 = new ErrorDTO();
+
+    GlobalThrowableMapper() {
+        e500.setCode((long) 500);
+        e500.setMessage("Internal server error");
+        e500.setMoreInfo("");
+        e500.setDescription("The server encountered an internal error. Please contact administrator.");
+    }
+
     @Override
     public Response toResponse(Throwable e) {
 
@@ -95,7 +119,7 @@ public class GlobalThrowableMapper  {
 
         if (e instanceof AuthenticationException) {
             ErrorDTO errorDetail = new ErrorDTO();
-            errorDetail.setCode((long)401);
+            errorDetail.setCode((long) 401);
             errorDetail.setMoreInfo("");
             errorDetail.setMessage("");
             errorDetail.setDescription(e.getMessage());
@@ -118,5 +142,4 @@ public class GlobalThrowableMapper  {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("Content-Type", "application/json")
                 .entity(e500).build();
     }
-    */
 }

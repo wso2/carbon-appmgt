@@ -27,7 +27,6 @@ import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
-import org.wso2.carbon.context.CarbonContext;
 
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
@@ -55,7 +54,8 @@ public class RestApiUtil {
     }
 
     public static APIProvider getLoggedInUserProvider() throws AppManagementException {
-        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        //need to set user when oauth configuration is implemented
+        String loggedInUser = "admin";//CarbonContext.getThreadLocalCarbonContext().getUsername();
         return APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
     }
 
