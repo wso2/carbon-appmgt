@@ -18,15 +18,24 @@
 
 package org.wso2.carbon.appmgt.rest.api.util.utils;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
+import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
+import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
@@ -34,8 +43,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class RestApiUtil {
+
+    private static final Log log = LogFactory.getLog(RestApiUtil.class);
+
     public static <T> ErrorDTO getConstraintViolationErrorDTO(Set<ConstraintViolation<T>> violations) {
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setDescription("Validation Error");
@@ -57,6 +70,16 @@ public class RestApiUtil {
         //need to set user when oauth configuration is implemented
         String loggedInUser = "admin";//CarbonContext.getThreadLocalCarbonContext().getUsername();
         return APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
+    }
+
+    public static String getLoggedInUsername() {
+        //need to set user when oauth configuration is implemented
+        return "admin";
+        // return CarbonContext.getThreadLocalCarbonContext().getUsername();
+    }
+
+    public static APIProvider getProvider(String username) throws AppManagementException {
+        return APIManagerFactory.getInstance().getAPIProvider(username);
     }
 
     /**
@@ -178,5 +201,103 @@ public class RestApiUtil {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_INTERNAL_SERVER_ERROR_MESSAGE_DEFAULT, 500l,
                                         RestApiConstants.STATUS_INTERNAL_SERVER_ERROR_DESCRIPTION_DEFAULT);
         return new InternalServerErrorException(errorDTO);
+    }
+
+    public static String getLoggedInUserTenantDomain() {
+        //need to modify after auth change
+        //return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        return "carbon.super";
+    }
+
+    /**
+     * Check if the specified throwable e is happened as the required resource cannot be found
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened as the required resource cannot be found, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToResourceNotFound(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof AppMgtResourceNotFoundException
+                || rootCause instanceof ResourceNotFoundException;
+    }
+
+    /**
+     * Attempts to find the actual cause of the throwable 'e'
+     *
+     * @param e throwable
+     * @return the root cause of 'e' if the root cause exists, otherwise returns 'e' itself
+     */
+    private static Throwable getPossibleErrorCause(Throwable e) {
+        Throwable rootCause = ExceptionUtils.getRootCause(e);
+        rootCause = rootCause == null ? e : rootCause;
+        return rootCause;
+    }
+
+    /**
+     * Check if the specified throwable e is due to an authorization failure
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is due to an authorization failure, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToAuthorizationFailure(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof AuthorizationFailedException
+                || rootCause instanceof AppMgtAuthorizationFailedException;
+    }
+
+    /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
+     * @param resource requested resource
+     * @param id       id of resource
+     * @param t        Throwable instance
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleResourceNotFoundError(String resource, String id, Throwable t, Log log)
+            throws NotFoundException {
+        NotFoundException notFoundException = buildNotFoundException(resource, id);
+        log.error(notFoundException.getMessage(), t);
+        throw notFoundException;
+    }
+
+    /**
+     * Returns a new NotFoundException
+     *
+     * @param resource Resource type
+     * @param id       identifier of the resource
+     * @return a new NotFoundException with the specified details as a response DTO
+     */
+    public static NotFoundException buildNotFoundException(String resource, String id) {
+        String description;
+        if (!StringUtils.isEmpty(id)) {
+            description = "Requested " + resource + " with Id '" + id + "' not found";
+        } else {
+            description = "Requested " + resource + " not found";
+        }
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT, 404l, description);
+        return new NotFoundException(errorDTO);
+    }
+
+    /**
+     * Check whether the specified apiId is of type UUID
+     *
+     * @param apiId api identifier
+     * @return true if apiId is of type UUID, false otherwise
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static boolean isUUID(String apiId) {
+        try {
+            UUID.fromString(apiId);
+            return true;
+        } catch (IllegalArgumentException e) {
+            if (log.isDebugEnabled()) {
+                log.debug(apiId + " is not a valid UUID");
+            }
+            return false;
+        }
+
     }
 }

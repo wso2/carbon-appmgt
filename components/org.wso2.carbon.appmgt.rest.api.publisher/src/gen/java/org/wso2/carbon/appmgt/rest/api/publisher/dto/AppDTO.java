@@ -1,16 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen",
-                            date = "2016-03-31T05:35:13.991Z")
 public class AppDTO {
 
     private String id = null;
@@ -22,33 +18,10 @@ public class AppDTO {
     private String version = null;
     private String provider = null;
     private String appDefinition = null;
-    private String status = null;
     private Boolean isDefaultVersion = null;
     private List<String> transport = new ArrayList<String>();
     private List<String> tags = new ArrayList<String>();
     private String thumbnailUrl = null;
-
-
-    public enum VisibilityEnum {
-        PUBLIC("PUBLIC"),
-        PRIVATE("PRIVATE"),
-        RESTRICTED("RESTRICTED"),
-        CONTROLLED("CONTROLLED");
-
-        private String value;
-
-        VisibilityEnum(String value) {
-            this.value = value;
-        }
-
-        @Override
-        @JsonValue
-        public String toString() {
-            return value;
-        }
-    }
-
-    private VisibilityEnum visibility = null;
     private List<String> visibleRoles = new ArrayList<String>();
     private String path = null;
     private String resourceId = null;
@@ -233,7 +206,7 @@ public class AppDTO {
 
 
     @ApiModelProperty(required = true,
-                      value = "Swagger definition of the APP which contains details about URI templates and scopes")
+                      value = "Swagger definition of the App which contains details about URI templates and scopes")
     @JsonProperty("appDefinition")
     public String getAppDefinition() {
         return appDefinition;
@@ -241,25 +214,6 @@ public class AppDTO {
 
     public void setAppDefinition(String appDefinition) {
         this.appDefinition = appDefinition;
-    }
-
-
-    /**
-     **/
-    public AppDTO status(String status) {
-        this.status = status;
-        return this;
-    }
-
-
-    @ApiModelProperty(example = "CREATED", value = "")
-    @JsonProperty("status")
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
 
@@ -337,25 +291,6 @@ public class AppDTO {
 
     public void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
-    }
-
-
-    /**
-     **/
-    public AppDTO visibility(VisibilityEnum visibility) {
-        this.visibility = visibility;
-        return this;
-    }
-
-
-    @ApiModelProperty(example = "PUBLIC", value = "")
-    @JsonProperty("visibility")
-    public VisibilityEnum getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(VisibilityEnum visibility) {
-        this.visibility = visibility;
     }
 
 
@@ -686,12 +621,10 @@ public class AppDTO {
                 Objects.equals(version, app.version) &&
                 Objects.equals(provider, app.provider) &&
                 Objects.equals(appDefinition, app.appDefinition) &&
-                Objects.equals(status, app.status) &&
                 Objects.equals(isDefaultVersion, app.isDefaultVersion) &&
                 Objects.equals(transport, app.transport) &&
                 Objects.equals(tags, app.tags) &&
                 Objects.equals(thumbnailUrl, app.thumbnailUrl) &&
-                Objects.equals(visibility, app.visibility) &&
                 Objects.equals(visibleRoles, app.visibleRoles) &&
                 Objects.equals(path, app.path) &&
                 Objects.equals(resourceId, app.resourceId) &&
@@ -711,10 +644,10 @@ public class AppDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, isSite, description, context, version, provider, appDefinition, status,
-                            isDefaultVersion, transport, tags, thumbnailUrl, visibility, visibleRoles, path, resourceId,
-                            lifecycle, lifecycleState, appUrL, bundleversion, packagename, category, displayName,
-                            screenshots, banner, createdtime, platform, lifecycleAvailableActions);
+        return Objects.hash(id, name, type, isSite, description, context, version, provider, appDefinition,
+                            isDefaultVersion, transport, tags, thumbnailUrl, visibleRoles, path, resourceId, lifecycle,
+                            lifecycleState, appUrL, bundleversion, packagename, category, displayName, screenshots,
+                            banner, createdtime, platform, lifecycleAvailableActions);
     }
 
     @Override
@@ -731,12 +664,10 @@ public class AppDTO {
         sb.append("    version: ").append(toIndentedString(version)).append("\n");
         sb.append("    provider: ").append(toIndentedString(provider)).append("\n");
         sb.append("    appDefinition: ").append(toIndentedString(appDefinition)).append("\n");
-        sb.append("    status: ").append(toIndentedString(status)).append("\n");
         sb.append("    isDefaultVersion: ").append(toIndentedString(isDefaultVersion)).append("\n");
         sb.append("    transport: ").append(toIndentedString(transport)).append("\n");
         sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
         sb.append("    thumbnailUrl: ").append(toIndentedString(thumbnailUrl)).append("\n");
-        sb.append("    visibility: ").append(toIndentedString(visibility)).append("\n");
         sb.append("    visibleRoles: ").append(toIndentedString(visibleRoles)).append("\n");
         sb.append("    path: ").append(toIndentedString(path)).append("\n");
         sb.append("    resourceId: ").append(toIndentedString(resourceId)).append("\n");
