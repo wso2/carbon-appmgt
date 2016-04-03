@@ -575,7 +575,7 @@
                     "type": "string",
                     "example": "admin"
                 },
-                "status": {
+                "lifecycleState": {
                     "type": "string",
                     "example": "CREATED"
                 }
@@ -632,10 +632,6 @@
                     "type": "string",
                     "example": "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
                 },
-                "status": {
-                    "type": "string",
-                    "example": "CREATED"
-                },
                 "isDefaultVersion": {
                     "type": "boolean",
                     "example": false
@@ -664,16 +660,6 @@
                 "thumbnailUrl": {
                     "type": "string",
                     "example": ""
-                },
-                "visibility": {
-                    "type": "string",
-                    "enum": [
-                        "PUBLIC",
-                        "PRIVATE",
-                        "RESTRICTED",
-                        "CONTROLLED"
-                    ],
-                    "example": "PUBLIC"
                 },
                 "visibleRoles": {
                     "type": "array",

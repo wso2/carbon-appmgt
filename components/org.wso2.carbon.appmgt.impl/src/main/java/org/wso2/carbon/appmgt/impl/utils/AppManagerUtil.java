@@ -186,7 +186,8 @@ public final class AppManagerUtil {
 			api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
 			api.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
 			api.setStatus(getApiStatus(artifact.getLifecycleState().toUpperCase()));
-			api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
+            api.setLifeCycleName(artifact.getLifecycleName());
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
 			api.setWsdlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WSDL));
 			api.setWadlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WADL));
 			api.setTechnicalOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER));
