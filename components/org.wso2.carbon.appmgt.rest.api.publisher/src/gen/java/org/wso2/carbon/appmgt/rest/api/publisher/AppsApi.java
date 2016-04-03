@@ -281,12 +281,12 @@ public class AppsApi {
         return delegate.appsMobileBinariesPost(body, ifMatch, ifUnmodifiedSince, securityContext);
     }
 
+
     @POST
     @Consumes({"application/json"})
     @Produces({"application/json"})
     @io.swagger.annotations.ApiOperation(value = "Create a new App", notes = "Create a new App",
-                                         response = AppDTO.class,
-                                         tags = {"Apps"})
+                                         response = AppDTO.class, tags = {"Apps"})
     @io.swagger.annotations.ApiResponses(value = {
             @io.swagger.annotations.ApiResponse(code = 201,
                                                 message = "Created. \nSuccessful response with the newly created " +
@@ -303,14 +303,14 @@ public class AppsApi {
                                                         " a not supported format.",
                                                 response = AppDTO.class)})
 
-    public Response appsPost(
-            @ApiParam(value = "Media type of the entity in the body. Default is JSON.", required = true,
-                      defaultValue = "JSON") @HeaderParam("Content-Type") String contentType,
-            @ApiParam(
-                    value = "Validator for conditional requests; based on Last Modified header of the \nformerly " +
-                            "retrieved variant of the resource.")
-            @HeaderParam("If-Modified-Since") String ifModifiedSince, @Context SecurityContext securityContext)
-            throws org.wso2.carbon.appmgt.rest.api.publisher.NotFoundException {
-        return delegate.appsPost(contentType, ifModifiedSince, securityContext);
+    public Response appsPost(@ApiParam(value = "App object that needs to be added", required = true) AppDTO body,
+                             @ApiParam(value = "Media type of the entity in the body. Default is JSON.",
+                                       required = true, defaultValue = "JSON") @HeaderParam("Content-Type")
+                             String contentType, @ApiParam(
+            value = "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.")
+                             @HeaderParam("If-Modified-Since") String ifModifiedSince,
+                             @Context SecurityContext securityContext)
+            throws NotFoundException {
+        return delegate.appsPost(body, contentType, ifModifiedSince, securityContext);
     }
 }

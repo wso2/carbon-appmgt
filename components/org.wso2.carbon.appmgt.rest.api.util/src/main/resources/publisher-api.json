@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.2.0",
+        "version": "1.0.0",
         "title": "WSO2 APP Manager - Publisher API",
         "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
@@ -94,6 +94,15 @@
                 "summary": "Create a new App",
                 "description": "Create a new App\n",
                 "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/App"
+                        }
+                    },
                     {
                         "$ref": "#/parameters/Content-Type"
                     },
