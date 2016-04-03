@@ -58,6 +58,7 @@ import org.wso2.carbon.appmgt.impl.template.APITemplateBuilder;
 import org.wso2.carbon.appmgt.impl.template.APITemplateBuilderImpl;
 import org.wso2.carbon.appmgt.impl.utils.APINameComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.common.dataobjects.GovernanceArtifact;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -76,6 +77,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.cache.Cache;
@@ -182,6 +184,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return apiSortedList;
 
     }
+
 
 
     /**
@@ -408,7 +411,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *          if failed to add WebApp
      */
     public void addWebApp(WebApp app) throws AppManagementException {
-        try {           
+        try {
             createAPI(app);
             appMDAO.addWebApp(app);
             if (AppManagerUtil.isAPIManagementEnabled()) {
@@ -416,7 +419,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             	Boolean apiContext = null;
             	if (contextCache.get(app.getContext()) != null) {
             		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
-            	} 
+            	}
             	if (apiContext == null) {
                     contextCache.put(app.getContext(), true);
                 }
@@ -506,14 +509,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                                   String author, boolean isShared,String policyPartialDesc) throws
                                                                                    AppManagementException {
         appMDAO.updateEntitlementPolicyPartial(policyPartialId, policyPartial, author, isShared, policyPartialDesc);
-        
+
         // Regenerate XACML policies of the apps which are using the updated policy partial.
         List<APIIdentifier> associatedApps = getAssociatedApps(policyPartialId);
-        
+
         for(APIIdentifier associatedApp : associatedApps){
         	generateEntitlementPolicies(associatedApp);
         }
-        
+
         return true;
     }
 
@@ -612,7 +615,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         WebApp oldApi = getAPI(api.getId());
         if (oldApi.getStatus().equals(api.getStatus())) {
             try {
-               
+
                 //boolean updatePermissions = false;
                 /*if(!oldApi.getVisibility().equals(api.getVisibility()) || (oldApi.getVisibility().equals(AppMConstants.API_RESTRICTED_VISIBILITY) && !api.getVisibleRoles().equals(oldApi.getVisibleRoles()))){
                     updatePermissions = true;
@@ -740,10 +743,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     registry.applyTag(artifactPath, tag);
                 }
             }
-          
+
 
             if (updateMetadata) {
-            	
+
                 if (api.getWsdlUrl() != null && !"".equals(api.getWsdlUrl())) {
                     String path = AppManagerUtil.createWSDL(registry, api);
                     if (path != null) {
@@ -759,9 +762,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     }
                 }
             }
-            
+
             artifactManager.updateGenericArtifact(updateApiArtifact);
-            
+
             //write WebApp Status to a separate property. This is done to support querying APIs using custom query (SQL)
             //to gain performance
             String apiStatus = api.getStatus().getStatus();
@@ -784,10 +787,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                  api.getId().getApiName(), re);
              }
              handleException("Error while performing registry transaction operation", e);
-           
+
         }
     }
-    
+
     /**
      * Create WebApp Definition in JSON and save in the registry
      *
@@ -796,37 +799,37 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *          if failed to generate the content and save
      */
     private void createUpdateAPIDefinition(WebApp api) throws AppManagementException {
-    	APIIdentifier identifier = api.getId(); 
-    	
+    	APIIdentifier identifier = api.getId();
+
     	try{
     		String jsonText = AppManagerUtil.createSwaggerJSONContent(api);
-    		
+
     		String resourcePath = AppManagerUtil.getAPIDefinitionFilePath(identifier.getApiName(), identifier.getVersion());
-    		
+
     		Resource resource = registry.newResource();
-    		    		
+
     		resource.setContent(jsonText);
     		resource.setMediaType("application/json");
     		registry.put(resourcePath, resource);
-    		
+
     		/*Set permissions to anonymous role */
     		AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), null, null, resourcePath);
-    			    
+
     	} catch (RegistryException e) {
     		handleException("Error while adding WebApp Definition for " + identifier.getApiName() + "-" + identifier.getVersion(), e);
 		} catch (AppManagementException e) {
 			handleException("Error while adding WebApp Definition for " + identifier.getApiName() + "-" + identifier.getVersion(), e);
 		}
     }
-    
-    
+
+
     @Override
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException {
         APIStatus currentStatus = api.getStatus();
         if (!currentStatus.equals(status)) {
             api.setStatus(status);
-            try {                
+            try {
             	//                updateApiArtifact(api, false,false);
             	//                appMDAO.recordAPILifeCycleEvent(api.getId(), currentStatus, status, userId);
 
@@ -970,7 +973,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String tenantDomain = null;
 			if (api.getId().getProviderName().contains("AT")) {
 				String provider = api.getId().getProviderName().replace("-AT-", "@");
-				tenantDomain = MultitenantUtils.getTenantDomain( provider);			
+				tenantDomain = MultitenantUtils.getTenantDomain( provider);
 			}
             APIGatewayManager gatewayManager = APIGatewayManager.getInstance();
             return gatewayManager.isAPIPublished(api, tenantDomain);
@@ -1224,16 +1227,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws org.wso2.carbon.apimgt.api.APIManagementException
      *          if failed to add the document as a resource to registry
      */
-    public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text) 
+    public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text)
     					throws AppManagementException {
     	String contentPath = AppManagerUtil.getAPIDefinitionFilePath(identifier.getApiName(), identifier.getVersion());
-    	
+
     	try {
             Resource docContent = registry.newResource();
             docContent.setContent(text);
             docContent.setMediaType("text/plain");
             registry.put(contentPath, docContent);
-            
+
             String apiPath = AppManagerUtil.getAPIPath(identifier);
             WebApp api = getAPI(apiPath);
             String visibleRolesList = api.getVisibleRoles();
@@ -1246,7 +1249,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String msg = "Failed to add the WebApp Definition content of : "
                          + documentationName + " of WebApp :" + identifier.getApiName();
             handleException(msg, e);
-        } 
+        }
     }
 
     /**
@@ -1282,7 +1285,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             }
 
             AppManagerUtil.setResourcePermissions(api.getId().getProviderName(), api.getVisibility(),visibleRoles,artifact.getPath());
-            
+
             String docFilePath = artifact.getAttribute(AppMConstants.DOC_FILE_PATH);
             if(docFilePath != null && !docFilePath.equals("")) {
                 //The docFilePatch comes as /t/tenanatdoman/registry/resource/_system/governance/apimgt/applicationdata..
@@ -1295,7 +1298,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
         } catch (RegistryException e) {
             handleException("Failed to update documentation", e);
-        } 
+        }
 
     }
 
@@ -1356,7 +1359,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 for (String tag : tagSet) {
                     registry.applyTag(artifactPath, tag);
                 }
-            }           
+            }
             if (api.getWsdlUrl() != null && !"".equals(api.getWsdlUrl())) {
                 String path = AppManagerUtil.createWSDL(registry, api);
                 if (path != null) {
@@ -1396,7 +1399,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
              }
              handleException("Error while performing registry transaction operation", e);
         }
-        
+
     }
 
     /**
@@ -1450,7 +1453,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             String[] authorizedRoles=getAuthorizedRoles(apiPath);
             AppManagerUtil.setResourcePermissions(getAPI(apiPath).getId().getProviderName(),
             		getAPI(apiPath).getVisibility(), authorizedRoles, artifact.getPath());
-            
+
             String docFilePath = artifact.getAttribute(AppMConstants.DOC_FILE_PATH);
             if(docFilePath != null && !docFilePath.equals("")){
                 //The docFilePatch comes as /t/tenanatdoman/registry/resource/_system/governance/apimgt/applicationdata..
@@ -1644,7 +1647,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                                                                             AppManagementException {
         List<WebApp> apiSortedList = new ArrayList<WebApp>();
         String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
-		      
+
         Pattern pattern;
         Matcher matcher;
         try {
@@ -1676,8 +1679,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     String apiName = api.getId().getApiName();
                     matcher = pattern.matcher(apiName);
                 }
-                
-                if (matcher.find()) {                 	
+
+                if (matcher.find()) {
                     apiSortedList.add(api);
                 }
 
@@ -1688,6 +1691,129 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Collections.sort(apiSortedList, new APINameComparator());
         return apiSortedList;
     }
+
+    /**
+     * Get a list of APIs published by the given provider. If a given WebApp has multiple APIs, only the latest version
+     * will be included in this list.
+     *
+     * @param providerId , provider id
+     * @param appType    Asset Type(either webapp/mobileapp)
+     * @return set of WebApp
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get set of WebApp
+     */
+    public List<WebApp> getAPIsByProvider(String providerId, String appType) throws AppManagementException {
+
+        List<WebApp> apiSortedList = new ArrayList<WebApp>();
+
+        try {
+            providerId = AppManagerUtil.replaceEmailDomain(providerId);
+            String providerPath = AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                    providerId;
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            Association[] associations = registry.getAssociations(providerPath,
+                                                                  AppMConstants.PROVIDER_ASSOCIATION);
+            for (Association association : associations) {
+                String apiPath = association.getDestinationPath();
+                Resource resource = registry.get(apiPath);
+                String apiArtifactId = resource.getUUID();
+                if (apiArtifactId != null) {
+                    GenericArtifact apiArtifact = artifactManager.getGenericArtifact(apiArtifactId);
+                    apiSortedList.add(AppManagerUtil.getAPI(apiArtifact, registry));
+                } else {
+                    throw new GovernanceException("artifact id is null of " + apiPath);
+                }
+            }
+
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs for provider : " + providerId, e);
+        }
+        Collections.sort(apiSortedList, new APINameComparator());
+
+        return apiSortedList;
+
+    }
+
+
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId)
+            throws AppManagementException {
+        List<WebApp> apiSortedList = new ArrayList<WebApp>();
+        String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
+
+        Pattern pattern;
+        Matcher matcher;
+
+        String appType = null;
+        //Select asset type
+        if (searchType.equalsIgnoreCase("Type")) {
+            if (searchTerm.equals(AppMConstants.APP_TYPE)) {
+                appType = AppMConstants.APP_TYPE;
+            } else if (searchTerm.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
+                appType = AppMConstants.MOBILE_ASSET_TYPE;
+            }
+        }
+
+        try {
+            List<WebApp> apiList;
+            if (providerId != null) {
+                if (appType == null) {
+                    //adding web apps
+                    apiList = getAPIsByProvider(providerId, AppMConstants.APP_TYPE);
+                    //adding mobile apps
+                    apiList.addAll(getAPIsByProvider(providerId, AppMConstants.MOBILE_ASSET_TYPE));
+                } else {
+                    apiList = getAPIsByProvider(providerId, appType);
+                }
+            } else {
+                if (appType == null) {
+                    //adding web apps
+                    apiList = getAllAPIs(AppMConstants.APP_TYPE);
+                    //adding mobile apps
+                    apiList.addAll(getAllAPIs(AppMConstants.MOBILE_ASSET_TYPE));
+                } else {
+                    apiList = getAllAPIs(appType);
+                }
+            }
+            if (apiList == null || apiList.size() == 0) {
+                return apiSortedList;
+            }
+            pattern = Pattern.compile(regex);
+            for (WebApp api : apiList) {
+
+                if (searchType.equalsIgnoreCase("Type")) {
+                    apiSortedList.add(api);
+                } else {
+                    if (searchType.equalsIgnoreCase("Name")) {
+                        String api1 = api.getId().getApiName();
+                        matcher = pattern.matcher(api1);
+                    } else if (searchType.equalsIgnoreCase("Provider")) {
+                        String api1 = api.getId().getProviderName();
+                        matcher = pattern.matcher(api1);
+                    } else if (searchType.equalsIgnoreCase("Version")) {
+                        String api1 = api.getId().getVersion();
+                        matcher = pattern.matcher(api1);
+                    } else if (searchType.equalsIgnoreCase("Context")) {
+                        String api1 = api.getContext();
+                        matcher = pattern.matcher(api1);
+                    } else if (searchType.equalsIgnoreCase("id")) {
+                        String api1 = api.getUUID();
+                        matcher = pattern.matcher(api1);
+                    } else {
+                        String apiName = api.getId().getApiName();
+                        matcher = pattern.matcher(apiName);
+                    }
+
+                    if (matcher.find()) {
+                        apiSortedList.add(api);
+                    }
+                }
+            }
+        } catch (AppManagementException e) {
+            handleException("Failed to search APIs with type", e);
+        }
+        Collections.sort(apiSortedList, new APINameComparator());
+        return apiSortedList;
+    }
+
 
     /**
      * Update the Tier Permissions
@@ -1730,7 +1856,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 	                for (int i = 0; i < inSeqChildPaths.length; i++) {
 		                Resource inSequence = registry.get(inSeqChildPaths[i]);
 		                OMElement seqElment = AppManagerUtil.buildOMElement(inSequence.getContentStream());
-		                sequenceList.add(seqElment.getAttributeValue(new QName("name")));		               
+		                sequenceList.add(seqElment.getAttributeValue(new QName("name")));
 	                }
                 }
             }
@@ -1761,8 +1887,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 	                for (int i = 0; i < outSeqChildPaths.length; i++) {
 		                Resource outSequence = registry.get(outSeqChildPaths[i]);
 		                OMElement seqElment = AppManagerUtil.buildOMElement(outSequence.getContentStream());
-		         
-		                sequenceList.add(seqElment.getAttributeValue(new QName("name")));		               
+
+		                sequenceList.add(seqElment.getAttributeValue(new QName("name")));
 	                }
                 }
             }

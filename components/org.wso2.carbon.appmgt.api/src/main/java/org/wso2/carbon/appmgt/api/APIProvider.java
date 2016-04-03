@@ -380,6 +380,18 @@ public interface APIProvider extends APIManager {
      */
     public List<WebApp> searchAPIs(String searchTerm, String searchType, String providerId) throws
                                                                                             AppManagementException;
+
+    /**
+     * Search WebApp and Mobileapps. If type is not mentioned, it will search in all tpyes
+     *
+     * @param searchTerm  Search Term
+     * @param searchType  Search Type
+     * @return   Set of APIs
+     * @throws AppManagementException
+     */
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId) throws
+                                                                                            AppManagementException;
+
     /**
      * Update the subscription status
      *

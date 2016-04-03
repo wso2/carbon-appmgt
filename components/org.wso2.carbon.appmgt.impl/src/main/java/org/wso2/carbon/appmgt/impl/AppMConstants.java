@@ -298,7 +298,8 @@ public final class AppMConstants {
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
     }
-    
+
+    public static final String API_NAME = "Name";
     public static final String API_GATEWAY = "APIGateway.";
     public static final String API_GATEWAY_SERVER_URL = "ServerURL";
     public static final String API_GATEWAY_USERNAME = "Username";
