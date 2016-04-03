@@ -122,6 +122,8 @@ public class WebApp {
 
     private String lifeCycleName;
 
+    private APIStatus lifeCycleStatus;
+
     public WebApp() {
     }
 
@@ -712,5 +714,13 @@ public class WebApp {
 
     public String getLifeCycleName() {
         return lifeCycleName;
+    }
+
+    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
+        this.lifeCycleStatus = lifeCycleStatus;
+    }
+
+    public APIStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
     }
 }

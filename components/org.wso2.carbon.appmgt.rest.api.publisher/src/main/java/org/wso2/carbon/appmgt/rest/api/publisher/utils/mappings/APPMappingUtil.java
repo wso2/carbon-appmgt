@@ -90,7 +90,7 @@ public class APPMappingUtil {
         apiInfoDTO.setVersion(apiId.getVersion());
         String providerName = api.getId().getProviderName();
         apiInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-        apiInfoDTO.setLifecycleState(api.getStatus().toString());
+        apiInfoDTO.setLifecycleState(api.getLifeCycleStatus().getStatus());
         return apiInfoDTO;
     }
 
@@ -186,7 +186,7 @@ public class APPMappingUtil {
 
         dto.setIsDefaultVersion(model.isDefaultVersion());
         dto.setThumbnailUrl(model.getThumbnailUrl());
-        dto.setLifecycleState(model.getStatus().getStatus());
+        dto.setLifecycleState(model.getLifeCycleStatus().getStatus());
 
         Set<String> apiTags = model.getTags();
         List<String> tagsToReturn = new ArrayList<>();
