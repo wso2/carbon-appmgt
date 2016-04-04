@@ -386,10 +386,11 @@ public interface APIProvider extends APIManager {
      *
      * @param searchTerm  Search Term
      * @param searchType  Search Type
+     * @param appType
      * @return   Set of APIs
      * @throws AppManagementException
      */
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId) throws
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId, String appType) throws
                                                                                             AppManagementException;
 
     /**
@@ -399,7 +400,7 @@ public interface APIProvider extends APIManager {
      * @param subStatus Subscription Status
      * @param appId Application Id              *
      * @return int value with subscription id
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
      *          If failed to update subscription status
      */
     public void updateSubscription(APIIdentifier apiId, String subStatus, int appId) throws

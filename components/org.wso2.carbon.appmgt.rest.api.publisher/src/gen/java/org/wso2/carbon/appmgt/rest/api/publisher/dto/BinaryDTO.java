@@ -1,14 +1,15 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Objects;
 
 
 
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
+
+
 public class BinaryDTO {
   
   private String binaryId = null;
@@ -60,9 +61,9 @@ public class BinaryDTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BinaryDTO binaryDTO = (BinaryDTO) o;
-    return Objects.equals(binaryId, binaryDTO.binaryId) &&
-        Objects.equals(name, binaryDTO.name);
+    BinaryDTO binary = (BinaryDTO) o;
+    return Objects.equals(binaryId, binary.binaryId) &&
+        Objects.equals(name, binary.name);
   }
 
   @Override

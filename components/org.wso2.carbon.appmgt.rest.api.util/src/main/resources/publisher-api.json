@@ -26,11 +26,14 @@
         "application/json"
     ],
     "paths": {
-        "/apps": {
+        "/apps/{appType}": {
             "get": {
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "name": "query",
                         "in": "query",
@@ -95,6 +98,9 @@
                 "description": "Create a new App\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
                         "in": "body",
                         "name": "body",
                         "description": "App object that needs to be added\n",
@@ -149,11 +155,14 @@
                 }
             }
         },
-        "/apps/{appId}": {
+        "/apps/{appType}/id/{appId}": {
             "get": {
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "$ref": "#/parameters/appId"
                     },
@@ -211,6 +220,9 @@
                 "summary": "Update an existing App",
                 "description": "Update an existing App\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "$ref": "#/parameters/appId"
                     },
@@ -292,6 +304,9 @@
                 "description": "Delete an existing App\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
                         "$ref": "#/parameters/appId"
                     },
                     {
@@ -329,11 +344,14 @@
                 }
             }
         },
-        "/apps/change-lifecycle": {
+        "/apps/{appType}/change-lifecycle": {
             "post": {
                 "summary": "Change App Status",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "name": "action",
                         "description": "The action to demote or promote the state of the App.\n\nSupported actions are [ **Initial,Created,In-Review,Approved,Rejected,Published,Unpublished,Deprecated,Retire **]\n",
@@ -468,6 +486,13 @@
             "required": true,
             "type": "string"
         },
+        "appType": {
+            "name": "appType",
+            "in": "path",
+            "description": "App Type. Either webapp or mobileapp\n",
+            "required": true,
+            "type": "string"
+        },
         "appId-Q": {
             "name": "appId",
             "in": "query",
@@ -530,7 +555,7 @@
         }
     },
     "definitions": {
-        "AppList": {
+        "AppListDTO": {
             "title": "App List",
             "properties": {
                 "count": {
@@ -556,7 +581,7 @@
                 }
             }
         },
-        "AppInfo": {
+        "AppInfoDTO": {
             "title": "App Info object with basic App details.",
             "properties": {
                 "id": {
@@ -590,7 +615,7 @@
                 }
             }
         },
-        "App": {
+        "AppDTO": {
             "title": "App object",
             "required": [
                 "name",
@@ -754,7 +779,7 @@
                 }
             }
         },
-        "binary": {
+        "BinaryDTO": {
             "title": "upload binary",
             "required": [
                 "name"
@@ -770,7 +795,7 @@
                 }
             }
         },
-        "Error": {
+        "ErrorDTO": {
             "title": "Error object returned with 4XX HTTP status",
             "required": [
                 "code",
@@ -802,7 +827,7 @@
                 }
             }
         },
-        "ErrorListItem": {
+        "ErrorListItemDTO": {
             "title": "Description of individual errors that may have occurred during a request.",
             "required": [
                 "code",

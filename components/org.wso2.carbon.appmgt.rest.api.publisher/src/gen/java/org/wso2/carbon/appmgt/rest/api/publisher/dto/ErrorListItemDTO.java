@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
+
 public class ErrorListItemDTO {
   
   private String code = null;
@@ -34,7 +34,7 @@ public class ErrorListItemDTO {
 
   
   /**
-   * Description about individual errors occurred
+   * Description about individual errors occurred\n
    **/
   public ErrorListItemDTO message(String message) {
     this.message = message;
@@ -42,7 +42,7 @@ public class ErrorListItemDTO {
   }
 
   
-  @ApiModelProperty(required = true, value = "Description about individual errors occurred")
+  @ApiModelProperty(required = true, value = "Description about individual errors occurred\n")
   @JsonProperty("message")
   public String getMessage() {
     return message;
@@ -61,9 +61,9 @@ public class ErrorListItemDTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ErrorListItemDTO errorListItemDTO = (ErrorListItemDTO) o;
-    return Objects.equals(code, errorListItemDTO.code) &&
-        Objects.equals(message, errorListItemDTO.message);
+    ErrorListItemDTO errorListItem = (ErrorListItemDTO) o;
+    return Objects.equals(code, errorListItem.code) &&
+        Objects.equals(message, errorListItem.message);
   }
 
   @Override
