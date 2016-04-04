@@ -29,7 +29,7 @@ import org.wso2.carbon.appmgt.mdm.restconnector.ApplicationOperationsImpl;
 import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 
 /**
- * @scr.component name="org.wso2.carbon.appmgt.mdm.restconnector.WSO2MDMComponent" immediate="true"
+ * @scr.component name="org.wso2.carbon.appmgt.mdm.restconnector" immediate="true"
  */
 
 public class MDMComponent {
@@ -41,7 +41,9 @@ public class MDMComponent {
     protected void activate(ComponentContext context) {
         BundleContext bundleContext = context.getBundleContext();
         mdmServiceRegistration = bundleContext.registerService(ApplicationOperations.class.getName(), new ApplicationOperationsImpl(), null);
-        log.debug("WSO2MDM MDM Component activated");
+        if (log.isDebugEnabled()) {
+            log.debug("WSO2MDM MDM Component activated");
+        }
     }
 
     protected void deactivate(ComponentContext context) {
@@ -49,7 +51,9 @@ public class MDMComponent {
             mdmServiceRegistration.unregister();
             mdmServiceRegistration = null;
         }
-        log.debug("WSO2MDM MDM Component deactivated");
+        if (log.isDebugEnabled()) {
+            log.debug("WSO2MDM MDM Component deactivated");
+        }
     }
 }
 
