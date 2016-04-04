@@ -1,6 +1,5 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,8 +26,71 @@ public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiService.class);
 
     @Override
-    public Response appsAppIdDelete(String appId, String ifMatch, String ifUnmodifiedSince,
-                                    SecurityContext securityContext)
+    public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
+                                                   String ifUnmodifiedSince, SecurityContext securityContext)
+            throws NotFoundException {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    }
+
+    @Override
+    public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
+                                   String ifNoneMatch, SecurityContext securityContext)
+            throws NotFoundException {
+        List<WebApp> allMatchedApis;
+        AppListDTO appListDTO;
+
+        //pre-processing
+        //setting default limit and offset values if they are not set
+        limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
+        offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
+        query = query == null ? "" : query;
+        try {
+            //handle type
+            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
+                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
+                return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+            }
+
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+
+            //if query parameter is not specified, This will search by name
+            String searchType = AppMConstants.API_NAME;
+            String searchContent = "";
+            if (!StringUtils.isBlank(query)) {
+                String[] querySplit = query.split(":");
+                if (querySplit.length == 2 && StringUtils.isNotBlank(querySplit[0]) && StringUtils
+                        .isNotBlank(querySplit[1])) {
+                    searchType = querySplit[0];
+                    searchContent = querySplit[1];
+                } else if (querySplit.length == 1) {
+                    searchContent = query;
+                } else {
+                    RestApiUtil.handleBadRequest("Provided query parameter '" + query + "' is invalid", log);
+                }
+            }
+
+            //We should send null as the provider, Otherwise searchAPIs will return all APIs of the provider
+            // instead of looking at type and query
+            allMatchedApis = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
+            if (allMatchedApis.isEmpty()) {
+                String errorMessage = "No result found.";
+                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            }
+            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApis, offset, limit);
+            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApis.size());
+            return Response.ok().entity(appListDTO).build();
+        } catch (AppManagementException e) {
+            String errorMessage = "Error while retrieving APIs";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince,
+                                             SecurityContext securityContext)
             throws NotFoundException {
         try {
             String username = RestApiUtil.getLoggedInUsername();
@@ -56,16 +118,18 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppIdGet(String appId, String accept, String ifNoneMatch, String ifModifiedSince,
-                                 SecurityContext securityContext)
+    public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
+                                          String ifModifiedSince, SecurityContext securityContext)
             throws NotFoundException {
+
         AppDTO apiToReturn;
         try {
             //WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";
-            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null);
+            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
+                                                                                 appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
@@ -87,91 +151,24 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppIdPut(String appId, AppDTO body, String contentType, String ifMatch,
-                                 String ifUnmodifiedSince, SecurityContext securityContext)
+    public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
+                                          String ifUnmodifiedSince, SecurityContext securityContext)
             throws NotFoundException {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
 
     @Override
-    public Response appsChangeLifecyclePost(String action, String appId, String ifMatch, String ifUnmodifiedSince,
-                                            SecurityContext securityContext)
+    public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince,
+                                    SecurityContext securityContext)
             throws NotFoundException {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
-
-    @Override
-    public Response appsGet(String query, Integer limit, Integer offset, String accept, String ifNoneMatch,
-                            SecurityContext securityContext)
-            throws NotFoundException {
-        // do some magic!
-        // return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-
-        List<WebApp> allMatchedApis;
-        AppListDTO appListDTO;
-
-        //pre-processing
-        //setting default limit and offset values if they are not set
-        limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
-        offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
-        query = query == null ? "" : query;
-        try {
-            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-
-            //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.API_NAME;
-            String searchContent = "";
-            if (!StringUtils.isBlank(query)) {
-                String[] querySplit = query.split(":");
-                if (querySplit.length == 2 && StringUtils.isNotBlank(querySplit[0]) && StringUtils
-                        .isNotBlank(querySplit[1])) {
-                    searchType = querySplit[0];
-                    searchContent = querySplit[1];
-
-                    //handle type
-                    if (searchType.equalsIgnoreCase("type")) {
-                        if (!searchContent.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
-                                !searchContent.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
-                            String errorMessage = "Invalid Asset Type : " + searchContent;
-                            return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
-                        }
-                    }
-                } else if (querySplit.length == 1) {
-                    searchContent = query;
-                } else {
-                    RestApiUtil.handleBadRequest("Provided query parameter '" + query + "' is invalid", log);
-                }
-            }
-
-            //We should send null as the provider, Otherwise searchAPIs will return all APIs of the provider
-            // instead of looking at type and query
-            allMatchedApis = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null);
-            if (allMatchedApis.isEmpty()) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
-            }
-            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApis, offset, limit);
-            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApis.size());
-            return Response.ok().entity(appListDTO).build();
-        } catch (AppManagementException e) {
-            String errorMessage = "Error while retrieving APIs";
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
-        }
-        return null;
     }
 
     @Override
     public Response appsMobileBinariesPost(byte[] body, String ifMatch, String ifUnmodifiedSince,
                                            SecurityContext securityContext)
-            throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
-
-    @Override
-    public Response appsPost(AppDTO body, String contentType, String ifModifiedSince, SecurityContext securityContext)
             throws NotFoundException {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();

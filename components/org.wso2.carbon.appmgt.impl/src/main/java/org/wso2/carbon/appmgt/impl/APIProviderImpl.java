@@ -1734,7 +1734,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId)
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId,String appType)
             throws AppManagementException {
         List<WebApp> apiSortedList = new ArrayList<WebApp>();
         String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
@@ -1742,36 +1742,19 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Pattern pattern;
         Matcher matcher;
 
-        String appType = null;
         //Select asset type
-        if (searchType.equalsIgnoreCase("Type")) {
-            if (searchTerm.equals(AppMConstants.APP_TYPE)) {
-                appType = AppMConstants.APP_TYPE;
-            } else if (searchTerm.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
-                appType = AppMConstants.MOBILE_ASSET_TYPE;
-            }
-        }
 
+        if (searchTerm.equals(AppMConstants.APP_TYPE)) {
+            appType = AppMConstants.APP_TYPE;
+        } else if (searchTerm.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
+            appType = AppMConstants.MOBILE_ASSET_TYPE;
+        }
         try {
             List<WebApp> apiList;
             if (providerId != null) {
-                if (appType == null) {
-                    //adding web apps
-                    apiList = getAPIsByProvider(providerId, AppMConstants.APP_TYPE);
-                    //adding mobile apps
-                    apiList.addAll(getAPIsByProvider(providerId, AppMConstants.MOBILE_ASSET_TYPE));
-                } else {
-                    apiList = getAPIsByProvider(providerId, appType);
-                }
+                apiList = getAPIsByProvider(providerId, appType);
             } else {
-                if (appType == null) {
-                    //adding web apps
-                    apiList = getAllAPIs(AppMConstants.APP_TYPE);
-                    //adding mobile apps
-                    apiList.addAll(getAllAPIs(AppMConstants.MOBILE_ASSET_TYPE));
-                } else {
-                    apiList = getAllAPIs(appType);
-                }
+                apiList = getAllAPIs(appType);
             }
             if (apiList == null || apiList.size() == 0) {
                 return apiSortedList;
@@ -1779,32 +1762,28 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             pattern = Pattern.compile(regex);
             for (WebApp api : apiList) {
 
-                if (searchType.equalsIgnoreCase("Type")) {
-                    apiSortedList.add(api);
+                if (searchType.equalsIgnoreCase("Name")) {
+                    String api1 = api.getId().getApiName();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Provider")) {
+                    String api1 = api.getId().getProviderName();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Version")) {
+                    String api1 = api.getId().getVersion();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Context")) {
+                    String api1 = api.getContext();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("id")) {
+                    String api1 = api.getUUID();
+                    matcher = pattern.matcher(api1);
                 } else {
-                    if (searchType.equalsIgnoreCase("Name")) {
-                        String api1 = api.getId().getApiName();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Provider")) {
-                        String api1 = api.getId().getProviderName();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Version")) {
-                        String api1 = api.getId().getVersion();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Context")) {
-                        String api1 = api.getContext();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("id")) {
-                        String api1 = api.getUUID();
-                        matcher = pattern.matcher(api1);
-                    } else {
-                        String apiName = api.getId().getApiName();
-                        matcher = pattern.matcher(apiName);
-                    }
+                    String apiName = api.getId().getApiName();
+                    matcher = pattern.matcher(apiName);
+                }
 
-                    if (matcher.find()) {
-                        apiSortedList.add(api);
-                    }
+                if (matcher.find()) {
+                    apiSortedList.add(api);
                 }
             }
         } catch (AppManagementException e) {

@@ -1,27 +1,27 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 
 
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
+
 public class AppListDTO {
   
   private Integer count = null;
   private String next = null;
   private String previous = null;
-  private List<AppInfoDTO> list = new ArrayList<>();
+  private List<AppInfoDTO> list = new ArrayList<AppInfoDTO>();
 
   
   /**
-   * Number of App returned.
+   * Number of App returned.\n
    **/
   public AppListDTO count(Integer count) {
     this.count = count;
@@ -29,7 +29,7 @@ public class AppListDTO {
   }
 
   
-  @ApiModelProperty(example = "1", value = "Number of App returned.")
+  @ApiModelProperty(example = "1", value = "Number of App returned.\n")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -40,7 +40,7 @@ public class AppListDTO {
 
   
   /**
-   * Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.
+   * Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n
    **/
   public AppListDTO next(String next) {
     this.next = next;
@@ -48,7 +48,7 @@ public class AppListDTO {
   }
 
   
-  @ApiModelProperty(example = "/app?limit=1&amp;offset=2&amp;query=", value = "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.")
+  @ApiModelProperty(example = "/app?limit=1&amp;offset=2&amp;query=", value = "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n")
   @JsonProperty("next")
   public String getNext() {
     return next;
@@ -59,7 +59,7 @@ public class AppListDTO {
 
   
   /**
-   * Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.
+   * Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n
    **/
   public AppListDTO previous(String previous) {
     this.previous = previous;
@@ -67,7 +67,7 @@ public class AppListDTO {
   }
 
   
-  @ApiModelProperty(example = "/app?limit=1&amp;offset=0&amp;query=", value = "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.")
+  @ApiModelProperty(example = "/app?limit=1&amp;offset=0&amp;query=", value = "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n")
   @JsonProperty("previous")
   public String getPrevious() {
     return previous;
@@ -104,11 +104,11 @@ public class AppListDTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AppListDTO appListDTO = (AppListDTO) o;
-    return Objects.equals(count, appListDTO.count) &&
-        Objects.equals(next, appListDTO.next) &&
-        Objects.equals(previous, appListDTO.previous) &&
-        Objects.equals(list, appListDTO.list);
+    AppListDTO appList = (AppListDTO) o;
+    return Objects.equals(count, appList.count) &&
+        Objects.equals(next, appList.next) &&
+        Objects.equals(previous, appList.previous) &&
+        Objects.equals(list, appList.list);
   }
 
   @Override

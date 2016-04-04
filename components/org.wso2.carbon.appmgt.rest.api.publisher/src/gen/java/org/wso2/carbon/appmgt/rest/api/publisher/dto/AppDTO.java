@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 public class AppDTO {
 
     private String id = null;
@@ -40,7 +41,7 @@ public class AppDTO {
 
 
     /**
-     * UUID of the app registry artifact
+     * UUID of the app registry artifact\n
      */
     public AppDTO id(String id) {
         this.id = id;
@@ -48,7 +49,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "01234567-0123-0123-0123-012345678901", value = "UUID of the app registry artifact")
+    @ApiModelProperty(example = "01234567-0123-0123-0123-012345678901", value = "UUID of the app registry artifact\n")
     @JsonProperty("id")
     public String getId() {
         return id;
@@ -176,7 +177,7 @@ public class AppDTO {
 
 
     /**
-     * If the provider value is not given user invoking the api will be used as the provider.
+     * If the provider value is not given user invoking the api will be used as the provider.\n
      */
     public AppDTO provider(String provider) {
         this.provider = provider;
@@ -185,7 +186,8 @@ public class AppDTO {
 
 
     @ApiModelProperty(example = "admin",
-                      value = "If the provider value is not given user invoking the api will be used as the provider.")
+                      value = "If the provider value is not given user invoking the api will be used as the provider" +
+                              ".\n")
     @JsonProperty("provider")
     public String getProvider() {
         return provider;
@@ -197,7 +199,7 @@ public class AppDTO {
 
 
     /**
-     * Swagger definition of the App which contains details about URI templates and scopes
+     * Swagger definition of the App which contains details about URI templates and scopes\n
      */
     public AppDTO appDefinition(String appDefinition) {
         this.appDefinition = appDefinition;
@@ -206,7 +208,7 @@ public class AppDTO {
 
 
     @ApiModelProperty(required = true,
-                      value = "Swagger definition of the App which contains details about URI templates and scopes")
+                      value = "Swagger definition of the App which contains details about URI templates and scopes\n")
     @JsonProperty("appDefinition")
     public String getAppDefinition() {
         return appDefinition;
@@ -237,7 +239,7 @@ public class AppDTO {
 
 
     /**
-     * Supported transports for the App (http and/or https).
+     * Supported transports for the App (http and/or https).\n
      */
     public AppDTO transport(List<String> transport) {
         this.transport = transport;
@@ -245,7 +247,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(required = true, value = "Supported transports for the App (http and/or https).")
+    @ApiModelProperty(required = true, value = "Supported transports for the App (http and/or https).\n")
     @JsonProperty("transport")
     public List<String> getTransport() {
         return transport;
@@ -314,7 +316,7 @@ public class AppDTO {
 
 
     /**
-     * Registry path of the asset
+     * Registry path of the asset\n
      */
     public AppDTO path(String path) {
         this.path = path;
@@ -323,7 +325,7 @@ public class AppDTO {
 
 
     @ApiModelProperty(example = "/_system/governance/mobileapps/admin/android/test/1.0",
-                      value = "Registry path of the asset")
+                      value = "Registry path of the asset\n")
     @JsonProperty("path")
     public String getPath() {
         return path;
@@ -335,7 +337,7 @@ public class AppDTO {
 
 
     /**
-     * Resource Id path of the asset
+     * Resource Id path of the asset\n
      */
     public AppDTO resourceId(String resourceId) {
         this.resourceId = resourceId;
@@ -344,7 +346,7 @@ public class AppDTO {
 
 
     @ApiModelProperty(example = "/_system/governance/mobileapps/admin/android/test/1.0",
-                      value = "Resource Id path of the asset")
+                      value = "Resource Id path of the asset\n")
     @JsonProperty("resourceId")
     public String getResourceId() {
         return resourceId;
@@ -356,7 +358,7 @@ public class AppDTO {
 
 
     /**
-     * lifecycle type of the asset
+     * lifecycle type of the asset\n
      */
     public AppDTO lifecycle(String lifecycle) {
         this.lifecycle = lifecycle;
@@ -364,7 +366,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "MobileAppLifeCycle", value = "lifecycle type of the asset")
+    @ApiModelProperty(example = "MobileAppLifeCycle", value = "lifecycle type of the asset\n")
     @JsonProperty("lifecycle")
     public String getLifecycle() {
         return lifecycle;
@@ -376,7 +378,7 @@ public class AppDTO {
 
 
     /**
-     * lifecycle state of the asset
+     * lifecycle state of the asset\n
      */
     public AppDTO lifecycleState(String lifecycleState) {
         this.lifecycleState = lifecycleState;
@@ -384,7 +386,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "Created", value = "lifecycle state of the asset")
+    @ApiModelProperty(example = "Created", value = "lifecycle state of the asset\n")
     @JsonProperty("lifecycleState")
     public String getLifecycleState() {
         return lifecycleState;
@@ -396,7 +398,7 @@ public class AppDTO {
 
 
     /**
-     * URL of the asset
+     * URL of the asset\n
      */
     public AppDTO appUrL(String appUrL) {
         this.appUrL = appUrL;
@@ -404,7 +406,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "/publisher/api/mobileapp/getfile/WKzeMgMhOrGvwTy.apk", value = "URL of the asset")
+    @ApiModelProperty(example = "/publisher/api/mobileapp/getfile/WKzeMgMhOrGvwTy.apk", value = "URL of the asset\n")
     @JsonProperty("appUrL")
     public String getAppUrL() {
         return appUrL;
@@ -416,7 +418,7 @@ public class AppDTO {
 
 
     /**
-     * Bundleversion of the asset
+     * Bundleversion of the asset\n
      */
     public AppDTO bundleversion(String bundleversion) {
         this.bundleversion = bundleversion;
@@ -424,7 +426,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "1.0", value = "Bundleversion of the asset")
+    @ApiModelProperty(example = "1.0", value = "Bundleversion of the asset\n")
     @JsonProperty("bundleversion")
     public String getBundleversion() {
         return bundleversion;
@@ -436,7 +438,7 @@ public class AppDTO {
 
 
     /**
-     * packagename of the asset
+     * packagename of the asset\n
      */
     public AppDTO packagename(String packagename) {
         this.packagename = packagename;
@@ -444,7 +446,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "home.jmstudios.calc", value = "packagename of the asset")
+    @ApiModelProperty(example = "home.jmstudios.calc", value = "packagename of the asset\n")
     @JsonProperty("packagename")
     public String getPackagename() {
         return packagename;
@@ -456,7 +458,7 @@ public class AppDTO {
 
 
     /**
-     * category of the asset
+     * category of the asset\n
      */
     public AppDTO category(String category) {
         this.category = category;
@@ -464,7 +466,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "Business", value = "category of the asset")
+    @ApiModelProperty(example = "Business", value = "category of the asset\n")
     @JsonProperty("category")
     public String getCategory() {
         return category;
@@ -476,7 +478,7 @@ public class AppDTO {
 
 
     /**
-     * displayName of the asset
+     * displayName of the asset\n
      */
     public AppDTO displayName(String displayName) {
         this.displayName = displayName;
@@ -484,7 +486,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "testapp1", value = "displayName of the asset")
+    @ApiModelProperty(example = "testapp1", value = "displayName of the asset\n")
     @JsonProperty("displayName")
     public String getDisplayName() {
         return displayName;
@@ -496,7 +498,7 @@ public class AppDTO {
 
 
     /**
-     * packagename of the asset
+     * packagename of the asset\n
      */
     public AppDTO screenshots(String screenshots) {
         this.screenshots = screenshots;
@@ -508,7 +510,7 @@ public class AppDTO {
             example = "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg," +
                     "/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG," +
                     "/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG",
-            value = "packagename of the asset")
+            value = "packagename of the asset\n")
     @JsonProperty("screenshots")
     public String getScreenshots() {
         return screenshots;
@@ -520,7 +522,7 @@ public class AppDTO {
 
 
     /**
-     * /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg
+     * /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n
      */
     public AppDTO banner(String banner) {
         this.banner = banner;
@@ -532,7 +534,7 @@ public class AppDTO {
             example = "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg," +
                     "/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG," +
                     "/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG",
-            value = "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg")
+            value = "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n")
     @JsonProperty("banner")
     public String getBanner() {
         return banner;
@@ -544,7 +546,7 @@ public class AppDTO {
 
 
     /**
-     * createdtime of the asset
+     * createdtime of the asset\n
      */
     public AppDTO createdtime(String createdtime) {
         this.createdtime = createdtime;
@@ -552,7 +554,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "00000001458300149192", value = "createdtime of the asset")
+    @ApiModelProperty(example = "00000001458300149192", value = "createdtime of the asset\n")
     @JsonProperty("createdtime")
     public String getCreatedtime() {
         return createdtime;
@@ -564,7 +566,7 @@ public class AppDTO {
 
 
     /**
-     * platform of the asset
+     * platform of the asset\n
      */
     public AppDTO platform(String platform) {
         this.platform = platform;
@@ -572,7 +574,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "andoid", value = "platform of the asset")
+    @ApiModelProperty(example = "andoid", value = "platform of the asset\n")
     @JsonProperty("platform")
     public String getPlatform() {
         return platform;
@@ -584,7 +586,7 @@ public class AppDTO {
 
 
     /**
-     * platform of the asset
+     * platform of the asset\n
      */
     public AppDTO lifecycleAvailableActions(String lifecycleAvailableActions) {
         this.lifecycleAvailableActions = lifecycleAvailableActions;
@@ -592,7 +594,7 @@ public class AppDTO {
     }
 
 
-    @ApiModelProperty(example = "[Submit for Review]", value = "platform of the asset")
+    @ApiModelProperty(example = "[Submit for Review]", value = "platform of the asset\n")
     @JsonProperty("lifecycleAvailableActions")
     public String getLifecycleAvailableActions() {
         return lifecycleAvailableActions;

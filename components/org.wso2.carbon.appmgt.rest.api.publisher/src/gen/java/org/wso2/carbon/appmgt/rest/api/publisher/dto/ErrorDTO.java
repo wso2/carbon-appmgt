@@ -11,7 +11,7 @@ import java.util.List;
 
 
 
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
+
 public class ErrorDTO {
   
   private Long code = null;
@@ -59,7 +59,7 @@ public class ErrorDTO {
 
   
   /**
-   * A detail description about the error message.
+   * A detail description about the error message.\n
    **/
   public ErrorDTO description(String description) {
     this.description = description;
@@ -67,7 +67,7 @@ public class ErrorDTO {
   }
 
   
-  @ApiModelProperty(value = "A detail description about the error message.")
+  @ApiModelProperty(value = "A detail description about the error message.\n")
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -78,7 +78,7 @@ public class ErrorDTO {
 
   
   /**
-   * Preferably an url with more details about the error.
+   * Preferably an url with more details about the error.\n
    **/
   public ErrorDTO moreInfo(String moreInfo) {
     this.moreInfo = moreInfo;
@@ -86,7 +86,7 @@ public class ErrorDTO {
   }
 
   
-  @ApiModelProperty(value = "Preferably an url with more details about the error.")
+  @ApiModelProperty(value = "Preferably an url with more details about the error.\n")
   @JsonProperty("moreInfo")
   public String getMoreInfo() {
     return moreInfo;
@@ -97,7 +97,7 @@ public class ErrorDTO {
 
   
   /**
-   * If there are more than one error list them out. \nFor example, list out validation errors by each field.
+   * If there are more than one error list them out. \nFor example, list out validation errors by each field.\n
    **/
   public ErrorDTO error(List<ErrorListItemDTO> error) {
     this.error = error;
@@ -105,7 +105,7 @@ public class ErrorDTO {
   }
 
   
-  @ApiModelProperty(value = "If there are more than one error list them out. \nFor example, list out validation errors by each field.")
+  @ApiModelProperty(value = "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n")
   @JsonProperty("error")
   public List<ErrorListItemDTO> getError() {
     return error;
@@ -124,12 +124,12 @@ public class ErrorDTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ErrorDTO errorDTO = (ErrorDTO) o;
-    return Objects.equals(code, errorDTO.code) &&
-        Objects.equals(message, errorDTO.message) &&
-        Objects.equals(description, errorDTO.description) &&
-        Objects.equals(moreInfo, errorDTO.moreInfo) &&
-        Objects.equals(errorDTO, errorDTO.error);
+    ErrorDTO error = (ErrorDTO) o;
+    return Objects.equals(code, error.code) &&
+        Objects.equals(message, error.message) &&
+        Objects.equals(description, error.description) &&
+        Objects.equals(moreInfo, error.moreInfo) &&
+        Objects.equals(error, error.error);
   }
 
   @Override
