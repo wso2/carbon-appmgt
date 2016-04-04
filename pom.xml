@@ -38,6 +38,7 @@
         <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
         <module>components/org.wso2.carbon.appmgt.rest.api.util</module>
         <module>components/org.wso2.carbon.appmgt.rest.api.publisher</module>
+        <module>components/org.wso2.carbon.appmgt.rest.api.store</module>
         <module>features/org.wso2.carbon.appmgt.core.feature</module>
         <module>features/org.wso2.carbon.appmgt.gateway.feature</module>
         <module>features/org.wso2.carbon.appmgt.publisher.feature</module>
@@ -212,6 +213,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.rest.api.publisher</artifactId>
+                <version>${carbon.appmgt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.appmgt</groupId>
+                <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
                 <version>${carbon.appmgt.version}</version>
             </dependency>
             <dependency>

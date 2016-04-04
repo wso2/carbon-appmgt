@@ -56,7 +56,7 @@ public final class RestApiConstants {
     public static final String API_VERSION_PARAM="{version}";
 
     //todo better to take from cxf level
-    public static final String RESOURCE_PATH_APIS = "/apis";
+    public static final String RESOURCE_PATH_APPS = "/apps";
     public static final String RESOURCE_PATH_APPLICATIONS = "/applications";
     public static final String SERVER_URL = "/applications";
     public static final String SERVER_USER_NAME = "/applications";
@@ -67,7 +67,7 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_TIERS_APPLICATION = RESOURCE_PATH_TIERS + "/application";
     public static final String RESOURCE_PATH_TIERS_RESOURCE = RESOURCE_PATH_TIERS + "/resource";
     public static final String RESOURCE_PATH_TAGS = "/tags";
-    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APIS + "/" + APIID_PARAM + "/documents";
+    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APIID_PARAM + "/documents";
     public static final String RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID = RESOURCE_PATH_DOCUMENTS + "/" + DOCUMENTID_PARAM;
     public static final String RESOURCE_PATH_DOCUMENT_CONTENT = RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID + "/content";
     public static final String REST_API_STORE_CONTEXT="store_rest_api";
@@ -86,7 +86,7 @@ public final class RestApiConstants {
     public static final String PAGINATION_PREVIOUS_LIMIT = "previous_limit";
 
     public static final String APIS_GET_PAGINATION_URL =
-            RESOURCE_PATH_APIS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+            RESOURCE_PATH_APPS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
 
     public static final String APPLICATIONS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
