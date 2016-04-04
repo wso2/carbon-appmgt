@@ -171,7 +171,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsPost(String contentType, String ifModifiedSince, SecurityContext securityContext)
+    public Response appsPost(AppDTO body, String contentType, String ifModifiedSince, SecurityContext securityContext)
             throws NotFoundException {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
