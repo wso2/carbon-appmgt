@@ -28,11 +28,12 @@ var render=function(theme,data,meta,require){
     switch(data.op){
 
         case 'create':
+            var ownerList = data.ownerList;
             listPartial='add-asset';
             heading = "Create New Web Application";
             break;
         case 'view':
-            log.info(data);
+            var ownerList = data.ownerList;
             data = require('/helpers/view-asset.js').merge(data);
             listPartial='view-asset';
             var copyOfData = parse(stringify(data));
@@ -46,6 +47,8 @@ var render=function(theme,data,meta,require){
             heading = data.newViewData.displayName.value;
             break;
         case 'edit':
+
+            data = require('/helpers/view-asset.js').merge(data);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
             if(data.artifact.lifecycleState == "Published"){
                 editEnabled = false;

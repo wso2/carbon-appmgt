@@ -31,7 +31,6 @@ var splitData = function(copyOfData){
 
     var log = new Log();
 
-    //log.info(dataPart);
 
     for(var i=0;i<dataPart.length;i++) {
         if (dataPart[i].name == "overview_name") {
@@ -41,9 +40,10 @@ var splitData = function(copyOfData){
             overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_context") {
             overview_meta.push(dataPart[i]);
-        }else if (dataPart[i].name == "overview_owner") {
+        }else if (dataPart[i].name == "overview_ownerName") {
             overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_version") {
+            //log.info(dataPart);
             overview_main.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_displayName") {
             overview_displayName = dataPart[i];
@@ -125,7 +125,7 @@ var splitData = function(copyOfData){
     newViewData.sso=sso;
     newViewData.oauthapis=oauthapis;
     newViewData.isMoreInfo=isMoreInfo;
-
+    newViewData.ownerList=copyOfData.ownerList;
 
     return newViewData;
 };

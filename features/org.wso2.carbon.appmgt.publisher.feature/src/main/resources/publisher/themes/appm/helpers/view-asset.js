@@ -39,8 +39,8 @@ var merge = function(data){
 		 } else if (data.data.fields[i].name == 'oauthapis_webappConsumerSecret')
 			 data.data.fields[i].value = sResult.split(",")[1];
 
-
-		 for (var c in data.data.fields) {
+var c = 0;
+		 for (c in data.data.fields) {
 
 			 if (data.data.fields[i].name == "uritemplate_policygroupid" + c) {
 				 if (data.data.fields[i].value != "" && !isNaN(data.data.fields[i].value)) {
@@ -66,7 +66,29 @@ var merge = function(data){
 	 }
 
 
+
+    var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+    var appMDAOObj = new appMDAO();
+
+   var owner_name =  appMDAOObj.getUserName(data.artifact.id);
+    data.data.fields[c].name = "overview_ownerName";
+    data.data.fields[c].label = "Business Owner";
+    data.data.fields[c].isRequired = true;
+    data.data.fields[c].isTextBox = true;
+    data.data.fields[c].isTextArea = false;
+    data.data.fields[c].isOptions = false;
+    data.data.fields[c].isOptionsText = false;
+    data.data.fields[c].isDate = false;
+    data.data.fields[c].isReadOnly = false;
+    data.data.fields[c].isEditable = true;
+    data.data.fields[c].isFile = false;
+    data.data.fields[c].isImageFile = false;
+    data.data.fields[c].value = owner_name;
+    data.data.fields[c].valueList = {};
+    log.info(data.artifact.id);
+    log.info(owner_name);
+
+
 	 return data;
 };
-
 

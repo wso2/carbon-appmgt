@@ -3783,7 +3783,61 @@ public class AppMDAO {
         }
         return applications;
     }
+    /**
+     *a
+     * @return Subscriber
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     *             if failed to get subscriber
+     */
+    public String getUserName(String trackingCode)
+            throws
+            AppManagementException {
+        PreparedStatement prepStmt = null;
+        Connection connection = null;
+        ResultSet rs = null;
 
+
+        int ownerId;
+        String ownerName="";
+        String sqlQuery =
+                "SELECT OWNER_ID FROM APM_APP WHERE UUID=?";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            connection.setAutoCommit(false);
+            prepStmt = connection.prepareStatement(sqlQuery);
+            prepStmt.setString(1, trackingCode);
+            rs = prepStmt.executeQuery();
+
+            if (rs.next()) {
+                ownerId = rs.getInt("OWNER_ID");
+
+                if(ownerId > 0){
+                    PreparedStatement prepStmt2 = null;
+                    Connection connection2 = null;
+                    connection2 = APIMgtDBUtil.getConnection();
+                    connection2.setAutoCommit(false);
+                    ResultSet rs2 = null;
+                    String sqlQuery2 = "SELECT OWNER_NAME FROM BUSINESS_OWNERS WHERE OWNER_ID=?";
+                    prepStmt2 = connection2.prepareStatement(sqlQuery2);
+                    prepStmt2.setInt(1, ownerId);
+                    rs2 = prepStmt2.executeQuery();
+                    if(rs2.next()) {
+                        ownerName = rs2.getString("OWNER_NAME");
+                    }
+
+                }
+
+            }
+
+        } catch (SQLException e) {
+            handleException("Error when reading the application information from"
+                                    + " the persistence store.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
+        }
+        return ownerName;
+    }
 	/**
 	 * returns a subscriber record for given username,tenant Id
 	 *
@@ -3990,11 +4044,9 @@ public class AppMDAO {
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String ownerName = app.getBusinessOwner();
-        String[] ownerDetails = ownerName.split("_");
-
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
                 "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, OWNER_ID ) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,(SELECT OWNER_ID FROM BUSINESS_OWNERS WHERE OWNER_NAME =?))";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4030,7 +4082,7 @@ public class AppMDAO {
             prepStmt.setBoolean(10, app.getAllowAnonymous());
             prepStmt.setString(11, app.getUrl());
             prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
-            prepStmt.setString(13, ownerDetails[1]);
+            prepStmt.setString(13, ownerName);
 
             prepStmt.execute();
 
@@ -4570,13 +4622,12 @@ public class AppMDAO {
 		}
 		return contexts;
 	}
-
 	public void updateAPI(WebApp api) throws AppManagementException {
 		Connection connection = null;
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
-                " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
+                " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ?, OWNER_ID=(SELECT OWNER_ID FROM BUSINESS_OWNERS WHERE OWNER_NAME =?) " +
                 " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4602,9 +4653,10 @@ public class AppMDAO {
 			prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
             prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
-			prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-			prepStmt.setString(7, api.getId().getApiName());
-			prepStmt.setString(8, api.getId().getVersion());
+            prepStmt.setString(6, api.getBusinessOwner());
+			prepStmt.setString(7, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+			prepStmt.setString(8, api.getId().getApiName());
+			prepStmt.setString(9, api.getId().getVersion());
             prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);

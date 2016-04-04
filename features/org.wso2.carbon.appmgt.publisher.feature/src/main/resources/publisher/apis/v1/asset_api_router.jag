@@ -553,6 +553,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             var appOwner = originalArtifact.attributes["overview_appOwner"];
             var appTenant = originalArtifact.attributes["overview_appTenant"];
             var isAdvertiseOnly = originalArtifact.attributes["overview_advertiseOnly"];
+                var businessOwner = originalArtifact.attributes["overview_ownerName"];
 
             modelA.import('form.importer', context.post);
 
@@ -594,6 +595,11 @@ require('/modules/publisher.js').exec(function(ctx) {
             artifact.attributes["overview_appOwner"] = appOwner;
             artifact.attributes["overview_appTenant"] = appTenant;
             artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+                artifact.attributes["overview_owner"] = isAdvertiseOnly;
+                artifact.attributes["overview_businessOwnerName"] = businessOwner;
+                log.info("---------------------====================--------------------------" + businessOwner+"-----------------------------------------------------"+artifact.attributes["overview_businessOwner"]);
+               // log.info(originalArtifact.attributes)
+
 
 
             var tenantId = server.current(session).tenantId;
@@ -665,6 +671,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
             var appMDAOObj = new appMDAO();
 
+                //appMDAOObj.updateOwner(attributes["overview_name"],
+                // attributes["overview_provider"],attributes["overview_version"],businessOwner)
 	    var tenantId = server.current(session).tenantId;
 
             appMDAOObj.updateOAuthAPIAccessInfo(webAppObj, tenantId);

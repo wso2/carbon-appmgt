@@ -47,6 +47,24 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     mod = jagg.module("documentation");
 
+    function getOwnerList(){
+        var businessOwnerList = apiProvider.getBusinessOwnerList();
+        var ownersList = JSON.parse(stringify(businessOwnerList));
+        var ownerNames ="";
+        for(var i = 0; i < ownersList.length ; i++){
+            // ownerNames[i] = ownersList[i].owner_name +"_"+ownersList[i].owner_id;
+            if(i==0){
+                ownerNames = ownerNames + "\'" + ownersList[i].owner_name;
+            } else {
+                ownerNames = ownerNames + "/" + ownersList[i].owner_name;
+            }
+
+        }
+        ownerNames = ownerNames + "\'";
+
+        return ownerNames;
+    }
+
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
     var shortName = (context.params.type) || '';
@@ -83,21 +101,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         var output = model.export('form');
         var title = shortName;
         var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
-        var businessOwnerList = apiProvider.getBusinessOwnerList();
-        var ownersList = JSON.parse(stringify(businessOwnerList));
-        var ownerNames ="";
-        for(var i = 0; i < ownersList.length ; i++){
-           // ownerNames[i] = ownersList[i].owner_name +"_"+ownersList[i].owner_id;
-            if(i==0){
-                ownerNames = ownerNames + "\'" + ownersList[i].owner_name +"_"+ownersList[i].owner_id;
-            } else {
-                ownerNames = ownerNames + "/" + ownersList[i].owner_name + "_" + ownersList[i].owner_id;
-            }
-
-        }
-        ownerNames = ownerNames + "\'";
-
-        log.info(ownerNames);
         var isSubscriptionEnabled;
         if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
             isSubscriptionEnabled = false;
@@ -113,7 +116,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             rxtTemplate: rxtTemplate,
             data: output,
             title: title,
-                           ownerList: JSON.stringify(ownerNames)}
+                           ownerList: JSON.stringify(getOwnerList())}
         );
     }
 });
@@ -202,7 +205,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
             title:title,
             docs: result.docs,
             appStores:appStoresDetail,
-            permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+            permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
+                           ownerList: JSON.stringify(getOwnerList())
         });
     } catch (e) {
         log.error('The asset with id ' + id + ' could not be found due to : ' + e);
@@ -331,7 +335,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     tags: tags,
                     title: title,
                     docs: result.docs,
-                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
+                                   ownerList: JSON.stringify(getOwnerList())
                 });
             } else {
                 caramel.render({
@@ -344,7 +349,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     data: output,
                     versions: versionList,
                     tags: tags,
-                    title: title
+                    title: title,
+                                   ownerList: JSON.stringify(getOwnerList())
                 });
             }
 

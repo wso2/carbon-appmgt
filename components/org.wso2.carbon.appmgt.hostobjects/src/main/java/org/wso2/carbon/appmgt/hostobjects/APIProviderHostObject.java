@@ -507,7 +507,7 @@ public class APIProviderHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
 
-            apiProvider. (api);x
+            apiProvider.addWebApp(api);
 
             if (fileHostObject != null && fileHostObject.getJavaScriptFile().getLength() != 0) {
                 Icon icon = new Icon(fileHostObject.getInputStream(),
@@ -1054,6 +1054,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
         }
+        String ownerName = (String) apiData.get("overview_businessOwnerName", apiData);
         String name = (String) apiData.get("overview_name", apiData);
         String version = (String) apiData.get("overview_version", apiData);
         String transports = (String) apiData.get("overview_transports", apiData);
@@ -1142,7 +1143,7 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         api.setUriTemplates(uriTemplates);
-
+        api.setBusinessOwner(ownerName);
         api.setTransports(transport);
         api.setDescription(StringEscapeUtils.escapeHtml(description));
         api.setLastUpdated(new Date());
