@@ -2210,7 +2210,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @param appType application type
      * @return
      */
-    public String[] getAllowedLifecycleActions(String appId, String appType) {
+    public String[] getAllowedLifecycleActions(String appId, String appType) throws AppManagementException {
         PrivilegedCarbonContext.startTenantFlow();
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
@@ -2226,9 +2226,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                         "Failed to get API. API artifact corresponding to artifactId " + appId + " does not exist");
             }
         } catch (AppManagementException e) {
-            e.printStackTrace();
+            handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
+                    " with id : "+appId, e);
         } catch (GovernanceException e) {
-            e.printStackTrace();
+            handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
+                    " with id : " + appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }

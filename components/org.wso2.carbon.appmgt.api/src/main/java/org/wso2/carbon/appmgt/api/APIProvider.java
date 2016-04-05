@@ -589,5 +589,5 @@ public interface APIProvider extends APIManager {
      * @param appId application type
      * @return list of allowed lifecycle actions perform on the app
      */
-    public String[] getAllowedLifecycleActions(String appType, String appId);
+    public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
 }

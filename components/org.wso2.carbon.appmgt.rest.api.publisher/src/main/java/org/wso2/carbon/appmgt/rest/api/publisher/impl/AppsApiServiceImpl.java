@@ -106,12 +106,18 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                    String ifUnmodifiedSince) {
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            boolean isValidAction = false;
 
-            if (!ArrayUtils.contains(APPLifecycleActions.values(), action)) {
+            for(APPLifecycleActions appLifecycleAction : APPLifecycleActions.values()){
+                if(appLifecycleAction.getStatus().equalsIgnoreCase(action)){
+                    isValidAction = true;
+                    break;
+                }
+            }
+            if(!isValidAction){
                 RestApiUtil.handleBadRequest("Invalid action '" + action + "' performed on a " + appType
                         + " with UUID " + appId, log);
             }
-
             String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
             if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
                 RestApiUtil.handleBadRequest(
@@ -119,7 +125,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                 ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
             }
             appProvider.changeLifeCycleStatus(appType, appId, action);
-
+            return Response.accepted().build();
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -130,7 +136,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        return null;
     }
 
     @Override
