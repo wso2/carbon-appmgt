@@ -26,11 +26,14 @@
         "application/json"
     ],
     "paths": {
-        "/apps": {
+        "/apps/{appType}": {
             "get": {
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "name": "query",
                         "in": "query",
@@ -91,11 +94,14 @@
                 }
             }
         },
-        "/apps/{appId}": {
+        "/apps/{appType}/id/{appId}": {
             "get": {
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "$ref": "#/parameters/appId"
                     },
@@ -149,6 +155,159 @@
                     }
                 }
             }
+        },
+        "/apps/download": {
+            "post": {
+                "summary": "Download App",
+                "description": "Download an new App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "download",
+                        "schema": {
+                            "$ref": "#/definitions/Download"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/uninstallation": {
+            "post": {
+                "summary": "Uninstall App",
+                "description": "Uninstall an existing App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "download",
+                        "schema": {
+                            "$ref": "#/definitions/Download"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/devices": {
+            "get": {
+                "summary": "Get all Devices",
+                "description": "Get a list of available Devices qualifying under a given search condition.\n",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "**Search condition**.\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\nEg. \"type:mobile\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Devices"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Devices are returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/DeviceList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -156,6 +315,13 @@
             "name": "appId",
             "in": "path",
             "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "required": true,
+            "type": "string"
+        },
+        "appType": {
+            "name": "appType",
+            "in": "path",
+            "description": "App Type. Either webapp or mobileapp\n",
             "required": true,
             "type": "string"
         },
@@ -262,8 +428,6 @@
                 }
             }
         },
-
-
         "DeviceList": {
             "title": "Device List",
             "properties": {
@@ -295,14 +459,34 @@
             "properties": {
                 "id": {
                     "type": "string",
-                    "example": "01234567-0123-0123-0123-012345678901"
+                    "example": "11"
+                },
+                "platform": {
+                    "type": "string",
+                    "example": "android"
+                },
+                "model": {
+                    "type": "string",
+                    "example": "Nexus"
+                },
+                "platform_version": {
+                    "type": "string",
+                    "example": "5.0"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Nexus"
+                },
+                "image": {
+                    "type": "string",
+                    "example": "/store/extensions/assets/mobileapp/resources/models/nexus.png"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "phone"
                 }
             }
         },
-
-
-
-
         "UserList": {
             "title": "User List",
             "properties": {
@@ -336,6 +520,28 @@
                     "type": "string",
                     "description": "Username of the new user.\n",
                     "example": "user1"
+                }
+            }
+        },
+        "Download": {
+            "title": "Download App",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Download type (either user or device).\n",
+                    "example": "user/device"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserList"
+                    }
+                },
+                "devices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DeviceList"
+                    }
                 }
             }
         },

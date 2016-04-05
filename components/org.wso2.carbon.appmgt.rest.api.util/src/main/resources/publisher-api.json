@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "WSO2 APP Manager - Publisher API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -37,7 +37,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "**Search condition**.\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "description": "**Search condition**.\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
                         "type": "string"
                     },
                     {
@@ -60,7 +60,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Apps is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppListDTO"
+                            "$ref": "#/definitions/AppList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -76,19 +76,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -106,7 +106,7 @@
                         "description": "App object that needs to be added\n",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/AppDTO"
+                            "$ref": "#/definitions/App"
                         }
                     },
                     {
@@ -123,7 +123,7 @@
                     "201": {
                         "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppDTO"
+                            "$ref": "#/definitions/App"
                         },
                         "headers": {
                             "Location": {
@@ -143,13 +143,13 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "415": {
                         "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -183,7 +183,7 @@
                     "200": {
                         "description": "OK. \nQualifying App is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppInfoDTO"
+                            "$ref": "#/definitions/AppInfo"
                         },
                         "headers": {
                             "Content-Type": {
@@ -199,19 +199,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -232,7 +232,7 @@
                         "description": "App object that needs to be added\n",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/AppDTO"
+                            "$ref": "#/definitions/App"
                         }
                     },
                     {
@@ -252,7 +252,7 @@
                     "200": {
                         "description": "OK. \nSuccessful response with updated App object\n",
                         "schema": {
-                            "$ref": "#/definitions/AppDTO"
+                            "$ref": "#/definitions/App"
                         },
                         "headers": {
                             "Location": {
@@ -276,25 +276,25 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -326,19 +326,19 @@
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nResource to be deleted does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -354,20 +354,20 @@
                     },
                     {
                         "name": "action",
-                        "description": "The action to demote or promote the state of the App.\n\nSupported actions are [ **Initial,Created,In-Review,Approved,Rejected,Published,Unpublished,Deprecated,Retire **]\n",
+                        "description": "The action to demote or promote the state of the App.\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n",
                         "in": "query",
                         "type": "string",
                         "required": true,
                         "enum": [
-                            "Initial",
-                            "Created",
-                            "In-Review",
-                            "Approved",
-                            "Rejected",
-                            "Published",
-                            "Unpublished",
-                            "Deprecated",
-                            "Retire"
+                            "Publish",
+                            "Approve",
+                            "Reject",
+                            "Unpublish",
+                            "Deprecate",
+                            "Retire",
+                            "Recycle",
+                            "Re-Publish",
+                            "Submit#for#Review"
                         ]
                     },
                     {
@@ -400,19 +400,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nRequested App does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -429,7 +429,7 @@
                         "description": "Upload .apk/.IPA file into App Publisher",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/BinaryDTO"
+                            "$ref": "#/definitions/Binary"
                         }
                     },
                     {
@@ -459,19 +459,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nRequested App does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/ErrorDTO"
+                            "$ref": "#/definitions/Error"
                         }
                     }
                 }
@@ -555,7 +555,7 @@
         }
     },
     "definitions": {
-        "AppListDTO": {
+        "AppList": {
             "title": "App List",
             "properties": {
                 "count": {
@@ -576,12 +576,12 @@
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AppInfoDTO"
+                        "$ref": "#/definitions/AppInfo"
                     }
                 }
             }
         },
-        "AppInfoDTO": {
+        "AppInfo": {
             "title": "App Info object with basic App details.",
             "properties": {
                 "id": {
@@ -615,7 +615,7 @@
                 }
             }
         },
-        "AppDTO": {
+        "App": {
             "title": "App object",
             "required": [
                 "name",
@@ -757,11 +757,6 @@
                     "type": "string",
                     "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
                 },
-                "screenshots": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
-                },
                 "createdtime": {
                     "description": "createdtime of the asset\n",
                     "type": "string",
@@ -779,7 +774,7 @@
                 }
             }
         },
-        "BinaryDTO": {
+        "Binary": {
             "title": "upload binary",
             "required": [
                 "name"
@@ -795,7 +790,7 @@
                 }
             }
         },
-        "ErrorDTO": {
+        "Error": {
             "title": "Error object returned with 4XX HTTP status",
             "required": [
                 "code",
@@ -822,12 +817,12 @@
                     "type": "array",
                     "description": "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n",
                     "items": {
-                        "$ref": "#/definitions/ErrorListItemDTO"
+                        "$ref": "#/definitions/ErrorListItem"
                     }
                 }
             }
         },
-        "ErrorListItemDTO": {
+        "ErrorListItem": {
             "title": "Description of individual errors that may have occurred during a request.",
             "required": [
                 "code",

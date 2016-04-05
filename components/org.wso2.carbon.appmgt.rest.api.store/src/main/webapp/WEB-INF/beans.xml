@@ -8,6 +8,7 @@
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
             <bean class="org.wso2.carbon.appmgt.rest.api.store.AppsApi"/>
+            <bean class="org.wso2.carbon.appmgt.rest.api.store.DevicesApi"/>
             
         </jaxrs:serviceBeans>
         <jaxrs:providers>
