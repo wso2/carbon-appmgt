@@ -1,11 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -28,7 +29,7 @@ public class AppDTO  {
   
   private String description = null;
   
-  @NotNull
+  
   private String context = null;
   
   @NotNull
@@ -163,7 +164,7 @@ public class AppDTO  {
   
   /**
    **/
-  @ApiModelProperty(required = true, value = "")
+  @ApiModelProperty(value = "")
   @JsonProperty("context")
   public String getContext() {
     return context;

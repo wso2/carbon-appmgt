@@ -16,18 +16,17 @@
  *
  */
 
-package org.wso2.carbon.appmgt.rest.api.publisher.utils;
+package org.wso2.carbon.appmgt.rest.api.store.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *  This class contains REST API Publisher related utility operations
+ * This class contains REST API Store related utility operations
  */
-public class RestApiPublisherUtils {
+public class RestApiStoreUtils {
 
-    private static final Log log = LogFactory.getLog(RestApiPublisherUtils.class);
-
+    private static final Log log = LogFactory.getLog(RestApiStoreUtils.class);
 
 
 }

@@ -8,6 +8,8 @@ info:
 
 
 
+
+
     It is written with [swagger 2](http://swagger.io/).
   contact:
     name: WSO2
@@ -39,7 +41,11 @@ paths:
 
 
 
+
+
             You can search in attributes by using an **"attribute:"** modifier.
+
+
 
 
 
@@ -48,8 +54,12 @@ paths:
 
 
 
+
+
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
+
+
 
 
 
@@ -269,6 +279,8 @@ paths:
 
 
 
+
+
             Supported actions are
             [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
             **]
@@ -480,7 +492,6 @@ definitions:
     title: App object
     required:
       - name
-      - context
       - version
       - appDefinition
       - transport

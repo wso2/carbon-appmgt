@@ -619,7 +619,6 @@
             "title": "App object",
             "required": [
                 "name",
-                "context",
                 "version",
                 "appDefinition",
                 "transport"

@@ -6,7 +6,7 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.*;
 import org.wso2.carbon.appmgt.rest.api.store.dto.DownloadDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 
 import java.util.List;
 
