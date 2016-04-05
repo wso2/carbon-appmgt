@@ -8,6 +8,8 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
@@ -15,6 +17,11 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
@@ -82,7 +89,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApis.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
-            String errorMessage = "Error while retrieving APIs";
+            String errorMessage = "Error while retrieving Apps";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return null;
@@ -94,16 +101,27 @@ public class AppsApiServiceImpl extends AppsApiService {
             throws NotFoundException {
         try {
             String username = RestApiUtil.getLoggedInUsername();
-            APIProvider apiProvider = RestApiUtil.getProvider(username);
-            WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
-            if (webApp.getId() == null) {
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            String searchContent = appId;
+            String searchType = "id";
+            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
+                                                                                 appType);
+            if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
             }
+            WebApp webApp = allMatchedApps.get(0);
             APIIdentifier apiIdentifier = webApp.getId();
-            //deletes the API
-            apiProvider.deleteApp(apiIdentifier, webApp.getSsoProviderDetails());
-            return Response.ok("App Id: " + appId + "deleted successfully.").build();
+            if (appType.equals(AppMConstants.APP_TYPE)) {
+                if (webApp.isAdvertiseOnly()) {
+                    removeArtifactOnly(webApp, username);
+                } else {
+                    apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails());
+                }
+            } else if (appType.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
+                removeArtifactOnly(webApp, username);
+            }
+            return Response.ok().build();
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -113,8 +131,27 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String errorMessage = "Error while deleting App : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
+        } catch (RegistryException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing UserStore", e, log);
         }
         return null;
+    }
+
+    //remove artifact from registry
+    private void removeArtifactOnly(WebApp webApp, String username)
+            throws RegistryException, AppManagementException, UserStoreException {
+        String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+        String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+        int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                tenantDomainName);
+        Registry registry = ServiceReferenceHolder.getInstance().
+                getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
+
+        GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                                                                                   AppMConstants.MOBILE_ASSET_TYPE);
+        artifactManager.removeGenericArtifact(webApp.getUUID());
     }
 
     @Override
@@ -143,7 +180,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
             } else {
-                String errorMessage = "Error while retrieving API : " + appId;
+                String errorMessage = "Error while retrieving App : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }

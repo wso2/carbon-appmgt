@@ -34,7 +34,7 @@ public final class RestApiConstants {
     public static final String DEFAULT_RESPONSE_CONTENT_TYPE = APPLICATION_JSON;
     
     public static final String RESOURCE = "resource";
-    public static final String RESOURCE_API = "API";
+    public static final String RESOURCE_API = "App";
     public static final String RESOURCE_APPLICATION = "application";
     public static final String RESOURCE_SUBSCRIPTION = "subscription";
     public static final String RESOURCE_DOCUMENTATION = "documentation";

@@ -1734,7 +1734,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId,String appType)
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId,
+                                                   String appType)
             throws AppManagementException {
         List<WebApp> apiSortedList = new ArrayList<WebApp>();
         String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
@@ -1742,13 +1743,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Pattern pattern;
         Matcher matcher;
 
-        //Select asset type
-
-        if (searchTerm.equals(AppMConstants.APP_TYPE)) {
-            appType = AppMConstants.APP_TYPE;
-        } else if (searchTerm.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
-            appType = AppMConstants.MOBILE_ASSET_TYPE;
-        }
         try {
             List<WebApp> apiList;
             if (providerId != null) {
@@ -1787,7 +1781,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
         } catch (AppManagementException e) {
-            handleException("Failed to search APIs with type", e);
+            handleException("Failed to search Apps with type", e);
         }
         Collections.sort(apiSortedList, new APINameComparator());
         return apiSortedList;
