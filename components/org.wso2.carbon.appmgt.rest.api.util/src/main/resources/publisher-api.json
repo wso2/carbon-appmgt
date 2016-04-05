@@ -60,7 +60,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Apps is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppList"
+                            "$ref": "#/definitions/AppListDTO"
                         },
                         "headers": {
                             "Content-Type": {
@@ -76,19 +76,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -106,7 +106,7 @@
                         "description": "App object that needs to be added\n",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/App"
+                            "$ref": "#/definitions/AppDTO"
                         }
                     },
                     {
@@ -123,7 +123,7 @@
                     "201": {
                         "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
                         "schema": {
-                            "$ref": "#/definitions/App"
+                            "$ref": "#/definitions/AppDTO"
                         },
                         "headers": {
                             "Location": {
@@ -143,13 +143,13 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "415": {
                         "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -183,7 +183,7 @@
                     "200": {
                         "description": "OK. \nQualifying App is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppInfo"
+                            "$ref": "#/definitions/AppInfoDTO"
                         },
                         "headers": {
                             "Content-Type": {
@@ -199,19 +199,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -232,7 +232,7 @@
                         "description": "App object that needs to be added\n",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/App"
+                            "$ref": "#/definitions/AppDTO"
                         }
                     },
                     {
@@ -252,7 +252,7 @@
                     "200": {
                         "description": "OK. \nSuccessful response with updated App object\n",
                         "schema": {
-                            "$ref": "#/definitions/App"
+                            "$ref": "#/definitions/AppDTO"
                         },
                         "headers": {
                             "Location": {
@@ -276,25 +276,25 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -326,19 +326,19 @@
                     "403": {
                         "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nResource to be deleted does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -400,19 +400,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nRequested App does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -429,7 +429,7 @@
                         "description": "Upload .apk/.IPA file into App Publisher",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/binary"
+                            "$ref": "#/definitions/BinaryDTO"
                         }
                     },
                     {
@@ -459,19 +459,19 @@
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found. \nRequested App does not exist.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
-                            "$ref": "#/definitions/Error"
+                            "$ref": "#/definitions/ErrorDTO"
                         }
                     }
                 }
@@ -576,7 +576,7 @@
                 "list": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AppInfo"
+                        "$ref": "#/definitions/AppInfoDTO"
                     }
                 }
             }
@@ -822,7 +822,7 @@
                     "type": "array",
                     "description": "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n",
                     "items": {
-                        "$ref": "#/definitions/ErrorListItem"
+                        "$ref": "#/definitions/ErrorListItemDTO"
                     }
                 }
             }
