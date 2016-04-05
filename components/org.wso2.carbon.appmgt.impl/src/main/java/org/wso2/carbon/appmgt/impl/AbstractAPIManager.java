@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.APIManager;
+import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
+import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -696,7 +698,15 @@ public abstract class AbstractAPIManager implements APIManager {
         throw new AppManagementException(msg);
     }
 
+    protected final void handleResourceAlreadyExistsException(String msg) throws AppMgtResourceAlreadyExistsException {
+        log.error(msg);
+        throw new AppMgtResourceAlreadyExistsException(msg);
+    }
 
+    protected final void handleResourceNotFoundException(String msg) throws AppMgtResourceNotFoundException {
+        log.error(msg);
+        throw new AppMgtResourceNotFoundException(msg);
+    }
     public boolean isApplicationTokenExists(String accessToken) throws AppManagementException {
         return appMDAO.isAccessTokenExists(accessToken);
     }

@@ -1,11 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -25,6 +27,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 
 public class AppsApiServiceImpl extends AppsApiService {
@@ -101,7 +104,32 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
-        // do some magic!
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+
+            if (!ArrayUtils.contains(APPLifecycleActions.values(), action)) {
+                RestApiUtil.handleBadRequest("Invalid action '" + action + "' performed on a " + appType
+                        + " with UUID " + appId, log);
+            }
+
+            String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
+            if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
+                RestApiUtil.handleBadRequest(
+                        "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
+                                ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
+            }
+            appProvider.changeLifeCycleStatus(appType, appId, action);
+
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifcycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
 

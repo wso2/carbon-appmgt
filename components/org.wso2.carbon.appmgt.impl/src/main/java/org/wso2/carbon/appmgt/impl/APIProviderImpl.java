@@ -2166,4 +2166,72 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
         return appMDAO.getAppDetailsFromUUID(uuid);
     }
+
+    /**
+     * Change the lifecycle state of a given application
+     *
+     * @param appType application type
+     * @param appId   application type
+     * @param action  lifecycle action perform on the application
+     * @throws AppManagementException
+     */
+    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+
+            if (appArtifact != null) {
+                appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                if (log.isDebugEnabled()) {
+                    String logMessage =
+                            "Application with appId : " + appId + " lifecycle has been changed successfully.";
+                    log.debug(logMessage);
+                }
+            }
+
+        } catch (AppManagementException e) {
+            handleException("Error occurred while retrieving GenericArtifactManager for appType : " + appType, e);
+        } catch (GovernanceException e) {
+            handleException("Error occurred while changing lifecycle state of application with appId : " +
+                    appId + " for action : " + action, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
+     * Get the available next lifecycle actions of a given application
+     *
+     * @param appId   application type
+     * @param appType application type
+     * @return
+     */
+    public String[] getAllowedLifecycleActions(String appId, String appType) {
+        PrivilegedCarbonContext.startTenantFlow();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+        String[] actions = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                //Get all the actions corresponding to current state of the api artifact
+                actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+            } else {
+                handleResourceNotFoundException(
+                        "Failed to get API. API artifact corresponding to artifactId " + appId + " does not exist");
+            }
+        } catch (AppManagementException e) {
+            e.printStackTrace();
+        } catch (GovernanceException e) {
+            e.printStackTrace();
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+        return actions;
+    }
 }

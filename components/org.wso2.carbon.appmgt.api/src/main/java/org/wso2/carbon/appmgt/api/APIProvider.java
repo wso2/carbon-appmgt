@@ -573,4 +573,21 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException;
+
+    /**
+     * Change the lifecycle status of a given application
+     * @param appType application type
+     * @param appId application type
+     * @param action lifecycle action perform on the application
+     * @throws AppManagementException
+     */
+    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException;
+
+    /**
+     * Get allowed lifecycle actions to perform on a given application
+     * @param appType application type
+     * @param appId application type
+     * @return list of allowed lifecycle actions perform on the app
+     */
+    public String[] getAllowedLifecycleActions(String appType, String appId);
 }

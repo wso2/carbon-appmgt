@@ -47,6 +47,7 @@ public final class AppMConstants {
     //This is registry status property
     public static final String WEB_APP_LIFECYCLE_STATUS = "registry.lifecycle.WebAppLifeCycle.state";
     public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
+    public static final String MOBILE_LIFE_CYCLE = "MobileAppLifeCycle";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
