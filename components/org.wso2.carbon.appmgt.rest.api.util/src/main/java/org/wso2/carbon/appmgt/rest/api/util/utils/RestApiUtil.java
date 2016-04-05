@@ -27,6 +27,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
 import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
@@ -36,6 +37,7 @@ import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
@@ -208,6 +210,7 @@ public class RestApiUtil {
         //return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         return "carbon.super";
     }
+
 
     /**
      * Check if the specified throwable e is happened as the required resource cannot be found

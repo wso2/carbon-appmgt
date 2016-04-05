@@ -1,12 +1,10 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: WSO2 APP Manager - Publisher API
+  title: WSO2 APP Manager - Store API
   description: >
     This document specifies a **RESTful API** for WSO2 **APP Manager**
     - Publisher.
-
-
 
 
 
@@ -21,7 +19,7 @@ info:
 schemes:
   - http
 host: apis.wso2.com
-basePath: /api/appm/publisher/v1.0
+basePath: /api/appm/store/v1.0
 consumes:
   - application/json
 produces:
@@ -41,11 +39,7 @@ paths:
 
 
 
-
-
             You can search in attributes by using an **"attribute:"** modifier.
-
-
 
 
 
@@ -54,12 +48,8 @@ paths:
 
 
 
-
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
-
 
 
 
@@ -100,50 +90,6 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-    post:
-      summary: Create a new App
-      description: |
-        Create a new App
-      parameters:
-        - $ref: '#/parameters/appType'
-        - in: body
-          name: body
-          description: |
-            App object that needs to be added
-          required: true
-          schema:
-            $ref: '#/definitions/App'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - Apps
-      responses:
-        '201':
-          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
-          schema:
-            $ref: '#/definitions/App'
-          headers:
-            Location:
-              description: |
-                The URL of the newly created resource.
-              type: string
-            Content-Type:
-              description: |
-                The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional request
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
-          schema:
-            $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}':
     get:
       summary: Get app details
@@ -161,7 +107,7 @@ paths:
         '200':
           description: "OK. \nQualifying App is returned.\n"
           schema:
-            $ref: '#/definitions/AppInfo'
+            $ref: '#/definitions/App'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -183,77 +129,27 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-    put:
-      summary: Update an existing App
+  /apps/download:
+    post:
+      summary: Download App
       description: |
-        Update an existing App
+        Download an new App
       parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
         - in: body
-          name: body
-          description: |
-            App object that needs to be added
-          required: true
+          name: download
           schema:
-            $ref: '#/definitions/App'
+            $ref: '#/definitions/Download'
         - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
       tags:
         - Apps
       responses:
         '200':
-          description: "OK. \nSuccessful response with updated App object\n"
-          schema:
-            $ref: '#/definitions/App'
-          headers:
-            Location:
-              description: |
-                The URL of the newly created resource.
-              type: string
-            Content-Type:
-              description: |
-                The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional request.
-              type: string
-            Last-Modified:
-              description: "Date and time the resource has been modifed the last time. \nUsed by caches, or in conditional requests.\n"
-              type: string
+          description: |
+            OK.
         '400':
-          description: "Bad Request. \nInvalid request or validation error\n"
+          description: "Bad Request. \nInvalid request or validation error.\n"
           schema:
             $ref: '#/definitions/Error'
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
-          schema:
-            $ref: '#/definitions/Error'
-    delete:
-      summary: Delete App
-      description: |
-        Delete an existing App
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: "OK. \nResource successfully deleted.\n"
         '403':
           description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
           schema:
@@ -262,108 +158,98 @@ paths:
           description: "Not Found. \nResource to be deleted does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/change-lifecycle':
+  /apps/uninstallation:
     post:
-      summary: Change App Status
+      summary: Uninstall App
       description: |
-        Change the lifecycle of an App
+        Uninstall an existing App
       parameters:
-        - $ref: '#/parameters/appType'
-        - name: action
-          description: >
-            The action to demote or promote the state of the App.
-
-
-
-
-
-            Supported actions are
-            [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
-            **]
-          in: query
-          type: string
-          required: true
-          enum:
-            - Publish
-            - Approve
-            - Reject
-            - Unpublish
-            - Deprecate
-            - Retire
-            - Recycle
-            - Re-Publish
-            - 'Submit#for#Review'
-        - $ref: '#/parameters/appId-Q'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
+        - in: body
+          name: download
+          schema:
+            $ref: '#/definitions/Download'
+        - $ref: '#/parameters/Content-Type'
       tags:
         - Apps
       responses:
         '200':
-          description: "OK. \nLifecycle changed successfully.\n"
-          headers:
-            ETag:
-              description: >
-                Entity Tag of the App. Used by caches, or in conditional
-                request.
-              type: string
-            Last-Modified:
-              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
-              type: string
+          description: |
+            OK.
         '400':
-          description: "Bad Request. \nInvalid request or validation error\n"
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nRequested App does not exist.\n"
+          description: "Not Found. \nResource to be deleted does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  /apps/mobile/binaries:
-    post:
-      summary: Uploading binary files
-      description: |
-        Uploading .apk/.IPA binary files.
+  /devices:
+    get:
+      summary: Get all Devices
+      description: >
+        Get a list of available Devices qualifying under a given search
+        condition.
       parameters:
-        - in: body
-          name: body
-          description: Upload .apk/.IPA file into App Publisher
-          required: true
-          schema:
-            $ref: '#/definitions/Binary'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
+        - name: query
+          in: query
+          description: >
+            **Search condition**.
+
+
+
+            You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+            Eg. "type:mobile" will match an App if the provider of the App
+            contains "wso2".
+
+
+
+            Supported attribute modifiers are [*provider, app_name, app_version,
+            app_id**]
+
+
+
+            If no advanced attribute modifier has been specified, search will
+            match the
+
+            given query string against App Name.
+          type: string
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
       tags:
-        - MobileApps
+        - Devices
       responses:
         '200':
-          description: "OK. \nLifecycle changed successfully.\n"
+          description: "OK. \nList of qualifying Devices are returned.\n"
+          schema:
+            $ref: '#/definitions/DeviceList'
           headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
             ETag:
               description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
-                request.
-              type: string
-            Last-Modified:
-              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error\n"
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nRequested App does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
 parameters:
@@ -378,12 +264,6 @@ parameters:
     in: path
     description: |
       App Type. Either webapp or mobileapp
-    required: true
-    type: string
-  appId-Q:
-    name: appId
-    in: query
-    description: "**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
     required: true
     type: string
   limit:
@@ -427,18 +307,6 @@ parameters:
     name: If-Modified-Since
     in: header
     description: "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n"
-    type: string
-  If-Match:
-    name: If-Match
-    in: header
-    description: |
-      Validator for conditional requests; based on ETag.
-    type: string
-  If-Unmodified-Since:
-    name: If-Unmodified-Since
-    in: header
-    description: |
-      Validator for conditional requests; based on Last Modified header.
     type: string
 definitions:
   AppList:
@@ -533,9 +401,6 @@ definitions:
           templates and scopes
         type: string
         example: "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
-      isDefaultVersion:
-        type: boolean
-        example: false
       transport:
         description: |
           Supported transports for the App (http and/or https).
@@ -555,21 +420,6 @@ definitions:
       thumbnailUrl:
         type: string
         example: ''
-      visibleRoles:
-        type: array
-        items:
-          type: string
-        example: []
-      path:
-        description: |
-          Registry path of the asset
-        type: string
-        example: /_system/governance/mobileapps/admin/android/test/1.0
-      resourceId:
-        description: |
-          Resource Id path of the asset
-        type: string
-        example: /_system/governance/mobileapps/admin/android/test/1.0
       lifecycle:
         description: |
           lifecycle type of the asset
@@ -580,11 +430,6 @@ definitions:
           lifecycle state of the asset
         type: string
         example: Created
-      appUrL:
-        description: |
-          URL of the asset
-        type: string
-        example: /publisher/api/mobileapp/getfile/WKzeMgMhOrGvwTy.apk
       bundleversion:
         description: |
           Bundleversion of the asset
@@ -630,17 +475,94 @@ definitions:
           platform of the asset
         type: string
         example: '[Submit for Review]'
-  Binary:
-    title: upload binary
-    required:
-      - name
+  DeviceList:
+    title: Device List
     properties:
-      binaryId:
+      count:
+        type: integer
+        description: |
+          Number of Devices returned.
+        example: 1
+      next:
         type: string
-        example: '1'
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/devices?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/devices?limit=1&offset=0&query='
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/DeviceInfo'
+  DeviceInfo:
+    title: Device Info object with basic Device details.
+    properties:
+      id:
+        type: string
+        example: '11'
+      platform:
+        type: string
+        example: android
+      model:
+        type: string
+        example: Nexus
+      platform_version:
+        type: string
+        example: '5.0'
       name:
         type: string
-        example: anroidapp.apk
+        example: My Nexus
+      image:
+        type: string
+        example: /store/extensions/assets/mobileapp/resources/models/nexus.png
+      type:
+        type: string
+        example: phone
+  UserList:
+    title: User List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of Users returned.
+        example: 1
+      next:
+        type: string
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/users?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/users?limit=1&offset=0&query='
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/UserInfo'
+  UserInfo:
+    title: User Details
+    properties:
+      username:
+        type: string
+        description: |
+          Username of the new user.
+        example: user1
+  Download:
+    title: Download App
+    properties:
+      type:
+        type: string
+        description: |
+          Download type (either user or device).
+        example: user/device
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserList'
+      devices:
+        type: array
+        items:
+          $ref: '#/definitions/DeviceList'
   Error:
     title: Error object returned with 4XX HTTP status
     required:

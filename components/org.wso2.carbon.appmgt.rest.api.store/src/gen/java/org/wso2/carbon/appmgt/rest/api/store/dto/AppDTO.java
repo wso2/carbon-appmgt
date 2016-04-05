@@ -1,12 +1,11 @@
-package org.wso2.carbon.appmgt.rest.api.publisher.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
+import java.util.*;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -41,9 +40,6 @@ public class AppDTO  {
   @NotNull
   private String appDefinition = null;
   
-  
-  private Boolean isDefaultVersion = null;
-  
   @NotNull
   private List<String> transport = new ArrayList<String>();
   
@@ -54,22 +50,10 @@ public class AppDTO  {
   private String thumbnailUrl = null;
   
   
-  private List<String> visibleRoles = new ArrayList<String>();
-  
-  
-  private String path = null;
-  
-  
-  private String resourceId = null;
-  
-  
   private String lifecycle = null;
   
   
   private String lifecycleState = null;
-  
-  
-  private String appUrL = null;
   
   
   private String bundleversion = null;
@@ -213,18 +197,6 @@ public class AppDTO  {
 
   
   /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("isDefaultVersion")
-  public Boolean getIsDefaultVersion() {
-    return isDefaultVersion;
-  }
-  public void setIsDefaultVersion(Boolean isDefaultVersion) {
-    this.isDefaultVersion = isDefaultVersion;
-  }
-
-  
-  /**
    * Supported transports for the App (http and/or https).
    **/
   @ApiModelProperty(required = true, value = "Supported transports for the App (http and/or https).")
@@ -262,44 +234,6 @@ public class AppDTO  {
 
   
   /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("visibleRoles")
-  public List<String> getVisibleRoles() {
-    return visibleRoles;
-  }
-  public void setVisibleRoles(List<String> visibleRoles) {
-    this.visibleRoles = visibleRoles;
-  }
-
-  
-  /**
-   * Registry path of the asset
-   **/
-  @ApiModelProperty(value = "Registry path of the asset")
-  @JsonProperty("path")
-  public String getPath() {
-    return path;
-  }
-  public void setPath(String path) {
-    this.path = path;
-  }
-
-  
-  /**
-   * Resource Id path of the asset
-   **/
-  @ApiModelProperty(value = "Resource Id path of the asset")
-  @JsonProperty("resourceId")
-  public String getResourceId() {
-    return resourceId;
-  }
-  public void setResourceId(String resourceId) {
-    this.resourceId = resourceId;
-  }
-
-  
-  /**
    * lifecycle type of the asset
    **/
   @ApiModelProperty(value = "lifecycle type of the asset")
@@ -322,19 +256,6 @@ public class AppDTO  {
   }
   public void setLifecycleState(String lifecycleState) {
     this.lifecycleState = lifecycleState;
-  }
-
-  
-  /**
-   * URL of the asset
-   **/
-  @ApiModelProperty(value = "URL of the asset")
-  @JsonProperty("appUrL")
-  public String getAppUrL() {
-    return appUrL;
-  }
-  public void setAppUrL(String appUrL) {
-    this.appUrL = appUrL;
   }
 
   
@@ -470,16 +391,11 @@ public class AppDTO  {
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  appDefinition: ").append(appDefinition).append("\n");
-    sb.append("  isDefaultVersion: ").append(isDefaultVersion).append("\n");
     sb.append("  transport: ").append(transport).append("\n");
     sb.append("  tags: ").append(tags).append("\n");
     sb.append("  thumbnailUrl: ").append(thumbnailUrl).append("\n");
-    sb.append("  visibleRoles: ").append(visibleRoles).append("\n");
-    sb.append("  path: ").append(path).append("\n");
-    sb.append("  resourceId: ").append(resourceId).append("\n");
     sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
-    sb.append("  appUrL: ").append(appUrL).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
     sb.append("  packagename: ").append(packagename).append("\n");
     sb.append("  category: ").append(category).append("\n");
