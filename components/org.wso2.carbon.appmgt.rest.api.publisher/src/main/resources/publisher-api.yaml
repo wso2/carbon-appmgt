@@ -1,0 +1,669 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: WSO2 APP Manager - Publisher API
+  description: >
+    This document specifies a **RESTful API** for WSO2 **APP Manager**
+    - Publisher.
+
+
+
+    It is written with [swagger 2](http://swagger.io/).
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/app-manager/'
+    email: architecture@wso2.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+host: apis.wso2.com
+basePath: /api/appm/publisher/v1.0
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/apps/{appType}':
+    get:
+      summary: Get all Apps
+      description: |
+        Get a list of available Apps qualifying under a given search condition.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - name: query
+          in: query
+          description: >
+            **Search condition**.
+
+
+
+            You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+            Eg. "provider:wso2" will match an App if the provider of the App
+            contains "wso2".
+
+
+
+            Supported attribute modifiers are [*provider, app_name, app_version,
+            app_id**]
+
+
+
+            If no advanced attribute modifier has been specified, search will
+            match the
+
+            given query string against App Name.
+          type: string
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Apps is returned.\n"
+          schema:
+            $ref: '#/definitions/AppList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create a new App
+      description: |
+        Create a new App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - in: body
+          name: body
+          description: |
+            App object that needs to be added
+          required: true
+          schema:
+            $ref: '#/definitions/App'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '201':
+          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
+          schema:
+            $ref: '#/definitions/App'
+          headers:
+            Location:
+              description: |
+                The URL of the newly created resource.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional request
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '415':
+          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}':
+    get:
+      summary: Get app details
+      description: |
+        Get details of an app.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nQualifying App is returned.\n"
+          schema:
+            $ref: '#/definitions/AppInfo'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Update an existing App
+      description: |
+        Update an existing App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - in: body
+          name: body
+          description: |
+            App object that needs to be added
+          required: true
+          schema:
+            $ref: '#/definitions/App'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nSuccessful response with updated App object\n"
+          schema:
+            $ref: '#/definitions/App'
+          headers:
+            Location:
+              description: |
+                The URL of the newly created resource.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional request.
+              type: string
+            Last-Modified:
+              description: "Date and time the resource has been modifed the last time. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete App
+      description: |
+        Delete an existing App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nResource successfully deleted.\n"
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nResource to be deleted does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/change-lifecycle':
+    post:
+      summary: Change App Status
+      description: |
+        Change the lifecycle of an App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - name: action
+          description: >
+            The action to demote or promote the state of the App.
+
+
+
+            Supported actions are
+            [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
+            **]
+          in: query
+          type: string
+          required: true
+          enum:
+            - Publish
+            - Approve
+            - Reject
+            - Unpublish
+            - Deprecate
+            - Retire
+            - Recycle
+            - Re-Publish
+            - 'Submit#for#Review'
+        - $ref: '#/parameters/appId-Q'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nLifecycle changed successfully.\n"
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nRequested App does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/mobile/binaries:
+    post:
+      summary: Uploading binary files
+      description: |
+        Uploading .apk/.IPA binary files.
+      parameters:
+        - in: body
+          name: body
+          description: Upload .apk/.IPA file into App Publisher
+          required: true
+          schema:
+            $ref: '#/definitions/Binary'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: "OK. \nLifecycle changed successfully.\n"
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nRequested App does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+parameters:
+  appId:
+    name: appId
+    in: path
+    description: "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    required: true
+    type: string
+  appType:
+    name: appType
+    in: path
+    description: |
+      App Type. Either webapp or mobileapp
+    required: true
+    type: string
+  appId-Q:
+    name: appId
+    in: query
+    description: "**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    required: true
+    type: string
+  limit:
+    name: limit
+    in: query
+    description: |
+      Maximum size of resource array to return.
+    default: 25
+    type: integer
+  offset:
+    name: offset
+    in: query
+    description: "Starting point within the complete list of items qualified.  \n"
+    default: 0
+    type: integer
+  Accept:
+    name: Accept
+    in: header
+    description: |
+      Media types acceptable for the response. Default is JSON.
+    default: JSON
+    type: string
+  Content-Type:
+    name: Content-Type
+    in: header
+    description: |
+      Media type of the entity in the body. Default is JSON.
+    default: JSON
+    required: true
+    type: string
+  If-None-Match:
+    name: If-None-Match
+    in: header
+    description: >
+      Validator for conditional requests; based on the ETag of the formerly
+      retrieved
+
+      variant of the resourec.
+    type: string
+  If-Modified-Since:
+    name: If-Modified-Since
+    in: header
+    description: "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n"
+    type: string
+  If-Match:
+    name: If-Match
+    in: header
+    description: |
+      Validator for conditional requests; based on ETag.
+    type: string
+  If-Unmodified-Since:
+    name: If-Unmodified-Since
+    in: header
+    description: |
+      Validator for conditional requests; based on Last Modified header.
+    type: string
+definitions:
+  AppList:
+    title: App List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of App returned.
+        example: 1
+      next:
+        type: string
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/app?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/app?limit=1&offset=0&query='
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/AppInfo'
+  AppInfo:
+    title: App Info object with basic App details.
+    properties:
+      id:
+        type: string
+        example: 01234567-0123-0123-0123-012345678901
+      name:
+        type: string
+        example: CalculatorApp
+      description:
+        type: string
+        example: A calculator App that supports basic operations
+      context:
+        type: string
+        example: CalculatorApp
+      version:
+        type: string
+        example: 1.0.0
+      provider:
+        description: >
+          If the provider value is not given, the user invoking the App will be
+          used as the provider.
+        type: string
+        example: admin
+      lifecycleState:
+        type: string
+        example: CREATED
+  App:
+    title: App object
+    required:
+      - name
+      - context
+      - version
+      - appDefinition
+      - transport
+    properties:
+      id:
+        type: string
+        description: |
+          UUID of the app registry artifact
+        example: 01234567-0123-0123-0123-012345678901
+      name:
+        type: string
+        example: CalculatorApp
+      type:
+        type: string
+        description: App type (either Webapp/Mobile app
+        example: 01234567-0123-0123-0123-012345678901
+      isSite:
+        type: string
+        description: Either a webapp or site
+        example: for sites - TRUE
+      description:
+        type: string
+        example: A calculator App that supports basic operations
+      context:
+        type: string
+        example: CalculatorApp
+      version:
+        type: string
+        example: 1.0.0
+      provider:
+        description: >
+          If the provider value is not given user invoking the api will be used
+          as the provider.
+        type: string
+        example: admin
+      appDefinition:
+        description: >
+          Swagger definition of the App which contains details about URI
+          templates and scopes
+        type: string
+        example: "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
+      isDefaultVersion:
+        type: boolean
+        example: false
+      transport:
+        description: |
+          Supported transports for the App (http and/or https).
+        type: array
+        items:
+          type: string
+        example:
+          - http
+          - https
+      tags:
+        type: array
+        items:
+          type: string
+        example:
+          - substract
+          - add
+      thumbnailUrl:
+        type: string
+        example: ''
+      visibleRoles:
+        type: array
+        items:
+          type: string
+        example: []
+      path:
+        description: |
+          Registry path of the asset
+        type: string
+        example: /_system/governance/mobileapps/admin/android/test/1.0
+      resourceId:
+        description: |
+          Resource Id path of the asset
+        type: string
+        example: /_system/governance/mobileapps/admin/android/test/1.0
+      lifecycle:
+        description: |
+          lifecycle type of the asset
+        type: string
+        example: MobileAppLifeCycle
+      lifecycleState:
+        description: |
+          lifecycle state of the asset
+        type: string
+        example: Created
+      appUrL:
+        description: |
+          URL of the asset
+        type: string
+        example: /publisher/api/mobileapp/getfile/WKzeMgMhOrGvwTy.apk
+      bundleversion:
+        description: |
+          Bundleversion of the asset
+        type: string
+        example: '1.0'
+      packagename:
+        description: |
+          packagename of the asset
+        type: string
+        example: home.jmstudios.calc
+      category:
+        description: |
+          category of the asset
+        type: string
+        example: Business
+      displayName:
+        description: |
+          displayName of the asset
+        type: string
+        example: testapp1
+      screenshots:
+        description: |
+          packagename of the asset
+        type: string
+        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+      banner:
+        description: |
+          /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg
+        type: string
+        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+      createdtime:
+        description: |
+          createdtime of the asset
+        type: string
+        example: 00000001458300149192
+      platform:
+        description: |
+          platform of the asset
+        type: string
+        example: andoid
+      lifecycleAvailableActions:
+        description: |
+          platform of the asset
+        type: string
+        example: '[Submit for Review]'
+  Binary:
+    title: upload binary
+    required:
+      - name
+    properties:
+      binaryId:
+        type: string
+        example: '1'
+      name:
+        type: string
+        example: anroidapp.apk
+  Error:
+    title: Error object returned with 4XX HTTP status
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+        description: Error message.
+      description:
+        type: string
+        description: |
+          A detail description about the error message.
+      moreInfo:
+        type: string
+        description: |
+          Preferably an url with more details about the error.
+      error:
+        type: array
+        description: "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n"
+        items:
+          $ref: '#/definitions/ErrorListItem'
+  ErrorListItem:
+    title: Description of individual errors that may have occurred during a request.
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+        description: |
+          Description about individual errors occurred

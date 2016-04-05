@@ -1,35 +1,36 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
+import java.util.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 
 
-
-
-
-public class AppListDTO {
+@ApiModel(description = "")
+public class AppListDTO  {
+  
+  
   
   private Integer count = null;
+  
+  
   private String next = null;
+  
+  
   private String previous = null;
+  
+  
   private List<AppInfoDTO> list = new ArrayList<AppInfoDTO>();
 
   
   /**
-   * Number of App returned.\n
+   * Number of App returned.
    **/
-  public AppListDTO count(Integer count) {
-    this.count = count;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "1", value = "Number of App returned.\n")
+  @ApiModelProperty(value = "Number of App returned.")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -40,15 +41,9 @@ public class AppListDTO {
 
   
   /**
-   * Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n
+   * Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.
    **/
-  public AppListDTO next(String next) {
-    this.next = next;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "/app?limit=1&amp;offset=2&amp;query=", value = "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n")
+  @ApiModelProperty(value = "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.")
   @JsonProperty("next")
   public String getNext() {
     return next;
@@ -59,15 +54,9 @@ public class AppListDTO {
 
   
   /**
-   * Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n
+   * Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.
    **/
-  public AppListDTO previous(String previous) {
-    this.previous = previous;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "/app?limit=1&amp;offset=0&amp;query=", value = "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n")
+  @ApiModelProperty(value = "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.")
   @JsonProperty("previous")
   public String getPrevious() {
     return previous;
@@ -79,12 +68,6 @@ public class AppListDTO {
   
   /**
    **/
-  public AppListDTO list(List<AppInfoDTO> list) {
-    this.list = list;
-    return this;
-  }
-
-  
   @ApiModelProperty(value = "")
   @JsonProperty("list")
   public List<AppInfoDTO> getList() {
@@ -97,47 +80,15 @@ public class AppListDTO {
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    AppListDTO appList = (AppListDTO) o;
-    return Objects.equals(count, appList.count) &&
-        Objects.equals(next, appList.next) &&
-        Objects.equals(previous, appList.previous) &&
-        Objects.equals(list, appList.list);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(count, next, previous, list);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AppList {\n");
+    sb.append("class AppListDTO {\n");
     
-    sb.append("    count: ").append(toIndentedString(count)).append("\n");
-    sb.append("    next: ").append(toIndentedString(next)).append("\n");
-    sb.append("    previous: ").append(toIndentedString(previous)).append("\n");
-    sb.append("    list: ").append(toIndentedString(list)).append("\n");
-    sb.append("}");
+    sb.append("  count: ").append(count).append("\n");
+    sb.append("  next: ").append(next).append("\n");
+    sb.append("  previous: ").append(previous).append("\n");
+    sb.append("  list: ").append(list).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-

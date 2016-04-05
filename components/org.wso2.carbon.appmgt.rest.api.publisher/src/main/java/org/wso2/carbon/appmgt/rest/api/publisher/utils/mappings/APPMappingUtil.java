@@ -212,7 +212,7 @@ public class APPMappingUtil {
         }
 
         if (model.getLifeCycleName() != null) {
-            dto.lifecycle(model.getLifeCycleName());
+            dto.setLifecycle(model.getLifeCycleName());
         }
 
         return dto;
