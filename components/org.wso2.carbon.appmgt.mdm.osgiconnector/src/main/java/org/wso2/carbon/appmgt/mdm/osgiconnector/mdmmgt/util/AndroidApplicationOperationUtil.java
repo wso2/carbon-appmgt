@@ -29,7 +29,7 @@ import org.wso2.carbon.device.mgt.core.operation.mgt.ProfileOperation;
 public class AndroidApplicationOperationUtil {
 
 	/**
-	 * This method is used to create Install Application operation.
+	 * Create Install Application operation.
 	 *
 	 * @param application MobileApp application
 	 * @return operation
@@ -69,7 +69,7 @@ public class AndroidApplicationOperationUtil {
 	}
 
 	/**
-	 * This method is used to create Uninstall Application operation.
+	 * Create Uninstall Application operation.
 	 *
 	 * @param application MobileApp application
 	 * @return operation

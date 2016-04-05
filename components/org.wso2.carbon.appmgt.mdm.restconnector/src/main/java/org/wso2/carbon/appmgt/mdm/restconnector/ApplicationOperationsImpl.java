@@ -170,6 +170,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			                                        "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			log.error(e);
+			throw new MobileApplicationException(e);
 		}
 
 		String requestURL = configProperties.get(Constants.PROPERTY_SERVER_URL);

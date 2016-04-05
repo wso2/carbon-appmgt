@@ -32,7 +32,7 @@ import java.util.Properties;
 public class IOSApplicationOperationUtil {
 
 	/**
-	 * This method is used to create Install Application operation.
+	 * Create Install Application operation.
 	 *
 	 * @param application MobileApp application
 	 * @return operation
@@ -94,7 +94,7 @@ public class IOSApplicationOperationUtil {
 	}
 
 	/**
-	 * This method is used to create uninstall operations
+	 * Create uninstall operations
 	 *
 	 * @param application
 	 * @return Uninstall operation

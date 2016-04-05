@@ -76,9 +76,9 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
+                            !org.wso2.carbon.appmgt.mobile.internal
                             org.wso2.mobile.utils.utilities.*,
                             org.wso2.carbon.appmgt.mobile.*,
-                            !org.wso2.carbon.appmgt.mobile.internal
                         </Export-Package>
                     </instructions>
                 </configuration>
