@@ -30,7 +30,7 @@ public class MDMServiceAPIUtils {
 	private static Log log = LogFactory.getLog(MDMServiceAPIUtils.class);
 
 	/**
-	 * Returns the DeviceManagementProviderService osgi service
+	 * Returns the DeviceManagementProviderService osgi service.
 	 *
 	 * @param tenantId tenant id
 	 * @return DeviceManagementProviderService
@@ -50,7 +50,7 @@ public class MDMServiceAPIUtils {
 	}
 
 	/**
-	 * Returns the ApplicationManagementProviderService osgi service
+	 * Returns the ApplicationManagementProviderService osgi service.
 	 *
 	 * @param tenantId tenant id
 	 * @return ApplicationManagementProviderService

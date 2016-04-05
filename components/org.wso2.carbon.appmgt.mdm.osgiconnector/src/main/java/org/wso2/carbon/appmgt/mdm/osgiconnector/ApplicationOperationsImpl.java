@@ -45,14 +45,14 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	private static final Log log = LogFactory.getLog(ApplicationOperationsImpl.class);
 
 	/**
-	 * @param applicationOperationAction holds the information needs to perform an action on mdm
+	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 * @throws MobileApplicationException
 	 */
 	public void performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (log.isDebugEnabled()) {
 			log.debug(applicationOperationAction.getAction() + " action is triggered for " +
-			          applicationOperationAction.getType());
+			          applicationOperationAction.getType() +".");
 		}
 
 		Operation operation = null;
@@ -166,17 +166,17 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				                  .installApplicationForDevices(operation, deviceIdentifiers);
 			}
 		} catch (DeviceApplicationException mdmExce) {
-			log.error("Error in creating operation object using app", mdmExce);
+			log.error("Error in creating operation object using app.", mdmExce);
 			throw new MobileApplicationException(mdmExce);
 		} catch (ApplicationManagementException appMgtExce) {
-			log.error("Error in app installation", appMgtExce);
+			log.error("Error in app installation.", appMgtExce);
 			throw new MobileApplicationException(appMgtExce);
 		}
 
 	}
 
 	/**
-	 * Create a new device identifier from Device object
+	 * Create a new device identifier from Device object.
 	 * @param device device which is to be retrieved type and id
 	 * @return created device identifier
 	 */
@@ -190,7 +190,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	}
 
 	/**
-	 * @param applicationOperationDevice holds the information needs to retrieve device list
+	 * @param applicationOperationDevice holds the information needs to retrieve device list.
 	 * @return List of devices
 	 * @throws MobileApplicationException
 	 */
@@ -240,7 +240,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				}
 			}
 		} catch (DeviceManagementException e) {
-			log.error("Error While retrieving Device List", e);
+			log.error("Error While retrieving Device List.", e);
 			throw new MobileApplicationException(e);
 
 		}

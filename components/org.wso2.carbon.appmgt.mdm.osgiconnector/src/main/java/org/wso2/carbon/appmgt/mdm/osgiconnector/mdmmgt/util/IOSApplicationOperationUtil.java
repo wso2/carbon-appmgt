@@ -94,7 +94,7 @@ public class IOSApplicationOperationUtil {
 	}
 
 	/**
-	 * Create uninstall operations
+	 * Create uninstall operations.
 	 *
 	 * @param application
 	 * @return Uninstall operation

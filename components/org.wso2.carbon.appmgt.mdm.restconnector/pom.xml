@@ -66,8 +66,8 @@
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
-                            !org.wso2.carbon.appmgt.mdm.restconnector.internal
-                            org.wso2.carbon.appmgt.mdm.restconnector.*,
+                            !org.wso2.carbon.appmgt.mdm.restconnector.internal,
+                            org.wso2.carbon.appmgt.mdm.restconnector.*
                         </Export-Package>
                     </instructions>
                 </configuration>

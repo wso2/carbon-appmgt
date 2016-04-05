@@ -38,7 +38,7 @@ public class RestUtils {
 	private static final Log log = LogFactory.getLog(RestUtils.class);
 
 	/**
-	 * If not exists generate new access key or return existing one
+	 * If not exists generate new access key or return existing one.
 	 *
 	 * @param remoteServer bean that holds information about remote server
 	 * @param generateNewKey whether generate new access key or not
@@ -105,7 +105,7 @@ public class RestUtils {
 	}
 
 	/**
-	 * Execute HTTP method and return whether operation success or not
+	 * Execute HTTP method and return whether operation success or not.
 	 *
 	 * @param remoteServer Bean that holds information about remote server
 	 * @param httpClient HTTP client object

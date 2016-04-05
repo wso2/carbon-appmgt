@@ -39,7 +39,7 @@ public class DeviceApplicationServiceComponent {
 		mdmServiceRegistration = bundleContext
 				.registerService(ApplicationOperations.class.getName(), new ApplicationOperationsImpl(), null);
 		if (log.isDebugEnabled()) {
-			log.debug("Device Application Service Component activated");
+			log.debug("Device Application Service Component activated.");
 		}
 
 	}
@@ -50,7 +50,7 @@ public class DeviceApplicationServiceComponent {
 			mdmServiceRegistration = null;
 		}
 		if (log.isDebugEnabled()) {
-			log.debug("Device Application Service Component deactivated");
+			log.debug("Device Application Service Component deactivated.");
 		}
 
 	}

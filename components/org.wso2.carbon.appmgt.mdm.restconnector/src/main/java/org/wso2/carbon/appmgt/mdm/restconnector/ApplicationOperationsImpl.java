@@ -21,6 +21,7 @@
 package org.wso2.carbon.appmgt.mdm.restconnector;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -56,7 +57,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	private static final RemoteServer remoteServer = new RemoteServer();
 
 	/**
-	 * @param applicationOperationAction holds the information needs to perform an action on mdm
+	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 */
 	@Override public void performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
@@ -199,7 +200,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	}
 
 	/**
-	 * @param applicationOperationDevice holds the information needs to retrieve device list
+	 * @param applicationOperationDevice holds the information needs to retrieve device list.
 	 * @return List of devices
 	 */
 	@Override public List<Device> getDevices(ApplicationOperationDevice applicationOperationDevice)
@@ -213,21 +214,20 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		String tenantDomain =
 				PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
 		String[] params = applicationOperationDevice.getParams();
-		List<Device> devices = getDevicesOfUser(params[0], tenantDomain);
-		for (Device device : devices) {
-			if ((applicationOperationDevice.getPlatform() != null &&
-			     device.getPlatform().equals(applicationOperationDevice.getPlatform())) ||
-			    (applicationOperationDevice.getPlatformVersion() != null &&
-			     device.getPlatformVersion()
-			           .equals(applicationOperationDevice.getPlatformVersion()))) {
-				filteredDevices.add(device);
-			} else if (applicationOperationDevice.getPlatform() == null &&
-			           applicationOperationDevice.getPlatformVersion() == null) {
-				filteredDevices.add(device);
-			}
+		GetMethod getMethod = new GetMethod();
+		List<NameValuePair> nameValuePairs = new ArrayList<>();
+		String platform = applicationOperationDevice.getPlatform();
+		String platformVersion = applicationOperationDevice.getPlatformVersion();
+		if(platform != null) {
+			nameValuePairs.add(new NameValuePair(Constants.PLATFORM, platform));
 		}
 
-		return filteredDevices;
+		if(platformVersion != null) {
+			nameValuePairs.add(new NameValuePair(Constants.PLATFORM_VERSION, platform));
+		}
+
+		getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
+		return getDevicesOfUser(getMethod, params[0], tenantDomain);
 
 	}
 
@@ -262,8 +262,9 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				jsonArray =
 						(JSONArray) new JSONValue().parse(new String(getMethod.getResponseBody()));
 				if (jsonArray != null) {
-					if (log.isDebugEnabled())
+					if (log.isDebugEnabled()) {
 						log.debug("Devices received from MDM: " + jsonArray.toJSONString());
+					}
 				}
 			} catch (IOException e) {
 				String errorMessage = "Invalid response from the devices API";
@@ -334,13 +335,13 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 	}
 
-	private List<Device> getDevicesOfUser(String user, String tenantDomain)
+	private List<Device> getDevicesOfUser(GetMethod getMethod, String user, String tenantDomain)
 			throws MobileApplicationException {
 
 		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USER, user, tenantDomain);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
-		return convertJSONToDevices(this.getDevices(requestURL, null));
+		return convertJSONToDevices(this.getDevices(requestURL, getMethod));
 	}
 
 	private JSONArray getDevicesOfUsers(List<String> users, String tenantDomain)

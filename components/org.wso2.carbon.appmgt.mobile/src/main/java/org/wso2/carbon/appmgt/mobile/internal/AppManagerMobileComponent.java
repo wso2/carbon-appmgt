@@ -39,24 +39,24 @@ public class AppManagerMobileComponent {
     private static final String APPLICATION_OPERATIONS_CLASS = "ApplicationOperationsImpl";
 
     protected void activate(ComponentContext context) {
-        log.info("App Manger Mobile Component activated");
+        log.info("App Manger Mobile Component activated.");
     }
 
     protected void deactivate(ComponentContext context) {
-        log.info("App Manger Mobile Component deactivated");
+        log.info("App Manger Mobile Component deactivated.");
     }
 
     protected void setMDMService(ApplicationOperations operations) {
         if((MobileConfigurations.getInstance().getActiveMDMBundle() + "." +
             APPLICATION_OPERATIONS_CLASS).equals(operations.getClass().getName())){
             MDMServiceReferenceHolder.getInstance().setMDMOperation(operations);
-            log.info(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.ACTIVE_MDM) + " MDM is bound to App Manager");
+            log.info(MobileConfigurations.getInstance().getMDMConfigs().get(MobileConfigurations.ACTIVE_MDM) + " MDM is bound to App Manager.");
         }
 
     }
 
     protected void unsetMDMService(ApplicationOperations operations) {
-        log.info("App Manger MDM is unbound");
+        log.info("App Manger MDM is unbound.");
     }
 
 }
