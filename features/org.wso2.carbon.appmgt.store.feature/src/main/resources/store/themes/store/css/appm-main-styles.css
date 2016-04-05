@@ -625,36 +625,46 @@ active: background 10% lighter, border 5% darker
 }
 .ep-install-modal .dataTables_filter label input {
     margin: 0 0 0 0 !important;
+    min-width: 258px !important;
 }
 
 /*TODO: Remove following ID selectors*/
-#modalEnterpriseInstall .dataTables_info {
+.ep-install-modal .dataTables_info {
     float: none !important;
 }
 
-#modalEnterpriseInstall .dataTables_paginate {
+.ep-install-modal .dataTables_paginate {
     float: none !important;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_next{
+.ep-install-modal .dataTables_paginate .paginate_enabled_next{
     color: #1b63ff;
     margin-left: 5px;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_previous{
+.ep-install-modal .dataTables_paginate .paginate_enabled_previous{
     color: #1b63ff;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_disabled_next{
+.ep-install-modal .dataTables_paginate .paginate_disabled_next{
     margin-left: 5px;
 }
 
-#modalEnterpriseInstall .modal-header button {
+.ep-install-modal .modal-header button {
     color: #000000;
 }
 
 #noty_center_layout_container {
     z-index: 100000001 !important;
+}
+
+/*=================MOBILE DEVICE INSTALL MODAL*==============*/
+.modal-dialog-devices .pager li>a {
+    background-color: transparent !important;
+}
+.modal-dialog-devices .thumbnail {
+    background-color: transparent; !important;
+    border: none !important;
 }
 /*---*/
 
