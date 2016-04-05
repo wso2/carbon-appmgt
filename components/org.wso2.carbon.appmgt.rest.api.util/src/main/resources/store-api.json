@@ -149,89 +149,6 @@
                     }
                 }
             }
-        },
-        "/users": {
-            "post": {
-                "summary": "Register new user",
-                "description": "Register new user\n",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "App object that needs to be added\n",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/User"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/Content-Type"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nUser successfully registered.\n"
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict. \nUser already exists.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{userName}/lookup": {
-            "get": {
-                "summary": "Get existence status of given username",
-                "description": "Get existence status of given username.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/userName"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. Username exists.\n"
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
         }
     },
     "parameters": {
@@ -239,13 +156,6 @@
             "name": "appId",
             "in": "path",
             "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
-            "required": true,
-            "type": "string"
-        },
-        "userName": {
-            "name": "userName",
-            "in": "path",
-            "description": "userName to be check existence.\n",
             "required": true,
             "type": "string"
         },
@@ -352,18 +262,80 @@
                 }
             }
         },
-        "User": {
-            "title": "User Register",
+
+
+        "DeviceList": {
+            "title": "Device List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of Devices returned.\n",
+                    "example": 1
+                },
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "example": "/devices?limit=1&offset=2&query="
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "example": "/devices?limit=1&offset=0&query="
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DeviceInfo"
+                    }
+                }
+            }
+        },
+        "DeviceInfo": {
+            "title": "Device Info object with basic Device details.",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "01234567-0123-0123-0123-012345678901"
+                }
+            }
+        },
+
+
+
+
+        "UserList": {
+            "title": "User List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of Users returned.\n",
+                    "example": 1
+                },
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "example": "/users?limit=1&offset=2&query="
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "example": "/users?limit=1&offset=0&query="
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserInfo"
+                    }
+                }
+            }
+        },
+        "UserInfo": {
+            "title": "User Details",
             "properties": {
                 "username": {
                     "type": "string",
                     "description": "Username of the new user.\n",
                     "example": "user1"
-                },
-                "password": {
-                    "type": "string",
-                    "description": "Password of the new user.\n",
-                    "example": "p@ssw0rd"
                 }
             }
         },
