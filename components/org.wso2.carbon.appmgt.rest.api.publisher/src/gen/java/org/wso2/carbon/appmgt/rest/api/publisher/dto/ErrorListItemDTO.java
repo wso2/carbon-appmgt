@@ -1,28 +1,26 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
-
-
-
-public class ErrorListItemDTO {
+@ApiModel(description = "")
+public class ErrorListItemDTO  {
   
+  
+  @NotNull
   private String code = null;
+  
+  @NotNull
   private String message = null;
 
   
   /**
    **/
-  public ErrorListItemDTO code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  
   @ApiModelProperty(required = true, value = "")
   @JsonProperty("code")
   public String getCode() {
@@ -34,15 +32,9 @@ public class ErrorListItemDTO {
 
   
   /**
-   * Description about individual errors occurred\n
+   * Description about individual errors occurred
    **/
-  public ErrorListItemDTO message(String message) {
-    this.message = message;
-    return this;
-  }
-
-  
-  @ApiModelProperty(required = true, value = "Description about individual errors occurred\n")
+  @ApiModelProperty(required = true, value = "Description about individual errors occurred")
   @JsonProperty("message")
   public String getMessage() {
     return message;
@@ -54,43 +46,13 @@ public class ErrorListItemDTO {
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ErrorListItemDTO errorListItem = (ErrorListItemDTO) o;
-    return Objects.equals(code, errorListItem.code) &&
-        Objects.equals(message, errorListItem.message);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code, message);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ErrorListItem {\n");
+    sb.append("class ErrorListItemDTO {\n");
     
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
-    sb.append("}");
+    sb.append("  code: ").append(code).append("\n");
+    sb.append("  message: ").append(message).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-

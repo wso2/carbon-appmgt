@@ -14,6 +14,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -23,27 +24,23 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiService.class);
 
+
     @Override
-    public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
-                                                   String ifUnmodifiedSince, SecurityContext securityContext)
-            throws NotFoundException {
+    public Response appsMobileBinariesPost(BinaryDTO body, String ifMatch, String ifUnmodifiedSince) {
         // do some magic!
         return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
     }
 
     @Override
     public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
-                                   String ifNoneMatch, SecurityContext securityContext)
-            throws NotFoundException {
+                                   String ifNoneMatch) {
         List<WebApp> allMatchedApis;
         AppListDTO appListDTO;
 
@@ -96,9 +93,58 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince,
-                                             SecurityContext securityContext)
-            throws NotFoundException {
+    public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    }
+
+    @Override
+    public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
+                                                   String ifUnmodifiedSince) {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
+                                          String ifModifiedSince) {
+        AppDTO apiToReturn;
+        try {
+            //WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            String searchContent = appId;
+            String searchType = "id";
+            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
+                                                                                 appType);
+            if (allMatchedApps.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                RestApiUtil.buildNotFoundException(errorMessage, appId);
+            }
+            WebApp webApp = allMatchedApps.get(0);
+            apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
+            return Response.ok().entity(apiToReturn).build();
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving App : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
+                                          String ifUnmodifiedSince) {
+        // do some magic!
+        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince) {
         try {
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
@@ -153,62 +199,4 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                                                    AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
     }
-
-    @Override
-    public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
-                                          String ifModifiedSince, SecurityContext securityContext)
-            throws NotFoundException {
-
-        AppDTO apiToReturn;
-        try {
-            //WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
-            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String searchContent = appId;
-            String searchType = "id";
-            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
-                                                                                 appType);
-            if (allMatchedApps.isEmpty()) {
-                String errorMessage = "Could not find requested application.";
-                RestApiUtil.buildNotFoundException(errorMessage, appId);
-            }
-            WebApp webApp = allMatchedApps.get(0);
-            apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
-            return Response.ok().entity(apiToReturn).build();
-        } catch (AppManagementException e) {
-            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
-            // existence of the resource
-            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
-            } else {
-                String errorMessage = "Error while retrieving App : " + appId;
-                RestApiUtil.handleInternalServerError(errorMessage, e, log);
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
-                                          String ifUnmodifiedSince, SecurityContext securityContext)
-            throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
-
-    @Override
-    public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince,
-                                    SecurityContext securityContext)
-            throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
-
-    @Override
-    public Response appsMobileBinariesPost(byte[] body, String ifMatch, String ifUnmodifiedSince,
-                                           SecurityContext securityContext)
-            throws NotFoundException {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-    }
-
 }

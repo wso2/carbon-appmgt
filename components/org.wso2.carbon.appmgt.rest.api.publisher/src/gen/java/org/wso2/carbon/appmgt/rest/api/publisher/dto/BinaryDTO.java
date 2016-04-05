@@ -1,30 +1,27 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Objects;
-
+import javax.validation.constraints.NotNull;
 
 
 
-
-
-public class BinaryDTO {
+@ApiModel(description = "")
+public class BinaryDTO  {
+  
+  
   
   private String binaryId = null;
+  
+  @NotNull
   private String name = null;
 
   
   /**
    **/
-  public BinaryDTO binaryId(String binaryId) {
-    this.binaryId = binaryId;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "1", value = "")
+  @ApiModelProperty(value = "")
   @JsonProperty("binaryId")
   public String getBinaryId() {
     return binaryId;
@@ -36,13 +33,7 @@ public class BinaryDTO {
   
   /**
    **/
-  public BinaryDTO name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  
-  @ApiModelProperty(example = "anroidapp.apk", required = true, value = "")
+  @ApiModelProperty(required = true, value = "")
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -54,43 +45,13 @@ public class BinaryDTO {
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BinaryDTO binary = (BinaryDTO) o;
-    return Objects.equals(binaryId, binary.binaryId) &&
-        Objects.equals(name, binary.name);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(binaryId, name);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Binary {\n");
+    sb.append("class BinaryDTO {\n");
     
-    sb.append("    binaryId: ").append(toIndentedString(binaryId)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("}");
+    sb.append("  binaryId: ").append(binaryId).append("\n");
+    sb.append("  name: ").append(name).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-
