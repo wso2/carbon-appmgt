@@ -168,21 +168,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.eclipse.osgi</groupId>
-        <artifactId>org.eclipse.osgi</artifactId>
-        <version>${eclipse.osgi.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.osgi</groupId>
-        <artifactId>org.eclipse.osgi.services</artifactId>
-        <version>${eclipse.osgi.service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.wso2.carbon.devicemgt</groupId>
-        <artifactId>org.wso2.carbon.policy.mgt.core</artifactId>
-        <version>${carbon.device.mgt.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.googlecode.json-simple.wso2</groupId>
         <artifactId>json-simple</artifactId>
         <version>${json-simple.wso2.version}</version>
@@ -337,11 +322,6 @@
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.identity.oauth</artifactId>
         <version>${carbon.identity.oauth.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.wso2.carbon.identity</groupId>
-        <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-        <version>${identity.oauth.common.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon</groupId>
@@ -628,14 +608,6 @@
     <carbon.appmgt.bundle.version>1.1.3</carbon.appmgt.bundle.version>
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
 
-    <carbon.device.mgt.version>1.0.3</carbon.device.mgt.version>
-    <carbon.device.mgt.version.range>[0.8.0, 2.0.0)</carbon.device.mgt.version.range>
-
-    <junit.version>4.8.2</junit.version>
-    <cxf.version>2.7.16</cxf.version>
-    <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
-    <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
-
 	<!-- Carbon kernel version -->
     <carbon.kernel.version>4.4.3</carbon.kernel.version>
     <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
@@ -659,6 +631,7 @@
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
     <carbon.store.version>1.4.0</carbon.store.version>
+    <carbon.device.mgt.version>0.9.1</carbon.device.mgt.version>
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
     <carbon.governance.pkg.version>[4.4.0, 4.6.0)</carbon.governance.pkg.version>
