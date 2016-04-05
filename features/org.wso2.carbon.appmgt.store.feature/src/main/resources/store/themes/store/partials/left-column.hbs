@@ -3,30 +3,31 @@ its own partion sinceit does not support tags--}}
 {{!-- navigation --}}
 <nav class="navigation">
     {{#each navigation}}
-        {{#ifCond partial "==" "my-apps"}}
+        {{#ifCond partial "==" "webapp"}}
+
             <a id="my-apps-link" href="{{tenantedUrl this.url}}"
                class="{{#if active}}background-color-subscribe{{/if}}">
-                <span class="icon background-color-subscribe"><i class="fw fw-application"></i></span>
+                <span class="icon background-color-subscribe"><i class="fw fw-web-app"></i></span>
                 <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-subscribe">
-                    {{t "My Apps"}}
+                    {{t "Web Apps"}}
                 </span>
             </a>
         {{/ifCond}}
-        {{#ifCond partial "==" "my-favorites"}}
+        {{#ifCond partial "==" "site"}}
             <a id="my-favorites-link" href="{{tenantedUrl this.url}}"
                class="{{#if active}}background-color-favorite{{/if}}">
-                <span class="icon background-color-favorite"><i class="fw fw-heart"></i></span>
+                <span class="icon background-color-favorite"><i class="fw fw-globe"></i></span>
                 <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-favorite">
-                    {{t "My Favorites"}}
+                    {{t "Sites"}}
                 </span>
             </a>
         {{/ifCond}}
-        {{#ifCond partial "==" "all-apps"}}
-            <a id="all-apps-link" href="{{tenantedUrl this.url}}"
+        {{#ifCond partial "==" "mobileapp"}}
+            <a  id="all-apps-link" href="{{tenantedUrl this.url}}"
                class="{{#if active}}background-color-all-apps{{/if}}">
-                <span class="icon background-color-all-apps"><i class="fw fw-resource"></i></span>
+                <span class="icon background-color-all-apps"><i class="fw fw-mobile"></i></span>
                 <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-all-apps">
-                    {{t "All Apps"}}
+                    {{t "Mobile Apps"}}
                 </span>
             </a>
         {{/ifCond}}

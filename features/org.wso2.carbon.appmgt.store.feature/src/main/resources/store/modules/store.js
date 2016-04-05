@@ -519,6 +519,31 @@ Store.prototype.tags = function (type, isSite) {
     return tagz;
 };
 
+Store.prototype.allTags = function () {
+    var TAG_QUERY = '/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
+    var tagsDetail = this.registry.query(TAG_QUERY);
+    var tags = [];
+    var tagCount = {};
+    for (var i = 0; i < tagsDetail.length; i++) {
+        var components = tagsDetail[i].split(':');
+        var tag = components[1];
+        if (!tagCount[tag]) {
+            tagCount[tag] = 1;
+        } else {
+            tagCount[tag] += 1;
+        }
+    }
+
+    for (var key in tagCount) {
+        if (tagCount.hasOwnProperty(key)) {
+            var tag = {"name": key, "count": tagCount[key]};
+            tags.push(tag);
+        }
+    }
+    return tags;
+
+}
+
 Store.prototype.comments = function (aid, paging) {
     var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
     return registry.comments(aid, paging);

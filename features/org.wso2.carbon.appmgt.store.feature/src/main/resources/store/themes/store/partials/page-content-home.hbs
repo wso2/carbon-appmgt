@@ -1,0 +1,23 @@
+{{!-- page content - home page apps --}}
+
+{{#each assets}}
+
+    {{#if assets}}
+
+        <div class="row page-title">
+
+            <h4>{{plural}}</h4>
+            {{#ifCond type "==" "mobileapp"}}
+                {{> page-content-home/mobileapp}}
+            {{else}}
+                {{#if ../../../subscriptionOn}}
+                    {{> page-content-home/subscription-on}}
+                {{else}}
+                    {{> page-content-home/subscription-off}}
+                {{/if}}
+            {{/ifCond}}
+        </div>
+
+    {{/if}}
+{{/each}}
+

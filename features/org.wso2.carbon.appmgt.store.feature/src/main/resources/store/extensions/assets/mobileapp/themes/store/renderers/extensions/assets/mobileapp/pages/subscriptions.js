@@ -112,7 +112,7 @@ var render = function (theme, data, meta, require) {
                 {
                     partial: 'page-header',
                     context: {
-                        title: "My Mobile Apps",
+                        title: "Mobile Apps",
                         sorting: null
                     }
                 }

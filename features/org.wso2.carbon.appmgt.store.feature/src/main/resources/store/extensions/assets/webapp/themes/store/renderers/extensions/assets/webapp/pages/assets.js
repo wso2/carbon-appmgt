@@ -50,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Web Apps",
+                    title: "Web Apps",
                     sorting: createSortOptions(data)
                 }
             }
@@ -85,19 +85,21 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
+    var enabledTypeList = data.enabledTypeList;
     var leftNavigationData = [
         {
-            active: true, partial: 'all-apps', url: "/assets/webapp"
+            active: true, partial: 'webapp', url: "/assets/webapp"
         }
     ];
+    var currentAppType = 'webapp';
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            leftNavigationData.push({
+                                        active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                         enabledTypeList[i]
+                                    });
+        }
 
-    leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
-                            });
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
-                                });
     }
     return leftNavigationData;
 }

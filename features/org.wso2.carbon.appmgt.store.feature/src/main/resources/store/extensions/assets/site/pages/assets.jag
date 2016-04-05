@@ -18,6 +18,11 @@
  */
 
 include('../modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+    response.sendError(404,'Resource does not exist');
+}
 
 var AuthService;
 var authenticator;
@@ -57,8 +62,8 @@ require('/modules/store.js').exec(function (ctx) {
         tag = null;
     }
 
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -411,33 +416,29 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.assetType = "site";
 
-    if(storeHostObj.isAssetTypeEnabled("site")) {
-        caramel.render({
-            title: 'Sites | Store',
-            user: user,
-            sso: sso,
-            header: headerData,
-            search: {
-                query: query
-            },
-            type: type,
-            tags: {
-                data: store.tags(type, isSite)
-            },
-            assets: assets,
-            assetType: 'site',
-            pagination: {
-                leftNav: leftnav,
-                rightNav: rightnav,
-                urlQuery: urlQuery
-            },
-            recentAssets: siteRecentAssets
-        });
+    caramel.render({
+                       title: 'Sites | Store',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           data: store.tags(type, isSite)
+                       },
+                       assets: assets,
+                       assetType: 'site',
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: siteRecentAssets,
+                       enabledTypeList: enabledTypeList
+                   });
 
-    }
-    else {
-        response.sendError(404, 'Resource does not exist');
-    }
 }, request, response, session);
 
 function getServiceDir(serviceName) {

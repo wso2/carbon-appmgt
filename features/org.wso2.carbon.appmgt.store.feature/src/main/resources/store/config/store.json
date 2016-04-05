@@ -41,7 +41,7 @@
         "mobileapp_install": "/permission/admin/manage/mobileapp/subscribe"
     },
     "pages": {
-        "landingPage": "/extensions/assets/webapp/myapps",
+        "landingPage": "/assets/",
         "favouritePage": "/assets/favouriteapps"
     }
 }

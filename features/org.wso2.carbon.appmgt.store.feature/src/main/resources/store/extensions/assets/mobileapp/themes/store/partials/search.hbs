@@ -7,9 +7,6 @@
                    placeholder="Search for mobile apps" />
 
             <div class="input-group-btn">
-                <button type="button" class="btn" id="searchBtn">
-                    <i class="fw fw-search"></i>
-                </button>
                 <button type="button" class="btn search-by" data-toggle="collapse"
                         data-target="#searchPane">
                     {{#compare "overview_platform" searchQuery.searchTerm}}By Platform{{/compare}}
@@ -18,7 +15,9 @@
                     {{#compare "overview_name" searchQuery.searchTerm}}By Name{{/compare}}
                     <span class="caret"></span>
                 </button>
-
+                <button type="button" class="btn" id="searchBtn">
+                    <i class="fw fw-search"></i>
+                </button>
             </div>
         </div>
         <div id="searchPane" class="search-options collapse col-xs-9 col-sm-6 col-md-6 col-lg-6">

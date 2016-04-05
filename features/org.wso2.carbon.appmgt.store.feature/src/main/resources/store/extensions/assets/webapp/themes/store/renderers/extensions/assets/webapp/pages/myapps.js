@@ -50,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "My Web Apps",
+                    title: "Web Apps",
                     sorting: createSortOptions(data.user, data.config)
                 }
             }
@@ -95,23 +95,32 @@ function createSortOptions(user, config) {
 }
 
 function createLeftNavLinks(data) {
+    var enabledTypeList = data.config.enabledTypeList;
     var leftNavigationData = [
         {
-            active: true, partial: 'my-apps', url :"/extensions/assets/webapp/myapps"
+            active: true, partial: 'webapp', url: "/extensions/assets/webapp/apps"
         }
     ];
+    var currentAppType = 'webapp'
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            if (enabledTypeList[i] != currentAppType) {
+                if (enabledTypeList[i] == 'mobileapp') {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                                 enabledTypeList[i]
+                                            });
+                } else {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                           enabledTypeList[i] + "/apps"
+                                            });
+                }
 
-    if(data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
-                                });
-    }
-    if (data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url :  "/assets/webapp"
-                                });
-    }
+            }
+        }
 
+    }
     return leftNavigationData;
 }
 
@@ -120,7 +129,7 @@ function getTagUrl(data) {
     var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
     var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        tagUrl = '/extensions/assets/webapp/myapps';
+        tagUrl = '/extensions/assets/webapp/apps';
     } else {
         tagUrl = '/assets/webapp';
     }

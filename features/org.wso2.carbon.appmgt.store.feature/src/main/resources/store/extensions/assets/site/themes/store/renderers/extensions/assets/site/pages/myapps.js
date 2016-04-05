@@ -50,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "My Sites",
+                    title: "Sites",
                     sorting: createSortOptions(data.user, data.config)
                 }
             }
@@ -95,24 +95,28 @@ function createSortOptions(user, config) {
 }
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
+    var enabledTypeList = data.config.enabledTypeList;
     var leftNavigationData = [
         {
-            active: true, partial: 'my-apps', url: "/extensions/assets/site/myapps"
+            active: true, partial: 'site', url: "/extensions/assets/site/apps"
         }
     ];
-
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=site"
-                                });
+    var currentAppType = 'site'
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            if (enabledTypeList[i] == 'mobileapp') {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                             enabledTypeList[i]
+                                        });
+            } else {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                           enabledTypeList[i] + "/apps"
+                                        });
+            }
+        }
     }
-    if (data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url: "/assets/site"
-                                });
-    }
-
     return leftNavigationData;
 }
 

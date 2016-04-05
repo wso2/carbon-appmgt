@@ -22,6 +22,11 @@ require('/modules/store.js').exec(function (ctx) {
     var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
     var storeHostObj = jagg.module("manager").getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(tenantDomain);
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+    var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
     var isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
 
@@ -124,7 +129,12 @@ require('/modules/store.js').exec(function (ctx) {
         },
         myAssets: { user: user, type: type, title: title },
         recentAssets: store.recentAssets(type),
-        assetType: "mobileapp"
+        assetType: "mobileapp",
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        }
     });
 }, request, response, session);
 %>

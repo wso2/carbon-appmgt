@@ -60,6 +60,8 @@ require('/modules/store.js').exec(function (ctx) {
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSite = 'false';//To get the webapp tags
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
@@ -153,7 +155,6 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             asset.rating = 0.0;
         }
-
         //check asset LC state
         //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
         //}
@@ -386,10 +387,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         var availableTiers = apiInfoManager.getTiers();
 
-        // user=authenticator.getLoggedInUser();
-
-        var subscriptionInfo = getSubscriptionInfo(asset);
-
+        var subscriptionInfo;
 
         var isEnterpriseSubscriptionAllowed = false;
 
@@ -414,7 +412,7 @@ require('/modules/store.js').exec(function (ctx) {
             isFavourite = isFavouriteApp(asset);
         }
 
-        if (subscriptionInfo.individualSubscription) {
+        if (subscriptionInfo && subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
                 isSubscribed = true;
                 subscriptionInfo.individualSubscription["OnHold"] = false;
@@ -538,7 +536,8 @@ require('/modules/store.js').exec(function (ctx) {
             isSubscriptionAvailable: isSubscriptionAvailable,
             config: {
                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList: enabledTypeList
             },
             assetType : 'webapp'
         });
