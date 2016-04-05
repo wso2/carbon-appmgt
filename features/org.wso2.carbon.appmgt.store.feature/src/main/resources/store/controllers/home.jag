@@ -1,7 +1,4 @@
 <%
-//TODO : remove this and fix welcome page properly
-//response.sendRedirect('.' + require('/store.js').config().assetsUrlPrefix + '/gadget');
-
 var caramel;
 var customType;
 
@@ -9,29 +6,20 @@ include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 var storeHostObj = jagg.module("manager").getAPIStoreObj();
 
 require('/modules/store.js').exec(function (ctx) {
-    var paging, count, current, loggedUser, manager, assets, length, recentDiff,
-            popularDiff, recent, popular, type, process,
+    var paging,  manager, assets, length,
             log = ctx.log,
             query = ctx.params.query,
             tag = ctx.params.tag,
             sso = ctx.sso,
             store = ctx.store,
             user = ctx.user,
-            tenantId = ctx.tenant.tenantId || -1234,
             storeTenantDomain = ctx.tenant.domain,
-            configs = ctx.configs,
             site = ctx.site,
-            matcher = ctx.matcher,
-            first = true,
-            recentCount = 10,
-            popularCount = 10,
             items = [],
             popularItems = [],
             recentItems = [],
-            options = {},
             types = store.assetTypes(),
             search = require('/modules/search.js'),
-            utility = require('/modules/util.js'), isSubscribed,
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
     caramel = require('caramel');
@@ -52,7 +40,6 @@ require('/modules/store.js').exec(function (ctx) {
         navigationData.showAllAppsLink = false;
     }
 
-    length = types.length;
     paging = store.assetsPaging(request);
     query = query ? search.build(String(query)) : null;
 
@@ -60,7 +47,6 @@ require('/modules/store.js').exec(function (ctx) {
     var WEBAPP_TYPE = 'webapp';
     var MOBILEAPP_TYPE = 'mobileapp';
     var siteAttribute;
-    var RECENT_APP_COUNT = Math.floor(store.getRecentAppCount().topAssetPage / length);
 
     types.forEach(function (type) {
         if(!storeHostObj.isAssetTypeEnabled(type)) {
