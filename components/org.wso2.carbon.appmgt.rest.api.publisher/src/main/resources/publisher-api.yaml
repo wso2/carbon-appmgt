@@ -328,23 +328,24 @@ paths:
             $ref: '#/definitions/Error'
   /apps/mobile/binaries:
     post:
+      consumes:
+        - multipart/form-data
       summary: Uploading binary files
       description: |
         Uploading .apk/.IPA binary files.
       parameters:
-        - in: body
-          name: body
-          description: Upload .apk/.IPA file into App Publisher
-          required: true
-          schema:
-            $ref: '#/definitions/Binary'
+        - in: formData
+          name: file
+          description: Document to upload
+          type: file
+          required: false
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
       tags:
         - MobileApps
       responses:
         '200':
-          description: "OK. \nLifecycle changed successfully.\n"
+          description: "OK. \nBinary file uploaded successfully.\n"
           headers:
             ETag:
               description: >
@@ -352,7 +353,7 @@ paths:
                 request.
               type: string
             Last-Modified:
-              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
+              description: "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n"
               type: string
         '400':
           description: "Bad Request. \nInvalid request or validation error\n"
