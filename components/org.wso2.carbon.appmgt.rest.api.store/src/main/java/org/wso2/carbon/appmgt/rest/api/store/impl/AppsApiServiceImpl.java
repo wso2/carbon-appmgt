@@ -7,14 +7,21 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.rest.api.store.ApiResponseMessage;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.DownloadDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -24,15 +31,59 @@ public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
 
     @Override
-    public Response appsDownloadPost(String contentType, DownloadDTO download) {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    public Response appsDownloadPost(String contentType, InstallDTO install) {
+        try {
+            if (install.getApps().size() == 0) {
+                String errorMessage = "Apps not found in payload.";
+                return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+            }
+
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            int tenantId = 0;
+            Registry registry = null;
+
+            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            registry = ServiceReferenceHolder.getInstance().getRegistryService().getGovernanceUserRegistry(
+                    tenantUserName, tenantId);
+
+
+            //Install to Devices
+            if (contentType == "device") {
+                if (install.getDevices().size() == 0) {
+                    String errorMessage = "Devices not found in payload.";
+                    return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+                }
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry) registry,
+                                                                                    "mobileapp");
+                GenericArtifact artifact = artifactManager.getGenericArtifact(install.getApps().get(0).getId());
+                APPMappingUtil.subscribeApp(registry, username, install.getApps().get(0).getId());
+                APPMappingUtil.showAppVisibilityToUser(artifact.getPath(), username, "ALLOW");
+            } else if (contentType == "user") {
+
+            /*
+            params.forEach(function(username) {
+                var path = user.userSpace({username:username, tenantId:tenantId})+SUBSCRIPTIONS_PATH + app;
+
+                subscribe(path, app, username);
+            }
+*/
+            }
+        } catch (RegistryException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing User Store", e, log);
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
+        }
+        return null;
     }
 
     @Override
-    public Response appsUninstallationPost(String contentType, DownloadDTO download) {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    public Response appsUninstallationPost(String contentType, InstallDTO install) {
+        return null;
     }
 
     @Override
@@ -119,4 +170,6 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
         return null;
     }
+
+
 }

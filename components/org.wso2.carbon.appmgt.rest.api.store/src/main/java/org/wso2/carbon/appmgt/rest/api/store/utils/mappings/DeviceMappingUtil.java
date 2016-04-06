@@ -14,7 +14,7 @@ public class DeviceMappingUtil {
     /**
      * Converts a List object of APIs into a DTO
      *
-     * @param deviceList List of APIs
+     * @param deviceList List of Devices
      * @param limit      maximum number of APIs returns
      * @param offset     starting index
      * @return APIListDTO object containing APIDTOs

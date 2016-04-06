@@ -31,6 +31,10 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.registry.api.Resource;
+import org.wso2.carbon.registry.core.ActionConstants;
+import org.wso2.carbon.registry.core.Registry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -203,12 +207,50 @@ public class APPMappingUtil {
         }
 
 
-
         if (model.getLifeCycleName() != null) {
             dto.setLifecycle(model.getLifeCycleName());
         }
 
         return dto;
+    }
+
+    public static void subscribeApp(Registry registry, String userId, String appId)
+            throws org.wso2.carbon.registry.api.RegistryException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        Resource resource = null;
+        try {
+            resource = registry.get(path);
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            log.error("RegistryException occurred");
+            log.debug("Error: " + e);
+        }
+        if (resource == null) {
+            resource = registry.newResource();
+            resource.setContent("");
+            registry.put(path, resource);
+        }
+    }
+
+    public static boolean showAppVisibilityToUser(String appPath, String username, String opType) {
+        String userRole = "Internal/private_" + username;
+
+        try {
+            if ("ALLOW".equalsIgnoreCase(opType)) {
+                org.wso2.carbon.user.api.UserRealm realm =
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().authorizeRole(userRole, appPath, ActionConstants.GET);
+                return true;
+            } else if ("DENY".equalsIgnoreCase(opType)) {
+                org.wso2.carbon.user.api.UserRealm realm =
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm();
+                realm.getAuthorizationManager().denyRole(userRole, appPath, ActionConstants.GET);
+                return true;
+            }
+            return false;
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            log.error("Error while updating visibility of mobile app at " + appPath, e);
+            return false;
+        }
     }
 
 

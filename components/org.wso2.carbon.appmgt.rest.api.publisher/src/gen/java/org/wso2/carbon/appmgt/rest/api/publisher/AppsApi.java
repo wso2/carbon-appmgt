@@ -1,25 +1,25 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.factories.AppsApiServiceFactory;
-
 import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.factories.AppsApiServiceFactory;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
+import java.io.InputStream;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -31,11 +31,11 @@ public class AppsApi  {
 
     @POST
     @Path("/mobile/binaries")
-    @Consumes({ "application/json" })
+    @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Uploading binary files", notes = "Uploading .apk/.IPA binary files.", response = Void.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nLifecycle changed successfully."),
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nBinary file uploaded successfully."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error"),
         
@@ -43,11 +43,12 @@ public class AppsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
 
-    public Response appsMobileBinariesPost(@ApiParam(value = "Upload .apk/.IPA file into App Publisher" ,required=true ) BinaryDTO body,
+    public Response appsMobileBinariesPost(@ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
+    @ApiParam(value = "Document to upload : details") @Multipart(value = "file" , required = false) Attachment fileDetail,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
     {
-    return delegate.appsMobileBinariesPost(body,ifMatch,ifUnmodifiedSince);
+    return delegate.appsMobileBinariesPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/{appType}")

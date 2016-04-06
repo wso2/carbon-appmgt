@@ -1,20 +1,24 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
-import io.swagger.annotations.ApiParam;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.DownloadDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.*;
+import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import io.swagger.annotations.ApiParam;
+
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -39,9 +43,9 @@ public class AppsApi  {
         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nResource to be deleted does not exist.") })
 
     public Response appsDownloadPost(@ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
-    @ApiParam(value = ""  ) DownloadDTO download)
+    @ApiParam(value = ""  ) InstallDTO install)
     {
-    return delegate.appsDownloadPost(contentType,download);
+    return delegate.appsDownloadPost(contentType,install);
     }
     @POST
     @Path("/uninstallation")
@@ -58,9 +62,9 @@ public class AppsApi  {
         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nResource to be deleted does not exist.") })
 
     public Response appsUninstallationPost(@ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
-    @ApiParam(value = ""  ) DownloadDTO download)
+    @ApiParam(value = ""  ) InstallDTO install)
     {
-    return delegate.appsUninstallationPost(contentType,download);
+    return delegate.appsUninstallationPost(contentType,install);
     }
     @GET
     @Path("/{appType}")

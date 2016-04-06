@@ -136,9 +136,9 @@ paths:
         Download an new App
       parameters:
         - in: body
-          name: download
+          name: install
           schema:
-            $ref: '#/definitions/Download'
+            $ref: '#/definitions/Install'
         - $ref: '#/parameters/Content-Type'
       tags:
         - Apps
@@ -165,9 +165,9 @@ paths:
         Uninstall an existing App
       parameters:
         - in: body
-          name: download
+          name: install
           schema:
-            $ref: '#/definitions/Download'
+            $ref: '#/definitions/Install'
         - $ref: '#/parameters/Content-Type'
       tags:
         - Apps
@@ -547,8 +547,8 @@ definitions:
         description: |
           Username of the new user.
         example: user1
-  Download:
-    title: Download App
+  Install:
+    title: Install/Download App
     properties:
       type:
         type: string
@@ -558,11 +558,15 @@ definitions:
       users:
         type: array
         items:
-          $ref: '#/definitions/UserList'
+          $ref: '#/definitions/UserInfo'
       devices:
         type: array
         items:
-          $ref: '#/definitions/DeviceList'
+          $ref: '#/definitions/DeviceInfo'
+      apps:
+        type: array
+        items:
+          $ref: '#/definitions/AppInfo'
   Error:
     title: Error object returned with 4XX HTTP status
     required:
