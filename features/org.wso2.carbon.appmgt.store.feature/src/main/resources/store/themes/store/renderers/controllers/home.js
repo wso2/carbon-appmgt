@@ -1,5 +1,5 @@
 var render = function (theme, data, meta, require) {
-    data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
+    data.tags.tagUrl = "/assets/";
 
     data.header.active = 'store';
     var enabledTypeList = data.config.enabledTypeList;
@@ -83,26 +83,3 @@ function createLeftNavLinks(data) {
     return leftNavigationData;
 }
 
-function getTagAndSearchUrl(data) {
-    var URLs = {}
-    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
-    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        if (data.assetType == "webapp") {
-            URLs.tagUrl = '/extensions/assets/webapp/myapps';
-            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
-        } else {
-            URLs.tagUrl = '/extensions/assets/site/myapps';
-            URLs.searchUrl = '/assets/favouriteapps?type=site';
-        }
-    } else {
-        if (data.assetType == "webapp") {
-            URLs.tagUrl = '/assets/webapp';
-            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
-        } else {
-            URLs.tagUrl = '/assets/site';
-            URLs.searchUrl = '/assets/favouriteapps?type=site';
-        }
-    }
-    return URLs;
-}

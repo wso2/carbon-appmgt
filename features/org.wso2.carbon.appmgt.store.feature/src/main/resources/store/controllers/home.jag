@@ -71,7 +71,19 @@ require('/modules/store.js').exec(function (ctx) {
                                       type: type
                                   }, paging);
         } else if (tag) {
-            assets = store.tagged(type, tag, paging);
+            var SITE_QUERY = {};
+            SITE_QUERY.overview_treatAsASite = (customType==SITE_TYPE) ? "TRUE": "FALSE";
+            if (!isMultipleVersionDisplayEnabled) {
+                SITE_QUERY.overview_makeAsDefaultVersion = "true"
+            }
+
+            var options = {
+                attributes: SITE_QUERY
+            };
+            options.tag = tag;
+            options.type = type;
+            options.lifecycleState = ["published"];
+            assets = store.taggeds(type, options, paging);
         } else {
             if (customType == MOBILEAPP_TYPE) {
                 assets = store.assets(customType, paging);
@@ -161,7 +173,7 @@ require('/modules/store.js').exec(function (ctx) {
                            isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
                        },
                        tags: {
-                           data: {}
+                           data: store.allTags()
                        },
                        config: {
                            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,

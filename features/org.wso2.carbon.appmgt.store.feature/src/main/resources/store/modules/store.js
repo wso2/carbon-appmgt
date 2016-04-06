@@ -521,7 +521,8 @@ Store.prototype.tags = function (type, isSite) {
 
 Store.prototype.allTags = function () {
     var TAG_QUERY = '/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
-    var tagsDetail = this.registry.query(TAG_QUERY);
+    var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
+    var tagsDetail = registry.query(TAG_QUERY);
     var tags = [];
     var tagCount = {};
     for (var i = 0; i < tagsDetail.length; i++) {
