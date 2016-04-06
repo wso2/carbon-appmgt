@@ -3,7 +3,7 @@ package org.wso2.carbon.appmgt.rest.api.storeadmin.impl;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.UsersApiService;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserListDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings.UsersMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.UsersMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;

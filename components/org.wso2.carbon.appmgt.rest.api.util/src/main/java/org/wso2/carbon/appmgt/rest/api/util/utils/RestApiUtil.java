@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.util.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -40,6 +41,10 @@ import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
 import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.validation.ConstraintViolation;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -302,5 +307,33 @@ public class RestApiUtil {
             return false;
         }
 
+    }
+
+    /**
+     * This method uploads a given file to specified location
+     *
+     * @param uploadedInputStream input stream of the file
+     * @param newFileName         name of the file to be created
+     * @param storageLocation     destination of the new file
+     * @throws AppManagementException if the file transfer fails
+     */
+    public static void transferFile(InputStream uploadedInputStream, String newFileName, String storageLocation)
+            throws AppManagementException {
+        FileOutputStream outFileStream = null;
+
+        try {
+            outFileStream = new FileOutputStream(new File(storageLocation, newFileName));
+            int read;
+            byte[] bytes = new byte[1024];
+            while ((read = uploadedInputStream.read(bytes)) != -1) {
+                outFileStream.write(bytes, 0, read);
+            }
+        } catch (IOException e) {
+            String errorMessage = "Error in transferring files.";
+            log.error(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
+        } finally {
+            IOUtils.closeQuietly(outFileStream);
+        }
     }
 }

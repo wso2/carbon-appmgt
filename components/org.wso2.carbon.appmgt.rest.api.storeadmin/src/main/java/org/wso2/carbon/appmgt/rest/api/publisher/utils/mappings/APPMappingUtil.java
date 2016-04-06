@@ -13,20 +13,18 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
+ * /
  */
 
-package org.wso2.carbon.appmgt.rest.api.storeadmin.utils;
+package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * This class contains REST API Store related utility operations
- */
-public class RestApiStoreUtils {
+public class APPMappingUtil {
 
-    private static final Log log = LogFactory.getLog(RestApiStoreUtils.class);
+    private static final Log log = LogFactory.getLog(APPMappingUtil.class);
+
 
 
 }

@@ -369,6 +369,12 @@ public final class AppMConstants {
     public static final String SELF_SIGN_UP_ROLE = SELF_SIGN_UP + "SubscriberRoleName";
     public static final String SELF_SIGN_UP_CREATE_ROLE = SELF_SIGN_UP + "CreateSubscriberRole";
 
+    public static final String MOBILE_APPS_CONFIGURATION = "MobileAppsConfiguration.";
+    public static final String BINARY_FILE_STORAGE = MOBILE_APPS_CONFIGURATION + "BinaryFileStorage.";
+    public static final String FILE_PRECISE_LOCATION = BINARY_FILE_STORAGE + "FilePreciseLocation.";
+    public static final String FILE_API_LOCATION = BINARY_FILE_STORAGE + "FileAPILocation.";
+
+
     public static final String STATUS_OBSERVERS = "StatusObservers.";
     public static final String OBSERVER = STATUS_OBSERVERS + "Observer";
     
@@ -619,7 +625,11 @@ public final class AppMConstants {
     //Directory path and name of the mobile app resources
     public static final String MOBILE_APPS_DIRECTORY_PATH = "repository/resources";
     public static final String MOBILE_APPS_DIRECTORY_NAME = "mobileapps";
-    
+
+    //Mobile application binary file extensions
+    public static final String MOBILE_APPS_ANDROID_EXT = "apk";
+    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
     public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
     

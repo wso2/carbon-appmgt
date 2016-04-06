@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package org.wso2.carbon.appmgt.rest.api.storeadmin;
+package org.wso2.carbon.appmgt.rest.api.publisher;
 
 import io.swagger.codegen.SupportingFile;
 import io.swagger.codegen.languages.JaxRSServerCodegen;

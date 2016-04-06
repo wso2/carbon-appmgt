@@ -1,13 +1,9 @@
 package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
 
 import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleInfoDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
-
 
 
 @ApiModel(description = "")

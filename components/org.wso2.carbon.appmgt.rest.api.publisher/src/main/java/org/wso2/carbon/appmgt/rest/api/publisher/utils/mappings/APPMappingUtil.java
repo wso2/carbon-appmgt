@@ -16,7 +16,7 @@
  * /
  */
 
-package org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings;
+package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,9 +26,9 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.AppInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 

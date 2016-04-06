@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.rest.api.storeadmin;
+package org.wso2.carbon.appmgt.rest.api.publisher;
 
 /*
  *  Copyright WSO2 Inc.

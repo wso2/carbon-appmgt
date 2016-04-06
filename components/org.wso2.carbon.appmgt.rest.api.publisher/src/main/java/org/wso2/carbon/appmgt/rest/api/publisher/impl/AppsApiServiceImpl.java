@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.rest.api.storeadmin.impl;
+package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -13,11 +13,12 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.ApiResponseMessage;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings.APPMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
+import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
@@ -34,6 +35,7 @@ import java.util.List;
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiService.class);
+
 
     @Override
     public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
@@ -108,15 +110,15 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             boolean isValidAction = false;
 
-            for(APPLifecycleActions appLifecycleAction : APPLifecycleActions.values()){
-                if(appLifecycleAction.getStatus().equalsIgnoreCase(action)){
+            for (APPLifecycleActions appLifecycleAction : APPLifecycleActions.values()) {
+                if (appLifecycleAction.getStatus().equalsIgnoreCase(action)) {
                     isValidAction = true;
                     break;
                 }
             }
-            if(!isValidAction){
+            if (!isValidAction) {
                 RestApiUtil.handleBadRequest("Invalid action '" + action + "' performed on a " + appType
-                        + " with UUID " + appId, log);
+                                                     + " with UUID " + appId, log);
             }
             String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
             if (!ArrayUtils.contains(allowedLifecycleActions, action)) {

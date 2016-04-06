@@ -4,9 +4,6 @@ package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotNull;
-
-
 
 @ApiModel(description = "")
 public class UserInfoDTO  {
