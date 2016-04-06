@@ -420,17 +420,18 @@
         },
         "/apps/mobile/binaries": {
             "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "summary": "Uploading binary files",
                 "description": "Uploading .apk/.IPA binary files.\n",
                 "parameters": [
                     {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Upload .apk/.IPA file into App Publisher",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/Binary"
-                        }
+                        "in": "formData",
+                        "name": "file",
+                        "description": "Document to upload",
+                        "type": "file",
+                        "required": false
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -444,14 +445,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nLifecycle changed successfully.\n",
+                        "description": "OK. \nBinary file uploaded successfully.\n",
                         "headers": {
                             "ETag": {
                                 "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
