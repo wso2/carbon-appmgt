@@ -12,8 +12,8 @@ var RESOURCES = [
 
 
 $( document ).ready(function() {
-
-
+    $('.makeAsDefaultVersion_checkbox').click();
+    $('#overview_makeAsDefaultVersion').val("true");
     $("#overview_context").attr('maxlength','200');
 
     //get Tier details from tier.xml
@@ -259,5 +259,16 @@ function setPolicyGroupValue() {
         }
 }
 
-
+$(".makeAsDefaultVersion_checkbox").click(function () {
+    var output = [];
+    $(".makeAsDefaultVersion_checkbox").each(function (index) {
+        if ($(this).is(':checked')) {
+            output.push("true");
+        }
+        else {
+            output.push("false");
+        }
+    });
+    $('#overview_makeAsDefaultVersion').val(output);
+});
 

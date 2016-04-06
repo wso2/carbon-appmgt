@@ -160,12 +160,12 @@ public abstract class AbstractAPIManager implements APIManager {
                     "   REG_PROPERTY RP " +
                     "WHERE " +
                     "   RT.REG_ID = RRT.REG_TAG_ID  " +
-                    "   AND R.REG_MEDIA_TYPE = 'application/vnd.wso2-webapp+xml' " +
+                    "   AND R.REG_MEDIA_TYPE = ? " +
                     "   AND RRT.REG_VERSION = R.REG_VERSION " +
                     "   AND RRP.REG_VERSION = R.REG_VERSION " +
-                    "   AND RP.REG_NAME = 'registry.lifecycle.WebAppLifeCycle.state' " +
+                    "   AND RP.REG_NAME = ? " +
                     "   AND RRP.REG_PROPERTY_ID = RP.REG_ID " +
-                    "   AND (RP.REG_VALUE !='DEPRECATED' AND RP.REG_VALUE !='CREATED' AND RP.REG_VALUE !='BLOCKED' AND RP.REG_VALUE !='RETIRED') " +
+                    "   AND RP.REG_VALUE LIKE ? " +
                     "GROUP BY " +
                     "   RT.REG_TAG_NAME";
             resource.setContent(sql1);
@@ -223,7 +223,7 @@ public abstract class AbstractAPIManager implements APIManager {
                     "   REG_PATH RP " +
                     "WHERE " +
                     "   RT.REG_TAG_NAME = ? "+
-                    "   AND R.REG_MEDIA_TYPE = 'application/vnd.wso2-webapp+xml' " +
+                    "   AND R.REG_MEDIA_TYPE = ? " +
                     "   AND RP.REG_PATH_ID = R.REG_PATH_ID " +
                     "   AND RT.REG_ID = RRT.REG_TAG_ID " +
                     "   AND RRT.REG_VERSION = R.REG_VERSION ";
@@ -267,6 +267,34 @@ public abstract class AbstractAPIManager implements APIManager {
         Collections.sort(apiSortedList, new APINameComparator());
         return apiSortedList;
     }
+
+    public List<WebApp> getAllAPIs(String appType) throws AppManagementException {
+        List<WebApp> apiSortedList = new ArrayList<WebApp>();
+        boolean isTenantFlowStarted = false;
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                apiSortedList.add(AppManagerUtil.getAPI(artifact));
+            }
+
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs from the registry", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
+        Collections.sort(apiSortedList, new APINameComparator());
+        return apiSortedList;
+    }
+
 
     public WebApp getAPI(APIIdentifier identifier) throws AppManagementException {
         String apiPath = AppManagerUtil.getAPIPath(identifier);

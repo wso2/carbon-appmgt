@@ -23,6 +23,7 @@ $(".btn-action").click(function (e) {
     var name = $(this).data("name");
     var version = $(this).data("version");
 	var action = $(this).data("action");
+    var isDefault = Boolean($(this).data("isdefault"));
 
     var status = isPublishedToExternalStore(action, provider, name, version);
 
@@ -35,30 +36,30 @@ $(".btn-action").click(function (e) {
         return false;
     }
 
-	if (action == "Reject") {
-		showCommentModel("Reason for Rejection", action, app, "webapp");
-	} else {
-		jQuery.ajax({
-			url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
-			type: 'PUT',
-			success: function (data, text) {
-				var msg = data.messages[0];
-				for (var i = 1; i < data.messages.length; i++) {
-					msg = msg + "</br>" + data.messages[i];
-				}
-				//showMessageModel(msg, data.status, 'webapp');
-                location.reload();
-			},
-			error: function (request, status, error) {
-				var data = jQuery.parseJSON(request.responseText);
-				var msg = data.messages[0];
-				for (var i = 1; i < data.messages.length; i++) {
-					msg = msg + "</br>" + data.messages[i];
-				}
-				showMessageModel(msg, data.status, 'webapp');
-			}
-		});
-	}
+    if (action == "Reject") {
+        showCommentModel("Reason for Rejection", action, app, "webapp");
+    } else {
+        jQuery.ajax({
+                        url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
+                        type: 'PUT',
+                        success: function (data, text) {
+                            var msg = data.messages[0];
+                            for (var i = 1; i < data.messages.length; i++) {
+                                msg = msg + "</br>" + data.messages[i];
+                            }
+                            //showMessageModel(msg, data.status, 'webapp');
+                            location.reload();
+                        },
+                        error: function (request, status, error) {
+                            var data = jQuery.parseJSON(request.responseText);
+                            var msg = data.messages[0];
+                            for (var i = 1; i < data.messages.length; i++) {
+                                msg = msg + "</br>" + data.messages[i];
+                            }
+                            showMessageModel(msg, data.status, 'webapp');
+                        }
+                    });
+    }
 
 	// Stop even propagation since it would trigger the click event listeners for the table rows.
 	e.stopPropagation();

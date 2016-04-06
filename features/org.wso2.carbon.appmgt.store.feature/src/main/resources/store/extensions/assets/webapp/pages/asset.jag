@@ -90,6 +90,15 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (asset) {
+        var assetLifecycleState = asset.lifecycleState;
+        //If the asset is not in "Published" or "Deprecated" state, webapp overview page should not be accessible
+        if (assetLifecycleState != "Published" && assetLifecycleState != "Deprecated") {
+            response.sendError(404, 'Requested asset with assset is : ' + asset.id + 'cannot be found. It is in ' +
+            assetLifecycleState + 'state.');
+        }
+    }
+
     var getRedirectURL = function (url) {
         var contextPath = caramel.configs().context,
                 reversProxyEnabled = caramel.configs().reverseProxyEnabled,
@@ -213,7 +222,6 @@ require('/modules/store.js').exec(function (ctx) {
                     break;
                 }
             }
-            //logg.getOwner();
             return assetsFromProvider;
         }
 
@@ -493,6 +501,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
+        headerData.assetType = "webapp";
 
         var metadata = {
             appName: asset.attributes.overview_name,
@@ -509,8 +518,7 @@ require('/modules/store.js').exec(function (ctx) {
             header: headerData,
             navigation: navigationData,
             search: {
-                query: searchQuery,
-                searchUrl: tagUrl
+                query: searchQuery
             },
             isSocial: configs.socialCommentsEnable,
             type: type,
@@ -535,9 +543,12 @@ require('/modules/store.js').exec(function (ctx) {
             apiData: apiData,
             metadata: metadata,
             isSubscriptionAvailable: isSubscriptionAvailable,
-            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-            businessOwner: businessOwner,
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            },
+            assetType : 'webapp',
+	    businessOwner: businessOwner,
             ownerName: businessOwner[1].value
         });
     }

@@ -42,11 +42,7 @@ $(function () {
             url: TAG_API + assetType + 's',
             type: 'GET',
             success: function (response) {
-
-                var tags = response;
-                console.log('obtaining tags of type.');
-
-                fetchTagsOfAsset(assetType, assetId, tags);
+                fetchTagsOfAsset(assetType, assetId, response);
             },
             error: function () {
                 console.log('unable to retrieve tags for ' + assetTYpe);

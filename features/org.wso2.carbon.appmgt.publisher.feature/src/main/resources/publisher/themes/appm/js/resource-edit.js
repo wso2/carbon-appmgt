@@ -28,7 +28,7 @@ $( document ).ready(function() {
     var appName = $('#overview_name').val();
     var providerName = $('#overview_provider').val();
     var appVersion = $('#overview_version').val();
-    var appStatus = "APP_IS_PUBLISHED";
+    var appStatus = "APP_IS_ANY_LIFECYCLE_STATE";
 
     $.ajax({
                url: caramel.context + '/api/asset/default/version/' + appName + '/' + providerName + '/' + appStatus,
@@ -39,7 +39,9 @@ $( document ).ready(function() {
                        isDefaultVersion = "true";
                        $('#lblDefaultVersion').html("(This is the current default version)");
                    } else {
-                       $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
+                       if (data != "null" && data != "") {
+                           $('#lblDefaultVersion').html("(Current default version is: " + data + ")");
+                       }
                    }
                },
                error: function (data) {
@@ -65,7 +67,6 @@ $( document ).ready(function() {
     $(".makeAsDefaultVersion_checkbox").each(function (index) {
         if (makeAsDefaultVal == "true") {
             $(this).prop('checked', true);
-            $(this).prop('disabled', true);
         }
         else {
             $(this).prop('checked', false);

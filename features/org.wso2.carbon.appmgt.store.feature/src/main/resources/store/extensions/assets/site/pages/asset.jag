@@ -62,8 +62,6 @@ require('/modules/store.js').exec(function (ctx) {
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
     var isSite = 'true';//To get the sites tags
-    var context = caramel.configs().context;
-    var tagUrl = context + '/assets/site';
 
 
     var SITE_QUERY = {"overview_treatAsASite": "TRUE"};
@@ -89,6 +87,15 @@ require('/modules/store.js').exec(function (ctx) {
         log.error(e);
         response.sendError(404, 'Requested page cannot be found');
         return;
+    }
+
+    if (asset) {
+        var assetLifecycleState = asset.lifecycleState;
+        //If the asset is not in "Published" or "Deprecated" state, webapp overview page should not be accessible
+        if (assetLifecycleState != "Published" && assetLifecycleState != "Deprecated") {
+            response.sendError(404, 'Requested asset with assset is : ' + asset.id + 'cannot be found. It is in ' +
+            assetLifecycleState + 'state.');
+        }
     }
 
     /**
@@ -396,7 +403,6 @@ require('/modules/store.js').exec(function (ctx) {
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 navigationData.showAllAppsLink = false;
-                tagUrl = context + '/extensions/assets/site/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -504,6 +510,7 @@ require('/modules/store.js').exec(function (ctx) {
         headerData.domain = tenantDomain;
         headerData.storeTenantDomain = tenantDomain;
         headerData.isFavMenu = subscriptionConfig.isMyFavouriteMenu();
+        headerData.assetType = "site";
 
         var metadata = {
             appName: asset.attributes.overview_name,
@@ -520,8 +527,7 @@ require('/modules/store.js').exec(function (ctx) {
                            header: headerData,
                            navigation: navigationData,
                            search: {
-                               query: searchQuery,
-                               searchUrl: tagUrl
+                               query: searchQuery
                            },
                            isSocial: configs.socialCommentsEnable,
 
@@ -537,7 +543,6 @@ require('/modules/store.js').exec(function (ctx) {
                            asset: asset,
                            tenantId: tenantIdVal,
                            tags: {
-                               tagUrl: tagUrl,
                                data: store.tags(type, isSite)
                            },
                            myAssets: { user: user, type: type, title: title },
@@ -548,8 +553,11 @@ require('/modules/store.js').exec(function (ctx) {
                            metadata: metadata,
                            subVisibility: subVisibility,
                            isSubscriptionAvailable: isSubscriptionAvailable,
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                           config: {
+                               isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                               isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                           },
+                           assetType : 'site'
                        });
     }
 

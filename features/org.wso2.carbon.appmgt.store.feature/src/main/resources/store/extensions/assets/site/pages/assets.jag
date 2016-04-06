@@ -401,6 +401,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             recentAssets[i].rating = 0;
         }
+        setDefaultThumbnail(recentAssets[i]);
         siteRecentAssets.push(recentAssets[i]);
     }
 
@@ -410,36 +411,33 @@ require('/modules/store.js').exec(function (ctx) {
     });
     headerData.assetType = "site";
 
-    caramel.render({
-                       title: 'Sites | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       search: {
-                           query: query,
-                           searchUrl:tagUrl
-                       },
-                       type: type,
-                       tags: {
-                           tagUrl: tagUrl,
-                           data: store.tags(type, isSite)
-                       },
-                       assets: assets,
-                       assetType : 'site',
-                       paging: {
-                           url: url + 'sort=' + paging.sort + '&page=',
-                           sort: paging.sort,
-                           tag: tag,
-                           size: assets.length
-                       },
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: siteRecentAssets
+    if(storeHostObj.isAssetTypeEnabled("site")) {
+        caramel.render({
+            title: 'Sites | Store',
+            user: user,
+            sso: sso,
+            header: headerData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            assets: assets,
+            assetType: 'site',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: siteRecentAssets
+        });
 
-                   });
+    }
+    else {
+        response.sendError(404, 'Resource does not exist');
+    }
 }, request, response, session);
 
 function getServiceDir(serviceName) {

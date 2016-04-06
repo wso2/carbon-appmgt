@@ -12,6 +12,23 @@ $(function () {
         $('#btn-signin').text('Sign In').removeClass('disabled');
     };
 
+    var isEnableEmailUsername = function () {
+        var isEmailUsername = false;
+        caramel.ajax({
+                         type: 'POST',
+                         url: '/apis/user/emailLogin',
+                         async: false,
+                         success: function (data) {
+                             isEmailUsername = data.isEmailUsername
+                             return isEmailUsername;
+                         },
+                         contentType: 'application/json',
+                         dataType: 'json'
+                     });
+        return isEmailUsername;
+    }
+
+
     var login = function () {
         if (!$("#form-login").valid())
             return;
@@ -58,6 +75,15 @@ $(function () {
         if (username.indexOf("/") > -1) {
             errorMessage = "Domain";
             return errorMessage;
+        }
+        if (!isEnableEmailUsername()) {
+            var tenantDomain = getURLTenantDomain();
+            if (tenantDomain == "null" || tenantDomain == "carbon.super") {
+                if (username.indexOf("@") > -1) {
+                    errorMessage = "Domain";
+                    return errorMessage;
+                }
+            }
         }
         return errorMessage;
     }
@@ -203,22 +229,7 @@ $(function () {
         $('#sso-login-form').submit();
     });
 
-    $('.store-menu > li > a').click(function () {
-        var url = $(this).attr('href');
-        window.location = url;
-    });
-
-    $('.store-menu > li > ul > li > a').click(function () {
-        var url = $(this).attr('href');
-        window.location = url;
-    });
-
-
-    $('.dropdown-toggle').click(function () {
-        window.location = $(this).attr('href');
-    });
-
-    $('#btn-register-close').click(function () {
+    $('.modal-header .close').click(function () {
         clearFields();
     });
 

@@ -32,8 +32,8 @@ var render = function (theme, data, meta, require) {
         isSubscribed: data.isSubscribed,
         subscriptionInfo: data.subscriptionInfo,
         isSubscriptionAvailable: data.isSubscriptionAvailable,
-        isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
-        isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled,
+        isSelfSubscriptionEnabled: data.config.isSelfSubscriptionEnabled,
+        isEnterpriseSubscriptionEnabled: data.config.isEnterpriseSubscriptionEnabled,
         isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
         metadata:data.metadata,
         tabs:{
@@ -44,9 +44,8 @@ var render = function (theme, data, meta, require) {
         }
     };
 
-    //var assetsByProvider = data.assetsByProvider;
-    //assetsByProvider['assets'] =
-    // require('/helpers/rating-provider.js').ratingProvider.formatRating(data.assetsByProvider.assets);
+    data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
+    var searchUrl = getTagAndSearchUrl(data).searchUrl;
 
     theme('2-column-left', {
         title: data.title,
@@ -62,14 +61,15 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:data.search.query,searchUrl:data.search.searchUrl}
+                context: {searchQuery:data.search.query,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -102,23 +102,36 @@ function createLeftNavLinks(data) {
 
     if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: true, partial: 'all-apps', url: context + "/assets/webapp"
+                                    active: true, partial: 'all-apps', url: "/assets/site"
                                 });
         leftNavigationData.push({
-                                    active: false, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                    active: false, partial: 'my-apps', url: "/extensions/assets/site/myapps"
                                 });
     } else {
         leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                    active: true, partial: 'my-apps', url: "/extensions/assets/site/myapps"
                                 });
     }
 
     if (data.user) {
         leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: context
-                + "/assets/favouriteapps?type=webapp"
+                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=site"
                                 });
     }
 
     return leftNavigationData;
+}
+
+function getTagAndSearchUrl(data) {
+    var URLs = {}
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        URLs.tagUrl = '/extensions/assets/site/myapps';
+        URLs.searchUrl = '/extensions/assets/site/myapps';
+    } else {
+        URLs.tagUrl = '/assets/site';
+        URLs.searchUrl = '/assets/site';
+    }
+    return URLs;
 }

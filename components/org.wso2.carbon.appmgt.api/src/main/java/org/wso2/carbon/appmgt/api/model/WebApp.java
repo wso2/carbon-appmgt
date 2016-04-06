@@ -119,6 +119,9 @@ public class WebApp {
     private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
+    private String lifeCycleName;
+
+    private APIStatus lifeCycleStatus;
 
     public WebApp() {
     }
@@ -702,5 +705,21 @@ public class WebApp {
 
     public void setAdvertisedAppUuid(String advertisedAppUuid) {
         this.advertisedAppUuid = advertisedAppUuid;
+    }
+
+    public void setLifeCycleName(String lifeCycleName) {
+        this.lifeCycleName = lifeCycleName;
+    }
+
+    public String getLifeCycleName() {
+        return lifeCycleName;
+    }
+
+    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
+        this.lifeCycleStatus = lifeCycleStatus;
+    }
+
+    public APIStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
     }
 }

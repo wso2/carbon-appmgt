@@ -57,7 +57,6 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        $(this).hide();
         var waitIconId = '#wait-' + appId;
         $(waitIconId).show();
 
@@ -77,7 +76,6 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        $(this).hide();
         var waitIconId = '#wait-' + appId;
         $(waitIconId).show();
 
@@ -87,8 +85,6 @@ $( document ).ready(function() {
 
     var addToFavourite = function (data, appId) {
         var waitIconId = '#wait-' + appId;
-        var rmvIconId = '#rmv-' + appId;
-        var addIconId = '#add-' + appId;
         $.ajax({
                    url: API_ADD_TO_FAVOURITE,
                    dataType: 'JSON',
@@ -97,13 +93,15 @@ $( document ).ready(function() {
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            $(waitIconId).hide();
-                           $(rmvIconId).show();
                            var message = 'You have successfully added  <b>' + data.name +
                                          '</b> to your favourite apps';
                            notify(message);
+
+                           document.getElementById("favRibbon-" + appId).style.visibility = "visible";
+                           document.getElementById("listItemAddFavorite-" + appId).style.display= "none";
+                           document.getElementById("listItemRmvFavorite-" + appId).style.display= "block";
                        } else {
                            $(waitIconId).hide();
-                           $(addIconId).show();
                            var message = 'Error occured in while adding  web app: ' + data.name +
                                          ' to my favourite web apps';
                            notify(message);
@@ -112,7 +110,6 @@ $( document ).ready(function() {
                    },
                    error: function (response) {
                        $(waitIconId).hide();
-                       $(addIconId).show();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
@@ -127,9 +124,6 @@ $( document ).ready(function() {
 
     var removeFromFavourite = function (data, appId) {
         var waitIconId = '#wait-' + appId;
-        var rmvIconId = '#rmv-' + appId;
-        var addIconId = '#add-' + appId;
-
         $.ajax({
                    url: API_REMOVE_FROM_FAVOURITE,
                    type: 'POST',
@@ -137,29 +131,28 @@ $( document ).ready(function() {
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
                            $(waitIconId).hide();
-                           $(addIconId).show();
                            var message = 'You have successfully removed  <b>' + data.name
-                               + '</b> from your favourite apps';
+                                         + '</b> from your favourite apps';
                            notify(message);
-                           $('#btnRemoveFromFav').hide();
-                           $('#btnAddToFav').show();
+
+                           document.getElementById("favRibbon-" + appId).style.visibility = "hidden";
+                           document.getElementById("listItemAddFavorite-" + appId).style.display= "block";
+                           document.getElementById("listItemRmvFavorite-" + appId).style.display= "none";
                        } else {
                            $(waitIconId).hide();
-                           $(rmvIconId).show();
                            var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                                         + ' from my favourite web apps';
                            notify(message);
                        }
                    },
                    error: function (response) {
                        $(waitIconId).hide();
-                       $(rmvIconId).show();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
                        } else {
                            var message = 'Error occured  when remove  web app: ' + data.name
-                               + ' from my favourite web apps';
+                                         + ' from my favourite web apps';
                            notify(message);
                        }
                    }
@@ -222,4 +215,58 @@ $( document ).ready(function() {
                    }
                });
     };
+
+    // My Apps the tour
+    var myAppsTour = new Tour({
+        storage: false,
+        steps: [
+            {
+                element: "#all-apps-link",
+                title: "Checkout new applications",
+                placement: "right",
+                content: "You can go to App Store from this link, search and subscribe to new applications"
+            },
+            {
+                element: "#my-apps-link",
+                title: "Select apps as Favourite",
+                placement: "right",
+                content: "You can mark or unmark your favourite apps in My Apps page"
+            },
+            {
+                element: "#my-favorites-link",
+                title: "Add to your favourites",
+                placement: "right",
+                content: "The subscribed application can be marked as your Favourites and make it your default home page."
+            }
+        ]
+    });
+
+    var myAppsSearchTour = new Tour({
+
+        storage: false,
+        steps: [
+            {
+                element: ".input-group",
+                title: "Change the Search term",
+                placement: "bottom",
+                content: "Change the search term here"
+            },
+            {
+                element: ".input-group-btn",
+                title: "Change the query type",
+                placement: "bottom",
+                content: "You can change what you want to search by selecting one of \"App Name\" or \"the App Provider\""
+            }
+        ]
+    });
+
+    $('#no-apps-default-jumbotron').on('click', function(e){
+        myAppsTour.init(true);
+        myAppsTour.start(false);
+    });
+
+    $('#no-apps-search-jumbotron').on('click', function(e){
+        myAppsSearchTour.init(true);
+        myAppsSearchTour.start(false);
+    });
 });

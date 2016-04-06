@@ -401,11 +401,54 @@ jQuery("#form-asset-create").submit(function(e) {
         $('#wizard_step2').hide();
 		e.preventDefault();
 	}
-   //alert($('#appmeta').val());
+
+    /**
+     * For store type = 'enterprise' and OS type != web app ,version is taken from
+     * uploaded binary and field is disabled.When do a form submission to send the version
+     * value need to enable the field.
+     */
+    if($('#txtVersion').prop("disabled")){
+        $('#txtVersion').prop("disabled",false);
+    }
 });
 
 $( document ).ajaxComplete(function( event, xhr, settings ) {
     if(xhr.status == 401){
         location.reload();
     }
+});
+
+/*======================Tags========================*/
+//Obtain all of the tags of asset type -mobileapp
+$.ajax({
+           url: caramel.context + '/api/tag/mobileapp',
+           type: 'GET',
+           success: function (response) {
+               $('#txtTags').tokenInput(response, {
+                   theme: 'facebook',
+                   allowFreeTagging: true,
+                   hintText: "Type for tags",
+               });
+
+           },
+           error: function () {
+               console.log('unable to fetch tag cloud for mobile app');
+           }
+       });
+
+//obtain the selected tags{id,value} and send tags values in the form submission
+$('#submitButton').click(function(){
+    var selectedTags = $('#txtTags').tokenInput('get');
+    var tags = [];
+    for (var index in selectedTags) {
+        tags.push(selectedTags[index].name);
+    }
+    $('#txtTags').val(tags);
+});
+
+/*====================================================*/
+//prevent form submission by pressing enter key
+//because when adding tags need to press the etner key to add the tags
+$(document).on("keypress", "form", function(event) {
+    return event.keyCode != 13;
 });

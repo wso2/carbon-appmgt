@@ -417,6 +417,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             recentAssets[i].rating = 0;
         }
+        setDefaultThumbnail(recentAssets[i]);
         webAppRecentAssets.push(recentAssets[i]);
     }
     var headerData = site.header(tenantId, {
@@ -428,36 +429,32 @@ require('/modules/store.js').exec(function (ctx) {
     headerData.domain = tenantDomain;
     headerData.assetType = "webapp";
 
-    caramel.render({
-                       title: 'Web Apps | Store',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       search: {
-                           query: query,
-                           searchUrl:tagUrl
-                       },
-                       type: type,
-                       tags: {
-                           tagUrl: tagUrl,
-                           data: store.tags(type, isSite)
-                       },
-                       assets: assets,
-                       assetType: 'webapp',
-                       paging: {
-                           url: url + 'sort=' + paging.sort + '&page=',
-                           sort: paging.sort,
-                           tag: tag,
-                           size: assets.length
-                       },
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
-
-                   });
+    if (storeHostObj.isAssetTypeEnabled("webapp")) {
+        caramel.render({
+            title: 'Web Apps | Store',
+            user: user,
+            sso: sso,
+            header: headerData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            assets: assets,
+            assetType: 'webapp',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: webAppRecentAssets
+        });
+    }
+    else {
+        response.sendError(404, 'Resource does not exist');
+    }
 }, request, response, session);
 
 function getServiceDir(serviceName) {

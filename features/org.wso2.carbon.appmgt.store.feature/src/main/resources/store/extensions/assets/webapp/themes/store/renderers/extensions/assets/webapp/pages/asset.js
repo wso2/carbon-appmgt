@@ -1,7 +1,7 @@
 var render = function (theme, data, meta, require) {
 
     var appUrl; // User is present here, so no need to check for user session.
-    if (!data.isSelfSubscriptionEnabled && !data.isEnterpriseSubscriptionAllowed) {
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
         // Subscription model is inactive, so any user can access this app.
         appUrl = getAppUrl(data);
     } else {
@@ -32,8 +32,8 @@ var render = function (theme, data, meta, require) {
         isSubscribed: data.isSubscribed,
         subscriptionInfo: data.subscriptionInfo,
         isSubscriptionAvailable: data.isSubscriptionAvailable,
-        isSelfSubscriptionEnabled: data.isSelfSubscriptionEnabled,
-        isEnterpriseSubscriptionEnabled: data.isEnterpriseSubscriptionEnabled,
+        isSelfSubscriptionEnabled: data.config.isSelfSubscriptionEnabled,
+        isEnterpriseSubscriptionEnabled: data.config.isEnterpriseSubscriptionEnabled,
         isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
         businessOwner: data.businessOwner,
         ownerName: data.ownerName,
@@ -46,9 +46,8 @@ var render = function (theme, data, meta, require) {
         }
     };
 
-    //var assetsByProvider = data.assetsByProvider;
-    //assetsByProvider['assets'] =
-    // require('/helpers/rating-provider.js').ratingProvider.formatRating(data.assetsByProvider.assets);
+    data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
+    var searchUrl = getTagAndSearchUrl(data).searchUrl;
 
     theme('2-column-left', {
         title: data.title,
@@ -64,14 +63,15 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
         search: [
             {
                 partial: 'search',
-                context: {searchQuery:data.search.query,searchUrl:data.search.searchUrl}
+                context: {searchQuery:data.search.query,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
@@ -97,29 +97,41 @@ function getAppUrl(data) {
 }
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
     var leftNavigationData = [
 
     ];
 
     if (data.navigation.showAllAppsLink) {
         leftNavigationData.push({
-                                    active: true, partial: 'all-apps', url: context + "/assets/webapp"
+                                    active: true, partial: 'all-apps', url: "/assets/webapp"
                                 });
         leftNavigationData.push({
-                                    active: false, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                    active: false, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
                                 });
     } else {
         leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: context + "/extensions/assets/webapp/myapps"
+                                    active: true, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
                                 });
     }
 
     if (data.user) {
         leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: context
-                + "/assets/favouriteapps?type=webapp"
+                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
                                 });
     }
     return leftNavigationData;
+}
+
+function getTagAndSearchUrl(data) {
+    var URLs = {}
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+            URLs.tagUrl = '/extensions/assets/webapp/myapps';
+            URLs.searchUrl = '/extensions/assets/webapp/myapps';
+    } else {
+            URLs.tagUrl = '/assets/webapp';
+            URLs.searchUrl = '/assets/webapp';
+    }
+    return URLs;
 }

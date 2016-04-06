@@ -65,11 +65,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
-    var tagUrl = context;
-    var searchUrl = context + '/extensions/assets/site/myapps';
-    url =
-    '/extensions/assets/site/myapps?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' :
-                                                                                   '');
     var leftnav, rightnav, urlQuery;//For pagination
     
     var headerData = site.header(tenantId, {
@@ -265,7 +260,9 @@ require('/modules/store.js').exec(function (ctx) {
                 });
             }
             else { //myapps page request
-                urlQuery = 'sort=' + paging.sort + '&';
+                if(paging.sort != "null") {
+                    urlQuery = 'sort=' + paging.sort + '&'
+                }
                 assets = store.search(SITE_OPTIONS, paging);
             }
         }
@@ -318,9 +315,6 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (currentPage - 1 > 0) {
             leftnav = currentPage - 1;
-        }
-        if (nextPageAvailable && (assets.length == PAGE_SIZE)) {
-            rightnav = currentPage + 1;
         }
     };
 
@@ -387,6 +381,7 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
             }
+            query = require('/modules/search.js').build(query);
             if (user) {
                 assets = subsApp.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
@@ -441,19 +436,11 @@ require('/modules/store.js').exec(function (ctx) {
      */
     var isActive = function (asset) {
         var active = false;
-        if(!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-            var lifeCycleState = asset.lifecycleState.toUpperCase();
-            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
-                active = true;
-            }
-            asset.lifecycleState = lifeCycleState;
-        } else {
-            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
-                active = true;
-            }
-            //when getting asset from apm db attribute name is different.
-            asset.lifecycleState = asset.lifeCycleStatus;
+        var lifeCycleState = asset.lifecycleState.toUpperCase();
+        if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+            active = true;
         }
+        asset.lifecycleState = lifeCycleState;
         return active
     };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
@@ -470,12 +457,10 @@ require('/modules/store.js').exec(function (ctx) {
 
         // hide all apps link in header
         navigationData.showAllAppsLink = false;
-        tagUrl = tagUrl + '/extensions/assets/site/myapps';
     } else {
         //show anonymous + subscribed apps for logged in user.
         //show anonymous apps for anonymous user.
         getAssetsFromDB();
-        tagUrl = tagUrl + '/assets/site';
     }
 
     // add rating,access url etc to retrieved webapps
@@ -485,45 +470,47 @@ require('/modules/store.js').exec(function (ctx) {
 
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
-    caramel.render({
-                       title: 'Sites | Store ',
-                       user: user,
-                       sso: sso,
-                       header: headerData,
-                       navigation: navigationData,
-                       search: {
-                           query: query,
-                           searchUrl: searchUrl
-                       },
-                       type: type,
-                       tags: {
-                           tagUrl: tagUrl,
-                           data: store.tags(type, isSite)
-                       },
-                       config: {
-                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-                       },
-                       assets: assets,
-                       assetType: 'site',
-                       paging: {
-                           url: url + 'sort=' + paging.sort + '&page=',
-                           sort: paging.sort,
-                           tag: tag,
-                           size: assets.length
-                       },
-                       pagination: {
-                           leftNav: leftnav,
-                           rightNav: rightnav,
-                           urlQuery: urlQuery
-                       },
-                       recentAssets: webAppRecentAssets
+    if (storeHostObj.isAssetTypeEnabled("site")) {
+        caramel.render({
+            title: 'My Apps | Store ',
+            user: user,
+            sso: sso,
+            header: headerData,
+            navigation: navigationData,
+            search: {
+                query: query
+            },
+            type: type,
+            tags: {
+                data: store.tags(type, isSite)
+            },
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            },
+            assets: assets,
+            assetType: 'site',
+            pagination: {
+                leftNav: leftnav,
+                rightNav: rightnav,
+                urlQuery: urlQuery
+            },
+            recentAssets: webAppRecentAssets
 
-                   });
+        });
+    }
+    else {
+        response.sendError(404, 'Resource does not exist');
+    }
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
+function getTags(type, store) {
+    var paging = {"start": 0, "count": 120000,"paginationLimit":120000};
+    return store.taggeds(type, options, paging)
+};
 %>

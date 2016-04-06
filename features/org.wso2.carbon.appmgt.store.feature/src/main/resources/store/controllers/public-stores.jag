@@ -14,6 +14,7 @@ var userName = session.get("LOGGED_IN_USER");
 var userTenantId = session.get("tenantId");
 var log = new Log();
 
+
 if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     require('/modules/store.js').exec(function (ctx) {
         var PAGE_SIZE = 10;

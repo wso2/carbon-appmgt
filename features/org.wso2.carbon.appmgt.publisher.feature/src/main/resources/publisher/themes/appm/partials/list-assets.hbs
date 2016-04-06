@@ -112,6 +112,7 @@
                                              data-name="{{../../../attributes.overview_name}}"
                                              data-provider="{{../../../attributes.overview_provider}}"
                                              data-version="{{../../../attributes.overview_version}}"
+                                             data-isDefault="{{../../../attributes.overview_makeAsDefault}}"
                                              class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
                                      {{/ifCond}}
 
@@ -121,6 +122,7 @@
                                          data-name="{{../../attributes.overview_name}}"
                                          data-provider="{{../../attributes.overview_provider}}"
                                          data-version="{{../../attributes.overview_version}}"
+                                         data-isdefault="{{../../attributes.overview_makeAsDefaultVersion}}"
                                          class="btn {{style}} btn-action" name="addNewAssetButton">{{name}}</a>
                                  {{/ifCond}}
                              {{/this.lifecycleAvailableActions}}
@@ -161,21 +163,33 @@
             </nav>
         </div>
 	{{else}}
-        <div class="emptyAssets-MsgDiv">
-            <i class="icon-inbox largeMsgIcon"></i>
-            <br />
-            No web applications added yet.
-            {{#ifCond cuser.um.tenantId "==" "-1234"}}
+        {{#if query}}
+            <div class="emptyAssets-MsgDiv">
+                <i class="icon-inbox largeMsgIcon"></i>
+                <br />
+                Sorry, We could not find any app for your search!
+                <br />
+                Your search filter was, "{{query}}". What can I do now?.
+                <br />
+            </div>
+        {{else}}
+            <div class="emptyAssets-MsgDiv">
+                <i class="icon-inbox largeMsgIcon"></i>
+                <br />
+                No web applications added yet.
+                {{#ifCond cuser.um.tenantId "==" "-1234"}}
+                    {{#if createPermission}}
+                        <a class="btn-deploySample" data-type="{{shortName}}">Click here</a>
+                to deploy sample web applications.
+                    {{/if}}
+                {{/ifCond}}
+                <br />
                 {{#if createPermission}}
-                    <a class="btn-deploySample" data-type="{{shortName}}">Click here</a>
-                    to deploy sample web applications.
+                    <a type="button" class="btn btn-addNewAssetLarge" href="{{url "/asset/"}}{{shortName}}"><i
+                            class="icon-plus-sign-alt"></i>Add New Web Application</a>
                 {{/if}}
-            {{/ifCond}}
-            <br />
-            {{#if createPermission}}
-            <a type="button" class="btn btn-addNewAssetLarge" href="{{url "/asset/"}}{{shortName}}"><i class="icon-plus-sign-alt"></i>Add New Web Application</a>
-            {{/if}}
-        </div>
+            </div>
+        {{/if}}
 	{{/if}}
 
 

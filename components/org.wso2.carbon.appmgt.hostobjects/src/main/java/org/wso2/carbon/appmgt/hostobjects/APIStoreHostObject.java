@@ -30,12 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
@@ -890,8 +885,9 @@ public class APIStoreHostObject extends ScriptableObject {
         String assetType =  null;
         if (args != null && isStringArray(args)) {
             //There will be separate two calls for this method with one argument and with three arguments.
-            if (args.length == 1) {
+            if (args.length == 2) {
                 tenantDomain = args[0].toString();
+                assetType = args[1].toString();
             }
             if (args.length == 3) {
                 tenantDomain = args[0].toString();
@@ -1584,7 +1580,8 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static boolean jsFunction_addAPISubscription(Context cx,
-                            Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+                            Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException, ScriptException, UserStoreException {
         if (!isStringArray(args)) {
             return false;
         }
@@ -1600,6 +1597,10 @@ public class APIStoreHostObject extends ScriptableObject {
         if (args.length > 7) {
             trustedIdp = args[7].toString();
         }
+
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+
+        addSubscriber(userId, thisObj);
 
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
@@ -2165,18 +2166,22 @@ public class APIStoreHostObject extends ScriptableObject {
         return null;
     }
 
-    public static boolean jsFunction_addSubscriber(Context cx,
-                                                   Scriptable thisObj, Object[] args, Function funObj)
+    private static boolean addSubscriber(String userId, Scriptable thisObj)
             throws ScriptException, AppManagementException, UserStoreException {
 
-        if (args!=null && isStringArray(args)) {
-            Subscriber subscriber = new Subscriber((String) args[0]);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        Subscriber subscriber = apiConsumer.getSubscriber(userId);
+        if (subscriber == null) {
+            subscriber = new Subscriber(userId);
             subscriber.setSubscribedDate(new Date());
             //TODO : need to set the proper email
             subscriber.setEmail("");
             APIConsumer apiConsumer = getAPIConsumer(thisObj);
             try {
-                int tenantId=ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(MultitenantUtils.getTenantDomain((String) args[0]));
+                int tenantId =
+                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                              .getTenantId(
+                                                      MultitenantUtils.getTenantDomain(userId));
                 subscriber.setTenantId(tenantId);
                 apiConsumer.addSubscriber(subscriber);
             } catch (AppManagementException e) {
@@ -2190,6 +2195,7 @@ public class APIStoreHostObject extends ScriptableObject {
         }
         return false;
     }
+
 
     public static boolean jsFunction_sleep(Context cx,
                                            Scriptable thisObj, Object[] args, Function funObj){
@@ -3438,7 +3444,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject row = new NativeObject();
                 row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, identifier.getProviderName());
+                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
                 row.put("version", row, identifier.getVersion());
                 row.put("context", row, app.getContext());
                 row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
@@ -3596,7 +3602,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 NativeObject attributes = new NativeObject();
                 attributes.put("overview_name", attributes, identifier.getApiName());
                 attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, identifier.getProviderName());
+                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                        identifier.getProviderName()));
                 attributes.put("overview_context", attributes, app.getContext());
                 attributes.put("overview_version", attributes, identifier.getVersion());
                 attributes.put("overview_appTenant", attributes, app.getAppTenant());
@@ -3608,7 +3615,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject asset = new NativeObject();
                 asset.put("id", asset, app.getUUID());
-                asset.put("lifeCycleStatus", asset, lifeCycleStatus);
+                asset.put("lifecycleState", asset, lifeCycleStatus);
                 asset.put("accessUrl", asset, accessUrl);
                 asset.put("attributes", asset, attributes);
 
@@ -3825,8 +3832,62 @@ public class APIStoreHostObject extends ScriptableObject {
         return subscriptionConfiguration;
     }
 
-    /**
-     * Retrieve the shared policy partials
+	/**
+     * Returns the enabled asset type list in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getEnabledAssetTypeList(Context cx, Scriptable thisObj,
+                                                                 Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray availableAssetTypes = new NativeArray(0);
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        for (int i = 0; i < typeList.size(); i++) {
+            availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
+        }
+        return availableAssetTypes;
+    }
+
+	/**
+     * Returns asset type enabled or not in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isAssetTypeEnabled(Context cx, Scriptable thisObj,
+                                                        Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        String assetType = (String) args[0];
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+
+        for (String type : typeList) {
+            if (assetType.equals(type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+ /**
+     * Retrieve the business Owner
      *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
@@ -3860,5 +3921,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
         return row;
     }
+
+
 
 }

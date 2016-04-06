@@ -3,10 +3,26 @@ var render = function(theme, data, meta, require) {
 	
 	var images = data.asset.attributes.images_screenshots.split(",");
 	data.asset.attributes.images_screenshots = images;
-	
-		
-	data.header.config = data.config;
 
+    var searchQuery =  data.search.query;
+    if(typeof(searchQuery) != typeof({})){
+        searchQuery = {overview_name : searchQuery, searchTerm: 'overview_name', search : searchQuery};
+    }else{
+        for (var key in searchQuery) {
+            if (searchQuery.hasOwnProperty(key)) {
+                if(key.indexOf("overview_") !== -1){
+                    searchQuery.searchTerm = key;
+                    searchQuery.search = searchQuery[key];
+                }
+            }
+        }
+    }
+
+    var categories = data.navigation.assets[data.type].categories;
+
+	data.header.config = data.config;
+    var searchUrl = "/assets/mobileapp";
+    data.tags.tagUrl = "/assets/mobileapp";
 
     theme('2-column-left', {
         title: data.title,
@@ -21,15 +37,16 @@ var render = function(theme, data, meta, require) {
                 partial: 'left-column',
                 context: {
                     navigation: createLeftNavLinks(data),
-                    tags: null,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    tags: data.tags,
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
         search: [
             {
                 partial: 'search',
-                context: {}
+                context: {searchQuery: searchQuery, categories: categories, searchUrl: searchUrl}
             }
         ],
         pageHeader: [
@@ -67,14 +84,14 @@ function createLeftNavLinks(data) {
     var context = caramel.configs().context;
     var leftNavigationData = [
         {
-            active: true, partial: 'all-apps', url: context + "/assets/mobileapp"
+            active: true, partial: 'all-apps', url: "/assets/mobileapp"
         }
     ];
 
     if (data.user) {
         leftNavigationData.push({
                                     active: false, partial: 'my-apps',
-                                    url: context + "/extensions/assets/mobileapp/subscriptions"
+                                    url: "/extensions/assets/mobileapp/subscriptions"
                                 });
     }
 

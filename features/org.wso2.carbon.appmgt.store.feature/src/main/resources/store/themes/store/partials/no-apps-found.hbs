@@ -1,11 +1,27 @@
 <div class="no-apps">
-    <div class="jumbotron">
-        <h1>
-            <span class="fw fw-warning"></span> No Apps Here!
-        </h1>
+        {{#if searchQuery.search}}
+            <div class="jumbotron" id="no-apps-search-jumbotron">
+                <h2>
+                    <span class="fw fw-warning"></span> Sorry, We could not find any app for your search!
+                </h2>
+                <p class="lead add-padding-top-3x text-muted">Your search filter was, "{{searchQuery.search}}". What can I do now?.<p>
+            </div>
+        {{else}}
 
-        <p class="lead add-padding-top-3x text-muted">
-            Sorry, We could not find any apps for you.
-        </p>
-    </div>
+            {{#if config.isSelfSubscriptionEnabled}}
+            <div class="jumbotron" id="no-apps-default-jumbotron">
+                <h2>
+                    <span class="fw fw-warning"></span> Sorry, We could not find any apps for you!
+                </h2>
+                <p class="lead add-padding-top-3x text-muted">What can I do now?.<p>
+            </div>
+            {{else}}
+                <div class="jumbotron" id="no-apps-noselfsub-jumbotron">
+                    <h2>
+                        <span class="fw fw-warning"></span>Sorry, There are no apps published yet!
+                    </h2>
+                    <p class="lead add-padding-top-3x text-muted">Please contact your publisher<p>
+                </div>
+            {{/if}}
+        {{/if}}
 </div>

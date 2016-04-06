@@ -186,7 +186,7 @@ public final class AppManagerUtil {
 			api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
 			api.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
 			api.setStatus(getApiStatus(artifact.getLifecycleState().toUpperCase()));
-			api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
 			api.setWsdlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WSDL));
 			api.setWadlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WADL));
 			api.setTechnicalOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER));
@@ -316,7 +316,17 @@ public final class AppManagerUtil {
 
             String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
                                                               AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
-            api.setDefaultVersion(defaultVersion.equals(apiVersion));
+            api.setDefaultVersion(apiVersion.equals(defaultVersion));
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp fro artifact ";
@@ -372,6 +382,17 @@ public final class AppManagerUtil {
 
 			api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
 			api.setSubscriptionAvailableTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
+
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp from artifact ";
@@ -1575,6 +1596,16 @@ public final class AppManagerUtil {
 			}
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp fro artifact ";
@@ -3178,5 +3209,23 @@ public final class AppManagerUtil {
         return path;
     }
 
+	/**
+	 * This get the basic authentication header as a input and decode it and gives username, password in return
+	 *
+	 * @param basicAuthHeader
+	 * @return
+	 */
+	public static String[] getCredentialsFromBasicAuthHeader(String basicAuthHeader) {
+		if (basicAuthHeader != null) {
+			String base64Credentials = basicAuthHeader.substring("Basic".length()).trim();
+			String credentialsString = new String(org.apache.commons.ssl.Base64.decodeBase64(base64Credentials.getBytes()));
+			final String[] credentials = credentialsString.split(":", 2);
+			if (credentials.length == 2) {
+				return credentials;
+			}
+		}
+
+		return null;
+	}
 
 }
