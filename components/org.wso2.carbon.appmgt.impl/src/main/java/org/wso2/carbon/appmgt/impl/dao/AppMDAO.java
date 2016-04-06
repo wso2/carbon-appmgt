@@ -5836,6 +5836,64 @@ public class AppMDAO {
         }
         return businessOwnersList;
     }
+
+    /**
+     * This methode is to return a List of existing business owners with their properties.
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException {
+
+        Connection connection = null;
+        PreparedStatement statementToGetBusinessOwners = null;
+        PreparedStatement statementToGetBusinessOwnersExtraFields = null;
+        BusinessOwner businessOwner = new BusinessOwner();
+        ResultSet rs1 = null;
+        ResultSet rs2 = null;
+        boolean isShared = true;
+
+        String queryToGetBusinessOwner = "SELECT BUSINESS_OWNERS.OWNER_ID, BUSINESS_OWNERS.OWNER_NAME, BUSINESS_OWNERS.OWNER_EMAIL, BUSINESS_OWNERS.OWNER_DESC, BUSINESS_OWNERS.OWNER_SITE FROM APM_APP INNER JOIN BUSINESS_OWNERS ON APM_APP.OWNER_ID = BUSINESS_OWNERS.OWNER_ID WHERE UUID = ? ";
+
+        try {
+            connection = APIMgtDBUtil.getConnection();
+            statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
+            statementToGetBusinessOwners.setString(1, appId);
+            rs1 = statementToGetBusinessOwners.executeQuery();
+
+               if(rs1.next()) {
+                int owner_id = rs1.getInt("OWNER_ID");
+                businessOwner.setOwner_id(owner_id);
+                businessOwner.setOwner_name(rs1.getString("OWNER_NAME"));
+                businessOwner.setOwner_desc(rs1.getString("OWNER_DESC"));
+                businessOwner.setOwner_mail(rs1.getString("OWNER_EMAIL"));
+                businessOwner.setOwner_site(rs1.getString("OWNER_SITE"));
+
+                String queryToGetKeyValue = "SELECT KEY, VALUE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+                statementToGetBusinessOwnersExtraFields = connection.prepareStatement(queryToGetKeyValue);
+                statementToGetBusinessOwnersExtraFields.setInt(1, owner_id);
+
+                rs2 = statementToGetBusinessOwnersExtraFields.executeQuery();
+
+                String keys = "";
+                String values = "";
+                while(rs2.next()){
+                    keys = keys + "/" + rs2.getNString("KEY");
+                    values = values + "/" + rs2.getNString("VALUE");
+                }
+                businessOwner.setKeys(keys);
+                businessOwner.setValues(values);
+
+
+            }
+
+        } catch (SQLException e) {
+            handleException("Failed to retrieve business owners.", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, rs1);
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersExtraFields, connection, rs2);
+        }
+        return businessOwner;
+    }
 	/**
 	 * Delete entitlement policy partial
 	 *

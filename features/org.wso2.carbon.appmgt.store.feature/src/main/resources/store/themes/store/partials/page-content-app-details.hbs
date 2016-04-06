@@ -3,7 +3,6 @@
     <input type="hidden" id="metadata-app-name" value="{{metadata.appName}}">
     <input type="hidden" id="metadata-app-provider" value="{{metadata.appProvider}}">
     <input type="hidden" id="metadata-app-version" value="{{metadata.appVersion}}">
-
     <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
         <a href="{{appUrl}}" {{#if appUrl}} title="Click to launch" class="hover-overlay-container"{{else}} class="disabled"{{/if}} target="_blank">
             <div class="ratio-responsive-16by9">
@@ -48,7 +47,8 @@
 
                 <p>
                     Version : {{asset.attributes.overview_version}}<br>
-                    By : {{asset.attributes.overview_provider}}<br>
+                    Provider : {{asset.attributes.overview_provider}}<br>
+                    By : {{ownerName}}<br>
                     Status: {{asset.lifecycleState}}
                 </p>
                 <span class="rating">
@@ -119,6 +119,7 @@
         <li class="active"><a data-toggle="tab" href="#menu1">Overview</a></li>
         <li><a data-toggle="tab" href="#menu2">Documentation</a></li>
         <li><a data-toggle="tab" href="#menu3">User Reviews</a></li>
+        <li><a data-toggle="tab" href="#menu4">Owner Details</a></li>
     </ul>
 
     <div class="tab-content">
@@ -142,6 +143,14 @@
                         style="border: none;"
                         src="{{socialURL}}/?target={{type}}:{{asset.id}}&user={{user.username}}">
                 </iframe>
+            </div>
+        </div>
+        <div id="menu4" class="tab-pane fade">
+            <div class="row">
+                {{#each businessOwner}}  <div>
+                    <label><b>&nbsp&nbsp&nbsp{{name}} &nbsp&nbsp&nbsp:&nbsp&nbsp&nbsp </b></label>
+                    <span>{{value}}</span><br />
+                </div>{{/each}}
             </div>
         </div>
     </div>

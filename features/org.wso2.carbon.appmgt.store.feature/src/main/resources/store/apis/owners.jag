@@ -1,0 +1,17 @@
+<%
+
+    var getAppOwner = '/{context}/apis/businessowners/{ownerId}';
+    var matcher = new URIMatcher(request.getRequestURI());
+    var method = request.getMethod();
+var log = new Log();
+
+if(method == 'GET'){
+    if(matcher.match(getAppOwner)){
+        log.info("99999999999999999999999999999999999999999999999999999999999999999999999999999");
+    }
+
+}
+
+
+
+%>

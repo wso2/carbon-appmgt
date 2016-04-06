@@ -46,6 +46,14 @@ public interface APIConsumer extends APIManager {
     public Set<WebApp> getAPIsWithTag(String tag) throws AppManagementException;
 
     /**
+     * Returns the details of the owner of the given app.
+     * @param appId
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException;
+
+    /**
      * Returns a paginated list of #{@link org.wso2.carbon.apimgt.api.model.API} bearing the selected tag
      *
      * @param tag name of the tag

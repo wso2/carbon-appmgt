@@ -9,8 +9,9 @@ include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
-
+var businessOwner = "";
 var APIInformationService=require('../services/api-information.js').serviceModule;
+var storeHostObj = jagg.module("manager").getAPIStoreObj();
 var apiInfoManager=new APIInformationService.APIInformationService();
 apiInfoManager.init(jagg,session);
 
@@ -203,6 +204,8 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+            businessOwner = storeHostObj.getBusinessOwner(asset.id);
+            businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {
@@ -210,6 +213,7 @@ require('/modules/store.js').exec(function (ctx) {
                     break;
                 }
             }
+            //logg.getOwner();
             return assetsFromProvider;
         }
 
@@ -532,7 +536,9 @@ require('/modules/store.js').exec(function (ctx) {
             metadata: metadata,
             isSubscriptionAvailable: isSubscriptionAvailable,
             isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            businessOwner: businessOwner,
+            ownerName: businessOwner[1].value
         });
     }
 

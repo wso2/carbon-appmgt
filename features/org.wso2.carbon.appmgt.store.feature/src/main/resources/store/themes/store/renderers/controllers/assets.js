@@ -14,7 +14,7 @@ var render = function (theme, data, meta, require) {
                 context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, assets.format(data.search))
             }
         ],
-       
+
         body: [
         	{
                 partial: 'sort-assets',

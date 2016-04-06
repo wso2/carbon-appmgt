@@ -37,12 +37,14 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
+import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -3822,4 +3824,41 @@ public class APIStoreHostObject extends ScriptableObject {
         }
         return subscriptionConfiguration;
     }
+
+    /**
+     * Retrieve the shared policy partials
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+
+
+    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj,
+                                                              Object[] args,
+                                                              Function funObj) throws
+                                                                               AppManagementException {
+
+        String appId = args[0].toString();
+        NativeArray myn = new NativeArray(0);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        int count = 0;
+
+            NativeObject row = new NativeObject();
+            row.put("owner_id", row, businessOwner.getOwner_id());
+            row.put("owner_name", row, businessOwner.getOwner_name());
+            row.put("owner_email", row, businessOwner.getOwner_mail());
+            row.put("owner_desc", row, businessOwner.getOwner_desc());
+            row.put("owner_site", row, businessOwner.getOwner_site());
+            row.put("keys", row, businessOwner.getKeys());
+            row.put("values", row, businessOwner.getValues());
+
+
+        return row;
+    }
+
 }

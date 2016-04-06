@@ -1054,7 +1054,7 @@ public class APIProviderHostObject extends ScriptableObject {
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
         }
-        String ownerName = (String) apiData.get("overview_businessOwnerName", apiData);
+        String ownerName = (String) apiData.get("overview_business", apiData);
         String name = (String) apiData.get("overview_name", apiData);
         String version = (String) apiData.get("overview_version", apiData);
         String transports = (String) apiData.get("overview_transports", apiData);
