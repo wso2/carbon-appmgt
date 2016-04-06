@@ -58,6 +58,8 @@ public final class RestApiConstants {
     //todo better to take from cxf level
     public static final String RESOURCE_PATH_APPS = "/apps";
     public static final String RESOURCE_PATH_DEVICES = "/devices";
+    public static final String RESOURCE_PATH_ROLES = "/roles";
+    public static final String RESOURCE_PATH_USERS = "/users";
     public static final String RESOURCE_PATH_APPLICATIONS = "/applications";
     public static final String SERVER_URL = "/applications";
     public static final String SERVER_USER_NAME = "/applications";
@@ -91,6 +93,12 @@ public final class RestApiConstants {
 
     public static final String DEVICES_GET_PAGINATION_URL =
             RESOURCE_PATH_DEVICES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+
+    public static final String ROLES_GET_PAGINATION_URL =
+            RESOURCE_PATH_ROLES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
+
+    public static final String USERS_GET_PAGINATION_URL =
+            RESOURCE_PATH_USERS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
 
     public static final String APPLICATIONS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
