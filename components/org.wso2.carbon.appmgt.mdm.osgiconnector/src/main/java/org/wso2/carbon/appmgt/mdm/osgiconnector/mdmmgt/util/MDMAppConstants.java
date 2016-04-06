@@ -34,6 +34,8 @@ public class MDMAppConstants {
 	public static final String IPHONE = "iphone";
 	public static final String NONE = "none";
 	public static final String IMAGE_URL = "ImageURL";
+	public static final String TYPE = "type";
+	public static final String ID = "id";
 
 	public class IOSConstants {
 

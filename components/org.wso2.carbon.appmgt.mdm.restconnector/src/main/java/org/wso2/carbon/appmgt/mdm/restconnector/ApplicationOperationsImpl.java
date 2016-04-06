@@ -95,6 +95,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						JSONObject parsedObj = (JSONObject) parser.parse(param);
 						deviceIdentifiers.add(parsedObj);
 					} catch (ParseException e) {
+						log.error("Device Identifier is not valid json object.", e);
+						throw new MobileApplicationException(e);
 					}
 
 				}
@@ -198,7 +200,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			}
 		} else {
 			if (log.isDebugEnabled()) {
-				log.debug(action + " operation unsuccessful");
+				log.debug(action + " operation unsuccessful.");
 			}
 		}
 

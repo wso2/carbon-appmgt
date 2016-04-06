@@ -17,6 +17,9 @@ package org.wso2.carbon.appmgt.mdm.osgiconnector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.beans.MobileApp;
 import org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.beans.MobileAppTypes;
 import org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.common.DeviceApplicationException;
@@ -103,10 +106,19 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			DeviceIdentifier deviceIdentifier;
 			for (String param : applicationOperationAction.getParams()) {
 				deviceIdentifier = new DeviceIdentifier();
-				String[] paramDevices = param.split("---");
-				deviceIdentifier.setId(paramDevices[0]);
-				deviceIdentifier.setType(paramDevices[1]);
-				deviceIdentifiers.add(deviceIdentifier);
+				if (isValidJSON(param)) {
+					JSONParser parser = new JSONParser();
+					try {
+						JSONObject parsedObj = (JSONObject) parser.parse(param);
+						deviceIdentifier.setId((String) parsedObj.get(MDMAppConstants.ID));
+						deviceIdentifier.setId((String) parsedObj.get(MDMAppConstants.TYPE));
+						deviceIdentifiers.add(deviceIdentifier);
+					} catch (ParseException e) {
+						log.error("Device Identifier is not valid json object.", e);
+						throw new MobileApplicationException(e);
+					}
+
+				}
 			}
 		} else {
 			throw new IllegalStateException("invalid type is received from app store.");
@@ -207,25 +219,25 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			if(log.isDebugEnabled()){
 				log.debug("device list got from mdm "+ deviceList.toString());
 			}
-			for (org.wso2.carbon.device.mgt.common.Device commondevice : deviceList) {
+			for (org.wso2.carbon.device.mgt.common.Device commonDevice : deviceList) {
 				if (MDMAppConstants.ACTIVE
-						.equals(commondevice.getEnrolmentInfo().getStatus().toString().
+						.equals(commonDevice.getEnrolmentInfo().getStatus().toString().
 								toLowerCase())) {
 					Device device = new Device();
 					org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier deviceIdentifier =
 							new org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier();
-					deviceIdentifier.setId(commondevice.getDeviceIdentifier());
-					deviceIdentifier.setType(commondevice.getType());
+					deviceIdentifier.setId(commonDevice.getDeviceIdentifier());
+					deviceIdentifier.setType(commonDevice.getType());
 					device.setDeviceIdentifier(deviceIdentifier);
-					device.setName(commondevice.getName());
-					device.setModel(commondevice.getName());
+					device.setName(commonDevice.getName());
+					device.setModel(commonDevice.getName());
 					device.setType(MDMAppConstants.MOBILE_DEVICE);
 					String imgUrl;
-					if (MDMAppConstants.ANDROID.equalsIgnoreCase(commondevice.getType())) {
+					if (MDMAppConstants.ANDROID.equalsIgnoreCase(commonDevice.getType())) {
 						imgUrl = String.format(applicationOperationDevice.getConfigParams()
 						                                                 .get(MDMAppConstants.IMAGE_URL),
 						                       MDMAppConstants.NEXUS);
-					} else if (MDMAppConstants.IOS.equalsIgnoreCase(commondevice.getType())) {
+					} else if (MDMAppConstants.IOS.equalsIgnoreCase(commonDevice.getType())) {
 						imgUrl = String.format(applicationOperationDevice.getConfigParams()
 						                                                 .get(MDMAppConstants.IMAGE_URL),
 						                       MDMAppConstants.IPHONE);
@@ -235,7 +247,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						                       MDMAppConstants.NONE);
 					}
 					device.setImage(imgUrl);
-					device.setPlatform(commondevice.getType());
+					device.setPlatform(commonDevice.getType());
 					devices.add(device);
 				}
 			}
@@ -245,6 +257,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		}
 		return devices;
+	}
+
+	private boolean isValidJSON(String json) {
+		JSONParser parser = new JSONParser();
+		try {
+			parser.parse(json);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
 	}
 
 }
