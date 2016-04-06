@@ -84,7 +84,7 @@ public class RestUtils {
 			}
 
 		} catch (IOException e) {
-			String errorMessage = "Cannot connect to Token API Endpoint";
+			String errorMessage = "Cannot connect to Token API Endpoint.";
 			log.error(errorMessage, e);
 			return null;
 		}
@@ -93,7 +93,7 @@ public class RestUtils {
 		try {
 			response = postMethod.getResponseBodyAsString();
 		} catch (IOException e) {
-			String errorMessage = "Cannot get response body for auth";
+			String errorMessage = "Cannot get response body for auth.";
 			log.error(errorMessage, e);
 			return null;
 		}
@@ -125,7 +125,7 @@ public class RestUtils {
 			while (statusCode != 200) {
 
 				if (log.isDebugEnabled()) {
-					log.debug("Trying to call API : trying for " + (tries + 1) + " time(s)");
+					log.debug("Trying to call API : trying for " + (tries + 1) + " time(s).");
 				}
 
 				httpMethod.setRequestHeader(Constants.RestConstants.AUTHORIZATION,
@@ -142,7 +142,7 @@ public class RestUtils {
 
 				if (++tries >= 3) {
 					log.info(
-							"API Call failed for the 3rd time: No or Unauthorized Access Aborting...");
+							"API Call failed for the 3rd time: No or Unauthorized Access Aborting.");
 					return false;
 				}
 				if (statusCode == 401) {
@@ -150,13 +150,13 @@ public class RestUtils {
 					if (log.isDebugEnabled()) {
 						log.debug(
 								"Access token getting again, Access token received :  " + authKey +
-								" in  try " + tries);
+								" in  try " + tries +".");
 					}
 				}
 			}
 			return true;
 		} catch (IOException e) {
-			String errorMessage = "No OK response received form the API";
+			String errorMessage = "No OK response received form the API.";
 			log.error(errorMessage, e);
 			return false;
 		}

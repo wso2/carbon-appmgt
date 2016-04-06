@@ -140,7 +140,7 @@ public class Devices {
             JSONArray jsonArrayDevices = new JSONArray();
             for(Device device : devices){
                 JSONObject deviceObj = new JSONObject();
-                deviceObj.put("id", device.getDeviceIdentifier().getId()+"---"+device.getDeviceIdentifier().getType());
+                deviceObj.put("id", device.getDeviceIdentifier().getId());
                 deviceObj.put("name", device.getName());
                 deviceObj.put("platform", device.getPlatform());
                 deviceObj.put("platform_version", device.getPlatformVersion());

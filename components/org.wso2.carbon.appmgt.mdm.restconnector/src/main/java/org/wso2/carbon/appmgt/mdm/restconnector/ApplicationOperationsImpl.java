@@ -21,7 +21,6 @@
 package org.wso2.carbon.appmgt.mdm.restconnector;
 
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -31,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.wso2.carbon.appmgt.mdm.restconnector.beans.RemoteServer;
 import org.wso2.carbon.appmgt.mdm.restconnector.utils.RestUtils;
 import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
@@ -88,11 +89,15 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		} else {
 			JSONArray deviceIdentifiers = new JSONArray();
 			for (String param : params) {
-				JSONObject obj = new JSONObject();
-				String[] paramDevices = param.split("---");
-				obj.put(Constants.ID, paramDevices[0]);
-				obj.put(Constants.TYPE, paramDevices[1]);
-				deviceIdentifiers.add(obj);
+				if (isValidJSON(param)) {
+					JSONParser parser = new JSONParser();
+					try {
+						JSONObject parsedObj = (JSONObject) parser.parse(param);
+						deviceIdentifiers.add(parsedObj);
+					} catch (ParseException e) {
+					}
+
+				}
 			}
 			requestObj.put(Constants.DEVICE_IDENTIFIERS, deviceIdentifiers);
 		}
@@ -208,7 +213,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		if (remoteServer.isEmpty()) {
 			setRemoteServer(this.remoteServer);
 		}
-		List<Device> filteredDevices = new ArrayList<>();
+		//List<Device> filteredDevices = new ArrayList<>();
 		int tenantId = applicationOperationDevice.getTenantId();
 		PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
 		String tenantDomain =
@@ -229,6 +234,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
 		return getDevicesOfUser(getMethod, params[0], tenantDomain);
 
+	}
+
+	private boolean isValidJSON(String json) {
+		JSONParser parser = new JSONParser();
+		try {
+			parser.parse(json);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
 	}
 
 	private JSONArray getDeviceIdsFromDevices(JSONArray devices) {
@@ -341,6 +356,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USER, user, tenantDomain);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
+		getMethod.setPath(requestURL);
 		return convertJSONToDevices(this.getDevices(requestURL, getMethod));
 	}
 
