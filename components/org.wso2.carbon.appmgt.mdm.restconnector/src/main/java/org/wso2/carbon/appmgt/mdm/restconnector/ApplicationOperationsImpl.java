@@ -78,12 +78,12 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 
 		if (Constants.USER.equals(type)) {
 			List<String> users = new ArrayList<>(Arrays.asList(params));
-			JSONArray devicesOfUsers = getDevicesOfUsers(users, tenantDomain);
+			JSONArray devicesOfUsers = getDevicesOfTypes(users, Constants.USERS, tenantDomain);
 			requestObj.put(Constants.DEVICE_IDENTIFIERS, getDeviceIdsFromDevices(devicesOfUsers));
 
 		} else if (Constants.ROLE.equals(type)) {
 			List<String> roles =  new ArrayList<>(Arrays.asList(params));
-			JSONArray devicesOfRoles = getDevicesOfRoles(roles, tenantDomain);
+			JSONArray devicesOfRoles = getDevicesOfTypes(roles, Constants.ROLES, tenantDomain);
 			requestObj.put(Constants.DEVICE_IDENTIFIERS, getDeviceIdsFromDevices(devicesOfRoles));
 
 		} else {
@@ -333,13 +333,22 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		return devices;
 	}
 
-	private JSONArray getDevicesOfRoles(List<String> roles, String tenantDomain)
+	/**
+	 * Will return device list for user list or role list
+	 *
+	 * @param types Type list which for devices to be retrieved. ex: user list or role list
+	 * @param typeName Type name which for devices to be retrieved ex: user or role
+	 * @param tenantDomain Tenant domain
+	 * @return Device list which retrieved for user set or role set
+	 * @throws MobileApplicationException
+	 */
+	private JSONArray getDevicesOfTypes(List<String> types, String typeName, String tenantDomain)
 			throws MobileApplicationException {
 		List<NameValuePair> nameValuePairs = new ArrayList<>();
-		for (String role : roles) {
-			nameValuePairs.add(new NameValuePair(Constants.ROLE, role));
+		for (String type : types) {
+			nameValuePairs.add(new NameValuePair(Constants.TYPES, type));
 		}
-		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_ROLES, tenantDomain);
+		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_TYPES, typeName, tenantDomain);
 		String requestURL =
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
 
@@ -358,22 +367,6 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
 		getMethod.setPath(requestURL);
 		return convertJSONToDevices(this.getDevices(requestURL, getMethod));
-	}
-
-	private JSONArray getDevicesOfUsers(List<String> users, String tenantDomain)
-			throws MobileApplicationException {
-		List<NameValuePair> nameValuePairs = new ArrayList<>();
-		for (String user : users) {
-			nameValuePairs.add(new NameValuePair(Constants.USER, user));
-		}
-		String deviceListAPI = String.format(Constants.API_DEVICE_LIST_OF_USERS, tenantDomain);
-		String requestURL =
-				getActiveMDMProperties().get(Constants.PROPERTY_SERVER_URL) + deviceListAPI;
-
-		GetMethod getMethod = new GetMethod(requestURL);
-		getMethod.setQueryString(nameValuePairs.toArray(new NameValuePair[nameValuePairs.size()]));
-
-		return this.getDevices(requestURL, getMethod);
 	}
 
 	private HashMap<String, String> getActiveMDMProperties() {

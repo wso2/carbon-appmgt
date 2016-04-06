@@ -24,8 +24,7 @@ public class Constants {
 
     public static final String MDM_NAME = "WSO2MDM";
     public static final String API_DEVICE_LIST_OF_USER = "/devices/user/%s/%s";
-    public static final String API_DEVICE_LIST_OF_ROLES = "/devices/roles/%s";
-    public static final String API_DEVICE_LIST_OF_USERS = "/devices/users/%s";
+    public static final String API_DEVICE_LIST_OF_TYPES = "/devices/%s/%s";
     public static final String API_INSTALL_APP = "/operations/installApp/%s";
     public static final String API_UNINSTALL_APP = "/operations/uninstallApp/%s";
 
@@ -38,11 +37,14 @@ public class Constants {
 
     public static final String USER = "user";
     public static final String ROLE = "role";
+    public static final String USERS = USER + "s";
+    public static final String ROLES = ROLE + "s";
     public static final String ANDROID = "android";
     public static final String PLATFORM = "platform";
     public static final String PLATFORM_VERSION = "platformVersion";
     public static final String PROPERTIES = "properties";
     public static final String TYPE = "type";
+    public static final String TYPES = TYPE + "s";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String USER_LIST = "userList";
