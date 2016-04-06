@@ -163,9 +163,9 @@
                 "parameters": [
                     {
                         "in": "body",
-                        "name": "download",
+                        "name": "install",
                         "schema": {
-                            "$ref": "#/definitions/Download"
+                            "$ref": "#/definitions/Install"
                         }
                     },
                     {
@@ -207,9 +207,9 @@
                 "parameters": [
                     {
                         "in": "body",
-                        "name": "download",
+                        "name": "install",
                         "schema": {
-                            "$ref": "#/definitions/Download"
+                            "$ref": "#/definitions/Install"
                         }
                     },
                     {
@@ -655,8 +655,8 @@
                 }
             }
         },
-        "Download": {
-            "title": "Download App",
+        "Install": {
+            "title": "Install/Download App",
             "properties": {
                 "type": {
                     "type": "string",
@@ -666,13 +666,19 @@
                 "users": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/UserList"
+                        "$ref": "#/definitions/UserInfo"
                     }
                 },
                 "devices": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/DeviceList"
+                        "$ref": "#/definitions/DeviceInfo"
+                    }
+                },
+                "apps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AppInfo"
                     }
                 }
             }
