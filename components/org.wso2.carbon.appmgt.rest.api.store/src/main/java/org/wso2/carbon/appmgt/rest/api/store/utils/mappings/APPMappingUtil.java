@@ -231,6 +231,12 @@ public class APPMappingUtil {
         }
     }
 
+    public static void unsubscribeApp(Registry registry, String userId, String appId)
+            throws org.wso2.carbon.registry.api.RegistryException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        registry.delete(path);
+    }
+
     public static boolean showAppVisibilityToUser(String appPath, String username, String opType) {
         String userRole = "Internal/private_" + username;
 
