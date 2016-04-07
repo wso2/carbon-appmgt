@@ -23,27 +23,9 @@ import java.io.Serializable;
 /**
  * This class represents the Enterprise Application information.
  */
-public class EnterpriseApplication implements Serializable {
+public class EnterpriseApplication extends AndroidApplication implements Serializable {
 
-	private String type;
 	private String url;
-	private String appIdentifier;
-
-	public String getAppIdentifier() {
-		return appIdentifier;
-	}
-
-	public void setAppIdentifier(String appIdentifier) {
-		this.appIdentifier = appIdentifier;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
 
 	public String getUrl() {
 		return url;
@@ -51,11 +33,6 @@ public class EnterpriseApplication implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public String toJSON() throws DeviceApplicationException {
-		Gson gson = new Gson();
-		return gson.toJson(this);
 	}
 
 }

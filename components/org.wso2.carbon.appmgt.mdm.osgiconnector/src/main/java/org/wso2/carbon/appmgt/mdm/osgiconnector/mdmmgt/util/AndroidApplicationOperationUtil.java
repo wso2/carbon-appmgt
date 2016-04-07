@@ -49,17 +49,10 @@ public class AndroidApplicationOperationUtil {
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
-				AppStoreApplication appStoreApplication = new AppStoreApplication();
-				appStoreApplication.setType(application.getType().toString());
-				appStoreApplication.setAppIdentifier(application.getIdentifier());
-				operation.setPayLoad(appStoreApplication.toJSON());
+				setOperationForPublicApp(operation, application);
 				break;
 			case WEBAPP:
-				WebApplication webApplication = new WebApplication();
-				webApplication.setUrl(application.getLocation());
-				webApplication.setName(application.getName());
-				webApplication.setType(application.getType().toString());
-				operation.setPayLoad(webApplication.toJSON());
+				setOperationForWebApp(operation, application);
 				break;
 			default:
 				String errorMessage = "Invalid application type.";
@@ -90,23 +83,33 @@ public class AndroidApplicationOperationUtil {
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
-				AppStoreApplication appStoreApplication = new AppStoreApplication();
-				appStoreApplication.setType(application.getType().toString());
-				appStoreApplication.setAppIdentifier(application.getIdentifier());
-				operation.setPayLoad(appStoreApplication.toJSON());
+				setOperationForPublicApp(operation, application);
 				break;
 			case WEBAPP:
-				WebApplication webApplication = new WebApplication();
-				webApplication.setUrl(application.getLocation());
-				webApplication.setName(application.getName());
-				webApplication.setType(application.getType().toString());
-				operation.setPayLoad(webApplication.toJSON());
+				setOperationForWebApp(operation, application);
 				break;
 			default:
 				String errorMessage = "Invalid application type.";
 				throw new DeviceApplicationException(errorMessage);
 		}
 		return operation;
+	}
+
+	private static void setOperationForPublicApp(Operation operation, MobileApp application)
+			throws DeviceApplicationException {
+		AppStoreApplication appStoreApplication = new AppStoreApplication();
+		appStoreApplication.setType(application.getType().toString());
+		appStoreApplication.setAppIdentifier(application.getIdentifier());
+		operation.setPayLoad(appStoreApplication.toJSON());
+	}
+
+	private static void setOperationForWebApp(Operation operation, MobileApp application)
+			throws DeviceApplicationException {
+		WebApplication webApplication = new WebApplication();
+		webApplication.setUrl(application.getLocation());
+		webApplication.setName(application.getName());
+		webApplication.setType(application.getType().toString());
+		operation.setPayLoad(webApplication.toJSON());
 	}
 
 }

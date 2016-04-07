@@ -111,7 +111,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					try {
 						JSONObject parsedObj = (JSONObject) parser.parse(param);
 						deviceIdentifier.setId((String) parsedObj.get(MDMAppConstants.ID));
-						deviceIdentifier.setId((String) parsedObj.get(MDMAppConstants.TYPE));
+						deviceIdentifier.setType((String) parsedObj.get(MDMAppConstants.TYPE));
 						deviceIdentifiers.add(deviceIdentifier);
 					} catch (ParseException e) {
 						log.error("Device Identifier is not valid json object.", e);
@@ -142,8 +142,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				properties.put(MDMAppConstants.IOSConstants.IS_REMOVE_APP, true);
 				properties.put(MDMAppConstants.IOSConstants.IS_PREVENT_BACKUP, true);
 			} else if (MDMAppConstants.IOSConstants.PUBLIC.equals(app.getType())) {
-				properties.put(MDMAppConstants.IOSConstants.I_TUNES_ID,
-				               Integer.parseInt(app.getIdentifier()));
+				properties.put(MDMAppConstants.IOSConstants.I_TUNES_ID, app.getIdentifier());
 				properties.put(MDMAppConstants.IOSConstants.IS_REMOVE_APP, true);
 				properties.put(MDMAppConstants.IOSConstants.IS_PREVENT_BACKUP, true);
 			} else if (MDMAppConstants.WEBAPP.equals(app.getType())) {

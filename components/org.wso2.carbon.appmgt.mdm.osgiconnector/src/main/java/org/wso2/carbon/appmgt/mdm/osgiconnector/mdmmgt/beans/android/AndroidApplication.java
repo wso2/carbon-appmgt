@@ -18,11 +18,29 @@ package org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.beans.android;
 import com.google.gson.Gson;
 import org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.common.DeviceApplicationException;
 
-import java.io.Serializable;
+public class AndroidApplication {
+	private String type;
+	private String appIdentifier;
 
-/**
- * This class represents the Appstore Application information.
- */
-public class AppStoreApplication extends AndroidApplication implements Serializable {
+	public String getAppIdentifier() {
+		return appIdentifier;
+	}
+
+	public void setAppIdentifier(String appIdentifier) {
+		this.appIdentifier = appIdentifier;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String toJSON() throws DeviceApplicationException {
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
 
 }

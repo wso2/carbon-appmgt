@@ -18,31 +18,11 @@
  */
 package org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.beans.ios;
 
-import com.google.gson.Gson;
-import org.wso2.carbon.appmgt.mdm.osgiconnector.mdmmgt.common.DeviceApplicationException;
-
 import java.io.Serializable;
 
-public class EnterpriseApplication implements Serializable {
+public class EnterpriseApplication extends IOSApplication implements Serializable {
 
-	private String identifier;
 	private String manifestURL;
-	private boolean removeAppUponMDMProfileRemoval;
-	private boolean preventBackupOfAppData;
-	private String bundleId;
-	private String UUID;
-
-	public void setUUID(String UUID) {
-		this.UUID = UUID;
-	}
-
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
 
 	public String getManifestURL() {
 		return manifestURL;
@@ -50,35 +30,6 @@ public class EnterpriseApplication implements Serializable {
 
 	public void setManifestURL(String manifestURL) {
 		this.manifestURL = manifestURL;
-	}
-
-	public boolean isRemoveAppUponMDMProfileRemoval() {
-		return removeAppUponMDMProfileRemoval;
-	}
-
-	public void setRemoveAppUponMDMProfileRemoval(boolean removeAppUponMDMProfileRemoval) {
-		this.removeAppUponMDMProfileRemoval = removeAppUponMDMProfileRemoval;
-	}
-
-	public boolean isPreventBackupOfAppData() {
-		return preventBackupOfAppData;
-	}
-
-	public void setPreventBackupOfAppData(boolean preventBackupOfAppData) {
-		this.preventBackupOfAppData = preventBackupOfAppData;
-	}
-
-	public String getBundleId() {
-		return bundleId;
-	}
-
-	public void setBundleId(String bundleId) {
-		this.bundleId = bundleId;
-	}
-
-	public String toJSON() throws DeviceApplicationException {
-		Gson gson = new Gson();
-		return gson.toJson(this);
 	}
 
 }
