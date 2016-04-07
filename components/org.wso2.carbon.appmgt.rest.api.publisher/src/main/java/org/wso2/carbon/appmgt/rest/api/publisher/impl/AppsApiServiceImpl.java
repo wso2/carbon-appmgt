@@ -25,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
@@ -93,9 +95,14 @@ public class AppsApiServiceImpl extends AppsApiService {
                     } else {
                         RestApiUtil.handleBadRequest("Invalid Filetype - Uploaded file is not an archive", log);
                     }
-                    binaryDTO.setName(information);
-                    mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
+                    JSONObject binaryObj = new JSONObject(information);
+                    binaryDTO.setPackage(binaryObj.getString("package"));
+                    binaryDTO.setVersion(binaryObj.getString("version"));
+                    String fileAPI = appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
+                            + filename;
+                    binaryDTO.setPath(fileAPI);
                     return Response.ok().entity(binaryDTO).build();
+                } catch (JSONException e) {
                 } finally {
                     IOUtils.closeQuietly(binaryInputStream);
                 }
@@ -104,7 +111,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleBadRequest("'file' should be specified", log);
             }
         } catch (AppManagementException e) {
-            e.printStackTrace();
+            RestApiUtil.handleInternalServerError(
+                    "Error occurred while parsing binary file archive and retrieving information", e, log);
         }
         return null;
     }

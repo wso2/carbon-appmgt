@@ -12,34 +12,49 @@ import javax.validation.constraints.NotNull;
 public class BinaryDTO  {
   
   
-  
-  private String binaryId = null;
-  
   @NotNull
-  private String name = null;
-
+  private String path = null;
   
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("binaryId")
-  public String getBinaryId() {
-    return binaryId;
-  }
-  public void setBinaryId(String binaryId) {
-    this.binaryId = binaryId;
-  }
+  
+  private String _package = null;
+  
+  
+  private String version = null;
 
   
   /**
    **/
   @ApiModelProperty(required = true, value = "")
-  @JsonProperty("name")
-  public String getName() {
-    return name;
+  @JsonProperty("path")
+  public String getPath() {
+    return path;
   }
-  public void setName(String name) {
-    this.name = name;
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("_package")
+  public String getPackage() {
+    return _package;
+  }
+  public void setPackage(String _package) {
+    this._package = _package;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("version")
+  public String getVersion() {
+    return version;
+  }
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   
@@ -49,8 +64,9 @@ public class BinaryDTO  {
     StringBuilder sb = new StringBuilder();
     sb.append("class BinaryDTO {\n");
     
-    sb.append("  binaryId: ").append(binaryId).append("\n");
-    sb.append("  name: ").append(name).append("\n");
+    sb.append("  path: ").append(path).append("\n");
+    sb.append("  _package: ").append(_package).append("\n");
+    sb.append("  version: ").append(version).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
