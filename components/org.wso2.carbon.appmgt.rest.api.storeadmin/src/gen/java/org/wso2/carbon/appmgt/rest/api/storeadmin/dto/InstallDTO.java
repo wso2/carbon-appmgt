@@ -1,9 +1,9 @@
 package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 
 
 @ApiModel(description = "")
@@ -14,19 +14,16 @@ public class InstallDTO  {
   private String type = null;
   
   
-  private List<UserInfoDTO> users = new ArrayList<UserInfoDTO>();
+  private Object typeIds = null;
   
   
-  private List<RoleInfoDTO> roles = new ArrayList<RoleInfoDTO>();
-  
-  
-  private List<AppInfoDTO> apps = new ArrayList<AppInfoDTO>();
+  private String appId = null;
 
   
   /**
-   * Download type (either user or device).
+   * Download type (either user or roles).
    **/
-  @ApiModelProperty(value = "Download type (either user or device).")
+  @ApiModelProperty(value = "Download type (either user or roles).")
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -37,38 +34,28 @@ public class InstallDTO  {
 
   
   /**
+   * List of Id's against type (role/user)
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("users")
-  public List<UserInfoDTO> getUsers() {
-    return users;
+  @ApiModelProperty(value = "List of Id's against type (role/user)")
+  @JsonProperty("typeIds")
+  public Object getTypeIds() {
+    return typeIds;
   }
-  public void setUsers(List<UserInfoDTO> users) {
-    this.users = users;
+  public void setTypeIds(Object typeIds) {
+    this.typeIds = typeIds;
   }
 
   
   /**
+   * App Id
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("roles")
-  public List<RoleInfoDTO> getRoles() {
-    return roles;
+  @ApiModelProperty(value = "App Id")
+  @JsonProperty("appId")
+  public String getAppId() {
+    return appId;
   }
-  public void setRoles(List<RoleInfoDTO> roles) {
-    this.roles = roles;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("apps")
-  public List<AppInfoDTO> getApps() {
-    return apps;
-  }
-  public void setApps(List<AppInfoDTO> apps) {
-    this.apps = apps;
+  public void setAppId(String appId) {
+    this.appId = appId;
   }
 
   
@@ -79,9 +66,8 @@ public class InstallDTO  {
     sb.append("class InstallDTO {\n");
     
     sb.append("  type: ").append(type).append("\n");
-    sb.append("  users: ").append(users).append("\n");
-    sb.append("  roles: ").append(roles).append("\n");
-    sb.append("  apps: ").append(apps).append("\n");
+    sb.append("  typeIds: ").append(typeIds).append("\n");
+    sb.append("  appId: ").append(appId).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
