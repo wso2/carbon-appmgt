@@ -1,10 +1,20 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.appmgt.rest.api.publisher.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
+import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
 
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch, String ifUnmodifiedSince);

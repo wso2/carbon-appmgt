@@ -1,4 +1,4 @@
-package org.wso2.carbon.appmgt.rest.api.publisher;
+package org.wso2.carbon.appmgt.rest.api.storeadmin;
 //comment
 public class ApiException extends Exception{
 	private int code;

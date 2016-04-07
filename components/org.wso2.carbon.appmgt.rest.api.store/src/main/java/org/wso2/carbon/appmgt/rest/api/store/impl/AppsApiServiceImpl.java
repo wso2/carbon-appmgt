@@ -51,17 +51,21 @@ public class AppsApiServiceImpl extends AppsApiService {
 
 
             //Install to Devices
-            if (contentType == "device") {
+            if (install.getType().equalsIgnoreCase("device")) {
                 if (install.getDevices().size() == 0) {
                     String errorMessage = "Devices not found in payload.";
                     return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
                 }
                 GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry) registry,
-                                                                                    "mobileapp");
-                GenericArtifact artifact = artifactManager.getGenericArtifact(install.getApps().get(0).getId());
-                APPMappingUtil.subscribeApp(registry, username, install.getApps().get(0).getId());
-                APPMappingUtil.showAppVisibilityToUser(artifact.getPath(), username, "ALLOW");
-            } else if (contentType == "user") {
+                                                                                    AppMConstants.MOBILE_ASSET_TYPE);
+
+                for (int i = 0; i < install.getApps().size(); i++) {
+                    String appId = install.getApps().get(i).getId();
+                    GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
+                    APPMappingUtil.subscribeApp(registry, username, appId);
+                    APPMappingUtil.showAppVisibilityToUser(artifact.getPath(), username, "ALLOW");
+                }
+            } else if (install.getType().equalsIgnoreCase("user")) {
 
             /*
             params.forEach(function(username) {
@@ -71,6 +75,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 */
             }
+            return Response.ok().build();
         } catch (RegistryException e) {
             RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
         } catch (UserStoreException e) {
@@ -83,6 +88,56 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
+        try {
+            if (install.getApps().size() == 0) {
+                String errorMessage = "Apps not found in payload.";
+                return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+            }
+
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            int tenantId = 0;
+            Registry registry = null;
+
+            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            registry = ServiceReferenceHolder.getInstance().getRegistryService().getGovernanceUserRegistry(
+                    tenantUserName, tenantId);
+
+
+            //Install to Devices
+            if (install.getType().equalsIgnoreCase("device")) {
+                if (install.getDevices().size() == 0) {
+                    String errorMessage = "Devices not found in payload.";
+                    return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+                }
+                GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry) registry,
+                                                                                    AppMConstants.MOBILE_ASSET_TYPE);
+                for (int i = 0; i < install.getApps().size(); i++) {
+                    String appId = install.getApps().get(i).getId();
+                    GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
+                    APPMappingUtil.unsubscribeApp(registry, username, appId);
+                    APPMappingUtil.showAppVisibilityToUser(artifact.getPath(), username, "DENY");
+                }
+            } else if (install.getType().equalsIgnoreCase("user")) {
+
+            /*
+            params.forEach(function(username) {
+                var path = user.userSpace({username:username, tenantId:tenantId})+SUBSCRIPTIONS_PATH + app;
+
+                subscribe(path, app, username);
+            }
+*/
+            }
+            return Response.ok().build();
+        } catch (RegistryException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing User Store", e, log);
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            RestApiUtil.handleInternalServerError("Error while initializing registry", e, log);
+        }
         return null;
     }
 

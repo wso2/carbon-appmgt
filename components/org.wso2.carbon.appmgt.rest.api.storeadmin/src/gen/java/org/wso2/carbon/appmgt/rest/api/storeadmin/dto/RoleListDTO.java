@@ -1,17 +1,13 @@
-package org.wso2.carbon.appmgt.rest.api.publisher.dto;
+package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
 
 import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotNull;
-
-
 
 @ApiModel(description = "")
-public class AppListDTO  {
+public class RoleListDTO  {
   
   
   
@@ -24,7 +20,7 @@ public class AppListDTO  {
   private String previous = null;
   
   
-  private List<AppInfoDTO> list = new ArrayList<AppInfoDTO>();
+  private List<RoleInfoDTO> list = new ArrayList<RoleInfoDTO>();
 
   
   /**
@@ -70,10 +66,10 @@ public class AppListDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("list")
-  public List<AppInfoDTO> getList() {
+  public List<RoleInfoDTO> getList() {
     return list;
   }
-  public void setList(List<AppInfoDTO> list) {
+  public void setList(List<RoleInfoDTO> list) {
     this.list = list;
   }
 
@@ -82,7 +78,7 @@ public class AppListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AppListDTO {\n");
+    sb.append("class RoleListDTO {\n");
     
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");

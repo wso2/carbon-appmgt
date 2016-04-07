@@ -1,0 +1,338 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: WSO2 APP Manager - Store Admin API
+  description: >
+    This document specifies a **RESTful API** for WSO2 **APP Manager**
+    - Publisher.
+
+
+
+    It is written with [swagger 2](http://swagger.io/).
+  contact:
+    name: WSO2
+    url: 'http://wso2.com/products/app-manager/'
+    email: architecture@wso2.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+schemes:
+  - http
+host: apis.wso2.com
+basePath: /api/appm/store/v1.0
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /roles:
+    get:
+      summary: Get all Roles
+      description: |
+        Get a list of available Roles.
+      parameters:
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Roles
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Roles are returned.\n"
+          schema:
+            $ref: '#/definitions/RoleList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  /users:
+    get:
+      summary: Get all Users
+      description: |
+        Get a list of available Users.
+      parameters:
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Users
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Users are returned.\n"
+          schema:
+            $ref: '#/definitions/UserList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/download:
+    post:
+      summary: Enterprise Download/Install App
+      description: |
+        Enterprise Download an new App
+      parameters:
+        - in: body
+          name: install
+          schema:
+            $ref: '#/definitions/Install'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nResource to be deleted does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/uninstallation:
+    post:
+      summary: Enterprise Uninstall App
+      description: |
+        Enterprise Uninstall an existing App
+      parameters:
+        - in: body
+          name: install
+          schema:
+            $ref: '#/definitions/Install'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nResource to be deleted does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+parameters:
+  limit:
+    name: limit
+    in: query
+    description: |
+      Maximum size of resource array to return.
+    default: 25
+    type: integer
+  offset:
+    name: offset
+    in: query
+    description: "Starting point within the complete list of items qualified.  \n"
+    default: 0
+    type: integer
+  Accept:
+    name: Accept
+    in: header
+    description: |
+      Media types acceptable for the response. Default is JSON.
+    default: JSON
+    type: string
+  Content-Type:
+    name: Content-Type
+    in: header
+    description: |
+      Media type of the entity in the body. Default is JSON.
+    default: JSON
+    required: true
+    type: string
+  If-None-Match:
+    name: If-None-Match
+    in: header
+    description: >
+      Validator for conditional requests; based on the ETag of the formerly
+      retrieved
+
+      variant of the resourec.
+    type: string
+definitions:
+  AppInfo:
+    title: App Info object with basic App details.
+    properties:
+      id:
+        type: string
+        example: 01234567-0123-0123-0123-012345678901
+      name:
+        type: string
+        example: CalculatorApp
+      description:
+        type: string
+        example: A calculator App that supports basic operations
+      context:
+        type: string
+        example: CalculatorApp
+      version:
+        type: string
+        example: 1.0.0
+      provider:
+        description: >
+          If the provider value is not given, the user invoking the App will be
+          used as the provider.
+        type: string
+        example: admin
+      lifecycleState:
+        type: string
+        example: CREATED
+  UserList:
+    title: User List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of Users returned.
+        example: 1
+      next:
+        type: string
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/users?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/users?limit=1&offset=0&query='
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/UserInfo'
+  UserInfo:
+    title: User Details
+    properties:
+      username:
+        type: string
+        description: |
+          Username of the new user.
+        example: user1
+  RoleList:
+    title: Role List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of App returned.
+        example: 1
+      next:
+        type: string
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/roles?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/roles?limit=1&offset=0&query='
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/RoleInfo'
+  RoleInfo:
+    title: App Info object with basic Role details.
+    properties:
+      name:
+        type: string
+        example: admin
+  Install:
+    title: Install/Download App
+    properties:
+      type:
+        type: string
+        description: |
+          Download type (either user or device).
+        example: user/device
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserInfo'
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/RoleInfo'
+      apps:
+        type: array
+        items:
+          $ref: '#/definitions/AppInfo'
+  Error:
+    title: Error object returned with 4XX HTTP status
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+        description: Error message.
+      description:
+        type: string
+        description: |
+          A detail description about the error message.
+      moreInfo:
+        type: string
+        description: |
+          Preferably an url with more details about the error.
+      error:
+        type: array
+        description: "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n"
+        items:
+          $ref: '#/definitions/ErrorListItem'
+  ErrorListItem:
+    title: Description of individual errors that may have occurred during a request.
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+        description: |
+          Description about individual errors occurred

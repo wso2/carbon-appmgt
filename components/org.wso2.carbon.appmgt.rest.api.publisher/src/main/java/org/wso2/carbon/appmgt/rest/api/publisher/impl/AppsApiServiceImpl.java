@@ -1,13 +1,10 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
@@ -20,7 +17,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -28,14 +25,9 @@ import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
-import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -44,46 +36,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiService.class);
 
+
     @Override
-    public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
-        try {
-            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            if (fileInputStream != null) {
-                String directoryLocation = CarbonUtils.getCarbonHome() + File.separator + "repository/resources/mobileapps/";
-                File docFile = new File(directoryLocation);
-
-                InputStream docInputStream = null;
-                try {
-                    ContentDisposition contentDisposition = fileDetail.getContentDisposition();
-                    String filename = RestApiPublisherUtils.generateBinaryUUID();
-                    String fileExtension = FilenameUtils.getExtension(filename);
-                    RestApiUtil.transferFile(fileInputStream, filename, docFile.getAbsolutePath());
-                    docInputStream = new FileInputStream(docFile.getAbsolutePath() + File.separator + filename + "." + fileExtension);
-                    String mediaType = fileDetail.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
-
-                    ZipFileReading zipFileReading = new ZipFileReading();
-                    if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension)) {
-                        String information = zipFileReading.readAndroidManifestFile(docFile.getAbsolutePath());
-                    } else if (AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
-
-                    } else {
-                        RestApiUtil.handleBadRequest("Invalid Filetype - Uploaded file is not an archive", log);
-                    }
-                    mediaType = mediaType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : mediaType;
-                    return Response.accepted().build();
-                } catch (FileNotFoundException e) {
-                    RestApiUtil.handleInternalServerError("Unable to read the file from path ", e, log);
-                } finally {
-                    IOUtils.closeQuietly(docInputStream);
-                }
-
-            } else {
-                RestApiUtil.handleBadRequest("'file' should be specified", log);
-            }
-        } catch (AppManagementException e) {
-            e.printStackTrace();
-        }
+    public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
+                                           String ifUnmodifiedSince) {
         return null;
     }
 
@@ -162,7 +118,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             if (!isValidAction) {
                 RestApiUtil.handleBadRequest("Invalid action '" + action + "' performed on a " + appType
-                        + " with UUID " + appId, log);
+                                                     + " with UUID " + appId, log);
             }
             String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
             if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
@@ -195,7 +151,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String searchContent = appId;
             String searchType = "id";
             List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
-                    appType);
+                                                                                 appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
@@ -231,7 +187,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String searchContent = appId;
             String searchType = "id";
             List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
-                    appType);
+                                                                                 appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
@@ -276,7 +232,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
 
         GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                AppMConstants.MOBILE_ASSET_TYPE);
+                                                                                   AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
     }
 }
