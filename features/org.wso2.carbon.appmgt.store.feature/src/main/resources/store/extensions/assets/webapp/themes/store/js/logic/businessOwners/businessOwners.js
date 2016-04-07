@@ -18,8 +18,11 @@
 function merge(businessOwner){
     var keys = businessOwner.keys;
     var values = businessOwner.values;
-    var keySet = keys.split("/");
-    var valueSet = values.split("/");
+
+    if(keys != null || keys !="") {
+        var keySet = keys.split("/");
+        var valueSet = values.split("/");
+        }
     var length = keySet.length +4;
     var owner = new Array();
 

@@ -1597,15 +1597,9 @@ public class APIStoreHostObject extends ScriptableObject {
         if (args.length > 7) {
             trustedIdp = args[7].toString();
         }
-
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-
         addSubscriber(userId, thisObj);
-
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
-
-
         boolean status = false;
         boolean isTenantFlowStarted = false;
         try {
@@ -2176,7 +2170,6 @@ public class APIStoreHostObject extends ScriptableObject {
             subscriber.setSubscribedDate(new Date());
             //TODO : need to set the proper email
             subscriber.setEmail("");
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             try {
                 int tenantId =
                         ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()

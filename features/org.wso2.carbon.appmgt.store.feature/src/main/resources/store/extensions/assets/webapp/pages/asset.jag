@@ -4,6 +4,7 @@ var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
+var ownerName = null;
 var log = new Log();
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
@@ -213,8 +214,13 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+
             businessOwner = storeHostObj.getBusinessOwner(asset.id);
-            businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+            if(businessOwner.owner_name != null) {
+                log.info("*****************************************************************************************************")
+                businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+                ownerName = businessOwner[1].value;
+            }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {
@@ -548,8 +554,8 @@ require('/modules/store.js').exec(function (ctx) {
                 isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
             },
             assetType : 'webapp',
-	    businessOwner: businessOwner,
-            ownerName: businessOwner[1].value
+	        businessOwner: businessOwner,
+            ownerName: ownerName
         });
     }
 

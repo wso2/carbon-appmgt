@@ -4357,6 +4357,14 @@ public class AppMDAO {
      * @throws AppManagementException
      * @throws SQLException
      */
+    /**
+     * Insert or Update default version details
+     *
+     * @param app
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
     private void saveDefaultVersionDetails(WebApp app, Connection connection)
             throws AppManagementException, SQLException {
         PreparedStatement prepStmt = null;
@@ -4381,13 +4389,25 @@ public class AppMDAO {
             }
 
             if (recordCount == 0) {
-                addDefaultVersionDetails(app, connection);
+                //if this is the default version and there are no existing records, create a new one
+                if (app.isDefaultVersion()) {
+                    addDefaultVersionDetails(app, connection);
+                }
             } else {
+                //if there is an existing record and if this is the latest default, update the status
                 if (app.isDefaultVersion()) {
                     updateDefaultVersionDetails(app, connection);
+                } else {
+                    //If this is an existing record but if this is not the latest default, check if this is the
+                    // previous default version
+                    String existingDefaultVersion = getDefaultVersion(app.getId().getApiName(), app.getId().getProviderName(),
+                                                                      AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE, connection);
+                    if (existingDefaultVersion.equals(app.getId().getVersion())) {
+                        //if this is the ex default version, delete the entry
+                        deleteDefaultVersionDetails(app.getId(), connection);
+                    }
                 }
             }
-
         } catch (SQLException e) {
             /* In the code it is using a single SQL connection passed from the parent function so the error is logged
              here and throwing the SQLException so the connection will be disposed by the parent function. */
@@ -4490,7 +4510,41 @@ public class AppMDAO {
         }
     }
 
-	/**
+
+    /**
+     * Delete default version details
+     *
+     * @param apiIdentifier APIIdentifier class
+     * @param connection
+     * @throws AppManagementException
+     * @throws SQLException
+     */
+    private void deleteDefaultVersionDetails(APIIdentifier apiIdentifier, Connection connection) throws
+                                                                                                 AppManagementException,
+                                                                                                 SQLException {
+        PreparedStatement prepStmt = null;
+        String query;
+        try {
+            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+            query = "DELETE FROM APM_APP_DEFAULT_VERSION WHERE APP_NAME=? AND APP_PROVIDER=? AND TENANT_ID=? ";
+            prepStmt = connection.prepareStatement(query);
+            prepStmt.setString(1, apiIdentifier.getApiName());
+            prepStmt.setString(2, apiIdentifier.getProviderName());
+            prepStmt.setInt(3, tenantId);
+            prepStmt.executeUpdate();
+        } catch (SQLException e) {
+              /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error while deleting default version details for WebApp : " +
+                              apiIdentifier.getApiName(), e);
+            throw e;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(prepStmt, null, null);
+        }
+    }
+
+
+    /**
 	 * update URI templates define for an API
 	 *
 	 * @param api

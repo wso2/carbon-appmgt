@@ -48,7 +48,9 @@
                 <p>
                     Version : {{asset.attributes.overview_version}}<br>
                     Provider : {{asset.attributes.overview_provider}}<br>
+                    {{#if ownerName}}
                     By : {{ownerName}}<br>
+                    {{/if}}
                     Status: {{asset.lifecycleState}}
                 </p>
                 <span class="rating">
@@ -119,7 +121,9 @@
         <li class="active"><a data-toggle="tab" href="#menu1">Overview</a></li>
         <li><a data-toggle="tab" href="#menu2">Documentation</a></li>
         <li><a data-toggle="tab" href="#menu3">User Reviews</a></li>
+        {{#if ownerName}}
         <li><a data-toggle="tab" href="#menu4">Owner Details</a></li>
+          {{/if}}
     </ul>
 
     <div class="tab-content">

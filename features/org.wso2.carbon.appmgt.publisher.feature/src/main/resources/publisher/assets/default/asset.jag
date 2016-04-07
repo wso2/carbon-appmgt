@@ -47,6 +47,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var filterManager = publisher.filterManager;
 
     mod = jagg.module("documentation");
+    var typeList = apiProvider.getEnabledAssetTypeList();
 
     function getOwnerList(){
         var businessOwnerList = apiProvider.getBusinessOwnerList();
