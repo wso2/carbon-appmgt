@@ -31,7 +31,7 @@ public class RestApiPublisherUtils {
     public static String generateBinaryUUID(){
 
       String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        String uuid = null;
+        String uuid = "";
         for(int i = 0; i<15; i++){
             uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));
         }

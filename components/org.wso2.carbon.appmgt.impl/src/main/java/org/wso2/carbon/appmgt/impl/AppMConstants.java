@@ -370,9 +370,9 @@ public final class AppMConstants {
     public static final String SELF_SIGN_UP_CREATE_ROLE = SELF_SIGN_UP + "CreateSubscriberRole";
 
     public static final String MOBILE_APPS_CONFIGURATION = "MobileAppsConfiguration.";
-    public static final String BINARY_FILE_STORAGE = MOBILE_APPS_CONFIGURATION + "BinaryFileStorage.";
-    public static final String FILE_PRECISE_LOCATION = BINARY_FILE_STORAGE + "FilePreciseLocation.";
-    public static final String FILE_API_LOCATION = BINARY_FILE_STORAGE + "FileAPILocation.";
+    public static final String MOBILE_APPS_BINARY_FILE_STORAGE = MOBILE_APPS_CONFIGURATION + "BinaryFileStorage.";
+    public static final String MOBILE_APPS_FILE_PRECISE_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FilePreciseLocation";
+    public static final String MOBILE_APPS_FILE_API_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FileAPILocation";
 
 
     public static final String STATUS_OBSERVERS = "StatusObservers.";
