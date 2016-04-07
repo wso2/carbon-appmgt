@@ -102,6 +102,48 @@ require('/modules/publisher.js').exec(function(ctx) {
         return "";
     };
 
+    var copyFile = function(fileName){
+        if(fileName){
+            var fileLocation ;
+
+            if(mam_config.filePreciseLocation.substring(0, 1) === "/"){
+                fileLocation = mam_config.filePreciseLocation;
+            }else{
+                fileLocation = Packages.java.lang.System.getProperty("carbon.home") + "/" + mam_config.filePreciseLocation;
+            }
+            //check existence of file
+            var oldFile = new File('file://'+fileLocation+fileName);
+            if(!oldFile.isExists()) {
+                log.error("Image file does not exists :" + oldFile.getPath());
+                return "";
+            }
+
+
+            //get old file extension
+            var fileExtension = "." + fileName.split('.').pop();
+            if(fileExtension==""){
+                return "";
+            }
+
+            //create random id for new file name
+            var uid= makeid();
+            //copy file
+            var newFileName = uid+fileExtension;
+            var fileTemp=new File( 'file://' + fileLocation + newFileName);
+            try{
+                fileTemp.open('w');
+                fileTemp.write(oldFile.getStream());
+            }catch(e){
+                log.error(e);
+                log.error("Error while copying image file");
+            } finally{
+                fileTemp.close();
+            }
+            return contextPath + mam_config.fileAPILocation + newFileName;
+        }
+        return "";
+    };
+
     var getBundleID = function(appid){
         try{
             var result =  get('https://itunes.apple.com/lookup?id='+appid).data;
@@ -1410,7 +1452,6 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
     function copyMobileApp(oldVersionArtifact, context){
-
         var postContext = context.post;
         var appType = context.params.type;
 
@@ -1443,15 +1484,55 @@ require('/modules/publisher.js').exec(function(ctx) {
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_VERSION, version);
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_BUNDLE_VERSION, version);
 
-        // handle images
-        inspectFiles(request, postContext);
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
-        var screenshots = oldVersionArtifact.attributes.images_screenshots.split(',');
-        screenshots[0] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
-        screenshots[1] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
-        screenshots[2] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots.join(","));
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
+        // handle images,if new image is uploaded then save it else copy the image of previous version
+        var files = request.getAllFiles();
+        var banner = files[mobileValidatorModule.Field.IMAGES_BANNER];
+        if(banner) {
+            banner = saveFile(banner);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_BANNER].split('/').pop();
+            banner = copyFile(fileName);
+        }
+
+
+        var icon = files[mobileValidatorModule.Field.IMAGES_THUMBNAIL];
+        if(icon) {
+            icon = saveFile(icon);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_THUMBNAIL].split('/').pop();
+            icon = copyFile(fileName);
+        }
+
+        var screenshot0 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
+        if(screenshot0) {
+            screenshot0 = saveFile(screenshot0);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_0].split('/').pop();
+            screenshot0 = copyFile(fileName);
+        }
+
+        var screenshot1 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
+        if(screenshot1) {
+            screenshot1 = saveFile(screenshot1);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_1].split('/').pop();
+            screenshot1 = copyFile(fileName);
+        }
+
+        var screenshot2 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
+        if(screenshot2) {
+            screenshot2 = saveFile(screenshot2);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_2].split('/').pop();
+            screenshot2 = copyFile(fileName);
+        }
+
+
+        var screenshots = screenshot0+","+screenshot1+","+screenshot2;
+
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, banner);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, icon);
 
         // validate model
         var mobileValidator = new mobileValidatorModule.Validator(null);
