@@ -129,30 +129,30 @@
 
 {{!-- modal section--}}
 <div class="modal fade" id="modalDevices">
-    <div class="modal-dialog-devices">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
-            </div>
-            <div class="modal-body">
+    <div class="modal-dialog">
+        <div class="modal-dialog-devices">
+            <div class="modal-content ep-install-modal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
+                </div>
+                <div class="modal-body">
 
-                <div class='row'>
-                    <div class='col-md-12'>
-                        <div class="carousel slide media-carousel" id="media">
-                            <div class="carousel-inner" id="devicesList">
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <div class="carousel slide media-carousel" id="media">
+                                <div class="carousel-inner" id="devicesList">
 
 
+                                </div>
                             </div>
-                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
-                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
 </div><!-- /.modal -->
 
 

@@ -25,8 +25,9 @@ $.ajax({
         var item = $("<div>", {class: "item " + isActive });
         var row = $("<div>", {class: "row"});
 
-        for(var k = 0 ; k < objects[j].length; k++){
-            row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id + '"  class="col-md-2 device-image-block-modal">' +
+        for (var k = 0; k < objects[j].length; k++) {
+            row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
+                '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-modal">' +
                 '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
                 '"><div>' + objects[j][k].name + '</div></a>' +
                 '</div>');
@@ -108,13 +109,15 @@ $(".device-image-block").click(function(index) {
 
 $("#devicesList").on( "click", ".device-image-block-modal", function() {
     var deviceId = $(this).data("deviceId");
-    performInstalltion(deviceId, appToInstall);
+    var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
+    performInstalltion(deviceId, devicePlatform, appToInstall);
 });
 
 
-function performInstalltion(device, app){
+function performInstalltion(deviceId, devicePlatform, app){
     jQuery.ajax({
-        url:  caramel.context +"/apps/devices/" + encodeURIComponent(device) + "/install",
+        url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
+              encodeURIComponent(devicePlatform) + "/install",
         type: "POST",
         dataType: "json",
         data : {"asset": app}

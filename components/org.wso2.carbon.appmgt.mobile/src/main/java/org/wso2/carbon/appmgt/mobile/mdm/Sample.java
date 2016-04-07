@@ -21,6 +21,8 @@
 package org.wso2.carbon.appmgt.mobile.mdm;
 
 
+import org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class Sample {
         List<Device> devices = new ArrayList<Device>();
 
         Device device1 = new Device();
-        device1.setId("11");
+        device1.setDeviceIdentifier(new DeviceIdentifier("11", ""));
         device1.setName("My Nexus");
         device1.setPlatform("android");
         device1.setPlatformVersion("5.0");
@@ -42,7 +44,7 @@ public class Sample {
         device1.setType("phone");
 
         Device device2 = new Device();
-        device2.setId("12");
+        device2.setDeviceIdentifier(new DeviceIdentifier("12", ""));
         device2.setName("My iPhone");
         device2.setPlatform("ios");
         device2.setPlatformVersion("8.0");
