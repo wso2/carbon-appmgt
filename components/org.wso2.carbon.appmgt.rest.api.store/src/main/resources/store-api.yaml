@@ -519,54 +519,20 @@ definitions:
       type:
         type: string
         example: phone
-  UserList:
-    title: User List
-    properties:
-      count:
-        type: integer
-        description: |
-          Number of Users returned.
-        example: 1
-      next:
-        type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/users?limit=1&offset=2&query='
-      previous:
-        type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/users?limit=1&offset=0&query='
-      list:
-        type: array
-        items:
-          $ref: '#/definitions/UserInfo'
-  UserInfo:
-    title: User Details
-    properties:
-      username:
-        type: string
-        description: |
-          Username of the new user.
-        example: user1
   Install:
     title: Install/Download App
     properties:
       type:
         type: string
         description: |
-          Download type (either user or device).
+          Download type (either use or devices).
         example: user/device
-      users:
-        type: array
-        items:
-          $ref: '#/definitions/UserInfo'
-      devices:
-        type: array
-        items:
-          $ref: '#/definitions/DeviceInfo'
-      apps:
-        type: array
-        items:
-          $ref: '#/definitions/AppInfo'
+      deviceIds:
+        type: object
+        description: "List of device Id's"
+      appIds:
+        type: object
+        description: "List of App Id's"
   Error:
     title: Error object returned with 4XX HTTP status
     required:
