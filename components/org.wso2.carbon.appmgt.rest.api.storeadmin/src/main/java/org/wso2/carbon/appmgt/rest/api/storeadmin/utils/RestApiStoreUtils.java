@@ -16,7 +16,7 @@
  *
  */
 
-package org.wso2.carbon.appmgt.rest.api.publisher.utils;
+package org.wso2.carbon.appmgt.rest.api.storeadmin.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -17,7 +17,6 @@ import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;

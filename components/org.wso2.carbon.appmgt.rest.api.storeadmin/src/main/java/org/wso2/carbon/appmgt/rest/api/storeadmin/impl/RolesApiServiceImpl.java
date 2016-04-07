@@ -3,7 +3,7 @@ package org.wso2.carbon.appmgt.rest.api.storeadmin.impl;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.RolesApiService;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.RolesMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings.RolesMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
