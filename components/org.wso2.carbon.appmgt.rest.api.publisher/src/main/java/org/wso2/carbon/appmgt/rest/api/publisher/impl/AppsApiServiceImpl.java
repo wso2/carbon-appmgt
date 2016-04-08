@@ -28,9 +28,10 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppManagementException; 
 import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -66,6 +67,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        InputStream binaryInputStream = null;
         try {
             BinaryDTO binaryDTO = new BinaryDTO();
             if (fileInputStream != null) {
@@ -76,13 +78,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                         appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
                 File binaryFile = new File(directoryLocation);
 
-                InputStream binaryInputStream = null;
-                try {
                     ContentDisposition contentDisposition = fileDetail.getContentDisposition();
                     String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
-                    String mediaType = fileDetail.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
 
                     ZipFileReading zipFileReading = new ZipFileReading();
                     String information = null;
@@ -103,7 +102,46 @@ public class AppsApiServiceImpl extends AppsApiService {
                             + filename;
                     binaryDTO.setPath(fileAPI);
                     return Response.ok().entity(binaryDTO).build();
-                } catch (JSONException e) {
+
+            } else {
+                RestApiUtil.handleBadRequest("'file' should be specified", log);
+            }
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError(
+                    "Error occurred while parsing binary file archive and retrieving information", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError(
+                    "Error occurred while parsing metadata of binary and retrieving information", e, log);
+        } finally {
+            IOUtils.closeQuietly(binaryInputStream);
+        }
+        return null;
+    }
+
+    @Override
+    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        try {
+            BinaryDTO binaryDTO = new BinaryDTO();
+            if (fileInputStream != null) {
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
+                        appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+                File binaryFile = new File(directoryLocation);
+
+                InputStream binaryInputStream = null;
+                try {
+                    ContentDisposition contentDisposition = fileDetail.getContentDisposition();
+                    String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
+                    String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
+                    RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
+
+                    String fileAPI = appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
+                            + filename;
+                    binaryDTO.setPath(fileAPI);
+                    return Response.ok().entity(binaryDTO).build();
                 } finally {
                     IOUtils.closeQuietly(binaryInputStream);
                 }
@@ -173,8 +211,23 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        AppDTO appDTO = new AppDTO();
+        if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                //TODO:APP Validations
+                //TODO:Get provider name from context (Token owner)
+                //TODO:Permission check
+                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body, "admin");
+                String applicationId = appProvider.addMobileApp(mobileApp);
+                appDTO.setId(applicationId);
+            } catch (AppManagementException e) {
+                RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
+            }
+        }else{
+            RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
+        }
+        return Response.ok().entity(appDTO).build();
     }
 
     @Override

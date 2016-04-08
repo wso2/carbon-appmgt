@@ -29,21 +29,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
-import org.wso2.carbon.appmgt.api.model.JavaPolicy;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.SSOProvider;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.Usage;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -427,6 +413,24 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } catch (AppManagementException e) {
             throw new AppManagementException("Error in adding WebApp :"+app.getId().getApiName(),e);
         }
+    }
+
+    /**
+     * Adds a new Mobile App to the Store
+     *
+     * @param app Mobile App
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     *          if failed to add the Mobile App
+     */
+    public String addMobileApp(MobileApp app) throws AppManagementException {
+        String artifactId = null;
+        try {
+            artifactId = createMobileApp(app);
+
+        } catch (AppManagementException e) {
+            throw new AppManagementException("Error in adding Mobile App :"+app.getAppName(),e);
+        }
+        return artifactId;
     }
 
     /**
@@ -1400,6 +1404,31 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
              handleException("Error while performing registry transaction operation", e);
         }
 
+    }
+
+    /**
+     * Create Mobile Application artifact
+     *
+     * @param mobileApp
+     * @throws AppManagementException
+     */
+    private String createMobileApp(MobileApp mobileApp) throws AppManagementException {
+        GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                AppMConstants.MOBILE_ASSET_TYPE);
+        String artifactId = null;
+        try {
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));
+            GenericArtifact artifact = AppManagerUtil.createMobileAppArtifactContent(genericArtifact, mobileApp);
+            artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            changeLifeCycleStatus(AppMConstants.MOBILE_ASSET_TYPE, artifactId, APPLifecycleActions.CREATE.getStatus());
+            registry.commitTransaction();
+        } catch (RegistryException e) {
+            handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
+        }
+        return artifactId;
     }
 
     /**
