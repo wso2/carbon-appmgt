@@ -3,7 +3,7 @@ package org.wso2.carbon.appmgt.rest.api.storeadmin;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.*;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.*;
 
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserListDTO;
+import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorDTO;
 
 import java.util.List;

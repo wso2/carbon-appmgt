@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "WSO2 APP Manager - Store Admin API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -51,7 +51,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Roles are returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/RoleList"
+                            "$ref": "#/definitions/RoleIdList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -110,7 +110,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Users are returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/UserList"
+                            "$ref": "#/definitions/UserIdList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -271,74 +271,21 @@
         }
     },
     "definitions": {
-        "UserList": {
+        "UserIdList": {
             "title": "User List",
             "properties": {
-                "count": {
-                    "type": "integer",
-                    "description": "Number of Users returned.\n",
-                    "example": 1
-                },
-                "next": {
-                    "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
-                    "example": "/users?limit=1&offset=2&query="
-                },
-                "previous": {
-                    "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
-                    "example": "/users?limit=1&offset=0&query="
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/UserInfo"
-                    }
+                "userIds": {
+                    "type": "object",
+                    "description": "List of User Names"
                 }
             }
         },
-        "UserInfo": {
-            "title": "User Details",
-            "properties": {
-                "username": {
-                    "type": "string",
-                    "description": "Username of the new user.\n",
-                    "example": "user1"
-                }
-            }
-        },
-        "RoleList": {
+        "RoleIdList": {
             "title": "Role List",
             "properties": {
-                "count": {
-                    "type": "integer",
-                    "description": "Number of App returned.\n",
-                    "example": 1
-                },
-                "next": {
-                    "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
-                    "example": "/roles?limit=1&offset=2&query="
-                },
-                "previous": {
-                    "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
-                    "example": "/roles?limit=1&offset=0&query="
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/RoleInfo"
-                    }
-                }
-            }
-        },
-        "RoleInfo": {
-            "title": "App Info object with basic Role details.",
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "example": "admin"
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Role Id's"
                 }
             }
         },

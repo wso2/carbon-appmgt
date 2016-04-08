@@ -6,7 +6,7 @@ import org.wso2.carbon.appmgt.rest.api.storeadmin.factories.RolesApiServiceFacto
 
 import io.swagger.annotations.ApiParam;
 
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleListDTO;
+import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorDTO;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class RolesApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get all Roles", notes = "Get a list of available Roles.", response = RoleListDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get all Roles", notes = "Get a list of available Roles.", response = RoleIdListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of qualifying Roles are returned."),
         
