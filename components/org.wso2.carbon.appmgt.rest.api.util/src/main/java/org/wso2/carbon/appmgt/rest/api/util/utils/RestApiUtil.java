@@ -74,15 +74,12 @@ public class RestApiUtil {
     }
 
     public static APIProvider getLoggedInUserProvider() throws AppManagementException {
-        //need to set user when oauth configuration is implemented
-        String loggedInUser = "admin";//CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
         return APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
     }
 
     public static String getLoggedInUsername() {
-        //need to set user when oauth configuration is implemented
-        return "admin";
-        // return CarbonContext.getThreadLocalCarbonContext().getUsername();
+        return CarbonContext.getThreadLocalCarbonContext().getUsername();
     }
 
     public static APIProvider getProvider(String username) throws AppManagementException {
@@ -211,9 +208,7 @@ public class RestApiUtil {
     }
 
     public static String getLoggedInUserTenantDomain() {
-        //need to modify after auth change
-        //return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        return "carbon.super";
+        return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
     }
 
 
