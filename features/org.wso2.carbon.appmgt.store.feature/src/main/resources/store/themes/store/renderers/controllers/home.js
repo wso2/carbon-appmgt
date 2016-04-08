@@ -48,7 +48,7 @@ var render = function (theme, data, meta, require) {
         pageContent: [
             {
                 partial: 'page-content-home',
-                context: getBodyContext(data.topAssets.assets, subscriptionOn, data.header.user)
+                context: getBodyContext(data, subscriptionOn)
             }
         ]
     });
@@ -89,9 +89,22 @@ function createLeftNavLinks(data) {
     return leftNavigationData;
 }
 
-function getBodyContext(assetTypes, subscriptionOnStatus, user) {
+function getBodyContext(data, subscriptionOnStatus) {
+    var assetTypes = data.topAssets.assets;
+    var user = data.header.user;
+    var enabledTypeList = data.config.enabledTypeList;
     for (var i = 0; i < assetTypes.length; i++) {
         assetTypes[i].user = user;
+        var type = assetTypes[i].singular.toLowerCase().replace(/ /g,'');
+        if (type == "mobileapp") {
+            assetTypes[i].seeMoreUrl = "/assets/mobileapp/"
+        } else {
+            if (subscriptionOnStatus) {
+                assetTypes[i].seeMoreUrl = "/assets/" + type + "/"
+            } else {
+                assetTypes[i].seeMoreUrl = "/extensions/assets/" + type + "/apps/"
+            }
+        }
     }
     return {assetTypes: assetTypes, subscriptionOn: subscriptionOnStatus};
 }

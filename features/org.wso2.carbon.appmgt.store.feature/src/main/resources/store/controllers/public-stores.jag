@@ -28,7 +28,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
             if (userName) {
                 var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
                 if (isFavouritePageSelected) {
-                    landingPage = configs.pages.favouritePage;
+                    landingPage = config.pages.favouritePage;
                 }
             }
 
@@ -56,7 +56,7 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
     if (userName != null) {
         var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
         if (isFavouritePageSelected) {
-            landingPage = configs.pages.favouritePage;
+            landingPage = config.pages.favouritePage;
         }
     }
     var redirectURl = contextPath + landingPage;

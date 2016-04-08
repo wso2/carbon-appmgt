@@ -42,6 +42,6 @@
     },
     "pages": {
         "landingPage": "/assets/",
-        "favouritePage": "/assets/favouriteapps"
+        "favouritePage": "/assets/favourite"
     }
 }

@@ -1,6 +1,6 @@
 {
     "assets": ["webapp", "site", "mobileapp"],
-    "assetsPageSize": 12,
+    "assetsPageSize": 6,
     "commentsPageSize": 10,
     "userSpace": "/_system/governance/users",
     "roles": {

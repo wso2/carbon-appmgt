@@ -4,8 +4,12 @@
     {{#if assets}}
 
         <div class="row page-title">
-
-            <h4>{{plural}}</h4>
+                <div class="container-fluid">
+                    <div class="title">{{plural}}</div><!--title-->
+                    <div class="float-right"><a class="more" href="{{url seeMoreUrl}}">See More</a></div>
+                    <hr>
+                </div>
+        </div>
             {{#ifCond type "==" "mobileapp"}}
                 {{> page-content-home/mobileapp}}
             {{else}}
@@ -15,7 +19,7 @@
                     {{> page-content-home/subscription-off}}
                 {{/if}}
             {{/ifCond}}
-        </div>
+
 
     {{/if}}
 {{/each}}
