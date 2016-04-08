@@ -8,6 +8,12 @@ info:
 
 
 
+
+
+
+
+
+
     It is written with [swagger 2](http://swagger.io/).
   contact:
     name: WSO2
@@ -41,7 +47,7 @@ paths:
         '200':
           description: "OK. \nList of qualifying Roles are returned.\n"
           schema:
-            $ref: '#/definitions/RoleList'
+            $ref: '#/definitions/RoleIdList'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -79,7 +85,7 @@ paths:
         '200':
           description: "OK. \nList of qualifying Users are returned.\n"
           schema:
-            $ref: '#/definitions/UserList'
+            $ref: '#/definitions/UserIdList'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -198,107 +204,32 @@ parameters:
       variant of the resourec.
     type: string
 definitions:
-  AppInfo:
-    title: App Info object with basic App details.
-    properties:
-      id:
-        type: string
-        example: 01234567-0123-0123-0123-012345678901
-      name:
-        type: string
-        example: CalculatorApp
-      description:
-        type: string
-        example: A calculator App that supports basic operations
-      context:
-        type: string
-        example: CalculatorApp
-      version:
-        type: string
-        example: 1.0.0
-      provider:
-        description: >
-          If the provider value is not given, the user invoking the App will be
-          used as the provider.
-        type: string
-        example: admin
-      lifecycleState:
-        type: string
-        example: CREATED
-  UserList:
+  UserIdList:
     title: User List
     properties:
-      count:
-        type: integer
-        description: |
-          Number of Users returned.
-        example: 1
-      next:
-        type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/users?limit=1&offset=2&query='
-      previous:
-        type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/users?limit=1&offset=0&query='
-      list:
-        type: array
-        items:
-          $ref: '#/definitions/UserInfo'
-  UserInfo:
-    title: User Details
-    properties:
-      username:
-        type: string
-        description: |
-          Username of the new user.
-        example: user1
-  RoleList:
+      userIds:
+        type: object
+        description: List of User Names
+  RoleIdList:
     title: Role List
     properties:
-      count:
-        type: integer
-        description: |
-          Number of App returned.
-        example: 1
-      next:
-        type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/roles?limit=1&offset=2&query='
-      previous:
-        type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/roles?limit=1&offset=0&query='
-      list:
-        type: array
-        items:
-          $ref: '#/definitions/RoleInfo'
-  RoleInfo:
-    title: App Info object with basic Role details.
-    properties:
-      name:
-        type: string
-        example: admin
+      roleIds:
+        type: object
+        description: "List of Role Id's"
   Install:
     title: Install/Download App
     properties:
       type:
         type: string
         description: |
-          Download type (either user or device).
+          Download type (either user or roles).
         example: user/device
-      users:
-        type: array
-        items:
-          $ref: '#/definitions/UserInfo'
-      roles:
-        type: array
-        items:
-          $ref: '#/definitions/RoleInfo'
-      apps:
-        type: array
-        items:
-          $ref: '#/definitions/AppInfo'
+      typeIds:
+        type: object
+        description: "List of Id's against type (role/user)"
+      appId:
+        type: string
+        description: App Id
   Error:
     title: Error object returned with 4XX HTTP status
     required:

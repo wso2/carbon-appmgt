@@ -1,14 +1,8 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import org.wso2.carbon.appmgt.rest.api.store.dto.DeviceInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.UserInfoDTO;
-import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.validation.constraints.NotNull;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 
 
@@ -20,19 +14,16 @@ public class InstallDTO  {
   private String type = null;
   
   
-  private List<UserInfoDTO> users = new ArrayList<UserInfoDTO>();
+  private Object deviceIds = null;
   
   
-  private List<DeviceInfoDTO> devices = new ArrayList<DeviceInfoDTO>();
-  
-  
-  private List<AppInfoDTO> apps = new ArrayList<AppInfoDTO>();
+  private Object appIds = null;
 
   
   /**
-   * Download type (either user or device).
+   * Download type (either use or devices).
    **/
-  @ApiModelProperty(value = "Download type (either user or device).")
+  @ApiModelProperty(value = "Download type (either use or devices).")
   @JsonProperty("type")
   public String getType() {
     return type;
@@ -43,38 +34,28 @@ public class InstallDTO  {
 
   
   /**
+   * List of device Id's
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("users")
-  public List<UserInfoDTO> getUsers() {
-    return users;
+  @ApiModelProperty(value = "List of device Id's")
+  @JsonProperty("deviceIds")
+  public Object getDeviceIds() {
+    return deviceIds;
   }
-  public void setUsers(List<UserInfoDTO> users) {
-    this.users = users;
+  public void setDeviceIds(Object deviceIds) {
+    this.deviceIds = deviceIds;
   }
 
   
   /**
+   * List of App Id's
    **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("devices")
-  public List<DeviceInfoDTO> getDevices() {
-    return devices;
+  @ApiModelProperty(value = "List of App Id's")
+  @JsonProperty("appIds")
+  public Object getAppIds() {
+    return appIds;
   }
-  public void setDevices(List<DeviceInfoDTO> devices) {
-    this.devices = devices;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("apps")
-  public List<AppInfoDTO> getApps() {
-    return apps;
-  }
-  public void setApps(List<AppInfoDTO> apps) {
-    this.apps = apps;
+  public void setAppIds(Object appIds) {
+    this.appIds = appIds;
   }
 
   
@@ -85,9 +66,8 @@ public class InstallDTO  {
     sb.append("class InstallDTO {\n");
     
     sb.append("  type: ").append(type).append("\n");
-    sb.append("  users: ").append(users).append("\n");
-    sb.append("  devices: ").append(devices).append("\n");
-    sb.append("  apps: ").append(apps).append("\n");
+    sb.append("  deviceIds: ").append(deviceIds).append("\n");
+    sb.append("  appIds: ").append(appIds).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
