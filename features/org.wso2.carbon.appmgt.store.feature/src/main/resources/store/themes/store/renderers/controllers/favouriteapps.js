@@ -17,7 +17,8 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    assetType: data.assetType
+                    assetType: data.assetType,
+                    myFavPage: true
                 }
             }
         ],
