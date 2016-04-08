@@ -1,7 +1,17 @@
 var render = function (theme, data, meta, require) {
-    data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
-    var searchUrl = getTagAndSearchUrl(data).searchUrl;
-    data.header.active = 'favourite';
+    data.tags.tagUrl = "/assets/";
+
+    data.header.active = 'store';
+    var enabledTypeList = data.config.enabledTypeList;
+    //if only mobile app is enabled hide favourite link from navigation
+    if( enabledTypeList.length == 1 &&  enabledTypeList[0] == "mobileapp") {
+        data.header.hideFavouriteMenu = true;
+    }
+
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
 
     theme('2-column-left', {
         title: data.title,
@@ -17,45 +27,33 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    assetType: data.assetType,
-                    myFavPage: true
+                    assetType: data.assetType
                 }
+            }
+        ],
+        search: [
+            {
+                partial: 'search',
+                context: {}
             }
         ],
         pageHeader: [
             {
                 partial: 'page-header',
                 context: {
-                    title: "Favourites",
-                    sorting: createSortOptions(data),
-                    myFav: true,
-                    isHomePage: data.isHomePage
+                    title: "Recent Apps"
                 }
             }
         ],
         pageContent: [
             {
-                partial: 'page-content-favouriteapps',
-                context: {favouriteApps: data.favouriteApps, searchQuery: data.search.query}
+                partial: 'page-content-home',
+                context: getBodyContext(data, subscriptionOn)
             }
         ]
     });
 };
 
-function createSortOptions(data) {
-    var sortOptions = {};
-    if (data.favouriteApps && data.favouriteApps.length == 0) {
-        return sortOptions;
-    }
-    var url = "/assets/favourite?type=" + data.assetType + "&sort=";
-    var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
-    var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
-    var options = [];
-    options.push(sortByAlphabet);
-    options.push(sortByRecent);
-    sortOptions["options"] = options;
-    return sortOptions;
-}
 
 function createLeftNavLinks(data) {
     var enabledTypeList = data.config.enabledTypeList;
@@ -91,26 +89,22 @@ function createLeftNavLinks(data) {
     return leftNavigationData;
 }
 
-function getTagAndSearchUrl(data) {
-    var URLs = {}
-    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
-    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        if (data.assetType == "webapp") {
-            URLs.tagUrl = '/extensions/assets/webapp/myapps';
-            URLs.searchUrl = '/assets/favourite?type=webapp';
+function getBodyContext(data, subscriptionOnStatus) {
+    var assetTypes = data.topAssets.assets;
+    var user = data.header.user;
+    var enabledTypeList = data.config.enabledTypeList;
+    for (var i = 0; i < assetTypes.length; i++) {
+        assetTypes[i].user = user;
+        var type = assetTypes[i].singular.toLowerCase().replace(/ /g,'');
+        if (type == "mobileapp") {
+            assetTypes[i].seeMoreUrl = "/assets/mobileapp/"
         } else {
-            URLs.tagUrl = '/extensions/assets/site/myapps';
-            URLs.searchUrl = '/assets/favourite?type=site';
-        }
-    } else {
-        if (data.assetType == "webapp") {
-            URLs.tagUrl = '/assets/webapp';
-            URLs.searchUrl = '/assets/favourite?type=webapp';
-        } else {
-            URLs.tagUrl = '/assets/site';
-            URLs.searchUrl = '/assets/favourite?type=site';
+            if (subscriptionOnStatus) {
+                assetTypes[i].seeMoreUrl = "/assets/" + type + "/"
+            } else {
+                assetTypes[i].seeMoreUrl = "/extensions/assets/" + type + "/apps/"
+            }
         }
     }
-    return URLs;
+    return {assetTypes: assetTypes, subscriptionOn: subscriptionOnStatus};
 }

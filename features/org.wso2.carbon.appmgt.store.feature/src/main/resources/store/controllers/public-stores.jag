@@ -24,11 +24,11 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         var stores = [];
         for (var i = ((currentPageNumber - 1) * PAGE_SIZE); i < numberOfTenantDomains; i++) {
 
-            var landingPage = config.pages.landingPage;
+            var landingPage = "";
             if (userName) {
                 var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, tenantDomains[i]).status;
                 if (isFavouritePageSelected) {
-                    landingPage = configs.pages.favouritePage;
+                    landingPage = config.pages.favouritePage;
                 }
             }
 
@@ -52,11 +52,11 @@ if (Array.isArray(tenantDomains) && (tenantDomains.length > 1)) {
         });
     }, request, response, session);
 } else {
-    var landingPage = config.pages.landingPage;
+    var landingPage = "/assets/";
     if (userName != null) {
         var isFavouritePageSelected = favourites.hasFavouritePage(userName, userTenantId, "carbon.super").status;
         if (isFavouritePageSelected) {
-            landingPage = configs.pages.favouritePage;
+            landingPage = config.pages.favouritePage;
         }
     }
     var redirectURl = contextPath + landingPage;

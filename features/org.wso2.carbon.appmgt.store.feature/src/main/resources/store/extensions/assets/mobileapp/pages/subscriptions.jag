@@ -1,7 +1,14 @@
 <%
+include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+    response.sendError(404,'Resource does not exist');
+}
+
 var caramel;
 
-include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+
 require('/modules/store.js').exec(function (ctx) {
     var count, title,
             log = ctx.log,
@@ -31,7 +38,12 @@ require('/modules/store.js').exec(function (ctx) {
 
     var selfUnsubscription = mdmConfig.EnableSelfUnsubscription == "true" ? true : false;
     var isDeviceSubscriptionEnabled = mdmConfig.EnableSubscriptionFromDevices == "true" ? true : false;
-
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+    //Get the subscription configuration options
+    var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
 
      var devices = [];
         if(user != null && isNotCatalog && isDeviceSubscriptionEnabled){
@@ -101,7 +113,12 @@ require('/modules/store.js').exec(function (ctx) {
         tags: {
             data: store.tags(type, null)
         },
-        assetType: "mobileapp"
+        assetType: "mobileapp",
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        }
     });
 }, request, response, session);
 %>

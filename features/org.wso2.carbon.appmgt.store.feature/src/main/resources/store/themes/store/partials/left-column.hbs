@@ -2,47 +2,55 @@
 its own partion sinceit does not support tags--}}
 {{!-- navigation --}}
 <nav class="navigation">
-    {{#each navigation}}
-        {{#ifCond partial "==" "my-apps"}}
-            <a id="my-apps-link" href="{{tenantedUrl this.url}}"
-               class="{{#if active}}background-color-subscribe{{/if}}">
-                <span class="icon background-color-subscribe"><i class="fw fw-application"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-subscribe">
-                    {{t "My Apps"}}
-                </span>
-            </a>
-        {{/ifCond}}
-        {{#ifCond partial "==" "my-favorites"}}
-            <a id="my-favorites-link" href="{{tenantedUrl this.url}}"
-               class="{{#if active}}background-color-favorite{{/if}}">
-                <span class="icon background-color-favorite"><i class="fw fw-heart"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-favorite">
-                    {{t "My Favorites"}}
-                </span>
-            </a>
-        {{/ifCond}}
-        {{#ifCond partial "==" "all-apps"}}
-            <a id="all-apps-link" href="{{tenantedUrl this.url}}"
-               class="{{#if active}}background-color-all-apps{{/if}}">
-                <span class="icon background-color-all-apps"><i class="fw fw-resource"></i></span>
-                <span class="navigation-item hidden-xs hidden-sm background-color-on-hover-all-apps">
-                    {{t "All Apps"}}
-                </span>
-            </a>
-        {{/ifCond}}
-    {{/each}}
-    {{#if navigation}}
-        <div class="hidden-xs" style="width: 200px; height: 0;"></div>
-    {{/if}}
+    <ul>
+        {{#each navigation}}
+            {{#ifCond partial "==" "webapp"}}
+                <li class="purple {{#if active}}active{{/if}}">
+                    <a id="my-apps-link" href="{{tenantedUrl this.url}}">
+                        <i class="fw fw-web-app icon"></i><span class="left-menu-item"> {{t "Web Apps"}}</span></a>
+                    {{#if myappsUrl}}
+                        <ul class="sublevel-menu" style="display: block;">
+                            <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-web-app icon"></i><span class="name">{{t "My Apps"}}</span></a>
+                            </li>
+                        </ul>
+                    {{/if}}
+                </li>
+            {{/ifCond}}
+            {{#ifCond partial "==" "site"}}
+            <li class="orange {{#if active}}active{{/if}}">
+                <a id="my-apps-link" href="{{tenantedUrl this.url}}">
+                    <i class="fw fw-globe icon"></i><span class="left-menu-item"> {{t "Sites"}}</span></a>
+                {{#if myappsUrl}}
+                    <ul class="sublevel-menu" style="display: block;">
+                        <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-globe icon"></i><span class="name">{{t "My Apps"}}</span></a></li>
+                    </ul>
+                </li>
+                {{/if}}
+            {{/ifCond}}
+            {{#ifCond partial "==" "mobileapp"}}
+            <li class="green {{#if active}}active{{/if}}">
+                <a id="my-apps-link" href="{{tenantedUrl this.url}}">
+                    <i class="fw fw-mobile icon"></i><span class="left-menu-item"> {{t "Mobile Apps"}}</span></a>
+                {{#if myappsUrl}}
+                    <ul class="sublevel-menu" style="display: block;">
+                        <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-mobile icon"></i><span class="name green">{{t "My Apps"}}</span></a></li>
+                    </ul>
+                </li>
+                {{/if}}
+            {{/ifCond}}
+        {{/each}}
+    </ul>
+
 </nav>
 
 {{!-- left-column - tags --}}
-<div class="add-margin-top-3x hidden-xs hidden-sm">
-    <div class="section-title"> {{t "Tags"}}</div>
+<div class="add-margin-top-3x hidden-xs hidden-sm" style = "{{#if myFavPage}}display: none{{/if}}">
+    <div class="section-title" > {{t "Tags"}}</div>
     {{#if tags}}
         <ul class="tags">
-            {{#each tags.data}}
-                <li><a href="{{tenantedUrl ../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
+            {{#each tags.data.allTags}}
+                <li class="{{#ifCond ../tags.data.searchedTag "==" name}}active{{/ifCond}}"><a
+                        href="{{tenantedUrl ../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
             {{/each}}
         </ul>
     {{else}}

@@ -2,6 +2,11 @@
 var caramel;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+    response.sendError(404,'Resource does not exist');
+}
 
 require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, selectedPlatform, key,
@@ -29,11 +34,15 @@ require('/modules/store.js').exec(function (ctx) {
     caramel = require('caramel');
     var urlQuery,leftNav,rightNav;
 
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+    //Get the subscription configuration options
+    var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
    // paging = store.assetsPaging(request);
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request);
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
 
     var PAGE_SIZE = store.getPageSize();
     var currIndex = paging.start + 1;
@@ -188,7 +197,6 @@ require('/modules/store.js').exec(function (ctx) {
         user: user
     });
     headerData.assetType = "mobileapp";
-    if(storeHostObj.isAssetTypeEnabled("mobileapp")) {
         caramel.render({
             title: 'Store | Assets',
             user: user,
@@ -203,7 +211,7 @@ require('/modules/store.js').exec(function (ctx) {
             selectedCategory: selectedCategory,
             selectedPlatform: selectedPlatform,
             tags: {
-                    data: store.tags(type)
+                    data:{allTags: store.tags(type), searchedTag: tag}
             },
             assets: assets,
             pagination: {
@@ -213,13 +221,14 @@ require('/modules/store.js').exec(function (ctx) {
             },
             config: mdmUIConfig,
             recentAssets: store.recentAssets(type),
-            assetType: "mobileapp"
+            assetType: "mobileapp",
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList: enabledTypeList
+            }
 
         });
-    }
-    else {
-        response.sendError(404, 'Resource does not exist');
-    }
 }, request, response, session);
 %>
 

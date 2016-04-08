@@ -21,6 +21,12 @@ var authenticator;
 var caramel;
 
 include('../modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("site")) {
+    response.sendError(404,'Resource does not exist');
+}
+
 var storeServer = require('store').server;
 var carbon = require('carbon');
 var user = storeServer.current(session);
@@ -49,9 +55,9 @@ require('/modules/store.js').exec(function (ctx) {
 
     caramel = require('caramel');
     //Check whether to show register link in myapps page
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
 
     //Get the subscription configuration options
     var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
@@ -88,7 +94,6 @@ require('/modules/store.js').exec(function (ctx) {
     var currIndex = paging.start + 1;
     var currentPage = store.getCurrentPage(currIndex);
 
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -470,38 +475,33 @@ require('/modules/store.js').exec(function (ctx) {
 
 
     /*------------------------------Retrieve apps based on subscription options -End-----------------------------------*/
-    if (storeHostObj.isAssetTypeEnabled("site")) {
-        caramel.render({
-            title: 'My Apps | Store ',
-            user: user,
-            sso: sso,
-            header: headerData,
-            navigation: navigationData,
-            search: {
-                query: query
-            },
-            type: type,
-            tags: {
-                data: store.tags(type, isSite)
-            },
-            config: {
-                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
-            },
-            assets: assets,
-            assetType: 'site',
-            pagination: {
-                leftNav: leftnav,
-                rightNav: rightnav,
-                urlQuery: urlQuery
-            },
-            recentAssets: webAppRecentAssets
-
-        });
-    }
-    else {
-        response.sendError(404, 'Resource does not exist');
-    }
+    caramel.render({
+                       title: 'Sites | Store ',
+                       user: user,
+                       sso: sso,
+                       header: headerData,
+                       navigation: navigationData,
+                       search: {
+                           query: query
+                       },
+                       type: type,
+                       tags: {
+                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                           enabledTypeList: enabledTypeList
+                       },
+                       assets: assets,
+                       assetType: 'site',
+                       pagination: {
+                           leftNav: leftnav,
+                           rightNav: rightnav,
+                           urlQuery: urlQuery
+                       },
+                       recentAssets: webAppRecentAssets
+                   });
 
 }, request, response, session);
 

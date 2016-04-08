@@ -892,6 +892,9 @@ public class APIStoreHostObject extends ScriptableObject {
                 assetType = args[1].toString();
                 attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, args[2].toString());
             }
+        } else {
+            String errorMessage = "Invalid number or invalid type of arguments";
+            handleException(errorMessage);
         }
         APIConsumer appConsumer = getAPIConsumer(thisObj);
         try {

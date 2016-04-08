@@ -35,10 +35,10 @@
                     </a>
 
                     <div class="summery">
+                        <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
                         <h4>{{attributes.overview_displayName}}</h4>
                         <h5>{{attributes.overview_version}}</h5>
-
-                        <p>{{attributes.overview_provider}}</p>
+                        </a>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
@@ -79,7 +79,6 @@
                                 {{/ifCond}}
                                 {{#if ../../user}}
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe" data-name="{{attributes.overview_name}}"
                                                    data-provider="{{attributes.overview_provider}}"
@@ -87,7 +86,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
                             </ul>
@@ -116,10 +114,10 @@
                     </a>
 
                     <div class="summery">
+                        <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
                         <h4>{{attributes.overview_displayName}}</h4>
                         <h5>{{attributes.overview_version}}</h5>
-
-                        <p>{{attributes.overview_provider}}</p>
+                        </a>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
@@ -150,7 +148,6 @@
 
 
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe"
                                                    data-name="{{attributes.overview_name}}"
@@ -159,7 +156,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
 

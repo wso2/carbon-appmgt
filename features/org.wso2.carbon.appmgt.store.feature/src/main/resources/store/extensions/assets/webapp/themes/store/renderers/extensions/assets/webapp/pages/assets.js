@@ -50,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Web Apps",
+                    title: "Web Apps",
                     sorting: createSortOptions(data)
                 }
             }
@@ -85,19 +85,31 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
-        {
-            active: true, partial: 'all-apps', url: "/assets/webapp"
-        }
-    ];
+    var enabledTypeList = data.enabledTypeList;
+    var currentAppType = 'webapp';
+    var leftNavigationData = [];
 
-    leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
-                            });
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
-                                });
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/"+currentAppType,
+            myapps: false, myappsUrl: "/extensions/assets/"+currentAppType+"/myapps"
+        }
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
+
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            leftNavigationData.push({
+                                        active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                         enabledTypeList[i]
+                                    });
+        }
+
     }
     return leftNavigationData;
 }
