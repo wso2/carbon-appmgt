@@ -525,7 +525,7 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
-                   data: store.tags(type, isSite)
+                   data: {allTags: store.tags(type, isSite), searchedTag: ""}
             },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,

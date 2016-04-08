@@ -48,8 +48,9 @@ its own partion sinceit does not support tags--}}
     <div class="section-title" > {{t "Tags"}}</div>
     {{#if tags}}
         <ul class="tags">
-            {{#each tags.data}}
-                <li><a href="{{tenantedUrl ../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
+            {{#each tags.data.allTags}}
+                <li class="{{#ifCond ../tags.data.searchedTag "==" name}}active{{/ifCond}}"><a
+                        href="{{tenantedUrl ../tags.tagUrl}}?tag={{name}}">{{name}}</a></li>
             {{/each}}
         </ul>
     {{else}}

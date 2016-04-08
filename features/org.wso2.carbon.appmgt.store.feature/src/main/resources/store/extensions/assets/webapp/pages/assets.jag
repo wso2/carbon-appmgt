@@ -446,7 +446,7 @@ require('/modules/store.js').exec(function (ctx) {
                        },
                        type: type,
                        tags: {
-                           data: store.tags(type, isSite)
+                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
                        },
                        assets: assets,
                        assetType: 'webapp',

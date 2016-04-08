@@ -211,7 +211,7 @@ require('/modules/store.js').exec(function (ctx) {
             selectedCategory: selectedCategory,
             selectedPlatform: selectedPlatform,
             tags: {
-                    data: store.tags(type)
+                    data:{allTags: store.tags(type), searchedTag: tag}
             },
             assets: assets,
             pagination: {

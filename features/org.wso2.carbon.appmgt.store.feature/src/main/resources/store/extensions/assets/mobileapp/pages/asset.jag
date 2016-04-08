@@ -125,7 +125,7 @@ require('/modules/store.js').exec(function (ctx) {
         asset: asset,
         config : mdmUIConfig,
         tags: {
-             data: store.tags(type, null)
+             data: {allTags: store.tags(type), searchedTag: ""}
         },
         myAssets: { user: user, type: type, title: title },
         recentAssets: store.recentAssets(type),
