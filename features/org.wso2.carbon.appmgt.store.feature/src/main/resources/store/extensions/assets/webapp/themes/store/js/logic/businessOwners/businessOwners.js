@@ -25,11 +25,7 @@ function merge(businessOwner){
         }
     var length = keySet.length +4;
     var owner = new Array();
-
-    owner.push({
-        name : "ID",
-        value : businessOwner.owner_id
-                  });
+    
     owner.push({
                       name : "Name",
                       value : businessOwner.owner_name

@@ -579,7 +579,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //Checks whether two models are equal
             var reqProps=['overview.name', 'overview.provider', 'overview.version']
-
+            var businesOwner = context.post["overview_ownerName"];
             var isEqual = modelManager.assertEqual(modelA, modelB,reqProps);
 
                 //If they are not equal,abort the operation
@@ -597,7 +597,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 artifact.attributes["overview_appTenant"] = appTenant;
                 artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
                 artifact.attributes["overview_owner"] = isAdvertiseOnly;
-                artifact.attributes["overview_business"] = context.post["overview_ownerName"];
+                artifact.attributes["overview_business"] = businesOwner;
 
 
             var tenantId = server.current(session).tenantId;

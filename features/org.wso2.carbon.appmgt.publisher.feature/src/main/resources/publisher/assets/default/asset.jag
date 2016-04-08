@@ -49,21 +49,18 @@ require('/modules/publisher.js').exec(function(ctx) {
     mod = jagg.module("documentation");
     var typeList = apiProvider.getEnabledAssetTypeList();
 
-    function getOwnerList(){
+    function getOwnerList() {
         var businessOwnerList = apiProvider.getBusinessOwnerList();
         var ownersList = JSON.parse(stringify(businessOwnerList));
-        var ownerNames ="";
-        for(var i = 0; i < ownersList.length ; i++){
-            // ownerNames[i] = ownersList[i].owner_name +"_"+ownersList[i].owner_id;
-            if(i==0){
+        var ownerNames = "";
+        for (var i = 0; i < ownersList.length; i++) {
+            if (i == 0) {
                 ownerNames = ownerNames + "\'" + ownersList[i].owner_name;
             } else {
                 ownerNames = ownerNames + "/" + ownersList[i].owner_name;
             }
-
         }
         ownerNames = ownerNames + "\'";
-
         return ownerNames;
     }
 
@@ -121,7 +118,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             data: output,
             title: title,
             typeList: typeList,
-	    ownerList: JSON.stringify(getOwnerList())
+	        ownerList: JSON.stringify(getOwnerList())
             }
         );
     }
@@ -217,7 +214,7 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     canEdit: docEditAuth,
                     canDelete: docDeleteAuth
                 },
-		ownerList: JSON.stringify(getOwnerList())
+		        ownerList: JSON.stringify(getOwnerList())
             });
         }
         else {

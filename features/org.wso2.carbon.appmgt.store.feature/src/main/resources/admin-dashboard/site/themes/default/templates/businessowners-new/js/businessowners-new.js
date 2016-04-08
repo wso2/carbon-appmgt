@@ -119,7 +119,7 @@ function GetDynamicTextBox(value) {
     var id_key = "key-".concat(value);
     var id_val = "value-".concat(value);
     if(value == 0){
-        return '<h5>Key &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value</h5><br>'
+        return '<h5>Property &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value</h5><br>'
                + '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp' +
                '<input name="value" type="text" id="'+id_val+'"/>'
 
@@ -148,8 +148,6 @@ $(document).on("click", "#btn-owner-save", function () {
             values = values.concat('/',value);
             i--;
         }
-
-        console.log(keys);
     }
 
     if(!isEmail(ownerMail)){
@@ -201,88 +199,3 @@ function sleep(milliseconds) {
         }
     }
 }
-
-//validate the condition
-function wait(){}
-$(document).on("click", ".policy-delete-button", function () {
-
-    var policyName = $(this).data("policyName");
-    var policyId = $(this).data("policyId");
-    var policyPartial;
-    var arrayIndex;
-    var conf;
-    $.each(xacmalPolicyPartialArray, function (index, obj) {
-        if (obj != null && obj.id == policyId) {
-            policyPartial = obj;
-            arrayIndex = index;
-            return false; // break
-        }
-
-    });
-
-    if (policyPartial.isShared) {
-        $.ajax({
-            async: false,
-            url: context + '/apis/xacmlpolicies/associated/apps',
-            data: {"policyId": policyId},
-            type: 'GET',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-                var apps = "";
-                if (response.length != 0) {
-                    // construct and show the  the warning message with app names which use this partial before delete
-                    for (var i = 0; i < response.length; i++) {
-                        var j = i + 1;
-                        apps = apps + j + ". " + response[i].appName + "\n";
-
-                    }
-                    var msg = "You cannot delete the policy " + policyName + " because it is been used in following apps\n\n" +
-                        apps;
-                    Showalert(msg);
-                    return;
-
-                } else {
-                    conf = confirm("Are you sure you want to delete the policy " + policyName + "?");
-                }
-
-            },
-            error: function (response) {
-                if (response.status==500){
-                    Showalert('Sorry, your session has expired', "alert-error", "statusError");
-                    location.reload();
-                }
-            }
-        });
-
-    }
-
-    if (conf == true) {
-
-        $.ajax({
-
-            url: context + '/apis/xacmlpolicies/delete/' + policyId,
-            type: 'DELETE',
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function (response) {
-
-                var success = JSON.parse(response);
-                if (success) {
-                    delete xacmalPolicyPartialArray[arrayIndex];
-                    updatePolicyPartial();
-
-
-                } else {
-                    Showalert("Couldn't delete the partial.This partial is being used by web apps  ", "alert-error", "statusError");
-                }
-
-            },
-            error: function (response) {
-                Showalert('Error occured while fetching entitlement policy content', "alert-error", "statusError");
-            }
-        });
-
-    }
-
-});

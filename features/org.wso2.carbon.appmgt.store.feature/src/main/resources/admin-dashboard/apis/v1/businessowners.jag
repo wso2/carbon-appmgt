@@ -1,6 +1,6 @@
 <%
 /*
- *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -28,19 +28,14 @@ var ownerList = '/{context}/apis/businessowners/list';
 var ownerUpdate = '/{context}/apis/businessowners/update';
 var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
 
-
 if (method == 'GET') {
     var log = new Log();
-    //console.log("API HITTED");
     if (uriMatcher.match(ownerList)) {
-    //    ///get policy list
-       print(ownerApi.getOwnerList());
-    //
+        print(ownerApi.getOwnerList());
     }
 }
 
-if(method == 'DELETE'){
-
+if (method == 'DELETE') {
     if (uriMatcher.match(ownerDelete)) {
         print(ownerApi.deleteOwner(uriMatcher.elements().ownerId));
     }
@@ -57,7 +52,7 @@ if (method == 'POST') {
         print(createResponseObject(ownerApi.saveOwner(ownerName, ownerMail, description, sitelink, keys, values)));
     }
 
-    if(uriMatcher.match(ownerUpdate)) {
+    if (uriMatcher.match(ownerUpdate)) {
         var ownerID = request.getParameter("owner_id");
         var ownerName = request.getParameter("ownerName");
         var ownerMail = request.getParameter("ownerMail");
@@ -66,10 +61,10 @@ if (method == 'POST') {
         var keys = request.getParameter("keys");
         var values = request.getParameter("values");
 
-        print(createResponseObject(ownerApi.updateOwner(ownerID,ownerName, ownerMail, description, sitelink, keys, values)));
+        print(createResponseObject(ownerApi.updateOwner(ownerID, ownerName, ownerMail, description, sitelink, keys,
+                                                        values)));
     }
 }
-
 
 function createResponseObject(object) {
     if (object !== null) {

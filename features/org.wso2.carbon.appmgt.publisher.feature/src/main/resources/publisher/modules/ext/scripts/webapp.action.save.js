@@ -132,7 +132,6 @@ var module = function () {
             var allowAnonymous=model.getField('overview.allowAnonymous').value;
             var skipGateway = model.getField('overview.skipGateway').value;
             var treatAsSite = model.getField('overview.treatAsASite').value;
-            var ownerName = model.getField('overview.owner').value;
 
 
             if(contextname.charAt(0)!='/'){

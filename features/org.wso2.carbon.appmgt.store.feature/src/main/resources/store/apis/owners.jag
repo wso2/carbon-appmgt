@@ -6,8 +6,7 @@
 var log = new Log();
 
 if(method == 'GET'){
-    if(matcher.match(getAppOwner)){
-        log.info("99999999999999999999999999999999999999999999999999999999999999999999999999999");
+    if(matcher.match(getAppOwner)){ //TODO implement the api
     }
 
 }

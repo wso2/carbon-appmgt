@@ -512,8 +512,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public int updateBusinessOwner(String ownerId,String ownerName, String ownerMail, String description, String sitelink, String keys,
-                                 String values) throws AppManagementException{
+    public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description,
+                                   String sitelink, String keys,
+                                   String values) throws AppManagementException {
         return appMDAO.updateBusinessOwner(ownerId, ownerName, ownerMail, description, sitelink, keys, values);
 
     }
@@ -560,7 +561,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
 
     public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
-
         return appMDAO.getBusinessOwnerList();
     }
 
@@ -2216,9 +2216,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public int deleteBusinessOwner(String ownerId) throws
-                                        AppManagementException{
-
+    public int deleteBusinessOwner(String ownerId) throws AppManagementException{
         return appMDAO.deleteBusinessOwner(ownerId);
     }
 }

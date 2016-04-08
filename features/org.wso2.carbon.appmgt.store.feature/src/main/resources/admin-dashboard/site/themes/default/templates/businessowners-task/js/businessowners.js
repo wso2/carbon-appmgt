@@ -91,7 +91,7 @@ $(document).ready(function () {
                                                     values: data[i].values
                                                 });
                    }
-                   updatePolicyPartial();
+                   updateOwners();
                },
                error: function () {
                }
@@ -148,7 +148,7 @@ $(document).on("click", "#btn-owner-save", function () {
            });
 });
 
-function updatePolicyPartial() {
+function updateOwners() {
     $('#ownerPartialsTable tbody').html("");
     //show empty msg
     if (businessOwnersArray.length > 0) {
@@ -166,11 +166,11 @@ function updatePolicyPartial() {
                                                   + obj.owner_site + '</td> <td>' + obj.owner_desc
                                                   + '</td> <td><a data-target="#entitlement-policy-editor" ' +
                                                   'data-toggle="modal" data-policy-id="' + obj.owner_id
-                                                  + '" class="policy-edit-button">' +
+                                                  + '" class="owner-edit-button">' +
                                                   '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="'
                                                   + obj.owner_name +
                                                   '"  data-policy-id="' + obj.owner_id
-                                                  + '" class="policy-delete-button"><i class="icon-trash"></i>' +
+                                                  + '" class="owner-delete-button"><i class="icon-trash"></i>' +
                                                   '</a></td></tr>');
         }
     });
@@ -205,7 +205,7 @@ $(document).on("click", "#btn-owner-add-field", function () {
 });
 
 //edit event
-$(document).on("click", ".policy-edit-button", function () {
+$(document).on("click", ".owner-edit-button", function () {
     var policyId = $(this).data("policyId");
     editedOwnerId = policyId;
     $('#owner_name').val("");
@@ -217,7 +217,6 @@ $(document).on("click", ".policy-edit-button", function () {
     jQuery('html, body').animate({
                                      scrollTop: section.offset().top
                                  }, 1000);
-    // editor.setValue("");
 
     $.each(businessOwnersArray, function (index, obj) {
         if (obj != null && obj.owner_id == policyId) {
@@ -225,7 +224,6 @@ $(document).on("click", ".policy-edit-button", function () {
             $('#owner-email').val(obj.owner_mail);
             $('#owner-site').val(obj.owner_site);
             $('#owner-desc').val(obj.owner_desc);
-
             if (obj.keys != null && obj.values != null) {
                 var keySet = obj.keys.split("/");
                 var valueSet = obj.values.split("/");
@@ -242,10 +240,7 @@ $(document).on("click", ".policy-edit-button", function () {
 });
 
 
-//delete event
-
-
-$(document).on("click", ".policy-delete-button", function () {
+$(document).on("click", ".owner-delete-button", function () {
     var ownerId = $(this).data("policyId");
     $.ajax({
                url: context + '/apis/businessowners/delete/' + ownerId,
@@ -253,7 +248,7 @@ $(document).on("click", ".policy-delete-button", function () {
                contentType: 'application/json',
                dataType: 'json',
                success: function (response) {
-                   updatePolicyPartial();
+                   updateOwners();
                    Showalert("Owner Deleted Successfully ", "alert-success", "statusSuccess");
                    location.reload();
                },

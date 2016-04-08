@@ -19,7 +19,6 @@
 
 var apiProvider = jagg.module('manager').getAPIProviderObj();
 var log = new Log();
-var appMDAOObj = new Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
 var apiUtil = new Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 
 

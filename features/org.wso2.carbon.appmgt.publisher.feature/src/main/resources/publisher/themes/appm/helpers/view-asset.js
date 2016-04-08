@@ -65,12 +65,10 @@ var c = 0;
 		 }
 	 }
 
-
-
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
+    var owner_name =  appMDAOObj.getUserName(data.artifact.id);
 
-   var owner_name =  appMDAOObj.getUserName(data.artifact.id);
     data.data.fields[c].name = "overview_ownerName";
     data.data.fields[c].label = "Business Owner";
     data.data.fields[c].isRequired = true;
@@ -87,7 +85,6 @@ var c = 0;
     data.data.fields[c].valueList = {};
     log.info(data.artifact.id);
     log.info(owner_name);
-
 
 	 return data;
 };

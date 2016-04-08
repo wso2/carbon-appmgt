@@ -693,14 +693,15 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Saves the given entitlement policy partial in database
+     * SaUpdate the given business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
      * @param funObj  Function object
      * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api
+     * .AppManagementException
      */
     public static int jsFunction_updateBusinessOwner(Context context, Scriptable thisObj,
                                                    Object[] args,
@@ -726,7 +727,7 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Saves the given entitlement policy partial in database
+     * Delete business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
@@ -739,13 +740,10 @@ public class APIProviderHostObject extends ScriptableObject {
                                                      Object[] args,
                                                      Function funObj) throws
                                                                       AppManagementException {
-
         if (args[0] == null) {
             handleException("Error while deleting business owner. Owner content is null");
         }
-
         String ownerId = args[0].toString();
-
         APIProvider apiProvider = getAPIProvider(thisObj);
         return apiProvider.deleteBusinessOwner(ownerId);
     }
