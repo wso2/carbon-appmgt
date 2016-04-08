@@ -45,65 +45,65 @@ public class APPMappingUtil {
     /**
      * Converts a List object of APIs into a DTO
      *
-     * @param apiList List of APIs
+     * @param appList List of Apps
      * @param limit   maximum number of APIs returns
      * @param offset  starting index
-     * @return APIListDTO object containing APIDTOs
+     * @return APIListDTO object containing AppInfoDTOs
      */
-    public static AppListDTO fromAPIListToDTO(List<WebApp> apiList, int offset, int limit) {
-        AppListDTO apiListDTO = new AppListDTO();
-        List<AppInfoDTO> apiInfoDTOs = apiListDTO.getList();
-        if (apiInfoDTOs == null) {
-            apiInfoDTOs = new ArrayList<>();
-            apiListDTO.setList(apiInfoDTOs);
+    public static AppListDTO fromAPIListToDTO(List<WebApp> appList, int offset, int limit) {
+        AppListDTO appListDTO = new AppListDTO();
+        List<AppInfoDTO> appInfoDTOs = appListDTO.getList();
+        if (appInfoDTOs == null) {
+            appInfoDTOs = new ArrayList<>();
+            appListDTO.setList(appInfoDTOs);
         }
 
         //add the required range of objects to be returned
-        int start = offset < apiList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
-        int end = offset + limit - 1 <= apiList.size() - 1 ? offset + limit - 1 : apiList.size() - 1;
+        int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
+        int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            apiInfoDTOs.add(fromAPIToInfoDTO(apiList.get(i)));
+            appInfoDTOs.add(fromAPIToInfoDTO(appList.get(i)));
         }
-        apiListDTO.setCount(apiInfoDTOs.size());
-        return apiListDTO;
+        appListDTO.setCount(appInfoDTOs.size());
+        return appListDTO;
     }
 
     /**
      * Creates a minimal DTO representation of an API object
      *
-     * @param api API object
+     * @param app WebApp object
      * @return a minimal representation DTO
      */
-    public static AppInfoDTO fromAPIToInfoDTO(WebApp api) {
-        AppInfoDTO apiInfoDTO = new AppInfoDTO();
-        apiInfoDTO.setDescription(api.getDescription());
-        String context = api.getContext();
+    public static AppInfoDTO fromAPIToInfoDTO(WebApp app) {
+        AppInfoDTO appInfoDTO = new AppInfoDTO();
+        appInfoDTO.setDescription(app.getDescription());
+        String context = app.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
                 context = context.replace("/" + RestApiConstants.API_VERSION_PARAM, "");
             }
-            apiInfoDTO.setContext(context);
+            appInfoDTO.setContext(context);
         }
-        apiInfoDTO.setId(api.getUUID());
-        APIIdentifier apiId = api.getId();
-        apiInfoDTO.setName(apiId.getApiName());
-        apiInfoDTO.setVersion(apiId.getVersion());
-        String providerName = api.getId().getProviderName();
-        apiInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-        apiInfoDTO.setLifecycleState(api.getLifeCycleStatus().getStatus());
-        return apiInfoDTO;
+        appInfoDTO.setId(app.getUUID());
+        APIIdentifier apiId = app.getId();
+        appInfoDTO.setName(apiId.getApiName());
+        appInfoDTO.setVersion(apiId.getVersion());
+        String providerName = app.getId().getProviderName();
+        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        return appInfoDTO;
     }
 
     /**
      * Sets pagination urls for a APIListDTO object given pagination parameters and url parameters
      *
-     * @param apiListDTO a APIListDTO object
+     * @param appListDTO a APIListDTO object
      * @param query      search condition
      * @param limit      max number of objects returned
      * @param offset     starting index
      * @param size       max offset
      */
-    public static void setPaginationParams(AppListDTO apiListDTO, String query, int offset, int limit, int size) {
+    public static void setPaginationParams(AppListDTO appListDTO, String query, int offset, int limit, int size) {
 
         //acquiring pagination parameters and setting pagination urls
         Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
@@ -122,53 +122,51 @@ public class APPMappingUtil {
                                         paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
         }
 
-        apiListDTO.setNext(paginatedNext);
-        apiListDTO.setPrevious(paginatedPrevious);
+        appListDTO.setNext(paginatedNext);
+        appListDTO.setPrevious(paginatedPrevious);
     }
 
     /**
-     * Returns the API given the uuid or the id in {provider}-{api}-{version} format
+     * Returns the WebApp given the uuid or the id in {provider}-{api}-{version} format
      *
-     * @param apiId uuid or the id in {provider}-{api}-{version} format
+     * @param appId uuid or the id in {provider}-{api}-{version} format
      * @return API which represents the given id
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    public static WebApp getAPIFromApiIdOrUUID(String apiId)
+    public static WebApp getAPIFromApiIdOrUUID(String appId)
             throws AppManagementException {
         //modify this method to support mobile apps
-        APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-        if (RestApiUtil.isUUID(apiId)) {
-            WebApp webapp = apiProvider.getAppDetailsFromUUID(apiId);
-            apiId = webapp.getId().getProviderName() + "-" + webapp.getId().getApiName() + "-" +
+        APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+        if (RestApiUtil.isUUID(appId)) {
+            WebApp webapp = appProvider.getAppDetailsFromUUID(appId);
+            appId = webapp.getId().getProviderName() + "-" + webapp.getId().getApiName() + "-" +
                     webapp.getId().getVersion();
         }
 
-        APIIdentifier apiIdentifier = getAPIIdentifierFromApiId(apiId);
-        WebApp webapp = apiProvider.getAPI(apiIdentifier);
+        APIIdentifier appIdentifier = getAppIdentifierFromApiId(appId);
+        WebApp webapp = appProvider.getAPI(appIdentifier);
         return webapp;
     }
 
-    public static APIIdentifier getAPIIdentifierFromApiId(String appID) {
+    public static APIIdentifier getAppIdentifierFromApiId(String appID) {
         //if appID contains -AT-, that need to be replaced before splitting
         appID = AppManagerUtil.replaceEmailDomainBack(appID);
-        String[] apiIdDetails = appID.split(RestApiConstants.API_ID_DELIMITER);
+        String[] appIdDetails = appID.split(RestApiConstants.API_ID_DELIMITER);
 
-        if (apiIdDetails.length < 3) {
+        if (appIdDetails.length < 3) {
             RestApiUtil.handleBadRequest("Provided API identifier '" + appID + "' is invalid", log);
         }
 
         // appID format: provider-apiName-version
-        String providerName = apiIdDetails[0];
-        String apiName = apiIdDetails[1];
-        String version = apiIdDetails[2];
+        String providerName = appIdDetails[0];
+        String apiName = appIdDetails[1];
+        String version = appIdDetails[2];
         String providerNameEmailReplaced = AppManagerUtil.replaceEmailDomain(providerName);
         return new APIIdentifier(providerNameEmailReplaced, apiName, version);
     }
 
 
     public static AppDTO fromAPItoDTO(WebApp model) throws AppManagementException {
-        //  APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-
         AppDTO dto = new AppDTO();
         dto.setName(model.getId().getApiName());
         dto.setVersion(model.getId().getVersion());
@@ -183,38 +181,30 @@ public class APPMappingUtil {
             dto.setContext(context);
         }
         dto.setDescription(model.getDescription());
-
         dto.setIsDefaultVersion(model.isDefaultVersion());
         dto.setThumbnailUrl(model.getThumbnailUrl());
         dto.setLifecycleState(model.getLifeCycleStatus().getStatus());
-
         Set<String> apiTags = model.getTags();
         List<String> tagsToReturn = new ArrayList<>();
         tagsToReturn.addAll(apiTags);
         dto.setTags(tagsToReturn);
-
         Set<Tier> apiTiers = model.getAvailableTiers();
         List<String> tiersToReturn = new ArrayList<>();
         for (Tier tier : apiTiers) {
             tiersToReturn.add(tier.getName());
         }
-
         if (model.getTransports() != null) {
             dto.setTransport(Arrays.asList(model.getTransports().split(",")));
         }
-
         if (model.getVisibleRoles() != null) {
             dto.setVisibleRoles(Arrays.asList(model.getVisibleRoles().split(",")));
         }
-
         if (model.getVisibleTenants() != null) {
             dto.setVisibleRoles(Arrays.asList(model.getVisibleTenants().split(",")));
         }
-
         if (model.getLifeCycleName() != null) {
             dto.setLifecycle(model.getLifeCycleName());
         }
-
         return dto;
     }
 

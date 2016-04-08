@@ -22,22 +22,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *  This class contains REST API Publisher related utility operations
+ * This class contains REST API Publisher related utility operations
  */
 public class RestApiPublisherUtils {
 
     private static final Log log = LogFactory.getLog(RestApiPublisherUtils.class);
 
-    public static String generateBinaryUUID(){
+    public static String generateBinaryUUID() {
 
-      String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         String uuid = "";
-        for(int i = 0; i<15; i++){
+        for (int i = 0; i < 15; i++) {
             uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));
         }
         return uuid;
     }
-
 
 
 }

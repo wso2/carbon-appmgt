@@ -29,7 +29,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -64,7 +63,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiService.class);
 
     @Override
-    public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
+                                           String ifUnmodifiedSince) {
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         try {
             BinaryDTO binaryDTO = new BinaryDTO();
@@ -98,7 +98,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                     JSONObject binaryObj = new JSONObject(information);
                     binaryDTO.setPackage(binaryObj.getString("package"));
                     binaryDTO.setVersion(binaryObj.getString("version"));
-                    String fileAPI = appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
+                    String fileAPI = appManagerConfiguration.getFirstProperty(
+                            AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
                             + filename;
                     binaryDTO.setPath(fileAPI);
                     return Response.ok().entity(binaryDTO).build();
@@ -120,16 +121,15 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
                                    String ifNoneMatch) {
-        List<WebApp> allMatchedApis;
+        List<WebApp> allMatchedApps;
         AppListDTO appListDTO;
 
-        //pre-processing
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
         query = query == null ? "" : query;
         try {
-            //handle type
+            //check if a valid asset type is provided
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
                     !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
@@ -156,13 +156,13 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             //We should send null as the provider, Otherwise searchAPIs will return all APIs of the provider
             // instead of looking at type and query
-            allMatchedApis = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
-            if (allMatchedApis.isEmpty()) {
+            allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
+            if (allMatchedApps.isEmpty()) {
                 String errorMessage = "No result found.";
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
-            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApis, offset, limit);
-            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApis.size());
+            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApps, offset, limit);
+            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApps.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving Apps";
@@ -220,7 +220,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO apiToReturn;
         try {
-            //WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";
@@ -258,16 +257,13 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String searchContent = appId;
-            String searchType = "id";
-            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
+            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(appId, "id", null,
                                                                                  appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
             }
             WebApp webApp = allMatchedApps.get(0);
-            APIIdentifier apiIdentifier = webApp.getId();
             if (appType.equals(AppMConstants.APP_TYPE)) {
                 if (webApp.isAdvertiseOnly()) {
                     removeArtifactOnly(webApp, username);
