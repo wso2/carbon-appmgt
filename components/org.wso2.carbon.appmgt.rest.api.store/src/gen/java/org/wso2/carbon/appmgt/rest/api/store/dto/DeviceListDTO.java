@@ -1,17 +1,16 @@
-package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.RoleInfoDTO;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
 @ApiModel(description = "")
-public class RoleListDTO  {
+public class DeviceListDTO  {
   
   
   
@@ -24,13 +23,13 @@ public class RoleListDTO  {
   private String previous = null;
   
   
-  private List<RoleInfoDTO> list = new ArrayList<RoleInfoDTO>();
+  private List<DeviceInfoDTO> list = new ArrayList<DeviceInfoDTO>();
 
   
   /**
-   * Number of App returned.
+   * Number of Devices returned.
    **/
-  @ApiModelProperty(value = "Number of App returned.")
+  @ApiModelProperty(value = "Number of Devices returned.")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -70,10 +69,10 @@ public class RoleListDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("list")
-  public List<RoleInfoDTO> getList() {
+  public List<DeviceInfoDTO> getList() {
     return list;
   }
-  public void setList(List<RoleInfoDTO> list) {
+  public void setList(List<DeviceInfoDTO> list) {
     this.list = list;
   }
 
@@ -82,7 +81,7 @@ public class RoleListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class RoleListDTO {\n");
+    sb.append("class DeviceListDTO {\n");
     
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");

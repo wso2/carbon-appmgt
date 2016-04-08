@@ -6,7 +6,7 @@ import org.wso2.carbon.appmgt.rest.api.storeadmin.factories.UsersApiServiceFacto
 
 import io.swagger.annotations.ApiParam;
 
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserListDTO;
+import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorDTO;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class UsersApi  {
     
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get all Users", notes = "Get a list of available Users.", response = UserListDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get all Users", notes = "Get a list of available Users.", response = UserIdListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of qualifying Users are returned."),
         

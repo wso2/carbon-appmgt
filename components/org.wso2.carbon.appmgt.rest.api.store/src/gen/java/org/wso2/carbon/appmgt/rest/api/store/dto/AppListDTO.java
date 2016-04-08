@@ -1,7 +1,7 @@
-package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserInfoDTO;
 import java.util.*;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 
 @ApiModel(description = "")
-public class UserListDTO  {
+public class AppListDTO  {
   
   
   
@@ -24,13 +24,13 @@ public class UserListDTO  {
   private String previous = null;
   
   
-  private List<UserInfoDTO> list = new ArrayList<UserInfoDTO>();
+  private List<AppInfoDTO> list = new ArrayList<AppInfoDTO>();
 
   
   /**
-   * Number of Users returned.
+   * Number of App returned.
    **/
-  @ApiModelProperty(value = "Number of Users returned.")
+  @ApiModelProperty(value = "Number of App returned.")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -70,10 +70,10 @@ public class UserListDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("list")
-  public List<UserInfoDTO> getList() {
+  public List<AppInfoDTO> getList() {
     return list;
   }
-  public void setList(List<UserInfoDTO> list) {
+  public void setList(List<AppInfoDTO> list) {
     this.list = list;
   }
 
@@ -82,7 +82,7 @@ public class UserListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UserListDTO {\n");
+    sb.append("class AppListDTO {\n");
     
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");

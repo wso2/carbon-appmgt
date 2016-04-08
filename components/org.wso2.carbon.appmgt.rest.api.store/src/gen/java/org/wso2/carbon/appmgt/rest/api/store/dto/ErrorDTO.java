@@ -1,6 +1,6 @@
-package org.wso2.carbon.appmgt.rest.api.storeadmin.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorListItemDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorListItemDTO;
 import java.util.*;
 
 import io.swagger.annotations.*;
