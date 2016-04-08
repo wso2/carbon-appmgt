@@ -8,7 +8,7 @@ var isEnterpriseSubEnabled = subscriptionConfig.EnableEnterpriseSubscription;
 var log = new Log("subscription-config.js");
 
 var isSelfSubscriptionEnabled = function () {
-    return true;
+    return isSelfSubEnabled;
 };
 
 var isEnterpriseSubscriptionEnabled = function () {
