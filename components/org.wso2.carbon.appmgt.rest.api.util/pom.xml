@@ -27,7 +27,7 @@
     <artifactId>org.wso2.carbon.appmgt.rest.api.util</artifactId>
     <version>1.1.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - API Manager Rest API Utility</name>
+    <name>WSO2 Carbon - App Manager Rest API Utility</name>
     <description>Rest API utility and Extensions</description>
     <url>http://wso2.org</url>
 
@@ -61,6 +61,7 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${cxf.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -83,11 +84,6 @@
             <version>${spring-web.version}</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jaxrs</artifactId>
             <version>${swagger-jaxrs.version}</version>
@@ -96,11 +92,6 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-validator.version}</version>
         </dependency>
 
         <dependency>
@@ -112,6 +103,7 @@
             <groupId>org.wso2.uri.template</groupId>
             <artifactId>wso2-uri-templates</artifactId>
            <version>${wso2-uri-templates.version}</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -140,9 +132,11 @@
                         </Bundle-SymbolicName>
                         <Import-Package>
                             org.apache.commons.logging.*; version="${commons.logging.imp.pkg.version}",
+                            javax.ws.rs.*,
                             *;resolution:=optional
                         </Import-Package>
                         <Export-Package>
+                            org.wso2.carbon.appmgt.rest.api.util;version="${carbon.appmgt.version}",
                             org.wso2.carbon.appmgt.rest.api.util.*;version="${carbon.appmgt.version}"
                         </Export-Package>
                     </instructions>

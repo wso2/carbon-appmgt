@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -15,26 +15,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.appmgt.oauth.rest.dto;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+package org.wso2.carbon.appmgt.oauth.rest;
 
-public abstract class RegistrationResponse extends Response {
+/**
+ * Represents an exceptions take place during dynamic client registration.
+ */
+public class RegistrationException extends Exception {
 
-    @Override
-    public Object getEntity() {
-        return null;
+
+    public RegistrationException(String errorMessage, Exception e) {
+        super(errorMessage, e);
     }
-
-    @Override
-    public int getStatus() {
-        return 0;
-    }
-
-    @Override
-    public MultivaluedMap<String, Object> getMetadata() {
-        return null;
-    }
-
 }

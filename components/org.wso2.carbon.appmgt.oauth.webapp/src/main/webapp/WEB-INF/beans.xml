@@ -13,18 +13,22 @@
     <jaxrs:server id="oauthService" address="/">
         <jaxrs:serviceBeans>
             <ref bean="registrationServiceBean"/>
-            <ref bean="tokenValidationServiceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jsonProvider"/>
-            <ref bean="faultResponseWriter"/>
         </jaxrs:providers>
     </jaxrs:server>
 
-    <bean id="registrationServiceBean" class="org.wso2.carbon.apimgt.rest.api.dcr.web.impl.RegistrationServiceImpl"/>
-    <bean id="tokenValidationServiceBean" class=""/>
+    <cxf:bus>
+        <cxf:inInterceptors>
+            <ref bean="authenticationInterceptor"/>
+        </cxf:inInterceptors>
+    </cxf:bus>
+
+    <bean id="registrationServiceBean" class="org.wso2.carbon.appmgt.oauth.rest.RegistrationService"/>
 
     <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
-    <bean id="faultResponseWriter" class="org.wso2.carbon.apimgt.rest.api.dcr.web.FaultMessageBodyWriter"/>
+
+    <bean id="authenticationInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.BasicAuthenticationInterceptor"/>
 
 </beans>

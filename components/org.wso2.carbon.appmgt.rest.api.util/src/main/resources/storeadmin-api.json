@@ -2,8 +2,8 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "WSO2 APP Manager - Store API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "title": "WSO2 APP Manager - Store Admin API",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -26,20 +26,11 @@
         "application/json"
     ],
     "paths": {
-        "/apps/{appType}": {
+        "/roles": {
             "get": {
-                "summary": "Get all Apps",
-                "description": "Get a list of available Apps qualifying under a given search condition.\n",
+                "summary": "Get all Roles",
+                "description": "Get a list of available Roles.\n",
                 "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "name": "query",
-                        "in": "query",
-                        "description": "**Search condition**.\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
-                        "type": "string"
-                    },
                     {
                         "$ref": "#/parameters/limit"
                     },
@@ -54,13 +45,13 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "Roles"
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "description": "OK. \nList of qualifying Roles are returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppList"
+                            "$ref": "#/definitions/RoleIdList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -94,35 +85,32 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}": {
+        "/users": {
             "get": {
-                "summary": "Get app details",
-                "description": "Get details of an app.\n",
+                "summary": "Get all Users",
+                "description": "Get a list of available Users.\n",
                 "parameters": [
                     {
-                        "$ref": "#/parameters/appType"
+                        "$ref": "#/parameters/limit"
                     },
                     {
-                        "$ref": "#/parameters/appId"
+                        "$ref": "#/parameters/offset"
                     },
                     {
                         "$ref": "#/parameters/Accept"
                     },
                     {
                         "$ref": "#/parameters/If-None-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "Users"
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nQualifying App is returned.\n",
+                        "description": "OK. \nList of qualifying Users are returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/App"
+                            "$ref": "#/definitions/UserIdList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -158,8 +146,8 @@
         },
         "/apps/download": {
             "post": {
-                "summary": "Download App",
-                "description": "Download an new App\n",
+                "summary": "Enterprise Download/Install App",
+                "description": "Enterprise Download an new App\n",
                 "parameters": [
                     {
                         "in": "body",
@@ -202,8 +190,8 @@
         },
         "/apps/uninstallation": {
             "post": {
-                "summary": "Uninstall App",
-                "description": "Uninstall an existing App\n",
+                "summary": "Enterprise Uninstall App",
+                "description": "Enterprise Uninstall an existing App\n",
                 "parameters": [
                     {
                         "in": "body",
@@ -243,88 +231,9 @@
                     }
                 }
             }
-        },
-        "/devices": {
-            "get": {
-                "summary": "Get all Devices",
-                "description": "Get a list of available Devices qualifying under a given search condition.\n",
-                "parameters": [
-                    {
-                        "name": "query",
-                        "in": "query",
-                        "description": "**Search condition**.\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\nEg. \"type:mobile\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
-                        "type": "string"
-                    },
-                    {
-                        "$ref": "#/parameters/limit"
-                    },
-                    {
-                        "$ref": "#/parameters/offset"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    }
-                ],
-                "tags": [
-                    "Devices"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nList of qualifying Devices are returned.\n",
-                        "schema": {
-                            "$ref": "#/definitions/DeviceList"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "description": "The content type of the body.",
-                                "type": "string"
-                            },
-                            "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
         }
     },
     "parameters": {
-        "appId": {
-            "name": "appId",
-            "in": "path",
-            "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
-            "required": true,
-            "type": "string"
-        },
-        "appType": {
-            "name": "appType",
-            "in": "path",
-            "description": "App Type. Either webapp or mobileapp\n",
-            "required": true,
-            "type": "string"
-        },
         "limit": {
             "name": "limit",
             "in": "query",
@@ -359,299 +268,24 @@
             "in": "header",
             "description": "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n",
             "type": "string"
-        },
-        "If-Modified-Since": {
-            "name": "If-Modified-Since",
-            "in": "header",
-            "description": "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n",
-            "type": "string"
         }
     },
     "definitions": {
-        "AppList": {
-            "title": "App List",
-            "properties": {
-                "count": {
-                    "type": "integer",
-                    "description": "Number of App returned.\n",
-                    "example": 1
-                },
-                "next": {
-                    "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
-                    "example": "/app?limit=1&offset=2&query="
-                },
-                "previous": {
-                    "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
-                    "example": "/app?limit=1&offset=0&query="
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/AppInfo"
-                    }
-                }
-            }
-        },
-        "AppInfo": {
-            "title": "App Info object with basic App details.",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "01234567-0123-0123-0123-012345678901"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "CalculatorApp"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "A calculator App that supports basic operations"
-                },
-                "context": {
-                    "type": "string",
-                    "example": "CalculatorApp"
-                },
-                "version": {
-                    "type": "string",
-                    "example": "1.0.0"
-                },
-                "provider": {
-                    "description": "If the provider value is not given, the user invoking the App will be used as the provider.\n",
-                    "type": "string",
-                    "example": "admin"
-                },
-                "lifecycleState": {
-                    "type": "string",
-                    "example": "CREATED"
-                }
-            }
-        },
-        "App": {
-            "title": "App object",
-            "required": [
-                "name",
-                "version",
-                "appDefinition",
-                "transport"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "UUID of the app registry artifact\n",
-                    "example": "01234567-0123-0123-0123-012345678901"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "CalculatorApp"
-                },
-                "type": {
-                    "type": "string",
-                    "description": "App type (either Webapp/Mobile app",
-                    "example": "01234567-0123-0123-0123-012345678901"
-                },
-                "isSite": {
-                    "type": "string",
-                    "description": "Either a webapp or site",
-                    "example": "for sites - TRUE"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "A calculator App that supports basic operations"
-                },
-                "context": {
-                    "type": "string",
-                    "example": "CalculatorApp"
-                },
-                "version": {
-                    "type": "string",
-                    "example": "1.0.0"
-                },
-                "provider": {
-                    "description": "If the provider value is not given user invoking the api will be used as the provider.\n",
-                    "type": "string",
-                    "example": "admin"
-                },
-                "appDefinition": {
-                    "description": "Swagger definition of the App which contains details about URI templates and scopes\n",
-                    "type": "string",
-                    "example": "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
-                },
-                "transport": {
-                    "description": "Supported transports for the App (http and/or https).\n",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "http",
-                        "https"
-                    ]
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "substract",
-                        "add"
-                    ]
-                },
-                "thumbnailUrl": {
-                    "type": "string",
-                    "example": ""
-                },
-                "lifecycle": {
-                    "description": "lifecycle type of the asset\n",
-                    "type": "string",
-                    "example": "MobileAppLifeCycle"
-                },
-                "lifecycleState": {
-                    "description": "lifecycle state of the asset\n",
-                    "type": "string",
-                    "example": "Created"
-                },
-                "bundleversion": {
-                    "description": "Bundleversion of the asset\n",
-                    "type": "string",
-                    "example": "1.0"
-                },
-                "packagename": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "home.jmstudios.calc"
-                },
-                "category": {
-                    "description": "category of the asset\n",
-                    "type": "string",
-                    "example": "Business"
-                },
-                "displayName": {
-                    "description": "displayName of the asset\n",
-                    "type": "string",
-                    "example": "testapp1"
-                },
-                "screenshots": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
-                },
-                "banner": {
-                    "description": "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n",
-                    "type": "string",
-                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
-                },
-                "createdtime": {
-                    "description": "createdtime of the asset\n",
-                    "type": "string",
-                    "example": "00000001458300149192"
-                },
-                "platform": {
-                    "description": "platform of the asset\n",
-                    "type": "string",
-                    "example": "andoid"
-                },
-                "lifecycleAvailableActions": {
-                    "description": "platform of the asset\n",
-                    "type": "string",
-                    "example": "[Submit for Review]"
-                }
-            }
-        },
-        "DeviceList": {
-            "title": "Device List",
-            "properties": {
-                "count": {
-                    "type": "integer",
-                    "description": "Number of Devices returned.\n",
-                    "example": 1
-                },
-                "next": {
-                    "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
-                    "example": "/devices?limit=1&offset=2&query="
-                },
-                "previous": {
-                    "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
-                    "example": "/devices?limit=1&offset=0&query="
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/DeviceInfo"
-                    }
-                }
-            }
-        },
-        "DeviceInfo": {
-            "title": "Device Info object with basic Device details.",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "11"
-                },
-                "platform": {
-                    "type": "string",
-                    "example": "android"
-                },
-                "model": {
-                    "type": "string",
-                    "example": "Nexus"
-                },
-                "platform_version": {
-                    "type": "string",
-                    "example": "5.0"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "My Nexus"
-                },
-                "image": {
-                    "type": "string",
-                    "example": "/store/extensions/assets/mobileapp/resources/models/nexus.png"
-                },
-                "type": {
-                    "type": "string",
-                    "example": "phone"
-                }
-            }
-        },
-        "UserList": {
+        "UserIdList": {
             "title": "User List",
             "properties": {
-                "count": {
-                    "type": "integer",
-                    "description": "Number of Users returned.\n",
-                    "example": 1
-                },
-                "next": {
-                    "type": "string",
-                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
-                    "example": "/users?limit=1&offset=2&query="
-                },
-                "previous": {
-                    "type": "string",
-                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
-                    "example": "/users?limit=1&offset=0&query="
-                },
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/UserInfo"
-                    }
+                "userIds": {
+                    "type": "object",
+                    "description": "List of User Names"
                 }
             }
         },
-        "UserInfo": {
-            "title": "User Details",
+        "RoleIdList": {
+            "title": "Role List",
             "properties": {
-                "username": {
-                    "type": "string",
-                    "description": "Username of the new user.\n",
-                    "example": "user1"
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Role Id's"
                 }
             }
         },
@@ -660,26 +294,16 @@
             "properties": {
                 "type": {
                     "type": "string",
-                    "description": "Download type (either user or device).\n",
+                    "description": "Download type (either user or roles).\n",
                     "example": "user/device"
                 },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/UserInfo"
-                    }
+                "typeIds": {
+                    "type": "object",
+                    "description": "List of Id's against type (role/user)"
                 },
-                "devices": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/DeviceInfo"
-                    }
-                },
-                "apps": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/AppInfo"
-                    }
+                "appId": {
+                    "type": "string",
+                    "description": "App Id"
                 }
             }
         },
