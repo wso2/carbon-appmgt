@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.impl.utils;
 
+import ca.uhn.hl7v2.util.ArrayUtil;
 import com.google.gson.Gson;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
@@ -29,6 +30,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -40,17 +42,7 @@ import org.wso2.carbon.appmgt.api.doc.model.APIDefinition;
 import org.wso2.carbon.appmgt.api.doc.model.APIResource;
 import org.wso2.carbon.appmgt.api.doc.model.Operation;
 import org.wso2.carbon.appmgt.api.doc.model.Parameter;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -533,6 +525,52 @@ public final class AppManagerUtil {
 		}
 		return artifact;
 	}
+
+
+	/**
+	 * Create Governance artifact from given attributes
+	 *
+	 * @param artifact
+	 *            initial governance artifact
+	 * @param mobileApp
+	 *            WebApp object with the attributes value
+	 * @return GenericArtifact
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
+	 *             if failed to create WebApp
+	 */
+	public static GenericArtifact createMobileAppArtifactContent(GenericArtifact artifact, MobileApp mobileApp)
+			throws
+			AppManagementException {
+
+		try {
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, mobileApp.getAppName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL, mobileApp.getAppUrl());
+			//artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, mobileApp.getVisibility());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION, mobileApp.getAppVersion());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME, mobileApp.getPackageName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY, mobileApp.getCategory());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, mobileApp.getDisplayName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, mobileApp.getMarketType());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES, mobileApp.getRecentChanges());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, mobileApp.getAppVersion());
+
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, mobileApp.getAppProvider());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, mobileApp.getDescription());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
+			String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER,mobileApp.getBanner());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID,mobileApp.getAppId());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM,mobileApp.getPlatform());
+		} catch (GovernanceException e) {
+			String msg = "Failed to create WebApp for : " + mobileApp.getAppName();
+			log.error(msg, e);
+			throw new AppManagementException(msg, e);
+		}
+		return artifact;
+	}
+
 
 	/**
 	 * Create the Documentation from artifact

@@ -24,7 +24,7 @@ public enum APPLifecycleActions {
 
 	PUBLISH("Publish"), APPROVE("Approve"), REJECT("Reject"), UNPUBLISH("Unpublish"),
 	DEPRECATE("Deprecate"), RETIRE("Retire"), RECYCLE("Recycle"), REPUBLISH("Re-Publish"),
-	SUBMIT_FOR_REVIEW("Submit for Review");
+	SUBMIT_FOR_REVIEW("Submit for Review"), CREATE("Create");
 
 	private String status;
 

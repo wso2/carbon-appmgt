@@ -29,9 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -82,7 +80,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                     String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
-                    String mediaType = fileDetail.getHeader(RestApiConstants.HEADER_CONTENT_TYPE);
 
                     ZipFileReading zipFileReading = new ZipFileReading();
                     String information = null;
@@ -173,8 +170,23 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
-        // do some magic!
-        return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+        AppDTO appDTO = new AppDTO();
+        if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+            try {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                //TODO:APP Validations
+                //TODO:Get provider name from context (Token owner)
+                //TODO:Permission check
+                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body, "admin");
+                String applicationId = appProvider.addMobileApp(mobileApp);
+                appDTO.setId(applicationId);
+            } catch (AppManagementException e) {
+                RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
+            }
+        }else{
+            RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
+        }
+        return Response.ok().entity(appDTO).build();
     }
 
     @Override

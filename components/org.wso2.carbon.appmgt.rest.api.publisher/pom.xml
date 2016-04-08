@@ -184,7 +184,7 @@
                 <artifactId>swagger2cxf-maven-plugin</artifactId>
                 <version>1.0-SNAPSHOT</version>
                 <configuration>
-                    <inputSpec>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_rest_api/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.publisher/src/main/resources/publisher-api.yaml</inputSpec>
+                    <inputSpec>/home/thilini/Development/appm/origin/rest-api/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.publisher/src/main/resources/publisher-api.yaml</inputSpec>
                 </configuration>
             </plugin>
             <!--   need to remove when deploying-->

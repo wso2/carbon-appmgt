@@ -496,8 +496,7 @@ definitions:
     required:
       - name
       - version
-      - appDefinition
-      - transport
+      - provider
     properties:
       id:
         type: string
@@ -509,8 +508,44 @@ definitions:
         example: CalculatorApp
       type:
         type: string
-        description: App type (either Webapp/Mobile app
-        example: 01234567-0123-0123-0123-012345678901
+        description: App type (either Webapp/Mobile app)
+        example: 'webapp,mobileapp'
+      appmeta:
+        type: object
+        properties:
+          path:
+            type: string
+            description: "Application binary file API \n"
+            example: '/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa'
+          package:
+            type: string
+            description: |
+              The package name of the application binary
+            example: home.jmstudios.calc
+          version:
+            type: string
+            description: |
+              The version of the application binary
+            example: '1.0'
+          weburl:
+            type: string
+            description: |
+              Web application urk
+            example: 'http://sample.com'
+      marketType:
+        type: string
+        example: 'enterprise,'
+      recentChanges:
+        type: string
+        example: Upgraded
+      visibility:
+        type: string
+        example: role
+      icon:
+        description: |
+          the image icon of the application
+        type: string
+        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG'
       isSite:
         type: string
         description: Either a webapp or site
@@ -610,9 +645,14 @@ definitions:
         example: testapp1
       screenshots:
         description: |
-          packagename of the asset
-        type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+          Screenshots attached to the application
+        type: array
+        items:
+          type: string
+        example:
+          - /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg
+          - /publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG
+          - /publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG
       banner:
         description: |
           /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg

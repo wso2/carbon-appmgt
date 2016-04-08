@@ -187,6 +187,17 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String MOBILE_APP_OVERVIEW_URL = "overview_url";
+    public static final String MOBILE_APP_OVERVIEW_PACKAGE_NAME = "overview_packagename";
+    public static final String MOBILE_APP_OVERVIEW_BUNDLE_VERSION = "overview_bundleversion";
+    public static final String MOBILE_APP_OVERVIEW_CATEGORY = "overview_category";
+    public static final String MOBILE_APP_OVERVIEW_TYPE = "overview_type";
+    public static final String MOBILE_APP_OVERVIEW_RECENT_CHANGES = "overview_recentchanges";
+    public static final String MOBILE_APP_OVERVIEW_PLATFORM = "overview_platform";
+    public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
+    public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
+    public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
+    public static final String MOBILE_APP_IMAGES_BANNER = "images_banner";
     
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";

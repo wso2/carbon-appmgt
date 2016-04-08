@@ -258,6 +258,14 @@ public interface APIProvider extends APIManager {
     public void addWebApp(WebApp api) throws AppManagementException;
 
     /**
+     * Adds a new Mobile Application to the Store
+     *
+     * @param mobileApp Mobile application
+     * @throws AppManagementException if failed to add MobileApp
+     */
+    public String addMobileApp(MobileApp mobileApp) throws AppManagementException;
+
+    /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
      * should throw an exceptions when such attempts are made. All life cycle state changes
      * should be carried out using the changeAPIStatus method of this interface.
