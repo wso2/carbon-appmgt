@@ -717,6 +717,27 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new AppManagementException("Invalid WebApp update operation involving WebApp status changes");
         }
     }
+    /**
+     * Updates an existing WebApp
+     *
+     * @param api WebApp
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     *          if failed to update WebApp
+     */
+    public void updateMobileApp(MobileApp mobileApp) throws AppManagementException {
+
+
+            try {
+
+                updateMobileAppArtifact(mobileApp, true);
+
+            } catch (AppManagementException e) {
+                handleException("Error while updating the WebApp :" +mobileApp.getAppName(),e);
+            }
+
+
+    }
+
 
 
 
@@ -791,6 +812,53 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                  api.getId().getApiName(), re);
              }
              handleException("Error while performing registry transaction operation", e);
+
+        }
+    }
+
+    private void updateMobileAppArtifact(MobileApp mobileApp, boolean updatePermissions) throws
+            AppManagementException {
+
+
+        try {
+            registry.beginTransaction();
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(mobileApp.getAppId());
+            if (artifact != null) {
+
+                GenericArtifact updateApiArtifact = AppManagerUtil.createMobileAppArtifactContent(artifact, mobileApp);
+                String artifactPath = GovernanceUtils.getArtifactPath(registry, updateApiArtifact.getId());
+                artifactManager.updateGenericArtifact(updateApiArtifact);
+            }else{
+                handleResourceNotFoundException(
+                        "Failed to get Mobile App. The artifact corresponding to artifactId " + mobileApp.getAppId() + " does not exist");
+            }
+//            org.wso2.carbon.registry.core.Tag[] oldTags = registry.getTags(artifactPath);
+//            if (oldTags != null) {
+//                for (org.wso2.carbon.registry.core.Tag tag : oldTags) {
+//                    registry.removeTag(artifactPath, tag.getTagName());
+//                }
+//            }
+
+//            Set<String> tagSet = api.getTags();
+//            if (tagSet != null) {
+//                for (String tag : tagSet) {
+//                    registry.applyTag(artifactPath, tag);
+//                }
+//            }
+
+
+
+
+            registry.commitTransaction();
+        } catch (Exception e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException("Error while rolling back the transaction for WebApp: " +mobileApp.getAppName(), re);
+            }
+            handleException("Error while performing registry transaction operation", e);
 
         }
     }
@@ -2252,7 +2320,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
             } else {
                 handleResourceNotFoundException(
-                        "Failed to get API. API artifact corresponding to artifactId " + appId + " does not exist");
+                        "Failed to get "+appType+" artifact corresponding to artifactId " + appId + ". Artifact does not exist");
             }
         } catch (AppManagementException e) {
             handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
