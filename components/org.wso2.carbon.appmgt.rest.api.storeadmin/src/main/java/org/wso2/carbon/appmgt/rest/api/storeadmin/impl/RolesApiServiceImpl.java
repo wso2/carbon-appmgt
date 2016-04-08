@@ -15,13 +15,11 @@ import javax.ws.rs.core.Response;
 public class RolesApiServiceImpl extends RolesApiService {
     @Override
     public Response rolesGet(Integer limit, Integer offset, String accept, String ifNoneMatch) {
-
         RoleIdListDTO roleListDTO = new RoleIdListDTO();
-
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
-
         String[] roleNames = null;
+
         try {
             UserRealm realm = realmService.getTenantUserRealm(-1234);
             UserStoreManager manager = realm.getUserStoreManager();
@@ -40,7 +38,6 @@ public class RolesApiServiceImpl extends RolesApiService {
                 roleNamesArr.add(roleName);
             }
         }
-
         roleListDTO.setRoleIds(roleNamesArr);
         return Response.ok().entity(roleListDTO).build();
     }

@@ -15,14 +15,11 @@ import javax.ws.rs.core.Response;
 public class UsersApiServiceImpl extends UsersApiService {
     @Override
     public Response usersGet(Integer limit, Integer offset, String accept, String ifNoneMatch) {
-
         UserIdListDTO userListDTO = new UserIdListDTO();
-
-
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
-
         String[] userNames = null;
+
         try {
             UserRealm realm = realmService.getTenantUserRealm(-1234);
             UserStoreManager manager = realm.getUserStoreManager();
@@ -34,14 +31,10 @@ public class UsersApiServiceImpl extends UsersApiService {
             return RestApiUtil.buildInternalServerErrorException().getResponse();
         }
 
-        //JSONArray userNamesArr = new JSONArray(Array);
         JSONArray userNamesArr = new JSONArray();
-
-
         for (int i = 0; i < userNames.length; i++) {
             userNamesArr.add(userNames[i]);
         }
-
         userListDTO.setUserIds(userNamesArr);
         return Response.ok().entity(userListDTO).build();
     }

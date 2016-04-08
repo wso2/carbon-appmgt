@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
  * This class contains REST API Store related utility operations
  */
 public class RestApiStoreUtils {
-
     private static final Log log = LogFactory.getLog(RestApiStoreUtils.class);
 
 

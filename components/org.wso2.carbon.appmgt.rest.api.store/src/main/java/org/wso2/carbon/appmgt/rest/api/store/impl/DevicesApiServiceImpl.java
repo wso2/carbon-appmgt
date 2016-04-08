@@ -25,15 +25,14 @@ public class DevicesApiServiceImpl extends DevicesApiService {
     @Override
     public Response devicesGet(String query, Integer limit, Integer offset, String accept, String ifNoneMatch) {
 
-        List<DeviceInfoDTO> allMatcheddevices = new ArrayList<>();
-        DeviceListDTO appListDTO;
+        List<DeviceInfoDTO> allMatchedDevices = new ArrayList<>();
+        DeviceListDTO deviceListDTO;
 
         //pre-processing
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
         query = query == null ? "" : query;
-
 
         Devices devices = new Devices();
 
@@ -47,13 +46,12 @@ public class DevicesApiServiceImpl extends DevicesApiService {
             RestApiUtil.handleInternalServerError("Error while initializing UserStore", e, log);
         }
 
+        //building request parameters to required format
         String[] users = {username};
-
         JSONObject userObj = new JSONObject();
         userObj.put("username", username);
         userObj.put("tenantDomain", tenantDomain);
         userObj.put("tenantId", tenantId);
-
 
         String deviceList = devices.getDevicesList(userObj.toJSONString(), tenantId, "user", users);
         JSONArray deviceArr = (JSONArray) new JSONValue().parse(deviceList);
@@ -61,7 +59,6 @@ public class DevicesApiServiceImpl extends DevicesApiService {
 
         for (int i = 0; i < deviceArr.size(); i++) {
             JSONObject jsonObject = (JSONObject) deviceArr.get(i);
-
             DeviceInfoDTO deviceInfoDTO = new DeviceInfoDTO();
             deviceInfoDTO.setId(jsonObject.get("id").toString());
             deviceInfoDTO.setImage(jsonObject.get("image").toString());
@@ -70,18 +67,16 @@ public class DevicesApiServiceImpl extends DevicesApiService {
             deviceInfoDTO.setPlatform(jsonObject.get("platform").toString());
             deviceInfoDTO.setPlatformVersion(jsonObject.get("platform_version").toString());
             deviceInfoDTO.setType(jsonObject.get("type").toString());
-
-            allMatcheddevices.add(deviceInfoDTO);
+            allMatchedDevices.add(deviceInfoDTO);
         }
 
-
-        if (allMatcheddevices.isEmpty()) {
+        if (allMatchedDevices.isEmpty()) {
             String errorMessage = "No result found.";
             return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
         }
 
-        appListDTO = DeviceMappingUtil.fromAPIListToDTO(allMatcheddevices, offset, limit);
-        DeviceMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatcheddevices.size());
-        return Response.ok().entity(appListDTO).build();
+        deviceListDTO = DeviceMappingUtil.fromAPIListToDTO(allMatchedDevices, offset, limit);
+        DeviceMappingUtil.setPaginationParams(deviceListDTO, query, offset, limit, allMatchedDevices.size());
+        return Response.ok().entity(deviceListDTO).build();
     }
 }
