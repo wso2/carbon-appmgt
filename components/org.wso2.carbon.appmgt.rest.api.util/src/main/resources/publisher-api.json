@@ -446,6 +446,9 @@
                 "responses": {
                     "200": {
                         "description": "OK. \nBinary file uploaded successfully.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Binary"
+                        },
                         "headers": {
                             "ETag": {
                                 "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
@@ -777,16 +780,20 @@
         "Binary": {
             "title": "upload binary",
             "required": [
-                "name"
+                "path"
             ],
             "properties": {
-                "binaryId": {
+                "path": {
                     "type": "string",
-                    "example": "1"
+                    "example": "1.0"
                 },
-                "name": {
+                "package": {
                     "type": "string",
-                    "example": "anroidapp.apk"
+                    "example": "sample.calc"
+                },
+                "version": {
+                    "type": "string",
+                    "example": "1.0"
                 }
             }
         },

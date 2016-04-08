@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
 import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
@@ -33,7 +34,7 @@ public class AppsApi  {
     @Path("/mobile/binaries")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Uploading binary files", notes = "Uploading .apk/.IPA binary files.", response = Void.class)
+    @io.swagger.annotations.ApiOperation(value = "Uploading binary files", notes = "Uploading .apk/.IPA binary files.", response = BinaryDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nBinary file uploaded successfully."),
         

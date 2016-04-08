@@ -346,6 +346,8 @@ paths:
       responses:
         '200':
           description: "OK. \nBinary file uploaded successfully.\n"
+          schema:
+            $ref: '#/definitions/Binary'
           headers:
             ETag:
               description: >
@@ -634,14 +636,17 @@ definitions:
   Binary:
     title: upload binary
     required:
-      - name
+      - path
     properties:
-      binaryId:
+      path:
         type: string
-        example: '1'
-      name:
+        example: '1.0'
+      package:
         type: string
-        example: anroidapp.apk
+        example: sample.calc
+      version:
+        type: string
+        example: '1.0'
   Error:
     title: Error object returned with 4XX HTTP status
     required:

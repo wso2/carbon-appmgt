@@ -43,6 +43,12 @@ public class ErrorDTO {
 
     private List<ErrorListItemDTO> error = new ArrayList<ErrorListItemDTO>();
 
+    public ErrorDTO(){}
+
+    public ErrorDTO(long code, String message) {
+        this.code = code;
+        this.message = message;
+    }
 
     /**
      **/
