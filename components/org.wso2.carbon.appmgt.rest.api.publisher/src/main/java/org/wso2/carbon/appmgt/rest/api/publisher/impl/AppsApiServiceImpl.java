@@ -28,7 +28,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.AppManagementException; 
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.*;
