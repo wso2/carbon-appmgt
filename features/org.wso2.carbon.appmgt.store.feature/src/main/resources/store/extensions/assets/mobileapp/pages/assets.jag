@@ -36,6 +36,10 @@ require('/modules/store.js').exec(function (ctx) {
 
     //Get the list of enabled app types
     var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+    //Get the subscription configuration options
+    var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
    // paging = store.assetsPaging(request);
     avaliablePages = store.getAvailablePages(type,ctx.request,ctx.session);
     paging = store.assetsPagingOverrided(request);
@@ -218,7 +222,11 @@ require('/modules/store.js').exec(function (ctx) {
             config: mdmUIConfig,
             recentAssets: store.recentAssets(type),
             assetType: "mobileapp",
-            enabledTypeList: enabledTypeList
+            config: {
+                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList: enabledTypeList
+            }
 
         });
 }, request, response, session);

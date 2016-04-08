@@ -24,7 +24,7 @@
 
 var render = function (theme, data, meta, require) {
     var categories = data.navigation.assets[data.type].categories;
-    var searchUrl = "/extensions/assets/mobileapp/subscriptions";
+    var searchUrl = "/extensions/assets/mobileapp/myapps";
     var searchQuery =  data.search.query
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
@@ -154,20 +154,38 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [];
-    var isAllAppsActive = true;
-
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: "/extensions/assets/mobileapp/subscriptions"
-                                });
-        isAllAppsActive = false;
+    var enabledTypeList = data.config.enabledTypeList;
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
     }
+    var currentAppType = 'mobileapp';
 
-    leftNavigationData.push({
-                                active: isAllAppsActive, partial: 'all-apps', url: "/assets/mobileapp"
-                            });
+    var leftNavigationData = [
+        {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
+        }
+    ];
 
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            var data;
+            if (subscriptionOn) {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                     enabledTypeList[i]
+                }
+            } else {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                     enabledTypeList[i] + "/apps"
+                }
+            }
+            leftNavigationData.push(data);
+        }
+
+    }
     return leftNavigationData;
 }
 

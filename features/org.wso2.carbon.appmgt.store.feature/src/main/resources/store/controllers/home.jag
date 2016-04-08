@@ -3,7 +3,8 @@ var caramel;
 var customType;
 
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
-var storeHostObj = jagg.module("manager").getAPIStoreObj();
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
 
 require('/modules/store.js').exec(function (ctx) {
     var paging,  manager, assets, length,
@@ -38,6 +39,14 @@ require('/modules/store.js').exec(function (ctx) {
     //because all apps will be displayed in myapps page.
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
         navigationData.showAllAppsLink = false;
+    }
+
+    var subscriptionService;
+    if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+        // Init subscription service.
+        var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
+        subscriptionService = new subscriptionServiceModule.SubscriptionService();
+        subscriptionService.init(jagg, session);
     }
 
     paging = store.assetsPaging(request);
@@ -132,8 +141,17 @@ require('/modules/store.js').exec(function (ctx) {
                 // set default thumbnail
                 setDefaultThumbnail(asset);
 
-                //Set access URL
+                //check app is favourite or not
+                if(user) {
+                    if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
+                                       asset.attributes.overview_provider, user, storeTenantDomain)) {
+                        asset.isFavourite = true;
+                    }
+                }
+
+
                 if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                    //Set access URL
                     //set direct app access url
                     if (asset.attributes.overview_skipGateway.toLowerCase() == "false") {
                         //Get the gateway url
@@ -147,6 +165,11 @@ require('/modules/store.js').exec(function (ctx) {
                     } else {
                         //Get the direct webapp url
                         asset.accessUrl = asset.attributes.overview_webAppUrl;
+                    }
+                } else {
+                    //check app is subscribed or not
+                    if(user) {
+                        asset.isSubscribed = isSubscribed(asset,user,subscriptionService);
                     }
                 }
             }
@@ -204,8 +227,41 @@ function setDefaultThumbnail(asset) {
     }
 }
 
-function setAccessURL(isSelfSubscriptionEnabled, isEnterpriseSubscriptionEnabled, asset, type) {
+/**
+ * Checks whether given app is already selected as favourite app by user or not.
+ * @param appName App Name
+ * @param version App Version
+ * @param provider App Provider
+ * @returns {boolean} true if favouirte app of user else false
+ */
+function isFavouriteApp(appName, version, provider, user, storeTenantDomain) {
+    var status = false;
+    if (user) {
+        // check whether this is favourite app of user.
+        status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                        storeTenantDomain).status;
+    }
+    return status;
+};
 
+/**
+ * Checks whether given app is subscribed by user
+ * @param asset
+ * @param user
+ * @returns {boolean}
+ */
+function isSubscribed(asset, user, subscriptionService) {
+    var appInfo = {};
+    appInfo["name"] = asset.attributes.overview_name;
+    appInfo["version"] = asset.attributes.overview_version;
+    appInfo["provider"] = asset.attributes.overview_provider;
 
+    var defaultApplicationName = "DefaultApplication";
+    var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                                     String(user.username)).subscription;
+    if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
+        return true;
+    }
+    return false;
 }
 %>

@@ -4,6 +4,8 @@
             <div class="app-tile">
                 <a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}" class="hover-overlay-container accessUrl">
                     <div class="ratio-responsive-4by3">
+                        {{> ribbons/subscribed}}
+                        {{> ribbons/favorite}}
                         {{#if defaultThumbnail}}
                             <div class="ratio-responsive-item"
                                  style="background-color: #{{defaultThumbnail.color}};">
@@ -33,6 +35,26 @@
                         </a>
                         <ul class="more-menu-items dropdown-menu">
                             <li><a href="{{tenantedUrl "/assets"}}/{{../type}}/{{id}}">More Details</a></li>
+                            {{#if ../user}}
+                                {{#if isSubscribed}}
+                                <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
+                                    style="display: none" {{/unless}}>
+                                    <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
+                                       data-provider="{{attributes.overview_provider}}"
+                                       data-version="{{attributes.overview_version}}" class="remove-from-fav">
+                                        Remove from Favorites
+                                    </a>
+                                </li>
+                                <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
+                                    style="display: none" {{/if}}>
+                                    <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
+                                       data-provider="{{attributes.overview_provider}}"
+                                       data-version="{{attributes.overview_version}}" class="add-to-fav">
+                                        Add to Favorites
+                                    </a>
+                                </li>
+                                {{/if}}
+                            {{/if}}
                         </ul>
                     </div>
                 </div>

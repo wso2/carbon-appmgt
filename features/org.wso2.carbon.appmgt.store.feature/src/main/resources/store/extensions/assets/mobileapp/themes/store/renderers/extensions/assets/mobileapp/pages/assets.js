@@ -91,19 +91,42 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var enabledTypeList = data.enabledTypeList;
-    var leftNavigationData = [
-        {
-            active: true, partial: 'mobileapp', url: "/assets/mobileapp"
+    var enabledTypeList = data.config.enabledTypeList;
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var currentAppType = 'mobileapp';
+    var leftNavigationData = [];
+
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
         }
-    ];
-    var currentAppType = 'mobileapp'
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
+
     for (var i = 0; i < enabledTypeList.length; i++) {
         if (enabledTypeList[i] != currentAppType) {
-            leftNavigationData.push({
-                                        active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
-                                                                                         enabledTypeList[i] + "/apps"
-                                    });
+            var data;
+            if (subscriptionOn) {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                     enabledTypeList[i]
+                }
+            } else {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                     enabledTypeList[i] + "/apps"
+                }
+            }
+            leftNavigationData.push(data);
         }
 
     }

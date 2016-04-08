@@ -86,12 +86,22 @@ function createSortOptions(data) {
 
 function createLeftNavLinks(data) {
     var enabledTypeList = data.enabledTypeList;
-    var leftNavigationData = [
-        {
-            active: true, partial: 'site', url: "/assets/site"
-        }
-    ];
     var currentAppType = 'site';
+    var leftNavigationData = [];
+
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/"+currentAppType,
+            myapps: false, myappsUrl: "/extensions/assets/"+currentAppType+"/myapps"
+        }
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
+
     for (var i = 0; i < enabledTypeList.length; i++) {
         if (enabledTypeList[i] != currentAppType) {
             leftNavigationData.push({

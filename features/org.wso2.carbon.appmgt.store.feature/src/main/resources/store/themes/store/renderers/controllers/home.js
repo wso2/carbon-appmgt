@@ -31,6 +31,12 @@ var render = function (theme, data, meta, require) {
                 }
             }
         ],
+        search: [
+            {
+                partial: 'search',
+                context: {}
+            }
+        ],
         pageHeader: [
             {
                 partial: 'page-header',
@@ -42,7 +48,7 @@ var render = function (theme, data, meta, require) {
         pageContent: [
             {
                 partial: 'page-content-home',
-                context: {assets: data.topAssets.assets, subscriptionOn:subscriptionOn}
+                context: getBodyContext(data.topAssets.assets, subscriptionOn, data.header.user)
             }
         ]
     });
@@ -83,3 +89,9 @@ function createLeftNavLinks(data) {
     return leftNavigationData;
 }
 
+function getBodyContext(assetTypes, subscriptionOnStatus, user) {
+    for (var i = 0; i < assetTypes.length; i++) {
+        assetTypes[i].user = user;
+    }
+    return {assetTypes: assetTypes, subscriptionOn: subscriptionOnStatus};
+}

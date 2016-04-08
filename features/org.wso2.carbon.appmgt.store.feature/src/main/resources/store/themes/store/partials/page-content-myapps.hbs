@@ -79,7 +79,6 @@
                                 {{/ifCond}}
                                 {{#if ../../user}}
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe" data-name="{{attributes.overview_name}}"
                                                    data-provider="{{attributes.overview_provider}}"
@@ -87,7 +86,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
                             </ul>
@@ -150,7 +148,6 @@
 
 
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe"
                                                    data-name="{{attributes.overview_name}}"
@@ -159,7 +156,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
 

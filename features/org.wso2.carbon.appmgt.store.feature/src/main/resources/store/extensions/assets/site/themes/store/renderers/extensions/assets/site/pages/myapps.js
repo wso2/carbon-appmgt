@@ -67,7 +67,14 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(user, config) {
     var isSelfSubscriptionEnabled = config.isSelfSubscriptionEnabled;
     var isEnterpriseSubscriptionEnabled = config.isEnterpriseSubscriptionEnabled;
-    var url = "/extensions/assets/site/myapps?sort=";
+    var subscriptionOn = true;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var url = "/extensions/assets/site/apps?sort=";
+    if(subscriptionOn){
+        url = "/extensions/assets/site/myapps?sort=";
+    }
     var sortOptions = {};
     var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
@@ -76,7 +83,7 @@ function createSortOptions(user, config) {
 
     var options = [];
 
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+    if (!subscriptionOn) {
         options.push(sortByAlphabet);
         options.push(sortByRecent);// recently added
         options.push(sortByPopularity);
@@ -96,27 +103,49 @@ function createSortOptions(user, config) {
 
 function createLeftNavLinks(data) {
     var enabledTypeList = data.config.enabledTypeList;
-    var leftNavigationData = [
-        {
-            active: true, partial: 'site', url: "/extensions/assets/site/apps"
-        }
-    ];
-    var currentAppType = 'site'
-    for (var i = 0; i < enabledTypeList.length; i++) {
-        if (enabledTypeList[i] != currentAppType) {
-            if (enabledTypeList[i] == 'mobileapp') {
+    var leftNavigationData = [];
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var currentAppType = 'site';
+
+    if(subscriptionOn) {
+        var data =  { active: true, partial: currentAppType, url: "/assets/"+currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/"+currentAppType+"/myapps" };
+        leftNavigationData.push(data)
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentAppType) {
                 leftNavigationData.push({
                                             active: false, partial: enabledTypeList[i], url: "/assets/" +
                                                                                              enabledTypeList[i]
                                         });
-            } else {
-                leftNavigationData.push({
-                                            active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
-                                                                                           enabledTypeList[i] + "/apps"
-                                        });
+
             }
+
+        }
+    } else {
+        var data =  { active: true, partial: currentAppType, url: "/extensions/assets/webapp/apps"};
+        leftNavigationData.push(data)
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentAppType) {
+                if (enabledTypeList[i] == 'mobileapp') {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                                 enabledTypeList[i]
+                                            });
+                } else {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                                 enabledTypeList[i] + "/apps"
+                                            });
+                }
+
+            }
+
         }
     }
+
     return leftNavigationData;
 }
 

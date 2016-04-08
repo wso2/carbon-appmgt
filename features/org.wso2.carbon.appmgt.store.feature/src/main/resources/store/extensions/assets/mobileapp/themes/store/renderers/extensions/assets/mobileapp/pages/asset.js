@@ -113,7 +113,7 @@ function createLeftNavLinks(data) {
             if (enabledTypeList[i] != currentType) {
                 leftNavigationData.push({
                                             active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
-                                                                                             enabledTypeList[i] + "apps"
+                                                                                             enabledTypeList[i] + "/apps"
                                         });
 
             }
