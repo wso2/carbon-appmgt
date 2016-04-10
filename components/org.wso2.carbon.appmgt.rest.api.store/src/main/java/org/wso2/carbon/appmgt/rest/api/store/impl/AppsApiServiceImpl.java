@@ -54,7 +54,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.API_NAME;
+            String searchType = AppMConstants.SEARCH_CONTENT_NAME;
             String searchContent = "";
             if (!StringUtils.isBlank(query)) {
                 String[] querySplit = query.split(":");

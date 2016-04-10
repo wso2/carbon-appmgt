@@ -325,7 +325,7 @@ definitions:
         type: string
         description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
         example: '/app?limit=1&offset=0&query='
-      list:
+      appList:
         type: array
         items:
           $ref: '#/definitions/AppInfo'
@@ -491,7 +491,7 @@ definitions:
         type: string
         description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
         example: '/devices?limit=1&offset=0&query='
-      list:
+      deviceList:
         type: array
         items:
           $ref: '#/definitions/DeviceInfo'

@@ -36,7 +36,6 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
@@ -177,7 +176,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.API_NAME;
+            String searchType = AppMConstants.SEARCH_CONTENT_NAME;
             String searchContent = "";
             if (!StringUtils.isBlank(query)) {
                 String[] querySplit = query.split(":");

@@ -52,10 +52,10 @@ public class APPMappingUtil {
      */
     public static AppListDTO fromAPIListToDTO(List<WebApp> appList, int offset, int limit) {
         AppListDTO appListDTO = new AppListDTO();
-        List<AppInfoDTO> appInfoDTOs = appListDTO.getList();
+        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppList();
         if (appInfoDTOs == null) {
             appInfoDTOs = new ArrayList<>();
-            appListDTO.setList(appInfoDTOs);
+            appListDTO.setAppList(appInfoDTOs);
         }
 
         //add the required range of objects to be returned
