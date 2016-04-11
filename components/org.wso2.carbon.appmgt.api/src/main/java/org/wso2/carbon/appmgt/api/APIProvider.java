@@ -608,4 +608,6 @@ public interface APIProvider extends APIManager {
      * @return list of allowed lifecycle actions perform on the app
      */
     public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
+    public void subscribeMobileApp(String userId, String appId) throws AppManagementException;
+    public void unSubscribeMobileApp(String userId, String appId) throws AppManagementException;
 }

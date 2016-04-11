@@ -50,6 +50,7 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Association;
@@ -2333,4 +2334,34 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
         return actions;
     }
+
+    public void subscribeMobileApp(String userId, String appId) throws AppManagementException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        Resource resource = null;
+        try {
+            if(registry.resourceExists(path)){
+                resource = registry.get(path);
+            }else{
+
+                resource = registry.newResource();
+                resource.setContent("");
+                registry.put(path, resource);
+            }
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+           handleException("Error occurred while retrieving registry", e);
+        }
+
+    }
+
+
+    public void unSubscribeMobileApp(String userId, String appId) throws AppManagementException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        try {
+            registry.delete(path);
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            log.error("" + path, e);
+            handleException("Error while deleting registry path: "+path, e);
+        }
+    }
+
 }
