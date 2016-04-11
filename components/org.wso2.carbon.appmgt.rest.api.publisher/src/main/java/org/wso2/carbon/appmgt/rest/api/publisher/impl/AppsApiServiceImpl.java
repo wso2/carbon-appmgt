@@ -170,7 +170,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
                     !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
-                return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+                RestApiUtil.handleBadRequest(errorMessage, log);
             }
 
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
@@ -272,6 +272,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO apiToReturn;
         try {
+            //currently supports only mobile apps
+            if (!appType.equals("mobileapp")) {
+                String errorMessage = "Type not supported.";
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";
@@ -279,9 +284,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                                                  appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
-                RestApiUtil.buildNotFoundException(errorMessage, appId);
+                RestApiUtil.handleBadRequest(errorMessage, log);
             }
             WebApp webApp = allMatchedApps.get(0);
+            webApp.setType(appType);
             apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
             return Response.ok().entity(apiToReturn).build();
         } catch (AppManagementException e) {

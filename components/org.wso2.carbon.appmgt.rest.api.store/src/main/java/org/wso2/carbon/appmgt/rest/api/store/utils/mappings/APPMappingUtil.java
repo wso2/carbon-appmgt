@@ -181,21 +181,19 @@ public class APPMappingUtil {
             dto.setContext(context);
         }
         dto.setDescription(model.getDescription());
-
+        dto.setIsDefaultVersion(model.isDefaultVersion());
+        dto.setIsSite(model.getTreatAsASite());
         dto.setThumbnailUrl(model.getThumbnailUrl());
         dto.setLifecycleState(model.getLifeCycleStatus().getStatus());
-
         Set<String> apiTags = model.getTags();
         List<String> tagsToReturn = new ArrayList<>();
         tagsToReturn.addAll(apiTags);
         dto.setTags(tagsToReturn);
-
         Set<Tier> apiTiers = model.getAvailableTiers();
         List<String> tiersToReturn = new ArrayList<>();
         for (Tier tier : apiTiers) {
             tiersToReturn.add(tier.getName());
         }
-
         if (model.getTransports() != null) {
             dto.setTransport(Arrays.asList(model.getTransports().split(",")));
         }
@@ -203,6 +201,26 @@ public class APPMappingUtil {
         if (model.getLifeCycleName() != null) {
             dto.setLifecycle(model.getLifeCycleName());
         }
+
+        dto.setType(model.getType());
+        dto.setMarketType(model.getMarketType());
+        dto.setBundleversion(model.getBundleVersion());
+        dto.setCategory(model.getCategory());
+        dto.setDisplayName(model.getDisplayName());
+        if (model.getScreenShots() != null) {
+            dto.setScreenshots(model.getScreenShots());
+        }
+        dto.setPlatform(model.getPlatform());
+        dto.setCreatedtime(model.getDisplayName());
+        dto.setBanner(model.getBanner());
+        dto.setRecentChanges(model.getRecentChanges());
+
+        dto.setIcon(model.getIcon());
+        dto.setAppType(model.getAppType());
+        dto.setRecentChanges(model.getRecentChanges());
+        dto.setCreatedtime(model.getCreatedTime());
+
+
         return dto;
     }
 

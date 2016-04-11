@@ -90,6 +90,12 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO appToReturn = null;
         try {
+            //currently supports only mobile apps
+            if (!appType.equals("mobileapp")) {
+                String errorMessage = "Type not supported.";
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
+
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";

@@ -579,11 +579,9 @@ definitions:
         type: string
         example: 'enterprise,'
       recentChanges:
+        description: recent changes
         type: string
-        example: Upgraded
-      visibility:
-        type: string
-        example: role
+        example: update details
       icon:
         description: |
           the image icon of the application
@@ -642,10 +640,9 @@ definitions:
           type: string
         example: []
       path:
-        description: |
-          Registry path of the asset
+        description: path of asset
         type: string
-        example: /_system/governance/mobileapps/admin/android/test/1.0
+        example: /_system/governance/mobileapps/admin/webapp/m1/1
       resourceId:
         description: |
           Resource Id path of the asset
@@ -671,11 +668,6 @@ definitions:
           Bundleversion of the asset
         type: string
         example: '1.0'
-      packagename:
-        description: |
-          packagename of the asset
-        type: string
-        example: home.jmstudios.calc
       category:
         description: |
           category of the asset
@@ -710,12 +702,24 @@ definitions:
         description: |
           platform of the asset
         type: string
-        example: andoid
+        example: android
+      appType:
+        description: 'mobile app type (eg: webapp/ios/android)'
+        type: string
+        example: android
+      mediaType:
+        description: media yype
+        type: string
+        example: application/vnd.wso2-mobileapp+xml
       lifecycleAvailableActions:
         description: |
           platform of the asset
         type: string
         example: '[Submit for Review]'
+      createdTime:
+        description: asset created timestamp
+        type: string
+        example: 00000001459919490157
   Binary:
     title: upload binary
     required:

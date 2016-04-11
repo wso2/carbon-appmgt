@@ -282,7 +282,7 @@ public abstract class AbstractAPIManager implements APIManager {
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
             GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
             for (GenericArtifact artifact : artifacts) {
-                apiSortedList.add(AppManagerUtil.getAPI(artifact));
+                apiSortedList.add(AppManagerUtil.getGenericApp(artifact));
             }
 
         } catch (RegistryException e) {
