@@ -18,8 +18,6 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
-import ca.uhn.hl7v2.util.ArrayUtil;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -35,10 +33,12 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class APPMappingUtil {
 
@@ -115,13 +115,13 @@ public class APPMappingUtil {
         if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
             paginatedPrevious = RestApiUtil
                     .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
-                            paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), query);
+                                        paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), query);
         }
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
             paginatedNext = RestApiUtil
                     .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
-                            paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
+                                        paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
         }
 
         appListDTO.setNext(paginatedNext);
@@ -184,6 +184,7 @@ public class APPMappingUtil {
         }
         dto.setDescription(model.getDescription());
         dto.setIsDefaultVersion(model.isDefaultVersion());
+        dto.setIsSite(model.getTreatAsASite());
         dto.setThumbnailUrl(model.getThumbnailUrl());
         dto.setLifecycleState(model.getLifeCycleStatus().getStatus());
         Set<String> apiTags = model.getTags();
@@ -201,12 +202,37 @@ public class APPMappingUtil {
         if (model.getVisibleRoles() != null) {
             dto.setVisibleRoles(Arrays.asList(model.getVisibleRoles().split(",")));
         }
-        if (model.getVisibleTenants() != null) {
-            dto.setVisibleRoles(Arrays.asList(model.getVisibleTenants().split(",")));
-        }
         if (model.getLifeCycleName() != null) {
             dto.setLifecycle(model.getLifeCycleName());
         }
+
+        dto.setType(model.getType());
+        dto.setMarketType(model.getMarketType());
+        dto.setBundleversion(model.getBundleVersion());
+        dto.setCategory(model.getCategory());
+        dto.setDisplayName(model.getDisplayName());
+        if (model.getScreenShots() != null) {
+            dto.setScreenshots(model.getScreenShots());
+        }
+        dto.setPlatform(model.getPlatform());
+        dto.setCreatedtime(model.getDisplayName());
+        dto.setBanner(model.getBanner());
+        dto.setRecentChanges(model.getRecentChanges());
+
+        AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
+        appAppmetaDTO.setPackage(model.getPackageName());
+        appAppmetaDTO.setPath(model.getPath());
+        appAppmetaDTO.setVersion(model.getId().getVersion());
+        appAppmetaDTO.setWeburl(model.getAppUrl());
+        dto.setAppmeta(appAppmetaDTO);
+
+        dto.setIcon(model.getIcon());
+        dto.setAppType(model.getAppType());
+        dto.setMediaType(model.getMediaType());
+        dto.setRecentChanges(model.getRecentChanges());
+        dto.setCreatedTime(model.getCreatedTime());
+
+
         return dto;
     }
 
@@ -222,7 +248,7 @@ public class APPMappingUtil {
         mobileAppModel.setDisplayName(dto.getDisplayName());
         mobileAppModel.setDescription(dto.getDescription());
         mobileAppModel.setAppVersion(appAppmetaDTO.getVersion());
-        mobileAppModel.setVisibility(dto.getVisibleRoles());
+        mobileAppModel.setAppVisibility(dto.getVisibleRoles());
         mobileAppModel.setAppProvider(dto.getProvider());
         mobileAppModel.setPlatform(dto.getPlatform());
         mobileAppModel.setAppVersion(dto.getVersion());
@@ -231,10 +257,10 @@ public class APPMappingUtil {
         mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
         mobileAppModel.setPlatform(dto.getPlatform());
         mobileAppModel.setMarketType(dto.getMarketType());
-        if("webapp".equals(dto.getPlatform())){
+        if ("webapp".equals(dto.getPlatform())) {
             mobileAppModel.setAppUrl(appAppmetaDTO.getWeburl());
 
-        }else {
+        } else {
             mobileAppModel.setAppUrl(appAppmetaDTO.getPath());
         }
         mobileAppModel.setAppUrl(appAppmetaDTO.getPath());

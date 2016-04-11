@@ -728,17 +728,16 @@
                             "example": "http://sample.com"
                         }
                     }
-
                 },
-                "marketType":{
-                    "type" : "string",
-                    "example" : "enterprise,"
+                "marketType": {
+                    "type": "string",
+                    "example": "enterprise,"
                 },
-                "recentChanges":{
-                    "type" : "string",
-                    "example" : "Upgraded"
+                "recentChanges": {
+                    "type": "string",
+                    "example": "Upgraded"
                 },
-                "icon":{
+                "icon": {
                     "description": "the image icon of the application\n",
                     "type": "string",
                     "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG"
@@ -836,11 +835,6 @@
                     "type": "string",
                     "example": "1.0"
                 },
-                "packagename": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "home.jmstudios.calc"
-                },
                 "category": {
                     "description": "category of the asset\n",
                     "type": "string",
@@ -857,7 +851,11 @@
                     "items": {
                         "type": "string"
                     },
-                    "example": ["/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg","/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG","/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"]
+                    "example": [
+                        "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg",
+                        "/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG",
+                        "/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
+                    ]
                 },
                 "banner": {
                     "description": "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n",
@@ -872,12 +870,37 @@
                 "platform": {
                     "description": "platform of the asset\n",
                     "type": "string",
-                    "example": "andoid"
+                    "example": "android"
+                },
+                "appType": {
+                    "description": "mobile app type (eg: webapp/ios/android)",
+                    "type": "string",
+                    "example": "android"
+                },
+                "mediaType": {
+                    "description": "media yype",
+                    "type": "string",
+                    "example": "application/vnd.wso2-mobileapp+xml"
+                },
+                "path": {
+                    "description": "path of asset",
+                    "type": "string",
+                    "example": "/_system/governance/mobileapps/admin/webapp/m1/1"
+                },
+                "recentChanges": {
+                    "description": "recent changes",
+                    "type": "string",
+                    "example": "update details"
                 },
                 "lifecycleAvailableActions": {
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "createdTime": {
+                    "description": "asset created timestamp",
+                    "type": "string",
+                    "example": "00000001459919490157"
                 }
             }
         },

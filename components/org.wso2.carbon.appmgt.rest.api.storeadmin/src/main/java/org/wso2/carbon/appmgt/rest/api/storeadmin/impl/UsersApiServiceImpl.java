@@ -1,6 +1,7 @@
 package org.wso2.carbon.appmgt.rest.api.storeadmin.impl;
 
 import org.json.simple.JSONArray;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.UsersApiService;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -21,7 +22,10 @@ public class UsersApiServiceImpl extends UsersApiService {
         String[] userNames = null;
 
         try {
-            UserRealm realm = realmService.getTenantUserRealm(-1234);
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
             UserStoreManager manager = realm.getUserStoreManager();
             userNames = manager.listUsers("", -1);
             if (userNames == null) {

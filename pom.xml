@@ -778,6 +778,8 @@
 
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
+
+        <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
     </properties>
 
 </project>

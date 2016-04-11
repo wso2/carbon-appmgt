@@ -24,7 +24,7 @@ public class DeviceListDTO  {
   private String previous = null;
   
   
-  private List<DeviceInfoDTO> list = new ArrayList<DeviceInfoDTO>();
+  private List<DeviceInfoDTO> deviceList = new ArrayList<DeviceInfoDTO>();
 
   
   /**
@@ -69,12 +69,12 @@ public class DeviceListDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("list")
-  public List<DeviceInfoDTO> getList() {
-    return list;
+  @JsonProperty("deviceList")
+  public List<DeviceInfoDTO> getDeviceList() {
+    return deviceList;
   }
-  public void setList(List<DeviceInfoDTO> list) {
-    this.list = list;
+  public void setDeviceList(List<DeviceInfoDTO> deviceList) {
+    this.deviceList = deviceList;
   }
 
   
@@ -87,7 +87,7 @@ public class DeviceListDTO  {
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  list: ").append(list).append("\n");
+    sb.append("  deviceList: ").append(deviceList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

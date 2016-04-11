@@ -36,7 +36,6 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.publisher.ApiResponseMessage;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
@@ -171,13 +170,13 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
                     !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
-                return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
+                RestApiUtil.handleBadRequest(errorMessage, log);
             }
 
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.API_NAME;
+            String searchType = AppMConstants.SEARCH_CONTENT_NAME;
             String searchContent = "";
             if (!StringUtils.isBlank(query)) {
                 String[] querySplit = query.split(":");
@@ -273,6 +272,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO apiToReturn;
         try {
+            //currently supports only mobile apps
+            if (!appType.equals("mobileapp")) {
+                String errorMessage = "Type not supported.";
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";
@@ -280,9 +284,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                                                  appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
-                RestApiUtil.buildNotFoundException(errorMessage, appId);
+                RestApiUtil.handleBadRequest(errorMessage, log);
             }
             WebApp webApp = allMatchedApps.get(0);
+            webApp.setType(appType);
             apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
             return Response.ok().entity(apiToReturn).build();
         } catch (AppManagementException e) {
