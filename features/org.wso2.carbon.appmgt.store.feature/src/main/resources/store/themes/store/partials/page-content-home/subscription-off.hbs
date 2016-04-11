@@ -2,7 +2,9 @@
     {{#each assets}}
         <div id="app-tile-{{id}}" class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
             <div class="app-tile">
-                <a href="{{accessUrl}}" class="hover-overlay-container accessUrl">
+                <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
+                   data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
+                   data-context="{{attributes.overview_context}}" data-stats="usage" class="hover-overlay-container">
                     <div class="ratio-responsive-4by3">
                         {{> ribbons/favorite}}
                         {{#if defaultThumbnail}}
