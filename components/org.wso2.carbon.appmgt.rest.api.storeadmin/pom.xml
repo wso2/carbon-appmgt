@@ -182,12 +182,4 @@
         </plugins>
     </build>
 
-    <properties>
-        <cxf.version>3.1.4</cxf.version>
-        <swagger-jaxrs.version>1.5.2</swagger-jaxrs.version>
-        <hibernate-validator.version>5.0.2.Final</hibernate-validator.version>
-        <junit.version>4.12</junit.version>
-        <spring-web.version>4.1.6.RELEASE</spring-web.version>
-    </properties>
-
 </project>
