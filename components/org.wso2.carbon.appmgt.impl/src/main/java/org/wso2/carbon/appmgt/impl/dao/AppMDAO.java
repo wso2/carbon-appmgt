@@ -5371,7 +5371,7 @@ public class AppMDAO {
                                                                      new String[]{"ENTITLEMENT_POLICY_PARTIAL_ID"});
             if ((keysArray.length > 1 && valuesArray.length > 1) && (keysArray.length == valuesArray.length)) {
                 for (int i = 1; i < keysArray.length; i++) {
-                    if (keysArray[i] != null && keysArray[i] != "") {
+                    if (keysArray[i] != null && !keysArray[i].isEmpty()) {
                         statementToInsertRecordTwo.setInt(1, ownerID);
                         statementToInsertRecordTwo.setString(2, keysArray[i]);
                         statementToInsertRecordTwo.setString(3, valuesArray[i]);
