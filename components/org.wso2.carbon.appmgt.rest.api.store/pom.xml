@@ -104,25 +104,24 @@
 
 
 
-        <!--   need to remove when deploying-->
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <!-- dependencies to annotations -->
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-codegen</artifactId>
-            <version>2.1.4</version>
-        </dependency>
-        <!--   need to remove when deploying-->
+        <!--   Uncomment when needed to generate swagger based skeleton
+       <dependency>
+           <groupId>org.apache.maven</groupId>
+           <artifactId>maven-plugin-api</artifactId>
+           <version>2.0</version>
+       </dependency>
+       <dependency>
+           <groupId>org.apache.maven.plugin-tools</groupId>
+           <artifactId>maven-plugin-annotations</artifactId>
+           <version>3.4</version>
+           <scope>provided</scope>
+       </dependency>
+       <dependency>
+           <groupId>io.swagger</groupId>
+           <artifactId>swagger-codegen</artifactId>
+           <version>2.1.4</version>
+       </dependency>
+       -->
 
     </dependencies>
 
@@ -183,16 +182,16 @@
             </plugin>
 
 
-            <!--   need to remove when deploying-->
-            <plugin>
-                <groupId>org.wso2.maven.plugins</groupId>
-                <artifactId>swagger2cxf-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <configuration>
-                    <inputSpec>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_rest_api/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.store/src/main/resources/store-api.yaml</inputSpec>
-                </configuration>
-            </plugin>
-            <!--   need to remove when deploying-->
+            <!--   Uncomment when needed to generate swagger based skeleton
+           <plugin>
+               <groupId>org.wso2.maven.plugins</groupId>
+               <artifactId>swagger2cxf-maven-plugin</artifactId>
+               <version>1.0-SNAPSHOT</version>
+               <configuration>
+                   <inputSpec>$(basePath)/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.store/src/main/resources/store-api.yaml</inputSpec>
+               </configuration>
+           </plugin>
+            -->
 
         </plugins>
     </build>
