@@ -1,12 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -31,9 +31,6 @@ public class AppDTO  {
   
   
   private String recentChanges = null;
-  
-  
-  private String visibility = null;
   
   
   private String icon = null;
@@ -90,9 +87,6 @@ public class AppDTO  {
   private String bundleversion = null;
   
   
-  private String packagename = null;
-  
-  
   private String category = null;
   
   
@@ -111,7 +105,16 @@ public class AppDTO  {
   private String platform = null;
   
   
+  private String appType = null;
+  
+  
+  private String mediaType = null;
+  
+  
   private String lifecycleAvailableActions = null;
+  
+  
+  private String createdTime = null;
 
   
   /**
@@ -177,26 +180,15 @@ public class AppDTO  {
 
   
   /**
+   * recent changes
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(value = "recent changes")
   @JsonProperty("recentChanges")
   public String getRecentChanges() {
     return recentChanges;
   }
   public void setRecentChanges(String recentChanges) {
     this.recentChanges = recentChanges;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("visibility")
-  public String getVisibility() {
-    return visibility;
-  }
-  public void setVisibility(String visibility) {
-    this.visibility = visibility;
   }
 
   
@@ -350,9 +342,9 @@ public class AppDTO  {
 
   
   /**
-   * Registry path of the asset
+   * path of asset
    **/
-  @ApiModelProperty(value = "Registry path of the asset")
+  @ApiModelProperty(value = "path of asset")
   @JsonProperty("path")
   public String getPath() {
     return path;
@@ -424,19 +416,6 @@ public class AppDTO  {
   }
   public void setBundleversion(String bundleversion) {
     this.bundleversion = bundleversion;
-  }
-
-  
-  /**
-   * packagename of the asset
-   **/
-  @ApiModelProperty(value = "packagename of the asset")
-  @JsonProperty("packagename")
-  public String getPackagename() {
-    return packagename;
-  }
-  public void setPackagename(String packagename) {
-    this.packagename = packagename;
   }
 
   
@@ -519,6 +498,32 @@ public class AppDTO  {
 
   
   /**
+   * mobile app type (eg: webapp/ios/android)
+   **/
+  @ApiModelProperty(value = "mobile app type (eg: webapp/ios/android)")
+  @JsonProperty("appType")
+  public String getAppType() {
+    return appType;
+  }
+  public void setAppType(String appType) {
+    this.appType = appType;
+  }
+
+  
+  /**
+   * media yype
+   **/
+  @ApiModelProperty(value = "media yype")
+  @JsonProperty("mediaType")
+  public String getMediaType() {
+    return mediaType;
+  }
+  public void setMediaType(String mediaType) {
+    this.mediaType = mediaType;
+  }
+
+  
+  /**
    * platform of the asset
    **/
   @ApiModelProperty(value = "platform of the asset")
@@ -528,6 +533,19 @@ public class AppDTO  {
   }
   public void setLifecycleAvailableActions(String lifecycleAvailableActions) {
     this.lifecycleAvailableActions = lifecycleAvailableActions;
+  }
+
+  
+  /**
+   * asset created timestamp
+   **/
+  @ApiModelProperty(value = "asset created timestamp")
+  @JsonProperty("createdTime")
+  public String getCreatedTime() {
+    return createdTime;
+  }
+  public void setCreatedTime(String createdTime) {
+    this.createdTime = createdTime;
   }
 
   
@@ -543,7 +561,6 @@ public class AppDTO  {
     sb.append("  appmeta: ").append(appmeta).append("\n");
     sb.append("  marketType: ").append(marketType).append("\n");
     sb.append("  recentChanges: ").append(recentChanges).append("\n");
-    sb.append("  visibility: ").append(visibility).append("\n");
     sb.append("  icon: ").append(icon).append("\n");
     sb.append("  isSite: ").append(isSite).append("\n");
     sb.append("  description: ").append(description).append("\n");
@@ -562,14 +579,16 @@ public class AppDTO  {
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
     sb.append("  appUrL: ").append(appUrL).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
-    sb.append("  packagename: ").append(packagename).append("\n");
     sb.append("  category: ").append(category).append("\n");
     sb.append("  displayName: ").append(displayName).append("\n");
     sb.append("  screenshots: ").append(screenshots).append("\n");
     sb.append("  banner: ").append(banner).append("\n");
     sb.append("  createdtime: ").append(createdtime).append("\n");
     sb.append("  platform: ").append(platform).append("\n");
+    sb.append("  appType: ").append(appType).append("\n");
+    sb.append("  mediaType: ").append(mediaType).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
+    sb.append("  createdTime: ").append(createdTime).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

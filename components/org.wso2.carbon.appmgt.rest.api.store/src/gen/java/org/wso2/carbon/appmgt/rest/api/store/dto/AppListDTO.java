@@ -24,7 +24,7 @@ public class AppListDTO  {
   private String previous = null;
   
   
-  private List<AppInfoDTO> list = new ArrayList<AppInfoDTO>();
+  private List<AppInfoDTO> appList = new ArrayList<AppInfoDTO>();
 
   
   /**
@@ -69,12 +69,12 @@ public class AppListDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("list")
-  public List<AppInfoDTO> getList() {
-    return list;
+  @JsonProperty("appList")
+  public List<AppInfoDTO> getAppList() {
+    return appList;
   }
-  public void setList(List<AppInfoDTO> list) {
-    this.list = list;
+  public void setAppList(List<AppInfoDTO> appList) {
+    this.appList = appList;
   }
 
   
@@ -87,7 +87,7 @@ public class AppListDTO  {
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  list: ").append(list).append("\n");
+    sb.append("  appList: ").append(appList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

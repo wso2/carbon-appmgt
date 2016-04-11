@@ -37,7 +37,7 @@ public class APPMappingUtil {
         Resource resource = null;
         try {
             resource = registry.get(path);
-        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+        } catch (RegistryException e) {
             log.error("RegistryException occurred", e);
         }
         if (resource == null) {

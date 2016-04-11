@@ -37,9 +37,13 @@ import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorExcepti
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.PreconditionFailedException;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
@@ -354,6 +358,38 @@ public class RestApiUtil {
             throw new AppManagementException(errorMessage, e);
         } finally {
             IOUtils.closeQuietly(outFileStream);
+        }
+    }
+
+    public static boolean isExistingUser(String username) {
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            return manager.isExistingUser(username);
+        } catch (UserStoreException e) {
+            log.error(e);
+            return false;
+        }
+    }
+
+    public static boolean isExistingRole(String roleName) {
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            return manager.isExistingRole(roleName);
+        } catch (UserStoreException e) {
+            log.error(e);
+            return false;
         }
     }
 }

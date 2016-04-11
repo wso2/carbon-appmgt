@@ -21,10 +21,10 @@ public class DeviceMappingUtil {
      */
     public static DeviceListDTO fromAPIListToDTO(List<DeviceInfoDTO> deviceList, int offset, int limit) {
         DeviceListDTO deviceListDTO = new DeviceListDTO();
-        List<DeviceInfoDTO> deviceInfoDTOs = deviceListDTO.getList();
+        List<DeviceInfoDTO> deviceInfoDTOs = deviceListDTO.getDeviceList();
         if (deviceInfoDTOs == null) {
             deviceInfoDTOs = new ArrayList<>();
-            deviceListDTO.setList(deviceInfoDTOs);
+            deviceListDTO.setDeviceList(deviceInfoDTOs);
         }
 
         //add the required range of objects to be returned

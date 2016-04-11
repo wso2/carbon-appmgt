@@ -1816,7 +1816,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 String apiArtifactId = resource.getUUID();
                 if (apiArtifactId != null) {
                     GenericArtifact apiArtifact = artifactManager.getGenericArtifact(apiArtifactId);
-                    apiSortedList.add(AppManagerUtil.getAPI(apiArtifact, registry));
+                    apiSortedList.add(AppManagerUtil.getGenericApp(apiArtifact, registry));
                 } else {
                     throw new GovernanceException("artifact id is null of " + apiPath);
                 }

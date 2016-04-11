@@ -47,14 +47,14 @@ public class MobileApp {
     private APIStatus lifecycleStatus;
     private List<String> screenShots;
     private String appUrl;
-    private List<String> visibility;
+    private List<String> appVisibility;
 
-    public List<String> getVisibility() {
-        return visibility;
+    public List<String> getAppVisibility() {
+        return appVisibility;
     }
 
-    public void setVisibility(List<String> visibility) {
-        this.visibility = visibility;
+    public void setAppVisibility(List<String> visibility) {
+        this.appVisibility = visibility;
     }
 
     public String getAppUrl() {
