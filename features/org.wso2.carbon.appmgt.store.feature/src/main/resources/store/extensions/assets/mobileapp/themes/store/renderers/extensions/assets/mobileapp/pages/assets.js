@@ -58,7 +58,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Mobile Apps",
+                    title: "Mobile Apps",
                     sorting: createSortOptions(data)
                 }
             }
@@ -91,17 +91,44 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
-        {
-            active: true, partial: 'all-apps', url: "/assets/mobileapp"
+    var enabledTypeList = data.config.enabledTypeList;
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var currentAppType = 'mobileapp';
+    var leftNavigationData = [];
+
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
         }
-    ];
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
 
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            var data;
+            if (subscriptionOn) {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                     enabledTypeList[i]
+                }
+            } else {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                     enabledTypeList[i] + "/apps"
+                }
+            }
+            leftNavigationData.push(data);
+        }
 
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-apps', url: "/extensions/assets/mobileapp/subscriptions"
-                                });
     }
     return leftNavigationData;
 }

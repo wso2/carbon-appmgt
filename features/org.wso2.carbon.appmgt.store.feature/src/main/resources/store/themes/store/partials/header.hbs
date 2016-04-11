@@ -1,8 +1,9 @@
 {{!-- header --}}
 <header class="header header-default">
-    <input type="hidden" value="{{storeTenantDomain}}" id="store-tenant-domain"/>
+    <input type="hidden" value="{{storeTenantDomain}}" id="store-tenant-domain" />
     <input type="hidden" name="tenant-store" id="user-tenant-id" value="{{user.tenantId}}">
     <input type="hidden" name="tenant-store" id="user-name" value="{{user.username}}">
+
     <div class="container-fluid">
         <div class="brand pull-left float-remove-xs text-center-xs">
             <a href="{{url "/"}}">
@@ -67,31 +68,23 @@
                                 <li><a href="{{url "/"}}">Public Store</a></li>
                             </ul>
                         </li>
-                    {{/if}}
+                    {{else}}
 
-                    {{#each enabledTypeList}}
-                        {{#ifCond this "==" "webapp"}}
-                            <li class="{{#ifCond ../../assetType "==" "webapp"}}active{{/ifCond}}">
-                                <a href="{{tenantedUrl "/extensions/assets/webapp/myapps"}}">
-                                    <span class="icon add-margin-right-1x"><i class="fw fw-web-app fw-lg"></i></span>Web Apps
-                                </a>
-                            </li>
-                        {{/ifCond}}
-                        {{#ifCond this "==" "mobileapp"}}
-                            <li class="{{#ifCond ../../assetType "==" "mobileapp"}}active{{/ifCond}}">
-                                <a href="{{tenantedUrl "/assets/mobileapp"}}">
-                                    <span class="icon add-margin-right-1x"><i class="fw fw-mobile fw-lg"></i></span>Mobile apps
-                                </a>
-                            </li>
-                        {{/ifCond}}
-                        {{#ifCond this "==" "site"}}
-                            <li class="{{#ifCond ../../assetType "==" "site"}}active{{/ifCond}}">
-                                <a href="{{tenantedUrl "/extensions/assets/site/myapps"}}">
-                                    <span class="icon add-margin-right-1x"><i class="fw fw-globe fw-lg"></i></span>Sites
-                                </a>
-                            </li>
-                        {{/ifCond}}
-                    {{/each}}
+                    <li class="{{#ifCond active "==" "store" }}active{{/ifCond}}">
+                        <a href="{{tenantedUrl "/assets/"}}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-organization fw-lg"></i></span>Store
+                        </a>
+                    </li>
+                    {{/if}}
+                    {{#if user}}
+                        {{#unless hideFavouriteMenu}}
+                    <li class="{{#ifCond active "==" "favourite" }}active{{/ifCond}}">
+                        <a href="{{tenantedUrl "/assets/favourite"}}">
+                            <span class="icon add-margin-right-1x"><i class="fw fw-heart fw-lg"></i></span>Favourites
+                        </a>
+                    </li>
+                        {{/unless}}
+                    {{/if}}
                 </ul>
             </div>
         </div>

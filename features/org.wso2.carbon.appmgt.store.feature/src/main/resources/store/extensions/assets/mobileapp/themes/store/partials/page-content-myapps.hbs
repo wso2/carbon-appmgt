@@ -1,5 +1,4 @@
 {{!-- page content - mobile apps my subscriptions page --}}
-
 <div class="row">
     {{#if userAssets.mobileapp}}
         {{#itr userAssets}}
@@ -22,9 +21,10 @@
                             </a>
 
                             <div class="summery">
+                                <a href="{{tenantedUrl "/assets/mobileapp"}}{{../../assetType}}/{{id}}">
                                 <h4>{{attributes.overview_displayName}}</h4>
-
-                                <p>{{attributes.overview_provider}}</p>
+                                <h5>{{attributes.overview_version}}</h5>
+                                </a>
 
                                 <div class="app-assets-icon-info">
                                     <i title="{{attributes.overview_platform}}"
@@ -66,7 +66,7 @@
                                                 </a>
                                             </li>
                                         {{/if}}
-                                        {{#if ../../selfUnsubscription}}
+                                        {{#if ../../../selfUnsubscription}}
                                             <li>
                                                 <a class="btn btn-danger asset-unsubscribe-btn" type="{{../key}}"
                                                    data-name="{{attributes.overview_name}}"
@@ -98,7 +98,6 @@
                             <div class="summery">
                                 <h4>{{attributes.overview_displayName}}</h4>
 
-                                <p>{{attributes.overview_provider}}</p>
 
                                 <div class="app-assets-icon-info">
                                     <i title="{{attributes.overview_platform}}"

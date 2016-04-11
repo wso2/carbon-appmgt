@@ -1,6 +1,7 @@
 var render = function (theme, data, meta, require) {
     data.tags.tagUrl = getTagAndSearchUrl(data).tagUrl;
     var searchUrl = getTagAndSearchUrl(data).searchUrl;
+    data.header.active = 'favourite';
 
     theme('2-column-left', {
         title: data.title,
@@ -16,22 +17,16 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: data.recentAssets,
-                    assetType: data.assetType
+                    assetType: data.assetType,
+                    myFavPage: true
                 }
-            }
-        ],
-        search: [
-            {
-                partial: 'search',
-                context: {searchQuery:data.search.query,searchUrl:searchUrl}
             }
         ],
         pageHeader: [
             {
                 partial: 'page-header',
                 context: {
-                    title: "Favourite Apps",
+                    title: "Favourites",
                     sorting: createSortOptions(data),
                     myFav: true,
                     isHomePage: data.isHomePage
@@ -52,7 +47,7 @@ function createSortOptions(data) {
     if (data.favouriteApps && data.favouriteApps.length == 0) {
         return sortOptions;
     }
-    var url = "/assets/favouriteapps?type=" + data.assetType + "&sort=";
+    var url = "/assets/favourite?type=" + data.assetType + "&sort=";
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
     var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
     var options = [];
@@ -63,24 +58,36 @@ function createSortOptions(data) {
 }
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
-    var leftNavigationData = [
-        {
-            active: true, partial: 'my-favorites', url: "/assets/favouriteapps?type=" + data.assetType
-        }
-    ];
-
-    leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: "/extensions/assets/" + data.assetType
-            + "/myapps"
-                            });
-
-    if (data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url: "/assets/" + data.assetType
-                                });
+    var enabledTypeList = data.config.enabledTypeList;
+    var leftNavigationData = [];
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
     }
+    for (var i = 0; i < enabledTypeList.length; i++) {
 
+        if (subscriptionOn) {
+            leftNavigationData.push({
+                                        active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                         enabledTypeList[i]
+                                    });
+        } else {
+            if (enabledTypeList[i] == 'mobileapp') {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                             enabledTypeList[i]
+                                        });
+            } else {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                             enabledTypeList[i]
+                        + "/apps"
+                                        });
+            }
+
+        }
+
+    }
     return leftNavigationData;
 }
 
@@ -91,18 +98,18 @@ function getTagAndSearchUrl(data) {
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
         if (data.assetType == "webapp") {
             URLs.tagUrl = '/extensions/assets/webapp/myapps';
-            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
+            URLs.searchUrl = '/assets/favourite?type=webapp';
         } else {
             URLs.tagUrl = '/extensions/assets/site/myapps';
-            URLs.searchUrl = '/assets/favouriteapps?type=site';
+            URLs.searchUrl = '/assets/favourite?type=site';
         }
     } else {
         if (data.assetType == "webapp") {
             URLs.tagUrl = '/assets/webapp';
-            URLs.searchUrl = '/assets/favouriteapps?type=webapp';
+            URLs.searchUrl = '/assets/favourite?type=webapp';
         } else {
             URLs.tagUrl = '/assets/site';
-            URLs.searchUrl = '/assets/favouriteapps?type=site';
+            URLs.searchUrl = '/assets/favourite?type=site';
         }
     }
     return URLs;

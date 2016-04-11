@@ -4,6 +4,7 @@ var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
+var ownerName = null;
 var log = new Log();
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
@@ -61,7 +62,11 @@ require('/modules/store.js').exec(function (ctx) {
     var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
 
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSite = 'false';//To get the webapp tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -154,7 +159,6 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             asset.rating = 0.0;
         }
-
         //check asset LC state
         //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
         //}
@@ -211,8 +215,12 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+
             businessOwner = storeHostObj.getBusinessOwner(asset.id);
-            businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+            if(businessOwner.owner_name != null) {
+                businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+                ownerName = businessOwner[1].value;
+            }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {
@@ -220,7 +228,6 @@ require('/modules/store.js').exec(function (ctx) {
                     break;
                 }
             }
-            //logg.getOwner();
             return assetsFromProvider;
         }
 
@@ -390,10 +397,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         var availableTiers = apiInfoManager.getTiers();
 
-        // user=authenticator.getLoggedInUser();
-
-        var subscriptionInfo = getSubscriptionInfo(asset);
-
+        var subscriptionInfo;
 
         var isEnterpriseSubscriptionAllowed = false;
 
@@ -406,6 +410,7 @@ require('/modules/store.js').exec(function (ctx) {
         if (user) {
             if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 navigationData.showAllAppsLink = false;
+                tagUrl = context + '/extensions/assets/webapp/myapps';
             } else if (isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
                 subscriptionInfo = getSubscriptionInfo(asset);
             } else {
@@ -418,7 +423,7 @@ require('/modules/store.js').exec(function (ctx) {
             isFavourite = isFavouriteApp(asset);
         }
 
-        if (subscriptionInfo.individualSubscription) {
+        if (subscriptionInfo && subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
                 isSubscribed = true;
                 subscriptionInfo.individualSubscription["OnHold"] = false;
@@ -531,7 +536,12 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
+<<<<<<< HEAD
+                   tagUrl: tagUrl,
                    data: store.tags(type, isSite)
+=======
+                   data: {allTags: store.tags(type, isSite), searchedTag: ""}
+>>>>>>> upstream/master
             },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,
@@ -540,18 +550,14 @@ require('/modules/store.js').exec(function (ctx) {
             apiData: apiData,
             metadata: metadata,
             isSubscriptionAvailable: isSubscriptionAvailable,
-<<<<<<< HEAD
-            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-            businessOwner: businessOwner,
-            ownerName: businessOwner[1].value
-=======
             config: {
                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList: enabledTypeList
             },
-            assetType : 'webapp'
->>>>>>> upstream/master
+            assetType : 'webapp',
+	        businessOwner: businessOwner,
+            ownerName: ownerName
         });
     }
 

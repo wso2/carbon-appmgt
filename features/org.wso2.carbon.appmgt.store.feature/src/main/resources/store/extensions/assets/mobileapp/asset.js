@@ -14,8 +14,8 @@ var assetLinks = function (user) {
                 path: 'process.jag'
             },
             {
-                title:'Subscriptions',
-                url:'subscriptions',
+                title:'My Apps',
+                url:'myapps',
                 path:'subscriptions.jag'
             }
         ]};

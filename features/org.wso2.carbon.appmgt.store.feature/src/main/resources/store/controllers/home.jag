@@ -1,0 +1,295 @@
+<%
+var caramel;
+var customType;
+
+include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+
+require('/modules/store.js').exec(function (ctx) {
+    var paging,  manager, assets, length,
+            log = ctx.log,
+            query = ctx.params.query,
+            tag = ctx.params.tag,
+            sso = ctx.sso,
+            store = ctx.store,
+            user = ctx.user,
+            storeTenantDomain = ctx.tenant.domain,
+            site = ctx.site,
+            items = [],
+            popularItems = [],
+            recentItems = [],
+            types = store.assetTypes(),
+            search = require('/modules/search.js'),
+            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
+    caramel = require('caramel');
+
+
+    var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(storeTenantDomain));
+    var subscriptionUtil = require('/themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionUtil.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionUtil.isEnterpriseSubscriptionEnabled();
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+
+    var navigationData = {
+        showAllAppsLink: true
+    };
+    //if both subscriptions off no need to show the link for all apps,
+    //because all apps will be displayed in myapps page.
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        navigationData.showAllAppsLink = false;
+    }
+
+    var subscriptionService;
+    if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+        // Init subscription service.
+        var subscriptionServiceModule = require('/extensions/assets/webapp/services/subscription.js').serviceModule;
+        subscriptionService = new subscriptionServiceModule.SubscriptionService();
+        subscriptionService.init(jagg, session);
+    }
+
+    paging = store.assetsPaging(request);
+    query = query ? search.build(String(query)) : null;
+
+    var SITE_TYPE = 'site';
+    var WEBAPP_TYPE = 'webapp';
+    var MOBILEAPP_TYPE = 'mobileapp';
+    var siteAttribute;
+    var tags=[];
+
+    types.forEach(function (type) {
+        if(!storeHostObj.isAssetTypeEnabled(type)) {
+            return
+        }
+        //Assign requested asset type to the customType. If the requested type is 'site' then set the type variable as
+        //'webapp', since we used the 'webapp' rxt for the 'site' publishing in the publisher side.
+        customType = type;
+        if (type == SITE_TYPE) {
+            type = WEBAPP_TYPE;
+        }
+        manager = store.rxtManager(customType, session);
+
+        var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
+        if (log.isDebugEnabled()) {
+            log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
+        }
+        if (query) {
+            assets = store.search({
+                                      attributes: query,
+                                      tag: tag,
+                                      type: type
+                                  }, paging);
+        } else if (tag) {
+            var options = {}
+            if(type == WEBAPP_TYPE){
+                var SITE_QUERY = {};
+                SITE_QUERY.overview_treatAsASite = (customType==SITE_TYPE) ? "TRUE": "FALSE";
+                if (!isMultipleVersionDisplayEnabled) {
+                    SITE_QUERY.overview_makeAsDefaultVersion = "true"
+                }
+                options.attributes = SITE_QUERY;
+            }
+            options.tag = tag;
+            options.type = type;
+            options.lifecycleState = ["published"];
+            assets = store.taggeds(type, options, paging);
+        } else {
+            if (customType == MOBILEAPP_TYPE) {
+                assets = store.assets(customType, paging);
+            } else {
+                if (customType == SITE_TYPE) {
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "TRUE"};
+                    } else {
+                        siteAttribute = {
+                            //if multiple versions to be displayed do consider default version
+                            "overview_treatAsASite": "TRUE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
+                } else if (customType == WEBAPP_TYPE) {
+                    if (isMultipleVersionDisplayEnabled) {
+                        //if multiple versions to be displayed don't consider default version
+                        siteAttribute = {"overview_treatAsASite": "FALSE"};
+                    } else {
+                        //if multiple versions to be displayed do consider default version
+                        siteAttribute = {
+                            "overview_treatAsASite": "FALSE",
+                            "overview_makeAsDefaultVersion": "true"
+                        };
+                    }
+                }
+                var siteOption = {
+                    type: type,
+                    attributes: siteAttribute
+                };
+                assets = store.search(siteOption, paging);
+            }
+        }
+
+
+        assets.forEach(function (asset) {
+
+            //set rating
+            if (JSON.parse(social.getRating(type + ":" + asset.id))) {
+                asset.rating = Math.floor(JSON.parse(social.getRating(type + ":" + asset.id)).rating);
+            } else {
+                asset.rating = 0;
+            }
+            if (type == WEBAPP_TYPE) {
+                // set default thumbnail
+                setDefaultThumbnail(asset);
+
+                //check app is favourite or not
+                if(user) {
+                    if (isFavouriteApp(asset.attributes.overview_name, asset.attributes.overview_version,
+                                       asset.attributes.overview_provider, user, storeTenantDomain)) {
+                        asset.isFavourite = true;
+                    }
+                }
+
+
+                if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+                    //Set access URL
+                    //set direct app access url
+                    if (asset.attributes.overview_skipGateway.toLowerCase() == "false") {
+                        //Get the gateway url
+                        var APIInformationService = require('/extensions/assets/webapp/services/api-information.js').serviceModule;
+                        var apiInfoManager = new APIInformationService.APIInformationService();
+                        apiInfoManager.init(jagg, session);
+                        var appData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
+                                                                       asset.attributes.overview_name,
+                                                                       asset.attributes.overview_version);
+                        asset.accessUrl = appData.serverURL.productionURL;
+                    } else {
+                        //Get the direct webapp url
+                        asset.accessUrl = asset.attributes.overview_webAppUrl;
+                    }
+                } else {
+                    //check app is subscribed or not
+                    if(user) {
+                        asset.isSubscribed = isSubscribed(asset,user,subscriptionService);
+                    }
+                }
+            }
+        });
+
+
+        items.push({
+                       assets: assets,
+                       plural: manager.pluralLabel,
+                       singular: manager.singularLabel,
+                       type: manager.shortName
+                   });
+
+        //Get tags
+        var tempTags = [];
+        if (customType == SITE_TYPE) {
+            tempTags = store.tags(type, 'true')
+        } else if (customType == WEBAPP_TYPE) {
+            tempTags = store.tags(type, 'false')
+        }
+        else if (type = MOBILEAPP_TYPE) {
+            tempTags = store.tags(type)
+        }
+        tags = tags.concat(tempTags);
+    });
+
+    //remove duplicate elements from tags
+    if (types.length > 0) {
+        var tags = tags.reduce(function (a, b) {
+            function indexOfProperty(a, b) {
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i].name == b.name) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+
+            if (indexOfProperty(a, b) < 0) a.push(b);
+            return a;
+        }, []);
+    }
+
+    caramel.render({
+                       title: 'Apps | Store',
+                       header: {
+                           user: user,
+                           sso: sso,
+                           storeTenantDomain: storeTenantDomain,
+                           enabledTypeList: enabledTypeList,
+                           isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
+                       },
+                       tags: {
+                           data: {allTags: tags, searchedTag: tag}
+                       },
+                       config: {
+                           isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                           enabledTypeList: enabledTypeList
+                       },
+                       navigation: navigationData,
+                       topAssets: {
+                           assets: items,
+                           popularAssets: popularItems
+                       },
+                       recentAssets: recentItems
+                   });
+}, request, response, session);
+
+function getServiceDir(serviceName) {
+    return '/extensions/assets/webapp/services/' + serviceName;
+}
+
+/**
+ * Sets the default thumbnail of the specified asset.
+ * @param asset {Object} asset
+ */
+function setDefaultThumbnail(asset) {
+    var assetThumbnail = asset.attributes.images_thumbnail;
+    if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
+        asset.defaultThumbnail = storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+    }
+}
+
+/**
+ * Checks whether given app is already selected as favourite app by user or not.
+ * @param appName App Name
+ * @param version App Version
+ * @param provider App Provider
+ * @returns {boolean} true if favouirte app of user else false
+ */
+function isFavouriteApp(appName, version, provider, user, storeTenantDomain) {
+    var status = false;
+    if (user) {
+        // check whether this is favourite app of user.
+        status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+                                        storeTenantDomain).status;
+    }
+    return status;
+};
+
+/**
+ * Checks whether given app is subscribed by user
+ * @param asset
+ * @param user
+ * @returns {boolean}
+ */
+function isSubscribed(asset, user, subscriptionService) {
+    var appInfo = {};
+    appInfo["name"] = asset.attributes.overview_name;
+    appInfo["version"] = asset.attributes.overview_version;
+    appInfo["provider"] = asset.attributes.overview_provider;
+
+    var defaultApplicationName = "DefaultApplication";
+    var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
+                                                                     String(user.username)).subscription;
+    if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
+        return true;
+    }
+    return false;
+}
+%>
