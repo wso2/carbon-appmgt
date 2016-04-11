@@ -1,6 +1,7 @@
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
 import ca.uhn.hl7v2.util.ArrayUtil;
+import com.mchange.v1.util.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +18,7 @@ import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -52,6 +54,18 @@ public class AppsApiServiceImpl extends AppsApiService {
             String appId = install.getAppId();
             Operations mobileOperation = new Operations();
             String action = "install";
+            String[] parameters = null;
+
+            if("user".equals(install.getType())) {
+                parameters[0] = tenantDomainName;
+            }else if("device".equals(install.getType())){
+                parameters = (String[]) install.getDeviceIds();
+                if(parameters == null){
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                }
+            }else{
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
 
             //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
             //TODO:We are prviding a stringified user here
@@ -59,19 +73,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
-            if("user".equals(install.getType())) {
-                appProvider.subscribeMobileApp(username, appId);
-                String[] parameters = new String[1];
-                parameters[0] = tenantDomainName;
-                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
 
-            }else if("device".equals(install.getType())){
-                String[] deviceIds = (String[]) install.getDeviceIds();
-                appProvider.subscribeMobileApp(username, appId);
-                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
-            }else{
-                RestApiUtil.handleBadRequest("Invalid installation type.", log);
-            }
+            appProvider.subscribeMobileApp(username, appId);
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
 
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
@@ -89,13 +93,29 @@ public class AppsApiServiceImpl extends AppsApiService {
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         String username = RestApiUtil.getLoggedInUsername();
         try {
+
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
-            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            int tenantId = 0;
+            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
             Operations mobileOperation = new Operations();
             String action = "uninstall";
+            String[] parameters = null;
+
+            if ("user".equals(install.getType())) {
+                parameters = new String[1];
+                parameters[0] = tenantDomainName;
+            } else if ("device".equals(install.getType())) {
+                parameters = (String[]) install.getDeviceIds();
+                if (parameters == null) {
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
 
             //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
             //TODO:We are prviding a stringified user here
@@ -103,27 +123,21 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("username", tenantUserName);
             user.put("tenantDomain", tenantDomainName);
             user.put("tenantId", tenantId);
-            if("user".equals(install.getType())) {
-                appProvider.unSubscribeMobileApp(username, appId);
-                String[] parameters = new String[1];
-                parameters[0] = tenantDomainName;
-                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
 
-            }else if("device".equals(install.getType())){
-                String[] deviceIds = (String[]) install.getDeviceIds();
-                appProvider.unSubscribeMobileApp(username, appId);
-                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
-            }else{
-                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            boolean isUnSubscribed = appProvider.unSubscribeMobileApp(username, appId);
+            if (!isUnSubscribed) {
+                RestApiUtil.handlePreconditionFailedRequest("Application is not installed yet. Application with id : " + appId +
+                        "must be installed prior to uninstall.", log);
             }
-
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
         } catch (AppManagementException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         } catch (UserStoreException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         } catch (JSONException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         }
+
         return Response.ok().build();
     }
 

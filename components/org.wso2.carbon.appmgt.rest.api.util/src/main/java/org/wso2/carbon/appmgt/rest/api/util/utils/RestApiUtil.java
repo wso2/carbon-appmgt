@@ -35,6 +35,7 @@ import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.PreconditionFailedException;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
@@ -100,6 +101,19 @@ public class RestApiUtil {
     }
 
     /**
+     * Logs the error, builds a BadRequestException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
+     */
+    public static void handlePreconditionFailedRequest(String msg, Log log) throws BadRequestException {
+        PreconditionFailedException preconditionFailedRequest = buildPreconditionFailedRequestException(msg);
+        log.error(msg);
+        throw preconditionFailedRequest;
+    }
+
+    /**
      * Returns a new BadRequestException
      *
      * @param description description of the exception
@@ -108,6 +122,17 @@ public class RestApiUtil {
     public static BadRequestException buildBadRequestException(String description) {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 400l, description);
         return new BadRequestException(errorDTO);
+    }
+
+    /**
+     * Returns a new BadRequestException
+     *
+     * @param description description of the exception
+     * @return a new BadRequestException with the specified details as a response DTO
+     */
+    public static PreconditionFailedException buildPreconditionFailedRequestException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_PRECONDITION_FAILED_MESSAGE_DEFAULT, 412l, description);
+        return new PreconditionFailedException(errorDTO);
     }
 
     /**
