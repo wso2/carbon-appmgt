@@ -280,50 +280,56 @@ require('/modules/store.js').exec(function (ctx) {
 
         }
         else if (paging.sort == 'usage') {
+            var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
             var urlQuery = 'sort=' + paging.sort + '&';
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
-                var getNextassetSet = function () {
+                var getNextAssetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
-
-                    var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                    var offset = paging.start + index;
+                    var result = appMgtDaoObj.getAppsByHitCount(userName, offset, PAGE_SIZE);
                     if (log.isDebugEnabled()) {
                         var recordCount = 0;
                         if (result != null) {
-                            recordCount = result.length;
+                            recordCount = JSON.parse(result).length;
                         }
                         log.debug("Query executed successfully to get the assets hit count. " + recordCount
-                        + " records found");
+                                          + " records found");
                     }
                     index += PAGE_SIZE;
-                    if (result.length > 0) {
+                    if (JSON.parse(result).length > 0) {
                         return JSON.parse(result);
                     } else {
                         return {};
                     }
                 };
-
                 assets = [];
-               var done = false;
-               while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
+                var done = false;
+                while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                     maxTry++;
-                    var result = getNextassetSet();
-                    if (result.length < 12){
+                    var result = [];
+                    if ((paging.start + index) < totalAppCount) {
+                        result = getNextAssetSet();
+                    }
+                    if (result.length < PAGE_SIZE) {
                         done = true;
                     }
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         var aid = String(result[n].UUID);
                         try {
                             var asset = store.asset(type, aid);
-                            asset.indashboard = store.isuserasset(aid, type);
-                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
-                                assets.push(asset);
+                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
+                                    >= 0) {
+                                //filter web apps
+                                if (asset.attributes.overview_treatAsASite != "TRUE") {
+                                    assets.push(asset);
+                                }
                             }
                         } catch (e) {
                             log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                            aid);
+                                     aid);
                         }
                     }
                 }
@@ -340,16 +346,10 @@ require('/modules/store.js').exec(function (ctx) {
     // Else assets should be queried to decide whether there are assets available for the next page.
 
     var nextPageAvailable = false;
-
+    var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
     if(assets.length == PAGE_SIZE) {
-
-        // Get the starting index, offset etc .. of the assumed next page.
-        var nextPage = store.buildNextPage(request,avaliablePages);
-
-        // Query the assets with the assumed 'next page'
-        var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
-        if(nextAssetSet.length > 0){
-          nextPageAvailable = true;
+        if (currentPage < availablePages) {
+            nextPageAvailable = true;
         }
     }
 
