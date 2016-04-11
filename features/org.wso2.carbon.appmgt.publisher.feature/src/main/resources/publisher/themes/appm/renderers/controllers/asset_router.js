@@ -25,6 +25,9 @@ var render=function(theme,data,meta,require){
     var notifications = session.get('notifications');
     var notificationCount = session.get('notificationCount');
     var typeList = apiProvider.getEnabledAssetTypeList();
+    var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+    var appMDAOObj = new appMDAO();
+    var owner_name =  appMDAOObj.getUserName(data.artifact.id);
     //Determine what view to show
     switch(data.op){
 
@@ -36,6 +39,7 @@ var render=function(theme,data,meta,require){
         case 'view':
             var ownerList = data.ownerList;
             data = require('/helpers/view-asset.js').merge(data);
+            data = require('/helpers/addField.js').addField(data, owner_name);
             data.typeList = typeList;
             listPartial = 'view-asset';
             var copyOfData = parse(stringify(data));
@@ -50,7 +54,7 @@ var render=function(theme,data,meta,require){
             break;
         case 'edit':
 
-            data = require('/helpers/view-asset.js').merge(data);
+            data = require('/helpers/addField.js').addField(data, owner_name);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
             if(data.artifact.lifecycleState == "Published"){
                 editEnabled = false;

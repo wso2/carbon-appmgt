@@ -138,9 +138,7 @@ $(document).on("click", "#btn-owner-save", function () {
                    "values": values
                },
                success: function (data) {
-
                    Showalert("Business Owner Saved Successfully", "alert-success", "statusError");
-                   location.reload();
                    location.reload();
                },
                error: function () {
