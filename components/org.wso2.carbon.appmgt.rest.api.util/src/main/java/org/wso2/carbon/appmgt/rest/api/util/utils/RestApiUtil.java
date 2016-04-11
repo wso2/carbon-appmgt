@@ -35,10 +35,15 @@ import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.PreconditionFailedException;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 import org.wso2.carbon.registry.core.secure.AuthorizationFailedException;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
@@ -74,15 +79,12 @@ public class RestApiUtil {
     }
 
     public static APIProvider getLoggedInUserProvider() throws AppManagementException {
-        //need to set user when oauth configuration is implemented
-        String loggedInUser = "admin";//CarbonContext.getThreadLocalCarbonContext().getUsername();
+        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
         return APIManagerFactory.getInstance().getAPIProvider(loggedInUser);
     }
 
     public static String getLoggedInUsername() {
-        //need to set user when oauth configuration is implemented
-        return "admin";
-        // return CarbonContext.getThreadLocalCarbonContext().getUsername();
+        return CarbonContext.getThreadLocalCarbonContext().getUsername();
     }
 
     public static APIProvider getProvider(String username) throws AppManagementException {
@@ -103,6 +105,19 @@ public class RestApiUtil {
     }
 
     /**
+     * Logs the error, builds a BadRequestException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
+     */
+    public static void handlePreconditionFailedRequest(String msg, Log log) throws BadRequestException {
+        PreconditionFailedException preconditionFailedRequest = buildPreconditionFailedRequestException(msg);
+        log.error(msg);
+        throw preconditionFailedRequest;
+    }
+
+    /**
      * Returns a new BadRequestException
      *
      * @param description description of the exception
@@ -111,6 +126,17 @@ public class RestApiUtil {
     public static BadRequestException buildBadRequestException(String description) {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 400l, description);
         return new BadRequestException(errorDTO);
+    }
+
+    /**
+     * Returns a new BadRequestException
+     *
+     * @param description description of the exception
+     * @return a new BadRequestException with the specified details as a response DTO
+     */
+    public static PreconditionFailedException buildPreconditionFailedRequestException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_PRECONDITION_FAILED_MESSAGE_DEFAULT, 412l, description);
+        return new PreconditionFailedException(errorDTO);
     }
 
     /**
@@ -211,9 +237,7 @@ public class RestApiUtil {
     }
 
     public static String getLoggedInUserTenantDomain() {
-        //need to modify after auth change
-        //return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        return "carbon.super";
+        return CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
     }
 
 
@@ -334,6 +358,38 @@ public class RestApiUtil {
             throw new AppManagementException(errorMessage, e);
         } finally {
             IOUtils.closeQuietly(outFileStream);
+        }
+    }
+
+    public static boolean isExistingUser(String username) {
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            return manager.isExistingUser(username);
+        } catch (UserStoreException e) {
+            log.error(e);
+            return false;
+        }
+    }
+
+    public static boolean isExistingRole(String roleName) {
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            return manager.isExistingRole(roleName);
+        } catch (UserStoreException e) {
+            log.error(e);
+            return false;
         }
     }
 }

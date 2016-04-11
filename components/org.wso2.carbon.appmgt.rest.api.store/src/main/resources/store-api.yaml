@@ -325,7 +325,7 @@ definitions:
         type: string
         description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
         example: '/app?limit=1&offset=0&query='
-      list:
+      appList:
         type: array
         items:
           $ref: '#/definitions/AppInfo'
@@ -374,8 +374,19 @@ definitions:
         example: CalculatorApp
       type:
         type: string
-        description: App type (either Webapp/Mobile app
+        description: App type (either Webapp/Mobile app)
         example: 01234567-0123-0123-0123-012345678901
+      marketType:
+        type: string
+        example: 'enterprise,'
+      recentChanges:
+        type: string
+        example: Upgraded
+      icon:
+        description: |
+          the image icon of the application
+        type: string
+        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG'
       isSite:
         type: string
         description: Either a webapp or site
@@ -401,6 +412,9 @@ definitions:
           templates and scopes
         type: string
         example: "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
+      isDefaultVersion:
+        type: boolean
+        example: false
       transport:
         description: |
           Supported transports for the App (http and/or https).
@@ -435,11 +449,6 @@ definitions:
           Bundleversion of the asset
         type: string
         example: '1.0'
-      packagename:
-        description: |
-          packagename of the asset
-        type: string
-        example: home.jmstudios.calc
       category:
         description: |
           category of the asset
@@ -452,14 +461,20 @@ definitions:
         example: testapp1
       screenshots:
         description: |
-          packagename of the asset
-        type: string
+          Screenshots attached to the application
+        type: array
+        items:
+          type: string
         example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
       banner:
         description: |
           /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg
         type: string
         example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+      appType:
+        description: 'mobile app type (eg: webapp/ios/android)'
+        type: string
+        example: android
       createdtime:
         description: |
           createdtime of the asset
@@ -491,7 +506,7 @@ definitions:
         type: string
         description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
         example: '/devices?limit=1&offset=0&query='
-      list:
+      deviceList:
         type: array
         items:
           $ref: '#/definitions/DeviceInfo'
@@ -530,9 +545,9 @@ definitions:
       deviceIds:
         type: object
         description: "List of device Id's"
-      appIds:
-        type: object
-        description: "List of App Id's"
+      appId:
+        type: string
+        description: Installing mobile app ID
   Error:
     title: Error object returned with 4XX HTTP status
     required:

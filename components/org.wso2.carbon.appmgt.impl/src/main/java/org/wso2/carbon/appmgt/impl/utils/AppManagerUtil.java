@@ -29,6 +29,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -47,6 +48,7 @@ import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Provider;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
@@ -119,6 +121,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -341,7 +344,307 @@ public final class AppManagerUtil {
 		return api;
 	}
 
-	public static WebApp getAPI(GovernanceArtifact artifact) throws AppManagementException {
+
+    public static WebApp getGenericApp(GovernanceArtifact artifact) throws AppManagementException {
+
+        WebApp api;
+        try {
+            String providerName = artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);
+            String apiName = artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME);
+            String apiVersion = artifact.getAttribute(AppMConstants.API_OVERVIEW_VERSION);
+            api = new WebApp(new APIIdentifier(providerName, apiName, apiVersion));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
+            api.setStatus(getApiStatus(artifact.getAttribute(AppMConstants.API_OVERVIEW_STATUS)));
+            api.setContext(artifact.getAttribute(AppMConstants.API_OVERVIEW_CONTEXT));
+            api.setVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
+            api.setVisibleRoles(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBLE_ROLES));
+            api.setVisibleTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS));
+            api.setTransports(artifact.getAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS));
+            api.setInSequence(artifact.getAttribute(AppMConstants.API_OVERVIEW_INSEQUENCE));
+            api.setInSequence(artifact.getAttribute(AppMConstants.API_OVERVIEW_OUTSEQUENCE));
+            api.setDescription(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
+            api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
+            api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
+            api.setUUID(artifact.getId());
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+
+
+            int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
+            try {
+                cacheTimeout =
+                        Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+            api.setCacheTimeout(cacheTimeout);
+
+            api.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
+            api.setAppOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
+            api.setAdvertiseOnly(Boolean.parseBoolean(artifact.getAttribute(
+                    AppMConstants.API_OVERVIEW_ADVERTISE_ONLY)));
+
+            api.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
+
+            api.setSubscriptionAvailability(artifact.getAttribute(
+                    AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
+            api.setSubscriptionAvailableTenants(artifact.getAttribute(
+                    AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
+
+            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
+            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
+            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
+
+            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
+                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
+                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
+                api.setScreenShots(screenShots);
+            }
+
+            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
+            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
+            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+            api.setMediaType(artifact.getMediaType());
+            api.setPath(artifact.getPath());
+            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
+            api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+
+        } catch (GovernanceException e) {
+            String msg = "Failed to get WebApp from artifact ";
+            throw new AppManagementException(msg, e);
+        }
+        return api;
+    }
+
+    /**
+     * This method used to get WebApp from governance artifact
+     *
+     * @param artifact
+     *            WebApp artifact
+     * @param registry
+     *            Registry
+     * @return WebApp
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     *             if failed to get WebApp from artifact
+     */
+    public static WebApp getGenericApp(GovernanceArtifact artifact, Registry registry)
+            throws
+            AppManagementException {
+
+        WebApp api;
+        try {
+            String providerName = artifact.getAttribute(AppMConstants.API_OVERVIEW_PROVIDER);
+            String apiName = artifact.getAttribute(AppMConstants.API_OVERVIEW_NAME);
+            String apiVersion = artifact.getAttribute(AppMConstants.API_OVERVIEW_VERSION);
+            APIIdentifier apiId = new APIIdentifier(AppManagerUtil.replaceEmailDomainBack(providerName), apiName, apiVersion);
+            api = new WebApp(apiId);
+            // set rating
+            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+            // BigDecimal bigDecimal = new BigDecimal(getAverageRating(apiId));
+            // BigDecimal res = bigDecimal.setScale(1, RoundingMode.HALF_UP);
+
+            // TODO revert this once proper db saving is done
+            api.setRating(1f);
+            //set name
+            api.setApiName(apiName);
+            // set description
+
+            api.setDescription(artifact.getAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION));
+            // set last access time
+            api.setLastUpdated(registry.get(artifactPath).getLastModified());
+            // set url
+            api.setUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL));
+            api.setLogoutURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL));
+            api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
+            api.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
+            api.setStatus(getApiStatus(artifact.getLifecycleState().toUpperCase()));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
+            api.setWsdlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WSDL));
+            api.setWadlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WADL));
+            api.setTechnicalOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER));
+            api.setTechnicalOwnerEmail(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER_EMAIL));
+            api.setBusinessOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER));
+            api.setBusinessOwnerEmail(artifact.getAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL));
+            api.setVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY));
+            api.setVisibleRoles(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBLE_ROLES));
+            api.setVisibleTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS));
+            api.setEndpointSecured(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_SECURED)));
+            api.setEndpointUTUsername(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_USERNAME));
+            api.setEndpointUTPassword(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_PASSWORD));
+            api.setTransports(artifact.getAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS));
+            api.setInSequence(artifact.getAttribute(AppMConstants.API_OVERVIEW_INSEQUENCE));
+            api.setOutSequence(artifact.getAttribute(AppMConstants.API_OVERVIEW_OUTSEQUENCE));
+            api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
+            api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
+            api.setUUID(artifact.getId());
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
+            api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
+            api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
+
+            int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
+            try {
+                cacheTimeout =
+                        Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+            api.setCacheTimeout(cacheTimeout);
+
+            api.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
+
+            api.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
+            api.setAppOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_OWNER));
+            api.setAdvertiseOnly(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ADVERTISE_ONLY)));
+            api.setAppTenant(artifact.getAttribute(AppMConstants.API_OVERVIEW_TENANT));
+            api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
+            api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
+            api.setSubscriptionAvailableTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
+
+            String tenantDomainName =
+                    MultitenantUtils.getTenantDomain(replaceEmailDomainBack(providerName));
+            int tenantId =
+                    ServiceReferenceHolder.getInstance().getRealmService()
+                            .getTenantManager().getTenantId(tenantDomainName);
+
+            Set<Tier> availableTier = new HashSet<Tier>();
+            String tiers = artifact.getAttribute(AppMConstants.API_OVERVIEW_TIER);
+
+            Map<String, Tier> definedTiers = getTiers(tenantId);
+            if (tiers != null && !"".equals(tiers)) {
+                String[] tierNames = tiers.split(",");
+                for (String tierName : tierNames) {
+                    Tier definedTier = definedTiers.get(tierName);
+                    if (definedTier != null) {
+                        availableTier.add(definedTier);
+                    } else {
+                        log.warn("Unknown tier: " + tierName + " found on WebApp: " + apiName);
+                    }
+                }
+            }
+            api.addAvailableTiers(availableTier);
+            if(tenantId==-1234) {
+                api.setContext(artifact.getAttribute(AppMConstants.API_OVERVIEW_CONTEXT));
+            }else{
+                String context = artifact.getAttribute(AppMConstants.API_OVERVIEW_CONTEXT);
+                if(!context.startsWith(RegistryConstants.PATH_SEPARATOR)){
+                    context = RegistryConstants.PATH_SEPARATOR + context;
+                }
+                api.setContext(RegistryConstants.PATH_SEPARATOR + "t" + RegistryConstants.PATH_SEPARATOR + tenantDomainName + context);
+            }
+            api.setLatest(Boolean.valueOf(artifact.getAttribute(AppMConstants.API_OVERVIEW_IS_LATEST)));
+
+            Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
+            List<String> uriTemplateNames = new ArrayList<String>();
+
+            List<URLMapping> urlPatterns = AppMDAO.getURITemplatesPerAPIAsString(apiId);
+
+            for (URLMapping urlMapping : urlPatterns) {
+                URITemplate uriTemplate = new URITemplate();
+                String uTemplate = urlMapping.getUrlPattern();
+                String method = urlMapping.getHttpMethod();
+                String authType = urlMapping.getHttpMethod();
+                String throttlingTier = urlMapping.getThrottlingTier();
+                String userRoles = urlMapping.getUserRoles();
+
+                uriTemplate.setHTTPVerb(method);
+                uriTemplate.setAuthType(authType);
+                uriTemplate.setThrottlingTier(throttlingTier);
+                uriTemplate.setHttpVerbs(method);
+                uriTemplate.setAuthTypes(authType);
+                uriTemplate.setUriTemplate(uTemplate);
+                uriTemplate.setResourceURI(api.getUrl());
+                uriTemplate.setResourceSandboxURI(api.getSandboxUrl());
+                uriTemplate.setThrottlingTiers(throttlingTier);
+                uriTemplate.setUserRoles(userRoles);
+                // Checking for duplicate uri template names
+                if (uriTemplateNames.contains(uTemplate)) {
+                    for (URITemplate tmp : uriTemplates) {
+                        if (uTemplate.equals(tmp.getUriTemplate())) {
+                            tmp.setHttpVerbs(method);
+                            tmp.setAuthTypes(authType);
+                            tmp.setThrottlingTiers(throttlingTier);
+                            break;
+                        }
+                    }
+
+                } else {
+                    uriTemplates.add(uriTemplate);
+                }
+
+                uriTemplateNames.add(uTemplate);
+
+            }
+            api.setUriTemplates(uriTemplates);
+
+            Set<String> tags = new HashSet<String>();
+            org.wso2.carbon.registry.core.Tag[] tag = registry.getTags(artifactPath);
+            for (Tag tag1 : tag) {
+                tags.add(tag1.getTagName());
+            }
+            api.addTags(tags);
+            api.setLastUpdated(registry.get(artifactPath).getLastModified());
+
+            String defaultVersion = AppMDAO.getDefaultVersion(apiName, providerName,
+                                                              AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
+            api.setDefaultVersion(apiVersion.equals(defaultVersion));
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
+
+            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
+            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
+            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
+            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
+            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
+                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
+                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
+                api.setScreenShots(screenShots);
+            }
+            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
+            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
+            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
+            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
+            api.setMediaType(artifact.getMediaType());
+            api.setPath(artifact.getPath());
+            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
+            api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+
+        } catch (GovernanceException e) {
+            String msg = "Failed to get WebApp fro artifact ";
+            throw new AppManagementException(msg, e);
+        } catch (RegistryException e) {
+            String msg = "Failed to get LastAccess time or Rating";
+            throw new AppManagementException(msg, e);
+        } catch (UserStoreException e) {
+            String msg = "Failed to get User Realm of WebApp Provider";
+            throw new AppManagementException(msg, e);
+        }
+        return api;
+    }
+
+
+
+    public static WebApp getAPI(GovernanceArtifact artifact) throws AppManagementException {
 
 		WebApp api;
 		try {
@@ -533,6 +836,52 @@ public final class AppManagerUtil {
 		}
 		return artifact;
 	}
+
+
+	/**
+	 * Create Governance artifact from given attributes
+	 *
+	 * @param artifact
+	 *            initial governance artifact
+	 * @param mobileApp
+	 *            WebApp object with the attributes value
+	 * @return GenericArtifact
+	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
+	 *             if failed to create WebApp
+	 */
+	public static GenericArtifact createMobileAppArtifactContent(GenericArtifact artifact, MobileApp mobileApp)
+			throws
+			AppManagementException {
+
+		try {
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, mobileApp.getAppName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL, mobileApp.getAppUrl());
+			//artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, mobileApp.getVisibility());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION, mobileApp.getAppVersion());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME, mobileApp.getPackageName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY, mobileApp.getCategory());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, mobileApp.getDisplayName());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, mobileApp.getMarketType());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES, mobileApp.getRecentChanges());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, mobileApp.getAppVersion());
+
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, mobileApp.getAppProvider());
+			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, mobileApp.getDescription());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
+			String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
+			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER,mobileApp.getBanner());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID,mobileApp.getAppId());
+			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM,mobileApp.getPlatform());
+		} catch (GovernanceException e) {
+			String msg = "Failed to create WebApp for : " + mobileApp.getAppName();
+			log.error(msg, e);
+			throw new AppManagementException(msg, e);
+		}
+		return artifact;
+	}
+
 
 	/**
 	 * Create the Documentation from artifact
@@ -1506,7 +1855,7 @@ public final class AppManagerUtil {
 			String apiVersion = artifact.getAttribute(AppMConstants.API_OVERVIEW_VERSION);
 			api = new WebApp(new APIIdentifier(providerName, apiName, apiVersion));
 			// set rating
-			String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+	String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
 			BigDecimal bigDecimal = new BigDecimal(registry.getAverageRating(artifactPath));
 			BigDecimal res = bigDecimal.setScale(1, RoundingMode.HALF_UP);
 			api.setRating(res.floatValue());

@@ -1,11 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -21,6 +22,15 @@ public class AppDTO  {
   
   
   private String type = null;
+  
+  
+  private String marketType = null;
+  
+  
+  private String recentChanges = null;
+  
+  
+  private String icon = null;
   
   
   private String isSite = null;
@@ -39,6 +49,9 @@ public class AppDTO  {
   
   @NotNull
   private String appDefinition = null;
+  
+  
+  private Boolean isDefaultVersion = null;
   
   @NotNull
   private List<String> transport = new ArrayList<String>();
@@ -59,19 +72,19 @@ public class AppDTO  {
   private String bundleversion = null;
   
   
-  private String packagename = null;
-  
-  
   private String category = null;
   
   
   private String displayName = null;
   
   
-  private String screenshots = null;
+  private List<String> screenshots = new ArrayList<String>();
   
   
   private String banner = null;
+  
+  
+  private String appType = null;
   
   
   private String createdtime = null;
@@ -109,15 +122,52 @@ public class AppDTO  {
 
   
   /**
-   * App type (either Webapp/Mobile app
+   * App type (either Webapp/Mobile app)
    **/
-  @ApiModelProperty(value = "App type (either Webapp/Mobile app")
+  @ApiModelProperty(value = "App type (either Webapp/Mobile app)")
   @JsonProperty("type")
   public String getType() {
     return type;
   }
   public void setType(String type) {
     this.type = type;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("marketType")
+  public String getMarketType() {
+    return marketType;
+  }
+  public void setMarketType(String marketType) {
+    this.marketType = marketType;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("recentChanges")
+  public String getRecentChanges() {
+    return recentChanges;
+  }
+  public void setRecentChanges(String recentChanges) {
+    this.recentChanges = recentChanges;
+  }
+
+  
+  /**
+   * the image icon of the application
+   **/
+  @ApiModelProperty(value = "the image icon of the application")
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   
@@ -193,6 +243,18 @@ public class AppDTO  {
   }
   public void setAppDefinition(String appDefinition) {
     this.appDefinition = appDefinition;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("isDefaultVersion")
+  public Boolean getIsDefaultVersion() {
+    return isDefaultVersion;
+  }
+  public void setIsDefaultVersion(Boolean isDefaultVersion) {
+    this.isDefaultVersion = isDefaultVersion;
   }
 
   
@@ -273,19 +335,6 @@ public class AppDTO  {
 
   
   /**
-   * packagename of the asset
-   **/
-  @ApiModelProperty(value = "packagename of the asset")
-  @JsonProperty("packagename")
-  public String getPackagename() {
-    return packagename;
-  }
-  public void setPackagename(String packagename) {
-    this.packagename = packagename;
-  }
-
-  
-  /**
    * category of the asset
    **/
   @ApiModelProperty(value = "category of the asset")
@@ -312,14 +361,14 @@ public class AppDTO  {
 
   
   /**
-   * packagename of the asset
+   * Screenshots attached to the application
    **/
-  @ApiModelProperty(value = "packagename of the asset")
+  @ApiModelProperty(value = "Screenshots attached to the application")
   @JsonProperty("screenshots")
-  public String getScreenshots() {
+  public List<String> getScreenshots() {
     return screenshots;
   }
-  public void setScreenshots(String screenshots) {
+  public void setScreenshots(List<String> screenshots) {
     this.screenshots = screenshots;
   }
 
@@ -334,6 +383,19 @@ public class AppDTO  {
   }
   public void setBanner(String banner) {
     this.banner = banner;
+  }
+
+  
+  /**
+   * mobile app type (eg: webapp/ios/android)
+   **/
+  @ApiModelProperty(value = "mobile app type (eg: webapp/ios/android)")
+  @JsonProperty("appType")
+  public String getAppType() {
+    return appType;
+  }
+  public void setAppType(String appType) {
+    this.appType = appType;
   }
 
   
@@ -385,23 +447,27 @@ public class AppDTO  {
     sb.append("  id: ").append(id).append("\n");
     sb.append("  name: ").append(name).append("\n");
     sb.append("  type: ").append(type).append("\n");
+    sb.append("  marketType: ").append(marketType).append("\n");
+    sb.append("  recentChanges: ").append(recentChanges).append("\n");
+    sb.append("  icon: ").append(icon).append("\n");
     sb.append("  isSite: ").append(isSite).append("\n");
     sb.append("  description: ").append(description).append("\n");
     sb.append("  context: ").append(context).append("\n");
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  appDefinition: ").append(appDefinition).append("\n");
+    sb.append("  isDefaultVersion: ").append(isDefaultVersion).append("\n");
     sb.append("  transport: ").append(transport).append("\n");
     sb.append("  tags: ").append(tags).append("\n");
     sb.append("  thumbnailUrl: ").append(thumbnailUrl).append("\n");
     sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
-    sb.append("  packagename: ").append(packagename).append("\n");
     sb.append("  category: ").append(category).append("\n");
     sb.append("  displayName: ").append(displayName).append("\n");
     sb.append("  screenshots: ").append(screenshots).append("\n");
     sb.append("  banner: ").append(banner).append("\n");
+    sb.append("  appType: ").append(appType).append("\n");
     sb.append("  createdtime: ").append(createdtime).append("\n");
     sb.append("  platform: ").append(platform).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");

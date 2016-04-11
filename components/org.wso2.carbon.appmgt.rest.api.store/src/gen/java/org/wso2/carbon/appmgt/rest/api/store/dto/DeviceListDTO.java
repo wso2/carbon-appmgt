@@ -1,11 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.appmgt.rest.api.store.dto.DeviceInfoDTO;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
@@ -23,7 +24,7 @@ public class DeviceListDTO  {
   private String previous = null;
   
   
-  private List<DeviceInfoDTO> list = new ArrayList<DeviceInfoDTO>();
+  private List<DeviceInfoDTO> deviceList = new ArrayList<DeviceInfoDTO>();
 
   
   /**
@@ -68,12 +69,12 @@ public class DeviceListDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("list")
-  public List<DeviceInfoDTO> getList() {
-    return list;
+  @JsonProperty("deviceList")
+  public List<DeviceInfoDTO> getDeviceList() {
+    return deviceList;
   }
-  public void setList(List<DeviceInfoDTO> list) {
-    this.list = list;
+  public void setDeviceList(List<DeviceInfoDTO> deviceList) {
+    this.deviceList = deviceList;
   }
 
   
@@ -86,7 +87,7 @@ public class DeviceListDTO  {
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  list: ").append(list).append("\n");
+    sb.append("  deviceList: ").append(deviceList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

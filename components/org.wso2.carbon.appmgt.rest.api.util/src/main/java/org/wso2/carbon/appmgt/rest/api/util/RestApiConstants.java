@@ -128,6 +128,7 @@ public final class RestApiConstants {
     public static final String STATUS_INTERNAL_SERVER_ERROR_MESSAGE_DEFAULT = "Internal server error";
     public static final String STATUS_METHOD_NOT_ALLOWED_MESSAGE_DEFAULT = "Method Not Allowed";
     public static final String STATUS_BAD_REQUEST_MESSAGE_DEFAULT = "Bad Request";
+    public static final String STATUS_PRECONDITION_FAILED_MESSAGE_DEFAULT = "Precondition Failed";
     public static final String STATUS_CONFLCIT_MESSAGE_DEFAULT = "Resource Already Exists";
 
     public static final String STATUS_INTERNAL_SERVER_ERROR_DESCRIPTION_DEFAULT = "The server encountered "

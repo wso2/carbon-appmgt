@@ -1,11 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -23,6 +24,18 @@ public class AppDTO  {
   private String type = null;
   
   
+  private AppAppmetaDTO appmeta = null;
+  
+  
+  private String marketType = null;
+  
+  
+  private String recentChanges = null;
+  
+  
+  private String icon = null;
+  
+  
   private String isSite = null;
   
   
@@ -34,16 +47,16 @@ public class AppDTO  {
   @NotNull
   private String version = null;
   
-  
+  @NotNull
   private String provider = null;
   
-  @NotNull
+  
   private String appDefinition = null;
   
   
   private Boolean isDefaultVersion = null;
   
-  @NotNull
+  
   private List<String> transport = new ArrayList<String>();
   
   
@@ -74,16 +87,13 @@ public class AppDTO  {
   private String bundleversion = null;
   
   
-  private String packagename = null;
-  
-  
   private String category = null;
   
   
   private String displayName = null;
   
   
-  private String screenshots = null;
+  private List<String> screenshots = new ArrayList<String>();
   
   
   private String banner = null;
@@ -95,7 +105,16 @@ public class AppDTO  {
   private String platform = null;
   
   
+  private String appType = null;
+  
+  
+  private String mediaType = null;
+  
+  
   private String lifecycleAvailableActions = null;
+  
+  
+  private String createdTime = null;
 
   
   /**
@@ -124,15 +143,65 @@ public class AppDTO  {
 
   
   /**
-   * App type (either Webapp/Mobile app
+   * App type (either Webapp/Mobile app)
    **/
-  @ApiModelProperty(value = "App type (either Webapp/Mobile app")
+  @ApiModelProperty(value = "App type (either Webapp/Mobile app)")
   @JsonProperty("type")
   public String getType() {
     return type;
   }
   public void setType(String type) {
     this.type = type;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("appmeta")
+  public AppAppmetaDTO getAppmeta() {
+    return appmeta;
+  }
+  public void setAppmeta(AppAppmetaDTO appmeta) {
+    this.appmeta = appmeta;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("marketType")
+  public String getMarketType() {
+    return marketType;
+  }
+  public void setMarketType(String marketType) {
+    this.marketType = marketType;
+  }
+
+  
+  /**
+   * recent changes
+   **/
+  @ApiModelProperty(value = "recent changes")
+  @JsonProperty("recentChanges")
+  public String getRecentChanges() {
+    return recentChanges;
+  }
+  public void setRecentChanges(String recentChanges) {
+    this.recentChanges = recentChanges;
+  }
+
+  
+  /**
+   * the image icon of the application
+   **/
+  @ApiModelProperty(value = "the image icon of the application")
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   
@@ -188,7 +257,7 @@ public class AppDTO  {
   /**
    * If the provider value is not given user invoking the api will be used as the provider.
    **/
-  @ApiModelProperty(value = "If the provider value is not given user invoking the api will be used as the provider.")
+  @ApiModelProperty(required = true, value = "If the provider value is not given user invoking the api will be used as the provider.")
   @JsonProperty("provider")
   public String getProvider() {
     return provider;
@@ -201,7 +270,7 @@ public class AppDTO  {
   /**
    * Swagger definition of the App which contains details about URI templates and scopes
    **/
-  @ApiModelProperty(required = true, value = "Swagger definition of the App which contains details about URI templates and scopes")
+  @ApiModelProperty(value = "Swagger definition of the App which contains details about URI templates and scopes")
   @JsonProperty("appDefinition")
   public String getAppDefinition() {
     return appDefinition;
@@ -226,7 +295,7 @@ public class AppDTO  {
   /**
    * Supported transports for the App (http and/or https).
    **/
-  @ApiModelProperty(required = true, value = "Supported transports for the App (http and/or https).")
+  @ApiModelProperty(value = "Supported transports for the App (http and/or https).")
   @JsonProperty("transport")
   public List<String> getTransport() {
     return transport;
@@ -273,9 +342,9 @@ public class AppDTO  {
 
   
   /**
-   * Registry path of the asset
+   * path of asset
    **/
-  @ApiModelProperty(value = "Registry path of the asset")
+  @ApiModelProperty(value = "path of asset")
   @JsonProperty("path")
   public String getPath() {
     return path;
@@ -351,19 +420,6 @@ public class AppDTO  {
 
   
   /**
-   * packagename of the asset
-   **/
-  @ApiModelProperty(value = "packagename of the asset")
-  @JsonProperty("packagename")
-  public String getPackagename() {
-    return packagename;
-  }
-  public void setPackagename(String packagename) {
-    this.packagename = packagename;
-  }
-
-  
-  /**
    * category of the asset
    **/
   @ApiModelProperty(value = "category of the asset")
@@ -390,14 +446,14 @@ public class AppDTO  {
 
   
   /**
-   * packagename of the asset
+   * Screenshots attached to the application
    **/
-  @ApiModelProperty(value = "packagename of the asset")
+  @ApiModelProperty(value = "Screenshots attached to the application")
   @JsonProperty("screenshots")
-  public String getScreenshots() {
+  public List<String> getScreenshots() {
     return screenshots;
   }
-  public void setScreenshots(String screenshots) {
+  public void setScreenshots(List<String> screenshots) {
     this.screenshots = screenshots;
   }
 
@@ -442,6 +498,32 @@ public class AppDTO  {
 
   
   /**
+   * mobile app type (eg: webapp/ios/android)
+   **/
+  @ApiModelProperty(value = "mobile app type (eg: webapp/ios/android)")
+  @JsonProperty("appType")
+  public String getAppType() {
+    return appType;
+  }
+  public void setAppType(String appType) {
+    this.appType = appType;
+  }
+
+  
+  /**
+   * media yype
+   **/
+  @ApiModelProperty(value = "media yype")
+  @JsonProperty("mediaType")
+  public String getMediaType() {
+    return mediaType;
+  }
+  public void setMediaType(String mediaType) {
+    this.mediaType = mediaType;
+  }
+
+  
+  /**
    * platform of the asset
    **/
   @ApiModelProperty(value = "platform of the asset")
@@ -454,6 +536,19 @@ public class AppDTO  {
   }
 
   
+  /**
+   * asset created timestamp
+   **/
+  @ApiModelProperty(value = "asset created timestamp")
+  @JsonProperty("createdTime")
+  public String getCreatedTime() {
+    return createdTime;
+  }
+  public void setCreatedTime(String createdTime) {
+    this.createdTime = createdTime;
+  }
+
+  
 
   @Override
   public String toString()  {
@@ -463,6 +558,10 @@ public class AppDTO  {
     sb.append("  id: ").append(id).append("\n");
     sb.append("  name: ").append(name).append("\n");
     sb.append("  type: ").append(type).append("\n");
+    sb.append("  appmeta: ").append(appmeta).append("\n");
+    sb.append("  marketType: ").append(marketType).append("\n");
+    sb.append("  recentChanges: ").append(recentChanges).append("\n");
+    sb.append("  icon: ").append(icon).append("\n");
     sb.append("  isSite: ").append(isSite).append("\n");
     sb.append("  description: ").append(description).append("\n");
     sb.append("  context: ").append(context).append("\n");
@@ -480,14 +579,16 @@ public class AppDTO  {
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
     sb.append("  appUrL: ").append(appUrL).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
-    sb.append("  packagename: ").append(packagename).append("\n");
     sb.append("  category: ").append(category).append("\n");
     sb.append("  displayName: ").append(displayName).append("\n");
     sb.append("  screenshots: ").append(screenshots).append("\n");
     sb.append("  banner: ").append(banner).append("\n");
     sb.append("  createdtime: ").append(createdtime).append("\n");
     sb.append("  platform: ").append(platform).append("\n");
+    sb.append("  appType: ").append(appType).append("\n");
+    sb.append("  mediaType: ").append(mediaType).append("\n");
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
+    sb.append("  createdTime: ").append(createdTime).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

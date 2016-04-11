@@ -1,22 +1,41 @@
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
+import ca.uhn.hl7v2.util.ArrayUtil;
+import com.mchange.v1.util.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
+import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.*;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
@@ -25,27 +44,115 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
-        return null;
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "install";
+            String[] parameters = null;
+
+            if("user".equals(install.getType())) {
+                parameters[0] = tenantDomainName;
+            }else if("device".equals(install.getType())){
+                parameters = (String[]) install.getDeviceIds();
+                if(parameters == null){
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                }
+            }else{
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
+
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+            appProvider.subscribeMobileApp(username, appId);
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        }
+        return Response.ok().build();
+
     }
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
-        return null;
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = 0;
+            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "uninstall";
+            String[] parameters = null;
+
+            if ("user".equals(install.getType())) {
+                parameters = new String[1];
+                parameters[0] = tenantDomainName;
+            } else if ("device".equals(install.getType())) {
+                parameters = (String[]) install.getDeviceIds();
+                if (parameters == null) {
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
+
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+            boolean isUnSubscribed = appProvider.unSubscribeMobileApp(username, appId);
+            if (!isUnSubscribed) {
+                RestApiUtil.handlePreconditionFailedRequest("Application is not installed yet. Application with id : " + appId +
+                        "must be installed prior to uninstall.", log);
+            }
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
+        }
+
+        return Response.ok().build();
     }
 
     @Override
     public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
                                    String ifNoneMatch) {
-        List<WebApp> allMatchedApis;
-        AppListDTO appListDTO;
+        List<WebApp> allMatchedApps;
+        AppListDTO appListDTO = null;
 
-        //pre-processing
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
         query = query == null ? "" : query;
         try {
-            //handle type
+            //check if a valid asset type is provided
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
                     !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
@@ -55,7 +162,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
             //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.API_NAME;
+            String searchType = AppMConstants.SEARCH_CONTENT_NAME;
             String searchContent = "";
             if (!StringUtils.isBlank(query)) {
                 String[] querySplit = query.split(":");
@@ -72,27 +179,31 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             //We should send null as the provider, Otherwise searchAPIs will return all APIs of the provider
             // instead of looking at type and query
-            allMatchedApis = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
-            if (allMatchedApis.isEmpty()) {
+            allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
+            if (allMatchedApps.isEmpty()) {
                 String errorMessage = "No result found.";
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
-            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApis, offset, limit);
-            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApis.size());
-            return Response.ok().entity(appListDTO).build();
+            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApps, offset, limit);
+            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApps.size());
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving Apps";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return null;
+        return Response.ok().entity(appListDTO).build();
     }
 
     @Override
     public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
                                           String ifModifiedSince) {
-        AppDTO apiToReturn;
+        AppDTO appToReturn = null;
         try {
-            //WebApp webApp = APPMappingUtil.getAPIFromApiIdOrUUID(appId);
+            //currently supports only mobile apps
+            if (!appType.equals("mobileapp")) {
+                String errorMessage = "Type not supported.";
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
+
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String searchContent = appId;
             String searchType = "id";
@@ -102,9 +213,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.buildNotFoundException(errorMessage, appId);
             }
-            WebApp webApp = allMatchedApps.get(0);
-            apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
-            return Response.ok().entity(apiToReturn).build();
+            appToReturn = APPMappingUtil.fromAPItoDTO(allMatchedApps.get(0));
+
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -115,7 +225,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return null;
+        return Response.ok().entity(appToReturn).build();
     }
 
 

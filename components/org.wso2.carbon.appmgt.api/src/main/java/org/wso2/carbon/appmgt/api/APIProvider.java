@@ -258,6 +258,14 @@ public interface APIProvider extends APIManager {
     public void addWebApp(WebApp api) throws AppManagementException;
 
     /**
+     * Adds a new Mobile Application to the Store
+     *
+     * @param mobileApp Mobile application
+     * @throws AppManagementException if failed to add MobileApp
+     */
+    public String addMobileApp(MobileApp mobileApp) throws AppManagementException;
+
+    /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
      * should throw an exceptions when such attempts are made. All life cycle state changes
      * should be carried out using the changeAPIStatus method of this interface.
@@ -266,6 +274,16 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException if failed to update WebApp
      */
     public void updateAPI(WebApp api) throws AppManagementException;
+
+    /**
+     * Updates an existing Mobile Application. This method must not be used to change Mobile App status. Implementations
+     * should throw an exceptions when such attempts are made. All life cycle state changes
+     * should be carried out using the changeAPIStatus method of this interface.
+     *
+     * @param mobileApp Mobile App
+     * @throws AppManagementException if failed to update WebApp
+     */
+    public void updateMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
      * Change the lifecycle state of the specified WebApp
@@ -590,4 +608,6 @@ public interface APIProvider extends APIManager {
      * @return list of allowed lifecycle actions perform on the app
      */
     public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
+    public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException;
+    public boolean unSubscribeMobileApp(String userId, String appId) throws AppManagementException;
 }

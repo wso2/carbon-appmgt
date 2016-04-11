@@ -51,6 +51,27 @@ public class AppsApi  {
     {
     return delegate.appsMobileBinariesPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
     }
+    @POST
+    @Path("/static-contents")
+    @Consumes({ "multipart/form-data" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Uploading images, pdf, documents files", notes = "Uploading images for banners, screenshots etc.", response = BinaryDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nStatic content uploaded successfully."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error"),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nRequested entity does not exist."),
+        
+        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
+
+    public Response appsStaticContentsPost(@ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
+    @ApiParam(value = "Document to upload : details") @Multipart(value = "file" , required = false) Attachment fileDetail,
+    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+    {
+    return delegate.appsStaticContentsPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
+    }
     @GET
     @Path("/{appType}")
     @Consumes({ "application/json" })

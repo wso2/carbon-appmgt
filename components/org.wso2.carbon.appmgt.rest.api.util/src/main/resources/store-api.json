@@ -240,6 +240,12 @@
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
                     }
                 }
             }
@@ -386,7 +392,7 @@
                     "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
                     "example": "/app?limit=1&offset=0&query="
                 },
-                "list": {
+                "appList": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/AppInfo"
@@ -448,8 +454,21 @@
                 },
                 "type": {
                     "type": "string",
-                    "description": "App type (either Webapp/Mobile app",
+                    "description": "App type (either Webapp/Mobile app)",
                     "example": "01234567-0123-0123-0123-012345678901"
+                },
+                "marketType": {
+                    "type": "string",
+                    "example": "enterprise,"
+                },
+                "recentChanges": {
+                    "type": "string",
+                    "example": "Upgraded"
+                },
+                "icon": {
+                    "description": "the image icon of the application\n",
+                    "type": "string",
+                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG"
                 },
                 "isSite": {
                     "type": "string",
@@ -477,6 +496,10 @@
                     "description": "Swagger definition of the App which contains details about URI templates and scopes\n",
                     "type": "string",
                     "example": "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
+                },
+                "isDefaultVersion": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "transport": {
                     "description": "Supported transports for the App (http and/or https).\n",
@@ -518,11 +541,6 @@
                     "type": "string",
                     "example": "1.0"
                 },
-                "packagename": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "home.jmstudios.calc"
-                },
                 "category": {
                     "description": "category of the asset\n",
                     "type": "string",
@@ -534,14 +552,22 @@
                     "example": "testapp1"
                 },
                 "screenshots": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
+                    "description": "Screenshots attached to the application\n",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
                     "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
                 },
                 "banner": {
                     "description": "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n",
                     "type": "string",
                     "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
+                },
+                "appType": {
+                    "description": "mobile app type (eg: webapp/ios/android)",
+                    "type": "string",
+                    "example": "android"
                 },
                 "createdtime": {
                     "description": "createdtime of the asset\n",
@@ -578,7 +604,7 @@
                     "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
                     "example": "/devices?limit=1&offset=0&query="
                 },
-                "list": {
+                "deviceList": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/DeviceInfo"
@@ -631,9 +657,9 @@
                     "type": "object",
                     "description": "List of device Id's"
                 },
-                "appIds": {
-                    "type": "object",
-                    "description": "List of App Id's"
+                "appId": {
+                    "type": "string",
+                    "description": "Installing mobile app ID"
                 }
             }
         },
