@@ -631,9 +631,9 @@
                     "type": "object",
                     "description": "List of device Id's"
                 },
-                "appIds": {
-                    "type": "object",
-                    "description": "List of App Id's"
+                "appId": {
+                    "type": "string",
+                    "description": "Installing mobile app ID"
                 }
             }
         },

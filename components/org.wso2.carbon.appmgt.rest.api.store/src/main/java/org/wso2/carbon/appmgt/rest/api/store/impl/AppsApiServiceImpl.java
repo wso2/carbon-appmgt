@@ -1,5 +1,6 @@
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
+import ca.uhn.hl7v2.util.ArrayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,26 +49,26 @@ public class AppsApiServiceImpl extends AppsApiService {
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "install";
 
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
             if("user".equals(install.getType())) {
-                List<String> appIds = (List<String>) install.getAppIds();
-                for(String appId : appIds){
-                    appProvider.subscribeMobileApp(username, appId);
-                }
+                appProvider.subscribeMobileApp(username, appId);
+                String[] parameters = new String[1];
+                parameters[0] = tenantDomainName;
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+
             }else if("device".equals(install.getType())){
-                List<String> appIds = (List<String>) install.getAppIds();
-                boolean isMDMOperationsEnabled = true;
-                for(String appId : appIds){
-                    appProvider.subscribeMobileApp(username, appId);
-                }
-                JSONObject user = new JSONObject();
-                user.put("username", tenantUserName);
-                user.put("tenantDomain", tenantDomainName);
-                user.put("tenantId", tenantId);
-
-                Operations mobileOperation = new Operations();
-                //TODO:
-
+                String[] deviceIds = (String[]) install.getDeviceIds();
+                appProvider.subscribeMobileApp(username, appId);
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
             }else{
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
             }
@@ -92,26 +93,26 @@ public class AppsApiServiceImpl extends AppsApiService {
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "uninstall";
 
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
             if("user".equals(install.getType())) {
-                List<String> appIds = (List<String>) install.getAppIds();
-                for(String appId : appIds){
-                    appProvider.subscribeMobileApp(username, appId);
-                }
+                appProvider.unSubscribeMobileApp(username, appId);
+                String[] parameters = new String[1];
+                parameters[0] = tenantDomainName;
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+
             }else if("device".equals(install.getType())){
-                List<String> appIds = (List<String>) install.getAppIds();
-                boolean isMDMOperationsEnabled = true;
-                for(String appId : appIds){
-                    appProvider.unSubscribeMobileApp(username, appId);
-                }
-                JSONObject user = new JSONObject();
-                user.put("username", tenantUserName);
-                user.put("tenantDomain", tenantDomainName);
-                user.put("tenantId", tenantId);
-
-                Operations mobileOperation = new Operations();
-                //TODO:
-
+                String[] deviceIds = (String[]) install.getDeviceIds();
+                appProvider.unSubscribeMobileApp(username, appId);
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
             }else{
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
             }

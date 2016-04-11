@@ -17,7 +17,7 @@ public class InstallDTO  {
   private Object deviceIds = null;
   
   
-  private Object appIds = null;
+  private String appId = null;
 
   
   /**
@@ -47,15 +47,15 @@ public class InstallDTO  {
 
   
   /**
-   * List of App Id's
+   * Installing mobile app ID
    **/
-  @ApiModelProperty(value = "List of App Id's")
-  @JsonProperty("appIds")
-  public Object getAppIds() {
-    return appIds;
+  @ApiModelProperty(value = "Installing mobile app ID")
+  @JsonProperty("appId")
+  public String getAppId() {
+    return appId;
   }
-  public void setAppIds(Object appIds) {
-    this.appIds = appIds;
+  public void setAppId(String appId) {
+    this.appId = appId;
   }
 
   
@@ -67,7 +67,7 @@ public class InstallDTO  {
     
     sb.append("  type: ").append(type).append("\n");
     sb.append("  deviceIds: ").append(deviceIds).append("\n");
-    sb.append("  appIds: ").append(appIds).append("\n");
+    sb.append("  appId: ").append(appId).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

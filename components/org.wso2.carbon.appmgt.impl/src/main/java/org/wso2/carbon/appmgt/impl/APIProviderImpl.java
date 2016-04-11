@@ -2339,16 +2339,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
         Resource resource = null;
         try {
-            if(registry.resourceExists(path)){
-                resource = registry.get(path);
-            }else{
-
+            if (!registry.resourceExists(path)) {
                 resource = registry.newResource();
                 resource.setContent("");
                 registry.put(path, resource);
             }
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
-           handleException("Error occurred while retrieving registry", e);
+            handleException("Error occurred while retrieving registry", e);
         }
 
     }
