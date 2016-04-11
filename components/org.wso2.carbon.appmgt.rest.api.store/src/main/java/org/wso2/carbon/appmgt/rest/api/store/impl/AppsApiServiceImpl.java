@@ -1,12 +1,19 @@
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
+import ca.uhn.hl7v2.util.ArrayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
@@ -14,9 +21,19 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
+import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
+import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.session.UserRegistry;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
-import java.util.List;
+import java.util.*;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
@@ -25,12 +42,89 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
-        return null;
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "install";
+
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+            if("user".equals(install.getType())) {
+                appProvider.subscribeMobileApp(username, appId);
+                String[] parameters = new String[1];
+                parameters[0] = tenantDomainName;
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+
+            }else if("device".equals(install.getType())){
+                String[] deviceIds = (String[]) install.getDeviceIds();
+                appProvider.subscribeMobileApp(username, appId);
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
+            }else{
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
+
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        }
+        return Response.ok().build();
+
     }
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
-        return null;
+        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = install.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "uninstall";
+
+            //TODO:Operations.performAction expects the user to be passed as a stringified object, so that
+            //TODO:We are prviding a stringified user here
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+            if("user".equals(install.getType())) {
+                appProvider.unSubscribeMobileApp(username, appId);
+                String[] parameters = new String[1];
+                parameters[0] = tenantDomainName;
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+
+            }else if("device".equals(install.getType())){
+                String[] deviceIds = (String[]) install.getDeviceIds();
+                appProvider.unSubscribeMobileApp(username, appId);
+                mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), deviceIds);
+            }else{
+                RestApiUtil.handleBadRequest("Invalid installation type.", log);
+            }
+
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+        }
+        return Response.ok().build();
     }
 
     @Override
