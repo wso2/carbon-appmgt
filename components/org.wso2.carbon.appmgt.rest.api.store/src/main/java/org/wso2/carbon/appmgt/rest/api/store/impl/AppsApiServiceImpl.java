@@ -1,41 +1,28 @@
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
-import ca.uhn.hl7v2.util.ArrayUtil;
-import com.mchange.v1.util.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.governance.api.exception.GovernanceException;
-import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
-import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
-import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.registry.api.Registry;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.List;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
@@ -49,21 +36,23 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
-            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
 
-            if("user".equals(install.getType())) {
+            if ("user".equals(install.getType())) {
                 parameters[0] = tenantDomainName;
-            }else if("device".equals(install.getType())){
+            } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
-                if(parameters == null){
-                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                if (parameters == null) {
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                                                 log);
                 }
-            }else{
+            } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
             }
 
@@ -97,7 +86,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
             int tenantId = 0;
-            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomainName);
+            tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
 
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
@@ -111,7 +101,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
-                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation", log);
+                    RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -126,8 +117,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             boolean isUnSubscribed = appProvider.unSubscribeMobileApp(username, appId);
             if (!isUnSubscribed) {
-                RestApiUtil.handlePreconditionFailedRequest("Application is not installed yet. Application with id : " + appId +
-                        "must be installed prior to uninstall.", log);
+                RestApiUtil.handlePreconditionFailedRequest(
+                        "Application is not installed yet. Application with id : " + appId +
+                                "must be installed prior to uninstall.", log);
             }
             mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
         } catch (AppManagementException e) {
@@ -211,7 +203,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                                                  appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
-                RestApiUtil.buildNotFoundException(errorMessage, appId);
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             appToReturn = APPMappingUtil.fromAPItoDTO(allMatchedApps.get(0));
 
