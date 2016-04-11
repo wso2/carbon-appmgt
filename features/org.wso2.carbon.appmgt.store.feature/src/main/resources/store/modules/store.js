@@ -726,6 +726,14 @@ Store.prototype.getAvailablePages = function (type,req,session) {
     return pageNumber;
 };
 
+Store.prototype.getTotalAssetCount = function (type,req,session) {
+    var managers= storeManagers(req,session,this.tenantId);
+    var rxtManager = managers.rxtManager;
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var appCount = artifactManager.count();
+    return appCount;
+};
+
 Store.prototype.getCurrentPage = function(currentIndex){
     var PAGE_SIZE = this.getPageSize();
     var pageNumber = Math.ceil(currentIndex/PAGE_SIZE);
