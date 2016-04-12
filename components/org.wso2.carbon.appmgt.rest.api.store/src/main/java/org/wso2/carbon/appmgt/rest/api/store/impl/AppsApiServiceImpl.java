@@ -29,6 +29,7 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
+import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
@@ -87,10 +88,13 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
         } catch (UserStoreException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+            RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
         } catch (JSONException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while installing", e, log);
+            RestApiUtil.handleInternalServerError("JSON data type related Error occurred while uninstalling", e, log);
+        }catch (MobileApplicationException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         }
+
         return Response.ok().build();
 
     }
@@ -143,8 +147,10 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         } catch (UserStoreException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
+            RestApiUtil.handleInternalServerError("User Store related Error occurred while uninstalling", e, log);
         } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("JSON data type related Error occurred while uninstalling", e, log);
+        } catch (MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Error occurred while uninstalling", e, log);
         }
 

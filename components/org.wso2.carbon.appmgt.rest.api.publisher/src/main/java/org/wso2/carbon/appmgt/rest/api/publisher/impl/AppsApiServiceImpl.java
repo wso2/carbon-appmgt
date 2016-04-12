@@ -169,7 +169,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
         query = query == null ? "" : query;
         try {
-            //check if a valid asset type is provided
+            //check if a valid asset type is providedg
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
                     !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;

@@ -27,6 +27,7 @@ import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.store.Devices;
+import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.DevicesApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.DeviceInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.DeviceListDTO;
@@ -95,7 +96,13 @@ public class DevicesApiServiceImpl extends DevicesApiService {
         userObj.put("tenantDomain", tenantDomain);
         userObj.put("tenantId", tenantId);
 
-        String deviceList = devices.getDevicesList(userObj.toJSONString(), tenantId, "user", users);
+        String deviceList = null;
+        try {
+            deviceList = devices.getDevicesList(userObj.toJSONString(), tenantId, "user", users);
+        } catch (MobileApplicationException e) {
+            log.error("Error while retrieving devices. " + e.getMessage());
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
+        }
         JSONArray deviceArr = (JSONArray) new JSONValue().parse(deviceList);
 
 
