@@ -97,6 +97,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
 
         <!--   Uncomment when needed to generate swagger based skeleton
         <dependency>

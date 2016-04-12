@@ -12,6 +12,7 @@ import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
@@ -29,9 +30,13 @@ import java.util.List;
 
 public class AppsApiServiceImpl extends AppsApiService {
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
+    BeanValidator beanValidator;
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
+        beanValidator = new BeanValidator();
+        beanValidator.validate(install);
+
         if (install.getAppId() == null) {
             String errorMessage = "Apps not found in payload.";
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
@@ -135,6 +140,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
+        beanValidator = new BeanValidator();
+        beanValidator.validate(install);
+
         if (install.getAppId() == null) {
             String errorMessage = "Apps not found in payload.";
             return RestApiUtil.buildBadRequestException(errorMessage).getResponse();
