@@ -1059,8 +1059,8 @@ public class APIProviderHostObject extends ScriptableObject {
         String description = (String) apiData.get("overview_description", apiData);
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
-       apiData.values();
-       apiData.keySet();
+        apiData.values();
+        apiData.keySet();
         ownerName = (String) apiData.get("overview_owner", apiData);
 
         logoutURL = logoutURL.replace(endpoint, "");
