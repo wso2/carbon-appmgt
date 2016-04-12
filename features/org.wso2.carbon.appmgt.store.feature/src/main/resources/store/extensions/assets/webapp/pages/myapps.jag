@@ -204,6 +204,7 @@ require('/modules/store.js').exec(function (ctx) {
 
             }
             else if (paging.sort == 'usage') { //sort by usage in myapps page
+                var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
                 urlQuery = 'sort=' + paging.sort + '&';
                 server.privileged(function () {
                     var userName = user ? user.username : "";
@@ -211,8 +212,8 @@ require('/modules/store.js').exec(function (ctx) {
                     var getNextAssetSet = function () {
                         var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                         var appMgtDaoObj = new appMgtDaoService();
-
-                        var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                        var offset = paging.start + index;
+                        var result = appMgtDaoObj.getAppsByHitCount(userName, offset, PAGE_SIZE);
                         if (log.isDebugEnabled()) {
                             var recordCount = 0;
                             if (result != null) {
@@ -228,25 +229,23 @@ require('/modules/store.js').exec(function (ctx) {
                             return {};
                         }
                     };
-
                     assets = [];
                     var done = false;
                     while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                         maxTry++;
-                        var result;
-                        if ((paging.start + index) < PAGE_SIZE) {
+                        var result = [];
+                        if ((paging.start + index) < totalAppCount) {
                             result = getNextAssetSet();
                         }
-                        if (result.length < 12) {
+                        if (result.length < PAGE_SIZE) {
                             done = true;
                         }
                         for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                             var aid = String(result[n].UUID);
                             try {
                                 var asset = store.asset(type, aid);
-                                asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
-                                    >= 0) {
+                                        >= 0) {
                                     //filter web apps
                                     if (asset.attributes.overview_treatAsASite != "TRUE") {
                                         assets.push(asset);
@@ -300,12 +299,7 @@ require('/modules/store.js').exec(function (ctx) {
         var nextPageAvailable = false;
 
         if (assets.length == PAGE_SIZE) {
-            // Get the starting index, offset etc .. of the assumed next page.
-            var nextPage = store.buildNextPage(request, availablePages);
-
-            // Query the assets with the assumed 'next page'
-            var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
-            if (nextAssetSet.length > 0) {
+            if (currentPage < availablePages) {
                 nextPageAvailable = true;
             }
         }

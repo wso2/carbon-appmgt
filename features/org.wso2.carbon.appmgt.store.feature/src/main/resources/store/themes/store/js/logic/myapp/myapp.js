@@ -30,7 +30,7 @@ $( document ).ready(function() {
         initializeUserActivity("init", jsonObj);
     }
 
-    $('.accessUrl').on('click', function (event) {
+    $("a[data-stats='usage']").on('click', function (event) {
         if(loggedInUserName) {
             jsonObj.appData.appId = $(this).data("id");
             jsonObj.appData.appName = $(this).data("name");
