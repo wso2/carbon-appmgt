@@ -1,27 +1,3 @@
-/*
- var render = function (theme, data, meta, require) {
- //print(caramel.build(data));
-
- theme('1-column', {
- title: data.title,
- navigation: [
- {
- partial: 'navigation',
- context: data.navigation
- }
- ],
- body: [
- {
- partial: 'userAssets',
- context: data.userAssets
- }
- ]
- });
- };
-
- */
-
-
 var render = function (theme, data, meta, require) {
     var categories = data.navigation.assets[data.type].categories;
     var searchUrl = "/extensions/assets/mobileapp/myapps";
@@ -94,7 +70,8 @@ var render = function (theme, data, meta, require) {
                         navigation: createLeftNavLinks(data),
                         tags: data.tags,
                         recentApps: data.recentAssets,
-                        assetType: data.assetType
+                        assetType: data.assetType,
+                        hideTag: true
                     }
                 }
             ],

@@ -23,7 +23,7 @@ var caramel;
 include('../modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
-if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+if(!storeHostObj.isAssetTypeEnabled("webapp")) {
     response.sendError(404,'Resource does not exist');
 }
 

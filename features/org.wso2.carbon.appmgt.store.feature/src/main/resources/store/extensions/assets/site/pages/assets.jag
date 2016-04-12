@@ -20,7 +20,7 @@
 include('../modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
-if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
+if(!storeHostObj.isAssetTypeEnabled("site")) {
     response.sendError(404,'Resource does not exist');
 }
 
