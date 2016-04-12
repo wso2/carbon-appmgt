@@ -24,7 +24,13 @@
 
                             <button type="button" id="searchSelect" class="btn dropdown-toggle search-by"
                                     data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="false">
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
+                                    value="Provider"
+                                {{else}}
+                                    value="Name"
+                                {{/ifCond}}>
                                 {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
                                     By Provider
                                 {{else}}

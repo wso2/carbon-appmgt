@@ -16,6 +16,10 @@ $(function () {
     });
 
     function searchAsset(searchTerm) {
+        if(isEmpty(searchTerm)) {
+            return;
+        }
+
         if (!checkIllegalChars(searchTerm)) {
             var searchSelect = $("#searchPane input[type='radio'][name='optionsRadios']:checked").val();
             searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
@@ -34,6 +38,12 @@ $(function () {
         return special_regex.test(value);
     }
 
+    function isEmpty(value) {
+        if (value && value.trim().length > 0) {
+            return false
+        }
+        return true;
+    }
 
     $('html').click(function () {
         if ($('#search-dropdown-cont').is(':visible')) {
