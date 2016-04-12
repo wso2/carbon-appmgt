@@ -21,6 +21,10 @@ $(function () {
     });
 
     function searchAsset(searchTerm) {
+        if(isEmpty(searchTerm)) {
+            return;
+        }
+
         if (!checkIllegalChars(searchTerm)) {
             var searchSelect = $('#searchSelect').val();
             searchTerm = searchSelect + ":" + "\"" + searchTerm + "\"";
@@ -45,6 +49,13 @@ $(function () {
         // registry doesn't allow following illegal charecters
         var special_regex = /[~!@#;%^*()+={}|\\<>"',]/;
         return special_regex.test(value);
+    }
+
+    function isEmpty(value) {
+        if (value && value.trim().length > 0) {
+            return false
+        }
+        return true;
     }
 
 });
