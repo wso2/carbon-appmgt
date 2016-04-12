@@ -21,8 +21,8 @@ package org.wso2.carbon.appmgt.custom.mediators.redirection;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.wso2.carbon.appmgt.gateway.utils.AppContextCacheUtil;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
-import org.wso2.carbon.appmgt.impl.utils.AppContextCacheUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;

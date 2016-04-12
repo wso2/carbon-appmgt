@@ -476,9 +476,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      *
      * @param policyId Entitlement policy id
      * @return entitlement policy content
+     * @throws AppManagementException
      */
     @Override
-    public String getEntitlementPolicy(String policyId) {
+    public String getEntitlementPolicy(String policyId) throws AppManagementException {
         if (policyId == null) {
             return null;
         }
@@ -864,7 +865,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                             if (!api.getSkipGateway()) {
                                 publishToGateway(api);
                             }
-                        } else {
+                        } else if(status.equals(APIStatus.UNPUBLISHED) || status.equals(APIStatus.RETIRED)) {
                             removeFromGateway(api);
                         }
                     }

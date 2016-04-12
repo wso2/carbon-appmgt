@@ -85,50 +85,17 @@
                                 <importFeatureDef>org.wso2.carbon.registry.ui.menu.governance:${carbon.registry.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.registry.task:${carbon.registry.version}</importFeatureDef>
 
-                                <!--importFeatureDef>org.apache.synapse.wso2:${carbon.mediation
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.transport.nhttp:${carbon.mediation
-                                .version}</importFeatureDef-->
                                 <importFeatureDef>org.apache.axis2.transport.mail:${axis2.transport.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.task.server:${axis2.transport.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.mediation.initializer:${carbon.mediation
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.admin:${carbon.mediation
-                                .version}</importFeatureDef-->
-                                <importFeatureDef>org.wso2.carbon.inbound.endpoints.server:${carbon.mediation.version}</importFeatureDef>
-
-                                <!--importFeatureDef>org.wso2.carbon.mediation.statistics:${carbon.mediation
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.configadmin:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.tracer:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediators.server:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.ui:${carbon.mediation
-                                .version}</importFeatureDef-->
 
                                 <importFeatureDef>org.wso2.appmanager.styles:${carbon.appmgt.server.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.relay.server:${carbon.mediation.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.event:${carbon.commons.version_4.4.8}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version_4.4.8}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.event.common:${carbon.commons.version_4.4.8}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.application.mgt:${carbon.commons.version_4.4.8}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.application.mgt:${carbon.identity.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.application.mgt.synapse.server:${carbon.mediation
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.application.deployer.synapse:${carbon.mediation
-                                .version}</importFeatureDef-->
 
-                                <!--APP Management related feature-->
                                 <importFeatureDef>org.jaggeryjs:${jaggery.js.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.appmgt:${carbon.appmgt
-                                .version}</importFeatureDef-->
-                                <importFeatureDef>org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.stratos.appmgt.dashboard.ui:${carbon.appmgt.server.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.publisher:${carbon.appmgt.version}</importFeatureDef>
 
                                 <!--Governance Feature-->
                                 <importFeatureDef>org.wso2.carbon.registry.extensions:${carbon.governance.version}</importFeatureDef>
@@ -168,7 +135,6 @@
                                 <importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version_4.6.0}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.webapp.mgt:${carbon.deployment.version_4.6.0}</importFeatureDef>
 
-                                <!--importFeatureDef>store:${es.feature.version}</importFeatureDef-->
                                 <importFeatureDef>org.jaggeryjs.modules.handlebars:${handlebars.feature.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.store.modules.login:${es.feature.version}</importFeatureDef>
                                 <importFeatureDef>org.jaggeryjs.modules.markdown:${jaggeryjs.markdown.feature.version}</importFeatureDef>
@@ -190,7 +156,6 @@
                                 <importFeatureDef>org.wso2.carbon.social:${carbon.store.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.sso.saml:${carbon.identity.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso:${carbon.identity.version}</importFeatureDef>
-                                <!--mportFeatureDef>caramel:${jaggeryjs.caramel.feature.version}</importFeatureDef-->
                                 <importFeatureDef>org.wso2.carbon.hostobjects.sso.server:${carbon.commons.version}</importFeatureDef>
 
                                 <importFeatureDef>org.wso2.carbon.ldap.server:${carbon.identity.version}</importFeatureDef>
@@ -213,10 +178,17 @@
                                 <importFeatureDef>org.wso2.carbon.identity.provisioning.connector.spml.server:${carbon.identity.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.authenticator.iwa:${carbon.identity.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.notification.mgt:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.identity.user.account.association:${carbon.identity.version}</importFeatureDef>
 
                                 <importFeatureDef>org.wso2.carbon.databridge.commons.server:${carbon.commons.version_4.4.8}</importFeatureDef>
 
-                                <importFeatureDef>org.wso2.carbon.identity.user.account.association:${carbon.identity.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.stratos.appmgt.dashboard.ui:${carbon.appmgt.server.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.appmgt.publisher:${carbon.appmgt.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
@@ -224,5 +196,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

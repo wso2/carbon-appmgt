@@ -243,6 +243,16 @@
         <version>${orbit.version.axis2}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.axis2.wso2</groupId>
+        <artifactId>axis2-client</artifactId>
+        <version>${orbit.version.axis2}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+        <artifactId>axiom</artifactId>
+        <version>${orbit.version.axiom}</version>
+      </dependency>
+      <dependency>
         <groupId>rhino.wso2</groupId>
         <artifactId>js</artifactId>
         <version>${rhino.wso2.js.version}</version>
@@ -368,7 +378,7 @@
         <version>${carbon.commons.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>org.wso2.carbon.sequences.stub</artifactId>
         <version>${carbon.sequences.stub.version}</version>
       </dependency>
@@ -378,7 +388,7 @@
         <version>${idp.mgt.stub.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
         <version>${carbon.mediation.security.stub}</version>
       </dependency>
@@ -594,6 +604,11 @@
         <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
         <version>${carbon.device.mgt.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.appmgt</groupId>
+        <artifactId>org.wso2.carbon.appmgt.gateway.stub</artifactId>
+        <version>${carbon.appmgt.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -645,7 +660,7 @@
     <bam.presentation.stub.version>4.2.0</bam.presentation.stub.version>
     <carbon.claim.mgt.stub>5.0.7</carbon.claim.mgt.stub>
     <carbon.identity.user.profile.stub>5.0.7</carbon.identity.user.profile.stub>
-    <carbon.mediation.security.stub>4.2.0</carbon.mediation.security.stub>
+    <carbon.mediation.security.stub>4.6.0</carbon.mediation.security.stub>
     <carbon.webapp.mgt.stub>4.2.0</carbon.webapp.mgt.stub>
 
     <!-- P2 Plugin Version -->
@@ -654,6 +669,7 @@
     <!-- Axis2 Version -->
     <axis2.wso2.version>1.6.1.wso2v11</axis2.wso2.version>
     <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
+    <orbit.version.axiom>1.2.11.wso2v4</orbit.version.axiom>
     <axis2.osgi.version.range>[1.6.1.wso2v10, 1.7.0)</axis2.osgi.version.range>
     <axis2.transport.version>1.1.0-wso2v15</axis2.transport.version>
 
@@ -699,7 +715,7 @@
     <handlebars.feature.version>1.0.0</handlebars.feature.version>
 
     <carbon.usage.agent.version>2.1.2</carbon.usage.agent.version>
-    <carbon.sequences.stub.version>4.2.1</carbon.sequences.stub.version>
+    <carbon.sequences.stub.version>4.6.0</carbon.sequences.stub.version>
 
     <!-- Misc Versions -->
     <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>

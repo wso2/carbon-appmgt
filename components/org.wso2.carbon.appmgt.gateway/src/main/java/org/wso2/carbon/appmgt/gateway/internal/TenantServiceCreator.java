@@ -17,7 +17,7 @@
 *
 */
 
-package org.wso2.carbon.appmgt.impl.observers;
+package org.wso2.carbon.appmgt.gateway.internal;
 
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;

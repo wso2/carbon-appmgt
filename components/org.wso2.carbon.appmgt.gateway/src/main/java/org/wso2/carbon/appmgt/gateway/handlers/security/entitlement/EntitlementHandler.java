@@ -131,7 +131,7 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
     	return appMDAO.getApplicableEntitlementPolicyIds(appId, matchedUrlPattern, httpVerb);
 	}
 
-	private boolean isResourcePermitted(EntitlementDecisionRequest request){
+	private boolean isResourcePermitted(EntitlementDecisionRequest request) throws AppManagementException {
         EntitlementService entitlementService = getEntitlementService();
         return entitlementService.isPermitted(request);
     }
@@ -192,7 +192,7 @@ public class EntitlementHandler extends AbstractHandler implements ManagedLifecy
      * Service endpoint is not available when init is called.
      * @return
      */
-    private EntitlementService getEntitlementService() {
+    private EntitlementService getEntitlementService() throws AppManagementException {
         return EntitlementServiceFactory.getEntitlementService(configuration);
     }
 }

@@ -42,14 +42,6 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
         </dependency>
-        <!-- APPM 1.1.0 <dependency>-->
-            <!--<groupId>org.wso2.carbon.apimgt</groupId>-->
-            <!--<artifactId>org.wso2.carbon.apimgt.handlers.security.stub</artifactId>-->
-        <!--</dependency>-->
-        <!-- APPM 1.1.0 <dependency>-->
-            <!--<groupId>org.wso2.carbon</groupId>-->
-            <!--<artifactId>org.wso2.carbon.apimgt.keymgt.stub</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.googlecode.json-simple.wso2</groupId>
             <artifactId>json-simple</artifactId>
@@ -58,11 +50,44 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.custom.mediators</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.sequences.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wso2.carbon.appmgt</groupId>
+                                    <artifactId>org.wso2.carbon.appmgt.oauth.endpoint</artifactId>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
+                                    <destFileName>appmoauth2.war</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -88,7 +113,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.wso2.maven</groupId>
                 <artifactId>carbon-p2-plugin</artifactId>
@@ -114,17 +138,20 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.impl:${carbon.appmgt.version}</bundleDef>
-                                <!-- APPM 1.1.0 <bundleDef>org.wso2.carbon:org.wso2.carbon.apimgt.keymgt.stub:${apimgt.keymgt.stub.version}</bundleDef>-->
-                                <!-- APPM 1.1.0 <bundleDef>org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.handlers.security.stub:${carbon.apimgt.version}</bundleDef>-->
                                 <bundleDef>com.googlecode.json-simple.wso2:json-simple:${json-simple.wso2.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.custom.mediators:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.throttle.core:${carbon.throttle.version}</importBundleDef>
                             </importBundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
-                                <!--<importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>-->
+                                <!--importFeatureDef>org.apache.synapse.wso2:${carbon.mediation
+                                .version}</importFeatureDef-->
+                                <!--importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
+                                .stub:${carbon.mediation.version}</importBundleDef>
+                                <importBundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security
+                                .stub:${carbon.mediation.version}</importBundleDef-->
                             </importFeatures>
                         </configuration>
                     </execution>

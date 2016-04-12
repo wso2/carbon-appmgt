@@ -26,7 +26,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-import org.wso2.carbon.appmgt.impl.observers.TenantServiceCreator;
+import org.wso2.carbon.appmgt.gateway.internal.TenantServiceCreator;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;

@@ -27,7 +27,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementDecisionRequest;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
@@ -86,7 +86,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         this.password = password;
     }
 
-    public void init(){
+    public void init() throws AppManagementException {
         try {
             String cookie = login(serverUrl, username, password);
 
@@ -100,7 +100,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         } catch (AxisFault axisFault) {
             String errorMessage = "Cannot initialize XACML entitlement service.";
             log.error(errorMessage, axisFault);
-            throw new SynapseException(errorMessage, axisFault);
+            throw new AppManagementException(errorMessage, axisFault);
         }
     }
 
@@ -187,12 +187,12 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
     }
 
     @Override
-    public boolean isPermitted(EntitlementDecisionRequest request) {
+    public boolean isPermitted(EntitlementDecisionRequest request) throws AppManagementException {
 
         PEPProxy pepProxy = getPepProxy();
 
         if(pepProxy == null){
-            throw new SynapseException("Cannot create PEP proxy.");
+            throw new AppManagementException("Cannot create PEP proxy.");
         }
 
         String decisionResult = null;
@@ -213,7 +213,7 @@ public class XacmlEntitlementServiceImpl implements EntitlementService {
         } catch (Exception e) {
             String errorMessage = String.format("Error while evaluating entitlement for the policy id '%s'.", request.getPolicyId());
             log.error(errorMessage, e);
-            throw new SynapseException(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
         }
 
     }

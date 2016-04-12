@@ -164,7 +164,7 @@ public interface APIProvider extends APIManager {
      * @param policyId Entitlement policy id
      * @return Entitlement policy content
      */
-    String getEntitlementPolicy(String policyId);
+    String getEntitlementPolicy(String policyId) throws AppManagementException;
 
     /**
      * Get web application id

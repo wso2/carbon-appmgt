@@ -19,7 +19,7 @@ package org.wso2.carbon.appmgt.gateway.internal;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
-import org.wso2.carbon.appmgt.impl.token.TokenGenerator;
+import org.wso2.carbon.appmgt.gateway.token.TokenGenerator;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ServiceReferenceHolder {

@@ -26,6 +26,14 @@
         <parameter name="hiddenService" locked="true">true</parameter>
     </service>
 
+    <service name="AppGatewayAdmin" scope="transportsession">
+        <transports><transport>http</transport></transports>
+        <description>Admin service to manage App publisher and store related functionality at the App Gateway</description>
+        <parameter name="ServiceClass">org.wso2.carbon.appmgt.gateway.service.AppGatewayAdmin</parameter>
+        <parameter name="DoAuthentication" locked="true">true</parameter>
+        <parameter name="AuthorizationAction" locked="true">/permission/admin/login</parameter>
+    </service>
+
     <service name="AppManagerOAuth2Service" scope="application">
         <transports>
             <transport>https</transport>

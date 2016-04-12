@@ -1,0 +1,1257 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.gateway.appmgt.carbon.wso2.org" xmlns:ax213="http://dto.gateway.appmgt.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax211="http://api.appmgt.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.gateway.appmgt.carbon.wso2.org">
+    <wsdl:documentation>AppGatewayAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://dto.gateway.appmgt.carbon.wso2.org/xsd">
+            <xs:complexType name="AppData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="context" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="host" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="port" type="xs:int"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="resources" nillable="true" type="ax213:ResourceData"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ResourceData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="contentType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="faultSeqXml" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="faultSequenceKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inSeqXml" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inSequenceKey" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="methods" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outSeqXml" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outSequenceKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="protocol" type="xs:int"/>
+                    <xs:element minOccurs="0" name="uriTemplate" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="urlMapping" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="userAgent" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://api.appmgt.carbon.wso2.org/xsd">
+            <xs:complexType name="AppManagementException">
+                <xs:sequence/>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax214="http://dto.gateway.appmgt.carbon.wso2.org/xsd" xmlns:ax212="http://api.appmgt.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.gateway.appmgt.carbon.wso2.org">
+            <xs:import namespace="http://api.appmgt.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://dto.gateway.appmgt.carbon.wso2.org/xsd"/>
+            <xs:element name="AppGatewayAdminAppManagementException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="AppManagementException" nillable="true" type="ax212:AppManagementException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionedWebAppForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getVersionedWebAppResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addNonVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addNonVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateNonVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateNonVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appConfig" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteNonVersionedWebAppForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteNonVersionedWebApp">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNonVersionedWebAppDataForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNonVersionedWebAppDataForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNonVersionedWebAppData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="appProviderName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="appName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getNonVersionedWebAppDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax214:AppData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addSequenceForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteSequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteSequenceForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequenceForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequenceForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExistingSequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExistingSequenceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExistingSequenceForTenant">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isExistingSequenceForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="doEncryption">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="plainTextPass" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="doEncryptionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addSequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequenceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:getVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="getVersionedWebAppForTenantResponse">
+        <wsdl:part name="parameters" element="ns:getVersionedWebAppForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="AppGatewayAdminAppManagementException">
+        <wsdl:part name="parameters" element="ns:AppGatewayAdminAppManagementException"/>
+    </wsdl:message>
+    <wsdl:message name="getSequenceForTenantRequest">
+        <wsdl:part name="parameters" element="ns:getSequenceForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="getSequenceForTenantResponse">
+        <wsdl:part name="parameters" element="ns:getSequenceForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:deleteVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="deleteSequenceForTenantRequest">
+        <wsdl:part name="parameters" element="ns:deleteSequenceForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="updateVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:updateVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="addVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:addVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="getSequenceRequest">
+        <wsdl:part name="parameters" element="ns:getSequence"/>
+    </wsdl:message>
+    <wsdl:message name="getSequenceResponse">
+        <wsdl:part name="parameters" element="ns:getSequenceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteNonVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:deleteNonVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="doEncryptionRequest">
+        <wsdl:part name="parameters" element="ns:doEncryption"/>
+    </wsdl:message>
+    <wsdl:message name="doEncryptionResponse">
+        <wsdl:part name="parameters" element="ns:doEncryptionResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:deleteVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="isExistingSequenceForTenantRequest">
+        <wsdl:part name="parameters" element="ns:isExistingSequenceForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="isExistingSequenceForTenantResponse">
+        <wsdl:part name="parameters" element="ns:isExistingSequenceForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addSequenceForTenantRequest">
+        <wsdl:part name="parameters" element="ns:addSequenceForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="deleteNonVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:deleteNonVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="updateNonVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:updateNonVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="addSequenceRequest">
+        <wsdl:part name="parameters" element="ns:addSequence"/>
+    </wsdl:message>
+    <wsdl:message name="getVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:getVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="getVersionedWebAppResponse">
+        <wsdl:part name="parameters" element="ns:getVersionedWebAppResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:addVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="addNonVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:addNonVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="getNonVersionedWebAppDataForTenantRequest">
+        <wsdl:part name="parameters" element="ns:getNonVersionedWebAppDataForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="getNonVersionedWebAppDataForTenantResponse">
+        <wsdl:part name="parameters" element="ns:getNonVersionedWebAppDataForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateNonVersionedWebAppRequest">
+        <wsdl:part name="parameters" element="ns:updateNonVersionedWebApp"/>
+    </wsdl:message>
+    <wsdl:message name="isExistingSequenceRequest">
+        <wsdl:part name="parameters" element="ns:isExistingSequence"/>
+    </wsdl:message>
+    <wsdl:message name="isExistingSequenceResponse">
+        <wsdl:part name="parameters" element="ns:isExistingSequenceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:updateVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="addNonVersionedWebAppForTenantRequest">
+        <wsdl:part name="parameters" element="ns:addNonVersionedWebAppForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="deleteSequenceRequest">
+        <wsdl:part name="parameters" element="ns:deleteSequence"/>
+    </wsdl:message>
+    <wsdl:message name="getNonVersionedWebAppDataRequest">
+        <wsdl:part name="parameters" element="ns:getNonVersionedWebAppData"/>
+    </wsdl:message>
+    <wsdl:message name="getNonVersionedWebAppDataResponse">
+        <wsdl:part name="parameters" element="ns:getNonVersionedWebAppDataResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="AppGatewayAdminPortType">
+        <wsdl:operation name="getVersionedWebAppForTenant">
+            <wsdl:input message="ns:getVersionedWebAppForTenantRequest" wsaw:Action="urn:getVersionedWebAppForTenant"/>
+            <wsdl:output message="ns:getVersionedWebAppForTenantResponse" wsaw:Action="urn:getVersionedWebAppForTenantResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
+            <wsdl:input message="ns:getSequenceForTenantRequest" wsaw:Action="urn:getSequenceForTenant"/>
+            <wsdl:output message="ns:getSequenceForTenantResponse" wsaw:Action="urn:getSequenceForTenantResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getSequenceForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebAppForTenant">
+            <wsdl:input message="ns:deleteVersionedWebAppForTenantRequest" wsaw:Action="urn:deleteVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
+            <wsdl:input message="ns:deleteSequenceForTenantRequest" wsaw:Action="urn:deleteSequenceForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteSequenceForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebApp">
+            <wsdl:input message="ns:updateVersionedWebAppRequest" wsaw:Action="urn:updateVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:updateVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebApp">
+            <wsdl:input message="ns:addVersionedWebAppRequest" wsaw:Action="urn:addVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getSequence">
+            <wsdl:input message="ns:getSequenceRequest" wsaw:Action="urn:getSequence"/>
+            <wsdl:output message="ns:getSequenceResponse" wsaw:Action="urn:getSequenceResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getSequenceAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebAppForTenant">
+            <wsdl:input message="ns:deleteNonVersionedWebAppForTenantRequest" wsaw:Action="urn:deleteNonVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteNonVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="doEncryption">
+            <wsdl:input message="ns:doEncryptionRequest" wsaw:Action="urn:doEncryption"/>
+            <wsdl:output message="ns:doEncryptionResponse" wsaw:Action="urn:doEncryptionResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:doEncryptionAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebApp">
+            <wsdl:input message="ns:deleteVersionedWebAppRequest" wsaw:Action="urn:deleteVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequenceForTenant">
+            <wsdl:input message="ns:isExistingSequenceForTenantRequest" wsaw:Action="urn:isExistingSequenceForTenant"/>
+            <wsdl:output message="ns:isExistingSequenceForTenantResponse" wsaw:Action="urn:isExistingSequenceForTenantResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:isExistingSequenceForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addSequenceForTenant">
+            <wsdl:input message="ns:addSequenceForTenantRequest" wsaw:Action="urn:addSequenceForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addSequenceForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebApp">
+            <wsdl:input message="ns:deleteNonVersionedWebAppRequest" wsaw:Action="urn:deleteNonVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteNonVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebAppForTenant">
+            <wsdl:input message="ns:updateNonVersionedWebAppForTenantRequest" wsaw:Action="urn:updateNonVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:updateNonVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addSequence">
+            <wsdl:input message="ns:addSequenceRequest" wsaw:Action="urn:addSequence"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addSequenceAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionedWebApp">
+            <wsdl:input message="ns:getVersionedWebAppRequest" wsaw:Action="urn:getVersionedWebApp"/>
+            <wsdl:output message="ns:getVersionedWebAppResponse" wsaw:Action="urn:getVersionedWebAppResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebAppForTenant">
+            <wsdl:input message="ns:addVersionedWebAppForTenantRequest" wsaw:Action="urn:addVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebApp">
+            <wsdl:input message="ns:addNonVersionedWebAppRequest" wsaw:Action="urn:addNonVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addNonVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppDataForTenant">
+            <wsdl:input message="ns:getNonVersionedWebAppDataForTenantRequest" wsaw:Action="urn:getNonVersionedWebAppDataForTenant"/>
+            <wsdl:output message="ns:getNonVersionedWebAppDataForTenantResponse" wsaw:Action="urn:getNonVersionedWebAppDataForTenantResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getNonVersionedWebAppDataForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebApp">
+            <wsdl:input message="ns:updateNonVersionedWebAppRequest" wsaw:Action="urn:updateNonVersionedWebApp"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:updateNonVersionedWebAppAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequence">
+            <wsdl:input message="ns:isExistingSequenceRequest" wsaw:Action="urn:isExistingSequence"/>
+            <wsdl:output message="ns:isExistingSequenceResponse" wsaw:Action="urn:isExistingSequenceResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:isExistingSequenceAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebAppForTenant">
+            <wsdl:input message="ns:updateVersionedWebAppForTenantRequest" wsaw:Action="urn:updateVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:updateVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebAppForTenant">
+            <wsdl:input message="ns:addNonVersionedWebAppForTenantRequest" wsaw:Action="urn:addNonVersionedWebAppForTenant"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:addNonVersionedWebAppForTenantAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequence">
+            <wsdl:input message="ns:deleteSequenceRequest" wsaw:Action="urn:deleteSequence"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:deleteSequenceAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppData">
+            <wsdl:input message="ns:getNonVersionedWebAppDataRequest" wsaw:Action="urn:getNonVersionedWebAppData"/>
+            <wsdl:output message="ns:getNonVersionedWebAppDataResponse" wsaw:Action="urn:getNonVersionedWebAppDataResponse"/>
+            <wsdl:fault message="ns:AppGatewayAdminAppManagementException" name="AppGatewayAdminAppManagementException" wsaw:Action="urn:getNonVersionedWebAppDataAppGatewayAdminAppManagementException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AppGatewayAdminSoap11Binding" type="ns:AppGatewayAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:getVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
+            <soap:operation soapAction="urn:getSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:deleteVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebApp">
+            <soap:operation soapAction="urn:updateVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
+            <soap:operation soapAction="urn:deleteSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebApp">
+            <soap:operation soapAction="urn:addVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSequence">
+            <soap:operation soapAction="urn:getSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:deleteNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="doEncryption">
+            <soap:operation soapAction="urn:doEncryption" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebApp">
+            <soap:operation soapAction="urn:deleteVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequenceForTenant">
+            <soap:operation soapAction="urn:isExistingSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSequenceForTenant">
+            <soap:operation soapAction="urn:addSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebApp">
+            <soap:operation soapAction="urn:deleteNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:updateNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSequence">
+            <soap:operation soapAction="urn:addSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionedWebApp">
+            <soap:operation soapAction="urn:getVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:addVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebApp">
+            <soap:operation soapAction="urn:addNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppDataForTenant">
+            <soap:operation soapAction="urn:getNonVersionedWebAppDataForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebApp">
+            <soap:operation soapAction="urn:updateNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequence">
+            <soap:operation soapAction="urn:isExistingSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:updateVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebAppForTenant">
+            <soap:operation soapAction="urn:addNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppData">
+            <soap:operation soapAction="urn:getNonVersionedWebAppData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequence">
+            <soap:operation soapAction="urn:deleteSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AppGatewayAdminSoap12Binding" type="ns:AppGatewayAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:getVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
+            <soap12:operation soapAction="urn:getSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:deleteVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebApp">
+            <soap12:operation soapAction="urn:updateVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
+            <soap12:operation soapAction="urn:deleteSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebApp">
+            <soap12:operation soapAction="urn:addVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSequence">
+            <soap12:operation soapAction="urn:getSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:deleteNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="doEncryption">
+            <soap12:operation soapAction="urn:doEncryption" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebApp">
+            <soap12:operation soapAction="urn:deleteVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequenceForTenant">
+            <soap12:operation soapAction="urn:isExistingSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSequenceForTenant">
+            <soap12:operation soapAction="urn:addSequenceForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebApp">
+            <soap12:operation soapAction="urn:deleteNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:updateNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addSequence">
+            <soap12:operation soapAction="urn:addSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionedWebApp">
+            <soap12:operation soapAction="urn:getVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:addVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebApp">
+            <soap12:operation soapAction="urn:addNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppDataForTenant">
+            <soap12:operation soapAction="urn:getNonVersionedWebAppDataForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebApp">
+            <soap12:operation soapAction="urn:updateNonVersionedWebApp" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequence">
+            <soap12:operation soapAction="urn:isExistingSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:updateVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebAppForTenant">
+            <soap12:operation soapAction="urn:addNonVersionedWebAppForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppData">
+            <soap12:operation soapAction="urn:getNonVersionedWebAppData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequence">
+            <soap12:operation soapAction="urn:deleteSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="AppGatewayAdminAppManagementException">
+                <soap12:fault use="literal" name="AppGatewayAdminAppManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AppGatewayAdminHttpBinding" type="ns:AppGatewayAdminPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getVersionedWebAppForTenant">
+            <http:operation location="getVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
+            <http:operation location="getSequenceForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebAppForTenant">
+            <http:operation location="deleteVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebApp">
+            <http:operation location="updateVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
+            <http:operation location="deleteSequenceForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebApp">
+            <http:operation location="addVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getSequence">
+            <http:operation location="getSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebAppForTenant">
+            <http:operation location="deleteNonVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="doEncryption">
+            <http:operation location="doEncryption"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteVersionedWebApp">
+            <http:operation location="deleteVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequenceForTenant">
+            <http:operation location="isExistingSequenceForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addSequenceForTenant">
+            <http:operation location="addSequenceForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteNonVersionedWebApp">
+            <http:operation location="deleteNonVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebAppForTenant">
+            <http:operation location="updateNonVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addSequence">
+            <http:operation location="addSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getVersionedWebApp">
+            <http:operation location="getVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addVersionedWebAppForTenant">
+            <http:operation location="addVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebApp">
+            <http:operation location="addNonVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppDataForTenant">
+            <http:operation location="getNonVersionedWebAppDataForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateNonVersionedWebApp">
+            <http:operation location="updateNonVersionedWebApp"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="isExistingSequence">
+            <http:operation location="isExistingSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateVersionedWebAppForTenant">
+            <http:operation location="updateVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addNonVersionedWebAppForTenant">
+            <http:operation location="addNonVersionedWebAppForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getNonVersionedWebAppData">
+            <http:operation location="getNonVersionedWebAppData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequence">
+            <http:operation location="deleteSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AppGatewayAdmin">
+        <wsdl:port name="AppGatewayAdminHttpSoap11Endpoint" binding="ns:AppGatewayAdminSoap11Binding">
+            <soap:address location="http://localhost:8280/services/AppGatewayAdmin.AppGatewayAdminHttpSoap11Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="AppGatewayAdminHttpSoap12Endpoint" binding="ns:AppGatewayAdminSoap12Binding">
+            <soap12:address
+                    location="http://localhost:8280/services/AppGatewayAdmin.AppGatewayAdminHttpSoap12Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="AppGatewayAdminHttpEndpoint" binding="ns:AppGatewayAdminHttpBinding">
+            <http:address location="http://localhost:8280/services/AppGatewayAdmin.AppGatewayAdminHttpEndpoint"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
