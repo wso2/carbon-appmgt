@@ -244,6 +244,9 @@ require('/modules/store.js').exec(function (ctx) {
                             var aid = String(result[n].UUID);
                             try {
                                 var asset = store.asset(type, aid);
+                                if (!asset) {
+                                    continue;
+                                }
                                // asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
                                         >= 0) {
