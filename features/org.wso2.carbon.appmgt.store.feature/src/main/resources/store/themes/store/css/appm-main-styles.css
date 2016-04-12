@@ -700,6 +700,18 @@ active: background 10% lighter, border 5% darker
     font-weight: 100;
 }
 
+.fav-app-title {
+    width: auto;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 3px solid #3a9ecf;
+    float: left;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 100;
+    margin-bottom: 10px;
+}
+
 .more {
     color:#000;
     float:right;
