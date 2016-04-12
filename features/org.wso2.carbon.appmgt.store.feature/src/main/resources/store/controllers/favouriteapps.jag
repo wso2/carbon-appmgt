@@ -141,7 +141,8 @@ require('/modules/store.js').exec(function (ctx) {
             },
             config: {
                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList:enabledTypeList
             },
             navigation: navigationData,
             search: {

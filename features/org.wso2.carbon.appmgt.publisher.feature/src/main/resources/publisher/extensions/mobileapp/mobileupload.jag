@@ -1,5 +1,6 @@
 <%
 (function(){
+    var CONTENT_TYPE_JSON = "application/json";
 	var mam_config = require('/extensions/mobileapp/config/mam-config.json');
 	var log=new Log();
     var caramel = require('caramel');
@@ -116,16 +117,16 @@
 					var information = JSON.parse(d);
 					mergeRecursive(meta,information);
 				}
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
 				print(meta);
 				log.debug("Successfully discovered");
 			}catch(e){
 				log.debug("Uploaded file is corrupted");
-                response.contentType = "application/json";
+                response.contentType = CONTENT_TYPE_JSON;
 				print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Uploaded file is corrupted"]}})
 			}
 		}else{
-            response.contentType = "application/json";
+            response.contentType = CONTENT_TYPE_JSON;
 			print({"ok" : false, "message" : "Validation failure", "report" : {"failed" : true, "name" : ["Invalid Filetype - Uploaded file is not an archive"]}})
 			return;
 		}

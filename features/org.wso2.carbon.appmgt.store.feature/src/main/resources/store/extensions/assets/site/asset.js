@@ -4,8 +4,13 @@ var assetLinks = function (user) {
         title: 'Sites',
         links: [
             {
-                title: 'My Applications',
+                title: 'My Apps',
                 url: 'myapps',
+                path: 'myapps.jag'
+            },
+            {
+                title: 'All Apps',
+                url: 'apps',
                 path: 'myapps.jag'
             },
             {

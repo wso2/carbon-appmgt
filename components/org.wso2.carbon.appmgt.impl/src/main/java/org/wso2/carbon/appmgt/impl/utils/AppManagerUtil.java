@@ -186,7 +186,7 @@ public final class AppManagerUtil {
 			api.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
 			api.setSandboxUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL));
 			api.setStatus(getApiStatus(artifact.getLifecycleState().toUpperCase()));
-			api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL));
 			api.setWsdlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WSDL));
 			api.setWadlUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_WADL));
 			api.setTechnicalOwner(artifact.getAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER));
@@ -318,6 +318,16 @@ public final class AppManagerUtil {
                                                               AppDefaultVersion.APP_IS_ANY_LIFECYCLE_STATE);
             api.setDefaultVersion(apiVersion.equals(defaultVersion));
 
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
+
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp fro artifact ";
 			throw new AppManagementException(msg, e);
@@ -372,6 +382,17 @@ public final class AppManagerUtil {
 
 			api.setSubscriptionAvailability(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABILITY));
 			api.setSubscriptionAvailableTenants(artifact.getAttribute(AppMConstants.API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS));
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
+
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp from artifact ";
@@ -1575,6 +1596,16 @@ public final class AppManagerUtil {
 			}
 			api.addTags(tags);
 			api.setLastUpdated(registry.get(artifactPath).getLastModified());
+
+            //Set Lifecycle status
+            if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
+                if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
+                    api.setLifeCycleStatus(APIStatus.INREVIEW);
+                } else {
+                    api.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                }
+            }
+            api.setLifeCycleName(artifact.getLifecycleName());
 
 		} catch (GovernanceException e) {
 			String msg = "Failed to get WebApp fro artifact ";

@@ -64,9 +64,7 @@ function promoteLifeCycleAction(assetUUID, lcAction, comment, triggeredButton) {
             allButtons.prop('disabled', true);
         },
         success: function (responseData, status, xhr) {
-            updateTable(responseData.artifacts);
-            displayMessage('success',
-                           ("<ul><li>" + responseData.messages.join("</li><li>") + "</li></ul>"));
+            location.reload();
         },
         error: function (response, status, error) {
             var responseData = JSON.parse(response.responseText);

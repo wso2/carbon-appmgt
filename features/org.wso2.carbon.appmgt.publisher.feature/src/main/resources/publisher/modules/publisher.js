@@ -264,7 +264,6 @@ var loadTagDependencies=function(registry){
 
     var TAGS_QUERY='SELECT RT.REG_TAG_ID FROM REG_RESOURCE_TAG RT ORDER BY RT.REG_TAG_ID';
     var TAGS_QUERY_PATH='/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
-
     //Check if the tag path exists
     var resource=registry.get(TAGS_QUERY_PATH);
 

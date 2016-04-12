@@ -45,7 +45,8 @@ public final class AppMConstants {
     public static final String API_RESOURCE_NAME ="/webapp";
 
     //This is registry status property
-    public static final String APP_RESOURCE_STATUS ="registry.lifecycle.WebAppLifeCycle.state";
+    public static final String WEB_APP_LIFECYCLE_STATUS = "registry.lifecycle.WebAppLifeCycle.state";
+    public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
@@ -119,6 +120,8 @@ public final class AppMConstants {
     public static final String WEBAPP_ASSET_TYPE = "webapp";
 
     public static final String SITE_ASSET_TYPE = "site";
+
+    public static final String MOBILE_ASSET_TYPE = "mobileapp";
 
     public static final String ENABLED_TYPE_LIST = "EnabledAssetTypeList.";
 
@@ -295,7 +298,8 @@ public final class AppMConstants {
         public static final String MANAGE_TIERS = "/permission/admin/manage/appm/manage_tiers";
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
     }
-    
+
+    public static final String API_NAME = "Name";
     public static final String API_GATEWAY = "APIGateway.";
     public static final String API_GATEWAY_SERVER_URL = "ServerURL";
     public static final String API_GATEWAY_USERNAME = "Username";
@@ -652,4 +656,9 @@ public final class AppMConstants {
     public static final String STATE_APPROVE ="Approve";
     public static final String STATE_PUBLISH ="Publish";
     public static final String APP_STORE_GET_UUID_URL ="/api/asset/get/uuid/webapp/";
+
+    public  static class MediaType {
+        public static final String WEB_APP = "application/vnd.wso2-webapp+xml";
+        public static final String MOBILE_APP = "application/vnd.wso2-mobileapp+xml";
+    }
 }

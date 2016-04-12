@@ -78,6 +78,23 @@ header .header-action:active {
     line-height: 30px;
 }
 
+.navbar-search, .navbar-search .navbar {
+    min-height: 40px;
+}
+
+.navbar-menu-toggle {
+    float: left;
+    height: 40px;
+    padding: 0;
+    line-height: 47px;
+    font-size: 16px;
+    background:#1A78D8;
+    color: #ffffff;
+}
+.navbar-menu-toggle:hover, .navbar-menu-toggle:focus, .navbar-menu-toggle:active {
+    color: #ffffff;
+    background: #0F5296;
+}
 /**/
 /*========== SEARCH ==========*/
 .search-bar {
@@ -131,6 +148,9 @@ header .header-action:active {
     font-weight: 100;
 }
 
+.search-field {
+    padding-left: 10px;
+}
 .search-box .search-by, .search-box .search-by-dropdown {
     background-color: #002760 !important;
     color: #fff !important;
@@ -625,36 +645,96 @@ active: background 10% lighter, border 5% darker
 }
 .ep-install-modal .dataTables_filter label input {
     margin: 0 0 0 0 !important;
+    min-width: 258px !important;
 }
 
 /*TODO: Remove following ID selectors*/
-#modalEnterpriseInstall .dataTables_info {
+.ep-install-modal .dataTables_info {
     float: none !important;
 }
 
-#modalEnterpriseInstall .dataTables_paginate {
+.ep-install-modal .dataTables_paginate {
     float: none !important;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_next{
+.ep-install-modal .dataTables_paginate .paginate_enabled_next{
     color: #1b63ff;
     margin-left: 5px;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_enabled_previous{
+.ep-install-modal .dataTables_paginate .paginate_enabled_previous{
     color: #1b63ff;
 }
 
-#modalEnterpriseInstall .dataTables_paginate .paginate_disabled_next{
+.ep-install-modal .dataTables_paginate .paginate_disabled_next{
     margin-left: 5px;
 }
 
-#modalEnterpriseInstall .modal-header button {
+.ep-install-modal .modal-header button {
     color: #000000;
 }
 
 #noty_center_layout_container {
     z-index: 100000001 !important;
 }
+
+/*=================MOBILE DEVICE INSTALL MODAL*==============*/
+.modal-dialog-devices .pager li>a {
+    background-color: transparent !important;
+}
+.modal-dialog-devices .thumbnail {
+    background-color: transparent; !important;
+    border: none !important;
+}
 /*---*/
 
+/*===================HOME PAGE SEE MORE OPTION==============*/
+.title {
+    width: auto;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 3px solid #3a9ecf;
+    float: left;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 100;
+}
+
+.fav-app-title {
+    width: auto;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 3px solid #3a9ecf;
+    float: left;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 100;
+    margin-bottom: 10px;
+}
+
+.more {
+    color:#000;
+    float:right;
+    background-image:url(../img/more-icon.png)!important;
+    background-position:center left;
+    background-repeat:no-repeat;
+    text-transform:uppercase;
+    padding:23px 3px 16px 36px !important
+}
+
+a.more:hover {
+    color:#3a9ecf;
+    text-decoration:none;
+    background-image:url(../img/more-icon-hover-blue.png)!important;
+    background-position:center left;
+    background-repeat:no-repeat
+}
+
+a.more:active {
+    background-color:none
+}
+
+a.more:focus {
+    border:none
+}
+/*---*/

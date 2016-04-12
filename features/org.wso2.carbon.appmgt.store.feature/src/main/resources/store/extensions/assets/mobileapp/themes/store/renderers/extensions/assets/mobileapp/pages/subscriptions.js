@@ -1,36 +1,12 @@
-/*
- var render = function (theme, data, meta, require) {
- //print(caramel.build(data));
-
- theme('1-column', {
- title: data.title,
- navigation: [
- {
- partial: 'navigation',
- context: data.navigation
- }
- ],
- body: [
- {
- partial: 'userAssets',
- context: data.userAssets
- }
- ]
- });
- };
-
- */
-
-
 var render = function (theme, data, meta, require) {
     var categories = data.navigation.assets[data.type].categories;
-    var searchUrl = "/assets/mobileapp";
+    var searchUrl = "/extensions/assets/mobileapp/myapps";
     var searchQuery =  data.search.query
 
     var storeObj = jagg.module("manager").getAPIStoreObj();
 
     var enabledTypeList = storeObj.getEnabledAssetTypeList();
-
+    data.tags.tagUrl = "/assets/mobileapp";
     if(data.userAssets){
 
 
@@ -48,80 +24,36 @@ var render = function (theme, data, meta, require) {
         var assets = [];
 
 
-        for( i = 0; i < data.userAssets.mobileapp.length; i++){
-
-            var platform = data.userAssets.mobileapp[i].attributes.overview_platform;
+        for(var i = 0; i < data.userAssets.mobileapp.length; i++){
+            var app = data.userAssets.mobileapp[i];
+            var platform = app.attributes.overview_platform;
             switch(userOS){
                 case "android":
                     if(platform === "android" || platform === "webapp"){
-                        assets.push(data.userAssets.mobileapp[i]);
+                        app.isActive = isActive(app);
+                        assets.push(app);
                     }
                     break;
                 case "ios":
                     if(platform === "ios" || platform === "webapp"){
-                        assets.push(data.userAssets.mobileapp[i]);
+                        app.isActive = isActive(app);
+                        assets.push(app);
                     }
                     break;
                 default:
-                    assets.push(data.userAssets.mobileapp[i]);
+                    app.isActive = isActive(app);
+                    assets.push(app);
             }
         }
 
         data.userAssets.mobileapp = assets;
 
-
-
-
-        for(i = 0; i < data.userAssets.mobileapp.length; i++){
-            //print(data.userAssets.mobileapp[i].lifecycleState);
-            if(data.userAssets.mobileapp[i].lifecycleState == 'Unpublished'){
-                delete data.userAssets.mobileapp.splice (i, 1);;
-            }
-        }
     }
 
 
     data.header.myApps = true;
 
-    /*
-    theme('2-column-right', {
-        title: data.title,
-        header: [
-            {
-                partial: 'header',
-                context: data.header
-            }
-        ],
-        navigation: [
-            {
-                partial: 'navigation',
-                context: require('/helpers/navigation.js').currentPage(data.navigation, data.type, data.search)
-            }
-        ],
-        body: [
-            {
-                partial: 'userAssets',
-                context: {
-                    'userAssets': data.userAssets,
-                    'URL': data.URL,
-                    'devices': data.devices,
-                    'selfUnsubscription' : data.selfUnsubscription,
-                    'isDeviceSubscriptionEnabled' : data.isDeviceSubscriptionEnabled
-                }
-            }
-        ],
-        right: [
-            {
-                partial: 'recent-assets',
-                context: require('/helpers/asset.js').formatRatings(data.recentAssets)
-            },
-            {
-                partial: 'tags',
-                context: data.tags
-            }
-        ]
-    });
-    */
+
     if(storeObj.isAssetTypeEnabled("mobileapp")) {
         theme('2-column-left', {
             title: data.title,
@@ -138,7 +70,8 @@ var render = function (theme, data, meta, require) {
                         navigation: createLeftNavLinks(data),
                         tags: data.tags,
                         recentApps: data.recentAssets,
-                        assetType: data.assetType
+                        assetType: data.assetType,
+                        hideTag: true
                     }
                 }
             ],
@@ -156,20 +89,21 @@ var render = function (theme, data, meta, require) {
                 {
                     partial: 'page-header',
                     context: {
-                        title: "My Mobile Apps",
-                        sorting: createSortOptions(data.user, data.config)
+                        title: "Mobile Apps",
+                        sorting: null
                     }
                 }
             ],
             pageContent: [
                 {
-                    partial: 'page-content-userAssets',
+                    partial: 'page-content-myapps',
                     context: {
                         'userAssets': data.userAssets,
                         'URL': data.URL,
                         'devices': data.devices,
                         'selfUnsubscription': data.selfUnsubscription,
-                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled
+                        'isDeviceSubscriptionEnabled': data.isDeviceSubscriptionEnabled,
+                        'searchQuery':searchQuery
                     }
                 }
             ]
@@ -197,19 +131,51 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [];
-    var isAllAppsActive = true;
-
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: "/extensions/assets/mobileapp/subscriptions"
-                                });
-        isAllAppsActive = false;
+    var enabledTypeList = data.config.enabledTypeList;
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
     }
+    var currentAppType = 'mobileapp';
 
-    leftNavigationData.push({
-                                active: isAllAppsActive, partial: 'all-apps', url: "/assets/mobileapp"
-                            });
+    var leftNavigationData = [
+        {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
+        }
+    ];
 
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            var data;
+            if (subscriptionOn) {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                     enabledTypeList[i]
+                }
+            } else {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                     enabledTypeList[i] + "/apps"
+                }
+            }
+            leftNavigationData.push(data);
+        }
+
+    }
     return leftNavigationData;
 }
+
+/**
+ * check whether asset has an active life cycle.
+ * return true if published/deprecated else false
+ */
+function isActive(asset) {
+    var active = false;
+    var lifeCycleState = asset.lifecycleState.toUpperCase();
+    if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+        active = true;
+    }
+    asset.lifecycleState = lifeCycleState;
+    return active
+};

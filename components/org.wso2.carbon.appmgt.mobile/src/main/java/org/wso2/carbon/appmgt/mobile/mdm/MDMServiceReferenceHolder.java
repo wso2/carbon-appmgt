@@ -20,13 +20,13 @@
 
 package org.wso2.carbon.appmgt.mobile.mdm;
 
-import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 
 public class MDMServiceReferenceHolder {
 
     private  static MDMServiceReferenceHolder mdmServiceReferenceHolder;
 
-    private MDMOperations mdmOperations;
+    private ApplicationOperations applicationOperations;
 
     private MDMServiceReferenceHolder(){
 
@@ -39,11 +39,11 @@ public class MDMServiceReferenceHolder {
         return mdmServiceReferenceHolder;
     }
 
-    public MDMOperations getMDMOperation(){
-            return mdmOperations;
+    public ApplicationOperations getMDMOperation(){
+            return applicationOperations;
     }
 
-    public void setMDMOperation(MDMOperations mdmOperations){
-        this.mdmOperations = mdmOperations;
+    public void setMDMOperation(ApplicationOperations applicationOperations){
+        this.applicationOperations = applicationOperations;
     }
 }

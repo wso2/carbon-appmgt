@@ -22,6 +22,7 @@ var render = function(theme, data, meta, require) {
 
 	data.header.config = data.config;
     var searchUrl = "/assets/mobileapp";
+    data.tags.tagUrl = "/assets/mobileapp";
 
     theme('2-column-left', {
         title: data.title,
@@ -36,7 +37,7 @@ var render = function(theme, data, meta, require) {
                 partial: 'left-column',
                 context: {
                     navigation: createLeftNavLinks(data),
-                    tags: null,
+                    tags: data.tags,
                     recentApps: data.recentAssets,
                     assetType: data.assetType
                 }
@@ -80,19 +81,43 @@ var render = function(theme, data, meta, require) {
 
 
 function createLeftNavLinks(data) {
-    var context = caramel.configs().context;
-    var leftNavigationData = [
-        {
-            active: true, partial: 'all-apps', url: "/assets/mobileapp"
-        }
-    ];
-
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-apps',
-                                    url: "/extensions/assets/mobileapp/subscriptions"
-                                });
+    var enabledTypeList = data.config.enabledTypeList;
+    var leftNavigationData = [];
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
     }
+    var currentType = "mobileapp";
 
+    if (subscriptionOn) {
+        leftNavigationData.push({
+                                    active: true, partial: currentType, url: "/assets/" + currentType
+
+                                });
+
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentType) {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/assets/"
+                        + enabledTypeList[i]
+
+                                        });
+            }
+        }
+    } else {
+        leftNavigationData.push({
+                                    active: true, partial: currentType, url: "/assets/" +
+                                                                             currentType
+                                });
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentType) {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                             enabledTypeList[i] + "/apps"
+                                        });
+
+            }
+        }
+    }
     return leftNavigationData;
 }
