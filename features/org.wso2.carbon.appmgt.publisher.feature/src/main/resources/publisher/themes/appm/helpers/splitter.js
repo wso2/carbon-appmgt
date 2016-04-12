@@ -40,7 +40,7 @@ var splitData = function(copyOfData){
             overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_context") {
             overview_meta.push(dataPart[i]);
-        }else if (dataPart[i].name == "overview_ownerName") {
+        }else if (dataPart[i].name == "overview_owner") {
             overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_version") {
             //log.info(dataPart);
