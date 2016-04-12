@@ -46,6 +46,15 @@ public interface APIConsumer extends APIManager {
     public Set<WebApp> getAPIsWithTag(String tag) throws AppManagementException;
 
     /**
+     * Returns the details of the owner of the given app.
+     *
+     * @param appId
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException;
+
+    /**
      * Returns a paginated list of #{@link org.wso2.carbon.apimgt.api.model.API} bearing the selected tag
      *
      * @param tag name of the tag
@@ -126,6 +135,7 @@ public interface APIConsumer extends APIManager {
      */
     public void rateAPI(APIIdentifier apiId, APIRating rating, String user) throws
                                                                             AppManagementException;
+
     /**
      * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an WebApp
      *
@@ -181,6 +191,7 @@ public interface APIConsumer extends APIManager {
 
     /**
      * Get the subscription for given search criteria.
+     *
      * @param apiIdentifier APIIdentifier
      * @param applicationId Application Id
      * @return Subscription if there is one, null otherwise.
@@ -294,6 +305,7 @@ public interface APIConsumer extends APIManager {
 
     /**
      * Check whether an application access token is already persist in database.
+     *
      * @param accessToken
      * @return
      * @throws AppManagementException
@@ -310,6 +322,7 @@ public interface APIConsumer extends APIManager {
     
     /**
      * Check whether given Tier is denied for the user
+     *
      * @param tierName
      * @return 
      * @throws AppManagementException if failed to get the tiers

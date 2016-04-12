@@ -81,6 +81,11 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         readTagCacheConfigs();
     }
 
+    @Override
+    public BusinessOwner  getBusinessOwner(String appId) throws AppManagementException {
+       return appMDAO.getBusinessOwner(appId);
+    }
+
     public APIConsumerImpl(String username) throws AppManagementException {
         super(username);
         readTagCacheConfigs();

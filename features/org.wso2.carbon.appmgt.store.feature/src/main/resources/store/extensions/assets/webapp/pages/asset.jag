@@ -4,13 +4,15 @@ var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
+var ownerName = null;
 var log = new Log();
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
-
+var businessOwner = "";
 var APIInformationService=require('../services/api-information.js').serviceModule;
+var storeHostObj = jagg.module("manager").getAPIStoreObj();
 var apiInfoManager=new APIInformationService.APIInformationService();
 apiInfoManager.init(jagg,session);
 
@@ -63,6 +65,8 @@ require('/modules/store.js').exec(function (ctx) {
     //Get the list of enabled app types
     var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSite = 'false';//To get the webapp tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -155,6 +159,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             asset.rating = 0.0;
         }
+
         //check asset LC state
         //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
         //}
@@ -211,6 +216,12 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+
+            businessOwner = storeHostObj.getBusinessOwner(asset.id);
+            if(businessOwner.owner_name != null) {
+                businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+                ownerName = businessOwner[0].value;
+            }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {
@@ -525,7 +536,7 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
-                   data: {allTags: store.tags(type, isSite), searchedTag: ""}
+                data: {allTags: store.tags(type, isSite), searchedTag: ""}
             },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,
@@ -539,7 +550,9 @@ require('/modules/store.js').exec(function (ctx) {
                 isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
                 enabledTypeList: enabledTypeList
             },
-            assetType : 'webapp'
+            assetType : 'webapp',
+	    businessOwner: businessOwner,
+            ownerName: ownerName
         });
     }
 

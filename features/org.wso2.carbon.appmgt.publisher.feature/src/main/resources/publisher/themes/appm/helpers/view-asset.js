@@ -39,8 +39,8 @@ var merge = function(data){
 		 } else if (data.data.fields[i].name == 'oauthapis_webappConsumerSecret')
 			 data.data.fields[i].value = sResult.split(",")[1];
 
-
-		 for (var c in data.data.fields) {
+var c = 0;
+		 for (c in data.data.fields) {
 
 			 if (data.data.fields[i].name == "uritemplate_policygroupid" + c) {
 				 if (data.data.fields[i].value != "" && !isNaN(data.data.fields[i].value)) {
@@ -64,9 +64,6 @@ var merge = function(data){
 
 		 }
 	 }
-
-
 	 return data;
 };
-
 

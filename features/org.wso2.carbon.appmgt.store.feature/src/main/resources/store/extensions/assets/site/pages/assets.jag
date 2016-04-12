@@ -20,7 +20,7 @@
 include('../modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
-if(!storeHostObj.isAssetTypeEnabled("site")) {
+if(!storeHostObj.isAssetTypeEnabled("mobileapp")) {
     response.sendError(404,'Resource does not exist');
 }
 
@@ -306,9 +306,6 @@ require('/modules/store.js').exec(function (ctx) {
                         var aid = String(result[n].UUID);
                         try {
                             var asset = store.asset(type, aid);
-                            if (!asset) {
-                                continue;
-                            }
                             if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
                                     >= 0) {
                                 //filter web apps

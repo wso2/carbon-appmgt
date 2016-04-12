@@ -36,7 +36,7 @@ $(function() {
             showAlert("Invalid URL. Please type a valid Web App URL.", 'error');
         }
     });
-		
+
 	  // let's fill all the permissions
     $.each($('.perm-check'), function () {
         // var checkbox = $(checkbox);
@@ -47,7 +47,7 @@ $(function() {
             $(this).attr('checked', false);
         }
     });
-    
+
     var sso_provider = $('#sso_ssoProvider').val();
     if(sso_provider != " "){
     	$('#autoConfig').prop('checked', true);
@@ -69,7 +69,7 @@ $(function() {
 	        	showAlert('Error adding providers.', 'error');
 	        }
 	});
-		
+
     } else{
 	$.ajax({
 		url: caramel.context + '/api/sso/providers',
@@ -87,7 +87,7 @@ $(function() {
 			showAlert('Error adding providers.', 'error');
 	        }
 	});
-    	
+
     }
 
     function loadProviders(providers_data){
@@ -101,9 +101,9 @@ $(function() {
 	var value = $('#providers').val();
 	loadClaims(value);
     }
-    
-    
-    
+
+
+
     function loadSelectedProviders(providers_data){
 	for(var i=0;i<providers_data.length;i++){
 		var x = providers_data[i];
@@ -115,7 +115,7 @@ $(function() {
 	loadClaims(sso_provider);
 	loadSelectedClaims(sso_provider);
      }
-    
+
     function loadSelectedClaims(selectedProvider){
     	var y = selectedProvider.split("-");
 		var appProvider = $("#overview_provider").val();
@@ -127,29 +127,29 @@ $(function() {
 	          type: 'GET',
 	          contentType: 'application/json',
 	          success: function(response) {
-	        	 
+
 	        	  var provider_data = response.response;
 	        	  var selected_claims = provider_data.claims;
 	        	  for(n=0;n<selected_claims.length;n++){
 	        		  var claim = selected_claims[n];
 	        		  if(claim == "http://wso2.org/claims/role"){
-	        			  addToClaimsTable(claim,false);  
+	        			  addToClaimsTable(claim,false);
 	        		  }else{
-	        			  addToClaimsTable(claim,true);  
+	        			  addToClaimsTable(claim,true);
 	        		  }
-	        		  
-	        		  
+
+
 	        	  }
-	  			
+
 	          },
 	          error: function(response) {
 	              showAlert('Error adding providers.', 'error');
 	          }
 	    });
     }
-    
-    
-    
+
+
+
     function loadClaims (provider){
     	var sso_values = provider.split("-");
     	$.ajax({
@@ -163,14 +163,14 @@ $(function() {
           		 console.log("y:"+y);
           		 $("#claims").append($("<option></option>").val(y).text(y));
           	 }
-    			
+
             },
             error: function(response) {
                 showAlert('Error adding claims.', 'error');
             }
         });
 	}
-    
+
     function removeClaim(i) {
         var propRow = document.getElementById("claimRow" + i);
         if (propRow != undefined && propRow != null) {
@@ -185,9 +185,9 @@ $(function() {
             }
         }
     }
-    
+
     function populateVisibleRoles(){
-		
+
 		var visibilityComponent = $('#roles');
 		var visibleRoles = visibilityComponent.data('roles');
 
@@ -206,7 +206,7 @@ $(function() {
     	var claim  = $("#claims").val();
 	addToClaimsTable(claim,true);
     });
-    
+
     function addToClaimsTable(claim,clickable){
         var isAlreadyExist = $.inArray(claim, addedClaimList);
         if(isAlreadyExist == -1) {
@@ -242,8 +242,8 @@ $(function() {
             $('#claimTableTbody').parent().show();
         }
     }
-	
-    
+
+
 
 	$('#editAssetButton').on('click', function() {
         var subAvailability = $('#sub-availability').val();
@@ -286,7 +286,7 @@ $(function() {
 
 		//Extract the fields
 		var fields = $('#form-asset-edit :input');
-		
+
 		if($('#autoConfig').is(':checked')){
 			var selectedProvider = $('#providers').val();
 			$('#sso_ssoProvider').val(selectedProvider);
@@ -294,7 +294,7 @@ $(function() {
 	    		var selectedProvider = " ";
 			$('#sso_ssoProvider').val(selectedProvider);
 	    	}
-		
+
 
 		//Create the data object which will be sent to the server
 		/*
@@ -316,13 +316,13 @@ $(function() {
 			},
 			success : function(response) {
 				var result = response;
-				
+
 				if (result.ok) {
 					var asset = result.asset;
 					createMessage(MSG_CONTAINER, SUCCESS_CSS, 'Asset updated successfully');
 
 					updateFileFields(asset);
-				        
+
 			        (function setupPermissions() {
 			    		var rolePermissions = [];
 
@@ -352,7 +352,7 @@ $(function() {
                                 		}
                             		});
                         	}
-	            			
+
         			})();
 
 			    	if($('#autoConfig').is(':checked')){
@@ -402,7 +402,7 @@ $(function() {
 		}
 		$('.' + CHARS_REM).text('Characters left: ' + left);
 	});
-	
+
 	// Visibility roles.
 	$('#roles').tokenInput(caramel.context + '/api/lifecycle/information/meta/' + $('#meta-asset-type').val() + '/roles', {
 		theme: 'facebook',
@@ -420,21 +420,21 @@ $(function() {
 			var rows = $('table.sso tr');
 			var provider =  rows.filter('.provider-table');
 			provider.hide();
-										
+
 			var claims = rows.filter('.claims-table');
 			claims.hide();
 			removeClaimTable();
 		}
 	});
-	 
+
 	 $("#providers").change(function () {
 		var value = $('#providers').val();
 	        loadClaims(value);
 	 });
 
-	// Populate 'Visibility' component with existing roles.	
+	// Populate 'Visibility' component with existing roles.
  	populateVisibleRoles();
-	 
+
 	/*
 	 The function updates the file upload fields after recieving a response from
 	 the server
@@ -585,9 +585,9 @@ $(function() {
 	}
 
 	var showModel=function(type,id){
-	     	
+
 		console.info('Successfully updated Web app: ');
-		
+
 		//alert('Succsessfully subscribed to the '+subscription.apiName+' Web App.');
 		$('#messageModal1').html($('#confirmation-data1').html());
 		$('#messageModal1 h3.modal-title').html(('Updating Successful'));
@@ -617,7 +617,7 @@ function removeClaim(i) {
 		    		var propertyTable = document.getElementById("claimTableId");
 		    		propertyTable.style.display = "none";
 
-		    	}	
+		    	}
 	    	}
 	    }
 }
@@ -633,7 +633,7 @@ function isContainRaw(tbody) {
 			            return true;
 			        }
 			    }
-	    	}	
+	    	}
 	    }
 	    return false;
 }

@@ -24,8 +24,6 @@
 
         //This will short circuit the handling of the requests
         var passed=sm.check(session);
-        
-
         //Stop servicing the request if the check failed
         if(!passed){
             return;
@@ -57,7 +55,6 @@
 		var patterns=[ '/{context}'+URL+'/{type}/{+suffix}',
 				'/{context}'+URL+'/{type}'];
 
-	
 		
 		if(isMatchingPattern(patterns,matcher)){
 
@@ -73,6 +70,7 @@
 			var fileTester=new File(path);
 
 			if(fileTester.isExists()){
+                log.info(path);
 				include(path);
 				return;
 			}
@@ -81,8 +79,8 @@
 
 			//Set the default path
 			path=DEFAULT_PATH+DEFAULT_ROUTER_NAME;
-			
-						
+
+            log.info(path);
 			//Default 
 			include(path);
 			
