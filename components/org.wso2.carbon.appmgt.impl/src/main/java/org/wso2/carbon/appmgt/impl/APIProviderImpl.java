@@ -33,6 +33,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
@@ -503,6 +504,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return appMDAO.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
                 policyPartialDesc, tenantId);
     }
+    @Override
+    public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+                                 String values) throws AppManagementException{
+        return appMDAO.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
+
+    }
+
+    @Override
+    public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description,
+                                   String sitelink, String keys,
+                                   String values) throws AppManagementException {
+        return appMDAO.updateBusinessOwner(ownerId, ownerName, ownerMail, description, sitelink, keys, values);
+
+    }
 
     @Override
     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
@@ -541,6 +556,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public List<EntitlementPolicyPartial> getSharedPolicyPartialsList() throws
                                                                         AppManagementException {
         return appMDAO.getSharedEntitlementPolicyPartialsList(tenantId);
+    }
+
+    @Override
+
+    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
+        return appMDAO.getBusinessOwnerList();
     }
 
 
@@ -2192,5 +2213,10 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
         return appMDAO.getAppDetailsFromUUID(uuid);
+    }
+
+    @Override
+    public int deleteBusinessOwner(String ownerId) throws AppManagementException{
+        return appMDAO.deleteBusinessOwner(ownerId);
     }
 }

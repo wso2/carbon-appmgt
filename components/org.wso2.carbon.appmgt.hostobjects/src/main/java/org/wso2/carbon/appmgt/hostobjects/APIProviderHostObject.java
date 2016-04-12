@@ -661,6 +661,93 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
+     * Saves the given entitlement policy partial in database
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return entitlement policy partial id
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     */
+    public static int jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
+                                                              Object[] args,
+                                                              Function funObj) throws
+                                                                               AppManagementException {
+        if (args == null || args.length != 6) {
+            handleException("Invalid number of input parameters.");
+        }
+        if (args[0] == null || args[1] == null ) {
+            handleException("Error while saving business owner. Owner content is null");
+        }
+
+        String ownerName = args[0].toString();
+        String ownerMail = args[1].toString();
+        String description = args[2].toString();
+        String sitelink = args[3].toString();
+        String keys = args[4].toString();
+        String values = args[5].toString();
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, keys, values);
+    }
+
+    /**
+     * Update the given business owner.
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return entitlement policy partial id
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api
+     * .AppManagementException
+     */
+    public static int jsFunction_updateBusinessOwner(Context context, Scriptable thisObj,
+                                                   Object[] args,
+                                                   Function funObj) throws
+                                                                    AppManagementException {
+        if (args == null || args.length != 7) {
+            handleException("Invalid number of input parameters.");
+        }
+        if (args[0] == null || args[1] == null ) {
+            handleException("Error while saving business owner. Owner content is null");
+        }
+
+        String ownerId = args[0].toString();
+        String ownerName = args[1].toString();
+        String ownerMail = args[2].toString();
+        String description = args[3].toString();
+        String sitelink = args[4].toString();
+        String keys = args[5].toString();
+        String values = args[6].toString();
+
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.updateBusinessOwner(ownerId, ownerName, ownerMail, description, sitelink, keys, values);
+    }
+
+    /**
+     * Delete business owner.
+     *
+     * @param context Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return entitlement policy partial id
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
+     */
+    public static int jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
+                                                     Object[] args,
+                                                     Function funObj) throws
+                                                                      AppManagementException {
+        if (args[0] == null) {
+            handleException("Error while deleting business owner. Owner content is null");
+        }
+        String ownerId = args[0].toString();
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        return apiProvider.deleteBusinessOwner(ownerId);
+    }
+    /**
      * Update a given entitlement policy partial with the given partial name and partial content
      *
      * @param context Rhino context
@@ -788,6 +875,42 @@ public class APIProviderHostObject extends ScriptableObject {
         return myn;
     }
 
+    /**
+     * Retrieve the shared policy partials
+     *
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+
+
+    public static NativeArray jsFunction_getBusinessOwnerList(Context cx, Scriptable thisObj,
+                                                                    Object[] args,
+                                                                    Function funObj) throws
+                                                                                     AppManagementException {
+
+        NativeArray myn = new NativeArray(0);
+        APIProvider apiProvider = getAPIProvider(thisObj);
+        List<BusinessOwner> BusinessOwnerList = apiProvider.getBusinessOwnerList();
+        int count = 0;
+        for (BusinessOwner businessOwner : BusinessOwnerList) {
+            NativeObject row = new NativeObject();
+            row.put("owner_id", row, businessOwner.getOwner_id());
+            row.put("owner_name", row, businessOwner.getOwner_name());
+            row.put("owner_email", row, businessOwner.getOwner_mail());
+            row.put("owner_desc", row, businessOwner.getOwner_desc());
+            row.put("owner_site", row, businessOwner.getOwner_site());
+            row.put("keys", row, businessOwner.getKeys());
+            row.put("values", row, businessOwner.getValues());
+            count++;
+            myn.put(count, myn, row);
+        }
+
+        return myn;
+    }
 
     /**
      * Get application wise policy group list
@@ -929,12 +1052,17 @@ public class APIProviderHostObject extends ScriptableObject {
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
         }
+        String ownerName = null;
         String name = (String) apiData.get("overview_name", apiData);
         String version = (String) apiData.get("overview_version", apiData);
         String transports = (String) apiData.get("overview_transports", apiData);
         String description = (String) apiData.get("overview_description", apiData);
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
+        apiData.values();
+        apiData.keySet();
+        ownerName = (String) apiData.get("overview_owner", apiData);
+
         logoutURL = logoutURL.replace(endpoint, "");
         boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
@@ -1017,7 +1145,7 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         api.setUriTemplates(uriTemplates);
-
+        api.setBusinessOwner(ownerName);
         api.setTransports(transport);
         api.setDescription(StringEscapeUtils.escapeHtml(description));
         api.setLastUpdated(new Date());

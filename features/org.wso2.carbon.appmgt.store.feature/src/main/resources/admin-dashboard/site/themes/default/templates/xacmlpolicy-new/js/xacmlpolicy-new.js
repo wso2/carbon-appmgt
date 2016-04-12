@@ -33,7 +33,7 @@ var Showalert = function(msg, type, target) {
     }, 1000);
 }
 
-policyPartialsArray = new Array(); // xacml policy details array
+xacmalPolicyPartialArray = new Array(); // xacml policy details array
 var editedpolicyPartialId = 0; //if 1 then edit else save
 var context = "/" + window.location.pathname.split("/")[1];  // default value is "/admin-dashboard"
 var tags =[];
@@ -91,7 +91,7 @@ $(document).ready(function () {
         dataType: 'json',
         success: function (data) {
             for (var i = 0; i < data.length; i++) {
-                policyPartialsArray.push({
+                xacmalPolicyPartialArray.push({
                     id: data[i].partialId,
                     policyPartialName: data[i].partialName,
                     policyPartial: data[i].partialContent,
@@ -252,9 +252,9 @@ function savePolicyPartial() {
     if (editedpolicyPartialId == 0) { //add
 
         //check if the name is already saved
-        if (policyPartialsArray.length > 0) {
-            for (var i = 0; i < policyPartialsArray.length; i++) {
-                if (policyPartialsArray[i].policyPartialName == policyPartialName) {
+        if (xacmalPolicyPartialArray.length > 0) {
+            for (var i = 0; i < xacmalPolicyPartialArray.length; i++) {
+                if (xacmalPolicyPartialArray[i].policyPartialName == policyPartialName) {
                     //if policy group name is already saved show an warning and return
                     Showalert("Cannot save Policy Group Name " + policyPartialName + " as it is already been saved. " +
                     "Please select a different name", "alert-error", "statusError");
@@ -277,7 +277,7 @@ function savePolicyPartial() {
             success: function (data) {
                 var returnedId = JSON.parse(data).response.id;
                 editedpolicyPartialId = returnedId;
-                policyPartialsArray.push({
+                xacmalPolicyPartialArray.push({
                     id: returnedId,
                     policyPartialName: policyPartialName,
                     policyPartial: ruleCondition,
@@ -297,7 +297,7 @@ function savePolicyPartial() {
     } else { // update
         var policyPartialObj;
 
-        $.each(policyPartialsArray, function (index, obj) {
+        $.each(xacmalPolicyPartialArray, function (index, obj) {
             if (obj != null && obj.id == editedpolicyPartialId) {
                 policyPartialObj = obj;
                 return false; // break
@@ -363,13 +363,13 @@ function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, g
         },
         success: function (data) {
             if (JSON.parse(data)) {
-                $.each(policyPartialsArray, function (index, obj) {
+                $.each(xacmalPolicyPartialArray, function (index, obj) {
                     if (obj != null && obj.id == editedpolicyPartialId) {
-                        policyPartialsArray[index].policyPartialName = policyPartialName;
-                        policyPartialsArray[index].policyPartial = ruleCondition;
-                        policyPartialsArray[index].ruleEffect = ruleEffect;
-                        policyPartialsArray[index].isShared = isSharedPartial;
-                        policyPartialsArray[index].description = policyPartialDesc
+                        xacmalPolicyPartialArray[index].policyPartialName = policyPartialName;
+                        xacmalPolicyPartialArray[index].policyPartial = ruleCondition;
+                        xacmalPolicyPartialArray[index].ruleEffect = ruleEffect;
+                        xacmalPolicyPartialArray[index].isShared = isSharedPartial;
+                        xacmalPolicyPartialArray[index].description = policyPartialDesc
 
                     }
                 });
@@ -388,7 +388,7 @@ function updateModifiedPolicyPartial(editedpolicyPartialId, policyPartialName, g
 
 function updatePolicyPartial() {
     $('#policyPartialsTable tbody').html("");
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(xacmalPolicyPartialArray, function (index, obj) {
         if (obj != null) {
 
             if (obj.isShared) {
@@ -443,7 +443,7 @@ $(document).on("click", ".policy-edit-button", function () {
     $('#policy-desc').val("");
     editor.setValue("");
 
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(xacmalPolicyPartialArray, function (index, obj) {
         if (obj != null && obj.id == policyId) {
             $('#policy-name').val(obj.policyPartialName);
             $('#policy-name').prop("readonly", true);
@@ -467,7 +467,7 @@ $(document).on("click", ".policy-delete-button", function () {
     var policyPartial;
     var arrayIndex;
     var conf;
-    $.each(policyPartialsArray, function (index, obj) {
+    $.each(xacmalPolicyPartialArray, function (index, obj) {
         if (obj != null && obj.id == policyId) {
             policyPartial = obj;
             arrayIndex = index;
@@ -525,7 +525,7 @@ $(document).on("click", ".policy-delete-button", function () {
 
                 var success = JSON.parse(response);
                 if (success) {
-                    delete policyPartialsArray[arrayIndex];
+                    delete xacmalPolicyPartialArray[arrayIndex];
                     updatePolicyPartial();
 
 

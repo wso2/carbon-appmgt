@@ -21,7 +21,7 @@
 								<textarea id='{{this.name}}' value='{{this.value}}' ></textarea>
 							{{/if}}
 						</div>
-					</div>	
+					</div>
 		     {{/each}}
 
                     <div id="saveButtons" class="form-actions">
@@ -41,8 +41,8 @@
                     <form  class="form-horizontal" id="form-asset-create" action="{{url "/asset/gadget"}}" method="POST" enctype="multipart/form-data">
                         {{#each data.fields}}
                         <div class="control-group">
-                            <b><label class="control-label">{{this.label}} 
-                            	
+                            <b><label class="control-label">{{this.label}}
+
                                 :</label>
                             </b>
                             <div class="controls">
@@ -53,7 +53,7 @@
                                 	{{else}}
                                 		<input id='{{this.name}}' name='{{this.name}}' type='text' value='{{this.value}}'  class="span8" {{#if isReadOnly}} disabled="true" {{/if}} {{#if this.isRequired}} required{{/if}}/>
                                 	{{/if}}
-                                    
+
                                 {{/if}}
                                 {{#if this.isOptions}}
                                     <select id="{{this.name}}"  class="span8 selectpicker" name='{{this.name}}'>
@@ -78,7 +78,7 @@
                                 				</div>
                                 			</div>
                                 		</div>
-                                		
+
                                 	</div>
                                 {{/if}}
                                 {{#if this.isOptionsText}}
@@ -97,8 +97,8 @@
 								<input type='text' id='tag-container' name='tag-container'>
 							</div>
 						</div>
-						
-						
+
+
                         <div id="saveButtons" class="form-actions">
                         	<button id="btn-create-asset" class="btn btn-primary" name="addNewAssetButton">Create</button>
                       		<button class="btn" type="reset">Reset</button>
@@ -106,7 +106,7 @@
                         </div>
                     </form>
                 </div>
-             
+
             </div>
 	    </div>
     </div>

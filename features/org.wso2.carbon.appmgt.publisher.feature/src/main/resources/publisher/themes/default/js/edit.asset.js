@@ -54,22 +54,22 @@ $(function() {
 		var options = {
 
 			beforeSubmit : function(arr, $form, options) {
-				
+
 				//Extract the fields
               // var fields = $('#form-asset-edit :input');
-       
+
                //Create the data object which will be sent to the server
-             
+
               /*
                fields.each(function () {
-                                  
+
                                               if ((this.type != 'button')&&(this.type!='reset')&&(this.type!='hidden')) {
                                                   data[this.id] = this.value;
                                                   formData=fillForm(this,arr);
                                               }
                                           });
               */
-              
+
 
 				for (var i in arr) {
 

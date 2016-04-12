@@ -1,0 +1,890 @@
+diff --git a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIConsumer.java b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIConsumer.java
+index fa3e53b..0a5ec9a 100644
+--- a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIConsumer.java
++++ b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIConsumer.java
+@@ -57,36 +57,36 @@ public interface APIConsumer extends APIManager {
+     /**
+      * Returns a paginated list of #{@link org.wso2.carbon.apimgt.api.model.API} bearing the selected tag
+      *
+-     * @param tag   name of the tag
++     * @param tag name of the tag
+      * @param start starting number
+-     * @param end   ending number
++     * @param end ending number
+      * @return set of WebApp having the given tag name
+      * @throws AppManagementException if failed to get set of WebApp
+      */
+-    public Map<String, Object> getPaginatedAPIsWithTag(String tag, int start, int end) throws
+-                                                                                       AppManagementException;
++    public Map<String,Object> getPaginatedAPIsWithTag(String tag,int start,int end) throws
++                                                                                    AppManagementException;
+ 
+     /**
+-     * Returns a list of all published APIs. If a given WebApp has multiple APIs, only the latest version will be
+-     * included in this list.
++     * Returns a list of all published APIs. If a given WebApp has multiple APIs,
++     * only the latest version will be included
++     * in this list.
+      *
+      * @return set of WebApp
+      * @throws AppManagementException if failed to WebApp set
+      */
+     public Set<WebApp> getAllPublishedAPIs(String tenantDomain) throws AppManagementException;
+-
+-    /**
+-     * Returns a paginated list of all published APIs. If a given WebApp has multiple APIs, only the latest version will
+-     * be included in this list.
+-     *
++ /**
++     * Returns a paginated list of all published APIs. If a given WebApp has multiple APIs,
++     * only the latest version will be included
++     * in this list.
+      * @param tenantDomain tenant domain
+-     * @param start        starting number
+-     * @param end          ending number
++     * @param start starting number
++     * @param end ending number
+      * @return set of WebApp
+      * @throws AppManagementException if failed to WebApp set
+      */
+-    public Map<String, Object> getAllPaginatedPublishedAPIs(String tenantDomain, int start, int end) throws
+-                                                                                                     AppManagementException;
++    public Map<String,Object> getAllPaginatedPublishedAPIs(String tenantDomain,int start,int end) throws
++                                                                                                  AppManagementException;
+ 
+     /**
+      * Returns top rated APIs
+@@ -104,8 +104,8 @@ public interface APIConsumer extends APIManager {
+      * @return set of WebApp
+      * @throws AppManagementException if failed to get recently added APIs
+      */
+-    public Set<WebApp> getRecentlyAddedAPIs(int limit, String tenantDomain) throws
+-                                                                            AppManagementException;
++    public Set<WebApp> getRecentlyAddedAPIs(int limit,String tenantDomain) throws
++                                                                           AppManagementException;
+ 
+     /**
+      * Get all tags of published Apps
+@@ -117,8 +117,7 @@ public interface APIConsumer extends APIManager {
+ 
+     /**
+      * @param tenantDomain
+-     * @param assetType    Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset
+-     *                     type.
++     * @param assetType Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset type.
+      * @param attributeMap Attribute map for the give assetType.
+      * @return matching tag set which qualified the conditions of assetTye and attributeMap.
+      * @throws AppManagementException
+@@ -131,21 +130,20 @@ public interface APIConsumer extends APIManager {
+      *
+      * @param apiId  The WebApp identifier
+      * @param rating The rating provided by the subscriber
+-     * @param user   Username of the subscriber providing the rating
++     * @param user Username of the subscriber providing the rating
+      * @throws AppManagementException If an error occurs while rating the WebApp
+      */
+     public void rateAPI(APIIdentifier apiId, APIRating rating, String user) throws
+                                                                             AppManagementException;
+ 
+     /**
+-     * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an
+-     * WebApp
++     * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an WebApp
+      *
+-     * @param apiId The WebApp identifier
+-     * @param user  Username of the subscriber providing the rating
++     * @param apiId  The WebApp identifier
++     * @param user Username of the subscriber providing the rating
+      * @throws AppManagementException If an error occurs while rating the WebApp
+      */
+-    public void removeAPIRating(APIIdentifier apiId, String user) throws AppManagementException;
++    public void removeAPIRating(APIIdentifier apiId,  String user) throws AppManagementException;
+ 
+     /**
+      * Returns a set of SubscribedAPI purchased by the given Subscriber
+@@ -181,14 +179,13 @@ public interface APIConsumer extends APIManager {
+     /**
+      * Add new Subscriber
+      *
+-     * @param identifier       APIIdentifier
++     * @param identifier    APIIdentifier
+      * @param subscriptionType Type of the subscription. E.g. Individual, Enterprise
+-     * @param userId           id of the user
+-     * @param applicationId    Application Id   @return String subscription status
++     * @param userId        id of the user
++     * @param applicationId Application Id   @return String subscription status
+      * @throws AppManagementException if failed to add subscription details to database
+      */
+-    public String addSubscription(APIIdentifier identifier, String subscriptionType, String userId, int applicationId,
+-                                  String trustedIdp)
++    public String addSubscription(APIIdentifier identifier, String subscriptionType, String userId, int applicationId, String trustedIdp)
+             throws AppManagementException;
+ 
+ 
+@@ -242,11 +239,11 @@ public interface APIConsumer extends APIManager {
+ 
+     /**
+      * @param identifier Api identifier
+-     * @param comment    comment text
+-     * @param user       Username of the comment author
++     * @param comment comment text
++     * @param user Username of the comment author                        
+      * @throws AppManagementException if failed to add comment for WebApp
+      */
+-    public void addComment(APIIdentifier identifier, String comment,
++    public void addComment(APIIdentifier identifier, String comment, 
+                            String user) throws AppManagementException;
+ 
+     /**
+@@ -277,14 +274,11 @@ public interface APIConsumer extends APIManager {
+     public Set<SubscribedAPI> getSubscribedIdentifiers(Subscriber subscriber,
+                                                        APIIdentifier identifier) throws
+                                                                                  AppManagementException;
+-
+-    public Set<WebApp> searchAPI(String searchTerm, String searchType, String tenantDomain) throws
+-                                                                                            AppManagementException;
+-
+-    public Map<String, Object> searchPaginatedAPIs(String searchTerm, String searchType, String tenantDomain, int start,
+-                                                   int end) throws
+-                                                            AppManagementException;
+-
++    
++    public Set<WebApp> searchAPI(String searchTerm, String searchType,String tenantDomain) throws
++                                                                                           AppManagementException;
++    public Map<String,Object> searchPaginatedAPIs(String searchTerm, String searchType,String tenantDomain,int start,int end) throws
++                                                                                                                              AppManagementException;
+     public int getUserRating(APIIdentifier apiId, String user) throws AppManagementException;
+ 
+     /**
+@@ -292,18 +286,17 @@ public interface APIConsumer extends APIManager {
+      *
+      * @param providerId , provider id
+      * @param loggedUser logged user
+-     * @param limit      Maximum number of results to return. Pass -1 to get all.
++     * @param limit Maximum number of results to return. Pass -1 to get all.
+      * @return set of WebApp
+      * @throws AppManagementException if failed to get set of WebApp
+      */
+-    public Set<WebApp> getPublishedAPIsByProvider(String providerId, String loggedUser, int limit) throws
+-                                                                                                   AppManagementException;
++    public Set<WebApp> getPublishedAPIsByProvider(String providerId,String loggedUser, int limit) throws
++                                                                                                  AppManagementException;/**
+ 
+-    /**
+-     * /** Get a list of published APIs by the given provider.
++     /** Get a list of published APIs by the given provider.
+      *
+      * @param providerId , provider id
+-     * @param limit      Maximum number of results to return. Pass -1 to get all.
++     * @param limit Maximum number of results to return. Pass -1 to get all.
+      * @return set of WebApp
+      * @throws AppManagementException if failed to get set of WebApp
+      */
+@@ -325,16 +318,16 @@ public interface APIConsumer extends APIManager {
+      * @return Set<String>
+      * @throws AppManagementException if failed to get the tiers
+      */
+-    public Set<String> getDeniedTiers() throws AppManagementException;
+-
++    public Set<String> getDeniedTiers()throws AppManagementException;
++    
+     /**
+      * Check whether given Tier is denied for the user
+      *
+      * @param tierName
+-     * @return
++     * @return 
+      * @throws AppManagementException if failed to get the tiers
+      */
+-    public boolean isTierDeneid(String tierName) throws AppManagementException;
++    public boolean isTierDeneid(String tierName)throws AppManagementException;
+ 
+     /**
+      * Returns a list of applications for a given subscriber
+diff --git a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIProvider.java b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIProvider.java
+index 8cbe342..2949106 100644
+--- a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIProvider.java
++++ b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/APIProvider.java
+@@ -54,8 +54,9 @@ public interface APIProvider extends APIManager {
+     public Set<Provider> getAllProviders() throws AppManagementException;
+ 
+     /**
+-     * Get a list of APIs published by the given provider. If a given WebApp has multiple APIs, only the latest version
+-     * will be included in this list.
++     * Get a list of APIs published by the given provider. If a given WebApp has multiple APIs,
++     * only the latest version will
++     * be included in this list.
+      *
+      * @param providerId , provider id
+      * @return set of WebApp
+@@ -143,7 +144,7 @@ public interface APIProvider extends APIManager {
+      * This method returns the subscribed apps by users
+      *
+      * @param fromDate From date
+-     * @param toDate   To date
++     * @param toDate To date
+      * @return list of subscribed apps by users.
+      * @throws AppManagementException
+      */
+@@ -194,52 +195,50 @@ public interface APIProvider extends APIManager {
+     /**
+      * Save the entitlement policy partial
+      *
+-     * @param policyPartialName        Name of the policy partial
+-     * @param policyPartial            policy content
+-     * @param isSharedPartial          policy status
+-     * @param policyAuthor             author of the policy
++     * @param policyPartialName Name of the policy partial
++     * @param policyPartial     policy content
++     * @param isSharedPartial   policy status
++     * @param policyAuthor      author of the policy
+      * @param policyPartialDescription policy description
+      * @return policy id
+      * @throws AppManagementException
+      */
+     int saveEntitlementPolicyPartial(String policyPartialName, String policyPartial, boolean isSharedPartial,
+-                                     String policyAuthor, String policyPartialDescription)
+-            throws AppManagementException;
++                                     String policyAuthor,String policyPartialDescription) throws AppManagementException;
+ 
+     /**
+      * Save a Business Owner.
+-     *
+-     * @param ownerName   Name of the business owner.
+-     * @param ownerMail   Email address of the business owner.
++     * @param ownerName Name of the business owner.
++     * @param ownerMail Email address of the business owner.
+      * @param description Description about the owner.
+-     * @param sitelink    Link to the business website.
+-     * @param keys        key values of extra fields separated by / e.g phoneNumber/IDnumber/BankAccountNo
+-     * @param values      Values of respective keys separated by / e.g +94772345467/9223348543v/8239445323
++     * @param sitelink Link to the business website.
++     * @param keys key values of extra fields separated by / e.g phoneNumber/IDnumber/BankAccountNo
++     * @param values Values of respective keys separated by / e.g +94772345467/9223348543v/8239445323
+      * @return Integer
+      * @throws AppManagementException
+      */
+     public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+-                                 String values) throws AppManagementException;
+-
++                          String values) throws AppManagementException;
+     /**
+      * Update the policy partial
+      *
+-     * @param policyPartialId          policy partial id
+-     * @param policyPartial            policy content
+-     * @param author                   author of the partial
+-     * @param isShared                 policy status
++     * @param policyPartialId policy partial id
++     * @param policyPartial   policy content
++     * @param author          author of the partial
++     * @param isShared        policy status
+      * @param policyPartialDescription policy description
+      * @return if update success return true else false
+      * @throws AppManagementException
+      */
+     public boolean updateEntitlementPolicyPartial(int policyPartialId, String policyPartial,
+-                                                  String author, boolean isShared, String policyPartialDescription)
+-            throws
+-            AppManagementException;
++                                                  String author, boolean isShared, String policyPartialDescription) throws
++                                                                                   AppManagementException;
++
+ 
+     /**
+      * Get policyPartial content
+      *
++     * Get policyPartial content
+      * @param policyPartialId
+      * @return entitlement policy
+      * @throws AppManagementException
+@@ -248,12 +247,12 @@ public interface APIProvider extends APIManager {
+                                                                           AppManagementException;
+ 
+     /**
+-     * Get the apps which use the given policy partial
+-     *
+-     * @param policyPartialId policy partial id
+-     * @return list of apps
+-     * @throws AppManagementException
+-     */
++          * Get the apps which use the given policy partial
++          *
++          * @param policyPartialId policy partial id
++          * @return list of apps
++          * @throws AppManagementException
++          */
+     public List<APIIdentifier> getAssociatedApps(int policyPartialId) throws AppManagementException;
+ 
+     /**
+@@ -265,8 +264,7 @@ public interface APIProvider extends APIManager {
+      * @throws AppManagementException
+      */
+     public boolean deleteEntitlementPolicyPartial(int policyPartialId, String author) throws
+-                                                                                      AppManagementException;
+-
++                                                                                     AppManagementException;
+     /**
+      * Get the list of shared policy partials
+      *
+@@ -289,8 +287,8 @@ public interface APIProvider extends APIManager {
+      * @return Result of the validation.
+      * @throws AppManagementException
+      */
+-    EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial) throws
+-                                                                                             AppManagementException;
++    EntitlementPolicyValidationResult validateEntitlementPolicyPartial(String policyPartial)throws
++                                                                                            AppManagementException;
+ 
+     /**
+      * Adds a new WebApp to the Store
+@@ -301,9 +299,9 @@ public interface APIProvider extends APIManager {
+     public void addWebApp(WebApp api) throws AppManagementException;
+ 
+     /**
+-     * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations should throw an
+-     * exceptions when such attempts are made. All life cycle state changes should be carried out using the
+-     * changeAPIStatus method of this interface.
++     * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
++     * should throw an exceptions when such attempts are made. All life cycle state changes
++     * should be carried out using the changeAPIStatus method of this interface.
+      *
+      * @param api WebApp
+      * @throws AppManagementException if failed to update WebApp
+@@ -313,9 +311,9 @@ public interface APIProvider extends APIManager {
+     /**
+      * Change the lifecycle state of the specified WebApp
+      *
+-     * @param api                 The WebApp whose status to be updated
+-     * @param status              New status of the WebApp
+-     * @param userId              User performing the WebApp state change
++     * @param api The WebApp whose status to be updated
++     * @param status New status of the WebApp
++     * @param userId User performing the WebApp state change
+      * @param updateGatewayConfig Whether the changes should be pushed to the WebApp gateway or not
+      * @throws AppManagementException on error
+      */
+@@ -335,7 +333,8 @@ public interface APIProvider extends APIManager {
+      *
+      * @param api        The WebApp id of the copying docs
+      * @param newVersion The version of the new WebApp
+-     * @throws AppManagementException If an error occurs while trying to create the new version of the WebApp
++     * @throws AppManagementException If an error occurs while trying to create
++     *                                the new version of the WebApp
+      */
+     public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException;
+ 
+@@ -377,11 +376,11 @@ public interface APIProvider extends APIManager {
+      * @param identifier,        WebApp identifier
+      * @param documentationName, name of the inline documentation
+      * @param text,              content of the inline documentation
+-     * @throws org.wso2.carbon.apimgt.api.APIManagementException if failed to add the document as a resource to
+-     *                                                           registry
++     * @throws org.wso2.carbon.apimgt.api.APIManagementException
++     *          if failed to add the document as a resource to registry
+      */
+     public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text)
+-            throws AppManagementException;
++    					throws AppManagementException;
+ 
+     /**
+      * Updates a given documentation
+@@ -406,7 +405,7 @@ public interface APIProvider extends APIManager {
+     /**
+      * Returns the details of all the life-cycle changes done per WebApp.
+      *
+-     * @param apiId id of the APIIdentifier
++     * @param apiId     id of the APIIdentifier
+      * @return List of life-cycle events per given WebApp
+      * @throws AppManagementException if failed to copy docs
+      */
+@@ -438,42 +437,41 @@ public interface APIProvider extends APIManager {
+     /**
+      * Update the subscription status
+      *
+-     * @param apiId     WebApp Identifier
++     * @param apiId WebApp Identifier
+      * @param subStatus Subscription Status
+-     * @param appId     Application Id              *
++     * @param appId Application Id              *
+      * @return int value with subscription id
+-     * @throws org.wso2.carbon.apimgt.api.APIManagementException If failed to update subscription status
++     * @throws org.wso2.carbon.apimgt.api.APIManagementException
++     *          If failed to update subscription status
+      */
+     public void updateSubscription(APIIdentifier apiId, String subStatus, int appId) throws
+-                                                                                     AppManagementException;
++                                                                                   AppManagementException;
+ 
+     /**
+      * Update the Tier Permissions
+      *
+-     * @param tierName       Tier Name
++     * @param tierName Tier Name
+      * @param permissionType Permission Type
+-     * @param roles          Roles
+-     * @throws org.wso2.carbon.apimgt.api.APIManagementException If failed to update subscription status
++     * @param roles Roles
++     * @throws org.wso2.carbon.apimgt.api.APIManagementException
++     *          If failed to update subscription status
+      */
+     public void updateTierPermissions(String tierName, String permissionType, String roles) throws
+                                                                                             AppManagementException;
+ 
+     /**
+      * This methode is to update a given business owner
+-     *
+-     * @param ownerId     ID of the owner.
+-     * @param ownerName   Edited name of the owner.
+-     * @param ownerMail   Edited E mail of the owner.
++     * @param ownerId ID of the owner.
++     * @param ownerName Edited name of the owner.
++     * @param ownerMail Edited E mail of the owner.
+      * @param description Description.
+-     * @param sitelink    Site Link of the owner.
+-     * @param keys        Set of keys for extra parameters.
+-     * @param values      Set of values for respective keys.
++     * @param sitelink Site Link of the owner.
++     * @param keys Set of keys for extra parameters.
++     * @param values Set of values for respective keys.
+      * @throws AppManagementException
+      */
+-    public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description,
+-                                   String sitelink, String keys, String values) throws
+-                                                                                AppManagementException;
+-
++   public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description, String sitelink, String keys, String values) throws
++                                                                                                                                                        AppManagementException;
+     /**
+      * This methode is to update a given business owner
+      *
+@@ -487,7 +485,8 @@ public interface APIProvider extends APIManager {
+      * Get the list of Tier Permissions
+      *
+      * @return Tier Permission Set
+-     * @throws org.wso2.carbon.apimgt.api.APIManagementException If failed to update subscription status
++     * @throws org.wso2.carbon.apimgt.api.APIManagementException
++     *          If failed to update subscription status
+      */
+     public Set getTierPermissions() throws AppManagementException;
+ 
+@@ -505,7 +504,7 @@ public interface APIProvider extends APIManager {
+     /**
+      * Delete an WebApp
+      *
+-     * @param identifier  APIIdentifier
++     * @param identifier APIIdentifier
+      * @param ssoProvider SSOProvider
+      * @throws AppManagementException if failed to remove the WebApp
+      */
+@@ -519,7 +518,7 @@ public interface APIProvider extends APIManager {
+      * @throws AppManagementException
+      */
+ 
+-    public List<String> getCustomInSequences() throws AppManagementException;
++    public List<String> getCustomInSequences()  throws AppManagementException;
+ 
+ 
+     /**
+@@ -572,22 +571,21 @@ public interface APIProvider extends APIManager {
+      * @throws AppManagementException on error
+      */
+     public List<EntitlementPolicyGroup> getPolicyGroupListByApplication(int appId) throws
+-                                                                                   AppManagementException;
++            AppManagementException;
+ 
+     /**
+      * Retrieves TRACKING_CODE sequences from APM_APP Table
+-     *
+-     * @param uuid : Application UUID
+-     * @return TRACKING_CODE
+-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
++     *@param uuid : Application UUID
++     *@return TRACKING_CODE
++     *@throws org.wso2.carbon.appmgt.api.AppManagementException
+      */
+-    public String getTrackingID(String uuid) throws AppManagementException;
++    public String getTrackingID(String uuid)throws AppManagementException;
++
+ 
+ 
+     /**
+      * Update (add/delete) the the app in external stores.
+-     *
+-     * @param webApp    Web App
++     * @param webApp Web App
+      * @param appStores External App Stores
+      * @throws AppManagementException
+      */
+diff --git a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/model/WebApp.java b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/model/WebApp.java
+index 7479f3b..ee373a2 100644
+--- a/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/model/WebApp.java
++++ b/components/org.wso2.carbon.appmgt.api/src/main/java/org/wso2/carbon/appmgt/api/model/WebApp.java
+@@ -29,6 +29,7 @@ import java.util.Collections;
+ public class WebApp {
+ 
+     private APIIdentifier id;
++
+     private String description;
+     private String url;
+     private String displayName;
+diff --git a/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIProviderHostObject.java b/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIProviderHostObject.java
+index 68170bd..92c8af7 100644
+--- a/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIProviderHostObject.java
++++ b/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIProviderHostObject.java
+@@ -693,7 +693,7 @@ public class APIProviderHostObject extends ScriptableObject {
+     }
+ 
+     /**
+-     * SaUpdate the given business owner.
++     * Update the given business owner.
+      *
+      * @param context Rhino context
+      * @param thisObj Scriptable object
+@@ -1052,13 +1052,19 @@ public class APIProviderHostObject extends ScriptableObject {
+         if (provider != null) {
+             provider = AppManagerUtil.replaceEmailDomain(provider);
+         }
+-        String ownerName = (String) apiData.get("overview_business", apiData);
++        String ownerName = null;
+         String name = (String) apiData.get("overview_name", apiData);
+         String version = (String) apiData.get("overview_version", apiData);
+         String transports = (String) apiData.get("overview_transports", apiData);
+         String description = (String) apiData.get("overview_description", apiData);
+         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
+         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
++
++        log.info(apiData.values());
++        log.info("------------------------------------------------------------------------------------------");
++        log.info(apiData.keySet());
++        ownerName = (String) apiData.get("overview_owner", apiData);
++
+         logoutURL = logoutURL.replace(endpoint, "");
+         boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
+         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
+diff --git a/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIStoreHostObject.java b/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIStoreHostObject.java
+index d10abb4..1511795 100644
+--- a/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIStoreHostObject.java
++++ b/components/org.wso2.carbon.appmgt.hostobjects/src/main/java/org/wso2/carbon/appmgt/hostobjects/APIStoreHostObject.java
+@@ -37,6 +37,7 @@ import org.mozilla.javascript.NativeObject;
+ import org.mozilla.javascript.Scriptable;
+ import org.mozilla.javascript.ScriptableObject;
+ import org.wso2.carbon.appmgt.api.APIConsumer;
++import org.wso2.carbon.appmgt.api.APIProvider;
+ import org.wso2.carbon.appmgt.api.AppManagementException;
+ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+ import org.wso2.carbon.appmgt.api.model.APIKey;
+@@ -47,6 +48,8 @@ import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+ import org.wso2.carbon.appmgt.api.model.Comment;
+ import org.wso2.carbon.appmgt.api.model.Documentation;
+ import org.wso2.carbon.appmgt.api.model.DocumentationType;
++import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
++import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
+ import org.wso2.carbon.appmgt.api.model.SubscribedAPI;
+ import org.wso2.carbon.appmgt.api.model.Subscriber;
+ import org.wso2.carbon.appmgt.api.model.Subscription;
+diff --git a/features/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.trace.db b/features/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.trace.db
+index 5a9a772..d3fe2ae 100644
+--- a/features/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.trace.db
++++ b/features/org.wso2.carbon.appmgt.core.feature/src/main/resources/repository/database/WSO2AM_DB.trace.db
+@@ -178,3 +178,183 @@ org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
+ 04-07 14:42:17 jdbc[2]: SQLException
+ org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
+    CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "BUSINESS_OWNERS" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP ( APP_ID INTEGER AUTO_INCREMENT, APP_PROVIDER VARCHAR(256), TENANT_ID INTEGER, APP_NAME VARCHAR(256), APP_VERSION VARCHAR(30), CONTEXT VARCHAR(256), TRACKING_CODE varchar(100), UUID varchar(500), SAML2_SSO_ISSUER varchar(500), LOG_OUT_URL varchar(500), APP_ALLOW_ANONYMOUS BOOLEAN NULL, APP_ENDPOINT varchar(500), TREAT_AS_SITE BOOLEAN NOT NULL, OWNER_ID INTEGER, PRIMARY KEY(APP_ID), FOREIGN KEY(OWNER_ID) REFERENCES BUSINESS_OWNERS(OWNER_ID), UNIQUE (APP_PROVIDER,APP_NAME,APP_VERSION,TRACKING_CODE,UUID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_POLICY_GROUP_MAPPING ( POLICY_GRP_ID INTEGER  NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY (APP_ID) REFERENCES  APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID)  ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (POLICY_GRP_ID,APP_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_URL_MAPPING ( URL_MAPPING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, HTTP_METHOD VARCHAR(20) NULL, URL_PATTERN VARCHAR(512) NULL, SKIP_THROTTLING BOOLEAN DEFAULT FALSE, POLICY_GRP_ID INTEGER NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID), PRIMARY KEY(URL_MAPPING_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_SUBSCRIPTION ( SUBSCRIPTION_ID INTEGER AUTO_INCREMENT, SUBSCRIPTION_TYPE VARCHAR(50), TIER_ID VARCHAR(50), APP_ID INTEGER, LAST_ACCESSED TIMESTAMP NULL, APPLICATION_ID INTEGER, SUB_STATUS VARCHAR(50), TRUSTED_IDP VARCHAR(255) NULL, SUBSCRIPTION_TIME TIMESTAMP NOT NULL, FOREIGN KEY(APPLICATION_ID) REFERENCES APM_APPLICATION(APPLICATION_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (SUBSCRIPTION_ID), UNIQUE(APP_ID, APPLICATION_ID,SUBSCRIPTION_TYPE) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_LC_EVENT ( EVENT_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, PREVIOUS_STATE VARCHAR(50), NEW_STATE VARCHAR(50) NOT NULL, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, EVENT_DATE TIMESTAMP NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (EVENT_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_COMMENTS ( COMMENT_ID INTEGER AUTO_INCREMENT, COMMENT_TEXT VARCHAR(512), COMMENTED_USER VARCHAR(255), DATE_COMMENTED TIMESTAMP NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (COMMENT_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_RATINGS( RATING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, RATING INTEGER, SUBSCRIBER_ID INTEGER, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(SUBSCRIBER_ID) REFERENCES APM_SUBSCRIBER(SUBSCRIBER_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (RATING_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_API_CONSUMER_APPS ( ID INTEGER AUTO_INCREMENT, SAML2_SSO_ISSUER varchar(500), APP_CONSUMER_KEY VARCHAR(512), API_TOKEN_ENDPOINT VARCHAR (1024), API_CONSUMER_KEY VARCHAR(512), API_CONSUMER_SECRET VARCHAR(512), APP_NAME VARCHAR(512), PRIMARY KEY (ID, APP_CONSUMER_KEY), FOREIGN KEY (SAML2_SSO_ISSUER) REFERENCES APM_APP(SAML2_SSO_ISSUER), FOREIGN KEY (APP_CONSUMER_KEY) REFERENCES IDN_OAUTH_CONSUMER_APPS(CONSUMER_KEY) ON UPDATE CASCADE ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++   CREATE TABLE IF NOT EXISTS APM_APP_JAVA_POLICY_MAPPING ( JAVA_POLICY_ID INTEGER NOT NULL, APP_ID  INTEGER NOT NULL, PRIMARY KEY (JAVA_POLICY_ID,APP_ID), FOREIGN KEY (JAVA_POLICY_ID) REFERENCES APM_APP_JAVA_POLICY(JAVA_POLICY_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_EXTERNAL_STORES( APP_STORE_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, STORE_ID VARCHAR(255) NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (APP_STORE_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_FAVOURITE_APPS ( ID INTEGER  AUTO_INCREMENT, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, APP_ID INTEGER NOT NULL, CREATED_TIME TIMESTAMP NOT NULL, PRIMARY KEY (ID), FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON DELETE CASCADE, UNIQUE (TENANT_ID,USER_ID,APP_ID) ) [42102-140]
++04-11 16:22:52 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
++   CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "BUSINESS_OWNERS" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP ( APP_ID INTEGER AUTO_INCREMENT, APP_PROVIDER VARCHAR(256), TENANT_ID INTEGER, APP_NAME VARCHAR(256), APP_VERSION VARCHAR(30), CONTEXT VARCHAR(256), TRACKING_CODE varchar(100), UUID varchar(500), SAML2_SSO_ISSUER varchar(500), LOG_OUT_URL varchar(500), APP_ALLOW_ANONYMOUS BOOLEAN NULL, APP_ENDPOINT varchar(500), TREAT_AS_SITE BOOLEAN NOT NULL, OWNER_ID INTEGER, PRIMARY KEY(APP_ID), FOREIGN KEY(OWNER_ID) REFERENCES BUSINESS_OWNERS(OWNER_ID), UNIQUE (APP_PROVIDER,APP_NAME,APP_VERSION,TRACKING_CODE,UUID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_POLICY_GROUP_MAPPING ( POLICY_GRP_ID INTEGER  NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY (APP_ID) REFERENCES  APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID)  ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (POLICY_GRP_ID,APP_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_URL_MAPPING ( URL_MAPPING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, HTTP_METHOD VARCHAR(20) NULL, URL_PATTERN VARCHAR(512) NULL, SKIP_THROTTLING BOOLEAN DEFAULT FALSE, POLICY_GRP_ID INTEGER NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID), PRIMARY KEY(URL_MAPPING_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_SUBSCRIPTION ( SUBSCRIPTION_ID INTEGER AUTO_INCREMENT, SUBSCRIPTION_TYPE VARCHAR(50), TIER_ID VARCHAR(50), APP_ID INTEGER, LAST_ACCESSED TIMESTAMP NULL, APPLICATION_ID INTEGER, SUB_STATUS VARCHAR(50), TRUSTED_IDP VARCHAR(255) NULL, SUBSCRIPTION_TIME TIMESTAMP NOT NULL, FOREIGN KEY(APPLICATION_ID) REFERENCES APM_APPLICATION(APPLICATION_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (SUBSCRIPTION_ID), UNIQUE(APP_ID, APPLICATION_ID,SUBSCRIPTION_TYPE) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_LC_EVENT ( EVENT_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, PREVIOUS_STATE VARCHAR(50), NEW_STATE VARCHAR(50) NOT NULL, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, EVENT_DATE TIMESTAMP NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (EVENT_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_COMMENTS ( COMMENT_ID INTEGER AUTO_INCREMENT, COMMENT_TEXT VARCHAR(512), COMMENTED_USER VARCHAR(255), DATE_COMMENTED TIMESTAMP NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (COMMENT_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_RATINGS( RATING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, RATING INTEGER, SUBSCRIBER_ID INTEGER, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(SUBSCRIBER_ID) REFERENCES APM_SUBSCRIBER(SUBSCRIBER_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (RATING_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_API_CONSUMER_APPS ( ID INTEGER AUTO_INCREMENT, SAML2_SSO_ISSUER varchar(500), APP_CONSUMER_KEY VARCHAR(512), API_TOKEN_ENDPOINT VARCHAR (1024), API_CONSUMER_KEY VARCHAR(512), API_CONSUMER_SECRET VARCHAR(512), APP_NAME VARCHAR(512), PRIMARY KEY (ID, APP_CONSUMER_KEY), FOREIGN KEY (SAML2_SSO_ISSUER) REFERENCES APM_APP(SAML2_SSO_ISSUER), FOREIGN KEY (APP_CONSUMER_KEY) REFERENCES IDN_OAUTH_CONSUMER_APPS(CONSUMER_KEY) ON UPDATE CASCADE ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++   CREATE TABLE IF NOT EXISTS APM_APP_JAVA_POLICY_MAPPING ( JAVA_POLICY_ID INTEGER NOT NULL, APP_ID  INTEGER NOT NULL, PRIMARY KEY (JAVA_POLICY_ID,APP_ID), FOREIGN KEY (JAVA_POLICY_ID) REFERENCES APM_APP_JAVA_POLICY(JAVA_POLICY_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_EXTERNAL_STORES( APP_STORE_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, STORE_ID VARCHAR(255) NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (APP_STORE_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_FAVOURITE_APPS ( ID INTEGER  AUTO_INCREMENT, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, APP_ID INTEGER NOT NULL, CREATED_TIME TIMESTAMP NOT NULL, PRIMARY KEY (ID), FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON DELETE CASCADE, UNIQUE (TENANT_ID,USER_ID,APP_ID) ) [42102-140]
++04-12 02:49:49 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
++   CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "BUSINESS_OWNERS" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP ( APP_ID INTEGER AUTO_INCREMENT, APP_PROVIDER VARCHAR(256), TENANT_ID INTEGER, APP_NAME VARCHAR(256), APP_VERSION VARCHAR(30), CONTEXT VARCHAR(256), TRACKING_CODE varchar(100), UUID varchar(500), SAML2_SSO_ISSUER varchar(500), LOG_OUT_URL varchar(500), APP_ALLOW_ANONYMOUS BOOLEAN NULL, APP_ENDPOINT varchar(500), TREAT_AS_SITE BOOLEAN NOT NULL, OWNER_ID INTEGER, PRIMARY KEY(APP_ID), FOREIGN KEY(OWNER_ID) REFERENCES BUSINESS_OWNERS(OWNER_ID), UNIQUE (APP_PROVIDER,APP_NAME,APP_VERSION,TRACKING_CODE,UUID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_POLICY_GROUP_MAPPING ( POLICY_GRP_ID INTEGER  NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY (APP_ID) REFERENCES  APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID)  ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (POLICY_GRP_ID,APP_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_URL_MAPPING ( URL_MAPPING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, HTTP_METHOD VARCHAR(20) NULL, URL_PATTERN VARCHAR(512) NULL, SKIP_THROTTLING BOOLEAN DEFAULT FALSE, POLICY_GRP_ID INTEGER NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID), PRIMARY KEY(URL_MAPPING_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_SUBSCRIPTION ( SUBSCRIPTION_ID INTEGER AUTO_INCREMENT, SUBSCRIPTION_TYPE VARCHAR(50), TIER_ID VARCHAR(50), APP_ID INTEGER, LAST_ACCESSED TIMESTAMP NULL, APPLICATION_ID INTEGER, SUB_STATUS VARCHAR(50), TRUSTED_IDP VARCHAR(255) NULL, SUBSCRIPTION_TIME TIMESTAMP NOT NULL, FOREIGN KEY(APPLICATION_ID) REFERENCES APM_APPLICATION(APPLICATION_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (SUBSCRIPTION_ID), UNIQUE(APP_ID, APPLICATION_ID,SUBSCRIPTION_TYPE) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_LC_EVENT ( EVENT_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, PREVIOUS_STATE VARCHAR(50), NEW_STATE VARCHAR(50) NOT NULL, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, EVENT_DATE TIMESTAMP NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (EVENT_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_COMMENTS ( COMMENT_ID INTEGER AUTO_INCREMENT, COMMENT_TEXT VARCHAR(512), COMMENTED_USER VARCHAR(255), DATE_COMMENTED TIMESTAMP NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (COMMENT_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_RATINGS( RATING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, RATING INTEGER, SUBSCRIBER_ID INTEGER, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(SUBSCRIBER_ID) REFERENCES APM_SUBSCRIBER(SUBSCRIBER_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (RATING_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_API_CONSUMER_APPS ( ID INTEGER AUTO_INCREMENT, SAML2_SSO_ISSUER varchar(500), APP_CONSUMER_KEY VARCHAR(512), API_TOKEN_ENDPOINT VARCHAR (1024), API_CONSUMER_KEY VARCHAR(512), API_CONSUMER_SECRET VARCHAR(512), APP_NAME VARCHAR(512), PRIMARY KEY (ID, APP_CONSUMER_KEY), FOREIGN KEY (SAML2_SSO_ISSUER) REFERENCES APM_APP(SAML2_SSO_ISSUER), FOREIGN KEY (APP_CONSUMER_KEY) REFERENCES IDN_OAUTH_CONSUMER_APPS(CONSUMER_KEY) ON UPDATE CASCADE ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++   CREATE TABLE IF NOT EXISTS APM_APP_JAVA_POLICY_MAPPING ( JAVA_POLICY_ID INTEGER NOT NULL, APP_ID  INTEGER NOT NULL, PRIMARY KEY (JAVA_POLICY_ID,APP_ID), FOREIGN KEY (JAVA_POLICY_ID) REFERENCES APM_APP_JAVA_POLICY(JAVA_POLICY_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_EXTERNAL_STORES( APP_STORE_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, STORE_ID VARCHAR(255) NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (APP_STORE_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_FAVOURITE_APPS ( ID INTEGER  AUTO_INCREMENT, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, APP_ID INTEGER NOT NULL, CREATED_TIME TIMESTAMP NOT NULL, PRIMARY KEY (ID), FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON DELETE CASCADE, UNIQUE (TENANT_ID,USER_ID,APP_ID) ) [42102-140]
++04-12 03:44:02 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
++   CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "BUSINESS_OWNERS" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP ( APP_ID INTEGER AUTO_INCREMENT, APP_PROVIDER VARCHAR(256), TENANT_ID INTEGER, APP_NAME VARCHAR(256), APP_VERSION VARCHAR(30), CONTEXT VARCHAR(256), TRACKING_CODE varchar(100), UUID varchar(500), SAML2_SSO_ISSUER varchar(500), LOG_OUT_URL varchar(500), APP_ALLOW_ANONYMOUS BOOLEAN NULL, APP_ENDPOINT varchar(500), TREAT_AS_SITE BOOLEAN NOT NULL, OWNER_ID INTEGER, PRIMARY KEY(APP_ID), FOREIGN KEY(OWNER_ID) REFERENCES BUSINESS_OWNERS(OWNER_ID), UNIQUE (APP_PROVIDER,APP_NAME,APP_VERSION,TRACKING_CODE,UUID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_POLICY_GROUP_MAPPING ( POLICY_GRP_ID INTEGER  NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY (APP_ID) REFERENCES  APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID)  ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (POLICY_GRP_ID,APP_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_URL_MAPPING ( URL_MAPPING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, HTTP_METHOD VARCHAR(20) NULL, URL_PATTERN VARCHAR(512) NULL, SKIP_THROTTLING BOOLEAN DEFAULT FALSE, POLICY_GRP_ID INTEGER NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID), PRIMARY KEY(URL_MAPPING_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_SUBSCRIPTION ( SUBSCRIPTION_ID INTEGER AUTO_INCREMENT, SUBSCRIPTION_TYPE VARCHAR(50), TIER_ID VARCHAR(50), APP_ID INTEGER, LAST_ACCESSED TIMESTAMP NULL, APPLICATION_ID INTEGER, SUB_STATUS VARCHAR(50), TRUSTED_IDP VARCHAR(255) NULL, SUBSCRIPTION_TIME TIMESTAMP NOT NULL, FOREIGN KEY(APPLICATION_ID) REFERENCES APM_APPLICATION(APPLICATION_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (SUBSCRIPTION_ID), UNIQUE(APP_ID, APPLICATION_ID,SUBSCRIPTION_TYPE) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_LC_EVENT ( EVENT_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, PREVIOUS_STATE VARCHAR(50), NEW_STATE VARCHAR(50) NOT NULL, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, EVENT_DATE TIMESTAMP NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (EVENT_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_COMMENTS ( COMMENT_ID INTEGER AUTO_INCREMENT, COMMENT_TEXT VARCHAR(512), COMMENTED_USER VARCHAR(255), DATE_COMMENTED TIMESTAMP NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (COMMENT_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_RATINGS( RATING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, RATING INTEGER, SUBSCRIBER_ID INTEGER, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(SUBSCRIBER_ID) REFERENCES APM_SUBSCRIBER(SUBSCRIBER_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (RATING_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_API_CONSUMER_APPS ( ID INTEGER AUTO_INCREMENT, SAML2_SSO_ISSUER varchar(500), APP_CONSUMER_KEY VARCHAR(512), API_TOKEN_ENDPOINT VARCHAR (1024), API_CONSUMER_KEY VARCHAR(512), API_CONSUMER_SECRET VARCHAR(512), APP_NAME VARCHAR(512), PRIMARY KEY (ID, APP_CONSUMER_KEY), FOREIGN KEY (SAML2_SSO_ISSUER) REFERENCES APM_APP(SAML2_SSO_ISSUER), FOREIGN KEY (APP_CONSUMER_KEY) REFERENCES IDN_OAUTH_CONSUMER_APPS(CONSUMER_KEY) ON UPDATE CASCADE ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++   CREATE TABLE IF NOT EXISTS APM_APP_JAVA_POLICY_MAPPING ( JAVA_POLICY_ID INTEGER NOT NULL, APP_ID  INTEGER NOT NULL, PRIMARY KEY (JAVA_POLICY_ID,APP_ID), FOREIGN KEY (JAVA_POLICY_ID) REFERENCES APM_APP_JAVA_POLICY(JAVA_POLICY_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_EXTERNAL_STORES( APP_STORE_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, STORE_ID VARCHAR(255) NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (APP_STORE_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_FAVOURITE_APPS ( ID INTEGER  AUTO_INCREMENT, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, APP_ID INTEGER NOT NULL, CREATED_TIME TIMESTAMP NOT NULL, PRIMARY KEY (ID), FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON DELETE CASCADE, UNIQUE (TENANT_ID,USER_ID,APP_ID) ) [42102-140]
++04-12 04:34:11 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
++   CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "BUSINESS_OWNERS" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP ( APP_ID INTEGER AUTO_INCREMENT, APP_PROVIDER VARCHAR(256), TENANT_ID INTEGER, APP_NAME VARCHAR(256), APP_VERSION VARCHAR(30), CONTEXT VARCHAR(256), TRACKING_CODE varchar(100), UUID varchar(500), SAML2_SSO_ISSUER varchar(500), LOG_OUT_URL varchar(500), APP_ALLOW_ANONYMOUS BOOLEAN NULL, APP_ENDPOINT varchar(500), TREAT_AS_SITE BOOLEAN NOT NULL, OWNER_ID INTEGER, PRIMARY KEY(APP_ID), FOREIGN KEY(OWNER_ID) REFERENCES BUSINESS_OWNERS(OWNER_ID), UNIQUE (APP_PROVIDER,APP_NAME,APP_VERSION,TRACKING_CODE,UUID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_POLICY_GROUP_MAPPING ( POLICY_GRP_ID INTEGER  NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY (APP_ID) REFERENCES  APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID)  ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (POLICY_GRP_ID,APP_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_URL_MAPPING ( URL_MAPPING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, HTTP_METHOD VARCHAR(20) NULL, URL_PATTERN VARCHAR(512) NULL, SKIP_THROTTLING BOOLEAN DEFAULT FALSE, POLICY_GRP_ID INTEGER NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (POLICY_GRP_ID) REFERENCES APM_POLICY_GROUP (POLICY_GRP_ID), PRIMARY KEY(URL_MAPPING_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_SUBSCRIPTION ( SUBSCRIPTION_ID INTEGER AUTO_INCREMENT, SUBSCRIPTION_TYPE VARCHAR(50), TIER_ID VARCHAR(50), APP_ID INTEGER, LAST_ACCESSED TIMESTAMP NULL, APPLICATION_ID INTEGER, SUB_STATUS VARCHAR(50), TRUSTED_IDP VARCHAR(255) NULL, SUBSCRIPTION_TIME TIMESTAMP NOT NULL, FOREIGN KEY(APPLICATION_ID) REFERENCES APM_APPLICATION(APPLICATION_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (SUBSCRIPTION_ID), UNIQUE(APP_ID, APPLICATION_ID,SUBSCRIPTION_TYPE) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_LC_EVENT ( EVENT_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER NOT NULL, PREVIOUS_STATE VARCHAR(50), NEW_STATE VARCHAR(50) NOT NULL, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, EVENT_DATE TIMESTAMP NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (EVENT_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_COMMENTS ( COMMENT_ID INTEGER AUTO_INCREMENT, COMMENT_TEXT VARCHAR(512), COMMENTED_USER VARCHAR(255), DATE_COMMENTED TIMESTAMP NOT NULL, APP_ID INTEGER NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (COMMENT_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_APP_RATINGS( RATING_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, RATING INTEGER, SUBSCRIBER_ID INTEGER, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE RESTRICT, FOREIGN KEY(SUBSCRIBER_ID) REFERENCES APM_SUBSCRIBER(SUBSCRIBER_ID) ON UPDATE CASCADE ON DELETE RESTRICT, PRIMARY KEY (RATING_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_API_CONSUMER_APPS ( ID INTEGER AUTO_INCREMENT, SAML2_SSO_ISSUER varchar(500), APP_CONSUMER_KEY VARCHAR(512), API_TOKEN_ENDPOINT VARCHAR (1024), API_CONSUMER_KEY VARCHAR(512), API_CONSUMER_SECRET VARCHAR(512), APP_NAME VARCHAR(512), PRIMARY KEY (ID, APP_CONSUMER_KEY), FOREIGN KEY (SAML2_SSO_ISSUER) REFERENCES APM_APP(SAML2_SSO_ISSUER), FOREIGN KEY (APP_CONSUMER_KEY) REFERENCES IDN_OAUTH_CONSUMER_APPS(CONSUMER_KEY) ON UPDATE CASCADE ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++   CREATE TABLE IF NOT EXISTS APM_APP_JAVA_POLICY_MAPPING ( JAVA_POLICY_ID INTEGER NOT NULL, APP_ID  INTEGER NOT NULL, PRIMARY KEY (JAVA_POLICY_ID,APP_ID), FOREIGN KEY (JAVA_POLICY_ID) REFERENCES APM_APP_JAVA_POLICY(JAVA_POLICY_ID) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_EXTERNAL_STORES( APP_STORE_ID INTEGER AUTO_INCREMENT, APP_ID INTEGER, STORE_ID VARCHAR(255) NOT NULL, FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (APP_STORE_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_APP" not found; SQL statement:
++  CREATE TABLE IF NOT EXISTS APM_FAVOURITE_APPS ( ID INTEGER  AUTO_INCREMENT, USER_ID VARCHAR(50) NOT NULL, TENANT_ID INTEGER NOT NULL, APP_ID INTEGER NOT NULL, CREATED_TIME TIMESTAMP NOT NULL, PRIMARY KEY (ID), FOREIGN KEY(APP_ID) REFERENCES APM_APP(APP_ID) ON DELETE CASCADE, UNIQUE (TENANT_ID,USER_ID,APP_ID) ) [42102-140]
++04-12 05:35:13 jdbc[2]: SQLException
++org.h2.jdbc.JdbcSQLException: Table "APM_SUBSCRIPTION" not found; SQL statement:
++   CREATE INDEX IDX_SUB_APP_ID ON APM_SUBSCRIPTION (APPLICATION_ID, SUBSCRIPTION_ID) [42102-140]
+diff --git a/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/apis/v1/asset_api_router.jag b/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/apis/v1/asset_api_router.jag
+index e561b1c..a640544 100755
+--- a/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/apis/v1/asset_api_router.jag
++++ b/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/apis/v1/asset_api_router.jag
+@@ -223,9 +223,9 @@ require('/modules/publisher.js').exec(function(ctx) {
+         var username = require('store').server.current(session).username;
+         var request = {};
+         request["username"] = stringify(username);
+-        request["creatorSession"] = sessionID;       
+-        request["webapps"] = stringify(webapps); 
+-        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer; 
++        request["creatorSession"] = sessionID;
++        request["webapps"] = stringify(webapps);
++        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer;
+         var deployerObj = new deployerClass();
+         var msg = {};
+         msg["isSampleDeployed"] = true;
+@@ -237,7 +237,7 @@ require('/modules/publisher.js').exec(function(ctx) {
+                 msg["response"] = "Samples deployed succesfully. " +
+                         "You can login to store using UserName : subscriber_" +username+
+                         " Password : subscriber"
+-                msg["isError"] = "false";        
++                msg["isError"] = "false";
+             }else{
+                 msg["response"] = username+" has already created a sample web application"
+                 msg["isError"] = "true";
+@@ -638,8 +638,8 @@ require('/modules/publisher.js').exec(function(ctx) {
+                 artifact.attributes["overview_appOwner"] = appOwner;
+                 artifact.attributes["overview_appTenant"] = appTenant;
+                 artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+-                artifact.attributes["overview_owner"] = isAdvertiseOnly;
+-                artifact.attributes["overview_business"] = businesOwner;
++                artifact.attributes["overview_ownerAdvertise"] = isAdvertiseOnly;
++                artifact.attributes["overview_ownersssssss"] = businesOwner;
+ 
+ 
+             var tenantId = server.current(session).tenantId;
+@@ -741,7 +741,7 @@ require('/modules/publisher.js').exec(function(ctx) {
+                 //Save OAuth APIs consumer details per given web-app
+                 appMDAOObj.addOAuthAPIAccessInfo(webAppObj, tenantId);
+             }
+-            
++
+             var artifactManagerForUpdate = rxtManager.getSystemArtifactManager(shortName,session);
+ 
+             if(originalArtifact.lifecycleState=="Approved") {
+diff --git a/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/themes/appm/renderers/controllers/asset_router.js b/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/themes/appm/renderers/controllers/asset_router.js
+index 30706e8..66af519 100644
+--- a/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/themes/appm/renderers/controllers/asset_router.js
++++ b/features/org.wso2.carbon.appmgt.publisher.feature/src/main/resources/publisher/themes/appm/renderers/controllers/asset_router.js
+@@ -27,7 +27,7 @@ var render=function(theme,data,meta,require){
+     var typeList = apiProvider.getEnabledAssetTypeList();
+     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+     var appMDAOObj = new appMDAO();
+-    var owner_name =  appMDAOObj.getUserName(data.artifact.id);
++
+     //Determine what view to show
+     switch(data.op){
+ 
+@@ -37,6 +37,7 @@ var render=function(theme,data,meta,require){
+             heading = "Create New Web Application";
+             break;
+         case 'view':
++            var owner_name =  appMDAOObj.getUserName(data.artifact.id);
+             var ownerList = data.ownerList;
+             data = require('/helpers/view-asset.js').merge(data);
+             data = require('/helpers/addField.js').addField(data, owner_name);
+@@ -53,7 +54,7 @@ var render=function(theme,data,meta,require){
+             heading = data.newViewData.displayName.value;
+             break;
+         case 'edit':
+-
++            var owner_name =  appMDAOObj.getUserName(data.artifact.id);
+             data = require('/helpers/addField.js').addField(data, owner_name);
+             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
+             if(data.artifact.lifecycleState == "Published"){
+diff --git a/features/org.wso2.carbon.appmgt.store.feature/src/main/resources/store/extensions/assets/webapp/pages/asset.jag b/features/org.wso2.carbon.appmgt.store.feature/src/main/resources/store/extensions/assets/webapp/pages/asset.jag
+index 0a22931..c89a573 100644
+--- a/features/org.wso2.carbon.appmgt.store.feature/src/main/resources/store/extensions/assets/webapp/pages/asset.jag
++++ b/features/org.wso2.carbon.appmgt.store.feature/src/main/resources/store/extensions/assets/webapp/pages/asset.jag
+@@ -220,7 +220,7 @@ require('/modules/store.js').exec(function (ctx) {
+             businessOwner = storeHostObj.getBusinessOwner(asset.id);
+             if(businessOwner.owner_name != null) {
+                 businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+-                ownerName = businessOwner[1].value;
++                ownerName = businessOwner[0].value;
+             }
+             //Remove the current asset from the assets list.
+             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
+@@ -423,7 +423,7 @@ require('/modules/store.js').exec(function (ctx) {
+             isFavourite = isFavouriteApp(asset);
+         }
+ 
+-        if (subscriptionInfo.individualSubscription) {
++        if (subscriptionInfo && subscriptionInfo.individualSubscription) {
+             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
+                 isSubscribed = true;
+                 subscriptionInfo.individualSubscription["OnHold"] = false;
+@@ -536,7 +536,7 @@ require('/modules/store.js').exec(function (ctx) {
+             asset: asset,
+             tenantId: tenantIdVal,
+             tags: {
+-                   data: store.tags(type, isSite)
++                data: {allTags: store.tags(type, isSite), searchedTag: ""}
+             },
+             myAssets: { user: user, type: type, title: title },
+             recentAssets: recentAssets,
+@@ -547,7 +547,8 @@ require('/modules/store.js').exec(function (ctx) {
+             isSubscriptionAvailable: isSubscriptionAvailable,
+             config: {
+                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
++                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
++                enabledTypeList: enabledTypeList
+             },
+             assetType : 'webapp',
+ 	    businessOwner: businessOwner,
