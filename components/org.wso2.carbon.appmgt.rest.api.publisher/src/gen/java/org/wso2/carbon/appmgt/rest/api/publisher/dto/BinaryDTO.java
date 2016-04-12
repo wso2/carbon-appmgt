@@ -1,95 +1,91 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * you may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
-
-
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
-public class BinaryDTO {
+@ApiModel(description = "")
+public class BinaryDTO  {
   
-  private String binaryId = null;
-  private String name = null;
-
   
-  /**
-   **/
-  public BinaryDTO binaryId(String binaryId) {
-    this.binaryId = binaryId;
-    return this;
-  }
-
+  @NotNull
+  private String path = null;
   
-  @ApiModelProperty(example = "1", value = "")
-  @JsonProperty("binaryId")
-  public String getBinaryId() {
-    return binaryId;
-  }
-  public void setBinaryId(String binaryId) {
-    this.binaryId = binaryId;
-  }
+  
+  private String _package = null;
+  
+  
+  private String version = null;
 
   
   /**
    **/
-  public BinaryDTO name(String name) {
-    this.name = name;
-    return this;
+  @ApiModelProperty(required = true, value = "")
+  @JsonProperty("path")
+  public String getPath() {
+    return path;
+  }
+  public void setPath(String path) {
+    this.path = path;
   }
 
   
-  @ApiModelProperty(example = "anroidapp.apk", required = true, value = "")
-  @JsonProperty("name")
-  public String getName() {
-    return name;
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("_package")
+  public String getPackage() {
+    return _package;
   }
-  public void setName(String name) {
-    this.name = name;
+  public void setPackage(String _package) {
+    this._package = _package;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("version")
+  public String getVersion() {
+    return version;
+  }
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BinaryDTO binaryDTO = (BinaryDTO) o;
-    return Objects.equals(binaryId, binaryDTO.binaryId) &&
-        Objects.equals(name, binaryDTO.name);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(binaryId, name);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Binary {\n");
+    sb.append("class BinaryDTO {\n");
     
-    sb.append("    binaryId: ").append(toIndentedString(binaryId)).append("\n");
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("}");
+    sb.append("  path: ").append(path).append("\n");
+    sb.append("  _package: ").append(_package).append("\n");
+    sb.append("  version: ").append(version).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-

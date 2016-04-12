@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.2.0",
+        "version": "1.0.0",
         "title": "WSO2 APP Manager - Publisher API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -26,15 +26,18 @@
         "application/json"
     ],
     "paths": {
-        "/apps": {
+        "/apps/{appType}": {
             "get": {
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
                         "name": "query",
                         "in": "query",
-                        "description": "**Search condition**.\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "description": "**Search condition**.\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
                         "type": "string"
                     },
                     {
@@ -95,6 +98,18 @@
                 "description": "Create a new App\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/App"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/Content-Type"
                     },
                     {
@@ -140,11 +155,14 @@
                 }
             }
         },
-        "/apps/{appId}": {
+        "/apps/{appType}/id/{appId}": {
             "get": {
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "$ref": "#/parameters/appId"
                     },
@@ -202,6 +220,9 @@
                 "summary": "Update an existing App",
                 "description": "Update an existing App\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
                     {
                         "$ref": "#/parameters/appId"
                     },
@@ -283,6 +304,9 @@
                 "description": "Delete an existing App\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
                         "$ref": "#/parameters/appId"
                     },
                     {
@@ -320,27 +344,30 @@
                 }
             }
         },
-        "/apps/change-lifecycle": {
+        "/apps/{appType}/change-lifecycle": {
             "post": {
                 "summary": "Change App Status",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
                         "name": "action",
-                        "description": "The action to demote or promote the state of the App.\n\nSupported actions are [ **Initial,Created,In-Review,Approved,Rejected,Published,Unpublished,Deprecated,Retire **]\n",
+                        "description": "The action to demote or promote the state of the App.\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n",
                         "in": "query",
                         "type": "string",
                         "required": true,
                         "enum": [
-                            "Initial",
-                            "Created",
-                            "In-Review",
-                            "Approved",
-                            "Rejected",
-                            "Published",
-                            "Unpublished",
-                            "Deprecated",
-                            "Retire"
+                            "Publish",
+                            "Approve",
+                            "Reject",
+                            "Unpublish",
+                            "Deprecate",
+                            "Retire",
+                            "Recycle",
+                            "Re-Publish",
+                            "Submit#for#Review"
                         ]
                     },
                     {
@@ -393,17 +420,18 @@
         },
         "/apps/mobile/binaries": {
             "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
                 "summary": "Uploading binary files",
                 "description": "Uploading .apk/.IPA binary files.\n",
                 "parameters": [
                     {
-                        "in": "body",
-                        "name": "body",
-                        "description": "Upload .apk/.IPA file into App Publisher",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/binary"
-                        }
+                        "in": "formData",
+                        "name": "file",
+                        "description": "Document to upload",
+                        "type": "file",
+                        "required": false
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -417,14 +445,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nLifecycle changed successfully.\n",
+                        "description": "OK. \nBinary file uploaded successfully.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Binary"
+                        },
                         "headers": {
                             "ETag": {
                                 "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
@@ -449,6 +480,69 @@
                     }
                 }
             }
+        },
+        "/apps/static-contents": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "summary": "Uploading images, pdf, documents files",
+                "description": "Uploading images for banners, screenshots etc.\n",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "description": "Document to upload",
+                        "type": "file",
+                        "required": false
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nStatic content uploaded successfully.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Binary"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -456,6 +550,13 @@
             "name": "appId",
             "in": "path",
             "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "required": true,
+            "type": "string"
+        },
+        "appType": {
+            "name": "appType",
+            "in": "path",
+            "description": "App Type. Either webapp or mobileapp\n",
             "required": true,
             "type": "string"
         },
@@ -585,10 +686,8 @@
             "title": "App object",
             "required": [
                 "name",
-                "context",
                 "version",
-                "appDefinition",
-                "transport"
+                "provider"
             ],
             "properties": {
                 "id": {
@@ -602,8 +701,46 @@
                 },
                 "type": {
                     "type": "string",
-                    "description": "App type (either Webapp/Mobile app",
-                    "example": "01234567-0123-0123-0123-012345678901"
+                    "description": "App type (either Webapp/Mobile app)",
+                    "example": "webapp,mobileapp"
+                },
+                "appmeta": {
+                    "type": "object",
+                    "properties": {
+                        "path": {
+                            "type": "string",
+                            "description": "Application binary file API \n",
+                            "example": "/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
+                        },
+                        "package": {
+                            "type": "string",
+                            "description": "The package name of the application binary\n",
+                            "example": "home.jmstudios.calc"
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "The version of the application binary\n",
+                            "example": "1.0"
+                        },
+                        "weburl": {
+                            "type": "string",
+                            "description": "Web application urk\n",
+                            "example": "http://sample.com"
+                        }
+                    }
+                },
+                "marketType": {
+                    "type": "string",
+                    "example": "enterprise,"
+                },
+                "recentChanges": {
+                    "type": "string",
+                    "example": "Upgraded"
+                },
+                "icon": {
+                    "description": "the image icon of the application\n",
+                    "type": "string",
+                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG"
                 },
                 "isSite": {
                     "type": "string",
@@ -698,11 +835,6 @@
                     "type": "string",
                     "example": "1.0"
                 },
-                "packagename": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "home.jmstudios.calc"
-                },
                 "category": {
                     "description": "category of the asset\n",
                     "type": "string",
@@ -714,17 +846,19 @@
                     "example": "testapp1"
                 },
                 "screenshots": {
-                    "description": "packagename of the asset\n",
-                    "type": "string",
-                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
+                    "description": "Screenshots attached to the application\n",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg",
+                        "/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG",
+                        "/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
+                    ]
                 },
                 "banner": {
                     "description": "/publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg\n",
-                    "type": "string",
-                    "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
-                },
-                "screenshots": {
-                    "description": "packagename of the asset\n",
                     "type": "string",
                     "example": "/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG"
                 },
@@ -736,28 +870,57 @@
                 "platform": {
                     "description": "platform of the asset\n",
                     "type": "string",
-                    "example": "andoid"
+                    "example": "android"
+                },
+                "appType": {
+                    "description": "mobile app type (eg: webapp/ios/android)",
+                    "type": "string",
+                    "example": "android"
+                },
+                "mediaType": {
+                    "description": "media yype",
+                    "type": "string",
+                    "example": "application/vnd.wso2-mobileapp+xml"
+                },
+                "path": {
+                    "description": "path of asset",
+                    "type": "string",
+                    "example": "/_system/governance/mobileapps/admin/webapp/m1/1"
+                },
+                "recentChanges": {
+                    "description": "recent changes",
+                    "type": "string",
+                    "example": "update details"
                 },
                 "lifecycleAvailableActions": {
                     "description": "platform of the asset\n",
                     "type": "string",
                     "example": "[Submit for Review]"
+                },
+                "createdTime": {
+                    "description": "asset created timestamp",
+                    "type": "string",
+                    "example": "00000001459919490157"
                 }
             }
         },
-        "binary": {
+        "Binary": {
             "title": "upload binary",
             "required": [
-                "name"
+                "path"
             ],
             "properties": {
-                "binaryId": {
+                "path": {
                     "type": "string",
-                    "example": "1"
+                    "example": "1.0"
                 },
-                "name": {
+                "package": {
                     "type": "string",
-                    "example": "anroidapp.apk"
+                    "example": "sample.calc"
+                },
+                "version": {
+                    "type": "string",
+                    "example": "1.0"
                 }
             }
         },

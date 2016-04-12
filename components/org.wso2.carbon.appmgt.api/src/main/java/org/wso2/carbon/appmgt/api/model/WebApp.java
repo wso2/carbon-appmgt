@@ -26,7 +26,7 @@ import java.util.Collections;
  * Provider's & system's view of WebApp
  */
 @SuppressWarnings("unused")
-public class WebApp {
+public class WebApp extends MobileApp{
 
     private APIIdentifier id;
 
@@ -123,6 +123,13 @@ public class WebApp {
     private String lifeCycleName;
 
     private APIStatus lifeCycleStatus;
+
+    //Asset Type : either webapp or mobile app
+    private String type;
+
+    private String mediaType;
+    private String path;
+    public String createdTime;
 
     public WebApp() {
     }
@@ -722,5 +729,37 @@ public class WebApp {
 
     public APIStatus getLifeCycleStatus() {
         return lifeCycleStatus;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
     }
 }

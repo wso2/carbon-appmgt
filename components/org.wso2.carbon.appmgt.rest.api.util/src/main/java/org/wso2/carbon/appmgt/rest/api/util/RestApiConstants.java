@@ -32,9 +32,9 @@ public final class RestApiConstants {
     public static final String AUTHENTICATION_REQUIRED = "authentication_required";
 
     public static final String DEFAULT_RESPONSE_CONTENT_TYPE = APPLICATION_JSON;
-    
+
     public static final String RESOURCE = "resource";
-    public static final String RESOURCE_API = "API";
+    public static final String RESOURCE_API = "App";
     public static final String RESOURCE_APPLICATION = "application";
     public static final String RESOURCE_SUBSCRIPTION = "subscription";
     public static final String RESOURCE_DOCUMENTATION = "documentation";
@@ -53,10 +53,13 @@ public final class RestApiConstants {
     public static final String APIID_PARAM = "{apiId}";
     public static final String APPLICATIONID_PARAM = "{applicationId}";
     public static final String DOCUMENTID_PARAM = "{documentId}";
-    public static final String API_VERSION_PARAM="{version}";
+    public static final String API_VERSION_PARAM = "{version}";
 
     //todo better to take from cxf level
-    public static final String RESOURCE_PATH_APIS = "/apis";
+    public static final String RESOURCE_PATH_APPS = "/apps";
+    public static final String RESOURCE_PATH_DEVICES = "/devices";
+    public static final String RESOURCE_PATH_ROLES = "/roles";
+    public static final String RESOURCE_PATH_USERS = "/users";
     public static final String RESOURCE_PATH_APPLICATIONS = "/applications";
     public static final String SERVER_URL = "/applications";
     public static final String SERVER_USER_NAME = "/applications";
@@ -67,13 +70,13 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_TIERS_APPLICATION = RESOURCE_PATH_TIERS + "/application";
     public static final String RESOURCE_PATH_TIERS_RESOURCE = RESOURCE_PATH_TIERS + "/resource";
     public static final String RESOURCE_PATH_TAGS = "/tags";
-    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APIS + "/" + APIID_PARAM + "/documents";
+    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APIID_PARAM + "/documents";
     public static final String RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID = RESOURCE_PATH_DOCUMENTS + "/" + DOCUMENTID_PARAM;
     public static final String RESOURCE_PATH_DOCUMENT_CONTENT = RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID + "/content";
-    public static final String REST_API_STORE_CONTEXT="store_rest_api";
-    public static final String REST_API_STORE_VERSION="v1";
-    public static final String REST_API_PUBLISHER_VERSION="v1";
-    public static final String REST_API_PUBLISHER_CONTEXT="publisher_rest_api";
+    public static final String REST_API_STORE_CONTEXT = "store_rest_api";
+    public static final String REST_API_STORE_VERSION = "v1";
+    public static final String REST_API_PUBLISHER_VERSION = "v1";
+    public static final String REST_API_PUBLISHER_CONTEXT = "publisher_rest_api";
     public static final String REST_API_PROVIDER = "admin";
     public static final String REST_API_WEB_APP_AUTHENTICATOR_IMPL_CLASS_NAME = "WebAppAuthenticatorImpl";
     public static final String AUTH_HEADER_NAME = "Authorization";
@@ -86,7 +89,16 @@ public final class RestApiConstants {
     public static final String PAGINATION_PREVIOUS_LIMIT = "previous_limit";
 
     public static final String APIS_GET_PAGINATION_URL =
-            RESOURCE_PATH_APIS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+            RESOURCE_PATH_APPS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+
+    public static final String DEVICES_GET_PAGINATION_URL =
+            RESOURCE_PATH_DEVICES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+
+    public static final String ROLES_GET_PAGINATION_URL =
+            RESOURCE_PATH_ROLES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
+
+    public static final String USERS_GET_PAGINATION_URL =
+            RESOURCE_PATH_USERS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
 
     public static final String APPLICATIONS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
@@ -116,8 +128,11 @@ public final class RestApiConstants {
     public static final String STATUS_INTERNAL_SERVER_ERROR_MESSAGE_DEFAULT = "Internal server error";
     public static final String STATUS_METHOD_NOT_ALLOWED_MESSAGE_DEFAULT = "Method Not Allowed";
     public static final String STATUS_BAD_REQUEST_MESSAGE_DEFAULT = "Bad Request";
+    public static final String STATUS_PRECONDITION_FAILED_MESSAGE_DEFAULT = "Precondition Failed";
     public static final String STATUS_CONFLCIT_MESSAGE_DEFAULT = "Resource Already Exists";
 
-    public static final String STATUS_INTERNAL_SERVER_ERROR_DESCRIPTION_DEFAULT = "The server encountered " 
+    public static final String STATUS_INTERNAL_SERVER_ERROR_DESCRIPTION_DEFAULT = "The server encountered "
             + "an internal error. Please contact administrator.";
+
+    public static final int SUPER_USER_TENANT_ID = -1234;
 }

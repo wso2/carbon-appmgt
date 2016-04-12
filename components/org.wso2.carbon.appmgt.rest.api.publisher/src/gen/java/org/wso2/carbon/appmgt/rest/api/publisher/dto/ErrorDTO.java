@@ -1,34 +1,55 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * you may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 
 
-
-
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
-public class ErrorDTO {
+@ApiModel(description = "")
+public class ErrorDTO  {
   
+  
+  @NotNull
   private Long code = null;
+  
+  @NotNull
   private String message = null;
+  
+  
   private String description = null;
+  
+  
   private String moreInfo = null;
+  
+  
   private List<ErrorListItemDTO> error = new ArrayList<ErrorListItemDTO>();
 
   
   /**
    **/
-  public ErrorDTO code(Long code) {
-    this.code = code;
-    return this;
-  }
-
-  
   @ApiModelProperty(required = true, value = "")
   @JsonProperty("code")
   public Long getCode() {
@@ -42,12 +63,6 @@ public class ErrorDTO {
   /**
    * Error message.
    **/
-  public ErrorDTO message(String message) {
-    this.message = message;
-    return this;
-  }
-
-  
   @ApiModelProperty(required = true, value = "Error message.")
   @JsonProperty("message")
   public String getMessage() {
@@ -61,12 +76,6 @@ public class ErrorDTO {
   /**
    * A detail description about the error message.
    **/
-  public ErrorDTO description(String description) {
-    this.description = description;
-    return this;
-  }
-
-  
   @ApiModelProperty(value = "A detail description about the error message.")
   @JsonProperty("description")
   public String getDescription() {
@@ -80,12 +89,6 @@ public class ErrorDTO {
   /**
    * Preferably an url with more details about the error.
    **/
-  public ErrorDTO moreInfo(String moreInfo) {
-    this.moreInfo = moreInfo;
-    return this;
-  }
-
-  
   @ApiModelProperty(value = "Preferably an url with more details about the error.")
   @JsonProperty("moreInfo")
   public String getMoreInfo() {
@@ -99,12 +102,6 @@ public class ErrorDTO {
   /**
    * If there are more than one error list them out. \nFor example, list out validation errors by each field.
    **/
-  public ErrorDTO error(List<ErrorListItemDTO> error) {
-    this.error = error;
-    return this;
-  }
-
-  
   @ApiModelProperty(value = "If there are more than one error list them out. \nFor example, list out validation errors by each field.")
   @JsonProperty("error")
   public List<ErrorListItemDTO> getError() {
@@ -117,49 +114,16 @@ public class ErrorDTO {
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ErrorDTO errorDTO = (ErrorDTO) o;
-    return Objects.equals(code, errorDTO.code) &&
-        Objects.equals(message, errorDTO.message) &&
-        Objects.equals(description, errorDTO.description) &&
-        Objects.equals(moreInfo, errorDTO.moreInfo) &&
-        Objects.equals(errorDTO, errorDTO.error);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code, message, description, moreInfo, error);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Error {\n");
+    sb.append("class ErrorDTO {\n");
     
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
-    sb.append("    description: ").append(toIndentedString(description)).append("\n");
-    sb.append("    moreInfo: ").append(toIndentedString(moreInfo)).append("\n");
-    sb.append("    error: ").append(toIndentedString(error)).append("\n");
-    sb.append("}");
+    sb.append("  code: ").append(code).append("\n");
+    sb.append("  message: ").append(message).append("\n");
+    sb.append("  description: ").append(description).append("\n");
+    sb.append("  moreInfo: ").append(moreInfo).append("\n");
+    sb.append("  error: ").append(error).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-
