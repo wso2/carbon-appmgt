@@ -25,9 +25,11 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationDevice;
+import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.Device;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
+import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 
@@ -50,15 +52,22 @@ public class Devices {
      * @param platformVersion Platform version of the devices
      * @return JSON List of devices
      */
-    public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform, String platformVersion){
+    public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform, String platformVersion)
+            throws MobileApplicationException {
 
         User user = setUserData(new User(), currentUser);
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices =  mdmOperations.getDevices(user, tenantId, type, params, platform, platformVersion,
-                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                configurations.getActiveMDMProperties());
+        ApplicationOperations applicationOperations = getMDMOperationsInstance();
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setPlatform(platform);
+        applicationOperationDevice.setPlatformVersion(platformVersion);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -71,16 +80,21 @@ public class Devices {
      * @param platform Platform of the devices
      * @return JSON List of devices
      */
-    public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform){
+    public String getDevicesList(String currentUser, int tenantId, String type, String[] params, String platform)
+            throws MobileApplicationException {
 
         User user = setUserData(new User(), currentUser);
 
-
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        MDMOperations mdmOperations =  getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, platform, null,
-                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                configurations.getActiveMDMProperties());
+        ApplicationOperations applicationOperations = getMDMOperationsInstance();
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setPlatform(platform);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 
@@ -92,21 +106,26 @@ public class Devices {
      * @param params Collection of ids of the type
      * @return JSON List of devices
      */
-    public String getDevicesList(String currentUser, int tenantId, String type, String[] params){
+    public String getDevicesList(String currentUser, int tenantId, String type, String[] params)
+            throws MobileApplicationException {
 
         User user = setUserData(new User(), currentUser);
 
         MobileConfigurations configurations = MobileConfigurations.getInstance();
-        MDMOperations mdmOperations = getMDMOperationsInstance();
-        List<Device> devices = mdmOperations.getDevices(user, tenantId, type, params, null, null,
-                Boolean.valueOf(configurations.getMDMConfigs().get(MobileConfigurations.ENABLE_SAMPLE_DEVICES)),
-                configurations.getActiveMDMProperties());
+        ApplicationOperations applicationOperations = getMDMOperationsInstance();
+        ApplicationOperationDevice applicationOperationDevice = new ApplicationOperationDevice();
+        applicationOperationDevice.setCurrentUser(user);
+        applicationOperationDevice.setTenantId(tenantId);
+        applicationOperationDevice.setType(type);
+        applicationOperationDevice.setParams(params);
+        applicationOperationDevice.setConfigParams(configurations.getActiveMDMProperties());
+        List<Device> devices = applicationOperations.getDevices(applicationOperationDevice);
         return convertDevicesToJSON(devices).toJSONString();
     }
 
-    private MDMOperations getMDMOperationsInstance(){
-        MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
-        return mdmOperations;
+    private ApplicationOperations getMDMOperationsInstance(){
+        ApplicationOperations applicationOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
+        return applicationOperations;
     }
 
     private User setUserData(User user, String userString){
@@ -121,7 +140,7 @@ public class Devices {
             JSONArray jsonArrayDevices = new JSONArray();
             for(Device device : devices){
                 JSONObject deviceObj = new JSONObject();
-                deviceObj.put("id", device.getId());
+                deviceObj.put("id", device.getDeviceIdentifier().getId());
                 deviceObj.put("name", device.getName());
                 deviceObj.put("platform", device.getPlatform());
                 deviceObj.put("platform_version", device.getPlatformVersion());

@@ -492,6 +492,9 @@ Store.prototype.tags = function (type) {
 };
 
 /**
+ * @type Type of asset
+ * @isSite - String value of TRUE or FALSE, used to get the tags of webapp and sites separately
+ *
  * Returns all tags which relevant to type and flag
  */
 Store.prototype.tags = function (type, isSite) {
@@ -506,7 +509,13 @@ Store.prototype.tags = function (type, isSite) {
     var tenantdomain = carbonContext.getTenantDomain();
     var storeObj = jagg.module("manager").getAPIStoreObj();
     if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
-        tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        if(isSite) {
+            //isSite value is given,get tags of  webapp or site based on isSite value
+            tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        } else {
+            //Get both webapp ans site tags
+            tagz = storeObj.getAllTags(String(tenantdomain), type);
+        }
         return tagz;
     } else if (type == RESOURCE_TYPE_MOBILEAPP) {
         tagz = storeObj.getAllTags(String(tenantdomain), type);
@@ -518,6 +527,32 @@ Store.prototype.tags = function (type, isSite) {
 
     return tagz;
 };
+
+Store.prototype.allTags = function () {
+    var TAG_QUERY = '/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
+    var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
+    var tagsDetail = registry.query(TAG_QUERY);
+    var tags = [];
+    var tagCount = {};
+    for (var i = 0; i < tagsDetail.length; i++) {
+        var components = tagsDetail[i].split(':');
+        var tag = components[1];
+        if (!tagCount[tag]) {
+            tagCount[tag] = 1;
+        } else {
+            tagCount[tag] += 1;
+        }
+    }
+
+    for (var key in tagCount) {
+        if (tagCount.hasOwnProperty(key)) {
+            var tag = {"name": key, "count": tagCount[key]};
+            tags.push(tag);
+        }
+    }
+    return tags;
+
+}
 
 Store.prototype.comments = function (aid, paging) {
     var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
@@ -698,6 +733,14 @@ Store.prototype.getAvailablePages = function (type,req,session) {
     var appCount = artifactManager.count();
     var pageNumber = Math.ceil(appCount/PAGE_SIZE);
     return pageNumber;
+};
+
+Store.prototype.getTotalAssetCount = function (type,req,session) {
+    var managers= storeManagers(req,session,this.tenantId);
+    var rxtManager = managers.rxtManager;
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var appCount = artifactManager.count();
+    return appCount;
 };
 
 Store.prototype.getCurrentPage = function(currentIndex){

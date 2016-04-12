@@ -9,8 +9,13 @@ var assetLinks = function (user) {
                 path: 'custom.jag'
             } ,
             {
-                title: 'My Applications',
+                title: 'My Apps',
                 url: 'myapps',
+                path: 'myapps.jag'
+            },
+            {
+                title: 'All Apps',
+                url: 'apps',
                 path: 'myapps.jag'
             },
             {

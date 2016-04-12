@@ -205,12 +205,15 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 if(attributeMap == null || attributeMap.isEmpty()) {
                     isTagRetrievable = true;
                 } else {
-                    String artifactTreatAsASiteValue = genericArtifact.getAttribute(
-                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toLowerCase();
-                    String attributeMapTreatAsASiteValue = attributeMap.get(
-                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toString().toLowerCase();
-                    if (attributeMapTreatAsASiteValue.equals(artifactTreatAsASiteValue)) {
-                        isTagRetrievable = true;
+                    //genericArtifact can be null when user doesn't have permission to artifact.
+                    if (genericArtifact != null) {
+                        String artifactTreatAsASiteValue = genericArtifact.getAttribute(
+                                AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toLowerCase();
+                        String attributeMapTreatAsASiteValue = attributeMap.get(
+                                AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toString().toLowerCase();
+                        if (attributeMapTreatAsASiteValue.equals(artifactTreatAsASiteValue)) {
+                            isTagRetrievable = true;
+                        }
                     }
                 }
 

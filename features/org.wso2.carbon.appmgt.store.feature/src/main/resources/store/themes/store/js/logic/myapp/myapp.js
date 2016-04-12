@@ -30,7 +30,7 @@ $( document ).ready(function() {
         initializeUserActivity("init", jsonObj);
     }
 
-    $('.accessUrl').on('click', function (event) {
+    $("a[data-stats='usage']").on('click', function (event) {
         if(loggedInUserName) {
             jsonObj.appData.appId = $(this).data("id");
             jsonObj.appData.appName = $(this).data("name");
@@ -57,8 +57,6 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        var waitIconId = '#wait-' + appId;
-        $(waitIconId).show();
 
         addToFavourite(appData, appId);
         disabledEventPropagation(e);
@@ -76,15 +74,12 @@ $( document ).ready(function() {
         appData['provider'] = $(this).data("provider");
         appData['storeTenantDomain'] = storeTenantDomain;
 
-        var waitIconId = '#wait-' + appId;
-        $(waitIconId).show();
 
         removeFromFavourite(appData, appId);
         disabledEventPropagation(e);
     });
 
     var addToFavourite = function (data, appId) {
-        var waitIconId = '#wait-' + appId;
         $.ajax({
                    url: API_ADD_TO_FAVOURITE,
                    dataType: 'JSON',
@@ -92,24 +87,18 @@ $( document ).ready(function() {
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           $(waitIconId).hide();
-                           var message = 'You have successfully added  <b>' + data.name +
-                                         '</b> to your favourite apps';
-                           notify(message);
 
                            document.getElementById("favRibbon-" + appId).style.visibility = "visible";
                            document.getElementById("listItemAddFavorite-" + appId).style.display= "none";
                            document.getElementById("listItemRmvFavorite-" + appId).style.display= "block";
                        } else {
-                           $(waitIconId).hide();
-                           var message = 'Error occured in while adding  web app: ' + data.name +
+                           var message = 'Error occured while adding  web app: ' + data.name +
                                          ' to my favourite web apps';
                            notify(message);
 
                        }
                    },
                    error: function (response) {
-                       $(waitIconId).hide();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);
@@ -123,30 +112,22 @@ $( document ).ready(function() {
     };
 
     var removeFromFavourite = function (data, appId) {
-        var waitIconId = '#wait-' + appId;
         $.ajax({
                    url: API_REMOVE_FROM_FAVOURITE,
                    type: 'POST',
                    data: data,
                    success: function (response, textStatus, xhr) {
                        if (response.error == false) {
-                           $(waitIconId).hide();
-                           var message = 'You have successfully removed  <b>' + data.name
-                                         + '</b> from your favourite apps';
-                           notify(message);
-
                            document.getElementById("favRibbon-" + appId).style.visibility = "hidden";
                            document.getElementById("listItemAddFavorite-" + appId).style.display= "block";
                            document.getElementById("listItemRmvFavorite-" + appId).style.display= "none";
                        } else {
-                           $(waitIconId).hide();
                            var message = 'Error occured  when remove  web app: ' + data.name
                                          + ' from my favourite web apps';
                            notify(message);
                        }
                    },
                    error: function (response) {
-                       $(waitIconId).hide();
                        if (response.status == 401) {
                            var message = 'Your session has time out.Please login again';
                            notify(message);

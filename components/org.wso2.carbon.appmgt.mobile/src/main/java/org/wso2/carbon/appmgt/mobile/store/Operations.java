@@ -24,10 +24,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.mobile.beans.ApplicationOperationAction;
+import org.wso2.carbon.appmgt.mobile.interfaces.ApplicationOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.App;
 import org.wso2.carbon.appmgt.mobile.mdm.AppDataLoader;
-import org.wso2.carbon.appmgt.mobile.interfaces.MDMOperations;
 import org.wso2.carbon.appmgt.mobile.mdm.MDMServiceReferenceHolder;
+import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.mobile.utils.MobileConfigurations;
 import org.wso2.carbon.appmgt.mobile.utils.User;
 import org.wso2.carbon.context.CarbonContext;
@@ -56,16 +58,23 @@ public class Operations {
      * @param type Type of the resource (device, user or role)
      * @param params Collection of ids of the type
      */
-    public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params ){
+    public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params )
+            throws MobileApplicationException {
         if(log.isDebugEnabled()) log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();
 
+        ApplicationOperationAction applicationOperationAction = new ApplicationOperationAction();
         User user = new User();
         JSONObject userObj = (JSONObject) new JSONValue().parse(currentUser);
         user.setUsername((String) userObj.get("username"));
         user.setTenantDomain((String) userObj.get("tenantDomain"));
         user.setTenantId(Integer.valueOf(String.valueOf(userObj.get("tenantId"))));
-
+        applicationOperationAction.setUser(user);
+        applicationOperationAction.setAction(action);
+        applicationOperationAction.setTenantId(tenantId);
+        applicationOperationAction.setType(type);
+        applicationOperationAction.setParams(params);
+        applicationOperationAction.setConfigParams(configurations.getActiveMDMProperties());
 
         try {
 
@@ -81,9 +90,10 @@ public class Operations {
             GenericArtifactManager artifactManager = new GenericArtifactManager((UserRegistry)registry, "mobileapp");
             GenericArtifact artifact = artifactManager.getGenericArtifact(app);
 
-            MDMOperations mdmOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
+            ApplicationOperations applicationOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action, tenantId);
-            mdmOperations.performAction(user, action, appToInstall, tenantId, type, params, configurations.getActiveMDMProperties());
+            applicationOperationAction.setApp(appToInstall);
+            applicationOperations.performAction(applicationOperationAction);
 
 
         } catch (UserStoreException e) {

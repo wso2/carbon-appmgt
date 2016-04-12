@@ -38,7 +38,7 @@ var getTenantDomainFromID = function() {
 
 
 // DEVICES APIS
-router.post('apps/devices/{deviceid}/install', function(ctx){
+router.post('apps/devices/{deviceid}/{devicetype}/install', function(ctx){
     if (!user) {
         response.sendError(401, 'Unauthorized');
         return;
@@ -46,7 +46,9 @@ router.post('apps/devices/{deviceid}/install', function(ctx){
         var tenant = server.tenant(request, session);
         var asset =  ctx.asset;
         var deviceId = ctx.deviceid;
-        enterpriseInstall.performAction('install', tenant.tenantId, 'device', asset, deviceId);
+        var deviceType = ctx.devicetype;
+        var deviceIdentifier = {"id" : deviceId, "type" : deviceType};
+        enterpriseInstall.performAction('install', tenant.tenantId, 'device', asset, stringify(deviceIdentifier));
 });
 
 router.post('apps/user/install', function(ctx){

@@ -58,11 +58,16 @@ var Field = {
     OVERVIEW_CATEGORY: 'overview.category',
     OVERVIEW_CREATED_TIME: 'overview.createdtime',
     IMAGES_BANNER: 'images.banner',
+    IMAGES_OLD_BANNER: 'images.oldbanner',
     IMAGES_SCREENSHOTS: 'images.screenshots',
     IMAGES_SCREENSHOT_0: 'images.screenshot0',
+    IMAGES_OLD_SCREENSHOT_0: 'images.oldscreenshot0',
     IMAGES_SCREENSHOT_1: 'images.screenshot1',
+    IMAGES_OLD_SCREENSHOT_1: 'images.oldscreenshot1',
     IMAGES_SCREENSHOT_2: 'images.screenshot2',
-    IMAGES_THUMBNAIL: 'images.thumbnail'
+    IMAGES_OLD_SCREENSHOT_2: 'images.oldscreenshot2',
+    IMAGES_THUMBNAIL: 'images.thumbnail',
+    IMAGES_OLD_THUMBNAIL: 'images.oldthumbnail'
 };
 
 /**
@@ -81,7 +86,7 @@ function Validator(configurations) {
         MAX_LENGTH_OF_DISPLAY_NAME: 30,
         MAX_LENGTH_OF_DESCRIPTION: 1000,
         MAX_LENGTH_OF_RECENT_CHANGES: 700,
-        SCREENSHOTS_COUNT: 3
+        SCREENSHOTS_MIN_COUNT: 1
     };
 
     /**
@@ -623,19 +628,19 @@ function Validator(configurations) {
             result.message = "Screenshots should be an array.";
             return result;
         }
-        var screenshotsCount = Constant.SCREENSHOTS_COUNT;
-        if (screenshots.length != screenshotsCount) {
+        var minScreenshotsCount = Constant.SCREENSHOTS_MIN_COUNT;
+        if (screenshots.length < minScreenshotsCount) {
             result.status = ValidationStatus.INVALID.FORMAT;
-            result.message = "Screenshots should contain " + screenshotsCount + " images.";
+            result.message = "Screenshots should contain at least" + minScreenshotsCount + " images.";
             return result;
         }
-        var emptyScreenshotsCount = 0;
-        for (var i = 0; i < screenshotsCount; i++) {
-            if (!screenshots[i]) {
-                emptyScreenshotsCount++;
+        var screenshotsCount = 0;
+        for (var i = 0; i < screenshots.length; i++) {
+            if (screenshots[i]) {
+                screenshotsCount++;
             }
         }
-        if (emptyScreenshotsCount == screenshotsCount) {
+        if (screenshotsCount < minScreenshotsCount) {
             result.status = ValidationStatus.INVALID.EMPTY;
             result.message = "Screenshots cannot be empty. "
                              + "Please select at least one screenshot image for this app.";

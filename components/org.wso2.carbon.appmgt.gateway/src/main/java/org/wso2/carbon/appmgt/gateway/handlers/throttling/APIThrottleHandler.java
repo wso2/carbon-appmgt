@@ -38,6 +38,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.throttle.core.*;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.rest.AbstractHandler;
@@ -52,16 +53,6 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.VerbInfoDTO;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.throttle.core.AccessInformation;
-import org.wso2.carbon.throttle.core.AccessRateController;
-import org.wso2.carbon.throttle.core.ConcurrentAccessController;
-import org.wso2.carbon.throttle.core.RoleBasedAccessRateController;
-import org.wso2.carbon.throttle.core.Throttle;
-import org.wso2.carbon.throttle.core.ThrottleConfiguration;
-import org.wso2.carbon.throttle.core.ThrottleConstants;
-import org.wso2.carbon.throttle.core.ThrottleContext;
-import org.wso2.carbon.throttle.core.ThrottleException;
-import org.wso2.carbon.throttle.core.ThrottleFactory;
 
 import javax.xml.stream.XMLStreamException;
 
