@@ -639,7 +639,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 artifact.attributes["overview_appTenant"] = appTenant;
                 artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
                 artifact.attributes["overview_ownerAdvertise"] = isAdvertiseOnly;
-                artifact.attributes["overview_ownersssssss"] = businesOwner;
+                artifact.attributes["overview_owner"] = businesOwner;
 
 
             var tenantId = server.current(session).tenantId;
