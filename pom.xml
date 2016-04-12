@@ -29,6 +29,7 @@
         <module>components/org.wso2.carbon.appmgt.gateway</module>
         <module>components/org.wso2.carbon.appmgt.usage</module>
         <module>components/org.wso2.carbon.appmgt.core</module>
+        <module>components/org.wso2.carbon.appmgt.oauth.webapp</module>
         <module>components/org.wso2.carbon.appmgt.oauth.endpoint</module>
         <module>components/org.wso2.carbon.appmgt.mobile</module>
         <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm</module>
@@ -38,6 +39,8 @@
         <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
         <module>components/org.wso2.carbon.appmgt.rest.api.util</module>
         <module>components/org.wso2.carbon.appmgt.rest.api.publisher</module>
+        <module>components/org.wso2.carbon.appmgt.rest.api.store</module>
+        <module>components/org.wso2.carbon.appmgt.rest.api.storeadmin</module>
         <module>features/org.wso2.carbon.appmgt.core.feature</module>
         <module>features/org.wso2.carbon.appmgt.gateway.feature</module>
         <module>features/org.wso2.carbon.appmgt.publisher.feature</module>
@@ -91,6 +94,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -215,6 +223,16 @@
                 <version>${carbon.appmgt.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.appmgt</groupId>
+                <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
+                <version>${carbon.appmgt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.appmgt</groupId>
+                <artifactId>org.wso2.carbon.appmgt.rest.api.storeadmin</artifactId>
+                <version>${carbon.appmgt.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.registry</groupId>
                 <artifactId>org.wso2.carbon.registry.indexing</artifactId>
                 <version>${carbon.registry.version}</version>
@@ -333,6 +351,16 @@
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth</artifactId>
                 <version>${carbon.identity.oauth.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity</groupId>
+                <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
+                <version>${carbon.identity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.identity</groupId>
+                <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
+                <version>${carbon.identity.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -572,11 +600,6 @@
                 <version>${jsoup.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-jaxrs</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.presentation.stub</artifactId>
                 <version>${bam.presentation.stub.version}</version>
@@ -605,6 +628,41 @@
                 <groupId>org.wso2.carbon.devicemgt</groupId>
                 <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
                 <version>${carbon.device.mgt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-jaxrs</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring-web.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jaxrs</artifactId>
+                <version>${swagger-jaxrs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -695,6 +753,13 @@
         <carbon.usage.agent.version>2.1.2</carbon.usage.agent.version>
         <carbon.sequences.stub.version>4.2.1</carbon.sequences.stub.version>
 
+        <!-- ReST API Versions -->
+        <cxf.version>3.1.4</cxf.version>
+        <jackson.version>1.8.6</jackson.version>
+        <spring-web.version>4.1.6.RELEASE</spring-web.version>
+        <hibernate-validator.version>5.0.2.Final</hibernate-validator.version>
+        <swagger-jaxrs.version>1.5.2</swagger-jaxrs.version>
+
         <!-- Misc Versions -->
         <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>
         <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
@@ -713,6 +778,8 @@
 
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
+
+        <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
     </properties>
 
 </project>

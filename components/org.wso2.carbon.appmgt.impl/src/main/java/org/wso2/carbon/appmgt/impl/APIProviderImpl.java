@@ -29,21 +29,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
-import org.wso2.carbon.appmgt.api.model.JavaPolicy;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.SSOProvider;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.Usage;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -64,6 +50,7 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Association;
@@ -430,6 +417,24 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Adds a new Mobile App to the Store
+     *
+     * @param app Mobile App
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     *          if failed to add the Mobile App
+     */
+    public String addMobileApp(MobileApp app) throws AppManagementException {
+        String artifactId = null;
+        try {
+            artifactId = createMobileApp(app);
+
+        } catch (AppManagementException e) {
+            throw new AppManagementException("Error in adding Mobile App :"+app.getAppName(),e);
+        }
+        return artifactId;
+    }
+
+    /**
      * Generates entitlement policies for the given app.
      *
      * @param apiIdentifier@throws AppManagementException
@@ -713,6 +718,27 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new AppManagementException("Invalid WebApp update operation involving WebApp status changes");
         }
     }
+    /**
+     * Updates an existing WebApp
+     *
+     * @param api WebApp
+     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     *          if failed to update WebApp
+     */
+    public void updateMobileApp(MobileApp mobileApp) throws AppManagementException {
+
+
+            try {
+
+                updateMobileAppArtifact(mobileApp, true);
+
+            } catch (AppManagementException e) {
+                handleException("Error while updating the WebApp :" +mobileApp.getAppName(),e);
+            }
+
+
+    }
+
 
 
 
@@ -787,6 +813,53 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                  api.getId().getApiName(), re);
              }
              handleException("Error while performing registry transaction operation", e);
+
+        }
+    }
+
+    private void updateMobileAppArtifact(MobileApp mobileApp, boolean updatePermissions) throws
+            AppManagementException {
+
+
+        try {
+            registry.beginTransaction();
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(mobileApp.getAppId());
+            if (artifact != null) {
+
+                GenericArtifact updateApiArtifact = AppManagerUtil.createMobileAppArtifactContent(artifact, mobileApp);
+                String artifactPath = GovernanceUtils.getArtifactPath(registry, updateApiArtifact.getId());
+                artifactManager.updateGenericArtifact(updateApiArtifact);
+            }else{
+                handleResourceNotFoundException(
+                        "Failed to get Mobile App. The artifact corresponding to artifactId " + mobileApp.getAppId() + " does not exist");
+            }
+//            org.wso2.carbon.registry.core.Tag[] oldTags = registry.getTags(artifactPath);
+//            if (oldTags != null) {
+//                for (org.wso2.carbon.registry.core.Tag tag : oldTags) {
+//                    registry.removeTag(artifactPath, tag.getTagName());
+//                }
+//            }
+
+//            Set<String> tagSet = api.getTags();
+//            if (tagSet != null) {
+//                for (String tag : tagSet) {
+//                    registry.applyTag(artifactPath, tag);
+//                }
+//            }
+
+
+
+
+            registry.commitTransaction();
+        } catch (Exception e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException("Error while rolling back the transaction for WebApp: " +mobileApp.getAppName(), re);
+            }
+            handleException("Error while performing registry transaction operation", e);
 
         }
     }
@@ -1403,6 +1476,31 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Create Mobile Application artifact
+     *
+     * @param mobileApp
+     * @throws AppManagementException
+     */
+    private String createMobileApp(MobileApp mobileApp) throws AppManagementException {
+        GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                AppMConstants.MOBILE_ASSET_TYPE);
+        String artifactId = null;
+        try {
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));
+            GenericArtifact artifact = AppManagerUtil.createMobileAppArtifactContent(genericArtifact, mobileApp);
+            artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            changeLifeCycleStatus(AppMConstants.MOBILE_ASSET_TYPE, artifactId, APPLifecycleActions.CREATE.getStatus());
+            registry.commitTransaction();
+        } catch (RegistryException e) {
+            handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
+        }
+        return artifactId;
+    }
+
+    /**
      * This function is to set resource permissions based on its visibility
      *
      * @param artifactPath WebApp resource path
@@ -1718,7 +1816,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 String apiArtifactId = resource.getUUID();
                 if (apiArtifactId != null) {
                     GenericArtifact apiArtifact = artifactManager.getGenericArtifact(apiArtifactId);
-                    apiSortedList.add(AppManagerUtil.getAPI(apiArtifact, registry));
+                    apiSortedList.add(AppManagerUtil.getGenericApp(apiArtifact, registry));
                 } else {
                     throw new GovernanceException("artifact id is null of " + apiPath);
                 }
@@ -1734,7 +1832,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
 
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId)
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId,
+                                                   String appType)
             throws AppManagementException {
         List<WebApp> apiSortedList = new ArrayList<WebApp>();
         String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
@@ -1742,36 +1841,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         Pattern pattern;
         Matcher matcher;
 
-        String appType = null;
-        //Select asset type
-        if (searchType.equalsIgnoreCase("Type")) {
-            if (searchTerm.equals(AppMConstants.APP_TYPE)) {
-                appType = AppMConstants.APP_TYPE;
-            } else if (searchTerm.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
-                appType = AppMConstants.MOBILE_ASSET_TYPE;
-            }
-        }
-
         try {
             List<WebApp> apiList;
             if (providerId != null) {
-                if (appType == null) {
-                    //adding web apps
-                    apiList = getAPIsByProvider(providerId, AppMConstants.APP_TYPE);
-                    //adding mobile apps
-                    apiList.addAll(getAPIsByProvider(providerId, AppMConstants.MOBILE_ASSET_TYPE));
-                } else {
-                    apiList = getAPIsByProvider(providerId, appType);
-                }
+                apiList = getAPIsByProvider(providerId, appType);
             } else {
-                if (appType == null) {
-                    //adding web apps
-                    apiList = getAllAPIs(AppMConstants.APP_TYPE);
-                    //adding mobile apps
-                    apiList.addAll(getAllAPIs(AppMConstants.MOBILE_ASSET_TYPE));
-                } else {
-                    apiList = getAllAPIs(appType);
-                }
+                apiList = getAllAPIs(appType);
             }
             if (apiList == null || apiList.size() == 0) {
                 return apiSortedList;
@@ -1779,36 +1854,32 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             pattern = Pattern.compile(regex);
             for (WebApp api : apiList) {
 
-                if (searchType.equalsIgnoreCase("Type")) {
-                    apiSortedList.add(api);
+                if (searchType.equalsIgnoreCase("Name")) {
+                    String api1 = api.getId().getApiName();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Provider")) {
+                    String api1 = api.getId().getProviderName();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Version")) {
+                    String api1 = api.getId().getVersion();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("Context")) {
+                    String api1 = api.getContext();
+                    matcher = pattern.matcher(api1);
+                } else if (searchType.equalsIgnoreCase("id")) {
+                    String api1 = api.getUUID();
+                    matcher = pattern.matcher(api1);
                 } else {
-                    if (searchType.equalsIgnoreCase("Name")) {
-                        String api1 = api.getId().getApiName();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Provider")) {
-                        String api1 = api.getId().getProviderName();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Version")) {
-                        String api1 = api.getId().getVersion();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("Context")) {
-                        String api1 = api.getContext();
-                        matcher = pattern.matcher(api1);
-                    } else if (searchType.equalsIgnoreCase("id")) {
-                        String api1 = api.getUUID();
-                        matcher = pattern.matcher(api1);
-                    } else {
-                        String apiName = api.getId().getApiName();
-                        matcher = pattern.matcher(apiName);
-                    }
+                    String apiName = api.getId().getApiName();
+                    matcher = pattern.matcher(apiName);
+                }
 
-                    if (matcher.find()) {
-                        apiSortedList.add(api);
-                    }
+                if (matcher.find()) {
+                    apiSortedList.add(api);
                 }
             }
         } catch (AppManagementException e) {
-            handleException("Failed to search APIs with type", e);
+            handleException("Failed to search Apps with type", e);
         }
         Collections.sort(apiSortedList, new APINameComparator());
         return apiSortedList;
@@ -2193,4 +2264,108 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
         return appMDAO.getAppDetailsFromUUID(uuid);
     }
+
+    /**
+     * Change the lifecycle state of a given application
+     *
+     * @param appType application type
+     * @param appId   application type
+     * @param action  lifecycle action perform on the application
+     * @throws AppManagementException
+     */
+    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+
+            if (appArtifact != null) {
+                appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                if (log.isDebugEnabled()) {
+                    String logMessage =
+                            "Application with appId : " + appId + " lifecycle has been changed successfully.";
+                    log.debug(logMessage);
+                }
+            }
+
+        } catch (AppManagementException e) {
+            handleException("Error occurred while retrieving GenericArtifactManager for appType : " + appType, e);
+        } catch (GovernanceException e) {
+            handleException("Error occurred while changing lifecycle state of application with appId : " +
+                    appId + " for action : " + action, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
+     * Get the available next lifecycle actions of a given application
+     *
+     * @param appId   application type
+     * @param appType application type
+     * @return
+     */
+    public String[] getAllowedLifecycleActions(String appId, String appType) throws AppManagementException {
+        PrivilegedCarbonContext.startTenantFlow();
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+        String[] actions = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                //Get all the actions corresponding to current state of the api artifact
+                actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+            } else {
+                handleResourceNotFoundException(
+                        "Failed to get "+appType+" artifact corresponding to artifactId " + appId + ". Artifact does not exist");
+            }
+        } catch (AppManagementException e) {
+            handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
+                    " with id : "+appId, e);
+        } catch (GovernanceException e) {
+            handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
+                    " with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+        return actions;
+    }
+
+    public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        Resource resource = null;
+        boolean isSubscribed = false;
+        try {
+            if (!registry.resourceExists(path)) {
+                resource = registry.newResource();
+                resource.setContent("");
+                registry.put(path, resource);
+                isSubscribed = true;
+            }
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            handleException("Error occurred while retrieving registry", e);
+        }
+        return isSubscribed;
+    }
+
+
+    public boolean unSubscribeMobileApp(String userId, String appId) throws AppManagementException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        boolean isUnSubscribed = false;
+        try {
+            if (registry.resourceExists(path)) {
+                registry.delete(path);
+                isUnSubscribed = true;
+            }
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            log.error("" + path, e);
+            handleException("Error while deleting registry path: "+path, e);
+        }
+        return isUnSubscribed;
+    }
+
 }

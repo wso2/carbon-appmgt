@@ -33,13 +33,13 @@ public final class AppMConstants {
 
     //key value of the APIImpl rxt
     public static final String API_KEY = "webapp";
-    
+
     //governance registry appmgt root location
     public static final String APPMGT_REGISTRY_LOCATION = "/appmgt";
 
     //governance registry appmgt mobile apps root location
     public static final String APPMGT_MOBILE_REGISTRY_LOCATION = "/mobileapps";
-    
+
     public static final String API_CONTEXT_ID = "api.context.id";
     //This is the resource name of API
     public static final String API_RESOURCE_NAME ="/webapp";
@@ -47,6 +47,7 @@ public final class AppMConstants {
     //This is registry status property
     public static final String WEB_APP_LIFECYCLE_STATUS = "registry.lifecycle.WebAppLifeCycle.state";
     public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
+    public static final String MOBILE_LIFE_CYCLE = "MobileAppLifeCycle";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
@@ -69,7 +70,7 @@ public final class AppMConstants {
 
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
-    
+
     public static final String API_TIER_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/tiers.xml";
 
     public static final String API_IMAGE_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/icons";
@@ -84,29 +85,29 @@ public final class AppMConstants {
 
     //registry location for consumer
     public static final String API_ROOT_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
-    
+
     //registry location for WebApp documentation
     public static final String API_DOC_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/api-docs";
-    
+
     //registry location for Custom sequences
     public static final String API_CUSTOM_SEQUENCE_LOCATION = APPMGT_REGISTRY_LOCATION +"/customsequences";
-    
+
     public static final String API_CUSTOM_INSEQUENCE_LOCATION = API_CUSTOM_SEQUENCE_LOCATION +"/in/";
-  
+
     public static final String API_CUSTOM_OUTSEQUENCE_LOCATION = API_CUSTOM_SEQUENCE_LOCATION +"/out/";
-    
+
     //registry location for secure vault passwords
     public static final String API_SYSTEM_CONFIG_SECURE_VAULT_LOCATION = "/repository/components/secure-vault";
-  
+
    //registry location for wsdl files
     public static final String API_WSDL_RESOURCE_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/wsdls/";
-    
+
     public static final String API_DOC_RESOURCE_NAME = "api-doc.json";
-    
+
     public static final String API_DEFINITION_DOC_NAME = "Swagger WebApp Definition";
 
     public static final String API_ICON_IMAGE = "icon";
-    
+
     public static final String API_GLOBAL_VISIBILITY = "public";
 
     public static final String API_RESTRICTED_VISIBILITY = "restricted";
@@ -164,7 +165,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_OUTSEQUENCE = "overview_outSequence";
     public static final String API_OVERVIEW_ALLOW_ANONYMOUS = "overview_allowAnonymous";
     public static final String API_OVERVIEW_SKIP_GATEWAY ="overview_skipGateway";
-    
+
     public static final String API_OVERVIEW_RESPONSE_CACHING = "overview_responseCaching";
     public static final String API_OVERVIEW_CACHE_TIMEOUT = "overview_cacheTimeout";
 
@@ -174,9 +175,11 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_ADVERTISE_ONLY = "overview_advertiseOnly";
     public static final String API_OVERVIEW_ADVERTISED_APP_UUID = "overview_advertisedAppUuid";
     public static final String API_OVERVIEW_ENDPOINT_CONFIG = "overview_endpointConfig";
-    
+
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABILITY = "overview_subscriptionAvailability";
     public static final String API_OVERVIEW_SUBSCRIPTION_AVAILABLE_TENANTS = "overview_tenants";
+
+    public static final String API_OVERVIEW_CREATED_TIME= "overview_createdtime";
 
     //
     public static final String API_OVERVIEW_ENABLE_SSO = "overview_enableSso";
@@ -186,7 +189,18 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
-    
+    public static final String MOBILE_APP_OVERVIEW_URL = "overview_url";
+    public static final String MOBILE_APP_OVERVIEW_PACKAGE_NAME = "overview_packagename";
+    public static final String MOBILE_APP_OVERVIEW_BUNDLE_VERSION = "overview_bundleversion";
+    public static final String MOBILE_APP_OVERVIEW_CATEGORY = "overview_category";
+    public static final String MOBILE_APP_OVERVIEW_TYPE = "overview_type";
+    public static final String MOBILE_APP_OVERVIEW_RECENT_CHANGES = "overview_recentchanges";
+    public static final String MOBILE_APP_OVERVIEW_PLATFORM = "overview_platform";
+    public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
+    public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
+    public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
+    public static final String MOBILE_APP_IMAGES_BANNER = "images_banner";
+
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";
     public static final String PROVIDER_OVERVIEW_EMAIL = "overview_email";
@@ -253,6 +267,7 @@ public final class AppMConstants {
     public static final String APP_LIFE_CYCLE="AppLifeCycle";
     public static final String APP_LC_PUBLISHED = "Published";
 
+
     public static class TokenStatus {
         public static final String ACTIVE = "ACTIVE";
         public static final String BLOCKED = "BLOCKED";
@@ -269,7 +284,7 @@ public final class AppMConstants {
 
     public static final String RXT_MEDIA_TYPE = "application/vnd.wso2.registry-ext-type+xml";
     public static final int TOP_TATE_MARGIN = 4;
-    
+
     public static final class Permissions {
         //Login permission
         public static final String LOGIN = "/permission/admin/login";
@@ -299,7 +314,9 @@ public final class AppMConstants {
         public static final String VIEW_STATS = "/permission/admin/manage/appm/view_stats";
     }
 
-    public static final String API_NAME = "Name";
+    public static final String SEARCH_CONTENT_NAME = "name";
+    public static final String SEARCH_CONTENT_TYPE = "type";
+
     public static final String API_GATEWAY = "APIGateway.";
     public static final String API_GATEWAY_SERVER_URL = "ServerURL";
     public static final String API_GATEWAY_USERNAME = "Username";
@@ -309,7 +326,7 @@ public final class AppMConstants {
     public static final String API_GATEWAY_CLIENT_DOMAIN_HEADER = API_GATEWAY + "ClientDomainHeader";
     public static final String API_GATEWAY_TYPE = "GatewayType";
     public static final String API_GATEWAY_TYPE_SYNAPSE = "Synapse";
-    
+
     public static final String API_KEY_MANAGER = "APIKeyManager.";
     public static final String API_KEY_MANAGER_URL = API_KEY_MANAGER + "ServerURL";
     public static final String API_KEY_MANAGER_TOKEN_ENDPOINT_NAME = API_KEY_MANAGER + "TokenEndPointName";
@@ -357,20 +374,26 @@ public final class AppMConstants {
 
     public static final String STORE_CONFIGURATION = "APPStoreConfiguration.";
     public static final String STORE_DISPLAY_MULTIPLE_VERSIONS = STORE_CONFIGURATION + "DisplayMultipleVersions";
- 
+
     public static final String AUTH_MANAGER = "AuthManager.";
     public static final String AUTH_MANAGER_URL = AUTH_MANAGER + "ServerURL";
     public static final String AUTH_MANAGER_USERNAME = AUTH_MANAGER + "Username";
     public static final String AUTH_MANAGER_PASSWORD = AUTH_MANAGER + "Password";
-    
+
     public static final String SELF_SIGN_UP = "SelfSignUp.";
     public static final String SELF_SIGN_UP_ENABLED = SELF_SIGN_UP + "Enabled";
     public static final String SELF_SIGN_UP_ROLE = SELF_SIGN_UP + "SubscriberRoleName";
     public static final String SELF_SIGN_UP_CREATE_ROLE = SELF_SIGN_UP + "CreateSubscriberRole";
 
+    public static final String MOBILE_APPS_CONFIGURATION = "MobileAppsConfiguration.";
+    public static final String MOBILE_APPS_BINARY_FILE_STORAGE = MOBILE_APPS_CONFIGURATION + "BinaryFileStorage.";
+    public static final String MOBILE_APPS_FILE_PRECISE_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FilePreciseLocation";
+    public static final String MOBILE_APPS_FILE_API_LOCATION = MOBILE_APPS_BINARY_FILE_STORAGE + "FileAPILocation";
+
+
     public static final String STATUS_OBSERVERS = "StatusObservers.";
     public static final String OBSERVER = STATUS_OBSERVERS + "Observer";
-    
+
     public static final String CORS_CONFIGURATION = "CORSConfiguration.";
     public static final String CORS_CONFIGURATION_ENABLED = CORS_CONFIGURATION + "Enabled";
     public static final String CORS_CONFIGURATION_ACCESS_CTL_ALLOW_ORIGIN = CORS_CONFIGURATION + "Access-Control-Allow-Origin";
@@ -396,13 +419,13 @@ public final class AppMConstants {
     public static final String SUBSCRIPTION_CONFIG = "SubscriptionConfiguration.";
     public static final String ENABLE_SELF_SUBSCRIPTION = SUBSCRIPTION_CONFIG + "EnableSelfSubscription";
     public static final String ENABLE_ENTERPRISE_SUBSCRIPTION = SUBSCRIPTION_CONFIG + "EnableEnterpriseSubscription";
-    
+
     public static final String API_KEY_TYPE = "AM_KEY_TYPE";
     public static final String API_KEY_TYPE_PRODUCTION = "PRODUCTION";
     public static final String API_KEY_TYPE_SANDBOX = "SANDBOX";
 
     public static final String BILLING_AND_USAGE_CONFIGURATION = "EnableBillingAndUsage";
-    
+
     public static final String DEFAULT_APPLICATION_NAME = "DefaultApplication";
 
     public static final QName POLICY_ELEMENT = new QName("http://schemas.xmlsoap.org/ws/2004/09/policy",
@@ -414,16 +437,16 @@ public final class AppMConstants {
     public static final QName THROTTLE_ID_DISPLAY_NAME_ELEMENT = new QName("http://www.wso2.org/products/wso2commons/throttle",
             "displayName");
     public static final String TIER_DESCRIPTION_PREFIX = "tier.desc.";
-    
+
     public static final String TIER_MANAGEMENT = "TierManagement.";
     public static final String ENABLE_UNLIMITED_TIER = TIER_MANAGEMENT + "EnableUnlimitedTier";
-    
+
     public static final String UNLIMITED_TIER = "Unlimited";
     public static final int UNLIMITED_TIER_REQUEST_PER_MINUTE = 10000;
     public static final String UNLIMITED_TIER_DESC = "Allows unlimited requests";
 
     public static final String UNAUTHENTICATED_TIER = "Unauthenticated";
-    
+
     public static final int AM_CREATOR_APIMGT_EXECUTION_ID = 200;
     public static final int AM_CREATOR_GOVERNANCE_EXECUTION_ID = 201;
     public static final int AM_PUBLISHER_APIMGT_EXECUTION_ID = 202;
@@ -447,9 +470,9 @@ public final class AppMConstants {
     public static final String AUTH_TYPE_APP = "APP";
 
     public static final String REMOTE_ADDR = "REMOTE_ADDR";
-    
+
     public static final String TIER_PERMISSION_ALLOW = "allow";
-    
+
     public static final String SUBSCRIPTION_TO_CURRENT_TENANT = "current_tenant";
     public static final String SUBSCRIPTION_TO_ALL_TENANTS = "all_tenants";
     public static final String SUBSCRIPTION_TO_SPECIFIC_TENANTS = "specific_tenants";
@@ -571,12 +594,12 @@ public final class AppMConstants {
     	public static final String QUERY_PARAM_DESCRIPTION = "Request Query Parameters";
     	public static final String PAYLOAD_PARAM_TYPE = "body";
     }
-    
+
     public static class CORSHeaders {
     	public static final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
     	public static final String ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
     	public static final String ACCESS_CONTROL_ALLOW_METHODS = "Access-Control-Allow-Methods";
-    	
+
     	public static final String ACCESS_CONTROL_ALLOW_HEADERS_VALUE = "authorization,Access-Control-Allow-Origin,Content-Type";
     	public static final String ACCESS_CONTROL_ALLOW_METHODS_VALUE = "GET,POST,PUT,DELETE,OPTIONS";
     }
@@ -586,16 +609,16 @@ public final class AppMConstants {
     public static final String GATEWAY_ENV_TYPE_HYBRID = "hybrid";
     public static final String GATEWAY_ENV_TYPE_PRODUCTION = "production";
     public static final String GATEWAY_ENV_TYPE_SANDBOX = "sandbox";
-    
+
     public static final String API_RESPONSE_CACHE_ENABLED = "Enabled";
     public static final String API_RESPONSE_CACHE_DISABLED = "Disabled";
     public static final int API_RESPONSE_CACHE_TIMEOUT = 300;
-    
-    
+
+
     public static class ApplicationStatus {
        public static final String APPLICATION_CREATED = "CREATED";
-       public static final String APPLICATION_APPROVED = "APPROVED"; 
-       public static final String APPLICATION_REJECTED = "REJECTED"; 
+       public static final String APPLICATION_APPROVED = "APPROVED";
+       public static final String APPLICATION_REJECTED = "REJECTED";
        public static final String APPLICATION_ONHOLD = "ON_HOLD";
         public static final String APPLICATION_RETIRED = "RETIRED";
 
@@ -614,14 +637,18 @@ public final class AppMConstants {
     }
     //key  of the endpoint securevault
     public static final String API_SECUREVAULT_ENABLE = "EnableSecureVault";
-    
+
     //Directory path and name of the mobile app resources
     public static final String MOBILE_APPS_DIRECTORY_PATH = "repository/resources";
     public static final String MOBILE_APPS_DIRECTORY_NAME = "mobileapps";
-    
+
+    //Mobile application binary file extensions
+    public static final String MOBILE_APPS_ANDROID_EXT = "apk";
+    public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
     public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
-    
+
     // These two synapse properties are used to in the entitlement handler.
     public static final String MATCHED_URL_PATTERN_PROERTY_NAME = "appm.matchedUrlPattern";
     public static final String MATCHED_APP_ID_PROERTY_NAME = "appm.matchedAppId";
@@ -661,4 +688,6 @@ public final class AppMConstants {
         public static final String WEB_APP = "application/vnd.wso2-webapp+xml";
         public static final String MOBILE_APP = "application/vnd.wso2-mobileapp+xml";
     }
+
+
 }
