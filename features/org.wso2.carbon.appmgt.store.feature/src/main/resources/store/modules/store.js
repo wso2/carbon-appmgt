@@ -492,6 +492,9 @@ Store.prototype.tags = function (type) {
 };
 
 /**
+ * @type Type of asset
+ * @isSite - String value of TRUE or FALSE, used to get the tags of webapp and sites separately
+ *
  * Returns all tags which relevant to type and flag
  */
 Store.prototype.tags = function (type, isSite) {
@@ -506,7 +509,13 @@ Store.prototype.tags = function (type, isSite) {
     var tenantdomain = carbonContext.getTenantDomain();
     var storeObj = jagg.module("manager").getAPIStoreObj();
     if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
-        tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        if(isSite) {
+            //isSite value is given,get tags of  webapp or site based on isSite value
+            tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        } else {
+            //Get both webapp ans site tags
+            tagz = storeObj.getAllTags(String(tenantdomain), type);
+        }
         return tagz;
     } else if (type == RESOURCE_TYPE_MOBILEAPP) {
         tagz = storeObj.getAllTags(String(tenantdomain), type);

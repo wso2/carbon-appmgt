@@ -18,7 +18,7 @@ var render = function (theme, data, meta, require) {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
                     assetType: data.assetType,
-                    myFavPage: true
+                    hideTag: true
                 }
             }
         ],

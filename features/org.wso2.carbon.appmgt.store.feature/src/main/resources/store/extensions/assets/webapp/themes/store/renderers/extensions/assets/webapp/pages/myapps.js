@@ -36,7 +36,8 @@ var render = function (theme, data, meta, require) {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
                     recentApps: data.recentAssets,
-                    assetType: data.assetType
+                    assetType: data.assetType,
+                    hideTag: hideTag(data)
                 }
             }
         ],
@@ -159,4 +160,13 @@ function getTagUrl(data) {
         tagUrl = '/assets/webapp';
     }
     return tagUrl;
+}
+
+function hideTag(data){
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        return false;
+    }
+    return true;
 }
