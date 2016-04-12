@@ -29,6 +29,7 @@ import java.util.Collections;
 public class WebApp {
 
     private APIIdentifier id;
+
     private String description;
     private String url;
     private String displayName;

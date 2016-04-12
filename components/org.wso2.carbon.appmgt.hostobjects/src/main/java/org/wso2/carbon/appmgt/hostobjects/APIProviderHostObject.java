@@ -693,7 +693,7 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * SaUpdate the given business owner.
+     * Update the given business owner.
      *
      * @param context Rhino context
      * @param thisObj Scriptable object
@@ -1052,13 +1052,17 @@ public class APIProviderHostObject extends ScriptableObject {
         if (provider != null) {
             provider = AppManagerUtil.replaceEmailDomain(provider);
         }
-        String ownerName = (String) apiData.get("overview_business", apiData);
+        String ownerName = null;
         String name = (String) apiData.get("overview_name", apiData);
         String version = (String) apiData.get("overview_version", apiData);
         String transports = (String) apiData.get("overview_transports", apiData);
         String description = (String) apiData.get("overview_description", apiData);
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
+       apiData.values();
+       apiData.keySet();
+        ownerName = (String) apiData.get("overview_owner", apiData);
+
         logoutURL = logoutURL.replace(endpoint, "");
         boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",

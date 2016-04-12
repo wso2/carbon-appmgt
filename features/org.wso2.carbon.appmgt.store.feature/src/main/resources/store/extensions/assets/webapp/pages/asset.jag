@@ -220,7 +220,7 @@ require('/modules/store.js').exec(function (ctx) {
             businessOwner = storeHostObj.getBusinessOwner(asset.id);
             if(businessOwner.owner_name != null) {
                 businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
-                ownerName = businessOwner[1].value;
+                ownerName = businessOwner[0].value;
             }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
@@ -423,7 +423,7 @@ require('/modules/store.js').exec(function (ctx) {
             isFavourite = isFavouriteApp(asset);
         }
 
-        if (subscriptionInfo.individualSubscription) {
+        if (subscriptionInfo && subscriptionInfo.individualSubscription) {
             if (subscriptionInfo.individualSubscription.subscriptionStatus === "UNBLOCKED") {
                 isSubscribed = true;
                 subscriptionInfo.individualSubscription["OnHold"] = false;
@@ -536,7 +536,7 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
-                   data: store.tags(type, isSite)
+                data: {allTags: store.tags(type, isSite), searchedTag: ""}
             },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,
@@ -547,7 +547,8 @@ require('/modules/store.js').exec(function (ctx) {
             isSubscriptionAvailable: isSubscriptionAvailable,
             config: {
                 isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                enabledTypeList: enabledTypeList
             },
             assetType : 'webapp',
 	    businessOwner: businessOwner,

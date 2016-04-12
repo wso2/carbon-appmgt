@@ -223,9 +223,9 @@ require('/modules/publisher.js').exec(function(ctx) {
         var username = require('store').server.current(session).username;
         var request = {};
         request["username"] = stringify(username);
-        request["creatorSession"] = sessionID;       
-        request["webapps"] = stringify(webapps); 
-        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer; 
+        request["creatorSession"] = sessionID;
+        request["webapps"] = stringify(webapps);
+        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer;
         var deployerObj = new deployerClass();
         var msg = {};
         msg["isSampleDeployed"] = true;
@@ -237,7 +237,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 msg["response"] = "Samples deployed succesfully. " +
                         "You can login to store using UserName : subscriber_" +username+
                         " Password : subscriber"
-                msg["isError"] = "false";        
+                msg["isError"] = "false";
             }else{
                 msg["response"] = username+" has already created a sample web application"
                 msg["isError"] = "true";
@@ -638,8 +638,8 @@ require('/modules/publisher.js').exec(function(ctx) {
                 artifact.attributes["overview_appOwner"] = appOwner;
                 artifact.attributes["overview_appTenant"] = appTenant;
                 artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
-                artifact.attributes["overview_owner"] = isAdvertiseOnly;
-                artifact.attributes["overview_business"] = businesOwner;
+                artifact.attributes["overview_ownerAdvertise"] = isAdvertiseOnly;
+                artifact.attributes["overview_ownersssssss"] = businesOwner;
 
 
             var tenantId = server.current(session).tenantId;
@@ -741,7 +741,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 //Save OAuth APIs consumer details per given web-app
                 appMDAOObj.addOAuthAPIAccessInfo(webAppObj, tenantId);
             }
-            
+
             var artifactManagerForUpdate = rxtManager.getSystemArtifactManager(shortName,session);
 
             if(originalArtifact.lifecycleState=="Approved") {

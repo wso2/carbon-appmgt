@@ -27,7 +27,7 @@ var render=function(theme,data,meta,require){
     var typeList = apiProvider.getEnabledAssetTypeList();
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
-    var owner_name =  appMDAOObj.getUserName(data.artifact.id);
+
     //Determine what view to show
     switch(data.op){
 
@@ -37,6 +37,7 @@ var render=function(theme,data,meta,require){
             heading = "Create New Web Application";
             break;
         case 'view':
+            var owner_name =  appMDAOObj.getUserName(data.artifact.id);
             var ownerList = data.ownerList;
             data = require('/helpers/view-asset.js').merge(data);
             data = require('/helpers/addField.js').addField(data, owner_name);
@@ -53,7 +54,7 @@ var render=function(theme,data,meta,require){
             heading = data.newViewData.displayName.value;
             break;
         case 'edit':
-
+            var owner_name =  appMDAOObj.getUserName(data.artifact.id);
             data = require('/helpers/addField.js').addField(data, owner_name);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
             if(data.artifact.lifecycleState == "Published"){

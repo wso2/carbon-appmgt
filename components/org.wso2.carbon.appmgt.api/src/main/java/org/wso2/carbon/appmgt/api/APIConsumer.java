@@ -57,36 +57,36 @@ public interface APIConsumer extends APIManager {
     /**
      * Returns a paginated list of #{@link org.wso2.carbon.apimgt.api.model.API} bearing the selected tag
      *
-     * @param tag   name of the tag
+     * @param tag name of the tag
      * @param start starting number
-     * @param end   ending number
+     * @param end ending number
      * @return set of WebApp having the given tag name
      * @throws AppManagementException if failed to get set of WebApp
      */
-    public Map<String, Object> getPaginatedAPIsWithTag(String tag, int start, int end) throws
-                                                                                       AppManagementException;
+    public Map<String,Object> getPaginatedAPIsWithTag(String tag,int start,int end) throws
+                                                                                    AppManagementException;
 
     /**
-     * Returns a list of all published APIs. If a given WebApp has multiple APIs, only the latest version will be
-     * included in this list.
+     * Returns a list of all published APIs. If a given WebApp has multiple APIs,
+     * only the latest version will be included
+     * in this list.
      *
      * @return set of WebApp
      * @throws AppManagementException if failed to WebApp set
      */
     public Set<WebApp> getAllPublishedAPIs(String tenantDomain) throws AppManagementException;
-
-    /**
-     * Returns a paginated list of all published APIs. If a given WebApp has multiple APIs, only the latest version will
-     * be included in this list.
-     *
+ /**
+     * Returns a paginated list of all published APIs. If a given WebApp has multiple APIs,
+     * only the latest version will be included
+     * in this list.
      * @param tenantDomain tenant domain
-     * @param start        starting number
-     * @param end          ending number
+     * @param start starting number
+     * @param end ending number
      * @return set of WebApp
      * @throws AppManagementException if failed to WebApp set
      */
-    public Map<String, Object> getAllPaginatedPublishedAPIs(String tenantDomain, int start, int end) throws
-                                                                                                     AppManagementException;
+    public Map<String,Object> getAllPaginatedPublishedAPIs(String tenantDomain,int start,int end) throws
+                                                                                                  AppManagementException;
 
     /**
      * Returns top rated APIs
@@ -104,8 +104,8 @@ public interface APIConsumer extends APIManager {
      * @return set of WebApp
      * @throws AppManagementException if failed to get recently added APIs
      */
-    public Set<WebApp> getRecentlyAddedAPIs(int limit, String tenantDomain) throws
-                                                                            AppManagementException;
+    public Set<WebApp> getRecentlyAddedAPIs(int limit,String tenantDomain) throws
+                                                                           AppManagementException;
 
     /**
      * Get all tags of published Apps
@@ -117,8 +117,7 @@ public interface APIConsumer extends APIManager {
 
     /**
      * @param tenantDomain
-     * @param assetType    Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset
-     *                     type.
+     * @param assetType Currently we don't use asset type. Asset type could be webapp, mobileapp or any other asset type.
      * @param attributeMap Attribute map for the give assetType.
      * @return matching tag set which qualified the conditions of assetTye and attributeMap.
      * @throws AppManagementException
@@ -131,21 +130,20 @@ public interface APIConsumer extends APIManager {
      *
      * @param apiId  The WebApp identifier
      * @param rating The rating provided by the subscriber
-     * @param user   Username of the subscriber providing the rating
+     * @param user Username of the subscriber providing the rating
      * @throws AppManagementException If an error occurs while rating the WebApp
      */
     public void rateAPI(APIIdentifier apiId, APIRating rating, String user) throws
                                                                             AppManagementException;
 
     /**
-     * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an
-     * WebApp
+     * Remove an user rating of a particular WebApp. This will be called when subscribers remove their rating on an WebApp
      *
-     * @param apiId The WebApp identifier
-     * @param user  Username of the subscriber providing the rating
+     * @param apiId  The WebApp identifier
+     * @param user Username of the subscriber providing the rating
      * @throws AppManagementException If an error occurs while rating the WebApp
      */
-    public void removeAPIRating(APIIdentifier apiId, String user) throws AppManagementException;
+    public void removeAPIRating(APIIdentifier apiId,  String user) throws AppManagementException;
 
     /**
      * Returns a set of SubscribedAPI purchased by the given Subscriber
@@ -181,14 +179,13 @@ public interface APIConsumer extends APIManager {
     /**
      * Add new Subscriber
      *
-     * @param identifier       APIIdentifier
+     * @param identifier    APIIdentifier
      * @param subscriptionType Type of the subscription. E.g. Individual, Enterprise
-     * @param userId           id of the user
-     * @param applicationId    Application Id   @return String subscription status
+     * @param userId        id of the user
+     * @param applicationId Application Id   @return String subscription status
      * @throws AppManagementException if failed to add subscription details to database
      */
-    public String addSubscription(APIIdentifier identifier, String subscriptionType, String userId, int applicationId,
-                                  String trustedIdp)
+    public String addSubscription(APIIdentifier identifier, String subscriptionType, String userId, int applicationId, String trustedIdp)
             throws AppManagementException;
 
 
@@ -242,11 +239,11 @@ public interface APIConsumer extends APIManager {
 
     /**
      * @param identifier Api identifier
-     * @param comment    comment text
-     * @param user       Username of the comment author
+     * @param comment comment text
+     * @param user Username of the comment author                        
      * @throws AppManagementException if failed to add comment for WebApp
      */
-    public void addComment(APIIdentifier identifier, String comment,
+    public void addComment(APIIdentifier identifier, String comment, 
                            String user) throws AppManagementException;
 
     /**
@@ -277,14 +274,11 @@ public interface APIConsumer extends APIManager {
     public Set<SubscribedAPI> getSubscribedIdentifiers(Subscriber subscriber,
                                                        APIIdentifier identifier) throws
                                                                                  AppManagementException;
-
-    public Set<WebApp> searchAPI(String searchTerm, String searchType, String tenantDomain) throws
-                                                                                            AppManagementException;
-
-    public Map<String, Object> searchPaginatedAPIs(String searchTerm, String searchType, String tenantDomain, int start,
-                                                   int end) throws
-                                                            AppManagementException;
-
+    
+    public Set<WebApp> searchAPI(String searchTerm, String searchType,String tenantDomain) throws
+                                                                                           AppManagementException;
+    public Map<String,Object> searchPaginatedAPIs(String searchTerm, String searchType,String tenantDomain,int start,int end) throws
+                                                                                                                              AppManagementException;
     public int getUserRating(APIIdentifier apiId, String user) throws AppManagementException;
 
     /**
@@ -292,18 +286,17 @@ public interface APIConsumer extends APIManager {
      *
      * @param providerId , provider id
      * @param loggedUser logged user
-     * @param limit      Maximum number of results to return. Pass -1 to get all.
+     * @param limit Maximum number of results to return. Pass -1 to get all.
      * @return set of WebApp
      * @throws AppManagementException if failed to get set of WebApp
      */
-    public Set<WebApp> getPublishedAPIsByProvider(String providerId, String loggedUser, int limit) throws
-                                                                                                   AppManagementException;
+    public Set<WebApp> getPublishedAPIsByProvider(String providerId,String loggedUser, int limit) throws
+                                                                                                  AppManagementException;/**
 
-    /**
-     * /** Get a list of published APIs by the given provider.
+     /** Get a list of published APIs by the given provider.
      *
      * @param providerId , provider id
-     * @param limit      Maximum number of results to return. Pass -1 to get all.
+     * @param limit Maximum number of results to return. Pass -1 to get all.
      * @return set of WebApp
      * @throws AppManagementException if failed to get set of WebApp
      */
@@ -325,16 +318,16 @@ public interface APIConsumer extends APIManager {
      * @return Set<String>
      * @throws AppManagementException if failed to get the tiers
      */
-    public Set<String> getDeniedTiers() throws AppManagementException;
-
+    public Set<String> getDeniedTiers()throws AppManagementException;
+    
     /**
      * Check whether given Tier is denied for the user
      *
      * @param tierName
-     * @return
+     * @return 
      * @throws AppManagementException if failed to get the tiers
      */
-    public boolean isTierDeneid(String tierName) throws AppManagementException;
+    public boolean isTierDeneid(String tierName)throws AppManagementException;
 
     /**
      * Returns a list of applications for a given subscriber
