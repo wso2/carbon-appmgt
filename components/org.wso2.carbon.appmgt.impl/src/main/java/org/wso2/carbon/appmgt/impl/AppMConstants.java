@@ -68,6 +68,8 @@ public final class AppMConstants {
 
     public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
+    public static final String TENANT_CONF_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  "tenant-conf.json";
+
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
 
@@ -266,6 +268,9 @@ public final class AppMConstants {
     public static final String DOCUMENTATION_INLINE_CONTENT_TYPE = "text/plain";
     public static final String APP_LIFE_CYCLE="AppLifeCycle";
     public static final String APP_LC_PUBLISHED = "Published";
+
+    // ReST API constants
+    public static final String REST_API_SCOPES_CONFIG = "RESTAPIScopes";
 
 
     public static class TokenStatus {

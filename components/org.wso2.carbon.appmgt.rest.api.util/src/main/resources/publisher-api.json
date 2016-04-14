@@ -28,6 +28,7 @@
     "paths": {
         "/apps/{appType}": {
             "get": {
+                "x-scope": "apim:api_view",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [

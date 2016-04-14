@@ -119,6 +119,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -3200,6 +3201,35 @@ public final class AppManagerUtil {
 			}
 		}
 	}
+
+    public static String getConfigRegistryResourceContent(String tenantDomain, final String registryLocation)
+            throws UserStoreException, RegistryException {
+
+        String content = null;
+        if (tenantDomain == null) {
+            tenantDomain = org.wso2.carbon.utils.multitenancy.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomain);
+            Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry(tenantId);
+            loadTenantRegistry(tenantId);
+
+            if (registry.resourceExists(registryLocation)) {
+                Resource resource = registry.get(registryLocation);
+                content = new String((byte[]) resource.getContent(), Charset.defaultCharset());
+            }
+        } catch (AppManagementException e) {
+            log.error(String.format("Can't get resouce in '%s'", registryLocation));
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+
+        return content;
+    }
 
 	/**
 	 * This is to get the registry resource's HTTP permlink path.

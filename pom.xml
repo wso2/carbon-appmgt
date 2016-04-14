@@ -29,6 +29,7 @@
         <module>components/org.wso2.carbon.appmgt.gateway</module>
         <module>components/org.wso2.carbon.appmgt.usage</module>
         <module>components/org.wso2.carbon.appmgt.core</module>
+        <module>components/org.wso2.carbon.appmgt.oauth.core</module>
         <module>components/org.wso2.carbon.appmgt.oauth.webapp</module>
         <module>components/org.wso2.carbon.appmgt.oauth.endpoint</module>
         <module>components/org.wso2.carbon.appmgt.mobile</module>
