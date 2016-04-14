@@ -1,20 +1,21 @@
 /*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * you may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * /
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
 import org.apache.commons.io.FilenameUtils;
@@ -30,8 +31,8 @@ import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.WebApp;
-import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -77,30 +78,30 @@ public class AppsApiServiceImpl extends AppsApiService {
                         appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
                 File binaryFile = new File(directoryLocation);
 
-                    ContentDisposition contentDisposition = fileDetail.getContentDisposition();
-                    String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
-                    String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                    RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
+                ContentDisposition contentDisposition = fileDetail.getContentDisposition();
+                String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
+                String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
+                RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
 
-                    ZipFileReading zipFileReading = new ZipFileReading();
-                    String information = null;
-                    String filePath = binaryFile.getAbsolutePath() + File.separator + filename;
+                ZipFileReading zipFileReading = new ZipFileReading();
+                String information = null;
+                String filePath = binaryFile.getAbsolutePath() + File.separator + filename;
 
-                    if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension)) {
-                        information = zipFileReading.readAndroidManifestFile(filePath);
-                    } else if (AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
-                        information = zipFileReading.readiOSManifestFile(filePath, null);
-                    } else {
-                        RestApiUtil.handleBadRequest("Invalid Filetype - Uploaded file is not an archive", log);
-                    }
-                    JSONObject binaryObj = new JSONObject(information);
-                    binaryDTO.setPackage(binaryObj.getString("package"));
-                    binaryDTO.setVersion(binaryObj.getString("version"));
-                    String fileAPI = appManagerConfiguration.getFirstProperty(
-                            AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
-                            + filename;
-                    binaryDTO.setPath(fileAPI);
-                    return Response.ok().entity(binaryDTO).build();
+                if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension)) {
+                    information = zipFileReading.readAndroidManifestFile(filePath);
+                } else if (AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
+                    information = zipFileReading.readiOSManifestFile(filePath, null);
+                } else {
+                    RestApiUtil.handleBadRequest("Invalid Filetype - Uploaded file is not an archive", log);
+                }
+                JSONObject binaryObj = new JSONObject(information);
+                binaryDTO.setPackage(binaryObj.getString("package"));
+                binaryDTO.setVersion(binaryObj.getString("version"));
+                String fileAPI = appManagerConfiguration.getFirstProperty(
+                        AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
+                        + filename;
+                binaryDTO.setPath(fileAPI);
+                return Response.ok().entity(binaryDTO).build();
 
             } else {
                 RestApiUtil.handleBadRequest("'file' should be specified", log);
@@ -118,7 +119,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
+                                           String ifUnmodifiedSince) {
         String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         try {
             BinaryDTO binaryDTO = new BinaryDTO();
@@ -137,7 +139,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
                     RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
 
-                    String fileAPI = appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
+                    String fileAPI = appManagerConfiguration.getFirstProperty(
+                            AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
                             + filename;
                     binaryDTO.setPath(fileAPI);
                     return Response.ok().entity(binaryDTO).build();
@@ -211,7 +214,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
         AppDTO appDTO = new AppDTO();
-        if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+        if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
             try {
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 //TODO:APP Validations
@@ -223,7 +226,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             } catch (AppManagementException e) {
                 RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
             }
-        }else{
+        } else {
             RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
         }
         return Response.ok().entity(appDTO).build();
@@ -307,7 +310,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
                                           String ifUnmodifiedSince) {
 
-        if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+        if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
             try {
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 //TODO:APP Validations
@@ -320,7 +323,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             } catch (AppManagementException e) {
                 RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
             }
-        }else{
+        } else {
             RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
         }
         return Response.accepted().build();
@@ -335,7 +338,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                                                  appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
-                RestApiUtil.buildNotFoundException(errorMessage, appId);
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             WebApp webApp = allMatchedApps.get(0);
             if (appType.equals(AppMConstants.APP_TYPE)) {

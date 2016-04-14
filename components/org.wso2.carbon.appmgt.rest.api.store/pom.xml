@@ -96,6 +96,11 @@
             <artifactId>org.wso2.carbon.appmgt.rest.api.util</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
 
 
         <!--   Uncomment when needed to generate swagger based skeleton
