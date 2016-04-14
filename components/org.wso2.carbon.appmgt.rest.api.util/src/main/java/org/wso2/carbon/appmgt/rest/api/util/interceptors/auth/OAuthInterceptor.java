@@ -17,29 +17,30 @@
 package org.wso2.carbon.appmgt.rest.api.util.interceptors.auth;
 
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.wso2.carbon.CarbonException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.util.AnonymousSessionUtil;
 import org.wso2.carbon.identity.oauth2.OAuth2TokenValidationService;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2ClientApplicationDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationRequestDTO;
 import org.wso2.carbon.identity.oauth2.dto.OAuth2TokenValidationResponseDTO;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.user.core.UserRealm;
-import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -80,13 +81,99 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
         }
 
         try {
-            setUserDetails(validationResponse.getAuthorizedUser());
+            if(hasValidScopes(inMessage, validationResponse)){
+                setUserDetails(validationResponse.getAuthorizedUser());
+            }else{
+                ErrorDTO errorDetail = new ErrorDTO((long)403, "Not authorized to access the API resource.");
+                sendErrorResponse(errorDetail, inMessage);
+                return;
+            }
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
             String errorMessage = "Can't set user details after authentication.";
             log.error(errorMessage, e);
             ErrorDTO errorDetail = new ErrorDTO((long)500, errorMessage);
             sendErrorResponse(errorDetail, inMessage);
         }
+    }
+
+    private boolean hasValidScopes(Message message, OAuth2TokenValidationResponseDTO validationResponse) {
+
+        String[] scopes = validationResponse.getScope();
+
+        // Get the swagger definition.
+        String scope = getResourceScope(message);
+
+        return ArrayUtils.contains(scopes, scope);
+
+    }
+
+    private String getResourceScope(Message message) {
+
+        String basePath = (String) message.get(Message.BASE_PATH);
+        String verb = (String) message.get(Message.HTTP_REQUEST_METHOD);
+
+        String apiName = null;
+
+        String matchedURITemplate = getMatchedURITemplate(message);
+
+        JSONObject apiDefinition = getAPIDefinition(basePath);
+
+        JSONObject matchedResourceTemplate = (JSONObject) ((JSONObject) apiDefinition.get("paths")).get(matchedURITemplate);
+
+        JSONObject matchedResource = (JSONObject) matchedResourceTemplate.get(verb.toLowerCase());
+
+        return (String) matchedResource.get("x-scope");
+
+    }
+
+    private String getMatchedURITemplate(Message message) {
+
+        Method resourceMethod = (Method) message.get("org.apache.cxf.resource.method");
+
+        String classResourcePath = resourceMethod.getDeclaringClass().getAnnotation(Path.class).value();
+        String methodResourcePath = resourceMethod.getAnnotation(Path.class).value();
+
+        if("/".equals(classResourcePath)){
+            return methodResourcePath;
+        }else{
+            return classResourcePath + methodResourcePath;
+        }
+
+    }
+
+    private JSONObject getAPIDefinition(String basePath) {
+
+        String apiDefinitionName = null;
+
+        if(basePath.contains("api/appm/publisher")){
+            apiDefinitionName = "publisher-api.json";
+        }else if(basePath.contains("api/appm/store")){
+            apiDefinitionName = "store-api.json";
+        }else if(basePath.contains("api/appm/storeadmin")){
+            apiDefinitionName = "storeadmin-api.json";
+        }
+
+
+        if(apiDefinitionName != null){
+            try {
+
+                String apiDefinition = IOUtils.toString(OAuthInterceptor.class.getResourceAsStream("/" + apiDefinitionName), "UTF-8");
+
+                if(apiDefinition != null){
+                    JSONParser parser = new JSONParser();
+                    JSONObject parsedAPIDefinition = (JSONObject) parser.parse(apiDefinition);
+                    return parsedAPIDefinition;
+                }
+
+            } catch (IOException e) {
+                log.error(String.format("Can't read the API definition '%s'", apiDefinitionName));
+            } catch (ParseException e) {
+                log.error(String.format("Can't read the API definition '%s'", apiDefinitionName));
+            }
+        }
+
+
+        return null;
     }
 
     private void setUserDetails(String username) throws org.wso2.carbon.user.api.UserStoreException {
