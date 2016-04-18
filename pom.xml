@@ -51,6 +51,9 @@
         <module>features/org.wso2.carbon.appmgt.mdm.wso2mdm.feature</module>
         <module>features/org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
         <module>features/org.wso2.carbon.appmgt.services.api.feature</module>
+        <module>features/org.wso2.carbon.appmgt.oauth.feature</module>
+        <module>features/org.wso2.carbon.appmgt.rest.api.store.feature</module>
+        <module>features/org.wso2.carbon.appmgt.rest.api.publisher.feature</module>
     </modules>
 
     <build>
@@ -215,6 +218,17 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.appmgt</groupId>
+                <artifactId>org.wso2.carbon.appmgt.oauth.core</artifactId>
+                <version>${carbon.appmgt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.appmgt</groupId>
+                <artifactId>org.wso2.carbon.appmgt.oauth.webapp</artifactId>
+                <version>${carbon.appmgt.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.rest.api.util</artifactId>
                 <version>${carbon.appmgt.version}</version>
             </dependency>
@@ -222,16 +236,19 @@
                 <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.rest.api.publisher</artifactId>
                 <version>${carbon.appmgt.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
                 <version>${carbon.appmgt.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.appmgt</groupId>
                 <artifactId>org.wso2.carbon.appmgt.rest.api.storeadmin</artifactId>
                 <version>${carbon.appmgt.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.registry</groupId>
