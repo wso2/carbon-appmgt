@@ -1,16 +1,15 @@
 <%
 
-    var getAppOwner = '/{context}/apis/businessowners/{ownerId}';
+    var getAppOwner = '/{context}/apis/businessowners/{appUuId}';
     var matcher = new URIMatcher(request.getRequestURI());
     var method = request.getMethod();
-var log = new Log();
+    var storeHostObj = jagg.module("manager").getAPIStoreObj();
+    var log = new Log();
 
 if(method == 'GET'){
-    if(matcher.match(getAppOwner)){ //TODO implement the api
+    if(matcher.match(getAppOwner)){
+        var uuid = uriMatcher.elements().appUuId;
+        print(storeHostObj.getBusinessOwner(uuid));
     }
-
 }
-
-
-
 %>

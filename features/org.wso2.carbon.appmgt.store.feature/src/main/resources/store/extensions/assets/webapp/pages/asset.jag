@@ -371,9 +371,7 @@ require('/modules/store.js').exec(function (ctx) {
             return hasRole;
         }
 
-
         var assetsByProvider = getAssetsFromProvider(asset, store);
-
 
         var docs;
         if (authenticator.getLoggedInUser()) {
@@ -395,15 +393,10 @@ require('/modules/store.js').exec(function (ctx) {
 
         var myapps;
         myapps = appInfoApi.getApplications(username);
-
         var availableTiers = apiInfoManager.getTiers();
-
         var subscriptionInfo;
-
         var isEnterpriseSubscriptionAllowed = false;
-
         var isFavourite = false;
-
         var navigationData = {
             showAllAppsLink: true
         };
@@ -551,7 +544,7 @@ require('/modules/store.js').exec(function (ctx) {
                 enabledTypeList: enabledTypeList
             },
             assetType : 'webapp',
-	    businessOwner: businessOwner,
+	        businessOwner: businessOwner,
             ownerName: ownerName
         });
     }
