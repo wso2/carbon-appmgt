@@ -28,6 +28,7 @@
     "paths": {
         "/apps/{appType}": {
             "get": {
+                "x-scope": "appm:read",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "x-scope": "API_PUBLISHER_SCOPE",
@@ -97,6 +98,7 @@
         },
         "/apps/{appType}/id/{appId}": {
             "get": {
+                "x-scope": "appm:read",
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
                 "parameters": [
@@ -159,6 +161,7 @@
         },
         "/apps/download": {
             "post": {
+                "x-scope": "appm:subscribe",
                 "summary": "Download App",
                 "description": "Download an new App\n",
                 "parameters": [
@@ -203,6 +206,7 @@
         },
         "/apps/uninstallation": {
             "post": {
+                "x-scope": "appm:subscribe",
                 "summary": "Uninstall App",
                 "description": "Uninstall an existing App\n",
                 "parameters": [
@@ -253,6 +257,7 @@
         },
         "/devices": {
             "get": {
+                "x-scope": "appm:appm:read",
                 "summary": "Get all Devices",
                 "description": "Get a list of available Devices qualifying under a given search condition.\n",
                 "parameters": [

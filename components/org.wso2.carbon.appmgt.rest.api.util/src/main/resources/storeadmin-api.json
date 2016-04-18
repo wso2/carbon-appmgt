@@ -28,6 +28,7 @@
     "paths": {
         "/roles": {
             "get": {
+                "x-scope": "appm:administration",
                 "summary": "Get all Roles",
                 "description": "Get a list of available Roles.\n",
                 "parameters": [
@@ -87,6 +88,7 @@
         },
         "/users": {
             "get": {
+                "x-scope": "appm:administration",
                 "summary": "Get all Users",
                 "description": "Get a list of available Users.\n",
                 "parameters": [
@@ -146,6 +148,7 @@
         },
         "/apps/download": {
             "post": {
+                "x-scope": "appm:administration",
                 "summary": "Enterprise Download/Install App",
                 "description": "Enterprise Download an new App\n",
                 "parameters": [
@@ -189,6 +192,7 @@
             }
         },
         "/apps/uninstallation": {
+            "x-scope": "appm:administration",
             "post": {
                 "summary": "Enterprise Uninstall App",
                 "description": "Enterprise Uninstall an existing App\n",

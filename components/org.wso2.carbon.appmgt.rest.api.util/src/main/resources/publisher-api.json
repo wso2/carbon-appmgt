@@ -28,7 +28,7 @@
     "paths": {
         "/apps/{appType}": {
             "get": {
-                "x-scope": "apim:api_view",
+                "x-scope": "appm:read",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [
@@ -158,6 +158,7 @@
         },
         "/apps/{appType}/id/{appId}": {
             "get": {
+                "x-scope": "appm:read",
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
                 "parameters": [
@@ -218,6 +219,7 @@
                 }
             },
             "put": {
+                "x-scope": "appm:update",
                 "summary": "Update an existing App",
                 "description": "Update an existing App\n",
                 "parameters": [
@@ -301,6 +303,7 @@
                 }
             },
             "delete": {
+                "x-scope": "appm:create",
                 "summary": "Delete App",
                 "description": "Delete an existing App\n",
                 "parameters": [
@@ -347,6 +350,7 @@
         },
         "/apps/{appType}/change-lifecycle": {
             "post": {
+                "x-scope": "appm:publish",
                 "summary": "Change App Status",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
@@ -424,6 +428,7 @@
                 "consumes": [
                     "multipart/form-data"
                 ],
+                "x-scope": "appm:create",
                 "summary": "Uploading binary files",
                 "description": "Uploading .apk/.IPA binary files.\n",
                 "parameters": [
@@ -487,6 +492,7 @@
                 "consumes": [
                     "multipart/form-data"
                 ],
+                "x-scope": "appm:create",
                 "summary": "Uploading images, pdf, documents files",
                 "description": "Uploading images for banners, screenshots etc.\n",
                 "parameters": [
