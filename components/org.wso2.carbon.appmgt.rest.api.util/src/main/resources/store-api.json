@@ -257,7 +257,7 @@
         },
         "/devices": {
             "get": {
-                "x-scope": "appm:appm:read",
+                "x-scope": "appm:read",
                 "summary": "Get all Devices",
                 "description": "Get a list of available Devices qualifying under a given search condition.\n",
                 "parameters": [

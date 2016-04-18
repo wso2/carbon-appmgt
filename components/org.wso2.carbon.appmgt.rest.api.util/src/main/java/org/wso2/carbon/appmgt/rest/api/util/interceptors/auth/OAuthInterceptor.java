@@ -103,7 +103,12 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
         // Get the swagger definition.
         String scope = getResourceScope(message);
 
-        return ArrayUtils.contains(scopes, scope);
+        if(scope == null){
+            return true;
+        }else{
+            return ArrayUtils.contains(scopes, scope);
+        }
+
 
     }
 
