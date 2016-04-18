@@ -35,7 +35,6 @@ import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -527,7 +526,6 @@ public interface APIProvider extends APIManager {
      * @return List of available sequences
      * @throws AppManagementException
      */
-
     public List<String> getCustomOutSequences() throws AppManagementException;
 
 
