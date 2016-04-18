@@ -19,6 +19,7 @@
 package org.wso2.carbon.appmgt.impl;
 
 import javax.xml.namespace.QName;
+import java.io.File;
 
 /**
  * This class represents the constants that are used for APIManager implementation
@@ -129,6 +130,14 @@ public final class AppMConstants {
     public static final String ENABLED_TYPE_LIST = "EnabledAssetTypeList.";
 
     public static final String ENABLED_ASSET_TYPE = ENABLED_TYPE_LIST + "Type";
+
+    public static final String RESOURCE_FOLDER_LOCATION = "repository"+ File.separator + "resources";
+
+    public static final String API_TENANT_CONF = "tenant-conf.json";
+
+    public static final String APPLICATION_JSON_MEDIA_TYPE = "application/json";
+
+    public static final String API_TENANT_CONF_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/" + API_TENANT_CONF;
 
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";

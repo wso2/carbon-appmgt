@@ -113,10 +113,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -3607,4 +3604,41 @@ public final class AppManagerUtil {
 		return null;
 	}
 
+    public static void loadTenantConf(int tenantID) throws AppManagementException {
+        RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
+        try {
+            UserRegistry registry = registryService.getConfigSystemRegistry(tenantID);
+            if (registry.resourceExists(AppMConstants.API_TENANT_CONF_LOCATION)) {
+                log.debug("Tenant conf already uploaded to the registry");
+                return;
+            }
+
+            String tenantConfLocation = CarbonUtils.getCarbonHome() + File.separator +
+                    AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                    AppMConstants.API_TENANT_CONF;
+
+            File tenantConfFile = new File(tenantConfLocation);
+
+            byte[] data;
+
+            if (tenantConfFile.exists()) { // Load conf from resources directory in pack if it exists
+                FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
+                data = IOUtils.toByteArray(fileInputStream);
+            } else { // Fallback to loading the conf that is stored at jar level if file does not exist in pack
+                InputStream inputStream = AppManagerComponent.class.getResourceAsStream("/tenant/" + AppMConstants.API_TENANT_CONF);
+                data = IOUtils.toByteArray(inputStream);
+            }
+
+            log.debug("Adding tenant config to the registry");
+            Resource resource = registry.newResource();
+            resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+            resource.setContent(data);
+
+            registry.put(AppMConstants.API_TENANT_CONF_LOCATION, resource);
+        } catch (RegistryException e) {
+            throw new AppManagementException("Error while saving tenant conf to the registry", e);
+        } catch (IOException e) {
+            throw new AppManagementException("Error while reading tenant conf file content", e);
+        }
+    }
 }
