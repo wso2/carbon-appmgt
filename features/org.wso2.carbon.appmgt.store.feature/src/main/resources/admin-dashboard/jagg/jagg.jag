@@ -161,6 +161,7 @@ return getThemePath() + path;
         var init, fn, blok, log = new Log();
 
         fn = template(name);
+       // log.info(name +"    '''''");
         if (!fn) {
             log.error("Template header and footer includes are missing for : " + name);
         }
@@ -456,6 +457,7 @@ return getThemePath() + path;
             log.error("Template header and footer includes are missing for : " + name);
         }
         inputs = obj.inputs;
+    //   log.info(obj);
         blok = block(name);
         if (blok.getOutputs) {
             outputs = blok.getOutputs(inputs);
@@ -475,7 +477,7 @@ return getThemePath() + path;
         renderBlock(name, inputs, null, true);
     };
 
-    var includeBlocks = function (bloks) {
+    var includeBlocks = function (bloks)  {
         if (!bloks) {
             return;
         }

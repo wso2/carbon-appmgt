@@ -34,7 +34,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     var publisher = require('/modules/publisher.js').publisher(request, session);
     var storageModule = require('/modules/data/storage.js').storageModule();
     var storageConfig = require('/config/storage.json');
-
+    var USER_ROLE_PREFIX = 'Internal/private_';
 
     var router = require('/modules/router-g.js').router();
     var routeManager = new router.Router();
@@ -47,8 +47,22 @@ require('/modules/publisher.js').exec(function(ctx) {
     var filterManager = publisher.filterManager;
 
     mod = jagg.module("documentation");
-
     var typeList = apiProvider.getEnabledAssetTypeList();
+
+    function getOwnerList() {
+        var businessOwnerList = apiProvider.getBusinessOwnerList();
+        var ownersList = JSON.parse(stringify(businessOwnerList));
+        var ownerNames = "";
+        for (var i = 0; i < ownersList.length; i++) {
+            if (i == 0) {
+                ownerNames = ownerNames + "\'" + ownersList[i].owner_name;
+            } else {
+                ownerNames = ownerNames + "/" + ownersList[i].owner_name;
+            }
+        }
+        ownerNames = ownerNames + "\'";
+        return ownerNames;
+    }
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
@@ -103,7 +117,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             rxtTemplate: rxtTemplate,
             data: output,
             title: title,
-            typeList: typeList
+            typeList: typeList,
+	        ownerList: JSON.stringify(getOwnerList())
             }
         );
     }
@@ -198,7 +213,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     canCreate: docCreateAuth,
                     canEdit: docEditAuth,
                     canDelete: docDeleteAuth
-                }
+                },
+		        ownerList: JSON.stringify(getOwnerList())
             });
         }
         else {
@@ -332,7 +348,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     tags: tags,
                     title: title,
                     docs: result.docs,
-                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
+                    ownerList: JSON.stringify(getOwnerList())
                 });
             } else {
                 caramel.render({
@@ -345,7 +362,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     data: output,
                     versions: versionList,
                     tags: tags,
-                    title: title
+                    title: title,
+                    ownerList: JSON.stringify(getOwnerList())
                 });
             }
 
@@ -637,7 +655,6 @@ function addTags(params,assetId,artifactManager,reg){
             params[index] = uuid;
         }
     }
-
 
 routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{value}', function (context) {
     log.debug('Unsupported method PUT for /asset called.');

@@ -30,14 +30,21 @@ import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.*;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
+import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -50,6 +57,8 @@ import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.URITemplate;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.WebAppSearchOption;
+import org.wso2.carbon.appmgt.api.model.WebAppSortOption;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
 import org.wso2.carbon.appmgt.hostobjects.internal.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
@@ -1598,15 +1607,9 @@ public class APIStoreHostObject extends ScriptableObject {
         if (args.length > 7) {
             trustedIdp = args[7].toString();
         }
-
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-
         addSubscriber(userId, thisObj);
-
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
-
-
         boolean status = false;
         boolean isTenantFlowStarted = false;
         try {
@@ -1616,6 +1619,7 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
+            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             WebApp api = apiConsumer.getAPI(apiIdentifier);
 
 	    	/* Tenant based validation for subscription*/
@@ -2184,10 +2188,10 @@ public class APIStoreHostObject extends ScriptableObject {
                 subscriber.setTenantId(tenantId);
                 apiConsumer.addSubscriber(subscriber);
             } catch (AppManagementException e) {
-                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                handleException("Error while adding the subscriber"+subscriber.getName(), e);
                 return false;
             } catch (Exception e) {
-                handleException("Error while adding the subscriber" + subscriber.getName(), e);
+                handleException("Error while adding the subscriber"+subscriber.getName(), e);
                 return false;
             }
             return true;
@@ -3884,4 +3888,33 @@ public class APIStoreHostObject extends ScriptableObject {
         return false;
     }
 
+
+ /**
+     * Retrieve the business Owner
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+ public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+         throws
+                                                                               AppManagementException {
+
+        String appId = args[0].toString();
+        NativeArray myn = new NativeArray(0);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        int count = 0;
+            NativeObject row = new NativeObject();
+            row.put("owner_id", row, businessOwner.getOwner_id());
+            row.put("owner_name", row, businessOwner.getOwner_name());
+            row.put("owner_email", row, businessOwner.getOwner_mail());
+            row.put("owner_desc", row, businessOwner.getOwner_desc());
+            row.put("owner_site", row, businessOwner.getOwner_site());
+            row.put("keys", row, businessOwner.getKeys());
+            row.put("values", row, businessOwner.getValues());
+        return row;
+    }
 }

@@ -56,6 +56,7 @@ require('/modules/store.js').exec(function (ctx) {
     var WEBAPP_TYPE = 'webapp';
     var MOBILEAPP_TYPE = 'mobileapp';
     var siteAttribute;
+    var tags=[];
 
     types.forEach(function (type) {
         if(!storeHostObj.isAssetTypeEnabled(type)) {
@@ -183,63 +184,35 @@ require('/modules/store.js').exec(function (ctx) {
                        type: manager.shortName
                    });
 
-
+        //Get tags
+        var tempTags = [];
+        if (customType == SITE_TYPE) {
+            tempTags = store.tags(type, 'true')
+        } else if (customType == WEBAPP_TYPE) {
+            tempTags = store.tags(type, 'false')
+        }
+        else if (type = MOBILEAPP_TYPE) {
+            tempTags = store.tags(type)
+        }
+        tags = tags.concat(tempTags);
     });
 
-    var tags = getTags();
-
-    function getTags() {
-        //Get tags
-        var tags = [];
-        var isWebAppEnabled = storeHostObj.isAssetTypeEnabled(WEBAPP_TYPE);
-        var isSiteAppEnabled = storeHostObj.isAssetTypeEnabled(SITE_TYPE);
-        var isMobileAppEnabled = storeHostObj.isAssetTypeEnabled(MOBILEAPP_TYPE);
-        if (isWebAppEnabled && isSiteAppEnabled) {
-            var webAppTags = store.tags(WEBAPP_TYPE);
-            if (webAppTags) {
-                tags = tags.concat(webAppTags);
-            }
-        } else if (isSiteAppEnabled) {
-            var webAppTags = store.tags(WEBAPP_TYPE, "TRUE");
-            if (webAppTags) {
-                tags = tags.concat(webAppTags);
-            }
-        } else if (isWebAppEnabled) {
-            var webAppTags = store.tags(WEBAPP_TYPE, "FALSE");
-            if (webAppTags) {
-                tags = tags.concat(webAppTags);
-            }
-        } else if (isMobileAppEnabled) {
-            //Get mobile apps tags
-            var mobileAppTags = store.tags(MOBILEAPP_TYPE);
-            if (mobileAppTags) {
-                tags = tags.concat(mobileAppTags);
-            }
-        }
-
-
-
-
-        //remove duplicate elements from tags
-        if (types.length > 0) {
-            var tags = tags.reduce(function (a, b) {
-                function indexOfProperty(a, b) {
-                    for (var i = 0; i < a.length; i++) {
-                        if (a[i].name == b.name) {
-                            return i;
-                        }
+    //remove duplicate elements from tags
+    if (types.length > 0) {
+        var tags = tags.reduce(function (a, b) {
+            function indexOfProperty(a, b) {
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i].name == b.name) {
+                        return i;
                     }
-                    return -1;
                 }
+                return -1;
+            }
 
-                if (indexOfProperty(a, b) < 0) a.push(b);
-                return a;
-            }, []);
-        }
-        return tags;
+            if (indexOfProperty(a, b) < 0) a.push(b);
+            return a;
+        }, []);
     }
-
-
 
     caramel.render({
                        title: 'Apps | Store',

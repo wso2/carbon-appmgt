@@ -1,7 +1,6 @@
 <% jagg.template("menu/left", function(inputs, outputs, jagg) { %>
 <%  var site = require("/site/conf/site.json");
     var ssoEnabled = site.ssoConfiguration.enabled;
-
     var reqUrl = request.getRequestURI();
     var listUrl=jagg.getAbsoluteUrl("/site/pages/index.jag");
     var listMappedUrl=jagg.getMappedUrl("/site/pages/index.jag");
@@ -12,6 +11,7 @@
 <div class="sidebar-nav left-menu-back01">
     <ul class="nav nav-list">
     <!--<li class="nav-header"><%=i18n.localize("tasks")%></li>-->
+
         <li class="dropdown custom-verticle">
             <a class="dropdown-toggle" data-toggle="dropdown">
             <i class="icon-flag"></i> <br>Pending Workflows  <i class="icon-chevron-right"></i>
@@ -34,6 +34,7 @@
                 </li>
             </ul>
         </li>
+
         <li class="dropdown custom-verticle">
             <a href="<%=listMappedUrl%>?task=xacmlpolicy" class="dropdown-toggle" data-toggle="dropdown">
             <i class="icon-wrench"></i> <br> <%=i18n.localize("entitlementPoliciesHeader")%>  <i class="icon-chevron-right"></i>
@@ -52,11 +53,32 @@
             </ul>
         </li>
 
+ <li class="dropdown custom-verticle">
+            <a href="<%=listMappedUrl%>?task=businessowners" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-user"></i> <br> Business Owners  <i class="icon-chevron-right"></i>
+           </b></a>
+            <ul class="dropdown-menu">
+                <li <%if(request.getParameter("task")=="businessowners"){%>class="active"<% } %>>
+                    <a href="<%=listMappedUrl%>?task=businessowners"  onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl
+        %>?task=BusinessOwners',e:event,ssoEnabled:<%=ssoEnabled%>})"><i class="icon-th-list"></i><br>
+                    List Owners</a>
+             </li>
+             <li <%if(request.getParameter("task")=="businessowners-new"){%>class="active"<% } %>>
+                    <a href="<%=listMappedUrl%>?task=businessowners-new"  onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl
+    %>?task=BusinessOwnersNew',e:event,ssoEnabled:<%=ssoEnabled%>})"><i class="icon-user"></i><br>
+                    Add Business Owner</a>
+             </li>
+            </ul>
+        </li>
+
          <li <%if(request.getParameter("task")=="cacheHitMiss"){%>class="active"<% } %>>
                 <a href="<%=listMappedUrl%>?task=cacheHitMiss"  onclick="jagg.sessionAwareJS({redirect:'<%=listMappedUrl
                 %>?task=cacheHitMiss',e:event,ssoEnabled:<%=ssoEnabled%>})"><i class="icon-signal"></i><br>
                 <%=i18n.localize("cacheHitMissHeader")%></a>
          </li>
+
+
+
 
      </ul>
 </div>

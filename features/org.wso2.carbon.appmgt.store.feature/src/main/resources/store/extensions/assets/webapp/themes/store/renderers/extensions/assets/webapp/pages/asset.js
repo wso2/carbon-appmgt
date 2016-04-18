@@ -35,6 +35,8 @@ var render = function (theme, data, meta, require) {
         isSelfSubscriptionEnabled: data.config.isSelfSubscriptionEnabled,
         isEnterpriseSubscriptionEnabled: data.config.isEnterpriseSubscriptionEnabled,
         isEnterpriseSubscriptionAllowed: data.isEnterpriseSubscriptionAllowed,
+        businessOwner: data.businessOwner,
+        ownerName: data.ownerName,
         metadata:data.metadata,
         tabs:{
             documentation:{

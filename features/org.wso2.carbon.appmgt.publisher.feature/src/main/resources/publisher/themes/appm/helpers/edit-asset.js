@@ -22,17 +22,20 @@ var processData = function(data){
 
 var selectCategory = function(data) {
 
-	var selected, 
+	var selected,
+        ownerList = data.ownerList,
 		arr=[],
 		currentCategory = data.artifact.attributes['overview_category'],
 		categories = selectCategories(data.data.fields);
+
 
 	for (var i in categories) {
 		
 		selected = (currentCategory == categories[i])?true:false;
 		arr.push({
 			cat:categories[i],
-			sel:selected
+			sel:selected,
+            ownerList: ownerList
 			});
 	}
 	data.categorySelect = arr;

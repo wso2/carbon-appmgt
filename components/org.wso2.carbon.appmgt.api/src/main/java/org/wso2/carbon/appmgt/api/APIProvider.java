@@ -18,7 +18,20 @@
 package org.wso2.carbon.appmgt.api;
 
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -77,6 +90,7 @@ public interface APIProvider extends APIManager {
      */
     public Usage getUsageByAPI(APIIdentifier apiIdentifier);
 
+
     /**
      * Return Usage of given provider and WebApp
      *
@@ -127,6 +141,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * This method returns the subscribed apps by users
+     *
      * @param fromDate From date
      * @param toDate To date
      * @return list of subscribed apps by users.
@@ -154,6 +169,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * Updates given entitlement policies.
+     *
      * @param policies Entitlement policies to be updated.
      * @throws AppManagementException when entitlement service implementation is unable to update policies.
      */
@@ -161,6 +177,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get entitlement policy content from policyId
+     *
      * @param policyId Entitlement policy id
      * @return Entitlement policy content
      */
@@ -168,6 +185,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get web application id
+     *
      * @param uuid web application uuid
      * @return web application id
      */
@@ -188,6 +206,19 @@ public interface APIProvider extends APIManager {
                                      String policyAuthor,String policyPartialDescription) throws AppManagementException;
 
     /**
+     * Save a Business Owner.
+     * @param ownerName Name of the business owner.
+     * @param ownerMail Email address of the business owner.
+     * @param description Description about the owner.
+     * @param sitelink Link to the business website.
+     * @param keys key values of extra fields separated by / e.g phoneNumber/IDnumber/BankAccountNo
+     * @param values Values of respective keys separated by / e.g +94772345467/9223348543v/8239445323
+     * @return Integer
+     * @throws AppManagementException
+     */
+    public int saveBusinessOwner(String ownerName, String ownerMail, String description, String sitelink, String keys,
+                          String values) throws AppManagementException;
+    /**
      * Update the policy partial
      *
      * @param policyPartialId policy partial id
@@ -202,7 +233,9 @@ public interface APIProvider extends APIManager {
                                                   String author, boolean isShared, String policyPartialDescription) throws
                                                                                    AppManagementException;
 
+
     /**
+     * Get policyPartial content
      *
      * Get policyPartial content
      * @param policyPartialId
@@ -241,7 +274,14 @@ public interface APIProvider extends APIManager {
                                                                         AppManagementException;
 
     /**
+     * @return
+     * @throws AppManagementException
+     */
+    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException;
+
+    /**
      * Validates the given entitlement policy partial.
+     *
      * @param policyPartial
      * @return Result of the validation.
      * @throws AppManagementException
@@ -281,6 +321,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * redeploy the synapse when webapp is being edited
+     *
      * @param api The WebApp whose status to be updated
      * @throws AppManagementException on error
      */
@@ -373,9 +414,9 @@ public interface APIProvider extends APIManager {
     /**
      * Search WebApp
      *
-     * @param searchTerm  Search Term
-     * @param searchType  Search Type
-     * @return   Set of APIs
+     * @param searchTerm Search Term
+     * @param searchType Search Type
+     * @return Set of APIs
      * @throws AppManagementException
      */
     public List<WebApp> searchAPIs(String searchTerm, String searchType, String providerId) throws
@@ -384,13 +425,13 @@ public interface APIProvider extends APIManager {
     /**
      * Search WebApp and Mobileapps. If type is not mentioned, it will search in all tpyes
      *
-     * @param searchTerm  Search Term
-     * @param searchType  Search Type
-     * @return   Set of APIs
+     * @param searchTerm Search Term
+     * @param searchType Search Type
+     * @return Set of APIs
      * @throws AppManagementException
      */
     public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId) throws
-                                                                                            AppManagementException;
+                                                                                                            AppManagementException;
 
     /**
      * Update the subscription status
@@ -416,6 +457,28 @@ public interface APIProvider extends APIManager {
      */
     public void updateTierPermissions(String tierName, String permissionType, String roles) throws
                                                                                             AppManagementException;
+
+    /**
+     * This methode is to update a given business owner
+     * @param ownerId ID of the owner.
+     * @param ownerName Edited name of the owner.
+     * @param ownerMail Edited E mail of the owner.
+     * @param description Description.
+     * @param sitelink Site Link of the owner.
+     * @param keys Set of keys for extra parameters.
+     * @param values Set of values for respective keys.
+     * @throws AppManagementException
+     */
+   public int updateBusinessOwner(String ownerId, String ownerName, String ownerMail, String description, String sitelink, String keys, String values) throws
+                                                                                                                                                        AppManagementException;
+    /**
+     * This methode is to update a given business owner
+     *
+     * @param ownerId ID of the owner.
+     * @throws AppManagementException
+     */
+    public int deleteBusinessOwner(String ownerId) throws
+                                                   AppManagementException;
 
     /**
      * Get the list of Tier Permissions
@@ -449,6 +512,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get the list of Custom InSequences.
+     *
      * @return List of available sequences
      * @throws AppManagementException
      */
@@ -458,11 +522,11 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get the list of Custom OutSequences.
+     *
      * @return List of available sequences
      * @throws AppManagementException
      */
-
-    public List<String> getCustomOutSequences()  throws AppManagementException;
+    public List<String> getCustomOutSequences() throws AppManagementException;
 
 
     /**
@@ -528,6 +592,7 @@ public interface APIProvider extends APIManager {
 
     /**
      * Get the external app stores for given identifier.
+     *
      * @param identifier WebApp Identifier
      * @return Set of App Store
      * @throws AppManagementException

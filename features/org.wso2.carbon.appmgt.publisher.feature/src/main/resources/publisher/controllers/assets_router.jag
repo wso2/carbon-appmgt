@@ -8,7 +8,6 @@
 (function () {
     var log = new Log();
     var config = require('/config/publisher.json');
-
     var DEFAULT_ROUTER_NAME = '/assets.jag';
     var EXT_ROUTER_NAME = '/pages/assets.jag';
     var EXT_PATH = config.paths.ASSETS_EXT_PATH;

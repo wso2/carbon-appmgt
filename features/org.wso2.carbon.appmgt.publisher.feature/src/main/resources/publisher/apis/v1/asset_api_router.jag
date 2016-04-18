@@ -211,7 +211,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     routeManager.register('GET', 'publisher', '/publisher/api/asset/{type}/trackingid/{uuid}', function (context) {
         var output = {};
         var uuid = context.params.uuid;
-        var trackinID= apiProvider.getTrackingID(uuid);
+        var trackinID = apiProvider.getTrackingID(uuid);
         output["TrackingID"] = trackinID;
         response.contentType = CONTENT_TYPE_JSON;
         print(output);
@@ -219,15 +219,15 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     routeManager.register('PUT', 'publisher', '/publisher/api/asset/{type}/deploySample', function (context) {
         var webapps = require('/config/SampleWebappConfiguration.json');
-        var sessionID=session.getId();
-        var username=require('store').server.current(session).username;
-        var request = {} ;
+        var sessionID = session.getId();
+        var username = require('store').server.current(session).username;
+        var request = {};
         request["username"] = stringify(username);
-        request["creatorSession"] = sessionID;       
-        request["webapps"] = stringify(webapps); 
-        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer; 
+        request["creatorSession"] = sessionID;
+        request["webapps"] = stringify(webapps);
+        var deployerClass = Packages.org.wso2.carbon.appmgt.sample.deployer.deploy.Deployer;
         var deployerObj = new deployerClass();
-        var msg={};
+        var msg = {};
         msg["isSampleDeployed"] = true;
         msg["isError"] = "true";
         msg["isNew"] = "true";
@@ -237,7 +237,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 msg["response"] = "Samples deployed succesfully. " +
                         "You can login to store using UserName : subscriber_" +username+
                         " Password : subscriber"
-                msg["isError"] = "false";        
+                msg["isError"] = "false";
             }else{
                 msg["response"] = username+" has already created a sample web application"
                 msg["isError"] = "true";
@@ -248,7 +248,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
 
         session.put("deploysample", msg);
-        response.contentType = CONTENT_TYPE_JSON;
+        response.contentType = "application/json";
         print(msg);
     });
 
@@ -425,7 +425,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             //Customize the resource for the current app
             dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
 
-            response.contentType = CONTENT_TYPE_JSON;
+            response.contentType = "application/json";
             print(artifact);
         } catch (e) {
 
@@ -535,7 +535,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         for (var index in tags) {
             tagArray.push({id: counter, name: tags[index]});
         }
-        response.contentType = CONTENT_TYPE_JSON;
+        response.contentType = "application/json";
         print(tagArray);
     });
 
@@ -621,22 +621,25 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //Checks whether two models are equal
             var reqProps=['overview.name', 'overview.provider', 'overview.version']
-
+            var businesOwner = context.post["overview_owner"];
             var isEqual = modelManager.assertEqual(modelA, modelB,reqProps);
 
-            //If they are not equal,abort the operation
-            if (!isEqual) {
-                log.debug('trying to get fields which are different');
-                var diff=modelManager.diff(modelA,modelB,reqProps);
-                response.sendError(406, 'The name,provider and version of an asset cannot be changed.The following fields'
-                        +' were modified: '+diff);
-                return;
-            }
-            modelA.set("overview.createdtime",modelB.get("overview.createdtime").value);
-            var artifact = modelA.export('asset.exporter');
-            artifact.attributes["overview_appOwner"] = appOwner;
-            artifact.attributes["overview_appTenant"] = appTenant;
-            artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+                //If they are not equal,abort the operation
+                if (!isEqual) {
+                    log.debug('trying to get fields which are different');
+                    var diff = modelManager.diff(modelA, modelB, reqProps);
+                    response.sendError(406,
+                                       'The name,provider and version of an asset cannot be changed.The following fields'
+                                       + ' were modified: ' + diff);
+                    return;
+                }
+                modelA.set("overview.createdtime", modelB.get("overview.createdtime").value);
+                var artifact = modelA.export('asset.exporter');
+                artifact.attributes["overview_appOwner"] = appOwner;
+                artifact.attributes["overview_appTenant"] = appTenant;
+                artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+                artifact.attributes["overview_ownerAdvertise"] = isAdvertiseOnly;
+                artifact.attributes["overview_owner"] = businesOwner;
 
 
             var tenantId = server.current(session).tenantId;
@@ -738,7 +741,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                 //Save OAuth APIs consumer details per given web-app
                 appMDAOObj.addOAuthAPIAccessInfo(webAppObj, tenantId);
             }
-            
+
             var artifactManagerForUpdate = rxtManager.getSystemArtifactManager(shortName,session);
 
             if(originalArtifact.lifecycleState=="Approved") {
@@ -985,32 +988,30 @@ require('/modules/publisher.js').exec(function(ctx) {
                               var lifecycleState = context.params.lifecyclestate;
                               var shortName = context.params.type;
                               var artifactManager = rxtManager.getArtifactManager(shortName);
-
                               var fn = function (asset) {
-                                  var cond1 = (asset.attributes.overview_provider == assetProvider ) ? true : false;
-                                  var cond2 = (asset.attributes.overview_name == assetName ) ? true : false;
-                                  var cond3 = (asset.lifecycleState == lifecycleState ) ? true : false;
-                                  return (cond1 && cond2 && cond3);
-                              }
+                                      var cond1 = (asset.attributes.overview_provider == assetProvider ) ? true : false;
+                                      var cond2 = (asset.attributes.overview_name == assetName ) ? true : false;
+                                      var cond3 = (asset.lifecycleState == lifecycleState ) ? true : false;
+                                      return (cond1 && cond2 && cond3);
+                                  }
 
                               var artifacts = artifactManager.find(fn, null);
                               var noOfArtifacts = 0;
                               var UUIDs = [];
+
                               for (noOfArtifacts = 0; noOfArtifacts < artifacts.length; noOfArtifacts++) {
                                   var artifactId = artifacts[noOfArtifacts].id;
-                                  UUIDs.push(artifactId);
+                                       UUIDs.push(artifactId);
                               }
                               if (UUIDs.length > 0) {
                                   var res = {error: false, uuids: UUIDs, count: noOfArtifacts};
                                   response.contentType = CONTENT_TYPE_JSON;
-                                  print(res);
+                                       print(res);
                               } else {
-                                  var res = {error: false, uuids: UUIDs, message: 'Could not find UUID for given webapp'};
-                                  response.contentType = CONTENT_TYPE_JSON;
-                                  print(res);
-                              }
-
-
+                                        var res = {error: false, uuids: UUIDs, message: 'Could not find UUID for given webapp'};
+                                        response.contentType = CONTENT_TYPE_JSON;
+                                        print(res);
+                                     }
                           });
 
     //Get external
@@ -1295,8 +1296,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
         }
         catch (e) {
-            log.error('An asset of type: ' + shortName + ' could not be created.');
             log.error(e);
+            log.error('An asset of type: ' + shortName + ' could not be created.');
             response.sendError(500, 'An asset of type: ' + shortName + ' could not be created.Please check the server logs.');
         }
 

@@ -4,13 +4,15 @@ var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
+var ownerName = null;
 var log = new Log();
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
-
+var businessOwner = "";
 var APIInformationService=require('../services/api-information.js').serviceModule;
+var storeHostObj = jagg.module("manager").getAPIStoreObj();
 var apiInfoManager=new APIInformationService.APIInformationService();
 apiInfoManager.init(jagg,session);
 
@@ -26,10 +28,8 @@ authenticator.init(jagg,session);
 
 var carbon = require('carbon');
 var tenantedUrl = '/{context}/t/{domain}' + configs.assetsUrlPrefix + '/{type}/{aid}';
-
 var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
-
 var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
 var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
 var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
@@ -63,6 +63,8 @@ require('/modules/store.js').exec(function (ctx) {
     //Get the list of enabled app types
     var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isSite = 'false';//To get the webapp tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/webapp';
 
     var SITE_QUERY = {"overview_treatAsASite": "FALSE"};
     var SITE_OPTIONS = {
@@ -155,6 +157,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             asset.rating = 0.0;
         }
+
         //check asset LC state
         //if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) < 0) {
         //}
@@ -164,7 +167,6 @@ require('/modules/store.js').exec(function (ctx) {
         }
 
         var rxtAttributes = utility.getRXTAttributes(tenantId, type);
-
         var ATTR_TREAT_AS_A_SITE = 'overview_treatAsASite';
         var ATTR_PROVIDER = 'overview_provider';
         var LIFECYCLE_STATE_PROPERTY = 'lcState';
@@ -211,6 +213,12 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
 
+
+            businessOwner = storeHostObj.getBusinessOwner(asset.id);
+            if(businessOwner.owner_name != null) {
+                businessOwner = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+                ownerName = businessOwner[0].value;
+            }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {
@@ -338,7 +346,6 @@ require('/modules/store.js').exec(function (ctx) {
             var appName = asset.attributes.overview_name;
             var version = asset.attributes.overview_version;
             var provider = asset.attributes.overview_provider;
-
             var status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
                                                 tenantDomain).status;
             return status;
@@ -360,9 +367,7 @@ require('/modules/store.js').exec(function (ctx) {
             return hasRole;
         }
 
-
         var assetsByProvider = getAssetsFromProvider(asset, store);
-
 
         var docs;
         if (authenticator.getLoggedInUser()) {
@@ -384,15 +389,10 @@ require('/modules/store.js').exec(function (ctx) {
 
         var myapps;
         myapps = appInfoApi.getApplications(username);
-
         var availableTiers = apiInfoManager.getTiers();
-
         var subscriptionInfo;
-
         var isEnterpriseSubscriptionAllowed = false;
-
         var isFavourite = false;
-
         var navigationData = {
             showAllAppsLink: true
         };
@@ -525,7 +525,7 @@ require('/modules/store.js').exec(function (ctx) {
             asset: asset,
             tenantId: tenantIdVal,
             tags: {
-                   data: {allTags: store.tags(type, isSite), searchedTag: ""}
+                data: {allTags: store.tags(type, isSite), searchedTag: ""}
             },
             myAssets: { user: user, type: type, title: title },
             recentAssets: recentAssets,
@@ -539,7 +539,9 @@ require('/modules/store.js').exec(function (ctx) {
                 isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
                 enabledTypeList: enabledTypeList
             },
-            assetType : 'webapp'
+            assetType : 'webapp',
+	        businessOwner: businessOwner,
+            ownerName: ownerName
         });
     }
 
