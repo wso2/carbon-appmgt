@@ -31,7 +31,6 @@
                 "x-scope": "appm:read",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
-                "x-scope": "API_PUBLISHER_SCOPE",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"

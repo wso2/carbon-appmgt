@@ -160,11 +160,11 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
 
         String apiDefinitionName = null;
 
-        if(basePath.contains("api/appm/publisher")){
+        if(basePath.contains("/api/appm/publisher/")){
             apiDefinitionName = "publisher-api.json";
-        }else if(basePath.contains("api/appm/store")){
+        }else if(basePath.contains("/api/appm/store/")){
             apiDefinitionName = "store-api.json";
-        }else if(basePath.contains("api/appm/storeadmin")){
+        }else if(basePath.contains("/api/appm/storeadmin/")){
             apiDefinitionName = "storeadmin-api.json";
         }
 
