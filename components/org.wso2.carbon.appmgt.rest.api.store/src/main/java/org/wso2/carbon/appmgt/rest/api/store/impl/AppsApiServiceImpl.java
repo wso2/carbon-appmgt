@@ -64,6 +64,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String[] parameters = null;
 
             if ("user".equals(install.getType())) {
+                parameters = new String[1];
                 parameters[0] = tenantDomainName;
             } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
