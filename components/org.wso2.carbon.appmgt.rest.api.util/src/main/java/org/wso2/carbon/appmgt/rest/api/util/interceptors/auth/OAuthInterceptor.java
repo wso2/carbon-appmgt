@@ -117,8 +117,6 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
         String basePath = (String) message.get(Message.BASE_PATH);
         String verb = (String) message.get(Message.HTTP_REQUEST_METHOD);
 
-        String apiName = null;
-
         String matchedURITemplate = getMatchedURITemplate(message);
 
         JSONObject apiDefinition = getAPIDefinition(basePath);
@@ -135,14 +133,26 @@ public class OAuthInterceptor extends AbstractPhaseInterceptor {
 
         Method resourceMethod = (Method) message.get("org.apache.cxf.resource.method");
 
-        String classResourcePath = resourceMethod.getDeclaringClass().getAnnotation(Path.class).value();
-        String methodResourcePath = resourceMethod.getAnnotation(Path.class).value();
+        String matchedUrlTemplate = "";
 
-        if("/".equals(classResourcePath)){
-            return methodResourcePath;
-        }else{
-            return classResourcePath + methodResourcePath;
+        Path classResourcePath  = resourceMethod.getDeclaringClass().getAnnotation(Path.class);
+
+        if(classResourcePath != null){
+            matchedUrlTemplate = classResourcePath.value();
         }
+
+        Path methodResourcePath = resourceMethod.getAnnotation(Path.class);
+
+        if(methodResourcePath != null){
+
+            if("/".equals(matchedUrlTemplate)){
+                matchedUrlTemplate  =  methodResourcePath.value();
+            }else{
+                matchedUrlTemplate = matchedUrlTemplate + methodResourcePath.value();
+            }
+        }
+
+        return matchedUrlTemplate;
 
     }
 
