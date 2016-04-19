@@ -1,28 +1,44 @@
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * you may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.Objects;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
-
-
-@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaJerseyServerCodegen", date = "2016-03-31T05:35:13.991Z")
-public class ErrorListItemDTO {
+@ApiModel(description = "")
+public class ErrorListItemDTO  {
   
+  
+  @NotNull
   private String code = null;
+  
+  @NotNull
   private String message = null;
 
   
   /**
    **/
-  public ErrorListItemDTO code(String code) {
-    this.code = code;
-    return this;
-  }
-
-  
   @ApiModelProperty(required = true, value = "")
   @JsonProperty("code")
   public String getCode() {
@@ -36,12 +52,6 @@ public class ErrorListItemDTO {
   /**
    * Description about individual errors occurred
    **/
-  public ErrorListItemDTO message(String message) {
-    this.message = message;
-    return this;
-  }
-
-  
   @ApiModelProperty(required = true, value = "Description about individual errors occurred")
   @JsonProperty("message")
   public String getMessage() {
@@ -54,43 +64,13 @@ public class ErrorListItemDTO {
   
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ErrorListItemDTO errorListItemDTO = (ErrorListItemDTO) o;
-    return Objects.equals(code, errorListItemDTO.code) &&
-        Objects.equals(message, errorListItemDTO.message);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(code, message);
-  }
-
-  @Override
-  public String toString() {
+  public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ErrorListItem {\n");
+    sb.append("class ErrorListItemDTO {\n");
     
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
-    sb.append("}");
+    sb.append("  code: ").append(code).append("\n");
+    sb.append("  message: ").append(message).append("\n");
+    sb.append("}\n");
     return sb.toString();
   }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
-
