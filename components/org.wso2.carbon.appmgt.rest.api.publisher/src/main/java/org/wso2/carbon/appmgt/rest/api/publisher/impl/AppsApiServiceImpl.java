@@ -41,6 +41,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -120,33 +121,20 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+        StaticContentDTO staticContentDTO = new StaticContentDTO();
         try {
-            BinaryDTO binaryDTO = new BinaryDTO();
             if (fileInputStream != null) {
 
                 AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                         getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
+                //Read file storage location from ap-manager.xml
+                String storageLocation = CarbonUtils.getCarbonHome() + File.separator +
                         appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
-                File binaryFile = new File(directoryLocation);
 
-                InputStream binaryInputStream = null;
-                try {
-                    ContentDisposition contentDisposition = fileDetail.getContentDisposition();
-                    String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
-                    String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                    RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
-
-                    String fileAPI = appManagerConfiguration.getFirstProperty(
-                            AppMConstants.MOBILE_APPS_FILE_API_LOCATION)
-                            + filename;
-                    binaryDTO.setPath(fileAPI);
-                    return Response.ok().entity(binaryDTO).build();
-                } finally {
-                    IOUtils.closeQuietly(binaryInputStream);
-                }
-
+                String fileName = RestApiPublisherUtils.uploadFileContent(fileInputStream, fileDetail, storageLocation);
+                String fileAPIPath = appManagerConfiguration.getFirstProperty(
+                        AppMConstants.MOBILE_APPS_FILE_API_LOCATION) + fileName;
+                staticContentDTO.setPath(fileAPIPath);
             } else {
                 RestApiUtil.handleBadRequest("'file' should be specified", log);
             }
@@ -154,7 +142,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(
                     "Error occurred while parsing binary file archive and retrieving information", e, log);
         }
-        return null;
+        return Response.ok().entity(staticContentDTO).build();
     }
 
     @Override

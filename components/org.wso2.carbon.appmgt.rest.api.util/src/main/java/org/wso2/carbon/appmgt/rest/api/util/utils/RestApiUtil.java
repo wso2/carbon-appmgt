@@ -353,7 +353,8 @@ public class RestApiUtil {
                 outFileStream.write(bytes, 0, read);
             }
         } catch (IOException e) {
-            String errorMessage = "Error in transferring files.";
+            String errorMessage = "Error in transferring file : " + newFileName + " into storage location : " +
+                    storageLocation;
             log.error(errorMessage, e);
             throw new AppManagementException(errorMessage, e);
         } finally {

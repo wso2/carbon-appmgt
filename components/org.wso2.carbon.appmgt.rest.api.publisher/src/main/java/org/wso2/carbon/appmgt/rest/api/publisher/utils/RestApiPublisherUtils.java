@@ -18,8 +18,22 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * This class contains REST API Publisher related utility operations
@@ -38,5 +52,25 @@ public class RestApiPublisherUtils {
         return uuid;
     }
 
+    /**
+     * Upload files into storage location
+     * @param fileInputStream
+     * @param fileDetail
+     * @return file API path
+     * @throws AppManagementException
+     */
+    public static String uploadFileContent(InputStream fileInputStream, Attachment fileDetail, String storageLocation)
+            throws AppManagementException {
 
+        File binaryFile = new File(storageLocation);
+        ContentDisposition contentDisposition = fileDetail.getContentDisposition();
+        String fileExtension = FilenameUtils.getExtension(contentDisposition.getParameter("filename"));
+        if(fileExtension == null){
+            RestApiUtil.handleBadRequest("Please provide a valid file to upload", log);
+        }
+        String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
+        RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
+        return filename;
+
+    }
 }
