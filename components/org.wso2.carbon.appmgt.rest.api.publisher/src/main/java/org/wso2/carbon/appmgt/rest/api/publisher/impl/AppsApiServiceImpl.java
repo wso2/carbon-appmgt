@@ -66,7 +66,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         InputStream binaryInputStream = null;
         try {
             BinaryDTO binaryDTO = new BinaryDTO();
@@ -239,6 +238,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             boolean isValidAction = false;
 
+            String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
+            if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
+                RestApiUtil.handleBadRequest(
+                        "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
+                                ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
+            }
             for (APPLifecycleActions appLifecycleAction : APPLifecycleActions.values()) {
                 if (appLifecycleAction.getStatus().equalsIgnoreCase(action)) {
                     isValidAction = true;
@@ -248,12 +253,6 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (!isValidAction) {
                 RestApiUtil.handleBadRequest("Invalid action '" + action + "' performed on a " + appType
                                                      + " with UUID " + appId, log);
-            }
-            String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
-            if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
-                RestApiUtil.handleBadRequest(
-                        "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
-                                ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
             }
             appProvider.changeLifeCycleStatus(appType, appId, action);
             return Response.accepted().build();
