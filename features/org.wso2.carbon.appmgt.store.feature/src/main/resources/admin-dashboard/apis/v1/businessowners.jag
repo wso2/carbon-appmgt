@@ -19,7 +19,7 @@
 
 include('/jagg/jagg.jag');
 var method = request.getMethod();
-var ownerApi = require('/modules/businessOwners-api.js');
+var businessOwnerApi = require('/modules/businessOwners-api.js');
 var uriMatcher = new URIMatcher(request.getRequestURI());
 var log = new Log();
 //POST patterns
@@ -27,20 +27,20 @@ var saveOwner = '/{context}/apis/businessowners/save';
 var ownerList = '/{context}/apis/businessowners/list';
 var ownerUpdate = '/{context}/apis/businessowners/update';
 var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
-var ownerDetails = '/{context}/apis/businessowners/details/{ownerId}';
+var OwnerCustomProperties = '/{context}/apis/businessowners/details/{ownerId}';
 
 if (method == 'GET') {
     if (uriMatcher.match(ownerList)) {
-        print(ownerApi.getOwnerList());
+        print(businessOwnerApi.getBusinessOwner());
     }
-    if (uriMatcher.match(ownerDetails)) {
-        print(ownerApi.getOwnerData(uriMatcher.elements().ownerId));
+    if (uriMatcher.match(OwnerCustomProperties)) {
+        print(businessOwnerApi.getBusineeOwnerDataCustomProperties(uriMatcher.elements().ownerId));
     }
 }
 
 if (method == 'DELETE') {
     if (uriMatcher.match(ownerDelete)) {
-        print(ownerApi.deleteOwner(uriMatcher.elements().ownerId));
+        print(businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId));
     }
 }
 if (method == 'POST') {
@@ -51,7 +51,7 @@ if (method == 'POST') {
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerDetails = request.getParameter("businessOwnerDetails");
 
-        print(createResponseObject(ownerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
     }
 
     if (uriMatcher.match(ownerUpdate)) {
@@ -61,7 +61,7 @@ if (method == 'POST') {
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerDetails = request.getParameter("businessOwnerDetails");
-        print(createResponseObject(ownerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+        print(createResponseObject(businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
     }
 }
 

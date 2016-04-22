@@ -150,33 +150,33 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         BusinessOwner businessOwner = new BusinessOwner();
-        ResultSet rs1 = null;
+        ResultSet businessOwnerResultSet = null;
 
         String queryToGetBusinessOwner =
-                "SELECT BUSINESS_OWNERS.OWNER_ID, BUSINESS_OWNERS.OWNER_NAME, BUSINESS_OWNERS.OWNER_EMAIL, " +
-                        "BUSINESS_OWNERS.OWNER_DESC, BUSINESS_OWNERS.OWNER_SITE FROM APM_APP INNER JOIN " +
-                        "BUSINESS_OWNERS ON APM_APP.OWNER_ID = BUSINESS_OWNERS.OWNER_ID WHERE UUID = ? ";
+                "SELECT BUSINESS_OWNER.OWNER_ID, BUSINESS_OWNER.OWNER_NAME, BUSINESS_OWNER.OWNER_EMAIL, " +
+                        "BUSINESS_OWNER.OWNER_DESC, BUSINESS_OWNER.OWNER_SITE FROM APM_APP INNER JOIN " +
+                        "BUSINESS_OWNER ON APM_APP.BUSINESS_OWNER_ID = BUSINESS_OWNER.OWNER_ID WHERE UUID = ? ";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
             statementToGetBusinessOwners.setString(1, appId);
-            rs1 = statementToGetBusinessOwners.executeQuery();
+            businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
 
-            if (rs1.next()) {
-                int businessOwnerId = rs1.getInt("OWNER_ID");
+            if (businessOwnerResultSet.next()) {
+                int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
                 businessOwner.setBusinessOwnerId(businessOwnerId);
-                businessOwner.setBusinessOwnerName(rs1.getString("OWNER_NAME"));
-                businessOwner.setBusinessOwnereDescription(rs1.getString("OWNER_DESC"));
-                businessOwner.setBusinessOwnerEmail(rs1.getString("OWNER_EMAIL"));
-                businessOwner.setBusinessOwnerSite(rs1.getString("OWNER_SITE"));
-                businessOwner.setBusinessOwnerDetails(getBusinessOwnerDetailsById(businessOwnerId));
+                businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
+                businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
+                businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
+                businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
+                businessOwner.setBusinessOwnerCustomProperties(getBusinessOwnerCustomPropertiesById(businessOwnerId));
             }
 
         } catch (SQLException e) {
             handleException("Failed to retrieve business owners.", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, rs1);
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
 
         }
         return businessOwner;
@@ -188,56 +188,32 @@ public class AppMDAO {
      * @return Owner Name
      * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get subscriber
      */
-    public String getBusinessOwnerName(String appId)
-            throws
-            AppManagementException {
+    public String getBusinessOwnerName(String appId) throws AppManagementException {
         PreparedStatement prepStmt = null;
         Connection connection = null;
-        ResultSet rs = null;
-
-
+        ResultSet businessOwnerNameResultSet = null;
         int ownerId;
         String ownerName = "";
-        String sqlQuery =
-                "SELECT OWNER_ID FROM APM_APP WHERE UUID=?";
+        String sqlQuery = "SELECT OWNER_NAME FROM BUSINESS_OWNER INNER JOIN APM_APP ON BUSINESS_OWNER.OWNER_ID = APM_APP.BUSINESS_OWNER_ID  WHERE UUID=?";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             connection.setAutoCommit(false);
             prepStmt = connection.prepareStatement(sqlQuery);
             prepStmt.setString(1, appId);
-            rs = prepStmt.executeQuery();
+            businessOwnerNameResultSet = prepStmt.executeQuery();
 
-            if (rs.next()) {
-                ownerId = rs.getInt("OWNER_ID");
-
-                if (ownerId > 0) {
-                    PreparedStatement prepStmt2 = null;
-                    Connection connection2 = null;
-                    connection2 = APIMgtDBUtil.getConnection();
-                    connection2.setAutoCommit(false);
-                    ResultSet rs2 = null;
-                    String sqlQuery2 = "SELECT OWNER_NAME FROM BUSINESS_OWNERS WHERE OWNER_ID=?";
-                    prepStmt2 = connection2.prepareStatement(sqlQuery2);
-                    prepStmt2.setInt(1, ownerId);
-                    rs2 = prepStmt2.executeQuery();
-                    if (rs2.next()) {
-                        ownerName = rs2.getString("OWNER_NAME");
-                    }
-
-                }
-
+            if (businessOwnerNameResultSet.next()) {
+                ownerName = businessOwnerNameResultSet.getString("OWNER_NAME");
             }
-
         } catch (SQLException e) {
             handleException("Error when reading the application information from"
                                     + " the persistence store.", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(prepStmt, null, rs);
+            APIMgtDBUtil.closeAllConnections(prepStmt, connection, businessOwnerNameResultSet);
         }
         return ownerName;
     }
-
 
     /**
      * Delete a given business owner.
@@ -252,17 +228,17 @@ public class AppMDAO {
         PreparedStatement statementToDeleteRecordTwo = null;
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Deleting a Business Owner");
+                log.debug("Deleting a Business Owner :" + ownerId);
             }
             connection = APIMgtDBUtil.getConnection();
 
-            String queryToDeleteRecordTwo = "DELETE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+            String queryToDeleteRecordTwo = "DELETE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
 
             statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo);
             statementToDeleteRecordTwo.setString(1, ownerId);
             statementToDeleteRecordTwo.executeUpdate();
 
-            String queryToDeleteRecord = "DELETE FROM BUSINESS_OWNERS WHERE OWNER_ID = ?";
+            String queryToDeleteRecord = "DELETE FROM BUSINESS_OWNER WHERE OWNER_ID = ?";
 
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
             statementToDeleteRecord.setString(1, ownerId);
@@ -273,10 +249,10 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    log.error("Failed to rollback the add entitlement policy partial with name : ", e1);
+                   handleException("Cannot delete business owner", e1);
                 }
             }
-            handleException("",  e );
+            handleException("Cannot delete business owner",  e );
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
         }
@@ -285,7 +261,7 @@ public class AppMDAO {
     /**
      * Update a Business owner.
      */
-    public void updateBusinessOwner(BusinessOwner businessOwner) {
+    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToInsertRecord = null;
@@ -295,35 +271,35 @@ public class AppMDAO {
         try {
 
             if (log.isDebugEnabled()) {
-                log.debug("Added a Business Owner");
+                log.debug("Updating a Business Owner" + businessOwner.getBusinessOwnerId());
             }
             connection = APIMgtDBUtil.getConnection();
-            String queryToInsertRecord = "UPDATE BUSINESS_OWNERS SET OWNER_NAME=?,OWNER_EMAIL=?,OWNER_DESC=?,OWNER_SITE=?"
+            String queryToInsertRecord = "UPDATE BUSINESS_OWNER SET OWNER_NAME=?,OWNER_EMAIL=?,OWNER_DESC=?,OWNER_SITE=?"
                     + " WHERE OWNER_ID=?";
 
             statementToInsertRecord = connection.prepareStatement(queryToInsertRecord);
             statementToInsertRecord.setString(1, businessOwner.getBusinessOwnerName());
             statementToInsertRecord.setString(2, businessOwner.getBusinessOwnerEmail());
-            statementToInsertRecord.setString(3, businessOwner.getBusinessOwnereDescription());
+            statementToInsertRecord.setString(3, businessOwner.getBusinessOwnerDescription());
             statementToInsertRecord.setString(4, businessOwner.getBusinessOwnerSite());
             statementToInsertRecord.setInt(5, businessOwner.getBusinessOwnerId());
 
             statementToInsertRecord.executeUpdate();
-            String queryToDelete = "DELETE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
+            String queryToDelete = "DELETE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
 
             statementToDelete = connection.prepareStatement(queryToDelete);
             statementToDelete.setInt(1, businessOwner.getBusinessOwnerId());
             statementToDelete.executeUpdate();
-            String queryToInsertRecordTwo = "INSERT INTO BUSINESS_OWNERS_EXTRA(OWNER_ID, KEY, VALUE) VALUES(?,?,?)";
+            String queryToInsertRecordTwo = "INSERT INTO BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE) VALUES(?,?,?)";
 
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
-            Set<String> keySet = businessOwner.getBusinessOwnerDetails().keySet();
+            Set<String> keySet = businessOwner.getBusinessOwnerCustomProperties().keySet();
             if (keySet.size() > 0) {
                 for (String   key : keySet) {
                     if(key != null && key != "" && !key.isEmpty()) {
                         statementToInsertRecordTwo.setInt(1, businessOwner.getBusinessOwnerId());
                         statementToInsertRecordTwo.setString(2, key);
-                        statementToInsertRecordTwo.setString(3, businessOwner.getBusinessOwnerDetails().get(key));
+                        statementToInsertRecordTwo.setString(3, businessOwner.getBusinessOwnerCustomProperties().get(key));
                         statementToInsertRecordTwo.executeUpdate();
                     }
                 }
@@ -338,6 +314,7 @@ public class AppMDAO {
                     log.error("Failed to Update owner : ", e1);
                 }
             }
+            handleException("Could not update business owner", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToInsertRecord, connection, null);
         }
@@ -351,7 +328,7 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public Map<String, String> getBusinessOwnerDetailsById(int businessOwnerId)
+    public Map<String, String> getBusinessOwnerCustomPropertiesById(int businessOwnerId)
             throws AppManagementException {
 
         Connection connection = null;
@@ -359,9 +336,7 @@ public class AppMDAO {
         HashMap<String, String> businessOwnerDetaisMap = new HashMap();
         ResultSet resultSetOfbusinessOwnerDetails = null;
 
-        String queryToGetKeyValue = "SELECT KEY, VALUE FROM BUSINESS_OWNERS_EXTRA WHERE OWNER_ID = ?";
-
-
+        String queryToGetKeyValue = "SELECT KEY, VALUE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
@@ -372,10 +347,11 @@ public class AppMDAO {
                                            resultSetOfbusinessOwnerDetails.getNString("VALUE"));
             }
 
-            } catch (SQLException e) {
+        } catch (SQLException e) {
             handleException("Failed to retrieve business owners Data", e);
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, connection, resultSetOfbusinessOwnerDetails);
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, connection,
+                                             resultSetOfbusinessOwnerDetails);
         }
 
         return businessOwnerDetaisMap;
@@ -388,14 +364,14 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
+    public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
         ResultSet businessOwnerResultSet = null;
 
-        String queryToGetBusinessOwner = "SELECT * FROM BUSINESS_OWNERS "; //TODO do pagination here
+        String queryToGetBusinessOwner = "SELECT * FROM BUSINESS_OWNER "; //TODO do pagination here
 
         try {
             connection = APIMgtDBUtil.getConnection();
@@ -404,11 +380,11 @@ public class AppMDAO {
 
             while (businessOwnerResultSet.next()) {
                 BusinessOwner businessOwner = new BusinessOwner();
-                int owner_id = businessOwnerResultSet.getInt("OWNER_ID");
+                int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
 
-                businessOwner.setBusinessOwnerId(owner_id);
+                businessOwner.setBusinessOwnerId(businessOwnerId);
                 businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
-                businessOwner.setBusinessOwnereDescription(businessOwnerResultSet.getString("OWNER_DESC"));
+                businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
                 businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
                 businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
                 businessOwnersList.add(businessOwner);
@@ -432,27 +408,27 @@ public class AppMDAO {
         PreparedStatement statementToInsertBusinessOwnerDetails = null;
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Adding a Business Owner");
+                log.debug("Adding a Business Owner" + businessOwner.getBusinessOwnerName());
             }
             connection = APIMgtDBUtil.getConnection();
-            String queryToInsertRecord = "INSERT INTO BUSINESS_OWNERS(OWNER_NAME,OWNER_EMAIL,OWNER_DESC,OWNER_SITE)"
+            String queryToInsertRecord = "INSERT INTO BUSINESS_OWNER(OWNER_NAME,OWNER_EMAIL,OWNER_DESC,OWNER_SITE)"
                     + " VALUES (?,?,?,?)";
 
             statementToInserBusinessOwner = connection.prepareStatement(queryToInsertRecord);
             statementToInserBusinessOwner.setString(1, businessOwner.getBusinessOwnerName());
             statementToInserBusinessOwner.setString(2, businessOwner.getBusinessOwnerEmail());
-            statementToInserBusinessOwner.setString(3, businessOwner.getBusinessOwnereDescription());
+            statementToInserBusinessOwner.setString(3, businessOwner.getBusinessOwnerDescription());
             statementToInserBusinessOwner.setString(4, businessOwner.getBusinessOwnerSite());
             statementToInserBusinessOwner.executeUpdate();
             String queryToInsertRecordTwo =
-                    "INSERT INTO BUSINESS_OWNERS_EXTRA(OWNER_ID, KEY, VALUE) VALUES(LAST_INSERT_ID(),?,?)";
+                    "INSERT INTO BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE) VALUES(LAST_INSERT_ID(),?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
-            Set<String> keySet = businessOwner.getBusinessOwnerDetails().keySet();
+            Set<String> keySet = businessOwner.getBusinessOwnerCustomProperties().keySet();
             if (keySet.size() > 0) {
                 for (String   key : keySet) {
                     statementToInsertBusinessOwnerDetails.setString(1, key);
-                    statementToInsertBusinessOwnerDetails.setString(2, businessOwner.getBusinessOwnerDetails().get(key));
+                    statementToInsertBusinessOwnerDetails.setString(2, businessOwner.getBusinessOwnerCustomProperties().get(key));
                     statementToInsertBusinessOwnerDetails.executeUpdate();
                 }
             }
@@ -4323,8 +4299,8 @@ public class AppMDAO {
         ResultSet rs = null;
         String ownerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, OWNER_ID ) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,(SELECT OWNER_ID FROM BUSINESS_OWNERS WHERE OWNER_NAME =?))";
+                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, BUSINESS_OWNER_ID ) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,(SELECT OWNER_ID FROM BUSINESS_OWNER WHERE OWNER_NAME =?))";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4953,7 +4929,7 @@ public class AppMDAO {
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
                 " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ?, " +
-                "OWNER_ID=(SELECT OWNER_ID FROM BUSINESS_OWNERS WHERE OWNER_NAME =?) " +
+                " BUSINESS_OWNER_ID=(SELECT OWNER_ID FROM BUSINESS_OWNER WHERE OWNER_NAME =?) " +
                 " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().

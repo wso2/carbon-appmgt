@@ -24,9 +24,9 @@ public class BusinessOwner {
     private int businessOwnerId;
     private String businessOwnerName;
     private String businessOwnerEmail;
-    private String businessOwnereDescription;
+    private String businessOwnerDescription;
     private String businessOwnerSite;
-    private Map<String, String> businessOwnerDetails;
+    private Map<String, String> businessOwnerCustomProperties;
 
 
 
@@ -34,8 +34,8 @@ public class BusinessOwner {
 
     }
 
-    public void setBusinessOwnerDetails(Map<String, String> businessOwnerDetails) {
-        this.businessOwnerDetails = businessOwnerDetails;
+    public void setBusinessOwnerCustomProperties(Map<String, String> businessOwnerCustomProperties) {
+        this.businessOwnerCustomProperties = businessOwnerCustomProperties;
     }
 
     public void setBusinessOwnerId(int businessOwnerId) {
@@ -54,8 +54,8 @@ public class BusinessOwner {
         this.businessOwnerSite = businessOwnerSite;
     }
 
-    public void setBusinessOwnereDescription(String businessOwnereDescription) {
-        this.businessOwnereDescription = businessOwnereDescription;
+    public void setBusinessOwnerDescription(String businessOwnerDescription) {
+        this.businessOwnerDescription = businessOwnerDescription;
     }
 
     public int getBusinessOwnerId() {
@@ -70,15 +70,15 @@ public class BusinessOwner {
         return businessOwnerEmail;
     }
 
-    public String getBusinessOwnereDescription() {
-        return businessOwnereDescription;
+    public String getBusinessOwnerDescription() {
+        return businessOwnerDescription;
     }
 
     public String getBusinessOwnerSite() {
         return businessOwnerSite;
     }
 
-    public Map<String, String> getBusinessOwnerDetails() {
-        return businessOwnerDetails;
+    public Map<String, String> getBusinessOwnerCustomProperties() {
+        return businessOwnerCustomProperties;
     }
 }

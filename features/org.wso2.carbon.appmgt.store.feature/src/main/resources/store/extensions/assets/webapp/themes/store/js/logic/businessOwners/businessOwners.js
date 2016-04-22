@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-function merge(businessOwner){
+function transform(businessOwner){
 var log = new Log();
     var owner = new Array();
     

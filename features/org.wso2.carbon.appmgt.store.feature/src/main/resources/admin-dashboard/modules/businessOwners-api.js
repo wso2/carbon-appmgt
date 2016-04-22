@@ -19,9 +19,6 @@
 
 var apiProvider = jagg.module('manager').getAPIProviderObj();
 var log = new Log();
-var apiUtil = new Packages.org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-
-
 
 function deleteOwner(ownerId){
     var partialId = deleteBusinessOwner(ownerId);
@@ -53,10 +50,10 @@ function  updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerE
     return apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
 }
 
-var getOwnerList = function () {
-    return apiProvider.getBusinessOwnerList();
+var getBusinessOwner = function () {
+    return apiProvider.getBusinessOwners();
 };
 
-function getOwnerData(ownerId) {
-    return apiProvider.getBusinessOwnerData(ownerId);
+function getBusineeOwnerDataCustomProperties(ownerId) {
+    return apiProvider.getBusinessOwnerCustomProperties(ownerId);
 };
