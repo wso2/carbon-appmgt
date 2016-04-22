@@ -1,0 +1,75 @@
+<%
+/*
+ *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+include('/jagg/jagg.jag');
+var method = request.getMethod();
+var ownerApi = require('/modules/businessOwners-api.js');
+var uriMatcher = new URIMatcher(request.getRequestURI());
+var log = new Log();
+//POST patterns
+var saveOwner = '/{context}/apis/businessowners/save';
+var ownerList = '/{context}/apis/businessowners/list';
+var ownerUpdate = '/{context}/apis/businessowners/update';
+var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
+var ownerDetails = '/{context}/apis/businessowners/details/{ownerId}';
+
+if (method == 'GET') {
+    if (uriMatcher.match(ownerList)) {
+        print(ownerApi.getOwnerList());
+    }
+    if (uriMatcher.match(ownerDetails)) {
+        print(ownerApi.getOwnerData(uriMatcher.elements().ownerId));
+    }
+}
+
+if (method == 'DELETE') {
+    if (uriMatcher.match(ownerDelete)) {
+        print(ownerApi.deleteOwner(uriMatcher.elements().ownerId));
+    }
+}
+if (method == 'POST') {
+    if (uriMatcher.match(saveOwner)) {
+        var businessOwnerName = request.getParameter("businessOwnerName");
+        var businessOwnerEmail = request.getParameter("businessOwnerEmail");
+        var businessOwnerDescription = request.getParameter("businessOwnerDescription");
+        var businessOwnerSite = request.getParameter("businessOwnerSite");
+        var businessOwnerDetails = request.getParameter("businessOwnerDetails");
+
+        print(createResponseObject(ownerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+    }
+
+    if (uriMatcher.match(ownerUpdate)) {
+        var businessOwnerId = request.getParameter("businessOwnerId");
+        var businessOwnerName = request.getParameter("businessOwnerName");
+        var businessOwnerEmail = request.getParameter("businessOwnerEmail");
+        var businessOwnerDescription = request.getParameter("businessOwnerDescription");
+        var businessOwnerSite = request.getParameter("businessOwnerSite");
+        var businessOwnerDetails = request.getParameter("businessOwnerDetails");
+        print(createResponseObject(ownerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+    }
+}
+
+function createResponseObject(object) {
+    if (object !== null) {
+        return {'success': true, 'response': object};
+    } else {
+        return {'success': false, 'response': object};
+    }
+}
+%>

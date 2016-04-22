@@ -130,7 +130,7 @@ var __module5__ = (function() {
   "use strict";
   var __exports__;
 
-  var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
+  var errorProps = ['businessOwnerDescription', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
 
   function Exception(message, node) {
     var line;

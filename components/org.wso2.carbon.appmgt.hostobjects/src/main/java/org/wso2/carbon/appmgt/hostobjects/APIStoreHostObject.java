@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIConsumer;
@@ -38,6 +39,7 @@ import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -213,6 +215,47 @@ public class APIStoreHostObject extends ScriptableObject {
             handleException("WebApp key manager URL unspecified");
         }
         return url;
+    }
+
+    /**
+     * Retrieve the business Owner
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws
+            AppManagementException {
+
+        String appId = args[0].toString();
+        NativeArray myn = new NativeArray(0);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        int count = 0;
+        NativeObject row = new NativeObject();
+        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
+        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
+        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
+        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnereDescription());
+        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+        Map<String, String> businessOwnerDetails = null;
+        businessOwnerDetails = businessOwner.getBusinessOwnerDetails();
+        JSONObject businessOwnerDetailsObject = new JSONObject();
+        if(businessOwnerDetails != null) {
+            Set<String> keySet = businessOwnerDetails.keySet();
+            for (String key : keySet) {
+                businessOwnerDetailsObject.put(key, businessOwnerDetails.get(key));
+            }
+            row.put("businessOwnerDeatails", row, businessOwnerDetailsObject.toJSONString());
+        } else {
+            row.put("businessOwnerDeatails", row, null);
+        }
+
+
+        return row;
     }
 
     /**
