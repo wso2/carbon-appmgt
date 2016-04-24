@@ -720,7 +720,7 @@
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.gateway.stub</artifactId>
             <version>${carbon.appmgt.version}</version>
-	<dependency>
+	</dependency>
     </dependencies>
   </dependencyManagement>
 
