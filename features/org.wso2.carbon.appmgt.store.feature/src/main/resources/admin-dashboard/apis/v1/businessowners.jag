@@ -49,9 +49,9 @@ if (method == 'POST') {
         var businessOwnerEmail = request.getParameter("businessOwnerEmail");
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
-        var businessOwnerDetails = request.getParameter("businessOwnerDetails");
+        var businessOwnerProperties = request.getParameter("businessOwnerProperties");
 
-        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerProperties)));
     }
 
     if (uriMatcher.match(ownerUpdate)) {
@@ -60,7 +60,7 @@ if (method == 'POST') {
         var businessOwnerEmail = request.getParameter("businessOwnerEmail");
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
-        var businessOwnerDetails = request.getParameter("businessOwnerDetails");
+        var businessOwnerDetails = request.getParameter("businessOwnerProperties");
         print(createResponseObject(businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
     }
 }
