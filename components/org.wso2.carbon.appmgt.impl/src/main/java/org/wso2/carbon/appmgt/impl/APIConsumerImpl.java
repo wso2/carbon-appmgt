@@ -171,7 +171,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      * @return
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
      */
-    private Set<WebApp> getAppsWithTag(Registry registry, String tag, Map<String, String> attributeMap)
+    private Set<WebApp> getAppsWithTag(Registry registry, String tag, String assetType,
+                                       Map<String, String> attributeMap)
             throws AppManagementException {
         Set<WebApp> apiSet = new TreeSet<WebApp>(new APINameComparator());
         boolean isTenantFlowStarted = false;
@@ -184,25 +185,35 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             String resourceByTagQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/resource-by-tag";
             Map<String, String> params = new HashMap<String, String>();
             params.put("1", tag);
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(assetType) || AppMConstants.SITE_ASSET_TYPE.equals(assetType)){
+                params.put("2",AppMConstants.MediaType.WEB_APP);
+            } else if(AppMConstants.MOBILE_ASSET_TYPE.equals(assetType)) {
+                params.put("2",AppMConstants.MediaType.MOBILE_APP);
+            } else {
+                handleException("Could not retrieved app for tag.App type :" + assetType +" does not exist");
+            }
+
             params.put(RegistryConstants.RESULT_TYPE_PROPERTY_NAME, RegistryConstants.RESOURCE_UUID_RESULT_TYPE);
             Collection collection = registry.executeQuery(resourceByTagQueryPath, params);
 
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                    AppMConstants.API_KEY);
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, assetType);
 
             for (String row : collection.getChildren()) {
                 boolean isTagRetrievable = false;
                 String uuid = row.substring(row.indexOf(";") + 1, row.length());
                 GenericArtifact genericArtifact = artifactManager.getGenericArtifact(uuid);
-                if(attributeMap == null) {
+                if(attributeMap == null || attributeMap.isEmpty()) {
                     isTagRetrievable = true;
                 } else {
-                    String artifactTreatAsASiteValue = genericArtifact.getAttribute(
-                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toLowerCase();
-                    String attributeMapTreatAsASiteValue = attributeMap.get(
-                            AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toString().toLowerCase();
-                    if (attributeMapTreatAsASiteValue.equals(artifactTreatAsASiteValue)) {
-                        isTagRetrievable = true;
+                    //genericArtifact can be null when user doesn't have permission to artifact.
+                    if (genericArtifact != null) {
+                        String artifactTreatAsASiteValue = genericArtifact.getAttribute(
+                                AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toLowerCase();
+                        String attributeMapTreatAsASiteValue = attributeMap.get(
+                                AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE).toString().toLowerCase();
+                        if (attributeMapTreatAsASiteValue.equals(artifactTreatAsASiteValue)) {
+                            isTagRetrievable = true;
+                        }
                     }
                 }
 
@@ -760,6 +771,19 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
             Map<String, String> params = new HashMap<String, String>();
             params.put(RegistryConstants.RESULT_TYPE_PROPERTY_NAME, RegistryConstants.TAG_SUMMARY_RESULT_TYPE);
+
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(assetType) || AppMConstants.SITE_ASSET_TYPE.equals(assetType)){
+                params.put("1",AppMConstants.MediaType.WEB_APP);
+                params.put("2",AppMConstants.WEB_APP_LIFECYCLE_STATUS);
+                params.put("3",AppMConstants.APP_LC_PUBLISHED);
+            } else if(AppMConstants.MOBILE_ASSET_TYPE.equals(assetType)) {
+                params.put("1",AppMConstants.MediaType.MOBILE_APP);
+                params.put("2",AppMConstants.MOBILE_APP_LIFECYCLE_STATUS);
+                params.put("3",AppMConstants.APP_LC_PUBLISHED);
+            } else {
+                handleException("Could not retrieved tags.App type :" + assetType +" does not exist");
+            }
+
             if ((this.isTenantModeStoreView && this.tenantDomain==null) || (this.isTenantModeStoreView && isTenantDomainNotMatching(requestedTenantDomain))) {//Tenant based store anonymous mode
                 int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
                         .getTenantId(this.requestedTenant);
@@ -773,7 +797,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
                 //remove hardcoded path value
                 String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
 
-                Set<WebApp> apisWithTag = getAppsWithTag(userRegistry, tagName, attributeMap);
+                Set<WebApp> apisWithTag = getAppsWithTag(userRegistry, tagName, assetType, attributeMap);
                     /* Add the APIs against the tag name */
                     if (apisWithTag.size() != 0) {
                         if (tempTaggedAPIs.containsKey(tagName)) {

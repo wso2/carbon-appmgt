@@ -102,6 +102,48 @@ require('/modules/publisher.js').exec(function(ctx) {
         return "";
     };
 
+    var copyFile = function(fileName){
+        if(fileName){
+            var fileLocation ;
+
+            if(mam_config.filePreciseLocation.substring(0, 1) === "/"){
+                fileLocation = mam_config.filePreciseLocation;
+            }else{
+                fileLocation = Packages.java.lang.System.getProperty("carbon.home") + "/" + mam_config.filePreciseLocation;
+            }
+            //check existence of file
+            var oldFile = new File('file://'+fileLocation+fileName);
+            if(!oldFile.isExists()) {
+                log.error("Image file does not exists :" + oldFile.getPath());
+                return "";
+            }
+
+
+            //get old file extension
+            var fileExtension = "." + fileName.split('.').pop();
+            if(fileExtension==""){
+                return "";
+            }
+
+            //create random id for new file name
+            var uid= makeid();
+            //copy file
+            var newFileName = uid+fileExtension;
+            var fileTemp=new File( 'file://' + fileLocation + newFileName);
+            try{
+                fileTemp.open('w');
+                fileTemp.write(oldFile.getStream());
+            }catch(e){
+                log.error(e);
+                log.error("Error while copying image file");
+            } finally{
+                fileTemp.close();
+            }
+            return contextPath + mam_config.fileAPILocation + newFileName;
+        }
+        return "";
+    };
+
     var getBundleID = function(appid){
         try{
             var result =  get('https://itunes.apple.com/lookup?id='+appid).data;
@@ -1221,6 +1263,22 @@ require('/modules/publisher.js').exec(function(ctx) {
             var idField = model.get('*.id');
 
             log.debug('obtained idField');
+            //update visibility
+            var roles = context.post['visibility'];
+            updateVisibility(roles,idField.value,rxtManager,shortName);
+
+            //add tags
+            var tags = context.post['tags'];
+            addTags(tags,idField.value,rxtManager,shortName);
+
+            try{
+                //add rating- 0.0 to newly created app otherwise this app will not be displayed when sort the app
+                //by popularity(ratings) in store.
+                var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+                social.warmUpRatingCache(shortName + ':' + idField.value);
+            }catch(e) {
+                log.warn("Unable to publish the asset: " + shortName + ":" + idField.value + " to social cache. This may affect on sort by popularity function.");
+            }
 
             var asset=model.export('asset.exporter');
             var assetCachingModule=require('/modules/cache/cache.manager.js').assetCachingModule();
@@ -1370,7 +1428,13 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             artifactManager.update(artifact);
 
-            // dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
+            //Update visibility
+            var roles = context.post['visibility'];
+            updateVisibility(roles,artifact.id,rxtManager,shortName);
+
+            //Update tags
+            var tags = context.post['tags'];
+            updateTags(tags,artifact.id,rxtManager,shortName);
 
             msg['ok']=true;
             msg['message']='asset updated';
@@ -1388,7 +1452,6 @@ require('/modules/publisher.js').exec(function(ctx) {
     }
 
     function copyMobileApp(oldVersionArtifact, context){
-
         var postContext = context.post;
         var appType = context.params.type;
 
@@ -1421,15 +1484,55 @@ require('/modules/publisher.js').exec(function(ctx) {
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_VERSION, version);
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_BUNDLE_VERSION, version);
 
-        // handle images
-        inspectFiles(request, postContext);
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, postContext[mobileValidatorModule.Field.IMAGES_BANNER]);
-        var screenshots = oldVersionArtifact.attributes.images_screenshots.split(',');
-        screenshots[0] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
-        screenshots[1] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
-        screenshots[2] = postContext[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots.join(","));
-        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, postContext[mobileValidatorModule.Field.IMAGES_THUMBNAIL]);
+        // handle images,if new image is uploaded then save it else copy the image of previous version
+        var files = request.getAllFiles();
+        var banner = files[mobileValidatorModule.Field.IMAGES_BANNER];
+        if(banner) {
+            banner = saveFile(banner);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_BANNER].split('/').pop();
+            banner = copyFile(fileName);
+        }
+
+
+        var icon = files[mobileValidatorModule.Field.IMAGES_THUMBNAIL];
+        if(icon) {
+            icon = saveFile(icon);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_THUMBNAIL].split('/').pop();
+            icon = copyFile(fileName);
+        }
+
+        var screenshot0 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_0];
+        if(screenshot0) {
+            screenshot0 = saveFile(screenshot0);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_0].split('/').pop();
+            screenshot0 = copyFile(fileName);
+        }
+
+        var screenshot1 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_1];
+        if(screenshot1) {
+            screenshot1 = saveFile(screenshot1);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_1].split('/').pop();
+            screenshot1 = copyFile(fileName);
+        }
+
+        var screenshot2 = files[mobileValidatorModule.Field.IMAGES_SCREENSHOT_2];
+        if(screenshot2) {
+            screenshot2 = saveFile(screenshot2);
+        } else {
+            var fileName = postContext[mobileValidatorModule.Field.IMAGES_OLD_SCREENSHOT_2].split('/').pop();
+            screenshot2 = copyFile(fileName);
+        }
+
+
+        var screenshots = screenshot0+","+screenshot1+","+screenshot2;
+
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_BANNER, banner);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_SCREENSHOTS, screenshots);
+        newVersionModel.set(mobileValidatorModule.Field.IMAGES_THUMBNAIL, icon);
 
         // validate model
         var mobileValidator = new mobileValidatorModule.Validator(null);
@@ -1547,10 +1650,78 @@ require('/modules/publisher.js').exec(function(ctx) {
 
 }, request, response, session);
 
+/**
+ Attach given tags to given asset
+ @tags - comma separated tags value
+ @assetId - app id
+ @rxtManager
+ @type - apptype e.g mobileapp
+ **/
+
+function addTags(tags, assetId, rxtManager, type) {
+    //Only proceed if there are any tags
+    if (tags.length == 0) {
+        log.debug("No tags to add to asset with id " +assetId);
+        return;
+    }
+
+    //Obtain the artifact
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var asset = artifactManager.get(assetId);
+
+    var path = asset.path;
+    tags = tags.split(',');
+
+    //Attach the tags
+    rxtManager.registry.tag(path, tags);
+}
+
+/**
+ Update given tags to given asset
+ @newTags - comma separated tags value
+ @assetId - app id
+ @rxtManager
+ @type - apptype e.g mobileapp
+ **/
+function updateTags(newTags, assetId, rxtManager, type) {
+
+    //Obtain the artifact
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var asset = artifactManager.get(assetId);
+
+    var path = asset.path;
+    var oldTags = rxtManager.registry.tags(path);
+
+    //Remove old tags
+    rxtManager.registry.untag(path, oldTags);
+    //add New Tags
+    addTags(newTags, assetId, rxtManager, type);
+    log.debug("Tags added visibility");
+}
 
 
-
-
+/**
+ Update the resource permission based on given roles.
+ @roles User Roles
+ @assetId Asset UUID
+ @rxtManager Rxt Manager
+ @type Type of the Asset
+ **/
+function updateVisibility(roles, assetId, rxtManager, type) {
+    if (roles.length == 0) {
+        log.debug("No roles found to add to asset with id " + assetId);
+        return
+    }
+    var permissions = [];
+    var roles = roles.split(',');
+    for (var i = 0; i < roles.length; i++) {
+        var permision = {"role": roles[i], "permissions": ["GET"]};
+        permissions.push(permision)
+    }
+    var artifactManager = rxtManager.getArtifactManager(type);
+    require("../../assets/default/asset.jag").overridePermissions(assetId, artifactManager, permissions);
+    log.debug("Updated role visibility");
+}
 
 function url_reg(){
     return /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url_reg.arguments[0]);

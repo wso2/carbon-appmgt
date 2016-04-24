@@ -75,7 +75,7 @@ if (matcher.match(apiEndpoint)) {
 } else if (matcher.match(store)) {
 
     var elements = matcher.elements();
-    path = '/controllers/top-assets.jag';
+    path = '/controllers/home.jag';
     resolveRouter(elements.domain, path, null);
 
 }

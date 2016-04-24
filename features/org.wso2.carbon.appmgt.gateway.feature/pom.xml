@@ -142,9 +142,6 @@
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.custom.mediators:${carbon.appmgt.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
                             </bundles>
-                            <importBundles>
-                                <importBundleDef>org.wso2.carbon:org.wso2.carbon.throttle.core:${carbon.throttle.version}</importBundleDef>
-                            </importBundles>
                             <importFeatures>
                                 <!--importFeatureDef>org.apache.synapse.wso2:${carbon.mediation
                                 .version}</importFeatureDef-->

@@ -31,7 +31,7 @@ var WEBAPP_TYPE = 'webapp';
         type = elements.type;
 
         if (type == "all") {
-            path = '/controllers/top-assets.jag';
+            path = '/controllers/home.jag';
             request.getMappedPath = mapper(path);
             include(path);
             return;

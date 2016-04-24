@@ -23,10 +23,10 @@ var render = function (theme, data, meta, require) {
     var selectedCategory = data.selectedCategory;
 
     var assets = require('/helpers/page-content-all-mobile-apps.js');
-    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.paging, data.config,
-                                         data.myAssets.pageIndices, data.myAssets.leftNav, data.myAssets.rightNav);
-
+    var bodyContext = assets.currentPage(data.assets, data.sso, data.user, data.pagination, data.config);
+    bodyContext.searchQuery =searchQuery;
     var searchUrl = "/assets/mobileapp";
+    data.tags.tagUrl = "/assets/mobileapp";
 
     theme('2-column-left', {
         title: data.title,
@@ -58,7 +58,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Mobile Apps",
+                    title: "Mobile Apps",
                     sorting: createSortOptions(data)
                 }
             }
@@ -77,29 +77,58 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(data) {
     var url = "/assets/mobileapp?sort=";
     var sortOptions = {};
+    var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
     var sortByRecent = {url: url + "recent", title: "Sort by Recent", class: "fw fw-calendar"};
 
     var options = [];
     options.push(sortByAlphabet);
     options.push(sortByRecent);// recently created
+    options.push(sortByPopularity);
     sortOptions["options"] = options;
     return sortOptions;
 }
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
-        {
-            active: true, partial: 'all-apps', url: "/assets/mobileapp"
+    var enabledTypeList = data.config.enabledTypeList;
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var currentAppType = 'mobileapp';
+    var leftNavigationData = [];
+
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
         }
-    ];
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
 
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            var data;
+            if (subscriptionOn) {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                     enabledTypeList[i]
+                }
+            } else {
+                data = {
+                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                     enabledTypeList[i] + "/apps"
+                }
+            }
+            leftNavigationData.push(data);
+        }
 
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-apps', url: "/extensions/assets/mobileapp/subscriptions"
-                                });
     }
     return leftNavigationData;
 }

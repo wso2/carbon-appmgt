@@ -20,17 +20,28 @@
 
 package org.wso2.carbon.appmgt.mobile.mdm;
 
+import org.wso2.carbon.appmgt.mobile.beans.DeviceIdentifier;
 
 public class Device {
 
 
     private String id;
+    private DeviceIdentifier deviceIdentifier;
     private String name;
     private String platform;
     private String platformVersion;
     private String model;
     private String type;
     private String image;
+
+
+    public DeviceIdentifier getDeviceIdentifier() {
+        return deviceIdentifier;
+    }
+
+    public void setDeviceIdentifier(DeviceIdentifier deviceIdentifier) {
+        this.deviceIdentifier = deviceIdentifier;
+    }
 
 
     public String getId() {

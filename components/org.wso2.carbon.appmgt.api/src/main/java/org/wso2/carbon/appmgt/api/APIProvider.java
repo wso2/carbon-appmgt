@@ -258,6 +258,14 @@ public interface APIProvider extends APIManager {
     public void addWebApp(WebApp api) throws AppManagementException;
 
     /**
+     * Adds a new Mobile Application to the Store
+     *
+     * @param mobileApp Mobile application
+     * @throws AppManagementException if failed to add MobileApp
+     */
+    public String addMobileApp(MobileApp mobileApp) throws AppManagementException;
+
+    /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
      * should throw an exceptions when such attempts are made. All life cycle state changes
      * should be carried out using the changeAPIStatus method of this interface.
@@ -266,6 +274,16 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException if failed to update WebApp
      */
     public void updateAPI(WebApp api) throws AppManagementException;
+
+    /**
+     * Updates an existing Mobile Application. This method must not be used to change Mobile App status. Implementations
+     * should throw an exceptions when such attempts are made. All life cycle state changes
+     * should be carried out using the changeAPIStatus method of this interface.
+     *
+     * @param mobileApp Mobile App
+     * @throws AppManagementException if failed to update WebApp
+     */
+    public void updateMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
      * Change the lifecycle state of the specified WebApp
@@ -380,6 +398,19 @@ public interface APIProvider extends APIManager {
      */
     public List<WebApp> searchAPIs(String searchTerm, String searchType, String providerId) throws
                                                                                             AppManagementException;
+
+    /**
+     * Search WebApp and Mobileapps. If type is not mentioned, it will search in all tpyes
+     *
+     * @param searchTerm  Search Term
+     * @param searchType  Search Type
+     * @param appType
+     * @return   Set of APIs
+     * @throws AppManagementException
+     */
+    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId, String appType) throws
+                                                                                            AppManagementException;
+
     /**
      * Update the subscription status
      *
@@ -387,7 +418,7 @@ public interface APIProvider extends APIManager {
      * @param subStatus Subscription Status
      * @param appId Application Id              *
      * @return int value with subscription id
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
      *          If failed to update subscription status
      */
     public void updateSubscription(APIIdentifier apiId, String subStatus, int appId) throws
@@ -560,4 +591,23 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException;
+
+    /**
+     * Change the lifecycle status of a given application
+     * @param appType application type
+     * @param appId application type
+     * @param action lifecycle action perform on the application
+     * @throws AppManagementException
+     */
+    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException;
+
+    /**
+     * Get allowed lifecycle actions to perform on a given application
+     * @param appType application type
+     * @param appId application type
+     * @return list of allowed lifecycle actions perform on the app
+     */
+    public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
+    public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException;
+    public boolean unSubscribeMobileApp(String userId, String appId) throws AppManagementException;
 }

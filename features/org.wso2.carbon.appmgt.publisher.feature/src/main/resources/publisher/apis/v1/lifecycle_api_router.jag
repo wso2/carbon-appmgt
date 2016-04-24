@@ -172,7 +172,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         var username = server.current(session).username;
 
         /** @type {{status: string, messages: string}} */
-        var content = {status: "", messages: ""};
+        var content = {status: "", messages: []};
 
         // validating action
         if (config.publisherActions.indexOf(action) == -1) {
@@ -181,8 +181,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 422; // Unprocessable Entity (WebDAV; RFC 4918)
             response.contentType = CONTENT_TYPE_JSON;
             content.status = "Invalid Action";
-            content.messages = "Action '" + action + "' cannot be performed on "
-                                  + appType + "s";
+            content.messages.push("Action '" + action + "' cannot be performed on "
+                                  + appType + "s");
             response.content = stringify(content);
             return;
         }
@@ -190,27 +190,6 @@ require('/modules/publisher.js').exec(function (ctx) {
         var userManager = server.userManager(server.current(session).tenantId);
         var user = server.current(session);
         var permission = null;
-
-        //check if its the default version and if it has any other versions when deprecating
-        if (action == "Deprecate") {
-            var webApp;
-            try {
-                webApp = apiProvider.getAppDetailsFromUUID(uuid);
-            } catch (e) {
-                log.error("The asset with UUID " + uuid + " could not be retrieved.");
-                log.error(e);
-                response.status = 404;
-                response.contentType = CONTENT_TYPE_JSON;
-                content.status = "Not Found";
-                content.messages = "The " + appType + " with UUID " + uuid + " cannot be retrieved";
-                response.content = stringify(content);
-                return;
-            }
-            var appProvider = webApp.provider;
-            var appName = webApp.name;
-            var appVersion = webApp.version;
-            var apiIdentifierObj = new apiIdentifier(appProvider, appName, appVersion);
-        }
 
         // To Send an app to submit for review, created permission is required.
         if (action != "Submit for Review") {
@@ -234,8 +213,8 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 401;
             response.contentType = CONTENT_TYPE_JSON;
             content.status = "Access Denied";
-            content.messages = "You do not have publisher permissions to perform '"
-                                  + action + "' on " + appType + "s";
+            content.messages.push("You do not have publisher permissions to perform '"
+                                  + action + "' on " + appType + "s");
             response.content = stringify(content);
             return;
         }
@@ -253,7 +232,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 404;
             response.contentType = CONTENT_TYPE_JSON;
             content.status = "Not Found";
-            content.messages = "The " + appType + " with UUID " + uuid + " cannot be retrieved";
+            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
             response.content = stringify(content);
             return;
         }
@@ -263,7 +242,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 404;
             response.contentType = "application/json";
             content.status = "Not Found";
-            content.messages = "The " + appType + " with UUID " + uuid + " cannot be retrieved";
+            content.messages.push("The " + appType + " with UUID " + uuid + " cannot be retrieved");
             response.content = stringify(content);
             return;
         }
@@ -295,11 +274,11 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.status = 401;
                 response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Insufficient Permissions";
-                content.messages = "You do not have permissions to perform action '"
+                content.messages.push("You do not have permissions to perform action '"
                                       + action + "' on version "
                                       + currentArtifact.attributes.overview_version
                                       + " of '" + currentArtifact.attributes.overview_name + "' "
-                                      + appType;
+                                      + appType);
                 response.content = stringify(content);
                 return;
             }
@@ -313,7 +292,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 500;
             response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
-            content.messages = "Cannot retrieve permissions for action '" + action + "'";
+            content.messages.push("Cannot retrieve permissions for action '" + action + "'");
             response.content = stringify(content);
             return;
         }
@@ -385,7 +364,7 @@ require('/modules/publisher.js').exec(function (ctx) {
         operationResult = promoteArtifactLifeCycle(artifactManager, currentArtifact,
                                                    appType, action);
         if (operationResult.isSuccess) {
-            content.messages = operationResult.message;
+            content.messages.push(operationResult.message);
         } else {
             // some error occurred in promoteArtifactLifeCycle function,
             // revert previously unpublished artifacts to Publish state
@@ -404,7 +383,7 @@ require('/modules/publisher.js').exec(function (ctx) {
             response.status = 500;
             response.contentType = CONTENT_TYPE_JSON;
             content.status = "Error";
-            content.messages = operationResult.message; // error message from last operation
+            content.messages.push(operationResult.message); // error message from last operation
             response.content = stringify(content);
             return;
         }
@@ -464,7 +443,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                     == currentArtifact.attributes.overview_oldVersion) {
                     operationResult = moveSubscriptions(previousArtifacts[i], currentArtifact, appType);
                     if (operationResult.isSuccess) {
-                        content.messages = operationResult.message;
+                        content.messages.push(operationResult.message);
                     } else {
                         // some error occurred in moveSubscriptions function
                         // abort further subscription moving
@@ -495,7 +474,7 @@ require('/modules/publisher.js').exec(function (ctx) {
                 response.status = 500;
                 response.contentType = CONTENT_TYPE_JSON;
                 content.status = "Error";
-                content.messages = operationResult.message; // error message from last operation
+                content.messages.push(operationResult.message); // error message from last operation
                 response.content = stringify(content);
                 return;
             }

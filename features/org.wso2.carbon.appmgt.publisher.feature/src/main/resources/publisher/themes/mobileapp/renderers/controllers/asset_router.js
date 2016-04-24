@@ -81,10 +81,6 @@ var render=function(theme,data,meta,require){
 		data = editHelper.screenshots(data);
 
 		data = require('/helpers/splitter.js').splitData(data);
-		if (data.artifact.lifecycleState == "Published") {
-			response.sendError(400);
-			return;
-		}
 		heading = data.artifact.attributes.overview_displayName;
 		break;
     case 'lifecycle':

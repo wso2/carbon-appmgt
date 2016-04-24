@@ -883,14 +883,18 @@ public class APIStoreHostObject extends ScriptableObject {
         String assetType =  null;
         if (args != null && isStringArray(args)) {
             //There will be separate two calls for this method with one argument and with three arguments.
-            if (args.length == 1) {
+            if (args.length == 2) {
                 tenantDomain = args[0].toString();
+                assetType = args[1].toString();
             }
             if (args.length == 3) {
                 tenantDomain = args[0].toString();
                 assetType = args[1].toString();
                 attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, args[2].toString());
             }
+        } else {
+            String errorMessage = "Invalid number or invalid type of arguments";
+            handleException(errorMessage);
         }
         APIConsumer appConsumer = getAPIConsumer(thisObj);
         try {

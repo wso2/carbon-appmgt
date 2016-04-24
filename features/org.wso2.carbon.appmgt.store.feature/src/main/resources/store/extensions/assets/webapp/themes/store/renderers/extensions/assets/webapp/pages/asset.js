@@ -95,27 +95,51 @@ function getAppUrl(data) {
 }
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
+    var enabledTypeList = data.config.enabledTypeList;
+    var leftNavigationData = [];
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var currentType = "webapp";
 
-    ];
+    if (subscriptionOn) {
+        leftNavigationData.push({
+                                    active: true, partial: currentType, url: "/assets/" + currentType
 
-    if (data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-                                    active: true, partial: 'all-apps', url: "/assets/webapp"
                                 });
-        leftNavigationData.push({
-                                    active: false, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
-                                });
+
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentType) {
+                leftNavigationData.push({
+                                            active: false, partial: enabledTypeList[i], url: "/assets/"
+                        + enabledTypeList[i]
+
+                                        });
+            }
+        }
     } else {
         leftNavigationData.push({
-                                    active: true, partial: 'my-apps', url: "/extensions/assets/webapp/myapps"
+                                    active: true, partial: currentType, url: "/extensions/assets/" +
+                                                                             currentType + "/apps"
                                 });
-    }
+        for (var i = 0; i < enabledTypeList.length; i++) {
+            if (enabledTypeList[i] != currentType) {
+                if (enabledTypeList[i] == "mobileapp") {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/assets/"
+                            + enabledTypeList[i]
 
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
-                                });
+                                            });
+                } else {
+                    leftNavigationData.push({
+                                                active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                                 enabledTypeList[i] + "/apps"
+                                            });
+                }
+
+            }
+        }
     }
     return leftNavigationData;
 }

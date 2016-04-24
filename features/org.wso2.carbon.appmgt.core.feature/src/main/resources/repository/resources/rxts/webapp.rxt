@@ -52,7 +52,7 @@
             </field>
 
             <field type="text" required="true">
-                <name>Treat as a Site</name>
+                <name label="Treat as a Site">Treat As A Site</name>
             </field>
 
             <field type="text">
@@ -67,13 +67,13 @@
                 <name>Description</name>
             </field>
             <field type="text" url="true" required="true">
-                <name>Web App URL</name>
+                <name label="Web App URL">Web App Url</name>
             </field>
             <field type="text" url="true">
                 <name>Acs URL</name>
             </field>
             <field type="text" url="true">
-                <name>Logout URL</name>
+                <name label="Logout URL">Logout Url</name>
             </field>
 
             <field type="options">
@@ -94,7 +94,7 @@
                 <name>Permissions</name>
             </field>
              <field type="text">
-                 <name>Redirect URL</name>
+                 <name label="Redirect URL">Redirect Url</name>
              </field>
              <field type="text" default="false">
                  <name>Advertise Only</name>
@@ -106,7 +106,7 @@
                  <name>APP Tenant</name>
              </field>
              <field type="text">
-                 <name>Advertised App UUID</name>
+                 <name label="Advertised App UUID">Advertised App Uuid</name>
              </field>
              <field type="text">
                  <name>Subscription Availability</name>
