@@ -48,12 +48,12 @@ var adjustStoreRight = function(){
 		
 		$('.store-right > .row > .span3').removeClass('span3').addClass('span12');
 		$('.store-right').height('auto');
-		$('.asset-businessOwnerDescription-header > .row > .span9').removeClass('span9').addClass('span12');
+		$('.asset-description-header > .row > .span9').removeClass('span9').addClass('span12');
 	} else {
 		$('.store-left').removeClass('span12').addClass('span9');
 		$('.store-right').removeClass('span12').addClass('span3');
 		$('.store-right > .row > .span12').removeClass('span12').addClass('span3');
-		$('.asset-businessOwnerDescription-header > .row > .span12').removeClass('span12').addClass('span9');
+		$('.asset-description-header > .row > .span12').removeClass('span12').addClass('span9');
 		
 	
 		

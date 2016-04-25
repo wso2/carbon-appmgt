@@ -49,7 +49,7 @@ var getStreamId	= function(stream,version){
                                                   "  'name':'" + stream + "'," +
                                                   "  'version':'" + version + "'," +
                                                   "  'nickName': 'social_comments'," +
-                                                  "  'businessOwnerDescription': 'Social comments feature'," +
+                                                  "  'description': 'Social comments feature'," +
                                                   "  'metaData':[" +
                                                   "          {'name':'clientType','type':'STRING'}" +
                                                   "  ]," +

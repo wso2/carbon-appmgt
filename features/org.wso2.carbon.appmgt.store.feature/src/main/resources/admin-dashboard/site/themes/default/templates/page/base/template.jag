@@ -37,7 +37,7 @@ i18n.init(request,localeResourcesBasePath);
     </script>
     <title><%=outputs.title%></title>
     <meta charset="UTF-8">
-    <meta name="businessOwnerDescription" content=""/>
+    <meta name="description" content=""/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <link href="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("lib/bootstrap/css/bootstrap.css"))%>" rel="stylesheet">
     <link href="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("lib/bootstrap/css/bootstrap-responsive.css"))%>" rel="stylesheet">

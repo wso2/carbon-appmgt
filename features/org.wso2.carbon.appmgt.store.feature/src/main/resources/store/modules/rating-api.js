@@ -45,9 +45,9 @@ var api = {};
     };
     /**
      * The function adds rating details to the provided assets
-     * @param {[type]} assets   [businessOwnerDescription]
-     * @param {[type]} tenantId [businessOwnerDescription]
-     * @param {[type]} username [businessOwnerDescription]
+     * @param {[type]} assets   [description]
+     * @param {[type]} tenantId [description]
+     * @param {[type]} username [description]
      */
     api.addRatings = function(assets,am,tenantId, username) {
         var carbon = require('carbon');

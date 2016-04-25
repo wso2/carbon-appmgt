@@ -71,7 +71,6 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -99,59 +98,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     public APIProviderImpl(String username) throws AppManagementException {
         super(username);
-    }
-
-    /**
-     *
-     * @param ownerId ID of the owner.
-     * @return
-     * @throws AppManagementException
-     */
-    @Override
-    public void deleteBusinessOwner(String ownerId) throws AppManagementException{
-         appMDAO.deleteBusinessOwner(ownerId);
-    }
-    /**
-     *
-     * @param businessOwner
-     * @throws AppManagementException
-     */
-    @Override
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.updateBusinessOwner(businessOwner);
-    }
-
-    /**
-     *
-     * @return
-     * @throws AppManagementException
-     */
-    @Override
-
-    public Map<String, String> getBusinessOwnerData(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwnerDetailsById(ownerId);
-    }
-
-
-    /**
-     *
-     * @return
-     * @throws AppManagementException
-     */
-    @Override
-
-    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
-        return appMDAO.getBusinessOwnerList();
-    }
-
-    /**
-     *
-     * @param businessOwner
-     * @throws AppManagementException
-     */
-    @Override
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.saveBusinessOwner(businessOwner);
     }
 
     /**
