@@ -100,6 +100,59 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Delete business owner.
+     * @param businessOwnerId ID of the owner.
+     * @throws AppManagementException
+     */
+    @Override
+    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+         appMDAO.deleteBusinessOwner(businessOwnerId);
+    }
+    /**
+     *Update a business owner.
+     * @param businessOwner
+     * @throws AppManagementException
+     */
+    @Override
+    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        appMDAO.updateBusinessOwner(businessOwner);
+    }
+
+    /**
+     * Get custom properties of a given business owner.
+     * @param ownerId
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+
+    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException {
+        return appMDAO.getBusinessOwnerCustomPropertiesById(ownerId);
+    }
+
+
+    /**
+     * Get all business Owners.
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+
+    public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
+        return appMDAO.getBusinessOwners();
+    }
+
+    /**
+     *Save business owner.
+     * @param businessOwner
+     * @throws AppManagementException
+     */
+    @Override
+    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        appMDAO.saveBusinessOwner(businessOwner);
+    }
+
+    /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *
      * @return Set<Provider>

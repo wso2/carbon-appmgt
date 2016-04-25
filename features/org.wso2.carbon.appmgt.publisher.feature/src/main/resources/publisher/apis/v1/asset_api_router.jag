@@ -621,7 +621,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //Checks whether two models are equal
             var reqProps=['overview.name', 'overview.provider', 'overview.version']
-
+                var businesOwner = context.post["overview_businessOwner"];
             var isEqual = modelManager.assertEqual(modelA, modelB,reqProps);
 
             //If they are not equal,abort the operation
@@ -632,13 +632,12 @@ require('/modules/publisher.js').exec(function(ctx) {
                         +' were modified: '+diff);
                 return;
             }
-            modelA.set("overview.createdtime",modelB.get("overview.createdtime").value);
-            var artifact = modelA.export('asset.exporter');
-            artifact.attributes["overview_appOwner"] = appOwner;
-            artifact.attributes["overview_appTenant"] = appTenant;
-            artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
-
-
+                modelA.set("overview.createdtime", modelB.get("overview.createdtime").value);
+                var artifact = modelA.export('asset.exporter');
+                artifact.attributes["overview_appOwner"] = appOwner;
+                artifact.attributes["overview_appTenant"] = appTenant;
+                artifact.attributes["overview_advertiseOnly"] = isAdvertiseOnly;
+                artifact.attributes["overview_businessOwner"] = businesOwner;
             var tenantId = server.current(session).tenantId;
             var tenantDomain = carbon.server.tenantDomain({tenantId:tenantId});
             var subscriptionAvailability = (artifact.attributes["overview_subscriptionAvailability"]).trim();

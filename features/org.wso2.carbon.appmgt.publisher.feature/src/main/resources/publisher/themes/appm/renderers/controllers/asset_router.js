@@ -25,6 +25,8 @@ var render=function(theme,data,meta,require){
     var notifications = session.get('notifications');
     var notificationCount = session.get('notificationCount');
     var typeList = apiProvider.getEnabledAssetTypeList();
+    var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
+    var appMDAOObj = new appMDAO();
     //Determine what view to show
     switch(data.op){
 
@@ -33,6 +35,7 @@ var render=function(theme,data,meta,require){
             heading = "Create New Web Application";
             break;
         case 'view':
+            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             data = require('/helpers/view-asset.js').merge(data);
             data.typeList = typeList;
             listPartial = 'view-asset';
@@ -45,8 +48,10 @@ var render=function(theme,data,meta,require){
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
+            data.businessOwnerName = businessOwnerName;
             break;
         case 'edit':
+            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
             if(data.artifact.lifecycleState == "Published"){
                 editEnabled = false;
@@ -62,6 +67,7 @@ var render=function(theme,data,meta,require){
             var copyOfData = parse(stringify(data));
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
+            data.businessOwnerName = businessOwnerName;
             break;
         case 'lifecycle':
             listPartial='lifecycle-asset';

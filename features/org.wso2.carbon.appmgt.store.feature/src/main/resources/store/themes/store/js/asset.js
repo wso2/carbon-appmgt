@@ -167,9 +167,9 @@ $(function () {
          $(document).scroll(function(){
          var h = $(this).scrollTop();
          if(h>19){
-         $('.asset-description-header').addClass('asset-description-header-scroll');
+         $('.asset-businessOwnerDescription-header').addClass('asset-businessOwnerDescription-header-scroll');
          } else {
-         $('.asset-description-header').removeClass('asset-description-header-scroll');
+         $('.asset-businessOwnerDescription-header').removeClass('asset-businessOwnerDescription-header-scroll');
          }
          })*/
     }
