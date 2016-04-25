@@ -50,8 +50,8 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     var typeList = apiProvider.getEnabledAssetTypeList();
 
-    function getBusinessOwner() {
-        var businessOwnerList = apiProvider.getBusinessOwners();
+    function getOwnerList() {
+        var businessOwnerList = apiProvider.getBusinessOwnerList();
         var ownersList = JSON.parse(stringify(businessOwnerList));
         var nameList = new Array();
         var nameList = new Array();
@@ -116,7 +116,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                                data: output,
                                title: title,
                                typeList: typeList,
-                               businessOwnerList: getBusinessOwner()
+                               businessOwnerList: getOwnerList()
                            }
             );
         }
@@ -212,7 +212,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                                        canEdit: docEditAuth,
                                        canDelete: docDeleteAuth
                                    },
-                                   businessOwnerList: getBusinessOwner()
+                                   businessOwnerList: getOwnerList()
                                });
             }
             else {
@@ -347,7 +347,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                                    title: title,
                                    docs: result.docs,
                                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
-                                   businessOwnerList: getBusinessOwner()
+                                   businessOwnerList: getOwnerList()
                                });
             } else {
                 caramel.render({
@@ -361,7 +361,7 @@ require('/modules/publisher.js').exec(function(ctx) {
                                    versions: versionList,
                                    tags: tags,
                                    title: title,
-                                   businessOwnerList: getBusinessOwner()
+                                   businessOwnerList: getOwnerList()
                                });
             }
 

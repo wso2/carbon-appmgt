@@ -4,7 +4,7 @@ var AuthService;
 var AppService;
 var appInfoApi;
 var authenticator;
-var businessOwnerCustomData;
+var businessOwnerData;
 var log = new Log();
 var businessOwner = "";
 var  ownerName;
@@ -215,8 +215,8 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
             businessOwner = storeHostObj.getBusinessOwner(asset.id);
             if(businessOwner != null && businessOwner.businessOwnerName != null) {
-                businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
-                ownerName = businessOwnerCustomData[0].value;
+                businessOwnerData = require('../themes/store/js/logic/businessOwners/businessOwners.js').merge(businessOwner);
+                ownerName = businessOwnerData[0].value;
             }
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
@@ -547,7 +547,7 @@ require('/modules/store.js').exec(function (ctx) {
                 enabledTypeList: enabledTypeList
             },
                            assetType: 'webapp',
-                           businessOwnerData: businessOwnerCustomData,
+                           businessOwnerData: businessOwnerData,
                            businessOwnerName: ownerName
         });
     }

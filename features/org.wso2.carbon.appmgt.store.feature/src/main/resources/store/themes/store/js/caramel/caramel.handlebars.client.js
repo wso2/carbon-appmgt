@@ -218,7 +218,7 @@
     });
 
     /**
-     *  Registers mergeContext handler which transform different contexts that needs to be passed in to a single partial.
+     *  Registers mergeContext handler which merge different contexts that needs to be passed in to a single partial.
      *
      * {{#mergeContext thisContext=this nameContext=../../name townContext=../town}}
      *      {{>child-partial}}

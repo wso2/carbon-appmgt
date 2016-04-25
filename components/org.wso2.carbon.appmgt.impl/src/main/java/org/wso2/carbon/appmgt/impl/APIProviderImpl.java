@@ -50,6 +50,7 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Association;
@@ -63,12 +64,14 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -99,16 +102,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Delete business owner.
-     * @param businessOwnerId ID of the owner.
+     *
+     * @param ownerId ID of the owner.
+     * @return
      * @throws AppManagementException
      */
     @Override
-    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
-         appMDAO.deleteBusinessOwner(businessOwnerId);
+    public void deleteBusinessOwner(String ownerId) throws AppManagementException{
+         appMDAO.deleteBusinessOwner(ownerId);
     }
     /**
-     *Update a business owner.
+     *
      * @param businessOwner
      * @throws AppManagementException
      */
@@ -118,31 +122,30 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Get custom properties of a given business owner.
-     * @param ownerId
+     *
      * @return
      * @throws AppManagementException
      */
     @Override
 
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwnerCustomPropertiesById(ownerId);
+    public Map<String, String> getBusinessOwnerData(int ownerId) throws AppManagementException {
+        return appMDAO.getBusinessOwnerDetailsById(ownerId);
     }
 
 
     /**
-     * Get all business Owners.
+     *
      * @return
      * @throws AppManagementException
      */
     @Override
 
-    public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
-        return appMDAO.getBusinessOwners();
+    public List<BusinessOwner> getBusinessOwnerList() throws AppManagementException {
+        return appMDAO.getBusinessOwnerList();
     }
 
     /**
-     *Save business owner.
+     *
      * @param businessOwner
      * @throws AppManagementException
      */

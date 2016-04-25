@@ -12,6 +12,7 @@
 <div class="wr-section">
     <h2 class="first-h2 exp_col" style="display:block"><i
             class="icon-chevron-sign-down icon"></i>General Details</h2>
+    {{dump businessOwnerList}}
     <fieldset>
         <input type='hidden' value="{{businessOwnerList}}" name="ownerList" id="owner_list"/>
         {{{ form_render "overview_provider" data.fields }}}

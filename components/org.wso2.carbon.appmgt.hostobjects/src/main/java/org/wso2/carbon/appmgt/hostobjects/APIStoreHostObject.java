@@ -230,21 +230,19 @@ public class APIStoreHostObject extends ScriptableObject {
             throws
             AppManagementException {
 
-        if (args == null || args.length != 1) {
-            throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
-        }
-
         String appId = args[0].toString();
+        NativeArray myn = new NativeArray(0);
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
         BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        int count = 0;
         NativeObject row = new NativeObject();
         row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
         row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
         row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
+        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnereDescription());
         row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
         Map<String, String> businessOwnerDetails = null;
-        businessOwnerDetails = businessOwner.getBusinessOwnerCustomProperties();
+        businessOwnerDetails = businessOwner.getBusinessOwnerDetails();
         JSONObject businessOwnerDetailsObject = new JSONObject();
         if(businessOwnerDetails != null) {
             Set<String> keySet = businessOwnerDetails.keySet();
