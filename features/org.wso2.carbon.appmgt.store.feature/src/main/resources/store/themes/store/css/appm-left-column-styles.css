@@ -441,3 +441,15 @@ nav.navigation .second_level > .left-menu-item {
         width: initial;
     }
 }
+
+.mobile-sub-menu-active {
+    color: #27ae60 !important;
+}
+
+.web-sub-menu-active {
+    color: #8e44ad !important;
+}
+
+.site-sub-menu-active {
+    color: #d35400 !important;
+}
