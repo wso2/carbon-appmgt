@@ -50,11 +50,7 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     var typeList = apiProvider.getEnabledAssetTypeList();
 
-    routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
-
-    var shortName = (context.params.type) || '';
-    var operation = 'create';
-      function getBusinessOwner() {
+    function getBusinessOwner() {
         var businessOwnerList = apiProvider.getBusinessOwners();
         var ownersList = JSON.parse(stringify(businessOwnerList));
         var nameList = new Array();
@@ -64,6 +60,11 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
         return nameList;
     }
+
+    routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
+
+    var shortName = (context.params.type) || '';
+    var operation = 'create';
 
     var rxtTemplate;
     if (apiProvider.isAssetTypeEnabled(shortName)) {
