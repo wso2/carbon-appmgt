@@ -49,7 +49,7 @@ if (matcher.match(apiEndpoint)) {
 
     var elements = matcher.elements();
     path = '/controllers/routers/assets.jag';
-    if(elements.type == "favouriteapps") {
+    if(elements.type == "favourite") {
         path = '/controllers/favouriteapps.jag';
     }
     resolveRouter(elements.domain, path, elements.type);
@@ -95,7 +95,7 @@ function resolveRouter(tenantDomain, path, type) {
     if (type == 'site') {
         include('/extensions/assets/site/modules/jagg/jagg.jag');
     }
-    if (type == "favouriteapps") {
+    if (type == "favourite") {
         include('/jagg/jagg.jag');
     } else {
         include('/extensions/assets/webapp/modules/jagg/jagg.jag');
