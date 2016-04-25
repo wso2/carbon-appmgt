@@ -660,6 +660,12 @@ public final class AppMConstants {
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
     public static final String MOBILE_APPS_IOS_EXT = ".ipa";
 
+    //Mobile application platform types
+    public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";
+    public static final String MOBILE_APPS_PLATFORM_IOS = "ios";
+    public static final String MOBILE_APPS_PLATFORM_WEBAPP = "webapp";
+
+
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
     public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";
 

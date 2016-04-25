@@ -549,6 +549,7 @@ definitions:
       - name
       - version
       - provider
+      - displayName
     properties:
       id:
         type: string

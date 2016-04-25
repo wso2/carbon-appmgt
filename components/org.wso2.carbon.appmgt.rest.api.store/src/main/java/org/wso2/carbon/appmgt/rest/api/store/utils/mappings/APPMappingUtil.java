@@ -215,7 +215,7 @@ public class APPMappingUtil {
         dto.setBanner(model.getBanner());
         dto.setRecentChanges(model.getRecentChanges());
 
-        dto.setIcon(model.getIcon());
+        dto.setIcon(model.getThumbnail());
         dto.setAppType(model.getAppType());
         dto.setRecentChanges(model.getRecentChanges());
         dto.setCreatedtime(model.getCreatedTime());

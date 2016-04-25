@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -50,7 +51,6 @@ import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Association;
@@ -64,7 +64,6 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.cache.Cache;
@@ -425,12 +424,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public String addMobileApp(MobileApp app) throws AppManagementException {
         String artifactId = null;
-        try {
-            artifactId = createMobileApp(app);
-
-        } catch (AppManagementException e) {
-            throw new AppManagementException("Error in adding Mobile App :"+app.getAppName(),e);
-        }
+        artifactId = createMobileApp(app);
         return artifactId;
     }
 
@@ -1482,10 +1476,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     private String createMobileApp(MobileApp mobileApp) throws AppManagementException {
-        GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                AppMConstants.MOBILE_ASSET_TYPE);
+
+
         String artifactId = null;
         try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            final String appName = mobileApp.getAppName();
+
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A mobile application with name : "+
+                        mobileApp.getAppName()+" already exists.");
+            }
             registry.beginTransaction();
             GenericArtifact genericArtifact =
                     artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));

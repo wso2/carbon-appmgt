@@ -26,6 +26,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
@@ -226,7 +227,7 @@ public class APPMappingUtil {
         appAppmetaDTO.setWeburl(model.getAppUrl());
         dto.setAppmeta(appAppmetaDTO);
 
-        dto.setIcon(model.getIcon());
+        dto.setIcon(model.getThumbnail());
         dto.setAppType(model.getAppType());
         dto.setMediaType(model.getMediaType());
         dto.setRecentChanges(model.getRecentChanges());
@@ -236,38 +237,86 @@ public class APPMappingUtil {
         return dto;
     }
 
-    public static MobileApp fromDTOtoMobileApp(AppDTO dto, String provider) throws AppManagementException {
+    /**
+     * This method validates and converts AppDTO into a MobileApp
+     * @param appDTO AppDTO
+     * @return if appDTO is valid, returns the converted MobileApp, else throws a BadRequestException
+     * @throws AppManagementException
+     */
+    public static MobileApp fromDTOtoMobileApp(AppDTO appDTO){
 
+        String providerName = RestApiUtil.getLoggedInUsername();
 
         MobileApp mobileAppModel = new MobileApp();
-        AppAppmetaDTO appAppmetaDTO = dto.getAppmeta();
-        mobileAppModel.setBanner(dto.getBanner());
-        mobileAppModel.setThumbnail(dto.getThumbnailUrl());
-        mobileAppModel.setScreenShots(dto.getScreenshots());
-        mobileAppModel.setAppName(dto.getName());
-        mobileAppModel.setDisplayName(dto.getDisplayName());
-        mobileAppModel.setDescription(dto.getDescription());
-        mobileAppModel.setAppVersion(appAppmetaDTO.getVersion());
-        mobileAppModel.setAppVisibility(dto.getVisibleRoles());
-        mobileAppModel.setAppProvider(dto.getProvider());
-        mobileAppModel.setPlatform(dto.getPlatform());
-        mobileAppModel.setAppVersion(dto.getVersion());
-        mobileAppModel.setCategory(dto.getCategory());
-        mobileAppModel.setRecentChanges(dto.getRecentChanges());
-        mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
-        mobileAppModel.setPlatform(dto.getPlatform());
-        mobileAppModel.setMarketType(dto.getMarketType());
-        if ("webapp".equals(dto.getPlatform())) {
-            mobileAppModel.setAppUrl(appAppmetaDTO.getWeburl());
+        AppAppmetaDTO appAppmetaDTO = appDTO.getAppmeta();
 
-        } else {
-            mobileAppModel.setAppUrl(appAppmetaDTO.getPath());
+        mobileAppModel.setAppProvider(providerName);
+        //Validate Mandatory fields
+
+        validateMandatoryField("platform", appDTO.getPlatform());
+        mobileAppModel.setPlatform(appDTO.getPlatform());
+
+        validateMandatoryField("markettype", appDTO.getMarketType());
+        mobileAppModel.setMarketType(appDTO.getMarketType());
+
+        if (validateMandatoryField("appmeta", appAppmetaDTO)) {
+            if (AppMConstants.MOBILE_APPS_PLATFORM_ANDROID.equals(appDTO.getPlatform()) ||
+                    AppMConstants.MOBILE_APPS_PLATFORM_IOS.equals(appDTO.getPlatform())) {
+
+                if ("enterprise".equals(appDTO.getMarketType())) {
+                    validateMandatoryField("path", appAppmetaDTO.getPath());
+                    mobileAppModel.setAppUrl(appAppmetaDTO.getPath());
+                    validateMandatoryField("package", appAppmetaDTO.getPackage());
+                    mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    mobileAppModel.setBundleVersion(appAppmetaDTO.getVersion());
+                    mobileAppModel.setVersion(appDTO.getVersion());
+                } else if ("public".equals(appDTO.getMarketType())) {
+                    validateMandatoryField("package", appAppmetaDTO.getPackage());
+                    mobileAppModel.setPackageName(appAppmetaDTO.getPackage());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    mobileAppModel.setBundleVersion(appAppmetaDTO.getVersion());
+                    mobileAppModel.setVersion(appDTO.getVersion());
+                } else {
+                    RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
+                            "' is provided for platform : " + appDTO.getPlatform(), log);
+                }
+            } else if (AppMConstants.MOBILE_APPS_PLATFORM_WEBAPP.equals(appDTO.getPlatform())) {
+                if ("webapp".equals(appDTO.getMarketType())) {
+                    validateMandatoryField("weburl", appAppmetaDTO.getWeburl());
+                    mobileAppModel.setAppUrl(appAppmetaDTO.getWeburl());
+                    validateMandatoryField("version", appAppmetaDTO.getVersion());
+                    mobileAppModel.setVersion(appAppmetaDTO.getVersion());
+                } else {
+                    RestApiUtil.handleBadRequest("Unsupported market type '" + appDTO.getMarketType() +
+                            "' is provided for platform : " + appDTO.getPlatform(), log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported platform '" + appDTO.getPlatform() + "' is provided.", log);
+            }
         }
-        mobileAppModel.setAppUrl(appAppmetaDTO.getPath());
-        mobileAppModel.setAppProvider(provider);
-
-
+        mobileAppModel.setAppName(appDTO.getName());
+        mobileAppModel.setDisplayName(appDTO.getDisplayName());
+        validateMandatoryField("description", appDTO.getDescription());
+        mobileAppModel.setDescription(appDTO.getDescription());
+        validateMandatoryField("category", appDTO.getCategory());
+        mobileAppModel.setCategory(appDTO.getCategory());
+        validateMandatoryField("banner", appDTO.getBanner());
+        mobileAppModel.setBanner(appDTO.getBanner());
+        validateMandatoryField("iconFile", appDTO.getIcon());
+        mobileAppModel.setThumbnail(appDTO.getIcon());
+        validateMandatoryField("screenshots", appDTO.getScreenshots());
+        mobileAppModel.setScreenShots(appDTO.getScreenshots());
+        mobileAppModel.setRecentChanges(appDTO.getRecentChanges());
         return mobileAppModel;
+    }
+
+    private static boolean validateMandatoryField(String fieldName, Object fieldValue) {
+
+        if (fieldValue == null) {
+            RestApiUtil.handleBadRequest("Mandatory field  '" + fieldName + "' is not provided.", log);
+        }
+        return true;
     }
 
 }
