@@ -157,7 +157,7 @@ $(document).on("click", "#btn-owner-save", function () {
                    "businessOwnerEmail": ownerMail,
                    "businessOwnerDescription": description,
                    "businessOwnerSite": siteLink,
-                   "businessOwnerProperties": details
+                   "businessOwnerDetails": details
                },
                success: function (data) {
                    Showalert("Business Owner Saved Successfully","alert-success", "statusError");

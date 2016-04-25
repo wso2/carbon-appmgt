@@ -105,7 +105,7 @@ $(document).on("click", "#btn-owner-save", function () {
     var businessOwnerEmail = $('#businessOwnerEmail').val();
     var businessOwnerDescription = $('#businessOwnerDescription').val();
     var businessOwnerSiteLink = $('#businessOwnerSite').val();
-    var ownerProperties = {};
+    var ownerDetails = {};
 
     if (extraFieldCount > 0) {
         var i = extraFieldCount;
@@ -114,12 +114,12 @@ $(document).on("click", "#btn-owner-save", function () {
             var val_id = "#value-".concat(i - 1);
             var key = $(key_id).val();
             var value = $(val_id).val();
-            ownerProperties[key] = value;
+            ownerDetails[key] = value;
             i--;
         }
     }
 
-    var properties = JSON.stringify(ownerProperties);
+    var details = JSON.stringify(ownerDetails);
     $.ajax({
                url: context + '/apis/businessowners/update',
                type: 'POST',
@@ -131,7 +131,7 @@ $(document).on("click", "#btn-owner-save", function () {
                    "businessOwnerEmail": businessOwnerEmail,
                    "businessOwnerDescription": businessOwnerDescription,
                    "businessOwnerSite":businessOwnerSiteLink,
-                   "businessOwnerProperties": properties
+                   "businessOwnerDetails": details
                },
                success: function (data) {
                    Showalert("Business Owner updated Successfully", "alert-success", "statusError");
@@ -159,7 +159,7 @@ function updateOwners() {
             $('#ownerPartialsTable tbody').append('<tr><td>' +
                                                   obj.businessOwnerName + '</td> <td>' + obj.businessOwnerEmail + '</td> <td>'
                                                   + obj.businessOwnerSite + '</td> <td>' + obj.businessOwnerDescription
-                                                  + '</td> <td><a data-target="" ' +
+                                                  + '</td> <td><a data-target="#entitlement-policy-editor" ' +
                                                   'data-toggle="modal" data-owner-id="' + obj.businessOwnerId
                                                   + '" class="owner-edit-button">' +
                                                   '<i class="icon-edit"></i></a> &nbsp;<a  data-policy-name="'

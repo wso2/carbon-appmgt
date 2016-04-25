@@ -337,10 +337,9 @@ public class APIProviderHostObject extends ScriptableObject {
         } catch (ParseException e) {
             handleException("Error while parsing JSON", e);
         }
-        Set<Map.Entry> entries = busiessOwnerDetailObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
+        Set<String> keys = busiessOwnerDetailObject.keySet();
+        for ( String key : keys) {
+            String value = (String) busiessOwnerDetailObject.get(key);
             businessOwnerMap.put(key, value);
         }
 
@@ -375,18 +374,14 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeObject businessOwnerDataObject = new NativeObject();
         APIProvider apiProvider = getAPIProvider(thisObj);
-        Map<String, String> businessOwnerProperties = null;
-        businessOwnerProperties = apiProvider.getBusinessOwnerCustomProperties(businessOwnerId);
-        JSONObject businessOwnerPropertiesObject = new JSONObject();
-
-        Set<Map.Entry<String, String>> entries = businessOwnerProperties.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
-            businessOwnerPropertiesObject.put(key, value);
+        Map<String, String> businessOwnerDetails = null;
+        businessOwnerDetails = apiProvider.getBusinessOwnerCustomProperties(businessOwnerId);
+        JSONObject businessOwnerDetailsObject = new JSONObject();
+        Set<String> keySet = businessOwnerDetails.keySet();
+        for(String key : keySet){
+            businessOwnerDetailsObject.put(key, businessOwnerDetails.get(key));
         }
-        businessOwnerDataObject.put("businessOwnerDeatails", businessOwnerDataObject,
-                                    businessOwnerPropertiesObject.toJSONString());
+        businessOwnerDataObject.put("businessOwnerDeatails", businessOwnerDataObject,  businessOwnerDetailsObject.toJSONString());
 
         return businessOwnerDataObject;
     }
@@ -394,6 +389,7 @@ public class APIProviderHostObject extends ScriptableObject {
 
     /**
      * Retrieve business owners
+     *
      * @param cx      Rhino context
      * @param thisObj Scriptable object
      * @param args    Passing arguments
@@ -457,12 +453,10 @@ public class APIProviderHostObject extends ScriptableObject {
         businessOwner.setBusinessOwnerSite(args[3].toString());
 
         JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
-
-        Set<Map.Entry> entries = busiessOwnerPropertyObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
+        JSONObject busiessOwnerDetailObject = (JSONObject) parser.parse(args[4].toString());
+        Set<String> keys = busiessOwnerDetailObject.keySet();
+        for ( String key : keys) {
+            String value = (String) busiessOwnerDetailObject.get(key);
             businessOwnerMap.put(key, value);
         }
         businessOwner.setBusinessOwnerCustomProperties(businessOwnerMap);

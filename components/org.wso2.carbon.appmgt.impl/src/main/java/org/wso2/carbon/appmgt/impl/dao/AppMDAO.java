@@ -140,8 +140,8 @@ public class AppMDAO {
     }
 
     /**
-     * This methode is to return a List of existing business owners with out their custom properties.
-     * @param appId
+     * This methode is to return a List of existing business owners with their properties.
+     *
      * @return
      * @throws AppManagementException
      */
@@ -183,10 +183,10 @@ public class AppMDAO {
     }
 
     /**
-     * Returns the name of the owner of given appId.
-     * @param appId
-     * @return
-     * @throws AppManagementException
+     * a
+     *
+     * @return Owner Name
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException if failed to get subscriber
      */
     public String getBusinessOwnerName(String appId) throws AppManagementException {
         PreparedStatement prepStmt = null;
@@ -259,9 +259,7 @@ public class AppMDAO {
     }
 
     /**
-     * Update business owner.
-     * @param businessOwner
-     * @throws AppManagementException
+     * Update a Business owner.
      */
     public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
 
@@ -323,9 +321,10 @@ public class AppMDAO {
     }
 
 
+
     /**
-     * Get custom properties of a given business owner.
-     * @param businessOwnerId
+     * This methode is to return a List of existing business owners with their properties.
+     *
      * @return
      * @throws AppManagementException
      */
@@ -399,8 +398,8 @@ public class AppMDAO {
     }
 
     /**
-     * Save a business owner.
-     * @param businessOwner
+     * Save business owner.
+     *
      */
     public void saveBusinessOwner(BusinessOwner businessOwner){
 
@@ -4298,7 +4297,7 @@ public class AppMDAO {
         Connection connection = null;
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
-        String businessOwnerName = app.getBusinessOwner();
+        String ownerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
                 "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, BUSINESS_OWNER_ID ) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,(SELECT OWNER_ID FROM BUSINESS_OWNER WHERE OWNER_NAME =?))";
@@ -4337,7 +4336,7 @@ public class AppMDAO {
             prepStmt.setBoolean(10, app.getAllowAnonymous());
             prepStmt.setString(11, app.getUrl());
             prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
-            prepStmt.setString(13, businessOwnerName);
+            prepStmt.setString(13, ownerName);
 
             prepStmt.execute();
 

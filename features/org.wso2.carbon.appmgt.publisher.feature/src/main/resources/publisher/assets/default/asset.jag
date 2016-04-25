@@ -49,6 +49,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     mod = jagg.module("documentation");
 
     var typeList = apiProvider.getEnabledAssetTypeList();
+
     function getBusinessOwner() {
         var businessOwnerList = apiProvider.getBusinessOwners();
         var ownersList = JSON.parse(stringify(businessOwnerList));
@@ -59,6 +60,7 @@ require('/modules/publisher.js').exec(function(ctx) {
         }
         return nameList;
     }
+
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
