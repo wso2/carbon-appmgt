@@ -49,168 +49,180 @@ require('/modules/publisher.js').exec(function(ctx) {
     mod = jagg.module("documentation");
 
     var typeList = apiProvider.getEnabledAssetTypeList();
+    function getBusinessOwner() {
+        var businessOwnerList = apiProvider.getBusinessOwners();
+        var ownersList = JSON.parse(stringify(businessOwnerList));
+        var nameList = new Array();
+        var nameList = new Array();
+        for (var i = 0; i < ownersList.length; i++) {
+            nameList.push(ownersList[i].businessOwnerName);
+        }
+        return nameList;
+    }
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
 
-    var shortName = (context.params.type) || '';
-    var operation = 'create';
+        var shortName = (context.params.type) || '';
+        var operation = 'create';
 
-    var rxtTemplate;
-    if (apiProvider.isAssetTypeEnabled(shortName)) {
-        rxtTemplate = rxtManager.findAssetTemplate(function (template) {
-            return (template.shortName == shortName) ? true : false;
-        });
-    }
-
-    var model = modelManager.getModel(shortName);
-
-    if (!rxtTemplate) {
-        log.debug('The requested asset type: ' + shortName + ' was not found');
-        response.sendError(404, 'Asset type not found'); //TODO: Replace
-    }
-    else {
-        //Obtain the username from the session and populate the provider field
-        var username = server.current(session).username;//.get('LOGGED_IN_USER');
-
-        var tenantDomain = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
-        var provider = "";
-        if(tenantIdVal=='-1234'){
-            provider = storeUser.cleanUsername(username);
-        }else {
-            provider = storeUser.cleanUsername(username)+'-AT-'+tenantDomain;
+        var rxtTemplate;
+        if (apiProvider.isAssetTypeEnabled(shortName)) {
+            rxtTemplate = rxtManager.findAssetTemplate(function (template) {
+                return (template.shortName == shortName) ? true : false;
+            });
         }
-
-        model.set('overview.provider', provider);
-
-        //model.set('overview.provider', storeUser.cleanUsername(username));
-
-        var output = model.export('form');
-        var title = shortName;
-        var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
-        var isSubscriptionEnabled;
-        if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
-            isSubscriptionEnabled = false;
-        }else{
-            isSubscriptionEnabled = true;
-        }
-        output.sso_provider = getIdentityProviderUrl();
-        caramel.render({
-            isSubscriptionEnabled:isSubscriptionEnabled,
-            op: operation,
-            cuser: server.current(session),
-            shortName: shortName,
-            rxtTemplate: rxtTemplate,
-            data: output,
-            title: title,
-            typeList: typeList
-            }
-        );
-    }
-});
-
-routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
-
-    var shortName = context.params.type;
-    //print(context.params);
-    var id = context.params.id;
-    var operation = 'view';
-    var artifactManager = rxtManager.getArtifactManager(shortName);
-
-    //If the id is not found it will throw a conversion exception
-    //TODO: Return an empty artifact or null
-    try {
-
-        log.debug('look for '+id);
-
-        var artifact = artifactManager.get(id);
-
-        log.debug('left');
-
-        //Get the template
-        var rxtTemplate = rxtManager.findAssetTemplate(function (template) {
-            return (template.shortName == shortName) ? true : false;
-        });
 
         var model = modelManager.getModel(shortName);
 
-        //Customize the asset for the app
-        dataInjector.inject(artifact, DataInjectorModes.DISPLAY);
-
-
-        //Perform filtering logic on the artifact
-        artifact=filterManager.filter(artifact,session);
-
-        //If there is no data after the filtering step we need to send an error
-        if(!artifact){
-            response.sendError(401,'You do not have viewing permissions to the requested asset');
-            return;
-        }
-
-        model.import('asset', artifact);
-
-        var output = model.export('form');
-
-        var assetName = model.get('overview.name').value;
-        //Get the list of versions
-        var versionList = artifactManager.getAllAssetVersions(assetName);
-
-        var path = artifact.path;
-        var tags = rxtManager.registry.tags(path);
-        var title = assetName;
-
-        //get document related data
-        var apiData = {};
-        apiData.provider = model.get('overview.provider').value;
-        apiData.name = model.get('overview.name').value;
-        apiData.version = model.get('overview.version').value;
-        var result = mod.getAllDocumentation(apiData);
-
-        //get external store details
-        var externalAppStores = getExternalAppStores(apiData);
-        var appStoresDetail = {};
-        appStoresDetail.app = apiData;
-        appStoresDetail.externalStores = externalAppStores;
-
-        // getting the user roles
-        var server = require('store').server;
-        var user = server.current(session);
-        var um = server.userManager(user.tenantId);
-
-        var docCreateAuth = permissions.isAuthorized(user.username, config.permissions.document_add, um);
-        var docEditAuth = permissions.isAuthorized(user.username, config.permissions.document_edit, um);
-        var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
-
-        if (apiProvider.isAssetTypeEnabled(shortName)) {
-            caramel.render({
-                op: operation,
-                cuser: server.current(session),
-                shortName: shortName,
-                artifact: artifact,
-                rxtTemplate: rxtTemplate,
-                data: output,
-                versions: versionList,
-                tags: tags,
-                title: title,
-                docs: result.docs,
-                appStores: appStoresDetail,
-                permissions: {
-                    canCreate: docCreateAuth,
-                    canEdit: docEditAuth,
-                    canDelete: docDeleteAuth
-                }
-            });
+        if (!rxtTemplate) {
+            log.debug('The requested asset type: ' + shortName + ' was not found');
+            response.sendError(404, 'Asset type not found'); //TODO: Replace
         }
         else {
-            response.sendError(404, 'Resource does not exist');
+            //Obtain the username from the session and populate the provider field
+            var username = server.current(session).username;//.get('LOGGED_IN_USER');
+
+            var tenantDomain = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+            var tenantIdVal = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            var provider = "";
+            if(tenantIdVal=='-1234'){
+                provider = storeUser.cleanUsername(username);
+            }else {
+                provider = storeUser.cleanUsername(username)+'-AT-'+tenantDomain;
+            }
+
+            model.set('overview.provider', provider);
+
+            //model.set('overview.provider', storeUser.cleanUsername(username));
+
+            var output = model.export('form');
+            var title = shortName;
+            var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+            var isSubscriptionEnabled;
+            if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+                isSubscriptionEnabled = false;
+            }else{
+                isSubscriptionEnabled = true;
+            }
+            output.sso_provider = getIdentityProviderUrl();
+            caramel.render({
+                               isSubscriptionEnabled:isSubscriptionEnabled,
+                               op: operation,
+                               cuser: server.current(session),
+                               shortName: shortName,
+                               rxtTemplate: rxtTemplate,
+                               data: output,
+                               title: title,
+                               typeList: typeList,
+                               businessOwnerList: getBusinessOwner()
+                           }
+            );
+        }
+    });
+
+    routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
+
+        var shortName = context.params.type;
+        //print(context.params);
+        var id = context.params.id;
+        var operation = 'view';
+        var artifactManager = rxtManager.getArtifactManager(shortName);
+
+        //If the id is not found it will throw a conversion exception
+        //TODO: Return an empty artifact or null
+        try {
+
+            log.debug('look for '+id);
+
+            var artifact = artifactManager.get(id);
+
+            log.debug('left');
+
+            //Get the template
+            var rxtTemplate = rxtManager.findAssetTemplate(function (template) {
+                return (template.shortName == shortName) ? true : false;
+            });
+
+            var model = modelManager.getModel(shortName);
+
+            //Customize the asset for the app
+            dataInjector.inject(artifact, DataInjectorModes.DISPLAY);
+
+
+            //Perform filtering logic on the artifact
+            artifact=filterManager.filter(artifact,session);
+
+            //If there is no data after the filtering step we need to send an error
+            if(!artifact){
+                response.sendError(401,'You do not have viewing permissions to the requested asset');
+                return;
+            }
+
+            model.import('asset', artifact);
+
+            var output = model.export('form');
+
+            var assetName = model.get('overview.name').value;
+            //Get the list of versions
+            var versionList = artifactManager.getAllAssetVersions(assetName);
+
+            var path = artifact.path;
+            var tags = rxtManager.registry.tags(path);
+            var title = assetName;
+
+            //get document related data
+            var apiData = {};
+            apiData.provider = model.get('overview.provider').value;
+            apiData.name = model.get('overview.name').value;
+            apiData.version = model.get('overview.version').value;
+            var result = mod.getAllDocumentation(apiData);
+
+            //get external store details
+            var externalAppStores = getExternalAppStores(apiData);
+            var appStoresDetail = {};
+            appStoresDetail.app = apiData;
+            appStoresDetail.externalStores = externalAppStores;
+
+            // getting the user roles
+            var server = require('store').server;
+            var user = server.current(session);
+            var um = server.userManager(user.tenantId);
+
+            var docCreateAuth = permissions.isAuthorized(user.username, config.permissions.document_add, um);
+            var docEditAuth = permissions.isAuthorized(user.username, config.permissions.document_edit, um);
+            var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
+
+            if (apiProvider.isAssetTypeEnabled(shortName)) {
+                caramel.render({
+                                   op: operation,
+                                   cuser: server.current(session),
+                                   shortName: shortName,
+                                   artifact: artifact,
+                                   rxtTemplate: rxtTemplate,
+                                   data: output,
+                                   versions: versionList,
+                                   tags: tags,
+                                   title: title,
+                                   docs: result.docs,
+                                   appStores: appStoresDetail,
+                                   permissions: {
+                                       canCreate: docCreateAuth,
+                                       canEdit: docEditAuth,
+                                       canDelete: docDeleteAuth
+                                   },
+                                   businessOwnerList: getBusinessOwner()
+                               });
+            }
+            else {
+                response.sendError(404, 'Resource does not exist');
+            }
+
+        } catch (e) {
+            log.error('The asset with id ' + id + ' could not be found due to : ' + e);
+            response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');
         }
 
-    } catch (e) {
-        log.error('The asset with id ' + id + ' could not be found due to : ' + e);
-        response.sendError(404, 'Asset with id ' + id + ' could not be found.Please check server log.');
-    }
-
-});
+    });
 
 
     routeManager.register('GET', 'publisher', '/publisher/asset/operations/{opType}/{type}/{id}', function (context) {
@@ -322,31 +334,33 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                 var docDeleteAuth = permissions.isAuthorized(user.username, config.permissions.document_delete, um);
 
                 caramel.render({
-                    op: operation,
-                    cuser: user,
-                    shortName: shortName,
-                    artifact: artifact,
-                    rxtTemplate: rxtTemplate,
-                    data: output,
-                    versions: versionList,
-                    tags: tags,
-                    title: title,
-                    docs: result.docs,
-                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
-                });
+                                   op: operation,
+                                   cuser: user,
+                                   shortName: shortName,
+                                   artifact: artifact,
+                                   rxtTemplate: rxtTemplate,
+                                   data: output,
+                                   versions: versionList,
+                                   tags: tags,
+                                   title: title,
+                                   docs: result.docs,
+                                   permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
+                                   businessOwnerList: getBusinessOwner()
+                               });
             } else {
                 caramel.render({
-                    isSubscriptionEnabled: isSubscriptionEnabled,
-                    op: operation,
-                    cuser: user,
-                    shortName: shortName,
-                    artifact: artifact,
-                    rxtTemplate: rxtTemplate,
-                    data: output,
-                    versions: versionList,
-                    tags: tags,
-                    title: title
-                });
+                                   isSubscriptionEnabled: isSubscriptionEnabled,
+                                   op: operation,
+                                   cuser: user,
+                                   shortName: shortName,
+                                   artifact: artifact,
+                                   rxtTemplate: rxtTemplate,
+                                   data: output,
+                                   versions: versionList,
+                                   tags: tags,
+                                   title: title,
+                                   businessOwnerList: getBusinessOwner()
+                               });
             }
 
         } catch (e) {
@@ -356,152 +370,152 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
 
     });
 
-routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (context) {
-    var log = new Log();
-    var oldVersion = context.post.oldVersion;
+    routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (context) {
+        var log = new Log();
+        var oldVersion = context.post.oldVersion;
 
-    var carbon = require('carbon');
-    var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+        var carbon = require('carbon');
+        var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
 
 
-    var server = require('store').server;
-    var user=server.current(session);
-    var um = server.userManager(server.current(session).tenantId);
-    var username = user.username;
-    var tenantId = server.current(session).tenantId;
+        var server = require('store').server;
+        var user=server.current(session);
+        var um = server.userManager(server.current(session).tenantId);
+        var username = user.username;
+        var tenantId = server.current(session).tenantId;
 
-    if (permissions.isAuthorized(username, config.permissions.webapp_create, um)) {
+        if (permissions.isAuthorized(username, config.permissions.webapp_create, um)) {
 
-        var shortName = context.params.type;
-        var artifactManager = rxtManager.getArtifactManager(shortName);
-        var model = modelManager.getModel(shortName);
-        var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
+            var shortName = context.params.type;
+            var artifactManager = rxtManager.getArtifactManager(shortName);
+            var model = modelManager.getModel(shortName);
+            var assetCacheManager = new assetCachingModule.AssetCacheManager(session);
 
-        //context.post['tag-container'] = ['tag1', 'tag2'];
+            //context.post['tag-container'] = ['tag1', 'tag2'];
 
-        //Check if the type is valid
-        try {
-            //Process and add any files in the request if the application is not in the copy mode
-            if (context.post["overview_treatAsASite"].toLowerCase() == 'true') {
-                assetType = SITE_TYPE;
-            } else {
-                assetType = WEBAPP_TYPE;
-            }
-            if(oldVersion == null || oldVersion == '') {
-                inspectFiles(request, context.post);
-            }
+            //Check if the type is valid
+            try {
+                //Process and add any files in the request if the application is not in the copy mode
+                if (context.post["overview_treatAsASite"].toLowerCase() == 'true') {
+                    assetType = SITE_TYPE;
+                } else {
+                    assetType = WEBAPP_TYPE;
+                }
+                if(oldVersion == null || oldVersion == '') {
+                    inspectFiles(request, context.post);
+                }
 
-            model.import('form.importer', context.post);
+                model.import('form.importer', context.post);
 
-            //Perform validation on the model
-            var report = model.validate();
+                //Perform validation on the model
+                var report = model.validate();
 
-            if ((report) && (report.failed)) {
+                if ((report) && (report.failed)) {
 
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({ok: false, message: 'Validation failure', report: report});
+                    return;
+                }
+
+                var name = model.get('overview.name').value;
+                var provider = model.get('overview.provider').value;
+                var version = model.get('overview.version').value;
+
+                if (context.post['overview_context'].length > 200) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({ok: false, message: 'Context value length is more than 200', report: report});
+                    return;
+                }
+
+                //Check whether duplicate webapp exists
+                var isexists = isWebappExists(name, provider, version);
+
+                //If exists, return an error message
+                if (isexists == true) {
+                    response.contentType = CONTENT_TYPE_JSON;
+                    print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
+                                                               name + "' and version - '" + version +"'"});
+                    return;
+                }
+
+                //log.debug(context.post);
+
+                model.save();
+
+                //Obtain the asset id in order to retrieve the asset again
+                var assetId = model.get('*.id').value;
+
+                try{
+                    social.warmUpRatingCache(shortName + ':' + assetId);
+                }catch(e) {
+                    log.warn("Unable to publish the asset: " + shortName + ":" + assetId + " to social cache. This may affect on sort by popularity function.");
+                }
+
+                //Convert the model to an artifact
+                var asset = model.export('asset.exporter');
+                //Cache the asset
+                assetCacheManager.add(asset, shortName);
+
+                var reg = rxtManager.registry;
+
+                //Add the tags
+                addTags(context.post, assetId, artifactManager, reg);
+
+                // Save external entitlement policies
+                var webappId = {};
+                webappId.provider = model.get('overview.provider').value;
+                webappId.name = model.get('overview.name').value;
+                webappId.version = model.get('overview.version').value;
+                if(oldVersion != null && oldVersion != '') {
+                    webappId.oldVersion = oldVersion;
+                    //Copy web app documentation
+                    copyDocuments(webappId);
+                    copyRolePermissions(assetId,artifactManager);
+                }
+                var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+                username = username + "@" + tenantDomain;
+                var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
+                appMgtProviderObj.generateEntitlementPolicies(webappId);
+
+                if (oldVersion == null || oldVersion == '') {
+                    auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
+                                                                                       "providerName='" + webappId.provider
+                                                                                       + '\'' +
+                                                                                       ", apiName='" + webappId.name + '\''
+                                                                                       +
+                                                                                       ", version='" + webappId.version
+                                                                                       + '\'' +
+                                                                                       '}', "", "");
+                }
+                else {
+                    auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
+                                                                                        "providerName='" + webappId.provider
+                                                                                        + '\'' +
+                                                                                        ", apiName='" + webappId.name + '\''
+                                                                                        +
+                                                                                        ", version='" + webappId.version
+                                                                                        + '\'' +
+                                                                                        '}', "", "");
+                }
                 response.contentType = CONTENT_TYPE_JSON;
-                print({ok: false, message: 'Validation failure', report: report});
-                return;
+                print({ok: true, message: 'asset added', id: assetId});
             }
-
-            var name = model.get('overview.name').value;
-            var provider = model.get('overview.provider').value;
-            var version = model.get('overview.version').value;
-
-            if (context.post['overview_context'].length > 200) {
-                response.contentType = CONTENT_TYPE_JSON;
-                print({ok: false, message: 'Context value length is more than 200', report: report});
-                return;
+            catch (e) {
+                log.error(e);
+                log.debug('An instance could not be created for asset with type :' + shortName + '.The following exception was recorded: ' + e);
+                response.sendError(500, 'The asset instance could not be created.Please check the server log.');
             }
-
-            //Check whether duplicate webapp exists
-            var isexists = isWebappExists(name, provider, version);
-
-            //If exists, return an error message
-            if (isexists == true) {
-                response.contentType = CONTENT_TYPE_JSON;
-                print({ok: false, isexists: true, message: "Error occurred while adding the WebApp. A duplicate WebApp already exists with name - '" +
-                                                       name + "' and version - '" + version +"'"});
-                return;
-            }
-
-            //log.debug(context.post);
-
-            model.save();
-
-            //Obtain the asset id in order to retrieve the asset again
-            var assetId = model.get('*.id').value;
-
-            try{
-                social.warmUpRatingCache(shortName + ':' + assetId);
-            }catch(e) {
-                log.warn("Unable to publish the asset: " + shortName + ":" + assetId + " to social cache. This may affect on sort by popularity function.");
-            }
-
-            //Convert the model to an artifact
-            var asset = model.export('asset.exporter');
-            //Cache the asset
-            assetCacheManager.add(asset, shortName);
-
-            var reg = rxtManager.registry;
-
-            //Add the tags
-            addTags(context.post, assetId, artifactManager, reg);
-
-            // Save external entitlement policies
-            var webappId = {};
-            webappId.provider = model.get('overview.provider').value;
-            webappId.name = model.get('overview.name').value;
-            webappId.version = model.get('overview.version').value;
-            if(oldVersion != null && oldVersion != '') {
-                webappId.oldVersion = oldVersion;
-                //Copy web app documentation
-                copyDocuments(webappId);
-                copyRolePermissions(assetId,artifactManager);
-            }
-            var tenantDomain = Packages.org.wso2.carbon.context.PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-            username = username + "@" + tenantDomain;
-            var appMgtProviderObj = new appmgtPublisher.APIProvider(username);
-            appMgtProviderObj.generateEntitlementPolicies(webappId);
-
-            if (oldVersion == null || oldVersion == '') {
-                auditLog.writeLog(tenantId, username, "NewAssestAdded", shortName, "{" +
-                                                                                   "providerName='" + webappId.provider
-                                                                                   + '\'' +
-                                                                                   ", apiName='" + webappId.name + '\''
-                                                                                   +
-                                                                                   ", version='" + webappId.version
-                                                                                   + '\'' +
-                                                                                   '}', "", "");
-            }
-            else {
-                auditLog.writeLog(tenantId, username, "NewVersionAdded", shortName, "{" +
-                                                                                    "providerName='" + webappId.provider
-                                                                                    + '\'' +
-                                                                                    ", apiName='" + webappId.name + '\''
-                                                                                    +
-                                                                                    ", version='" + webappId.version
-                                                                                    + '\'' +
-                                                                                    '}', "", "");
-            }
+        }else{
             response.contentType = CONTENT_TYPE_JSON;
-            print({ok: true, message: 'asset added', id: assetId});
+            print({ok: false, message: 'Failed to add Asset. Insufficient privileges.'});
+            return;
+            //response.sendError(401, 'Failed to add Asset : Insufficient Privilages.');
         }
-        catch (e) {
-            log.error(e);
-            log.debug('An instance could not be created for asset with type :' + shortName + '.The following exception was recorded: ' + e);
-            response.sendError(500, 'The asset instance could not be created.Please check the server log.');
-        }
-    }else{
-        response.contentType = CONTENT_TYPE_JSON;
-        print({ok: false, message: 'Failed to add Asset. Insufficient privileges.'});
-        return;
-        //response.sendError(401, 'Failed to add Asset : Insufficient Privilages.');
-    }
 
-});
+    });
 
- routeManager.register('POST', 'publisher', '/publisher/asset/{type}/id/{assetId}/permissions', function(context) {
+    routeManager.register('POST', 'publisher', '/publisher/asset/{type}/id/{assetId}/permissions', function(context) {
 
         var assetId = context.params.assetId;
 
@@ -512,8 +526,8 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
     });
 
     /**
-    * Get identity provider URL
-    */
+     * Get identity provider URL
+     */
     function getIdentityProviderUrl() {
         return apiProvider.getIdentityProviderUrl();
     }
@@ -532,16 +546,16 @@ routeManager.register('POST', 'publisher', '/publisher/asset/{type}', function (
         }
 
     }
-/**
-* Check whether the application already exists
-*/
-function isWebappExists(webappName,provider,version){
-    return apiProvider.isWebappExists(webappName,provider,version);
-}
+    /**
+     * Check whether the application already exists
+     */
+    function isWebappExists(webappName,provider,version){
+        return apiProvider.isWebappExists(webappName,provider,version);
+    }
 
-   function copyDocuments(webappId){
-       apiProvider.copyWebappDocumentations(webappId);
-   }
+    function copyDocuments(webappId){
+        apiProvider.copyWebappDocumentations(webappId);
+    }
 
     function copyRolePermissions(webappId,artifactManager){
         var registry = new carbon.registry.Registry(server, {
@@ -558,35 +572,35 @@ function isWebappExists(webappName,provider,version){
         registry.put(permPath,resource);
     }
 
-/*
-The function is used to add tags to the provided asset id
-@params: A post parameter object
-@assetId: The id of the asset to which the tags will be applied
-@artifactManager: An artifact manager instance
-@reg: A registry instance
- */
-function addTags(params,assetId,artifactManager,reg){
+    /*
+     The function is used to add tags to the provided asset id
+     @params: A post parameter object
+     @assetId: The id of the asset to which the tags will be applied
+     @artifactManager: An artifact manager instance
+     @reg: A registry instance
+     */
+    function addTags(params,assetId,artifactManager,reg){
 
-    //Obtain the tags parameter
-   // var tags=params['tags']||[];
-     var tags=params['tag-container']||[];
+        //Obtain the tags parameter
+        // var tags=params['tags']||[];
+        var tags=params['tag-container']||[];
 
-    //Only proceed if there are any tags
-    if(tags.length==0){
-        log.debug('no tags to add to '+assetId);
-        return;
+        //Only proceed if there are any tags
+        if(tags.length==0){
+            log.debug('no tags to add to '+assetId);
+            return;
+        }
+
+        //Obtain the artifact
+        var asset=artifactManager.get(assetId);
+
+        var path=asset.path;
+        tags = tags.split(',');
+
+        //Attach the tags
+        reg.tag(path,tags);
+
     }
-
-    //Obtain the artifact
-    var asset=artifactManager.get(assetId);
-
-    var path=asset.path;
-    tags = tags.split(',');
-
-    //Attach the tags
-    reg.tag(path,tags);
-
-}
 
 
 
@@ -614,12 +628,12 @@ function addTags(params,assetId,artifactManager,reg){
         }
 
         var storageManager = new storageModule.StorageManager({
-            context: 'storage',
-            isCached: false,
-            connectionInfo: {
-                dataSource: storageConfig.dataSource
-            }
-        });
+                                                                  context: 'storage',
+                                                                  isCached: false,
+                                                                  connectionInfo: {
+                                                                      dataSource: storageConfig.dataSource
+                                                                  }
+                                                              });
 
         for (var index in files) {
             if (!files.hasOwnProperty(index)) {
@@ -639,47 +653,47 @@ function addTags(params,assetId,artifactManager,reg){
     }
 
 
-routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{value}', function (context) {
-    log.debug('Unsupported method PUT for /asset called.');
-    /*var shortName=context.params.type;
-     var id=context.params.id;
-     var attribute=context.params.attr;
-     var attributeValue=context.params.value;
-     var artifactManager=rxtManager.getArtifactManager(shortName);
+    routeManager.register('PUT', 'publisher', '/publisher/asset/{type}/{id}/{attr}/{value}', function (context) {
+        log.debug('Unsupported method PUT for /asset called.');
+        /*var shortName=context.params.type;
+         var id=context.params.id;
+         var attribute=context.params.attr;
+         var attributeValue=context.params.value;
+         var artifactManager=rxtManager.getArtifactManager(shortName);
 
-     //Obtain the artifact
-     try{
-     var result=artifactManager.update({
-     id:id,
-     attributes: {
-     attribute:attributeValue,
-     overview_type:'default'
-     }
-     });
-     print(result);
+         //Obtain the artifact
+         try{
+         var result=artifactManager.update({
+         id:id,
+         attributes: {
+         attribute:attributeValue,
+         overview_type:'default'
+         }
+         });
+         print(result);
 
-     }catch(e){
-     print('unable to update artifact with id'+e);
-     }*/
-});
+         }catch(e){
+         print('unable to update artifact with id'+e);
+         }*/
+    });
 
-routeManager.register('DELETE', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
-    var shortName = context.params.type;
-    var id = context.params.id;
+    routeManager.register('DELETE', 'publisher', '/publisher/asset/{type}/{id}', function (context) {
+        var shortName = context.params.type;
+        var id = context.params.id;
 
-    var artifactManager = rxtManager.getArtifactManager(shortName);
+        var artifactManager = rxtManager.getArtifactManager(shortName);
 
-    try {
-        artifactManager.remove(id);
+        try {
+            artifactManager.remove(id);
 
-    } catch (e) {
-        log.debug('Asset id: ' + id + 'was not removed.Due to exception: ' + e);
-        response.sendError(404, 'Asset with id: ' + id + 'was not removed.Please check the server log for more details.');
-    }
+        } catch (e) {
+            log.debug('Asset id: ' + id + 'was not removed.Due to exception: ' + e);
+            response.sendError(404, 'Asset with id: ' + id + 'was not removed.Please check the server log for more details.');
+        }
 
 
-});
-routeManager.handle(request, response);
+    });
+    routeManager.handle(request, response);
 
 }, request, response, session);
 
