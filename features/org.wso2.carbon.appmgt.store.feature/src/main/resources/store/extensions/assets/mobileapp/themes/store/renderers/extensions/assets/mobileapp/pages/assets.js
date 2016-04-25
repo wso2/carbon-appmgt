@@ -102,7 +102,7 @@ function createLeftNavLinks(data) {
     if(data.user) {
         var data =  {
             active: true, partial: currentAppType, url: "/assets/" + currentAppType,
-            myapps: true, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
+            myapps: false, myappsUrl: "/extensions/assets/" + currentAppType + "/myapps"
         }
         leftNavigationData.push(data)
     } else {
