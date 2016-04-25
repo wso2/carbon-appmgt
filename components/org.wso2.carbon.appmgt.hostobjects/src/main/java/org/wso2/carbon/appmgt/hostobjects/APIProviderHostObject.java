@@ -29,35 +29,11 @@ import org.apache.woden.WSDLFactory;
 import org.apache.woden.WSDLReader;
 import org.jaggeryjs.hostobjects.file.FileHostObject;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeJavaObject;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIKey;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.DocumentationType;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.Icon;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.SSOProvider;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.URITemplate;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 import org.wso2.carbon.appmgt.hostobjects.internal.HostObjectComponent;
@@ -70,50 +46,23 @@ import org.wso2.carbon.appmgt.impl.dto.TierPermissionDTO;
 import org.wso2.carbon.appmgt.impl.utils.APIVersionStringComparator;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResourcePathUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseFaultCountDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionLastAccessTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIVersionUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.AppHitsStatsDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.PerUserAPIUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.UserHitsPerAppDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.*;
 import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.authenticator.stub.AuthenticationAdminStub;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.mgt.stub.UserAdminStub;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class APIProviderHostObject extends ScriptableObject {
@@ -273,201 +222,6 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         return "https://" + hostName + ":" + backendHttpsPort;
 
-    }
-
-    /**
-     * Delete business owner.
-     *
-     * @param context Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
-     */
-    public static void jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
-        if (args == null || args.length != 1) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null) {
-            handleException("Error while deleting business owner. Owner content is null");
-        }
-        String ownerId = args[0].toString();
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.deleteBusinessOwner(ownerId);
-    }
-
-    /**
-     * Update the given business owner.
-     *
-     * @param context Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api
-     * .AppManagementException
-     */
-    public static void jsFunction_updateBusinessOwner(Context context, Scriptable thisObj,
-                                                     Object[] args,
-                                                     Function funObj) throws
-                                                                      AppManagementException {
-        if (args == null || args.length != 6) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null || args[1] == null ) {
-            handleException("Error while saving business owner. Owner content is null");
-        }
-        BusinessOwner businessOwner = new BusinessOwner();
-        HashMap<String, String> businessOwnerMap = new HashMap<String, String>();
-
-        businessOwner.setBusinessOwnerId(Integer.parseInt(args[0].toString()));
-        businessOwner.setBusinessOwnerName(args[1].toString());
-        businessOwner.setBusinessOwnerEmail(args[2].toString());
-        businessOwner.setBusinessOwnerDescription(args[3].toString());
-        businessOwner.setBusinessOwnerSite(args[4].toString());
-
-        JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerDetailObject = null;
-        try {
-            busiessOwnerDetailObject = (JSONObject) parser.parse(args[5].toString());
-        } catch (ParseException e) {
-            handleException("Error while parsing JSON", e);
-        }
-        Set<Map.Entry> entries = busiessOwnerDetailObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
-            businessOwnerMap.put(key, value);
-        }
-
-        businessOwner.setBusinessOwnerCustomProperties(businessOwnerMap);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.updateBusinessOwner(businessOwner);
-    }
-
-    /**
-     * Retrieve business owners details
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-
-
-    public static NativeObject jsFunction_getBusinessOwnerCustomProperties(Context cx, Scriptable thisObj,
-                                                              Object[] args,
-                                                              Function funObj)
-                                                                        throws AppManagementException {
-        if (args == null || args.length != 1) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null) {
-            handleException("Error while saving business owner. Owner content is null");
-        }
-        String ownerId = args[0].toString();
-        int businessOwnerId = Integer.parseInt(ownerId);
-
-        NativeObject businessOwnerDataObject = new NativeObject();
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        Map<String, String> businessOwnerProperties = null;
-        businessOwnerProperties = apiProvider.getBusinessOwnerCustomProperties(businessOwnerId);
-        JSONObject businessOwnerPropertiesObject = new JSONObject();
-
-        Set<Map.Entry<String, String>> entries = businessOwnerProperties.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
-            businessOwnerPropertiesObject.put(key, value);
-        }
-        businessOwnerDataObject.put("businessOwnerDeatails", businessOwnerDataObject,
-                                    businessOwnerPropertiesObject.toJSONString());
-
-        return businessOwnerDataObject;
-    }
-
-
-    /**
-     * Retrieve business owners
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-
-
-    public static NativeArray jsFunction_getBusinessOwners(Context cx, Scriptable thisObj,
-                                                              Object[] args,
-                                                              Function funObj) throws
-                                                                               AppManagementException {
-
-        NativeArray myn = new NativeArray(0);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        List<BusinessOwner> BusinessOwnerList = apiProvider.getBusinessOwners();
-        int count = 0;
-        for (BusinessOwner businessOwner : BusinessOwnerList) {
-            NativeObject row = new NativeObject();
-            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-            count++;
-            myn.put(count, myn, row);
-        }
-
-        return myn;
-    }
-
-
-    /**
-     * Saves business owner.
-     *
-     * @param context Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return entitlement policy partial id
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
-     */
-    public static void jsFunction_saveBusinessOwner(Context context, Scriptable thisObj,
-                                                   Object[] args,
-                                                   Function funObj) throws
-                                                                    AppManagementException, ParseException {
-        BusinessOwner businessOwner = new BusinessOwner();
-        HashMap<String, String> businessOwnerMap = new HashMap<String, String>();
-
-        if (args == null || args.length != 5) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null || args[1] == null ) {
-            handleException("Error while saving business owner. Owner content is null");
-        }
-
-        businessOwner.setBusinessOwnerName(args[0].toString());
-        businessOwner.setBusinessOwnerEmail(args[1].toString());
-        businessOwner.setBusinessOwnerDescription(args[2].toString());
-        businessOwner.setBusinessOwnerSite(args[3].toString());
-
-        JSONParser parser = new JSONParser();
-        JSONObject busiessOwnerPropertyObject = (JSONObject) parser.parse(args[4].toString());
-
-        Set<Map.Entry> entries = busiessOwnerPropertyObject.entrySet();
-        for (Map.Entry entry : entries) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
-            businessOwnerMap.put(key, value);
-        }
-        businessOwner.setBusinessOwnerCustomProperties(businessOwnerMap);
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.saveBusinessOwner(businessOwner);
     }
 
     /**
@@ -1181,7 +935,6 @@ public class APIProviderHostObject extends ScriptableObject {
         String description = (String) apiData.get("overview_description", apiData);
         String endpoint = (String) apiData.get("overview_webAppUrl",apiData);
         String logoutURL = (String) apiData.get("overview_logoutUrl",apiData);
-        String businessOwnerName = (String) apiData.get("overview_businessOwner", apiData);
         logoutURL = logoutURL.replace(endpoint, "");
         boolean allowAnonymous = Boolean.parseBoolean((String) apiData.get("overview_allowAnonymous", apiData));
         boolean makeAsDefaultVersion = Boolean.parseBoolean((String) apiData.get("overview_makeAsDefaultVersion",
@@ -1264,7 +1017,7 @@ public class APIProviderHostObject extends ScriptableObject {
         }
 
         api.setUriTemplates(uriTemplates);
-        api.setBusinessOwner(businessOwnerName);
+
         api.setTransports(transport);
         api.setDescription(StringEscapeUtils.escapeHtml(description));
         api.setLastUpdated(new Date());

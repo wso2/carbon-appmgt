@@ -15,7 +15,7 @@
  */
 
 /**
- * @businessOwnerDescription Check jQuery
+ * @description Check jQuery
  * @throw  {String}  throw an exception message if jquery is not loaded
  */
 if (typeof(jQuery) === 'undefined') {
@@ -28,7 +28,7 @@ var responsiveTextRatio = 0.4,
 (function($) {
 
     /**
-     * @businessOwnerDescription Dependancy injection function
+     * @description Dependancy injection function
      * @param  {String}     File    Name of the dependancy
      * @param  {String}     Type    Dependancy type
      * @return {Null}
@@ -57,7 +57,7 @@ var responsiveTextRatio = 0.4,
     };
 
     /**
-     * @businessOwnerDescription Attribute toggle function
+     * @description Attribute toggle function
      * @param  {String} attr    Attribute Name
      * @param  {String} val     Value to be matched
      * @param  {String} val2    Value to be replaced with
@@ -126,7 +126,7 @@ var responsiveTextRatio = 0.4,
 
 
     /**
-     * @businessOwnerDescription Data Loader function
+     * @description Data Loader function
      * @param  {String}     action of the loader
      */
     $.fn.loading = function(action) {
@@ -165,7 +165,7 @@ var responsiveTextRatio = 0.4,
 
 
     /**
-     * @businessOwnerDescription Auto resize icons and text on browser resize
+     * @description Auto resize icons and text on browser resize
      * @param  {Number}     Compression Ratio
      * @param  {Object}     Object containing the values to override defaults
      * @return {Node}       DOM Node
@@ -200,7 +200,7 @@ var responsiveTextRatio = 0.4,
     };
 
     /**
-     * @businessOwnerDescription Random background color generator for thumbs
+     * @description Random background color generator for thumbs
      * @param  {range}      Color Range Value
      * @return {Node}       DOM Node
      */

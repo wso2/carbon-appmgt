@@ -5417,7 +5417,7 @@
     var first = markedSpansBefore(oldFirst, startCh, isInsert);
     var last = markedSpansAfter(oldLast, endCh, isInsert);
 
-    // Next, transform those two ends
+    // Next, merge those two ends
     var sameLine = change.text.length == 1, offset = lst(change.text).length + (sameLine ? startCh : 0);
     if (first) {
       // Fix up .to properties of first

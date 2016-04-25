@@ -48,7 +48,7 @@ var serviceModule = (function () {
     var URI_MAP_KEY_TIERDESCRIPTION = 'tierDescription';
 
     /*
-     Constants used in constructing the businessOwnerDescription JSON
+     Constants used in constructing the description JSON
      */
     var APP_CONTEXT_KEY = 'context';
     var APP_VERSION_KEY = 'version';
@@ -173,8 +173,8 @@ var serviceModule = (function () {
     }
 
     /*
-     The method returns the businessOwnerDescription of a given tier.
-     @returns: A string containing the tier businessOwnerDescription. If the tier is not valid then an empty string is provided.
+     The method returns the description of a given tier.
+     @returns: A string containing the tier description. If the tier is not valid then an empty string is provided.
      */
     TierMap.prototype.getTierDescription = function (tierName) {
         if (this.map.hasOwnProperty(tierName)) {
@@ -370,7 +370,7 @@ var serviceModule = (function () {
     };
 
     /*
-     The function adds tier businessOwnerDescription data to the uri template map  by reading the tier data
+     The function adds tier description data to the uri template map  by reading the tier data
      in a TierMap object.
      */
     var addTierDescription = function (uriTemplateMap, tierMap) {

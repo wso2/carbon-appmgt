@@ -43,7 +43,7 @@ var serviceModule = (function () {
      options.username
      options.tier
      options.callbackUrl
-     options.businessOwnerDescription
+     options.description
      */
     AppService.prototype.updateApplication = function (options) {
 

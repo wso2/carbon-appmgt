@@ -22,7 +22,6 @@ import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,44 +31,6 @@ import java.util.Set;
  */
 public interface APIProvider extends APIManager {
 
-
-    /**
-     * This methode is to delete a given business owner
-     *
-     * @param businessOwnerId ID of the owner.
-     * @throws AppManagementException
-     */
-    public void deleteBusinessOwner(String businessOwnerId) throws
-                                                   AppManagementException;
-
-    /**
-     * update a Business Owner.
-     * @return Integer
-     * @throws AppManagementException
-     */
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
-
-    /**
-
-     /* *
-     *Get business ower data.
-     * @param ownerId
-     * @return
-     * @throws AppManagementException
-     */
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException;
-    /**
-     * @return
-     * @throws AppManagementException
-     */
-    public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
-
-    /**
-     * Save a Business Owner.
-     * @return Integer
-     * @throws AppManagementException
-     */
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
     /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *
