@@ -115,16 +115,7 @@
                                 <importFeatureDef>org.wso2.stratos.appmgt.dashboard.ui:${carbon.appmgt.server.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.appmgt.gateway:${carbon.appmgt.server.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.appmgt.core:${carbon.appmgt.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.appmgt.mobile:${carbon.appmgt
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2mdm:${carbon.appmgt.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.mdm.wso2emm:${carbon.appmgt
-                                .version}</importFeatureDef-->
                                 <importFeatureDef>org.wso2.carbon.appmgt.services.api:${carbon.appmgt.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.appmgt.publisher:${carbon.appmgt
-                                .version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.appmgt.store:${carbon.appmgt
-                                .version}</importFeatureDef-->
 
                                 <!--Governance Feature-->
                                 <importFeatureDef>org.wso2.carbon.registry.extensions:${carbon.governance.version}</importFeatureDef>
@@ -164,29 +155,10 @@
                                 <importFeatureDef>org.wso2.carbon.as.runtimes.cxf:${carbon.deployment.version_4.6.0}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.webapp.mgt:${carbon.deployment.version_4.6.0}</importFeatureDef>
 
-                                <!--importFeatureDef>store:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>handlebars:${handlebars.feature.version}</importFeatureDef>
-                                <importFeatureDef>login:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>markdown:${jaggeryjs.markdown.feature.version}</importFeatureDef>
-                                <importFeatureDef>event:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>registration:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>caramel:${jaggeryjs.caramel.feature.version}</importFeatureDef>
-                                <importFeatureDef>carbon:${jaggeryjs.carbon.feature.version}</importFeatureDef>
-                                <importFeatureDef>email:${jaggeryjs.email.feature.version}</importFeatureDef>
-                                <importFeatureDef>i18n:${jaggeryjs.i18n.feature.version}</importFeatureDef>
-                                <importFeatureDef>process:${jaggeryjs.process.feature.version}</importFeatureDef>
-                                <importFeatureDef>uuid:${jaggeryjs.uuid.feature.version}</importFeatureDef>
-                                <importFeatureDef>ws:${jaggeryjs.ws.feature.version}</importFeatureDef>
-                                <importFeatureDef>permission:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>sso:${es.feature.version}</importFeatureDef>
-                                <importFeatureDef>claims:${es.feature.version}</importFeatureDef-->
-
                                 <importFeatureDef>org.wso2.carbon.identity.application.authentication.framework.server:${carbon.identity.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.store:${carbon.store.version}</importFeatureDef-->
                                 <importFeatureDef>org.wso2.carbon.social:${carbon.store.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.sso.saml:${carbon.identity.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.identity.authenticator.saml2.sso:${carbon.identity.version}</importFeatureDef>
-                                <!--importFeatureDef>caramel:${jaggeryjs.caramel.feature.version}</importFeatureDef-->
                                 <importFeatureDef>org.wso2.carbon.hostobjects.sso.server:${carbon.commons.version}</importFeatureDef>
 
                                 <importFeatureDef>org.wso2.carbon.ldap.server:${carbon.identity.version}</importFeatureDef>
@@ -211,7 +183,6 @@
                                 <importFeatureDef>org.wso2.carbon.identity.notification.mgt:${carbon.identity.version}</importFeatureDef>
 
                                 <importFeatureDef>org.wso2.carbon.databridge.commons.server:${carbon.commons.version_4.4.8}</importFeatureDef>
-
                                 <importFeatureDef>org.wso2.carbon.identity.user.account.association:${carbon.identity.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>

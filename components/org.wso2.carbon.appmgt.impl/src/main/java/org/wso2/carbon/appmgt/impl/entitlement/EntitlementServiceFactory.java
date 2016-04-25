@@ -37,7 +37,8 @@ public class EntitlementServiceFactory {
      * @return
      * @throws AppManagementException
      */
-    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration) throws AppManagementException {
+    public static EntitlementService getEntitlementService(AppManagerConfiguration configuration)
+            throws AppManagementException {
 
         String serverUrl = configuration.getFirstProperty(SERVER_URL);
         String username = configuration.getFirstProperty(USERNAME);

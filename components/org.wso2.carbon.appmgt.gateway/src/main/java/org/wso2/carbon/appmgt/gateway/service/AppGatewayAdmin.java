@@ -1,17 +1,19 @@
-/**
- *  Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.appmgt.gateway.service;
 
@@ -45,7 +47,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on Errors.
      */
-    public void addVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig, String tenantDomain)
+    public void addVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
+                                            String tenantDomain)
             throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.addVersionedWebAppForTenant(appConfig, tenantDomain);
@@ -59,8 +62,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param appConfig String.
      * @throws AppManagementException on Errors.
      */
-    public void addVersionedWebApp(String appProviderName, String appName, String version, String appConfig) throws
-                                                                                                             AppManagementException {
+    public void addVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.addVersionedWebApp(appConfig);
     }
@@ -74,8 +77,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return versioned webapp configuration data.
      * @throws AppManagementException on errors.
      */
-    public AppData getVersionedWebAppForTenant(String appProviderName, String appName, String version, String tenantDomain)
-            throws AppManagementException {
+    public AppData getVersionedWebAppForTenant(String appProviderName, String appName, String version,
+                                               String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getVersionedWebAppForTenant(tenantDomain);
         return convert(apiData);
@@ -89,7 +92,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return versioned webapp configuration data.
      * @throws AppManagementException on errors.
      */
-    public AppData getVersionedWebApp(String appProviderName, String appName, String version) throws AppManagementException {
+    public AppData getVersionedWebApp(String appProviderName, String appName, String version)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         APIData apiData = restClient.getVersionedWebApp();
         return convert(apiData);
@@ -104,8 +108,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on errors.
      */
-    public void updateVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig, String
-            tenantDomain) throws AppManagementException {
+    public void updateVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
+                                               String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.updateVersionedWebAppForTenant(appConfig, tenantDomain);
     }
@@ -118,8 +122,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param appConfig String.
      * @throws AppManagementException on errors.
      */
-    public void updateVersionedWebApp(String appProviderName, String appName, String version, String appConfig) throws
-                                                                                                                 AppManagementException {
+    public void updateVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.updateVersionedWebApp(appConfig);
     }
@@ -132,8 +136,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on errors.
      */
-    public void deleteVersionedWebAppForTenant(String appProviderName, String appName, String version, String tenantDomain)
-            throws AppManagementException {
+    public void deleteVersionedWebAppForTenant(String appProviderName, String appName, String version,
+                                               String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.deleteVersionedWebAppForTenant(tenantDomain);
     }
@@ -145,7 +149,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param version String.
      * @throws AppManagementException on errors.
      */
-    public void deleteVersionedWebApp(String appProviderName, String appName, String version) throws AppManagementException {
+    public void deleteVersionedWebApp(String appProviderName, String appName, String version)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.deleteVersionedWebApp();
     }
@@ -159,8 +164,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on errors.
      */
-    public void addNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig, String
-            tenantDomain) throws AppManagementException {
+    public void addNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
+                                               String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.addNonVersionedWebAppForTenant(appConfig, tenantDomain);
     }
@@ -173,8 +178,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param appConfig String.
      * @throws AppManagementException on errors.
      */
-    public void addNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig) throws
-                                                                                                                 AppManagementException {
+    public void addNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.addNonVersionedWebApp(appConfig);
     }
@@ -188,8 +193,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on errors.
      */
-    public void updateNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig, String
-            tenantDomain) throws AppManagementException {
+    public void updateNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
+                                                  String appConfig, String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.updateNonVersionedWebAppForTenant(appConfig, tenantDomain);
     }
@@ -202,8 +207,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param appConfig String.
      * @throws AppManagementException on errors.
      */
-    public void updateNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig) throws
-                                                                                                                   AppManagementException {
+    public void updateNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.updateNonVersionedWebApp(appConfig);
     }
@@ -216,7 +221,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param tenantDomain String.
      * @throws AppManagementException on errors.
      */
-    public void deleteNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String tenantDomain)
+    public void deleteNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
+                                                  String tenantDomain)
             throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.deleteNonVersionedWebAppForTenant(tenantDomain);
@@ -229,7 +235,8 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @param version String.
      * @throws AppManagementException on errors.
      */
-    public void deleteNonVersionedWebApp(String appProviderName, String appName, String version) throws AppManagementException {
+    public void deleteNonVersionedWebApp(String appProviderName, String appName, String version)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
         restClient.deleteNonVersionedWebApp();
     }
@@ -243,10 +250,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return non versioned webapp configuration data.
      * @throws AppManagementException on errors.
      */
-    public AppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version, String tenantDomain)
-            throws AppManagementException {
+    public AppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version,
+                                                      String tenantDomain) throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
-        APIData apiData= restClient.getNonVersionedWebAppDataForTenant(tenantDomain);
+        APIData apiData = restClient.getNonVersionedWebAppDataForTenant(tenantDomain);
         return convert(apiData);
     }
 
@@ -258,9 +265,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
      * @return non versioned webapp configuration data.
      * @throws AppManagementException on errors.
      */
-    public AppData getNonVersionedWebAppData(String appProviderName, String appName, String version) throws AppManagementException {
+    public AppData getNonVersionedWebAppData(String appProviderName, String appName, String version)
+            throws AppManagementException {
         RESTAPIAdminClient restClient = new RESTAPIAdminClient(appProviderName, appName, version);
-        APIData apiData= restClient.getNonVersionedWebAppData();
+        APIData apiData = restClient.getNonVersionedWebAppData();
         return convert(apiData);
     }
 

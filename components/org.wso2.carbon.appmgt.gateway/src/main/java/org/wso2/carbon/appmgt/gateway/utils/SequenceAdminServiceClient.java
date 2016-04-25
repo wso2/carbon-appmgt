@@ -40,7 +40,7 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 		try {
 			sequenceAdminStub = new SequenceAdminServiceStub(null, backendURLl +"SequenceAdminService");
 		} catch (AxisFault e) {
-			throw new AppManagementException("Error while adding new sequence", e);
+			throw new AppManagementException("Error while calling to sequence admin service client.", e);
 		}
 	}
 
@@ -51,12 +51,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
      */
 	public void addSequenceForTenant(OMElement sequence, String tenantDomain) throws AppManagementException {
+		String errorMsg = "Error while adding the sequence for super tenant user.";
 		try {
 			sequenceAdminStub.addSequenceForTenant(sequence, tenantDomain);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while adding new sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while adding new sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -66,12 +67,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void addSequence(OMElement sequence) throws AppManagementException {
+		String errorMsg = "Error while adding the sequence for tenant user.";
 		try {
 			sequenceAdminStub.addSequence(sequence);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while adding new sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while adding new sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -82,12 +84,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void deleteSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
+		String errorMsg = "Error while deleting the sequence for super tenant user.";
 		try {
 			sequenceAdminStub.deleteSequenceForTenant(sequenceName, tenantDomain);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while deleting sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while deleting sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -98,12 +101,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public void deleteSequence(String sequenceName) throws AppManagementException {
+		String errorMsg = "Error while deleting the sequence for tenant user.";
 		try {
 			sequenceAdminStub.deleteSequence(sequenceName);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while deleting sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while deleting sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -114,12 +118,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws AppManagementException {
+		String errorMsg = "Error while retrieving the sequence for tenant user.";
 		try {
 			return (OMElement) sequenceAdminStub.getSequenceForTenant(sequenceName, tenantDomain);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while retrieving the sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while retrieving the sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -129,12 +134,13 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 	 * @throws AppManagementException on errors.
 	 */
 	public OMElement getSequence(String sequenceName) throws AppManagementException {
+		String errorMsg = "Error while retrieving the sequence for super tenant user.";
 		try {
 			return  (OMElement) sequenceAdminStub.getSequence(sequenceName);
 		} catch (SequenceEditorException e) {
-			throw new AppManagementException("Error while retrieving the sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		} catch (RemoteException e) {
-			throw new AppManagementException("Error while retrieving the sequence", e);
+			throw new AppManagementException(errorMsg, e);
 		}
 	}
 
@@ -149,8 +155,8 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
 		try{
 			return sequenceAdminStub.isExistingSequenceForTenant(sequenceName, tenantDomain);
 		}catch (RemoteException e){
-			throw new AppManagementException("Error while checking for existence of sequence : " + sequenceName + "in tenant " +
-					                                 tenantDomain, e);
+			throw new AppManagementException("Error while checking for existence of sequence : " + sequenceName + "in" +
+					                                 " tenant " + tenantDomain, e);
 		}
 	}
 
@@ -167,5 +173,4 @@ public class SequenceAdminServiceClient extends AbstractAPIGatewayAdminClient {
             throw new AppManagementException("Error while checking for existence of sequence : " + sequenceName , e);
         }
     }
-
 }

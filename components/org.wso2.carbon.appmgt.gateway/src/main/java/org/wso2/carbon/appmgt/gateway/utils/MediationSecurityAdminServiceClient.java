@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2013, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  * 
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -36,7 +36,8 @@ public class MediationSecurityAdminServiceClient extends AbstractAPIGatewayAdmin
 
 	public MediationSecurityAdminServiceClient() throws AppManagementException {
 		try {
-			mediationSecurityAdminServiceStub = new MediationSecurityAdminServiceStub(null, backendUrl + "MediationSecurityAdminService");
+			mediationSecurityAdminServiceStub = new MediationSecurityAdminServiceStub(null, backendUrl +
+					"MediationSecurityAdminService");
 
 		} catch (AxisFault ex) {
 			throw new AppManagementException("Error while adding new sequence", ex);
