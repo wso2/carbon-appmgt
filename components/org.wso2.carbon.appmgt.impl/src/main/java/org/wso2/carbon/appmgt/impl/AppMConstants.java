@@ -574,7 +574,7 @@ public final class AppMConstants {
     public static final String CREATOR_ROLE = "internal/creator";
     public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String STORE_ADMIN_ROLE = "internal/store-admin";
-    public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
+    public static final String ANONYMOUS_ROLE = "SYSTEM/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
     public static final String WRITE_ACTION = "3";

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
@@ -35,11 +36,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class APPMappingUtil {
 
@@ -305,9 +302,29 @@ public class APPMappingUtil {
         mobileAppModel.setBanner(appDTO.getBanner());
         validateMandatoryField("iconFile", appDTO.getIcon());
         mobileAppModel.setThumbnail(appDTO.getIcon());
-        validateMandatoryField("screenshots", appDTO.getScreenshots());
+        List<String> screenShots = appDTO.getScreenshots();
+        validateMandatoryField("screenshots", screenShots);
+        if(screenShots.size() > 3){
+            RestApiUtil.handleBadRequest("Attached screenshots count exceeds the maximum number of allowed screenshots",
+                    log);
+        }
+        while(screenShots.size() < 3){
+            screenShots.add("");
+        }
         mobileAppModel.setScreenShots(appDTO.getScreenshots());
         mobileAppModel.setRecentChanges(appDTO.getRecentChanges());
+
+        if (appDTO.getTags() != null) {
+            Set<String> apiTags = new HashSet<>(appDTO.getTags());
+            mobileAppModel.addTags(apiTags);
+        }
+        List<String> visibleRoleList = new ArrayList<String>();
+        visibleRoleList = appDTO.getVisibleRoles();
+        if (visibleRoleList != null) {
+            String[] visibleRoles = new String[visibleRoleList.size()];
+            visibleRoles = visibleRoleList.toArray(visibleRoles);
+            mobileAppModel.setAppVisibility(visibleRoles);
+        }
         return mobileAppModel;
     }
 

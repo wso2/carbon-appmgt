@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,15 +46,29 @@ public class MobileApp {
     private String recentChanges;
     private APIStatus lifecycleStatus;
     private List<String> screenShots;
-    private List<String> appVisibility;
+    private String createdTime;
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    private String[] appVisibility;
     private Set<String> tags = new LinkedHashSet<String>();
 
     public Set<String> getTags() {
-        return tags;
+        return Collections.unmodifiableSet(tags);
     }
 
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
+    public void addTags(Set<String> tags) {
+        this.tags.addAll(tags);
+    }
+
+    public void removeTags(Set<String> tags) {
+        this.tags.removeAll(tags);
     }
 
     public String getVersion() {
@@ -209,11 +224,11 @@ public class MobileApp {
         this.screenShots = screenShots;
     }
 
-    public List<String> getAppVisibility() {
+    public String[] getAppVisibility() {
         return appVisibility;
     }
 
-    public void setAppVisibility(List<String> appVisibility) {
+    public void setAppVisibility(String[] appVisibility) {
         this.appVisibility = appVisibility;
     }
 }

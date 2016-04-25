@@ -469,15 +469,57 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Adds a new Mobile App to the Store
+     * Create a new mobile applcation artifact
      *
-     * @param app Mobile App
+     * @param mobileApp Mobile App
      * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     *          if failed to add the Mobile App
      */
-    public String addMobileApp(MobileApp app) throws AppManagementException {
+    public String createMobileApp(MobileApp mobileApp) throws AppManagementException {
         String artifactId = null;
-        artifactId = createMobileApp(app);
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.MOBILE_ASSET_TYPE);
+            final String appName = mobileApp.getAppName();
+
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(appName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A duplicate mobile application already exists for name : "+
+                        mobileApp.getAppName());
+            }
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));
+            GenericArtifact artifact = AppManagerUtil.createMobileAppArtifactContent(genericArtifact, mobileApp);
+            artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            changeLifeCycleStatus(AppMConstants.MOBILE_ASSET_TYPE, artifactId, APPLifecycleActions.CREATE.getStatus());
+            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+            Set<String> tagSet = mobileApp.getTags();
+            if (tagSet != null) {
+                for (String tag : tagSet) {
+                    registry.applyTag(artifactPath, tag);
+                }
+            }
+
+            if(mobileApp.getAppVisibility() != null) {
+                AppManagerUtil.setResourcePermissions(mobileApp.getAppProvider(),
+                        AppMConstants.API_RESTRICTED_VISIBILITY, mobileApp.getAppVisibility(), artifactPath);
+            }
+            registry.commitTransaction();
+        } catch (RegistryException e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException(
+                        "Error while rolling back the transaction for mobile application: "
+                                + mobileApp.getAppName(), re);
+            }
+            handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
+        }
         return artifactId;
     }
 
@@ -1520,44 +1562,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
              handleException("Error while performing registry transaction operation", e);
         }
 
-    }
-
-    /**
-     * Create Mobile Application artifact
-     *
-     * @param mobileApp
-     * @throws AppManagementException
-     */
-    private String createMobileApp(MobileApp mobileApp) throws AppManagementException {
-
-
-        String artifactId = null;
-        try {
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                    AppMConstants.MOBILE_ASSET_TYPE);
-            final String appName = mobileApp.getAppName();
-
-            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
-            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
-                add(appName);
-            }});
-            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
-            if (existingArtifacts != null && existingArtifacts.length > 0) {
-                handleResourceAlreadyExistsException("A mobile application with name : "+
-                        mobileApp.getAppName()+" already exists.");
-            }
-            registry.beginTransaction();
-            GenericArtifact genericArtifact =
-                    artifactManager.newGovernanceArtifact(new QName(mobileApp.getAppName()));
-            GenericArtifact artifact = AppManagerUtil.createMobileAppArtifactContent(genericArtifact, mobileApp);
-            artifactManager.addGenericArtifact(artifact);
-            artifactId = artifact.getId();
-            changeLifeCycleStatus(AppMConstants.MOBILE_ASSET_TYPE, artifactId, APPLifecycleActions.CREATE.getStatus());
-            registry.commitTransaction();
-        } catch (RegistryException e) {
-            handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
-        }
-        return artifactId;
     }
 
     /**

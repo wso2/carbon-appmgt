@@ -219,9 +219,9 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
-                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
 
-                String applicationId = appProvider.addMobileApp(mobileApp);
+                MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
+                String applicationId = appProvider.createMobileApp(mobileApp);
                 appDTO.setId(applicationId);
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 //TODO:Implement webapp logic
@@ -289,7 +289,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String searchContent = appId;
             String searchType = "id";
             List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
-                                                                                 appType);
+                    appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.handleBadRequest(errorMessage, log);
@@ -340,7 +340,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(appId, "id", null,
-                                                                                 appType);
+                    appType);
             if (allMatchedApps.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
@@ -384,7 +384,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
 
         GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                                                                                   AppMConstants.MOBILE_ASSET_TYPE);
+                AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
     }
 }

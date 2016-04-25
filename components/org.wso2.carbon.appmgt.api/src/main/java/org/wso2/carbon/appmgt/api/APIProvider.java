@@ -302,7 +302,7 @@ public interface APIProvider extends APIManager {
      * @param mobileApp Mobile application
      * @throws AppManagementException if failed to add MobileApp
      */
-    public String addMobileApp(MobileApp mobileApp) throws AppManagementException;
+    public String createMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
