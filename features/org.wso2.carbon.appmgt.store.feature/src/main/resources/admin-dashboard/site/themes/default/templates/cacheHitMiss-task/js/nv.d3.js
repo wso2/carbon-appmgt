@@ -7624,7 +7624,7 @@ nv.models.multiBar = function() {
       x   .domain(xDomain || d3.merge(seriesData).map(function(d) { return d.x }))
           .rangeBands(xRange || [0, availableWidth], groupSpacing);
 
-      //y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return d.y + (stacked ? d.y1 : 0) }).concat(forceY)))
+      //y   .domain(yDomain || d3.extent(d3.transform(seriesData).map(function(d) { return d.y + (stacked ? d.y1 : 0) }).concat(forceY)))
       y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return stacked ? (d.y > 0 ? d.y1 : d.y1 + d.y ) : d.y }).concat(forceY)))
           .range(yRange || [availableHeight, 0]);
 
@@ -8598,7 +8598,7 @@ nv.models.multiBarHorizontal = function() {
       x   .domain(xDomain || d3.merge(seriesData).map(function(d) { return d.x }))
           .rangeBands(xRange || [0, availableHeight], .1);
 
-      //y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return d.y + (stacked ? d.y0 : 0) }).concat(forceY)))
+      //y   .domain(yDomain || d3.extent(d3.transform(seriesData).map(function(d) { return d.y + (stacked ? d.y0 : 0) }).concat(forceY)))
       y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return stacked ? (d.y > 0 ? d.y1 + d.y : d.y1 ) : d.y }).concat(forceY)))
 
       if (showValues && !stacked)
@@ -10803,7 +10803,7 @@ nv.models.pieChart = function() {
   chart.dispatch = dispatch;
   chart.pie = pie;
 
-  d3.rebind(chart, pie, 'valueFormat', 'values', 'x', 'y', 'description', 'id', 'showLabels', 'donutLabelsOutside', 'pieLabelsOutside', 'labelType', 'donut', 'donutRatio', 'labelThreshold');
+  d3.rebind(chart, pie, 'valueFormat', 'values', 'x', 'y', 'businessOwnerDescription', 'id', 'showLabels', 'donutLabelsOutside', 'pieLabelsOutside', 'labelType', 'donut', 'donutRatio', 'labelThreshold');
   chart.options = nv.utils.optionsFunc.bind(chart);
 
   chart.margin = function(_) {

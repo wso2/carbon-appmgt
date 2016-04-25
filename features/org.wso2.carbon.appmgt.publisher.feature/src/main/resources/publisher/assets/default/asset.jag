@@ -54,6 +54,16 @@ require('/modules/publisher.js').exec(function(ctx) {
 
     var shortName = (context.params.type) || '';
     var operation = 'create';
+      function getBusinessOwner() {
+        var businessOwnerList = apiProvider.getBusinessOwners();
+        var ownersList = JSON.parse(stringify(businessOwnerList));
+        var nameList = new Array();
+        var nameList = new Array();
+        for (var i = 0; i < ownersList.length; i++) {
+            nameList.push(ownersList[i].businessOwnerName);
+        }
+        return nameList;
+    }
 
     var rxtTemplate;
     if (apiProvider.isAssetTypeEnabled(shortName)) {
@@ -103,7 +113,8 @@ require('/modules/publisher.js').exec(function(ctx) {
             rxtTemplate: rxtTemplate,
             data: output,
             title: title,
-            typeList: typeList
+            typeList: typeList,
+	    businessOwnerList: getBusinessOwner()
             }
         );
     }
@@ -198,7 +209,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     canCreate: docCreateAuth,
                     canEdit: docEditAuth,
                     canDelete: docDeleteAuth
-                }
+                },
+		businessOwnerList: getBusinessOwner()
             });
         }
         else {
@@ -332,7 +344,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     tags: tags,
                     title: title,
                     docs: result.docs,
-                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth}
+                    permissions: {canCreate: docCreateAuth, canEdit: docEditAuth, canDelete:docDeleteAuth},
+		    businessOwnerList: getBusinessOwner()
                 });
             } else {
                 caramel.render({
@@ -345,7 +358,8 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
                     data: output,
                     versions: versionList,
                     tags: tags,
-                    title: title
+                    title: title,
+		    businessOwnerList: getBusinessOwner()
                 });
             }
 

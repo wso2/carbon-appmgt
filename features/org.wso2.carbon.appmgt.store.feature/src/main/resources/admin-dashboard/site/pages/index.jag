@@ -11,17 +11,23 @@ var middlePage="signup-task";
 
 var pageName=request.getParameter("task");
 if(pageName=="subscription"){
-middlePage="subscription-task";
+    middlePage="subscription-task";
 }else if(pageName=="signup"){
-middlePage="signup-task";
+    middlePage="signup-task";
 }else if(pageName=="publishapp"){
-middlePage="publishapp-task";
+    middlePage="publishapp-task";
 }else if(pageName=="xacmlpolicy"){
-middlePage="xacmlpolicy-task";
+    middlePage="xacmlpolicy-task";
 }else if(pageName=="cacheHitMiss"){
-  middlePage="cacheHitMiss-task";
-  }else if(pageName=="xacmlpolicy-new"){
+    middlePage="cacheHitMiss-task";
+}else if(pageName=="xacmlpolicy-new"){
     middlePage="xacmlpolicy-new";
+}else if(pageName == "businessowners"){
+    middlePage = "businessowners-task";
+}else if(pageName == "businessowners-new"){
+    middlePage = "businessowners-new";
+}else if(pageName=="businessowners"){
+    middlePage="businessowners-task";
 }
 
 (function () {

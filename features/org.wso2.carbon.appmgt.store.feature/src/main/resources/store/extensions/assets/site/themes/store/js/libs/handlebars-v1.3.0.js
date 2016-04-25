@@ -130,7 +130,7 @@ var __module5__ = (function() {
   "use strict";
   var __exports__;
 
-  var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
+  var errorProps = ['businessOwnerDescription', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
 
   function Exception(message, node) {
     var line;
@@ -1932,7 +1932,7 @@ var __module11__ = (function(__dependency1__, __dependency2__) {
         params.push("depth" + this.environment.depths.list[i]);
       }
 
-      // Perform a second pass over the output to merge content when possible
+      // Perform a second pass over the output to transform content when possible
       var source = this.mergeSource();
 
       if (!this.isChild) {
@@ -2472,7 +2472,7 @@ var __module11__ = (function(__dependency1__, __dependency2__) {
           createdStack,
           usedLiteral;
 
-      // If we are currently inline then we want to merge the inline statement into the
+      // If we are currently inline then we want to transform the inline statement into the
       // replacement statement via ','
       if (inline) {
         var top = this.popStack(true);
