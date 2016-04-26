@@ -24,12 +24,13 @@
         </jaxrs:providers>
     </jaxrs:server>
 
+
     <cxf:bus>
         <cxf:inInterceptors>
-            <ref bean="authenticationInterceptor" />
+            <ref bean="oauthInterceptor"/>
         </cxf:inInterceptors>
     </cxf:bus>
 
-    <bean id="authenticationInterceptor"
-          class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.BasicAuthenticationInterceptor" />
+    <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor"/>
+
 </beans>
