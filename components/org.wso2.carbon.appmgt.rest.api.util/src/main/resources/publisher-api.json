@@ -1383,10 +1383,16 @@
         },
         "/xacmlpolicies/":{
             "get": {
-                "x-scope": "appm:administration",
+                "x-scope": "appm:create",
                 "summary": "Get all XACML policies",
                 "description": "Get a list of XACML policies.\n",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
                     {
                         "$ref": "#/parameters/Accept"
                     },
@@ -2414,11 +2420,36 @@
                     "description": "Number of App returned.\n",
                     "example": 1
                 },
-                "list": {
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "example": "/xacmlpolicies?limit=1&offset=2&query="
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "example": "/xacmlpolicies?limit=1&offset=0&query="
+                },
+                "policyList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/PolicyPartial"
+                        "$ref": "#/definitions/PolicyPartialInfo"
                     }
+                }
+            }
+        },
+        "PolicyPartialInfo":{
+            "title": "Policy Partial",
+            "properties": {
+                "policyPartialId": {
+                    "type": "integer",
+                    "description": "Id of the policy\n",
+                    "example": "1"
+                },
+                "policyPartialName": {
+                    "type": "string",
+                    "description": "name of the policy\n",
+                    "example": "policy1"
                 }
             }
         },

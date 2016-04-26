@@ -6,6 +6,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.factories.AdministrationApiServ
 
 import io.swagger.annotations.ApiParam;
 
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialDTO;
 
@@ -26,6 +27,27 @@ public class AdministrationApi  {
 
    private final AdministrationApiService delegate = AdministrationApiServiceFactory.getAdministrationApi();
 
+    @GET
+    @Path("/policygroups/{policyGroupId}/apps")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get apps associated with policy group", notes = "Get apps associated with policy group.", response = AppListDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of qualifying Apps is returned."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
+
+    public Response administrationPolicygroupsPolicyGroupIdAppsGet(@ApiParam(value = "policy group id",required=true ) @PathParam("policyGroupId") Integer policyGroupId,
+    @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
+    @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch,
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
+    {
+    return delegate.administrationPolicygroupsPolicyGroupIdAppsGet(policyGroupId,accept,ifNoneMatch,ifModifiedSince);
+    }
     @POST
     @Path("/xacmlpolicies/")
     @Consumes({ "application/json" })
