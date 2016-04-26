@@ -41,10 +41,12 @@ public class XacmlpoliciesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
 
-    public Response xacmlpoliciesGet(@ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
+    public Response xacmlpoliciesGet(@ApiParam(value = "Maximum size of resource array to return.", defaultValue="25") @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
+    @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
     {
-    return delegate.xacmlpoliciesGet(accept,ifNoneMatch);
+    return delegate.xacmlpoliciesGet(limit,offset,accept,ifNoneMatch);
     }
     @GET
     @Path("/{policyPartialId}/apps")

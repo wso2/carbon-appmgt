@@ -15,7 +15,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import javax.ws.rs.core.Response;
 
 public abstract class XacmlpoliciesApiService {
-    public abstract Response xacmlpoliciesGet(String accept,String ifNoneMatch);
+    public abstract Response xacmlpoliciesGet(Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response xacmlpoliciesPolicyPartialIdAppsGet(Integer policyPartialId,Integer limit,Integer offset,String accept,String ifNoneMatch);
 }
 

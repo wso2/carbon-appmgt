@@ -61,6 +61,7 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_ROLES = "/roles";
     public static final String RESOURCE_PATH_USERS = "/users";
     public static final String RESOURCE_PATH_APPLICATIONS = "/applications";
+    public static final String RESOURCE_PATH_XACML_POLICIES = "/xacmlpolicies";
     public static final String SERVER_URL = "/applications";
     public static final String SERVER_USER_NAME = "/applications";
     public static final String SERVER_PASSWORD = "/applications";
@@ -102,6 +103,10 @@ public final class RestApiConstants {
 
     public static final String APPLICATIONS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
+                    + GROUPID_PARAM;
+
+    public static final String XACML_POLICIES_GET_PAGINATION_URL =
+            RESOURCE_PATH_XACML_POLICIES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
                     + GROUPID_PARAM;
 
     public static final String SUBSCRIPTIONS_GET_PAGINATION_URL_APIID =

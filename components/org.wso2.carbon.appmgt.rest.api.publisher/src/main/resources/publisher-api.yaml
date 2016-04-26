@@ -937,52 +937,15 @@ paths:
           description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/policygroups/{policyGroupId}/apps':
-    get:
-      x-scope: 'appm:read'
-      summary: Get apps associated with policy group
-      description: |
-        Get apps associated with policy group.
-      parameters:
-        - $ref: '#/parameters/policyGroupId'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - PolicyGroups
-      responses:
-        '200':
-          description: "OK. \nList of qualifying Apps is returned.\n"
-          schema:
-            $ref: '#/definitions/AppList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
   /xacmlpolicies/:
     get:
-      x-scope: 'appm:administration'
+      x-scope: 'appm:create'
       summary: Get all XACML policies
       description: |
         Get a list of XACML policies.
       parameters:
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
       tags:
@@ -1027,6 +990,45 @@ paths:
         - $ref: '#/parameters/If-None-Match'
       tags:
         - Apps
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Apps is returned.\n"
+          schema:
+            $ref: '#/definitions/AppList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/administration/policygroups/{policyGroupId}/apps':
+    get:
+      x-scope: 'appm:read'
+      summary: Get apps associated with policy group
+      description: |
+        Get apps associated with policy group.
+      parameters:
+        - $ref: '#/parameters/policyGroupId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - PolicyGroups
       responses:
         '200':
           description: "OK. \nList of qualifying Apps is returned.\n"
@@ -1737,10 +1739,31 @@ definitions:
         description: |
           Number of App returned.
         example: 1
-      list:
+      next:
+        type: string
+        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
+        example: '/xacmlpolicies?limit=1&offset=2&query='
+      previous:
+        type: string
+        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
+        example: '/xacmlpolicies?limit=1&offset=0&query='
+      policyList:
         type: array
         items:
-          $ref: '#/definitions/PolicyPartial'
+          $ref: '#/definitions/PolicyPartialInfo'
+  PolicyPartialInfo:
+    title: Policy Partial
+    properties:
+      policyPartialId:
+        type: integer
+        description: |
+          Id of the policy
+        example: '1'
+      policyPartialName:
+        type: string
+        description: |
+          name of the policy
+        example: policy1
   PolicyPartialIdList:
     title: "XACML policy partial Id's"
     properties:
