@@ -573,7 +573,9 @@ paths:
       tags:
         - Apps
       responses:
-        '200':
+        '202':
+          schema:
+            $ref: '#/definitions/ResponseMessage'
           description: "OK. \nLifecycle changed successfully.\n"
           headers:
             ETag:
@@ -662,7 +664,7 @@ paths:
         '200':
           description: "OK. \nStatic content uploaded successfully.\n"
           schema:
-            $ref: '#/definitions/Binary'
+            $ref: '#/definitions/StaticContent'
           headers:
             ETag:
               description: >
@@ -1321,7 +1323,7 @@ definitions:
     required:
       - name
       - version
-      - provider
+      - displayName
     properties:
       id:
         type: string
@@ -1509,13 +1511,29 @@ definitions:
     properties:
       path:
         type: string
-        example: '1.0'
+        example: /api/getFile/DTRDOIO787.apk
       package:
         type: string
         example: sample.calc
       version:
         type: string
         example: '1.0'
+  StaticContent:
+    title: 'upload static content like image, documentation'
+    required:
+      - path
+    properties:
+      path:
+        type: string
+        example: /api/getFile/IUYFGF98098.jpg
+  ResponseMessage:
+    title: Reponse message returned at successful API invocation
+    required:
+      - message
+    properties:
+      message:
+        type: string
+        example: API has been successfully invoked
   TagList:
     title: Tag List
     properties:

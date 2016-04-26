@@ -20,6 +20,10 @@ package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
 /**
  * This class contains REST API Publisher related utility operations
@@ -37,6 +41,5 @@ public class RestApiPublisherUtils {
         }
         return uuid;
     }
-
 
 }

@@ -349,7 +349,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}":{
+        "/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}": {
             "delete": {
                 "x-scope": "appm:create",
                 "summary": "Delete policy partial mapping from an App",
@@ -399,7 +399,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/tags":{
+        "/apps/{appType}/id/{appId}/tags": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Tags of an App",
@@ -588,7 +588,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/xacmlpolicies":{
+        "/apps/{appType}/id/{appId}/xacmlpolicies": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all XACML policies relevant to an App",
@@ -698,7 +698,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/subscriptions":{
+        "/apps/{appType}/appId/{appId}/subscriptions": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get subscribed user list for an App",
@@ -802,7 +802,10 @@
                     "Apps"
                 ],
                 "responses": {
-                    "200": {
+                    "202": {
+                        "schema": {
+                            "$ref": "#/definitions/ResponseMessage"
+                        },
                         "description": "OK. \nLifecycle changed successfully.\n",
                         "headers": {
                             "ETag": {
@@ -930,7 +933,7 @@
                     "200": {
                         "description": "OK. \nStatic content uploaded successfully.\n",
                         "schema": {
-                            "$ref": "#/definitions/Binary"
+                            "$ref": "#/definitions/StaticContent"
                         },
                         "headers": {
                             "ETag": {
@@ -964,13 +967,12 @@
                 }
             }
         },
-        "/apps/{appType}/tags":{
+        "/apps/{appType}/tags": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Tags",
                 "description": "Get a list of available Tags relevant to given App Type.\n",
                 "parameters": [
-
                     {
                         "$ref": "#/parameters/appType"
                     },
@@ -1022,7 +1024,7 @@
                 }
             }
         },
-        "/apps/{appType}/throttlingtiers":{
+        "/apps/{appType}/throttlingtiers": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Tiers",
@@ -1079,7 +1081,7 @@
                 }
             }
         },
-        "/apps/{appType}/cache":{
+        "/apps/{appType}/cache": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Apps from Cache",
@@ -1148,7 +1150,7 @@
                 }
             }
         },
-        "/xacmlpolicies/":{
+        "/xacmlpolicies/": {
             "get": {
                 "x-scope": "appm:create",
                 "summary": "Get all XACML policies",
@@ -1208,7 +1210,7 @@
                 }
             }
         },
-        "/xacmlpolicies/{policyPartialId}/apps":{
+        "/xacmlpolicies/{policyPartialId}/apps": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Apps mapped to a policy partial",
@@ -1271,7 +1273,7 @@
                 }
             }
         },
-        "/administration/policygroups/{policyGroupId}/apps":{
+        "/administration/policygroups/{policyGroupId}/apps": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get apps associated with policy group",
@@ -1331,7 +1333,7 @@
                 }
             }
         },
-        "/administration/xacmlpolicies/validate":{
+        "/administration/xacmlpolicies/validate": {
             "post": {
                 "x-scope": "appm:administration",
                 "summary": "Validate Policy contenr",
@@ -1385,7 +1387,7 @@
                 }
             }
         },
-        "/administration/xacmlpolicies/":{
+        "/administration/xacmlpolicies/": {
             "post": {
                 "x-scope": "appm:administration",
                 "summary": "Create a new Policy Partial",
@@ -1439,7 +1441,7 @@
                 }
             }
         },
-        "/administration/xacmlpolicies/{policyPartialId}":{
+        "/administration/xacmlpolicies/{policyPartialId}": {
             "put": {
                 "x-scope": "appm:administration",
                 "summary": "Update an existing policy partial",
@@ -1681,14 +1683,14 @@
             "required": true,
             "type": "string"
         },
-        "policyGroupId":{
+        "policyGroupId": {
             "name": "policyGroupId",
             "in": "path",
             "description": "policy group id\n",
             "required": true,
             "type": "integer"
         },
-        "policyPartialId":{
+        "policyPartialId": {
             "name": "policyPartialId",
             "in": "path",
             "description": "policy partial id\n",
@@ -1822,7 +1824,7 @@
             "required": [
                 "name",
                 "version",
-                "provider"
+                "displayName"
             ],
             "properties": {
                 "id": {
@@ -2047,7 +2049,7 @@
             "properties": {
                 "path": {
                     "type": "string",
-                    "example": "1.0"
+                    "example": "/api/getFile/DTRDOIO787.apk"
                 },
                 "package": {
                     "type": "string",
@@ -2056,6 +2058,30 @@
                 "version": {
                     "type": "string",
                     "example": "1.0"
+                }
+            }
+        },
+        "StaticContent": {
+            "title": "upload static content like image, documentation",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "example": "/api/getFile/IUYFGF98098.jpg"
+                }
+            }
+        },
+        "ResponseMessage": {
+            "title": "Reponse message returned at successful API invocation",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "API has been successfully invoked"
                 }
             }
         },
@@ -2077,7 +2103,7 @@
                 }
             }
         },
-        "PolicyPartial":{
+        "PolicyPartial": {
             "title": "Policy Partial",
             "required": [
                 "policyPartial"
@@ -2135,7 +2161,7 @@
                 }
             }
         },
-        "PolicyPartialInfo":{
+        "PolicyPartialInfo": {
             "title": "Policy Partial",
             "properties": {
                 "policyPartialId": {
@@ -2150,7 +2176,7 @@
                 }
             }
         },
-        "PolicyPartialIdList":{
+        "PolicyPartialIdList": {
             "title": "XACML policy partial Id's",
             "properties": {
                 "xacmlPolicyIds": {

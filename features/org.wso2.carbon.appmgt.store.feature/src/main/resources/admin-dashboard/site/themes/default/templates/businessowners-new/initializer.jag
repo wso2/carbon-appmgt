@@ -1,0 +1,9 @@
+<%
+jagg.initializer("businessowners-new", {
+
+    preInitialize:function () {
+        jagg.addFooterJS("application", "jagg", "templates/businessowners-new/js/businessowners-new.js");
+    }
+});
+%>
+

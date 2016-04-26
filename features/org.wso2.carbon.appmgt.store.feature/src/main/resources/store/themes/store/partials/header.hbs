@@ -59,23 +59,19 @@
                 <ul class="nav navbar-nav">
                     {{#if isTenanted}}
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-expanded="false">
+                            <a href="{{url "/"}}">
                                 <i class="fw fw-organization add-margin-right-1x"></i>
-                                {{currentTenant}}<span class="caret"></span>
+                                Public Store
                             </a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{url "/"}}">Public Store</a></li>
-                            </ul>
                         </li>
-                    {{else}}
+                    {{/if}}
 
                     <li class="{{#ifCond active "==" "store" }}active{{/ifCond}}">
-                        <a href="{{tenantedUrl "/assets/"}}">
+                        <a href="{{tenantedUrl "/"}}">
                             <span class="icon add-margin-right-1x"><i class="fw fw-organization fw-lg"></i></span>Store
                         </a>
                     </li>
-                    {{/if}}
+
                     {{#if user}}
                         {{#unless hideFavouriteMenu}}
                     <li class="{{#ifCond active "==" "favourite" }}active{{/ifCond}}">

@@ -5,35 +5,44 @@ its own partion sinceit does not support tags--}}
     <ul>
         {{#each navigation}}
             {{#ifCond partial "==" "webapp"}}
-                <li class="purple {{#if active}}active{{/if}}">
-                    <a id="my-apps-link" href="{{tenantedUrl this.url}}">
-                        <i class="fw fw-web-app icon"></i><span class="left-menu-item"> {{t "Web Apps"}}</span></a>
-                    {{#if myappsUrl}}
-                        <ul class="sublevel-menu" style="display: block;">
-                            <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-web-app icon"></i><span class="name">{{t "My Apps"}}</span></a>
-                            </li>
-                        </ul>
-                    {{/if}}
-                </li>
-            {{/ifCond}}
-            {{#ifCond partial "==" "site"}}
-            <li class="orange {{#if active}}active{{/if}}">
-                <a id="my-apps-link" href="{{tenantedUrl this.url}}">
-                    <i class="fw fw-globe icon"></i><span class="left-menu-item"> {{t "Sites"}}</span></a>
+            <li class="purple {{#if active}}active{{/if}}">
+            <a id="my-apps-link" href="{{tenantedUrl this.url}}">
+                <i class="fw fw-web-app icon"></i><span class="left-menu-item"> {{t "Web Apps"}}
                 {{#if myappsUrl}}
                     <ul class="sublevel-menu" style="display: block;">
-                        <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-globe icon"></i><span class="name">{{t "My Apps"}}</span></a></li>
+                        <li><a href="{{tenantedUrl myappsUrl}}"><i class=""></i><span class="name">
+                            <i class="{{#if myapps}}web-sub-menu-active {{else}} icon {{/if}} fw fw-web-app"></i>{{t "My Apps"}}</span></a>
+                        </li>
                     </ul>
                 </li>
                 {{/if}}
             {{/ifCond}}
+
+            {{#ifCond partial "==" "site"}}
+            <li class="orange {{#if active}}active{{/if}}">
+                <a id="my-apps-link" href="{{tenantedUrl this.url}}">
+                    <i class="fw fw-globe icon"></i><span class="left-menu-item"> {{t "Sites"}}
+                    {{#if myappsUrl}}<i class="fw fw-up"></i>{{/if}}</span></a>
+                {{#if myappsUrl}}
+                    <ul class="sublevel-menu" style="display: block;">
+                        <li><a href="{{tenantedUrl myappsUrl}}"><i class=""></i><span class="name">
+                            <i class="{{#if myapps}}site-sub-menu-active {{else}} icon{{/if}} fw fw-globe"></i>{{t "My Apps"}}</span></a>
+                        </li>
+                    </ul>
+                </li>
+                {{/if}}
+            {{/ifCond}}
+
             {{#ifCond partial "==" "mobileapp"}}
             <li class="green {{#if active}}active{{/if}}">
                 <a id="my-apps-link" href="{{tenantedUrl this.url}}">
-                    <i class="fw fw-mobile icon"></i><span class="left-menu-item"> {{t "Mobile Apps"}}</span></a>
+                    <i class="fw fw-mobile icon"></i><span class="left-menu-item"> {{t "Mobile Apps"}}
+                    {{#if myappsUrl}}<i class="fw fw-up"></i>{{/if}}</span></a>
                 {{#if myappsUrl}}
                     <ul class="sublevel-menu" style="display: block;">
-                        <li><a href="{{tenantedUrl myappsUrl}}"><i class="fw fw-mobile icon"></i><span class="name green">{{t "My Apps"}}</span></a></li>
+                        <li><a href="{{tenantedUrl myappsUrl}}"><i class=""></i><span class="name">
+                            <i class="{{#if myapps}}mobile-sub-menu-active {{else}} icon{{/if}} fw fw-mobile"></i>{{t "My Apps"}}</span></a>
+                        </li>
                     </ul>
                 </li>
                 {{/if}}
@@ -44,8 +53,8 @@ its own partion sinceit does not support tags--}}
 </nav>
 
 {{!-- left-column - tags --}}
-<div class="add-margin-top-3x hidden-xs hidden-sm" style = "{{#if hideTag}}display: none{{/if}}">
-    <div class="section-title" > {{t "Tags"}}</div>
+<div class="add-margin-top-3x hidden-xs hidden-sm" style="{{#if hideTag}}display: none{{/if}}">
+    <div class="section-title"> {{t "Tags"}}</div>
     {{#if tags}}
         <ul class="tags">
             {{#each tags.data.allTags}}
@@ -66,25 +75,25 @@ its own partion sinceit does not support tags--}}
         <ul class="recent-app-items">
             {{#each recentApps}}
                 <li>
-                {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
-                            <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
-                {{else}}
+                    {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
+                    <a href="{{url "/t"}}/{{attributes.overview_appTenant}}/assets/{{../../../assetType}}/{{attributes.overview_advertisedAppUuid}}">
+                    {{else}}
                     <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
-                {{/ifCond}}
-                        <div class="recent-app-item-thumbnail">
-                            {{#if defaultThumbnail}}
-                                <div style="background-color: #{{defaultThumbnail.color}};">
-                                    <span>{{defaultThumbnail.text}}</span>
-                                </div>
-                            {{else}}
-                                <img src="{{attributes.images_thumbnail}}" />
-                            {{/if}}
-                        </div>
-                        <div class="recent-app-item-summery">
-                            <h4 class="media-heading">{{attributes.overview_displayName}} </h4>
-                            {{attributes.overview_version}}
-                        </div>
-                    </a>
+                    {{/ifCond}}
+                    <div class="recent-app-item-thumbnail">
+                        {{#if defaultThumbnail}}
+                            <div style="background-color: #{{defaultThumbnail.color}};">
+                                <span>{{defaultThumbnail.text}}</span>
+                            </div>
+                        {{else}}
+                            <img src="{{attributes.images_thumbnail}}" />
+                        {{/if}}
+                    </div>
+                    <div class="recent-app-item-summery">
+                        <h4 class="media-heading">{{attributes.overview_displayName}} </h4>
+                        {{attributes.overview_version}}
+                    </div>
+                </a>
                 </li>
             {{/each}}
         </ul>

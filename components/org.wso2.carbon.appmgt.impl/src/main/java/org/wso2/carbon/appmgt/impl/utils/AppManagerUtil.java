@@ -852,26 +852,29 @@ public final class AppManagerUtil {
 			AppManagementException {
 
 		try {
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, mobileApp.getAppName());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL, mobileApp.getAppUrl());
-			//artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, mobileApp.getVisibility());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION, mobileApp.getAppVersion());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME, mobileApp.getPackageName());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY, mobileApp.getCategory());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, mobileApp.getDisplayName());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, mobileApp.getMarketType());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES, mobileApp.getRecentChanges());
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, mobileApp.getAppVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, mobileApp.getAppName());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL, mobileApp.getAppUrl());
+            //artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, mobileApp.getVisibility());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION, mobileApp.getBundleVersion());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME, mobileApp.getPackageName());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY, mobileApp.getCategory());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getBanner());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, mobileApp.getDisplayName());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE, mobileApp.getMarketType());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES, mobileApp.getRecentChanges());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, mobileApp.getVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, mobileApp.getAppProvider());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, mobileApp.getDescription());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
+            String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
+            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
+            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER, mobileApp.getBanner());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID, mobileApp.getAppId());
+            artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(mobileApp.getAppVisibility()));
 
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, mobileApp.getAppProvider());
-			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, mobileApp.getDescription());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
-			String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
-			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
-			artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER,mobileApp.getBanner());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID,mobileApp.getAppId());
-			artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM,mobileApp.getPlatform());
+
 		} catch (GovernanceException e) {
 			String msg = "Failed to create WebApp for : " + mobileApp.getAppName();
 			log.error(msg, e);

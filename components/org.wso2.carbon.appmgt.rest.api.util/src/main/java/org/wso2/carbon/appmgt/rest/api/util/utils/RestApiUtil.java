@@ -32,10 +32,7 @@ import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorListItemDTO;
-import org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException;
-import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
-import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
-import org.wso2.carbon.appmgt.rest.api.util.exception.PreconditionFailedException;
+import org.wso2.carbon.appmgt.rest.api.util.exception.*;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
@@ -111,6 +108,19 @@ public class RestApiUtil {
      * @param log Log instance
      * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
      */
+    public static void handleConflictException(String msg, Log log) throws ConflictException {
+        ConflictException conflictException = buildConflictException(msg);
+        log.error(msg);
+        throw conflictException;
+    }
+
+    /**
+     * Logs the error, builds a BadRequestException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.BadRequestException
+     */
     public static void handlePreconditionFailedRequest(String msg, Log log) throws BadRequestException {
         PreconditionFailedException preconditionFailedRequest = buildPreconditionFailedRequestException(msg);
         log.error(msg);
@@ -127,6 +137,18 @@ public class RestApiUtil {
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 400l, description);
         return new BadRequestException(errorDTO);
     }
+
+    /**
+     * Returns a new ConflictException
+     *
+     * @param description description of the exception
+     * @return a new ConflictException with the specified details as a response DTO
+     */
+    public static ConflictException buildConflictException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_CONFLCIT_MESSAGE_DEFAULT, 409l, description);
+        return new ConflictException(errorDTO);
+    }
+
 
     /**
      * Returns a new BadRequestException
@@ -353,7 +375,8 @@ public class RestApiUtil {
                 outFileStream.write(bytes, 0, read);
             }
         } catch (IOException e) {
-            String errorMessage = "Error in transferring files.";
+            String errorMessage = "Error in transferring file : " + newFileName + " into storage location : " +
+                    storageLocation;
             log.error(errorMessage, e);
             throw new AppManagementException(errorMessage, e);
         } finally {
