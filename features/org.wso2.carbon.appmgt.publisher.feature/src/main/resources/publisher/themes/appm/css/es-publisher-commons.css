@@ -1780,3 +1780,7 @@ background-color:red;
     text-align: center;
     min-height: 210px;
 }
+
+.checkbox-div {
+    margin: 10px 0;
+}
