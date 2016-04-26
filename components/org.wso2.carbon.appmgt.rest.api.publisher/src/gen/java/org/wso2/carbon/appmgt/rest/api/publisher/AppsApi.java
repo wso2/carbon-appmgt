@@ -1,31 +1,14 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.factories.AppsApiServiceFactory;
-
 import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
-import java.io.File;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.factories.AppsApiServiceFactory;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -60,7 +43,7 @@ public class AppsApi  {
     @Path("/static-contents")
     @Consumes({ "multipart/form-data" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Uploading images, pdf, documents files", notes = "Uploading images for banners, screenshots etc.", response = BinaryDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Uploading images, pdf, documents files", notes = "Uploading images for banners, screenshots etc.", response = StaticContentDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nStatic content uploaded successfully."),
         
@@ -168,9 +151,9 @@ public class AppsApi  {
     @Path("/{appType}/change-lifecycle")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Change App Status", notes = "Change the lifecycle of an App", response = Void.class)
+    @io.swagger.annotations.ApiOperation(value = "Change App Status", notes = "Change the lifecycle of an App", response = ResponseMessageDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nLifecycle changed successfully."),
+        @io.swagger.annotations.ApiResponse(code = 202, message = "OK. \nLifecycle changed successfully."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error"),
         

@@ -32,7 +32,7 @@ i18n.init(request,localeResourcesBasePath);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="">
     <meta charset="UTF-8">
-    <meta name="description" content=""/>
+    <meta name="businessOwnerDescription" content=""/>
 
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="<%=jagg.getAbsoluteUrl(jagg.getThemeFile("images/favicon-store.png"))%>">

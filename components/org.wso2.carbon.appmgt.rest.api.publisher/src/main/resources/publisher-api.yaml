@@ -5,11 +5,6 @@ info:
   description: >
     This document specifies a **RESTful API** for WSO2 **APP Manager**
     - Publisher.
-
-
-
-
-
     It is written with [swagger 2](http://swagger.io/).
   contact:
     name: WSO2
@@ -39,34 +34,13 @@ paths:
           in: query
           description: >
             **Search condition**.
-
-
-
-
-
             You can search in attributes by using an **"attribute:"** modifier.
-
-
-
-
-
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
-
-
-
-
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
-
-
-
-
             If no advanced attribute modifier has been specified, search will
             match the
-
             given query string against App Name.
           type: string
         - $ref: '#/parameters/limit'
@@ -575,11 +549,6 @@ paths:
         - name: action
           description: >
             The action to demote or promote the state of the App.
-
-
-
-
-
             Supported actions are
             [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
             **]
@@ -602,7 +571,9 @@ paths:
       tags:
         - Apps
       responses:
-        '200':
+        '202':
+          schema:
+            $ref: '#/definitions/ResponseMessage'
           description: "OK. \nLifecycle changed successfully.\n"
           headers:
             ETag:
@@ -691,7 +662,7 @@ paths:
         '200':
           description: "OK. \nStatic content uploaded successfully.\n"
           schema:
-            $ref: '#/definitions/Binary'
+            $ref: '#/definitions/StaticContent'
           headers:
             ETag:
               description: >
@@ -801,34 +772,13 @@ paths:
           in: query
           description: >
             **Search condition**.
-
-
-
-
-
             You can search in attributes by using an **"attribute:"** modifier.
-
-
-
-
-
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
-
-
-
-
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
-
-
-
-
             If no advanced attribute modifier has been specified, search will
             match the
-
             given query string against App Name.
           type: string
         - $ref: '#/parameters/limit'
@@ -1399,7 +1349,6 @@ parameters:
     description: >
       Validator for conditional requests; based on the ETag of the formerly
       retrieved
-
       variant of the resourec.
     type: string
   If-Modified-Since:
@@ -1473,6 +1422,7 @@ definitions:
       - name
       - version
       - provider
+      - displayName
     properties:
       id:
         type: string
@@ -1660,13 +1610,29 @@ definitions:
     properties:
       path:
         type: string
-        example: '1.0'
+        example: /api/getFile/DTRDOIO787.apk
       package:
         type: string
         example: sample.calc
       version:
         type: string
         example: '1.0'
+  StaticContent:
+    title: 'upload static content like image, documentation'
+    required:
+      - path
+    properties:
+      path:
+        type: string
+        example: /api/getFile/IUYFGF98098.jpg
+  ResponseMessage:
+    title: Reponse message returned at successful API invocation
+    required:
+      - message
+    properties:
+      message:
+        type: string
+        example: API has been successfully invoked
   TagList:
     title: Tag List
     properties:
