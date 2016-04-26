@@ -41,6 +41,8 @@ import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -233,6 +235,18 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
+                                                          String ifNoneMatch, String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeCacheGet(String appType, String query, Integer limit, Integer offset, String accept,
+                                        String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
         try {
@@ -365,6 +379,59 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("Error while initializing UserStore", e, log);
         }
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdPolicygroupsPolicyGroupIdDelete(String appType, String appId,
+                                                                      Integer policyGroupId, String ifMatch,
+                                                                      String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdTagsPut(String appType, String appId, TagListDTO body, String contentType,
+                                              String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, String ifMatch,
+                                                 String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdXacmlpoliciesGet(String appType, String appId, String accept,
+                                                       String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdXacmlpoliciesPost(String appType, String appId, PolicyPartialIdListDTO body,
+                                                        String contentType, String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType, String appId,
+                                                                         Integer policyPartialId, String ifMatch,
+                                                                         String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeThrottlingtiersGet(String appType, String accept, String ifNoneMatch) {
         return null;
     }
 

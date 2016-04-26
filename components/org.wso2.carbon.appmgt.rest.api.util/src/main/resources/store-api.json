@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "WSO2 APP Manager - Store API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Store.\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -313,6 +313,216 @@
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/roles": {
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get all Roles",
+                "description": "Get a list of available Roles.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Roles are returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/RoleIdList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/users": {
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get all Users",
+                "description": "Get a list of available Users.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Users are returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/UserIdList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/apps/download": {
+            "post": {
+                "x-scope": "appm:administration",
+                "summary": "Enterprise Download/Install App",
+                "description": "Enterprise Download an new App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "install",
+                        "schema": {
+                            "$ref": "#/definitions/AdminInstall"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/apps/uninstallation": {
+            "x-scope": "appm:administration",
+            "post": {
+                "summary": "Enterprise Uninstall App",
+                "description": "Enterprise Uninstall an existing App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "install",
+                        "schema": {
+                            "$ref": "#/definitions/AdminInstall"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -650,12 +860,30 @@
                 }
             }
         },
+        "UserIdList": {
+            "title": "User List",
+            "properties": {
+                "userIds": {
+                    "type": "object",
+                    "description": "List of User Names"
+                }
+            }
+        },
+        "RoleIdList": {
+            "title": "Role List",
+            "properties": {
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Role Id's"
+                }
+            }
+        },
         "Install": {
             "title": "Install/Download App",
             "properties": {
                 "type": {
                     "type": "string",
-                    "description": "Download type (either use or devices).\n",
+                    "description": "Download type (either user or devices).\n",
                     "example": "user/device"
                 },
                 "deviceIds": {
@@ -665,6 +893,24 @@
                 "appId": {
                     "type": "string",
                     "description": "Installing mobile app ID"
+                }
+            }
+        },
+        "AdminInstall": {
+            "title": "Install/Download App",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "Download type (either user or roles).\n",
+                    "example": "user/device"
+                },
+                "typeIds": {
+                    "type": "object",
+                    "description": "List of Id's against type (role/user)"
+                },
+                "appId": {
+                    "type": "string",
+                    "description": "App Id"
                 }
             }
         },
