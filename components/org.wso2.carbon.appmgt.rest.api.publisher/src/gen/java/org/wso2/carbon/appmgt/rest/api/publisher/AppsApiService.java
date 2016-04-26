@@ -33,7 +33,6 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdPut(String appType,String appId,AppDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsAppTypeIdAppIdPolicygroupsPolicyGroupIdDelete(String appType,String appId,Integer policyGroupId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdTagsGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdTagsPut(String appType,String appId,TagListDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdTagsDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);

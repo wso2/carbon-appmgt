@@ -254,28 +254,6 @@ public class AppsApi  {
     {
     return delegate.appsAppTypeIdAppIdDelete(appType,appId,ifMatch,ifUnmodifiedSince);
     }
-    @DELETE
-    @Path("/{appType}/id/{appId}/policygroups/{policyGroupId}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Delete Policy Group", notes = "Delete an existing Policy Group", response = Void.class)
-    @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nResource successfully deleted."),
-        
-        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nResource to be deleted does not exist."),
-        
-        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
-
-    public Response appsAppTypeIdAppIdPolicygroupsPolicyGroupIdDelete(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
-    @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
-    @ApiParam(value = "policy group id",required=true ) @PathParam("policyGroupId") Integer policyGroupId,
-    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
-    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
-    {
-    return delegate.appsAppTypeIdAppIdPolicygroupsPolicyGroupIdDelete(appType,appId,policyGroupId,ifMatch,ifUnmodifiedSince);
-    }
     @GET
     @Path("/{appType}/id/{appId}/tags")
     @Consumes({ "application/json" })

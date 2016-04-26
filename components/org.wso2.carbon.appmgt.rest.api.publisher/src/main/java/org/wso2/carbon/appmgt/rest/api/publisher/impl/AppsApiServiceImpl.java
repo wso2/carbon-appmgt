@@ -383,13 +383,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdPolicygroupsPolicyGroupIdDelete(String appType, String appId,
-                                                                      Integer policyGroupId, String ifMatch,
-                                                                      String ifUnmodifiedSince) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
         return null;
     }
