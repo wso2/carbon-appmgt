@@ -5,6 +5,11 @@ info:
   description: >
     This document specifies a **RESTful API** for WSO2 **APP Manager**
     - Publisher.
+
+
+
+
+
     It is written with [swagger 2](http://swagger.io/).
   contact:
     name: WSO2
@@ -34,13 +39,34 @@ paths:
           in: query
           description: >
             **Search condition**.
+
+
+
+
+
             You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+
+
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
+
+
+
+
+
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
+
+
+
+
+
             If no advanced attribute modifier has been specified, search will
             match the
+
             given query string against App Name.
           type: string
         - $ref: '#/parameters/limit'
@@ -469,35 +495,6 @@ paths:
           description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/policygroups/{policyGroupId}':
-    delete:
-      x-scope: 'appm:create'
-      summary: Delete Policy Group
-      description: |
-        Delete an existing Policy Group
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/policyGroupId'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: "OK. \nResource successfully deleted.\n"
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nResource to be deleted does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
-          schema:
-            $ref: '#/definitions/Error'
   '/apps/{appType}/appId/{appId}/subscriptions':
     get:
       x-scope: 'appm:read'
@@ -549,6 +546,11 @@ paths:
         - name: action
           description: >
             The action to demote or promote the state of the App.
+
+
+
+
+
             Supported actions are
             [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
             **]
@@ -772,13 +774,34 @@ paths:
           in: query
           description: >
             **Search condition**.
+
+
+
+
+
             You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+
+
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
+
+
+
+
+
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
+
+
+
+
+
             If no advanced attribute modifier has been specified, search will
             match the
+
             given query string against App Name.
           type: string
         - $ref: '#/parameters/limit'
@@ -811,130 +834,6 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  '/javapolicies/appid/{appId}':
-    get:
-      x-scope: 'appm:read'
-      summary: Get available java policies
-      description: |
-        Get available java policies.
-      parameters:
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - JavaPolicies
-      responses:
-        '200':
-          description: "OK. \nQualifying App is returned.\n"
-          schema:
-            $ref: '#/definitions/JavaPolicy'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  /policygroups:
-    post:
-      x-scope: 'appm:read'
-      summary: Create a new policy group
-      description: |
-        Create a new policy group
-      parameters:
-        - in: body
-          name: body
-          description: |
-            PolicyGroup object that needs to be added
-          required: true
-          schema:
-            $ref: '#/definitions/PolicyGroup'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - PolicyGroups
-      responses:
-        '201':
-          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
-          schema:
-            $ref: '#/definitions/PolicyGroup'
-          headers:
-            Location:
-              description: |
-                The URL of the newly created resource.
-              type: string
-            Content-Type:
-              description: |
-                The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional request
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  '/policygroups/{policyGroupId}':
-    put:
-      x-scope: 'appm:update'
-      summary: Update an existing policy group
-      description: |
-        Update an existing policy group
-      parameters:
-        - $ref: '#/parameters/policyGroupId'
-        - in: body
-          name: body
-          description: |
-            App object that needs to be added
-          required: true
-          schema:
-            $ref: '#/definitions/PolicyGroup'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
-      tags:
-        - PolicyGroups
-      responses:
-        '200':
-          description: |
-            OK.
-        '400':
-          description: "Bad Request. \nInvalid request or validation error\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '412':
-          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
           schema:
             $ref: '#/definitions/Error'
   /xacmlpolicies/:
@@ -1351,6 +1250,7 @@ parameters:
     description: >
       Validator for conditional requests; based on the ETag of the formerly
       retrieved
+
       variant of the resourec.
     type: string
   If-Modified-Since:
@@ -1423,7 +1323,6 @@ definitions:
     required:
       - name
       - version
-      - provider
       - displayName
     properties:
       id:
@@ -1647,63 +1546,6 @@ definitions:
       roleIds:
         type: object
         description: List of Tiers
-  PolicyGroup:
-    title: PolicyGroup object
-    required:
-      - name
-    properties:
-      id:
-        type: integer
-        description: |
-          policy group id
-        example: '1'
-      name:
-        type: string
-        example: policy_group1
-      throttlingTier:
-        type: string
-        description: throttling tier name
-        example: gold
-      userRoles:
-        type: string
-        description: visibility restricted user roles
-        example: admin
-      isAnonymousAllowed:
-        type: boolean
-        example: 'true'
-      policyPartialMappings:
-        description: |
-          list of xacml policy partial Id's relevant to policy group.
-        type: object
-        example: '[1,2,3]'
-      description:
-        description: |
-          brief description about policy group
-        type: string
-  JavaPolicy:
-    title: JavaPolicy object
-    required:
-      - displayName
-    properties:
-      id:
-        type: integer
-        description: |
-          java policy id
-        example: '1'
-      displayName:
-        type: string
-        example: stats handler
-      description:
-        type: string
-      displayOrder:
-        type: integer
-        description: |
-          display order of the policy in UI
-        example: '1'
-      applicationId:
-        type: string
-        description: mapped interna app id
-        example: '1'
   PolicyPartial:
     title: Policy Partial
     required:

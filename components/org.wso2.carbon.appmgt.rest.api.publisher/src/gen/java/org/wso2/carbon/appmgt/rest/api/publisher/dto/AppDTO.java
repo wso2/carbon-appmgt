@@ -47,7 +47,7 @@ public class AppDTO  {
   @NotNull
   private String version = null;
   
-  @NotNull
+  
   private String provider = null;
   
   
@@ -89,7 +89,7 @@ public class AppDTO  {
   
   private String category = null;
   
-  
+  @NotNull
   private String displayName = null;
   
   
@@ -257,7 +257,7 @@ public class AppDTO  {
   /**
    * If the provider value is not given user invoking the api will be used as the provider.
    **/
-  @ApiModelProperty(required = true, value = "If the provider value is not given user invoking the api will be used as the provider.")
+  @ApiModelProperty(value = "If the provider value is not given user invoking the api will be used as the provider.")
   @JsonProperty("provider")
   public String getProvider() {
     return provider;
@@ -435,7 +435,7 @@ public class AppDTO  {
   /**
    * displayName of the asset
    **/
-  @ApiModelProperty(value = "displayName of the asset")
+  @ApiModelProperty(required = true, value = "displayName of the asset")
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
