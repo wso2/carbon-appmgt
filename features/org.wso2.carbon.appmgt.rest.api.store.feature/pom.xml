@@ -63,14 +63,6 @@
                                     <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
                                     <destFileName>api#appm#store#v1.0.war</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.wso2.carbon.appmgt</groupId>
-                                    <artifactId>org.wso2.carbon.appmgt.rest.api.storeadmin</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <type>war</type>
-                                    <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
-                                    <destFileName>api#appm#storeadmin#v1.0.war</destFileName>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>

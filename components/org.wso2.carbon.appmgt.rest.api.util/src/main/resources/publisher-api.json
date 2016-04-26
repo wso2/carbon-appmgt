@@ -95,6 +95,7 @@
                 }
             },
             "post": {
+                "x-scope": "appm:create",
                 "summary": "Create a new App",
                 "description": "Create a new App\n",
                 "parameters": [
@@ -348,6 +349,468 @@
                 }
             }
         },
+        "/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}":{
+            "delete": {
+                "x-scope": "appm:create",
+                "summary": "Delete policy partial mapping from an App",
+                "description": "Delete policy partial mapping from an App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/tags":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all Tags of an App",
+                "description": "Get a list of available Tags relevant to given App Internal Id.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/TagList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-scope": "appm:update",
+                "summary": "Update an existing App",
+                "description": "Update an existing Tags relevant to an App by App Internal Id\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TagList"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nSuccessful response with updated App object\n",
+                        "schema": {
+                            "$ref": "#/definitions/App"
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "The URL of the newly created resource.\n",
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modifed the last time. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-scope": "appm:create",
+                "summary": "Delete Tags relevant to an App by App Internal Id",
+                "description": "Delete an existing App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/xacmlpolicies":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all XACML policies relevant to an App",
+                "description": "Get a list of XACML policies relevant to an App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of XACML policies is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartialList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Assign a policy partial to an App",
+                "description": "Assign a policy partial to an App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartialIdList"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/policygroups/{policyGroupId}":{
+            "delete": {
+                "x-scope": "appm:create",
+                "summary": "Delete Policy Group",
+                "description": "Delete an existing Policy Group\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/policyGroupId"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/appId/{appId}/subscriptions":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get subscribed user list for an App",
+                "description": "Get subscribed user list for an App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying User List is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/UserIdList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appType}/change-lifecycle": {
             "post": {
                 "x-scope": "appm:publish",
@@ -550,6 +1013,884 @@
                     }
                 }
             }
+        },
+        "/apps/{appType}/tags":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all Tags",
+                "description": "Get a list of available Tags relevant to given App Type.\n",
+                "parameters": [
+
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/TagList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/throttlingtiers":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all Tiers",
+                "description": "Get a list of Tiers.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Tiers"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of Tiers is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/TierList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/cache":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all Apps from Cache",
+                "description": "Get a list of available Apps qualifying under a given search condition.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "**Search condition**.\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "type": "string"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/javapolicies/appid/{appId}":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get available java policies",
+                "description": "Get available java policies.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "JavaPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/JavaPolicy"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/policygroups":{
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Create a new policy group",
+                "description": "Create a new policy group\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "PolicyGroup object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyGroup"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "PolicyGroups"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PolicyGroup"
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "The URL of the newly created resource.\n",
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/policygroups/{policyGroupId}":{
+            "put": {
+                "x-scope": "appm:update",
+                "summary": "Update an existing policy group",
+                "description": "Update an existing policy group\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyGroupId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyGroup"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "PolicyGroups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                     "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/policygroups/{policyGroupId}/apps":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get apps associated with policy group",
+                "description": "Get apps associated with policy group.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyGroupId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "PolicyGroups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/xacmlpolicies/":{
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get all XACML policies",
+                "description": "Get a list of XACML policies.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "XACMLPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of XACML policies is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartialList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/xacmlpolicies/{policyPartialId}/apps":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get all Apps mapped to a policy partial",
+                "description": "Get a list of available Apps mapped to a policy partial.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/xacmlpolicies/validate":{
+            "post": {
+                "x-scope": "appm:administration",
+                "summary": "Validate Policy contenr",
+                "description": "Create a new App\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartial"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "XACMLPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/xacmlpolicies/":{
+            "post": {
+                "x-scope": "appm:administration",
+                "summary": "Create a new Policy Partial",
+                "description": "Create a new Policy Partial.\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartial"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "XACMLPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/xacmlpolicies/{policyPartialId}":{
+            "put": {
+                "x-scope": "appm:administration",
+                "summary": "Update an existing policy partial",
+                "description": "Update an existing policy partial\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartial"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "XACMLPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get policy partial details",
+                "description": "Get policy partial.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "XACMLPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PolicyPartial"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-scope": "appm:administration",
+                "summary": "Delete policy partial",
+                "description": "Delete an existing policy partial\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/roles": {
+            "get": {
+                "x-scope": "appm:create",
+                "summary": "Get all Roles",
+                "description": "Get a list of available Roles.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Roles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Roles are returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/RoleIdList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -566,6 +1907,20 @@
             "description": "App Type. Either webapp or mobileapp\n",
             "required": true,
             "type": "string"
+        },
+        "policyGroupId":{
+            "name": "policyGroupId",
+            "in": "path",
+            "description": "policy group id\n",
+            "required": true,
+            "type": "integer"
+        },
+        "policyPartialId":{
+            "name": "policyPartialId",
+            "in": "path",
+            "description": "policy partial id\n",
+            "required": true,
+            "type": "integer"
         },
         "appId-Q": {
             "name": "appId",
@@ -928,6 +2283,169 @@
                 "version": {
                     "type": "string",
                     "example": "1.0"
+                }
+            }
+        },
+        "TagList": {
+            "title": "Tag List",
+            "properties": {
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Tags"
+                }
+            }
+        },
+        "TierList": {
+            "title": "Tier List",
+            "properties": {
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Tiers"
+                }
+            }
+        },
+        "PolicyGroup":{
+            "title": "PolicyGroup object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "policy group id\n",
+                    "example": "1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "policy_group1"
+                },
+                "throttlingTier": {
+                    "type": "string",
+                    "description": "throttling tier name",
+                    "example": "gold"
+                },
+                "userRoles": {
+                    "type": "string",
+                    "description": "visibility restricted user roles",
+                    "example": "admin"
+                },
+                "isAnonymousAllowed": {
+                    "type": "boolean",
+                    "example": "true"
+                },
+                "policyPartialMappings": {
+                    "description": "list of xacml policy partial Id's relevant to policy group.\n",
+                    "type": "object",
+                    "example": "[1,2,3]"
+                },
+                "description": {
+                    "description": "brief description about policy group\n",
+                    "type": "string"
+                }
+            }
+        },
+        "JavaPolicy":{
+            "title": "JavaPolicy object",
+            "required": [
+                "displayName"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "java policy id\n",
+                    "example": "1"
+                },
+                "displayName": {
+                    "type": "string",
+                    "example": "stats handler"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "displayOrder": {
+                    "type": "integer",
+                    "description": "display order of the policy in UI\n",
+                    "example": "1"
+                },
+                "applicationId": {
+                    "type": "string",
+                    "description": "mapped interna app id",
+                    "example": "1"
+                }
+            }
+        },
+        "PolicyPartial":{
+            "title": "Policy Partial",
+            "required": [
+                "policyPartial"
+            ],
+            "properties": {
+                "policyPartialId": {
+                    "type": "integer",
+                    "description": "Id of the policy\n",
+                    "example": "1"
+                },
+                "policyPartialName": {
+                    "type": "string",
+                    "description": "name of the policy\n",
+                    "example": "policy1"
+                },
+                "policyPartial": {
+                    "type": "string",
+                    "description": "policy content\n",
+                    "example": "xacml policy implementation"
+                },
+                "isSharedPartial": {
+                    "type": "boolean",
+                    "description": "whether shared or not",
+                    "example": "true/false"
+                },
+                "policyPartialDesc": {
+                    "type": "string",
+                    "description": "description about the policy"
+                }
+            }
+        },
+        "PolicyPartialList": {
+            "title": "Policy Partial List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of App returned.\n",
+                    "example": 1
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PolicyPartial"
+                    }
+                }
+            }
+        },
+        "PolicyPartialIdList":{
+            "title": "XACML policy partial Id's",
+            "properties": {
+                "xacmlPolicyIds": {
+                    "type": "object",
+                    "description": "List of XACML policy partial Id's"
+                }
+            }
+        },
+        "UserIdList": {
+            "title": "User List",
+            "properties": {
+                "userIds": {
+                    "type": "object",
+                    "description": "List of User Names"
+                }
+            }
+        },
+        "RoleIdList": {
+            "title": "Role List",
+            "properties": {
+                "roleIds": {
+                    "type": "object",
+                    "description": "List of Role Id's"
                 }
             }
         },

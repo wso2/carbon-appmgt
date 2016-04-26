@@ -13,6 +13,7 @@
         <jaxrs:serviceBeans>
             <bean class="org.wso2.carbon.appmgt.rest.api.store.AppsApi" />
             <bean class="org.wso2.carbon.appmgt.rest.api.store.DevicesApi" />
+            <bean class="org.wso2.carbon.appmgt.rest.api.store.AdministrationApi" />
 
         </jaxrs:serviceBeans>
         <jaxrs:providers>
