@@ -1381,66 +1381,6 @@
                 }
             }
         },
-        "/policygroups/{policyGroupId}/apps":{
-            "get": {
-                "x-scope": "appm:read",
-                "summary": "Get apps associated with policy group",
-                "description": "Get apps associated with policy group.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/policyGroupId"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
-                    }
-                ],
-                "tags": [
-                    "PolicyGroups"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
-                        "schema": {
-                            "$ref": "#/definitions/AppList"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "description": "The content type of the body.",
-                                "type": "string"
-                            },
-                            "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
         "/xacmlpolicies/":{
             "get": {
                 "x-scope": "appm:administration",
@@ -1519,6 +1459,66 @@
                 ],
                 "tags": [
                     "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Apps is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/policygroups/{policyGroupId}/apps":{
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get apps associated with policy group",
+                "description": "Get apps associated with policy group.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/policyGroupId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "PolicyGroups"
                 ],
                 "responses": {
                     "200": {
