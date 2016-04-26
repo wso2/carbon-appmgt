@@ -51,7 +51,6 @@
     <module>components/org.wso2.carbon.appmgt.rest.api.util</module>
     <module>components/org.wso2.carbon.appmgt.rest.api.publisher</module>
     <module>components/org.wso2.carbon.appmgt.rest.api.store</module>
-    <module>components/org.wso2.carbon.appmgt.rest.api.storeadmin</module>
     <module>features/org.wso2.carbon.appmgt.oauth.feature</module>
     <module>features/org.wso2.carbon.appmgt.rest.api.store.feature</module>
     <module>features/org.wso2.carbon.appmgt.rest.api.publisher.feature</module>
@@ -666,12 +665,6 @@
         <dependency>
             <groupId>org.wso2.carbon.appmgt</groupId>
             <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
-            <version>${carbon.appmgt.version}</version>
-            <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.appmgt</groupId>
-            <artifactId>org.wso2.carbon.appmgt.rest.api.storeadmin</artifactId>
             <version>${carbon.appmgt.version}</version>
             <type>war</type>
         </dependency>

@@ -1,43 +1,31 @@
-/*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * you may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
-package org.wso2.carbon.appmgt.rest.api.storeadmin.impl;
+package org.wso2.carbon.appmgt.rest.api.store.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.ErrorListItemDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.storeadmin.utils.mappings.APPMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.store.AdministrationApiService;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AdminInstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorListItemDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.RoleIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
-import org.wso2.carbon.user.core.UserStoreManager;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
@@ -45,13 +33,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-public class AppsApiServiceImpl extends AppsApiService {
-    private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
+public class AdministrationApiServiceImpl extends AdministrationApiService {
+    private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
     BeanValidator beanValidator;
 
     @Override
-    public Response appsDownloadPost(String contentType, InstallDTO install) {
+    public Response administrationAppsDownloadPost(String contentType,AdminInstallDTO install){
         beanValidator = new BeanValidator();
         beanValidator.validate(install);
 
@@ -107,7 +94,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                             if (RestApiUtil.isExistingRole(typeId) == false) {
                                 throw new NotFoundException();
                             }
-                            UserStoreManager userStoreManager =
+                            org.wso2.carbon.user.core.UserStoreManager userStoreManager =
                                     ((UserRegistry) registry).getUserRealm().getUserStoreManager();
                             String[] users = userStoreManager.getUserListOfRole(typeId);
                             for (String userId : users) {
@@ -155,9 +142,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         return null;
     }
-
     @Override
-    public Response appsUninstallationPost(String contentType, InstallDTO install) {
+    public Response administrationAppsUninstallationPost(String contentType,AdminInstallDTO install){
         beanValidator = new BeanValidator();
         beanValidator.validate(install);
 
@@ -213,7 +199,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                             if (RestApiUtil.isExistingRole(typeId) == false) {
                                 throw new NotFoundException();
                             }
-                            UserStoreManager userStoreManager =
+                            org.wso2.carbon.user.core.UserStoreManager userStoreManager =
                                     ((UserRegistry) registry).getUserRealm().getUserStoreManager();
                             String[] users = userStoreManager.getUserListOfRole(typeId);
                             for (String userId : users) {
@@ -260,6 +246,64 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         return null;
     }
+    @Override
+    public Response administrationRolesGet(Integer limit,Integer offset,String accept,String ifNoneMatch){
+        RoleIdListDTO roleListDTO = new RoleIdListDTO();
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        String[] roleNames = null;
 
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            roleNames = manager.getRoleNames();
+            if (roleNames == null) {
+                return RestApiUtil.buildNotFoundException("Roles not found", null).getResponse();
+            }
+        } catch (UserStoreException e) {
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
+        }
 
+        JSONArray roleNamesArr = new JSONArray();
+        for (int i = 0; i < roleNames.length; i++) {
+            String roleName = roleNames[i];
+            //exclude internal roles
+            if (roleName.indexOf("Internal/") <= -1) {
+                roleNamesArr.add(roleName);
+            }
+        }
+        roleListDTO.setRoleIds(roleNamesArr);
+        return Response.ok().entity(roleListDTO).build();
+    }
+    @Override
+    public Response administrationUsersGet(Integer limit,Integer offset,String accept,String ifNoneMatch){
+        UserIdListDTO userListDTO = new UserIdListDTO();
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+        String[] userNames = null;
+
+        try {
+            String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            UserRealm realm = realmService.getTenantUserRealm(tenantId);
+            UserStoreManager manager = realm.getUserStoreManager();
+            userNames = manager.listUsers("", -1);
+            if (userNames == null) {
+                return RestApiUtil.buildNotFoundException("Users not found", null).getResponse();
+            }
+        } catch (UserStoreException e) {
+            return RestApiUtil.buildInternalServerErrorException().getResponse();
+        }
+
+        JSONArray userNamesArr = new JSONArray();
+        for (int i = 0; i < userNames.length; i++) {
+            userNamesArr.add(userNames[i]);
+        }
+        userListDTO.setUserIds(userNamesArr);
+        return Response.ok().entity(userListDTO).build();
+    }
 }
