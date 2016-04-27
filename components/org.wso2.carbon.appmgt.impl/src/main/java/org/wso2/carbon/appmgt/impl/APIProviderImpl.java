@@ -2338,6 +2338,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -2376,11 +2377,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return
      */
     public String[] getAllowedLifecycleActions(String appId, String appType) throws AppManagementException {
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
         String[] actions = null;
         try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
 
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
@@ -2392,8 +2394,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     actions = appArtifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
                 }
             } else {
-                handleResourceNotFoundException(
-                        "Failed to get " + appType + " artifact corresponding to artifactId " + appId + ". Artifact does not exist");
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
         } catch (GovernanceException e) {
             handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
