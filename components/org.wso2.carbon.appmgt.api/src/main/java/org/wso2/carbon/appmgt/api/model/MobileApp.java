@@ -17,7 +17,10 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is used to store and process mobile application details
@@ -26,52 +29,56 @@ public class MobileApp {
 
     private String appName;
     private String appId;
-    private String appVersion;
+    private String appUrl;
+    private String version;
     private String appProvider;
+    private String bundleVersion;
     private String category;
+    private String packageName;
     private String platform;
     private String marketType;
     private String appType;
     private String banner;
     private String description;
     private String displayName;
-    private String screenshot1;
-    private String screenshot2;
-    private String screenshot3;
-    private String icon;
-    private String bundleVersion;
-    private String packageName;
+    private String thumbnail;
     private String[] availableLifecycleActions;
     private String recentChanges;
-    private String thumbnail;
     private APIStatus lifecycleStatus;
     private List<String> screenShots;
-    private String appUrl;
-    private List<String> appVisibility;
+    private String createdTime;
 
-    public List<String> getAppVisibility() {
-        return appVisibility;
+    public String getCreatedTime() {
+        return createdTime;
     }
 
-    public void setAppVisibility(List<String> visibility) {
-        this.appVisibility = visibility;
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
     }
 
-    public String getAppUrl() {
-        return appUrl;
+    private String[] appVisibility;
+    private Set<String> tags = new LinkedHashSet<String>();
+
+    public Set<String> getTags() {
+        return Collections.unmodifiableSet(tags);
     }
 
-    public void setAppUrl(String appUrl) {
-        this.appUrl = appUrl;
+    public void addTags(Set<String> tags) {
+        this.tags.addAll(tags);
     }
 
-    public APIStatus getLifecycleStatus() {
-        return lifecycleStatus;
+    public void removeTags(Set<String> tags) {
+        this.tags.removeAll(tags);
     }
 
-    public void setLifecycleStatus(APIStatus lifecycleStatus) {
-        this.lifecycleStatus = lifecycleStatus;
+    public String getVersion() {
+        return version;
     }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
 
     public String getAppName() {
         return appName;
@@ -89,12 +96,12 @@ public class MobileApp {
         this.appId = appId;
     }
 
-    public String getAppVersion() {
-        return appVersion;
+    public String getAppUrl() {
+        return appUrl;
     }
 
-    public void setAppVersion(String appVersion) {
-        this.appVersion = appVersion;
+    public void setAppUrl(String appUrl) {
+        this.appUrl = appUrl;
     }
 
     public String getAppProvider() {
@@ -105,12 +112,28 @@ public class MobileApp {
         this.appProvider = appProvider;
     }
 
+    public String getBundleVersion() {
+        return bundleVersion;
+    }
+
+    public void setBundleVersion(String bundleVersion) {
+        this.bundleVersion = bundleVersion;
+    }
+
     public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     public String getPlatform() {
@@ -145,14 +168,6 @@ public class MobileApp {
         this.banner = banner;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getDisplayName() {
         return displayName;
     }
@@ -161,52 +176,20 @@ public class MobileApp {
         this.displayName = displayName;
     }
 
-    public String getScreenshot1() {
-        return screenshot1;
+    public String getDescription() {
+        return description;
     }
 
-    public void setScreenshot1(String screenshot1) {
-        this.screenshot1 = screenshot1;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getScreenshot2() {
-        return screenshot2;
+    public String getThumbnail() {
+        return thumbnail;
     }
 
-    public void setScreenshot2(String screenshot2) {
-        this.screenshot2 = screenshot2;
-    }
-
-    public String getScreenshot3() {
-        return screenshot3;
-    }
-
-    public void setScreenshot3(String screenshot3) {
-        this.screenshot3 = screenshot3;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getBundleVersion() {
-        return bundleVersion;
-    }
-
-    public void setBundleVersion(String bundleVersion) {
-        this.bundleVersion = bundleVersion;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public String[] getAvailableLifecycleActions() {
@@ -225,12 +208,12 @@ public class MobileApp {
         this.recentChanges = recentChanges;
     }
 
-    public String getThumbnail() {
-        return thumbnail;
+    public APIStatus getLifecycleStatus() {
+        return lifecycleStatus;
     }
 
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void setLifecycleStatus(APIStatus lifecycleStatus) {
+        this.lifecycleStatus = lifecycleStatus;
     }
 
     public List<String> getScreenShots() {
@@ -239,5 +222,13 @@ public class MobileApp {
 
     public void setScreenShots(List<String> screenShots) {
         this.screenShots = screenShots;
+    }
+
+    public String[] getAppVisibility() {
+        return appVisibility;
+    }
+
+    public void setAppVisibility(String[] appVisibility) {
+        this.appVisibility = appVisibility;
     }
 }

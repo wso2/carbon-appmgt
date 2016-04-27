@@ -7,19 +7,24 @@
 
 <div class="wr-section">
     <h2 class="first-h2 exp_col" style="display:block"><i class="icon-chevron-sign-down icon"></i>Overview</h2>
-
     <div id="wr-overview" style="display:block">
         <fieldset>
+            <input type='hidden' value="{{businessOwnerList}}" name="ownerList" id="owner_list"/>
             {{{ form_render "overview_provider" data.fields }}}
             {{{ form_render "overview_name" data.fields }}}
             {{{ form_render "overview_displayName" data.fields }}}
             {{{ form_render "overview_context" data.fields }}}
             {{{ form_render "overview_version" data.fields }}}
-
+            <div class="form-group">
+                <label class="control-label col-sm-2">Owner :  </label>
+                <div class="col-sm-10">
+                    <input id='overview_businessOwner' name='overview_businessOwner' class="col-lg-6 col-sm-12 col-xs-12" type='text' value=''  placeholder=" Owner Name"  />
+                </div>
+            </div>
             <div class="form-group">
                 <label class="control-label col-sm-2">Make As Default Version: </label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-10 checkbox-div">
                     <label>
                         <input type="checkbox" class="makeAsDefaultVersion_checkbox"/>
                     </label>
@@ -55,7 +60,7 @@
             <div class="form-group">
                 <label class="control-label col-sm-2">Treat as a Site: </label>
 
-                <div class="col-sm-10">
+                <div class="col-sm-10 checkbox-div">
                     <input type="checkbox" class="treatAsASite_checkbox">
                 </div>
             </div>
