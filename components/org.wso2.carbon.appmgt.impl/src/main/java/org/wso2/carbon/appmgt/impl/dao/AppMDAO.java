@@ -5724,31 +5724,34 @@ public class AppMDAO {
 	public EntitlementPolicyPartial getPolicyPartial(int policyPartialId) throws
                                                                           AppManagementException {
 
-		Connection connection = null;
-		PreparedStatement statementToGetPolicyPartial = null;
-		EntitlementPolicyPartial entitlementPolicyPartial = null;
-		ResultSet rs = null;
-		String queryToGetPolicyPartial =
-				"SELECT NAME,CONTENT " +
-						"FROM APM_ENTITLEMENT_POLICY_PARTIAL " +
-						"WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ?";
+        Connection connection = null;
+        PreparedStatement statementToGetPolicyPartial = null;
+        EntitlementPolicyPartial entitlementPolicyPartial = null;
+        ResultSet rs = null;
+        String queryToGetPolicyPartial =
+                "SELECT NAME, CONTENT, SHARED, DESCRIPTION, AUTHOR " +
+                        "FROM APM_ENTITLEMENT_POLICY_PARTIAL " +
+                        "WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ?";
 
-		try {
+        try {
 
-			if (log.isDebugEnabled()) {
-				log.debug("Retrieving policy content of policy partial with id : " + policyPartialId);
-			}
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving policy content of policy partial with id : " + policyPartialId);
+            }
 
-			connection = APIMgtDBUtil.getConnection();
-			statementToGetPolicyPartial = connection.prepareStatement(queryToGetPolicyPartial);
-			statementToGetPolicyPartial.setInt(1, policyPartialId);
+            connection = APIMgtDBUtil.getConnection();
+            statementToGetPolicyPartial = connection.prepareStatement(queryToGetPolicyPartial);
+            statementToGetPolicyPartial.setInt(1, policyPartialId);
 
-			rs = statementToGetPolicyPartial.executeQuery();
-			while (rs.next()) {
-				entitlementPolicyPartial = new EntitlementPolicyPartial();
-				entitlementPolicyPartial.setPolicyPartialName(rs.getString("NAME"));
-				entitlementPolicyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
-			}
+            rs = statementToGetPolicyPartial.executeQuery();
+            while (rs.next()) {
+                entitlementPolicyPartial = new EntitlementPolicyPartial();
+                entitlementPolicyPartial.setPolicyPartialName(rs.getString("NAME"));
+                entitlementPolicyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
+                entitlementPolicyPartial.setAuthor(rs.getString("AUTHOR"));
+                entitlementPolicyPartial.setDescription(rs.getString("DESCRIPTION"));
+                entitlementPolicyPartial.setShared(rs.getBoolean("SHARED"));
+            }
 
 		} catch (SQLException e) {
 			handleException("Failed to retrieve application entitlement policy partial with id : " +
