@@ -1484,11 +1484,11 @@
                         "description": "OK.\n",
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the Policy Partial. Used by caches, or in conditional request.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time the Policy Partial has been modified the last time. \nUsed by caches, or in conditional requests.\n",
                                 "type": "string"
                             }
                         }

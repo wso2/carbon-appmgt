@@ -126,7 +126,30 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     public Response administrationXacmlpoliciesPolicyPartialIdPut(Integer policyPartialId, PolicyPartialDTO body,
                                                                   String contentType, String ifMatch,
                                                                   String ifUnmodifiedSince) {
-        return null;
+        beanValidator = new BeanValidator();
+        beanValidator.validate(body);
+        PolicyPartialDTO policyPartialDTO = new PolicyPartialDTO();
+        try {
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            String currentUser = RestApiUtil.getLoggedInUsername();
+            if (body.getPolicyPartial().trim().isEmpty()) {
+                RestApiUtil.handleBadRequest("XACML Policy Content cannot be empty", log);
+            }
+            //update policy
+            apiProvider.updateEntitlementPolicyPartial(policyPartialId, body.getPolicyPartial(), currentUser,
+                                                       body.getIsSharedPartial(), body.getPolicyPartialDesc());
+            //retrieved updated policy details by id
+            EntitlementPolicyPartial entitlementPolicyPartial = apiProvider.getPolicyPartial(policyPartialId);
+            policyPartialDTO.setPolicyPartialId(policyPartialId);
+            policyPartialDTO.setPolicyPartialName(entitlementPolicyPartial.getPolicyPartialName());
+            policyPartialDTO.setPolicyPartial(entitlementPolicyPartial.getPolicyPartialContent());
+            policyPartialDTO.setPolicyPartialDesc(entitlementPolicyPartial.getDescription());
+            policyPartialDTO.setIsSharedPartial(entitlementPolicyPartial.isShared());
+        } catch (AppManagementException e) {
+            String errorMessage = "Error while updating XACML policy";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().build();
     }
 
     @Override
