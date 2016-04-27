@@ -56,11 +56,22 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This is the service implementation class for Publisher API related operations
+ */
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiService.class);
     BeanValidator beanValidator;
 
+    /**
+     * Upload binary files into storage
+     * @param fileInputStream Uploading fileInputStream
+     * @param fileDetail Attachment details
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return API path of the uploaded binary
+     */
     @Override
     public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
@@ -121,6 +132,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(binaryDTO).build();
     }
 
+    /**
+     * Upload static contents like images into storage
+     * @param fileInputStream Upload static content's fileInputStream
+     * @param fileDetail uploading file details
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return API path of the uploaded static content
+     */
     @Override
     public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
@@ -209,6 +228,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Create an application
+     * @param appType application type ie: webapp, mobileapp
+     * @param body Application DTO
+     * @param contentType
+     * @param ifModifiedSince
+     * @return created application id
+     */
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
         beanValidator = new BeanValidator();
@@ -253,6 +280,15 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Change lifecycle state of an application
+     * @param appType application type ie: webapp, mobileapp
+     * @param action lifecycle action
+     * @param appId application uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return status message
+     */
     @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
@@ -323,6 +359,16 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Update an application
+     * @param appType appType application type ie: webapp, mobileapp
+     * @param appId application id
+     * @param body Application DTO
+     * @param contentType
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return 
+     */
     @Override
     public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
                                           String ifUnmodifiedSince) {
