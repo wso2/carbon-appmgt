@@ -2347,19 +2347,22 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
 
             if (appArtifact != null) {
-                appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                //Change lifecycle status
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(action, AppMConstants.WEBAPP_LIFE_CYCLE);
+                }
                 if (log.isDebugEnabled()) {
                     String logMessage =
-                            "Application with appId : " + appId + " lifecycle has been changed successfully.";
+                            "Lifecycle action " + action + " has been successfully performed on " + appType
+                                    + "with id" + appId;
                     log.debug(logMessage);
                 }
             }
-
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving GenericArtifactManager for appType : " + appType, e);
         } catch (GovernanceException e) {
-            handleException("Error occurred while changing lifecycle state of application with appId : " +
-                    appId + " for action : " + action, e);
+            handleException("Error occurred while performing lifecycle action : " + action + " on " + appType + " with id : " +
+                    appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -2378,18 +2381,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
         String[] actions = null;
         try {
+
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
             if (appArtifact != null) {
-                //Get all the actions corresponding to current state of the api artifact
-                actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    //Get all the actions corresponding to current state of the api artifact
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                }else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
+                }
             } else {
                 handleResourceNotFoundException(
-                        "Failed to get "+appType+" artifact corresponding to artifactId " + appId + ". Artifact does not exist");
+                        "Failed to get " + appType + " artifact corresponding to artifactId " + appId + ". Artifact does not exist");
             }
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
-                    " with id : "+appId, e);
         } catch (GovernanceException e) {
             handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
                     " with id : " + appId, e);

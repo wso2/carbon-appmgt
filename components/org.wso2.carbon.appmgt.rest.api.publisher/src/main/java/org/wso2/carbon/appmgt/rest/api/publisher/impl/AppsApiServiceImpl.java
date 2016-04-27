@@ -297,14 +297,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                boolean isValidAction = false;
                 String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
                 if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
                     RestApiUtil.handleBadRequest(
                             "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
                                     ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
                 }
-
                 appProvider.changeLifeCycleStatus(appType, appId, action);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
@@ -367,7 +365,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @param contentType
      * @param ifMatch
      * @param ifUnmodifiedSince
-     * @return 
+     * @return
      */
     @Override
     public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
