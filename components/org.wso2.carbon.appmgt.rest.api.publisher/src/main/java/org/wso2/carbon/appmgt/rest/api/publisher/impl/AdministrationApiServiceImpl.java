@@ -29,11 +29,13 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 
 import javax.ws.rs.core.Response;
 
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
+    BeanValidator beanValidator;
 
     @Override
     public Response administrationPolicygroupsPolicyGroupIdAppsGet(Integer policyGroupId, String accept,
@@ -49,7 +51,22 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     @Override
     public Response administrationXacmlpoliciesValidatePost(PolicyPartialDTO body, String contentType,
                                                             String ifModifiedSince) {
-        return null;
+        beanValidator = new BeanValidator();
+        beanValidator.validate(body);
+        try {
+            if (body.getPolicyPartial().isEmpty()) {
+                RestApiUtil.handleBadRequest("XACML Policy Content is null", log);
+            }
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            Boolean isValid = apiProvider.validateEntitlementPolicyPartial(body.getPolicyPartial()).isValid();
+            if (!isValid) {
+                RestApiUtil.handleBadRequest("XACML Policy Content is not valid", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error while validating XACML policy content ";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().build();
     }
 
     @Override
