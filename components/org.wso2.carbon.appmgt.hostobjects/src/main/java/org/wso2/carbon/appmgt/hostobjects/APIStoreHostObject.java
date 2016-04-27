@@ -218,49 +218,6 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     /**
-     * Retrieve the business Owner
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
-            throws
-            AppManagementException {
-
-        if (args == null || args.length != 1) {
-            throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
-        }
-
-        String appId = args[0].toString();
-        APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
-        NativeObject row = new NativeObject();
-        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-        Map<String, String> businessOwnerDetails = null;
-        businessOwnerDetails = businessOwner.getBusinessOwnerCustomProperties();
-        JSONObject businessOwnerDetailsObject = new JSONObject();
-        if(businessOwnerDetails != null) {
-            Set<String> keySet = businessOwnerDetails.keySet();
-            for (String key : keySet) {
-                businessOwnerDetailsObject.put(key, businessOwnerDetails.get(key));
-            }
-            row.put("businessOwnerDeatails", row, businessOwnerDetailsObject.toJSONString());
-        } else {
-            row.put("businessOwnerDeatails", row, null);
-        }
-
-
-        return row;
-    }
-
-    /**
      * Get the identity provider URL from app-manager.xml file
      *
      * @param context Rhino context

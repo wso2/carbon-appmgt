@@ -140,82 +140,6 @@ public class AppMDAO {
     }
 
     /**
-     * This methode is to return a List of existing business owners with out their custom properties.
-     * @param appId
-     * @return
-     * @throws AppManagementException
-     */
-    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException {
-
-        Connection connection = null;
-        PreparedStatement statementToGetBusinessOwners = null;
-        BusinessOwner businessOwner = new BusinessOwner();
-        ResultSet businessOwnerResultSet = null;
-
-        String queryToGetBusinessOwner =
-                "SELECT BUSINESS_OWNER.OWNER_ID, BUSINESS_OWNER.OWNER_NAME, BUSINESS_OWNER.OWNER_EMAIL, " +
-                        "BUSINESS_OWNER.OWNER_DESC, BUSINESS_OWNER.OWNER_SITE FROM APM_APP INNER JOIN " +
-                        "BUSINESS_OWNER ON APM_APP.BUSINESS_OWNER_ID = BUSINESS_OWNER.OWNER_ID WHERE UUID = ? ";
-
-        try {
-            connection = APIMgtDBUtil.getConnection();
-            statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
-            statementToGetBusinessOwners.setString(1, appId);
-            businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
-
-            if (businessOwnerResultSet.next()) {
-                int businessOwnerId = businessOwnerResultSet.getInt("OWNER_ID");
-                businessOwner.setBusinessOwnerId(businessOwnerId);
-                businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
-                businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
-                businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
-                businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
-                businessOwner.setBusinessOwnerCustomProperties(getBusinessOwnerCustomPropertiesById(businessOwnerId));
-            }
-
-        } catch (SQLException e) {
-            handleException("Failed to retrieve business owners.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwners, connection, businessOwnerResultSet);
-
-        }
-        return businessOwner;
-    }
-
-    /**
-     * Returns the name of the owner of given appId.
-     * @param appId
-     * @return
-     * @throws AppManagementException
-     */
-    public String getBusinessOwnerName(String appId) throws AppManagementException {
-        PreparedStatement prepStmt = null;
-        Connection connection = null;
-        ResultSet businessOwnerNameResultSet = null;
-        int ownerId;
-        String ownerName = "";
-        String sqlQuery = "SELECT OWNER_NAME FROM BUSINESS_OWNER INNER JOIN APM_APP ON BUSINESS_OWNER.OWNER_ID = APM_APP.BUSINESS_OWNER_ID  WHERE UUID=?";
-
-        try {
-            connection = APIMgtDBUtil.getConnection();
-            connection.setAutoCommit(false);
-            prepStmt = connection.prepareStatement(sqlQuery);
-            prepStmt.setString(1, appId);
-            businessOwnerNameResultSet = prepStmt.executeQuery();
-
-            if (businessOwnerNameResultSet.next()) {
-                ownerName = businessOwnerNameResultSet.getString("OWNER_NAME");
-            }
-        } catch (SQLException e) {
-            handleException("Error when reading the application information from"
-                                    + " the persistence store.", e);
-        } finally {
-            APIMgtDBUtil.closeAllConnections(prepStmt, connection, businessOwnerNameResultSet);
-        }
-        return ownerName;
-    }
-
-    /**
      * Delete a given business owner.
      *
      * @param ownerId
@@ -4300,8 +4224,8 @@ public class AppMDAO {
         ResultSet rs = null;
         String businessOwnerName = app.getBusinessOwner();
         String query = "INSERT INTO APM_APP(APP_PROVIDER, TENANT_ID, APP_NAME, APP_VERSION, CONTEXT, TRACKING_CODE, " +
-                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE, BUSINESS_OWNER_ID ) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,(SELECT OWNER_ID FROM BUSINESS_OWNER WHERE OWNER_NAME =?))";
+                "UUID, SAML2_SSO_ISSUER, LOG_OUT_URL,APP_ALLOW_ANONYMOUS, APP_ENDPOINT, TREAT_AS_SITE) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4337,7 +4261,6 @@ public class AppMDAO {
             prepStmt.setBoolean(10, app.getAllowAnonymous());
             prepStmt.setString(11, app.getUrl());
             prepStmt.setBoolean(12, Boolean.parseBoolean(app.getTreatAsASite()));
-            prepStmt.setString(13, businessOwnerName);
 
             prepStmt.execute();
 
@@ -4929,8 +4852,7 @@ public class AppMDAO {
 		PreparedStatement prepStmt = null;
         ResultSet rs = null;
         String query = "UPDATE APM_APP " +
-                " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ?, " +
-                " BUSINESS_OWNER_ID=(SELECT OWNER_ID FROM BUSINESS_OWNER WHERE OWNER_NAME =?) " +
+                " SET CONTEXT = ?, LOG_OUT_URL  = ?, APP_ALLOW_ANONYMOUS = ?, APP_ENDPOINT = ? ,TREAT_AS_SITE = ? " +
                 " WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ? ";
 
 		String gatewayURLs = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().
@@ -4956,10 +4878,9 @@ public class AppMDAO {
             prepStmt.setBoolean(3, api.getAllowAnonymous());
             prepStmt.setString(4, api.getUrl());
             prepStmt.setBoolean(5, Boolean.parseBoolean(api.getTreatAsASite()));
-            prepStmt.setString(6, api.getBusinessOwner());
-            prepStmt.setString(7, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
-            prepStmt.setString(8, api.getId().getApiName());
-            prepStmt.setString(9, api.getId().getVersion());
+            prepStmt.setString(6, AppManagerUtil.replaceEmailDomainBack(api.getId().getProviderName()));
+            prepStmt.setString(7, api.getId().getApiName());
+            prepStmt.setString(8, api.getId().getVersion());
             prepStmt.execute();
 
 			int webAppId = getWebAppIdFromUUID(api.getUUID(), connection);

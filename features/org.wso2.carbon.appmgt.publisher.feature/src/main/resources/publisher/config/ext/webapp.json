@@ -75,6 +75,11 @@
             "field": "*.lifeCycle",
             "name": "save",
             "value": "asset.lifecycle.action.save"
+        },
+        {
+            "field": "overview.businessOwner",
+            "name": "editable",
+            "value": true
         }
     ],
 

@@ -38,6 +38,8 @@ var splitData = function(copyOfData){
             overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_context") {
             overview_meta.push(dataPart[i]);
+        }else if (dataPart[i].name == "overview_businessOwner") {
+            overview_meta.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_version") {
             overview_main.push(dataPart[i]);
         }else if (dataPart[i].name == "overview_displayName") {
