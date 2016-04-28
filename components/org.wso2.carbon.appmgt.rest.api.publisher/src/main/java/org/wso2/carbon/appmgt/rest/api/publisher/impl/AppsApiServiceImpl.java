@@ -277,9 +277,20 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
-                Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
-                userIdListDTO.setUserIds(subscriberSet);
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+                if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                    userIdListDTO.setUserIds(subscriberSet);
+                }else{
+                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
+                }
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -588,7 +599,26 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
                                                    String ifModifiedSince) {
-        return null;
+        boolean isContextExists = false;
+        try {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                if(StringUtils.isEmpty(appContext)){
+                    RestApiUtil.handleBadRequest("Webapp context is not provided", log);
+                }
+
+                if(appContext.indexOf("/") != 0){
+                    appContext = "/" + appContext;
+                }
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                isContextExists = appProvider.isContextExist(appContext);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error retrieving tags for " + appType + "s.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(isContextExists).build();
     }
 
 
