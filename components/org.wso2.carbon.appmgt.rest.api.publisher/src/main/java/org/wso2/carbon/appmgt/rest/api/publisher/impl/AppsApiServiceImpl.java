@@ -431,7 +431,25 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
-        return null;
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.getAllTags(appType, appId);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error retrieving tags for " + appType + " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().build();
     }
 
     /**
@@ -464,12 +482,13 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
             } else {
-                String errorMessage = "Error while adding a tag to " + appType + "with id : " + appId;
+                String errorMessage = "Error while adding a tag to " + appType + " with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return null;
+        return Response.ok().build();
     }
+
 
     @Override
     public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, TagListDTO body, String ifMatch, String ifUnmodifiedSince) {
@@ -491,11 +510,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
             } else {
-                String errorMessage = "Error while adding a tag to " + appType + "with id : " + appId;
+                String errorMessage = "Error while deleting tags from " + appType + " with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return null;
+        return Response.ok().build();
     }
 
     @Override
@@ -519,7 +538,19 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
-        return null;
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.getAllTags(appType);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error retrieving tags for " + appType + "s.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+
+        }
+        return Response.ok().build();
     }
 
     @Override
