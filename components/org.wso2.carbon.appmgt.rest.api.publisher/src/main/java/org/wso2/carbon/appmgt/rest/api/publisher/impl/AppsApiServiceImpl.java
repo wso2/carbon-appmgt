@@ -451,6 +451,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdCreateNewVersionPost(String appType, String appId, String contentType,
+                                                           String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
@@ -578,6 +584,13 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeThrottlingtiersGet(String appType, String accept, String ifNoneMatch) {
         return null;
     }
+
+    @Override
+    public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
+                                                   String ifModifiedSince) {
+        return null;
+    }
+
 
     //remove artifact from registry
     private void removeArtifactOnly(WebApp webApp, String username)
