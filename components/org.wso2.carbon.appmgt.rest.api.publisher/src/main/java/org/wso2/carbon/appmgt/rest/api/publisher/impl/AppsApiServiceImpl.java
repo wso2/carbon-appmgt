@@ -434,15 +434,67 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Add a tag to an application
+     * @param appType appType application type ie: webapp, mobileapp
+     * @param appId application uuid
+     * @param body tag list
+     * @param contentType
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdTagsPut(String appType, String appId, TagListDTO body, String contentType,
                                               String ifMatch, String ifUnmodifiedSince) {
+        beanValidator = new BeanValidator();
+        //Validate common mandatory fields for mobile and webapp
+        beanValidator.validate(body);
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                List<String> tagList = body.getTags();
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.addTags(appType, appId, tagList);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while adding a tag to " + appType + "with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, String ifMatch,
-                                                 String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, TagListDTO body, String ifMatch, String ifUnmodifiedSince) {
+
+        beanValidator = new BeanValidator();
+        //Validate common mandatory fields for mobile and webapp
+        beanValidator.validate(body);
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                List<String> tags = body.getTags();
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.removeTag(appType, appId, tags);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while adding a tag to " + appType + "with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
         return null;
     }
 
