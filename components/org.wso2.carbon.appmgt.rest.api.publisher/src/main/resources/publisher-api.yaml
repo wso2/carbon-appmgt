@@ -10,6 +10,10 @@ info:
 
 
 
+
+
+
+
     It is written with [swagger 2](http://swagger.io/).
   contact:
     name: WSO2
@@ -44,7 +48,15 @@ paths:
 
 
 
+
+
+
+
             You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+
 
 
 
@@ -57,8 +69,16 @@ paths:
 
 
 
+
+
+
+
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
+
+
+
+
 
 
 
@@ -551,6 +571,10 @@ paths:
 
 
 
+
+
+
+
             Supported actions are
             [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review
             **]
@@ -596,6 +620,71 @@ paths:
             $ref: '#/definitions/Error'
         '412':
           description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/create-new-version':
+    post:
+      x-scope: 'appm:create'
+      summary: Create a new version of an App
+      description: |
+        Create a new version of an App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '201':
+          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
+          schema:
+            $ref: '#/definitions/App'
+          headers:
+            Location:
+              description: |
+                The URL of the newly created resource.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional request
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '415':
+          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/validate-context':
+    post:
+      x-scope: 'appm:create'
+      summary: Validate App Context
+      description: |
+        Validate App Context.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appContext'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - App
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '415':
+          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
           schema:
             $ref: '#/definitions/Error'
   /apps/mobile/binaries:
@@ -779,7 +868,15 @@ paths:
 
 
 
+
+
+
+
             You can search in attributes by using an **"attribute:"** modifier.
+
+
+
+
 
 
 
@@ -792,8 +889,16 @@ paths:
 
 
 
+
+
+
+
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
+
+
+
+
 
 
 
@@ -1188,6 +1293,45 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
+  '/javapolicies/appid/{appId}':
+    get:
+      x-scope: 'appm:read'
+      summary: Get available java policies
+      description: |
+        Get available java policies.
+      parameters:
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - JavaPolicies
+      responses:
+        '200':
+          description: "OK. \nQualifying App is returned.\n"
+          schema:
+            $ref: '#/definitions/JavaPolicy'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
 parameters:
   appId:
     name: appId
@@ -1220,6 +1364,12 @@ parameters:
     name: appId
     in: query
     description: "**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    required: true
+    type: string
+  appContext:
+    name: appContext
+    in: query
+    description: Application Context
     required: true
     type: string
   limit:
@@ -1630,6 +1780,30 @@ definitions:
       roleIds:
         type: object
         description: "List of Role Id's"
+  JavaPolicy:
+    title: JavaPolicy object
+    required:
+      - displayName
+    properties:
+      id:
+        type: integer
+        description: |
+          java policy id
+        example: '1'
+      displayName:
+        type: string
+        example: stats handler
+      description:
+        type: string
+      displayOrder:
+        type: integer
+        description: |
+          display order of the policy in UI
+        example: '1'
+      applicationId:
+        type: string
+        description: mapped interna app id
+        example: '1'
   Error:
     title: Error object returned with 4XX HTTP status
     required:

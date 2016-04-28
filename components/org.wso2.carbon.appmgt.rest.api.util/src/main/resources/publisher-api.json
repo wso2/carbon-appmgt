@@ -3,7 +3,7 @@
     "info": {
         "version": "1.0.0",
         "title": "WSO2 APP Manager - Publisher API",
-        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
+        "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {
             "name": "WSO2",
             "url": "http://wso2.com/products/app-manager/",
@@ -38,7 +38,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "**Search condition**.\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "description": "**Search condition**.\n\n\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
                         "type": "string"
                     },
                     {
@@ -772,7 +772,7 @@
                     },
                     {
                         "name": "action",
-                        "description": "The action to demote or promote the state of the App.\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n",
+                        "description": "The action to demote or promote the state of the App.\n\n\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n",
                         "in": "query",
                         "type": "string",
                         "required": true,
@@ -832,6 +832,105 @@
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/create-new-version":{
+            "post": {
+                "x-scope": "appm:create",
+                "summary": "Create a new version of an App",
+                "description": "Create a new version of an App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "schema": {
+                            "$ref": "#/definitions/App"
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "The URL of the newly created resource.\n",
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/validate-context": {
+            "post": {
+                "x-scope": "appm:create",
+                "summary": "Validate App Context",
+                "description": "Validate App Context.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appContext"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "App"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1093,7 +1192,7 @@
                     {
                         "name": "query",
                         "in": "query",
-                        "description": "**Search condition**.\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
+                        "description": "**Search condition**.\n\n\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
                         "type": "string"
                     },
                     {
@@ -1484,11 +1583,11 @@
                         "description": "OK.\n",
                         "headers": {
                             "ETag": {
-                                "description": "Entity Tag of the Policy Partial. Used by caches, or in conditional request.\n",
+                                "description": "Entity Tag of the App. Used by caches, or in conditional request.\n",
                                 "type": "string"
                             },
                             "Last-Modified": {
-                                "description": "Date and time the Policy Partial has been modified the last time. \nUsed by caches, or in conditional requests.\n",
+                                "description": "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n",
                                 "type": "string"
                             }
                         }
@@ -1673,6 +1772,66 @@
                     }
                 }
             }
+        },
+        "/javapolicies/appid/{appId}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get available java policies",
+                "description": "Get available java policies.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "JavaPolicies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/JavaPolicy"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -1708,6 +1867,13 @@
             "name": "appId",
             "in": "query",
             "description": "**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "required": true,
+            "type": "string"
+        },
+        "appContext": {
+            "name": "appContext",
+            "in": "query",
+            "description": "Application Context",
             "required": true,
             "type": "string"
         },
@@ -1878,8 +2044,9 @@
                     "example": "enterprise,"
                 },
                 "recentChanges": {
+                    "description": "recent changes",
                     "type": "string",
-                    "example": "Upgraded"
+                    "example": "update details"
                 },
                 "icon": {
                     "description": "the image icon of the application\n",
@@ -1950,9 +2117,9 @@
                     "example": []
                 },
                 "path": {
-                    "description": "Registry path of the asset\n",
+                    "description": "path of asset",
                     "type": "string",
-                    "example": "/_system/governance/mobileapps/admin/android/test/1.0"
+                    "example": "/_system/governance/mobileapps/admin/webapp/m1/1"
                 },
                 "resourceId": {
                     "description": "Resource Id path of the asset\n",
@@ -2025,16 +2192,6 @@
                     "description": "media yype",
                     "type": "string",
                     "example": "application/vnd.wso2-mobileapp+xml"
-                },
-                "path": {
-                    "description": "path of asset",
-                    "type": "string",
-                    "example": "/_system/governance/mobileapps/admin/webapp/m1/1"
-                },
-                "recentChanges": {
-                    "description": "recent changes",
-                    "type": "string",
-                    "example": "update details"
                 },
                 "lifecycleAvailableActions": {
                     "description": "platform of the asset\n",
@@ -2207,6 +2364,36 @@
                 "roleIds": {
                     "type": "object",
                     "description": "List of Role Id's"
+                }
+            }
+        },
+        "JavaPolicy": {
+            "title": "JavaPolicy object",
+            "required": [
+                "displayName"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "java policy id\n",
+                    "example": "1"
+                },
+                "displayName": {
+                    "type": "string",
+                    "example": "stats handler"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "displayOrder": {
+                    "type": "integer",
+                    "description": "display order of the policy in UI\n",
+                    "example": "1"
+                },
+                "applicationId": {
+                    "type": "string",
+                    "description": "mapped interna app id",
+                    "example": "1"
                 }
             }
         },

@@ -253,6 +253,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+
     @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
@@ -386,6 +387,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdCreateNewVersionPost(String appType, String appId, String contentType,
+                                                           String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
         return null;
     }
@@ -430,6 +437,13 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeThrottlingtiersGet(String appType, String accept, String ifNoneMatch) {
         return null;
     }
+
+    @Override
+    public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
+                                                   String ifModifiedSince) {
+        return null;
+    }
+
 
     //remove artifact from registry
     private void removeArtifactOnly(WebApp webApp, String username)
