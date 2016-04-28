@@ -32,6 +32,7 @@ public class AppCreateRequest extends AbstractRequest {
     private String overview_webAppUrl = "http://localhost:8080/travel-booking-1.0/";
     private String overview_description = "The provider has not given a description.";
     private String overview_treatAsASite = "FALSE";
+    private String overview_businessOwner = "";
     private String images_thumbnail = "";
     private String images_banner = "";
     private String context = "";
@@ -100,6 +101,7 @@ public class AppCreateRequest extends AbstractRequest {
         addParameter("overview_webAppUrl", getOverview_webAppUrl());
         addParameter("overview_description", getOverview_description());
         addParameter("overview_treatAsASite", getOverview_treatAsASite());
+        addParameter("overview_businessOwner", getOverview_businessOwner());
         addParameter("images_thumbnail", getImages_thumbnail());
         addParameter("images_banner", getImages_banner());
         addParameter("context", getContext());
@@ -650,5 +652,13 @@ public class AppCreateRequest extends AbstractRequest {
 
     public void setOverview_treatAsASite(String overview_treatAsASite) {
         this.overview_treatAsASite = overview_treatAsASite;
+    }
+
+    public String getOverview_businessOwner() {
+        return overview_businessOwner;
+    }
+
+    public void setOverview_businessOwner(String overview_businessOwner) {
+        this.overview_businessOwner = overview_businessOwner;
     }
 }
