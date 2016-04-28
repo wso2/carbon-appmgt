@@ -285,6 +285,17 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeAppIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeAppIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
+                                                             String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
                                                           String ifNoneMatch, String ifModifiedSince) {
         return null;
