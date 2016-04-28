@@ -259,7 +259,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 
         } catch (AppManagementException e) {
-            if (e instanceof AppMgtResourceAlreadyExistsException) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleConflictException("A mobile application already exists with the name : "
                         + body.getName(), log);
             } else {

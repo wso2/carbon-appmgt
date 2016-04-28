@@ -23,10 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
+import org.wso2.carbon.appmgt.api.*;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -274,6 +271,18 @@ public class RestApiUtil {
         Throwable rootCause = getPossibleErrorCause(e);
         return rootCause instanceof AppMgtResourceNotFoundException
                 || rootCause instanceof ResourceNotFoundException;
+    }
+
+    /**
+     * Check if the specified throwable e is happened as the required resource cannot be found
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened as the required resource cannot be found, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToResourceAlreadyExisting(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof AppMgtResourceAlreadyExistsException;
     }
 
     /**
