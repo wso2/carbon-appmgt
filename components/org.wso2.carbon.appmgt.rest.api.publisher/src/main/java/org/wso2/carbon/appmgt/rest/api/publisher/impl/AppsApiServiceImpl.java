@@ -30,6 +30,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -37,7 +38,16 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -54,6 +64,7 @@ import org.wso2.mobile.utils.utilities.ZipFileReading;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -68,8 +79,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Upload binary files into storage
-     * @param fileInputStream Uploading fileInputStream
-     * @param fileDetail Attachment details
+     *
+     * @param fileInputStream   Uploading fileInputStream
+     * @param fileDetail        Attachment details
      * @param ifMatch
      * @param ifUnmodifiedSince
      * @return API path of the uploaded binary
@@ -91,7 +103,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
                         String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
-                                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+                                appManagerConfiguration.getFirstProperty(
+                                        AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
 
                         File binaryFile = new File(directoryLocation);
                         //Generate UUID for the uploading file
@@ -136,8 +149,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Upload static contents like images into storage
-     * @param fileInputStream Upload static content's fileInputStream
-     * @param fileDetail uploading file details
+     *
+     * @param fileInputStream   Upload static content's fileInputStream
+     * @param fileDetail        uploading file details
      * @param ifMatch
      * @param ifUnmodifiedSince
      * @return API path of the uploaded static content
@@ -232,8 +246,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Create an application
-     * @param appType application type ie: webapp, mobileapp
-     * @param body Application DTO
+     *
+     * @param appType         application type ie: webapp, mobileapp
+     * @param body            Application DTO
      * @param contentType
      * @param ifModifiedSince
      * @return created application id
@@ -261,13 +276,25 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleConflictException("A mobile application already exists with the name : "
-                        + body.getName(), log);
+                                                            + body.getName(), log);
             } else {
-                RestApiUtil.handleInternalServerError("Error occurred while creating mobile application : " + body.getName(), e, log);
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while creating mobile application : " + body.getName(), e, log);
             }
         }
 
         return Response.ok().entity(appDTO).build();
+    }
+
+    @Override
+    public Response appsAppTypeAppIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeAppIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
+                                                             String ifNoneMatch) {
+        return null;
     }
 
     @Override
@@ -314,9 +341,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Change lifecycle state of an application
-     * @param appType application type ie: webapp, mobileapp
-     * @param action lifecycle action
-     * @param appId application uuid
+     *
+     * @param appType           application type ie: webapp, mobileapp
+     * @param action            lifecycle action
+     * @param appId             application uuid
      * @param ifMatch
      * @param ifUnmodifiedSince
      * @return status message
@@ -391,9 +419,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Update an application
-     * @param appType appType application type ie: webapp, mobileapp
-     * @param appId application id
-     * @param body Application DTO
+     *
+     * @param appType           appType application type ie: webapp, mobileapp
+     * @param appId             application id
+     * @param body              Application DTO
      * @param contentType
      * @param ifMatch
      * @param ifUnmodifiedSince
@@ -492,9 +521,10 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Add a tag to an application
-     * @param appType appType application type ie: webapp, mobileapp
-     * @param appId application uuid
-     * @param body tag list
+     *
+     * @param appType           appType application type ie: webapp, mobileapp
+     * @param appId             application uuid
+     * @param body              tag list
      * @param contentType
      * @param ifMatch
      * @param ifUnmodifiedSince
@@ -529,7 +559,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
 
     @Override
-    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, TagListDTO body, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, TagListDTO body, String ifMatch,
+                                                 String ifUnmodifiedSince) {
 
         beanValidator = new BeanValidator();
         //Validate common mandatory fields for mobile and webapp
@@ -553,6 +584,39 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
         return Response.ok().build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdThrottlingtiersGet(String appType, String appId, String accept,
+                                                         String ifNoneMatch) {
+        TierListDTO tierListDTO = new TierListDTO();
+        try {
+            //check appType validity (currently support only webApps)
+            if (!AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+
+            List<TierDTO> tierDTOList = new ArrayList<>();
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            Set<Tier> tiers = apiProvider.getTiers();
+            if (tiers.isEmpty()) {
+                return RestApiUtil.buildNotFoundException("Tiers", null).getResponse();
+            }
+
+            for (Tier tier : tiers) {
+                TierDTO tierDTO = new TierDTO();
+                tierDTO.setTierName(tier.getName());
+                tierDTO.setTierDisplayName(tier.getDisplayName());
+                tierDTO.setTierDescription(tier.getDescription() != null ? tier.getDescription() : "");
+                tierDTO.setTierSortKey(tier.getRequestPerMinute());
+                tierDTOList.add(tierDTO);
+            }
+            tierListDTO.setTierList(tierDTOList);
+        } catch (AppManagementException e) {
+            String errorMessage = "Error while retrieving Throttling Tier details";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(tierListDTO).build();
     }
 
     @Override
@@ -591,10 +655,6 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().build();
     }
 
-    @Override
-    public Response appsAppTypeThrottlingtiersGet(String appType, String accept, String ifNoneMatch) {
-        return null;
-    }
 
     @Override
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,

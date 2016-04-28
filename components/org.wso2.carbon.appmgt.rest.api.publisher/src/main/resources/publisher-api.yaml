@@ -562,6 +562,124 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/create-new-version':
+    post:
+      x-scope: 'appm:create'
+      summary: Create a new version of an App
+      description: |
+        Create a new version of an App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '201':
+          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
+          schema:
+            $ref: '#/definitions/App'
+          headers:
+            Location:
+              description: |
+                The URL of the newly created resource.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional request
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '415':
+          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/appId/{appId}/lifecycle':
+    get:
+      x-scope: 'appm:read'
+      summary: Get lifecycle details
+      description: |
+        Get lifecycle details.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Lifecycle
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Apps is returned.\n"
+          schema:
+            $ref: '#/definitions/LifeCycle'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/appId/{appId}/lifecycle-history':
+    get:
+      x-scope: 'appm:read'
+      summary: Get lifecycle details
+      description: |
+        Get lifecycle details.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Lifecycle
+      responses:
+        '200':
+          description: "OK. \nList of qualifying Apps is returned.\n"
+          schema:
+            $ref: '#/definitions/LifeCycle'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
   '/apps/{appType}/change-lifecycle':
     post:
       x-scope: 'appm:publish'
@@ -627,46 +745,6 @@ paths:
             $ref: '#/definitions/Error'
         '412':
           description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/create-new-version':
-    post:
-      x-scope: 'appm:create'
-      summary: Create a new version of an App
-      description: |
-        Create a new version of an App
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - Apps
-      responses:
-        '201':
-          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
-          schema:
-            $ref: '#/definitions/App'
-          headers:
-            Location:
-              description: |
-                The URL of the newly created resource.
-              type: string
-            Content-Type:
-              description: |
-                The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional request
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/validate-context':
@@ -820,7 +898,7 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/throttlingtiers':
+  '/apps/{appType}/id/{appId}/throttlingtiers':
     get:
       x-scope: 'appm:read'
       summary: Get all Tiers
@@ -828,6 +906,7 @@ paths:
         Get a list of Tiers.
       parameters:
         - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
       tags:
@@ -1710,11 +1789,27 @@ definitions:
           - tag3
         description: List of Tags
   TierList:
-    title: Tier List
+    title: Throttle Tier details.
     properties:
-      roleIds:
-        type: object
-        description: List of Tiers
+      tierList:
+        type: array
+        items:
+          $ref: '#/definitions/Tier'
+  Tier:
+    title: Throttle Tier details.
+    properties:
+      tierName:
+        type: string
+        example: Gold
+      tierDisplayName:
+        type: string
+        example: Gold
+      tierDescription:
+        type: string
+        example: Gold tier with limit 20 request
+      tierSortKey:
+        type: integer
+        example: '1'
   PolicyPartial:
     title: Policy Partial
     required:
@@ -1817,6 +1912,17 @@ definitions:
         type: string
         description: mapped interna app id
         example: '1'
+  LifeCycle:
+    title: LifeCycle object
+    properties:
+      state:
+        type: string
+      actions:
+        type: string
+      lifecycle:
+        type: string
+      async:
+        type: boolean
   Error:
     title: Error object returned with 4XX HTTP status
     required:

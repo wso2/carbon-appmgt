@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 @ApiModel(description = "")
@@ -11,19 +14,18 @@ public class TierListDTO  {
   
   
   
-  private Object roleIds = null;
+  private List<TierDTO> tierList = new ArrayList<TierDTO>();
 
   
   /**
-   * List of Tiers
    **/
-  @ApiModelProperty(value = "List of Tiers")
-  @JsonProperty("roleIds")
-  public Object getRoleIds() {
-    return roleIds;
+  @ApiModelProperty(value = "")
+  @JsonProperty("tierList")
+  public List<TierDTO> getTierList() {
+    return tierList;
   }
-  public void setRoleIds(Object roleIds) {
-    this.roleIds = roleIds;
+  public void setTierList(List<TierDTO> tierList) {
+    this.tierList = tierList;
   }
 
   
@@ -33,7 +35,7 @@ public class TierListDTO  {
     StringBuilder sb = new StringBuilder();
     sb.append("class TierListDTO {\n");
     
-    sb.append("  roleIds: ").append(roleIds).append("\n");
+    sb.append("  tierList: ").append(tierList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
