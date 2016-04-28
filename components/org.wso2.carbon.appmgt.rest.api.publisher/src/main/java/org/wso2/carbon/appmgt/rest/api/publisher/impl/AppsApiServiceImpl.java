@@ -30,6 +30,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
@@ -55,6 +56,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -271,7 +273,26 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
                                                           String ifNoneMatch, String ifModifiedSince) {
-        return null;
+        UserIdListDTO userIdListDTO = new UserIdListDTO();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                userIdListDTO.setUserIds(subscriberSet);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        }
+        return Response.ok().entity(userIdListDTO).build();
     }
 
     @Override
