@@ -2325,7 +2325,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
-        return appMDAO.getAppDetailsFromUUID(uuid);
+        WebApp webApp = appMDAO.getAppDetailsFromUUID(uuid);
+        if (webApp == null) {
+            handleResourceNotFoundException("Webapp does not exist with requested appID : " + uuid);
+        }
+        return webApp;
     }
 
     /**

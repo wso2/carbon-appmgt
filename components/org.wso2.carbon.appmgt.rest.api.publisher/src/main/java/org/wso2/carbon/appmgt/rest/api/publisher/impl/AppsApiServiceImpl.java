@@ -31,6 +31,7 @@ import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
@@ -46,6 +47,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -272,7 +274,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 
         } catch (AppManagementException e) {
-            if (e instanceof AppMgtResourceAlreadyExistsException) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleConflictException("A mobile application already exists with the name : "
                                                             + body.getName(), log);
             } else {
@@ -298,7 +300,37 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
                                                           String ifNoneMatch, String ifModifiedSince) {
-        return null;
+        UserIdListDTO userIdListDTO = new UserIdListDTO();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+                if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                    userIdListDTO.setUserIds(subscriberSet);
+                }else{
+                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        }
+        return Response.ok().entity(userIdListDTO).build();
     }
 
     @Override
@@ -627,7 +659,26 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
                                                    String ifModifiedSince) {
-        return null;
+        boolean isContextExists = false;
+        try {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                if(StringUtils.isEmpty(appContext)){
+                    RestApiUtil.handleBadRequest("Webapp context is not provided", log);
+                }
+
+                if(appContext.indexOf("/") != 0){
+                    appContext = "/" + appContext;
+                }
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                isContextExists = appProvider.isContextExist(appContext);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error retrieving tags for " + appType + "s.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(isContextExists).build();
     }
 
 
