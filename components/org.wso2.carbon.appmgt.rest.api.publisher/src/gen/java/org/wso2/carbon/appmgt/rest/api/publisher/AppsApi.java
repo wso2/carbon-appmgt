@@ -1,34 +1,33 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import io.swagger.annotations.ApiParam;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.factories.AppsApiServiceFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+import io.swagger.annotations.ApiParam;
+
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
+import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+
+import java.util.List;
+
 import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -345,6 +344,27 @@ public class AppsApi  {
     return delegate.appsAppTypeIdAppIdTagsDelete(appType,appId,body,ifMatch,ifUnmodifiedSince);
     }
     @GET
+    @Path("/{appType}/id/{appId}/throttlingtiers")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get all Tiers", notes = "Get a list of Tiers.", response = TierListDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of Tiers is returned."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
+
+    public Response appsAppTypeIdAppIdThrottlingtiersGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
+    @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
+    @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
+    {
+    return delegate.appsAppTypeIdAppIdThrottlingtiersGet(appType,appId,accept,ifNoneMatch);
+    }
+    @GET
     @Path("/{appType}/id/{appId}/xacmlpolicies")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
@@ -426,26 +446,6 @@ public class AppsApi  {
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
     {
     return delegate.appsAppTypeTagsGet(appType,accept,ifNoneMatch);
-    }
-    @GET
-    @Path("/{appType}/throttlingtiers")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get all Tiers", notes = "Get a list of Tiers.", response = TierListDTO.class)
-    @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of Tiers is returned."),
-        
-        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
-        
-        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
-
-    public Response appsAppTypeThrottlingtiersGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
-    @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
-    @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
-    {
-    return delegate.appsAppTypeThrottlingtiersGet(appType,accept,ifNoneMatch);
     }
     @POST
     @Path("/{appType}/validate-context")

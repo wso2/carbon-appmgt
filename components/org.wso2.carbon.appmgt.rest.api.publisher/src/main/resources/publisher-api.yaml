@@ -820,7 +820,7 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/throttlingtiers':
+  '/apps/{appType}/id/{appId}/throttlingtiers':
     get:
       x-scope: 'appm:read'
       summary: Get all Tiers
@@ -828,6 +828,7 @@ paths:
         Get a list of Tiers.
       parameters:
         - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
       tags:
@@ -1710,11 +1711,27 @@ definitions:
           - tag3
         description: List of Tags
   TierList:
-    title: Tier List
+    title: Throttle Tier details.
     properties:
-      roleIds:
-        type: object
-        description: List of Tiers
+      tierList:
+        type: array
+        items:
+          $ref: '#/definitions/Tier'
+  Tier:
+    title: Throttle Tier details.
+    properties:
+      tierName:
+        type: string
+        example: Gold
+      tierDisplayName:
+        type: string
+        example: Gold
+      tierDescription:
+        type: string
+        example: Gold tier with limit 20 request
+      tierSortKey:
+        type: integer
+        example: '1'
   PolicyPartial:
     title: Policy Partial
     required:

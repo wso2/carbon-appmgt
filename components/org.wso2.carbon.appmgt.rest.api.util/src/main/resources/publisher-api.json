@@ -848,7 +848,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/create-new-version":{
+        "/apps/{appType}/id/{appId}/create-new-version": {
             "post": {
                 "x-scope": "appm:create",
                 "summary": "Create a new version of an App",
@@ -1132,7 +1132,7 @@
                 }
             }
         },
-        "/apps/{appType}/throttlingtiers": {
+        "/apps/{appType}/id/{appId}/throttlingtiers": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get all Tiers",
@@ -1140,6 +1140,9 @@
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
                     },
                     {
                         "$ref": "#/parameters/Accept"
@@ -2276,11 +2279,34 @@
             }
         },
         "TierList": {
-            "title": "Tier List",
+            "title": "Throttle Tier details.",
             "properties": {
-                "roleIds": {
-                    "type": "object",
-                    "description": "List of Tiers"
+                "tierList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Tier"
+                    }
+                }
+            }
+        },
+        "Tier": {
+            "title": "Throttle Tier details.",
+            "properties": {
+                "tierName": {
+                    "type": "string",
+                    "example": "Gold"
+                },
+                "tierDisplayName": {
+                    "type": "string",
+                    "example": "Gold"
+                },
+                "tierDescription": {
+                    "type": "string",
+                    "example": "Gold tier with limit 20 request"
+                },
+                "tierSortKey": {
+                    "type": "integer",
+                    "example": "1"
                 }
             }
         },
