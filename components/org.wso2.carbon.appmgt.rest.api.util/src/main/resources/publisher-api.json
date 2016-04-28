@@ -459,9 +459,9 @@
                 }
             },
             "put": {
-                "x-scope": "appm:update",
-                "summary": "Update an existing App",
-                "description": "Update an existing Tags relevant to an App by App Internal Id\n",
+                "x-scope": "appm:create",
+                "summary": "Add a new tag",
+                "description": "Add a new tag into tag collection of a given application type.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"
@@ -472,7 +472,7 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": "App object that needs to be added\n",
+                        "description": "Tag object that needs to be added\n",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/TagList"
@@ -558,6 +558,15 @@
                     },
                     {
                         "$ref": "#/parameters/If-Unmodified-Since"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Tag object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TagList"
+                        }
                     }
                 ],
                 "tags": [
@@ -2252,8 +2261,16 @@
         "TagList": {
             "title": "Tag List",
             "properties": {
-                "roleIds": {
-                    "type": "object",
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "tag1",
+                        "tag2",
+                        "tag3"
+                    ],
                     "description": "List of Tags"
                 }
             }

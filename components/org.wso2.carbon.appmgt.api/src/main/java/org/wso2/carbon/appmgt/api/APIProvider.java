@@ -647,6 +647,56 @@ public interface APIProvider extends APIManager {
      * @return list of allowed lifecycle actions perform on the app
      */
     public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
+
+    /**
+     * Add mobile application subscription for a given user
+     * @param userId userId
+     * @param appId application id
+     * @return
+     * @throws AppManagementException
+     */
     public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException;
+
+    /**
+     * Remove mobile application subscription for a given user
+     * @param userId username
+     * @param appId application id
+     * @return
+     * @throws AppManagementException
+     */
     public boolean unSubscribeMobileApp(String userId, String appId) throws AppManagementException;
+
+    /**
+     * Add tags to a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @param tags tag list to be added
+     * @return
+     * @throws AppManagementException
+     */
+    public void addTags(String appType,String appId, List<String> tags) throws AppManagementException;
+
+    /**
+     * Remove tag from a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @param tags tag list to be deleted
+     * @throws AppManagementException
+     */
+    public void removeTag(String appType, String appId, List<String> tags) throws AppManagementException;
+
+    /**
+     * Retrieve all tags for a given application type
+     * @param appType application type ie: webapp or mobileapp
+     * @throws AppManagementException
+     */
+    public void getAllTags(String appType) throws AppManagementException;
+
+    /**
+     * Retrieve all tags for a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @throws AppManagementException
+     */
+    public void getAllTags(String appType, String appId) throws AppManagementException;
 }

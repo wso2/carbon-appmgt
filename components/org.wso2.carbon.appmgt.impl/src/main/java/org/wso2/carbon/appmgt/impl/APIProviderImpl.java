@@ -1,20 +1,22 @@
 /*
-*  Copyright (c) 2005-2013, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *
+ *   Copyright (c) 2005-2013, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ * /
+ */
 
 package org.wso2.carbon.appmgt.impl;
 
@@ -31,6 +33,7 @@ import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -52,11 +55,7 @@ import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.common.CommonConstants;
-import org.wso2.carbon.registry.core.ActionConstants;
-import org.wso2.carbon.registry.core.Association;
-import org.wso2.carbon.registry.core.CollectionImpl;
-import org.wso2.carbon.registry.core.RegistryConstants;
-import org.wso2.carbon.registry.core.Resource;
+import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
@@ -2338,6 +2337,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -2347,19 +2347,22 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
 
             if (appArtifact != null) {
-                appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                //Change lifecycle status
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(action, AppMConstants.WEBAPP_LIFE_CYCLE);
+                }
                 if (log.isDebugEnabled()) {
                     String logMessage =
-                            "Application with appId : " + appId + " lifecycle has been changed successfully.";
+                            "Lifecycle action " + action + " has been successfully performed on " + appType
+                                    + "with id" + appId;
                     log.debug(logMessage);
                 }
             }
-
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving GenericArtifactManager for appType : " + appType, e);
         } catch (GovernanceException e) {
-            handleException("Error occurred while changing lifecycle state of application with appId : " +
-                    appId + " for action : " + action, e);
+            handleException("Error occurred while performing lifecycle action : " + action + " on " + appType + " with id : " +
+                    appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -2373,23 +2376,28 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return
      */
     public String[] getAllowedLifecycleActions(String appId, String appType) throws AppManagementException {
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
         String[] actions = null;
         try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
             if (appArtifact != null) {
-                //Get all the actions corresponding to current state of the api artifact
-                actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    //Get all the actions corresponding to current state of the api artifact
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                }else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
+                } else {
+                    handleException("Unsupported applicatio type : " + appType +" provided");
+                }
             } else {
-                handleResourceNotFoundException(
-                        "Failed to get "+appType+" artifact corresponding to artifactId " + appId + ". Artifact does not exist");
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
-                    " with id : "+appId, e);
         } catch (GovernanceException e) {
             handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
                     " with id : " + appId, e);
@@ -2430,6 +2438,115 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error while deleting registry path: "+path, e);
         }
         return isUnSubscribed;
+    }
+
+    @Override
+    public void addTags(String appType, String appId, List<String> tags) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                for(String tag : tags){
+                    registry.applyTag(appArtifact.getPath(), tag);
+                }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while adding tags"+StringUtils.join(tags, ",")+" to " + appType +" with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    @Override
+    public void removeTag(String appType, String appId, List<String> tags) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                for(String tag : tags) {
+                    registry.removeTag(appArtifact.getPath(), tag);
+                }
+            } else {
+                handleResourceNotFoundException("Failed to retrieve " + appType +
+                        " artifact corresponding to artifactId " +appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while removing tags '" + StringUtils.join(tags, ",") + "' from "
+                    + appType + " with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    @Override
+    public void getAllTags(String appType) throws AppManagementException {
+
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            Map<String, String> params = new HashMap<String, String>();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                params.put("1",AppMConstants.MediaType.WEB_APP);
+                params.put("2",AppMConstants.WEB_APP_LIFECYCLE_STATUS);
+                params.put("3","%");
+            } else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                params.put("1",AppMConstants.MediaType.MOBILE_APP);
+                params.put("2",AppMConstants.MOBILE_APP_LIFECYCLE_STATUS);
+                params.put("3","%");
+            } else {
+                handleException("Could not retrieve tags. Unsupported applictaion type :" + appType +" provided");
+            }
+
+            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+
+            org.wso2.carbon.registry.core.Collection collection = registry.executeQuery(tagsQueryPath, params);
+            for (String fullTag : collection.getChildren()) {
+
+                String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
+            }
+
+        } catch (RegistryException e) {
+            handleException("Error occurred while retrieving tags for " + appType +"s" , e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    @Override
+    public void getAllTags(String appType, String appId) throws AppManagementException {
+        org.wso2.carbon.registry.core.Tag[] tags = null;
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+              String artifactPath = appArtifact.getPath();
+                tags = registry.getTags(artifactPath);
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while retrieving tags from " + appType +" with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
 }

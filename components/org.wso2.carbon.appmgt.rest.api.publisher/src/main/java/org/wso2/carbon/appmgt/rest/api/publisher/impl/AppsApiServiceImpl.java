@@ -56,11 +56,22 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This is the service implementation class for Publisher API related operations
+ */
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiService.class);
     BeanValidator beanValidator;
 
+    /**
+     * Upload binary files into storage
+     * @param fileInputStream Uploading fileInputStream
+     * @param fileDetail Attachment details
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return API path of the uploaded binary
+     */
     @Override
     public Response appsMobileBinariesPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
@@ -121,6 +132,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(binaryDTO).build();
     }
 
+    /**
+     * Upload static contents like images into storage
+     * @param fileInputStream Upload static content's fileInputStream
+     * @param fileDetail uploading file details
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return API path of the uploaded static content
+     */
     @Override
     public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
                                            String ifUnmodifiedSince) {
@@ -209,6 +228,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Create an application
+     * @param appType application type ie: webapp, mobileapp
+     * @param body Application DTO
+     * @param contentType
+     * @param ifModifiedSince
+     * @return created application id
+     */
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
         beanValidator = new BeanValidator();
@@ -253,7 +280,15 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
-
+    /**
+     * Change lifecycle state of an application
+     * @param appType application type ie: webapp, mobileapp
+     * @param action lifecycle action
+     * @param appId application uuid
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return status message
+     */
     @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
@@ -262,14 +297,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                boolean isValidAction = false;
                 String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
                 if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
                     RestApiUtil.handleBadRequest(
                             "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
                                     ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
                 }
-
                 appProvider.changeLifeCycleStatus(appType, appId, action);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
@@ -324,6 +357,16 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Update an application
+     * @param appType appType application type ie: webapp, mobileapp
+     * @param appId application id
+     * @param body Application DTO
+     * @param contentType
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdPut(String appType, String appId, AppDTO body, String contentType, String ifMatch,
                                           String ifUnmodifiedSince) {
@@ -394,19 +437,90 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
-        return null;
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.getAllTags(appType, appId);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error retrieving tags for " + appType + " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().build();
     }
 
+    /**
+     * Add a tag to an application
+     * @param appType appType application type ie: webapp, mobileapp
+     * @param appId application uuid
+     * @param body tag list
+     * @param contentType
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdTagsPut(String appType, String appId, TagListDTO body, String contentType,
                                               String ifMatch, String ifUnmodifiedSince) {
-        return null;
+        beanValidator = new BeanValidator();
+        //Validate common mandatory fields for mobile and webapp
+        beanValidator.validate(body);
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                List<String> tagList = body.getTags();
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.addTags(appType, appId, tagList);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while adding a tag to " + appType + " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().build();
     }
 
+
     @Override
-    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, String ifMatch,
-                                                 String ifUnmodifiedSince) {
-        return null;
+    public Response appsAppTypeIdAppIdTagsDelete(String appType, String appId, TagListDTO body, String ifMatch, String ifUnmodifiedSince) {
+
+        beanValidator = new BeanValidator();
+        //Validate common mandatory fields for mobile and webapp
+        beanValidator.validate(body);
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                List<String> tags = body.getTags();
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.removeTag(appType, appId, tags);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
+            // existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while deleting tags from " + appType + " with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().build();
     }
 
     @Override
@@ -430,7 +544,19 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
-        return null;
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.getAllTags(appType);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error retrieving tags for " + appType + "s.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+
+        }
+        return Response.ok().build();
     }
 
     @Override

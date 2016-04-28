@@ -1,8 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
+import java.util.*;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
@@ -11,19 +14,19 @@ public class TagListDTO  {
   
   
   
-  private Object roleIds = null;
+  private List<String> tags = new ArrayList<String>();
 
   
   /**
    * List of Tags
    **/
   @ApiModelProperty(value = "List of Tags")
-  @JsonProperty("roleIds")
-  public Object getRoleIds() {
-    return roleIds;
+  @JsonProperty("tags")
+  public List<String> getTags() {
+    return tags;
   }
-  public void setRoleIds(Object roleIds) {
-    this.roleIds = roleIds;
+  public void setTags(List<String> tags) {
+    this.tags = tags;
   }
 
   
@@ -33,7 +36,7 @@ public class TagListDTO  {
     StringBuilder sb = new StringBuilder();
     sb.append("class TagListDTO {\n");
     
-    sb.append("  roleIds: ").append(roleIds).append("\n");
+    sb.append("  tags: ").append(tags).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

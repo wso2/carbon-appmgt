@@ -360,17 +360,17 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      x-scope: 'appm:update'
-      summary: Update an existing App
+      x-scope: 'appm:create'
+      summary: Add a new tag
       description: |
-        Update an existing Tags relevant to an App by App Internal Id
+        Add a new tag into tag collection of a given application type.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
         - in: body
           name: body
           description: |
-            App object that needs to be added
+            Tag object that needs to be added
           required: true
           schema:
             $ref: '#/definitions/TagList'
@@ -427,6 +427,13 @@ paths:
         - $ref: '#/parameters/appId'
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
+        - in: body
+          name: body
+          description: |
+            Tag object that needs to be added
+          required: true
+          schema:
+            $ref: '#/definitions/TagList'
       tags:
         - Tags
       responses:
@@ -1693,8 +1700,14 @@ definitions:
   TagList:
     title: Tag List
     properties:
-      roleIds:
-        type: object
+      tags:
+        type: array
+        items:
+          type: string
+        example:
+          - tag1
+          - tag2
+          - tag3
         description: List of Tags
   TierList:
     title: Tier List

@@ -301,7 +301,7 @@ public class AppsApi  {
     @Path("/{appType}/id/{appId}/tags")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Update an existing App", notes = "Update an existing Tags relevant to an App by App Internal Id", response = AppDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Add a new tag", notes = "Add a new tag into tag collection of a given application type.", response = AppDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nSuccessful response with updated App object"),
         
@@ -315,7 +315,7 @@ public class AppsApi  {
 
     public Response appsAppTypeIdAppIdTagsPut(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
-    @ApiParam(value = "App object that needs to be added" ,required=true ) TagListDTO body,
+    @ApiParam(value = "Tag object that needs to be added" ,required=true ) TagListDTO body,
     @ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
@@ -338,10 +338,11 @@ public class AppsApi  {
 
     public Response appsAppTypeIdAppIdTagsDelete(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "Tag object that needs to be added" ,required=true ) TagListDTO body,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
     {
-    return delegate.appsAppTypeIdAppIdTagsDelete(appType,appId,ifMatch,ifUnmodifiedSince);
+    return delegate.appsAppTypeIdAppIdTagsDelete(appType,appId,body,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/{appType}/id/{appId}/xacmlpolicies")
