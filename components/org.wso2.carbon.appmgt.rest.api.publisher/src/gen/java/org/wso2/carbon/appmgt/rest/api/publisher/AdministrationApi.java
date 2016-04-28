@@ -52,9 +52,9 @@ public class AdministrationApi  {
     @Path("/xacmlpolicies/")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Create a new Policy Partial", notes = "Create a new Policy Partial.", response = Void.class)
+    @io.swagger.annotations.ApiOperation(value = "Create a new Policy Partial", notes = "Create a new Policy Partial.", response = PolicyPartialDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
+        @io.swagger.annotations.ApiResponse(code = 201, message = "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
         

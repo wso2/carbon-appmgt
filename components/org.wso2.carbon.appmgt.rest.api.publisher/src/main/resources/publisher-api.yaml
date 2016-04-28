@@ -1019,17 +1019,23 @@ paths:
       tags:
         - XACMLPolicies
       responses:
-        '200':
-          description: |
-            OK.
+        '201':
+          description: "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n"
+          schema:
+            $ref: '#/definitions/PolicyPartial'
           headers:
+            Location:
+              description: |
+                The URL of the newly created resource.
+              type: string
+            Content-Type:
+              description: |
+                The content type of the body.
+              type: string
             ETag:
               description: >
-                Entity Tag of the App. Used by caches, or in conditional
-                request.
-              type: string
-            Last-Modified:
-              description: "Date and time the App lifecycle has been modified the last time. \nUsed by caches, or in conditional requests.\n"
+                Entity Tag of the response resource. Used by caches, or in
+                conditional request
               type: string
         '400':
           description: "Bad Request. \nInvalid request or validation error.\n"
