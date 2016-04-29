@@ -415,4 +415,29 @@ public class RestApiUtil {
             return false;
         }
     }
+
+    /**
+     *
+     * Returns the seach terms of the given query string.
+     *
+     * @param query
+     * @return
+     */
+    public static Map<String, String> getSearchTerms(String query) {
+
+        Map<String, String> searchTerms = new HashMap<String, String>();
+
+        if(query != null && !query.isEmpty()){
+
+            String[] termTokens = query.split(",");
+
+            String[] termElements = null;
+            for(String termToken : termTokens){
+                termElements = termToken.split(":");
+                searchTerms.put(termElements[0], termElements[1]);
+            }
+        }
+
+        return searchTerms;
+    }
 }

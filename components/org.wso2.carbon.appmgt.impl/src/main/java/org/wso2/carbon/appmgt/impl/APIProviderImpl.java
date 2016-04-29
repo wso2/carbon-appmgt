@@ -64,6 +64,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.cache.Cache;
@@ -1895,60 +1896,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
+    @Override
+    public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException {
 
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId,
-                                                   String appType)
-            throws AppManagementException {
-        List<WebApp> apiSortedList = new ArrayList<WebApp>();
-        String regex = "(?i)[\\w.|-]*" + searchTerm.trim() + "[\\w.|-]*";
+        List<App> apps = new ArrayList<App>();
+        List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
 
-        Pattern pattern;
-        Matcher matcher;
-
-        try {
-            List<WebApp> apiList;
-            if (providerId != null) {
-                apiList = getAPIsByProvider(providerId, appType);
-            } else {
-                apiList = getAllAPIs(appType);
+        for(GenericArtifact artifact : appArtifacts){
+            if(isSearchHit(artifact, searchTerms)){
+                apps.add(createApp(artifact, appType));
             }
-            if (apiList == null || apiList.size() == 0) {
-                return apiSortedList;
-            }
-            pattern = Pattern.compile(regex);
-            for (WebApp api : apiList) {
-
-                if (searchType.equalsIgnoreCase("Name")) {
-                    String api1 = api.getId().getApiName();
-                    matcher = pattern.matcher(api1);
-                } else if (searchType.equalsIgnoreCase("Provider")) {
-                    String api1 = api.getId().getProviderName();
-                    matcher = pattern.matcher(api1);
-                } else if (searchType.equalsIgnoreCase("Version")) {
-                    String api1 = api.getId().getVersion();
-                    matcher = pattern.matcher(api1);
-                } else if (searchType.equalsIgnoreCase("Context")) {
-                    String api1 = api.getContext();
-                    matcher = pattern.matcher(api1);
-                } else if (searchType.equalsIgnoreCase("id")) {
-                    String api1 = api.getUUID();
-                    matcher = pattern.matcher(api1);
-                } else {
-                    String apiName = api.getId().getApiName();
-                    matcher = pattern.matcher(apiName);
-                }
-
-                if (matcher.find()) {
-                    apiSortedList.add(api);
-                }
-            }
-        } catch (AppManagementException e) {
-            handleException("Failed to search Apps with type", e);
         }
-        Collections.sort(apiSortedList, new APINameComparator());
-        return apiSortedList;
-    }
 
+        return apps;
+    }
 
     /**
      * Update the Tier Permissions
@@ -2431,6 +2392,95 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     appId, e);
         }
         return isUnSubscribed;
+    }
+
+    /**
+     *
+     * Returns the 'app' (e.g. webapp, mobileapp) registry artifacts.
+     *
+     * @param appType
+     * @return
+     * @throws AppManagementException
+     */
+    private List<GenericArtifact> getAppArtifacts(String appType) throws AppManagementException {
+
+        List<GenericArtifact> appArtifacts = new ArrayList<GenericArtifact>();
+
+        boolean isTenantFlowStarted = false;
+        try {
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+            for (GenericArtifact artifact : artifacts) {
+                appArtifacts.add(artifact);
+            }
+
+        } catch (RegistryException e) {
+            handleException("Failed to get APIs from the registry", e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+
+        return appArtifacts;
+    }
+
+
+    private App createApp(GenericArtifact artifact, String appType) throws AppManagementException {
+
+        AppFactory appFactory = null;
+
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+            appFactory = new WebAppFactory();
+        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+            appFactory = new MobileAppFactory();
+        }
+
+        return appFactory.createApp(artifact, registry);
+    }
+
+    private boolean isSearchHit(GenericArtifact artifact, Map<String, String> searchTerms) throws AppManagementException {
+
+        boolean isSearchHit = true;
+
+        for(Map.Entry<String, String> term : searchTerms.entrySet()){
+            try {
+                if("ID".equalsIgnoreCase(term.getKey())) {
+                    if(!artifact.getId().equals(term.getValue())){
+                        isSearchHit = false;
+                        break;
+                    }
+                }else if(!term.getValue().equals(artifact.getAttribute(getRxtAttributeName(term.getKey())))){
+                    isSearchHit = false;
+                    break;
+                }
+            } catch (GovernanceException e) {
+                String errorMessage = String.format("Error while determining whether artifact '%s' is a search hit.", artifact.getId());
+                throw new AppManagementException(errorMessage, e);
+            }
+        }
+
+        return isSearchHit;
+    }
+
+    private String getRxtAttributeName(String searchKey) {
+
+        String rxtAttributeName = null;
+
+        if(searchKey.equalsIgnoreCase("NAME")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_NAME;
+        }else if(searchKey.equalsIgnoreCase("PROVIDER")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_PROVIDER;
+        }else if(searchKey.equalsIgnoreCase("VERSION")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_VERSION;
+        }
+
+        return rxtAttributeName;
     }
 
 }
