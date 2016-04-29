@@ -189,7 +189,6 @@ jQuery(function ($) {
 
 
 
-
     $('#btn-schduled-install').click(function () {
         $('#modalInstallApp').modal('hide');
         $('#modalDevices').modal('show');
@@ -235,6 +234,7 @@ jQuery(function ($) {
 		}
        
     });
+    
 
     $('#btn-schduled-update').click(function () {  
         $('#modalUpdateApp').modal('hide');
@@ -243,6 +243,7 @@ jQuery(function ($) {
         $('.device-image-block-update-modal').show();
         
         var device = getURLParameter("device");
+
        appToInstall = $(this).data("app");
 	   devicePlatform = $(this).data("platform").toLowerCase();
 

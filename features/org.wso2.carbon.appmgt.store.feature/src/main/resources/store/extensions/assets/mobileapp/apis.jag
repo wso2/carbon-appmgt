@@ -66,6 +66,19 @@ router.post('apps/devices/{deviceid}/{devicetype}/update', function(ctx){
         enterpriseInstall.performAction('update', tenant.tenantId, 'device', asset, stringify(deviceIdentifier), schedule);
 });
 
+router.post('apps/devices/{deviceid}/{devicetype}/update', function(ctx){
+    if (!user) {
+        response.sendError(401, 'Unauthorized');
+        return;
+    }
+        var tenant = server.tenant(request, session);
+        var asset =  ctx.asset;
+        var deviceId = ctx.deviceid;
+        var deviceType = ctx.devicetype;
+        var deviceIdentifier = {"id" : deviceId, "type" : deviceType};
+        enterpriseInstall.performAction('update', tenant.tenantId, 'device', asset, stringify(deviceIdentifier));
+});
+
 router.post('apps/user/install', function(ctx){
     if (!user) {
         response.sendError(401, 'Unauthorized');

@@ -55,7 +55,7 @@
 
                 var path = user.userSpace(currentUser) + SUBSCRIPTIONS_PATH +  app;
 
-                if(action == 'install') {
+                if(action == 'install' || action == 'update') {
                     subscribe(path, app, currentUser.username);
                 }else if(action === 'uninstall') {
                     unsubscribe(path, app, currentUser.username);

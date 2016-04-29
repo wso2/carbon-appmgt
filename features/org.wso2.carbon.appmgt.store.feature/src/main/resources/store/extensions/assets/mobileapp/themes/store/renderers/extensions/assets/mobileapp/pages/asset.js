@@ -66,6 +66,7 @@ var render = function(theme, data, meta, require) {
                                                                            asset: data.asset,
                                                                            type: data.type,
                                                                            inDashboard: data.inDashboard,
+                                                                           isUpdatedApp: data.isUpdatedApp,
                                                                            isEnterpriseInstallEnabled: data.isEnterpriseInstallEnabled,
                                                                            isDeviceSubscriptionEnabled: data.isDeviceSubscriptionEnabled,
                                                                            isDirectDownloadEnabled: data.isDirectDownloadEnabled,

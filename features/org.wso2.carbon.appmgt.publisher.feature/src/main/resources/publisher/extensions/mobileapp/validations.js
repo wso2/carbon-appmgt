@@ -46,6 +46,7 @@ var Field = {
     OVERVIEW_TYPE: 'overview.type',
     OVERVIEW_PACKAGE_NAME: 'overview.packagename',
     OVERVIEW_APP_ID: 'overview.appid',
+    OVERVIEW_PREVIOUS_VERSION_APP_ID: 'overview.previousVersionAppId',
     OVERVIEW_URL: 'overview.url',
     OVERVIEW_FILE: 'overview.file',
     OVERVIEW_NAME: 'overview.name',

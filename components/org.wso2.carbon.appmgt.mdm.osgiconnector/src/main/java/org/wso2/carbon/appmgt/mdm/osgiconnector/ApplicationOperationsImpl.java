@@ -164,6 +164,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					} else if (MDMAppConstants.UPDATE.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
 								.createUpdateAppOperation(mobileApp, applicationOperationAction.getSchedule());
+
 					} else {
 						operation = AndroidApplicationOperationUtil
 								.createAppUninstallOperation(mobileApp, applicationOperationAction.getSchedule());

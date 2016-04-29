@@ -13,6 +13,7 @@ require('/modules/store.js').exec(function (ctx) {
             site = ctx.site,
             matcher = ctx.matcher,
             inDashboard = false,
+            isUpdatedApp = false,
             utility = require('/modules/util.js'),
             mdm = require('/extensions/assets/mobileapp/modules/mdm.js').module,
             mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
@@ -77,6 +78,11 @@ require('/modules/store.js').exec(function (ctx) {
         inDashboard = true;
     }
 
+    // If the user has subscribed to previous version of the app
+    if (store.isuserasset(asset.attributes.overview_previousVersionAppId, type)) {
+    	isUpdatedApp = true;
+    }
+
     var rxtAttributes = utility.getRXTAttributes(tenantId, type);
 
     var devices = [];
@@ -122,6 +128,7 @@ require('/modules/store.js').exec(function (ctx) {
         type: type,
         embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
         inDashboard: inDashboard,
+        isUpdatedApp: isUpdatedApp,
         asset: asset,
         config : mdmUIConfig,
         tags: {

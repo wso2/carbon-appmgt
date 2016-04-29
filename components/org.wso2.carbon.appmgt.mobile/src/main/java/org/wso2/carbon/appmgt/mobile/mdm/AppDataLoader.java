@@ -62,7 +62,7 @@ public class AppDataLoader {
                 APIProvider appProvider = getLoggedInUserProvider();
                 String oneTimeDownloadUUID = appProvider.generateOneTimeDownloadLink(artifact.getId());
                 app.setType(artifact.getAttribute("overview_type"));
-                if("install".equals(action)){
+                if("install".equals(action) || "update".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         String oneTimeDownloadLink = MobileConfigurations.getInstance().getBinaryFileStorageConfig().get(
                                 MobileConfigurations.APP_BINARY_FILE_API_LOCATION);

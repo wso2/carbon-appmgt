@@ -72,6 +72,7 @@
                                 {{#if isDeviceSubscriptionEnabled}}
                                     <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
                                        data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+
                                        data-target="#modalUpdateApp"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
                                 {{else}}
@@ -90,7 +91,7 @@
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
                                 {{/if}}
-                            {{/if}}
+                            {{/if}}{{/if}}
                         {{else}}
                             <a id="btn-add-gadget-install"href="{{tenantedUrl "/login"}}"
                                class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>

@@ -149,6 +149,9 @@ public class AppDTO  {
   
   
   private String createdTime = null;
+  
+  
+  private String previousVersionAppID = null;
 
 
   private List<CustomPropertyDTO> customProperties = new ArrayList<CustomPropertyDTO>();
