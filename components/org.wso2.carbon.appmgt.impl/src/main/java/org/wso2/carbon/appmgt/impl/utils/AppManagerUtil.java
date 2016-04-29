@@ -398,24 +398,8 @@ public final class AppManagerUtil {
             }
             api.setLifeCycleName(artifact.getLifecycleName());
 
-            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
-            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
-            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
-
-            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
-                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
-                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
-                api.setScreenShots(screenShots);
-            }
-
-            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
-            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
-            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
             api.setMediaType(artifact.getMediaType());
             api.setPath(artifact.getPath());
-            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
 
         } catch (GovernanceException e) {
@@ -609,22 +593,8 @@ public final class AppManagerUtil {
             }
             api.setLifeCycleName(artifact.getLifecycleName());
 
-            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
-            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
-            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
-            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
-                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
-                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
-                api.setScreenShots(screenShots);
-            }
-            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
-            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
-            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
             api.setMediaType(artifact.getMediaType());
             api.setPath(artifact.getPath());
-            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
 
         } catch (GovernanceException e) {
