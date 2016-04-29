@@ -1483,6 +1483,9 @@ require('/modules/publisher.js').exec(function(ctx) {
         var version = postContext[mobileValidatorModule.Field.OVERVIEW_VERSION];
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_VERSION, version);
         newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_BUNDLE_VERSION, version);
+        
+        // Set previous app's ID to new app's PREVIOUS_VERSION_APP_ID
+        newVersionModel.set(mobileValidatorModule.Field.OVERVIEW_PREVIOUS_VERSION_APP_ID, oldVersionArtifact.id);
 
         // handle images,if new image is uploaded then save it else copy the image of previous version
         var files = request.getAllFiles();

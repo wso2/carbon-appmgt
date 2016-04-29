@@ -133,6 +133,9 @@ public class AppDTO  {
   
   
   private String createdTime = null;
+  
+  
+  private String previousVersionAppID = null;
 
   
   /**
@@ -564,6 +567,19 @@ public class AppDTO  {
   }
   public void setCreatedTime(String createdTime) {
     this.createdTime = createdTime;
+  }
+
+  
+  /**
+   * previous version app ID if this is an updated app
+   **/
+  @ApiModelProperty(value = "previous version app ID if this is an updated app")
+  @JsonProperty("previousVersionAppID")
+  public String getPreviousVersionAppID() {
+    return previousVersionAppID;
+  }
+  public void setPreviousVersionAppID(String previousVersionAppID) {
+    this.previousVersionAppID = previousVersionAppID;
   }
 
   

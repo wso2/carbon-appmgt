@@ -160,6 +160,9 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
 								.createInstallAppOperation(mobileApp);
+					} else if (MDMAppConstants.UPDATE.equals(applicationOperationAction.getAction())) {
+						operation = AndroidApplicationOperationUtil
+								.createUpdateAppOperation(mobileApp);
 					} else {
 						operation = AndroidApplicationOperationUtil
 								.createAppUninstallOperation(mobileApp);

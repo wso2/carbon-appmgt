@@ -51,6 +51,18 @@
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-default"><i class="fw fw-refresh"></i>Re-Install</a>
                                 {{/if}}
+                            {{!--Check if already subscribed to previous version of the app--}}
+                            {{else}} {{#if isUpdatedApp}}
+                                {{#if isDeviceSubscriptionEnabled}}
+                                    <a id="btn-add-gadget-update" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}" data-toggle="modal"
+                                       data-target="#modalDevices"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                {{else}}
+                                    <a id="btn-add-gadget-install" href="#" data-app="{{asset.id}}"
+                                       data-platform="{{asset.attributes.overview_platform}}"
+                                       class="btn btn-default"><i class="fw fw-refresh"></i>Update</a>
+                                {{/if}}
                             {{else}}
                                 {{#if isDeviceSubscriptionEnabled}}
                                     <a id="btn-add-gadget" href="#" data-app="{{asset.id}}"
@@ -62,7 +74,7 @@
                                        data-platform="{{asset.attributes.overview_platform}}"
                                        class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
                                 {{/if}}
-                            {{/if}}
+                            {{/if}}{{/if}}
                         {{else}}
                             <a id="btn-add-gadget-install"href="{{tenantedUrl "/login"}}"
                                class="btn btn-subscribe"> <i class="fw fw-mobile"></i>Install</a>
