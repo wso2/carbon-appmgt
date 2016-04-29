@@ -56,7 +56,7 @@ public class AppDataLoader {
 
             if("enterprise".equals(artifact.getAttribute("overview_type"))){
                 app.setType(artifact.getAttribute("overview_type"));
-                if("install".equals(action)){
+                if("install".equals(action) || "update".equals(action)){
                     if("android".equals(artifact.getAttribute("overview_platform"))){
                         app.setLocation(HostResolver.getHost(MobileConfigurations.getInstance().getMDMConfigs()
                                 .get(MobileConfigurations.APP_DOWNLOAD_URL_HOST)) + artifact.getAttribute("overview_url"));

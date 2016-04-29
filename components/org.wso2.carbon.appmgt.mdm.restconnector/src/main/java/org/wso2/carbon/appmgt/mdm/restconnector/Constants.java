@@ -26,6 +26,7 @@ public class Constants {
     public static final String API_DEVICE_LIST_OF_USER = "/devices/user/%s/%s";
     public static final String API_DEVICE_LIST_OF_TYPES = "/devices/%s/%s";
     public static final String API_INSTALL_APP = "/operations/installApp/%s";
+    public static final String API_UPDATE_APP = "/operations/updateApp/%s";
     public static final String API_UNINSTALL_APP = "/operations/uninstallApp/%s";
 
     public static final String PROPERTY_SERVER_URL = "ServerURL";
@@ -56,6 +57,7 @@ public class Constants {
     public static final String NONE = "none";
     public static final String IMAGE_URL = "ImageURL";
     public static final String INSTALL = "install";
+    public static final String UPDATE = "update";
     public static final String MOBILE_DEVICE = "mobileDevice";
 
 

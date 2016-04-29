@@ -27,10 +27,15 @@ $.ajax({
 
         for (var k = 0; k < objects[j].length; k++) {
             row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
-                '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-modal">' +
-                '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
-                '"><div>' + objects[j][k].name + '</div></a>' +
-                '</div>');
+                    '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-modal">' +
+                    '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
+                    '"><div>' + objects[j][k].name + '</div></a>' +
+                    '</div>');
+            row.append('<div data-dismiss="modal" data-device-id="' + objects[j][k].id +
+                    '" data-device-platform="' + objects[j][k].platform + '" class="col-md-2 device-image-block-update-modal">' +
+                    '<a class="thumbnail" href="#"><img alt="" src="' + objects[j][k].image +
+                    '"><div>' + objects[j][k].name + '</div></a>' +
+                    '</div>');
         }
         item.append(row);
         $("#devicesList").append(item);
@@ -113,6 +118,12 @@ $("#devicesList").on( "click", ".device-image-block-modal", function() {
     performInstalltion(deviceId, devicePlatform, appToInstall);
 });
 
+$("#devicesList").on( "click", ".device-image-block-update-modal", function() {
+    var deviceId = $(this).data("deviceId");
+    var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
+    performUpdate(deviceId, devicePlatform, appToInstall);
+});
+
 
 function performInstalltion(deviceId, devicePlatform, app){
     jQuery.ajax({
@@ -138,6 +149,29 @@ function performInstalltion(deviceId, devicePlatform, app){
 
     });
 
+}
+
+
+function performUpdate(deviceId, devicePlatform, app){
+    jQuery.ajax({
+        url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
+              encodeURIComponent(devicePlatform) + "/update",
+        type: "POST",
+        dataType: "json",
+        data : {"asset": app}
+    });
+
+    $( document ).ajaxComplete(function() {
+        noty({
+            text : 'You have been subscribed to the application successfully',
+            'layout' : 'center',
+            'timeout': 1500,
+            'modal': false,
+             'onClose': function() {
+                 location.reload();
+            }
+        });
+    });
 }
 
 
