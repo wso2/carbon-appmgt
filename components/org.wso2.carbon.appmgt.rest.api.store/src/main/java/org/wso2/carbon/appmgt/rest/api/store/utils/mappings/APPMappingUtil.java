@@ -48,19 +48,19 @@ public class APPMappingUtil {
     private static final Log log = LogFactory.getLog(APPMappingUtil.class);
 
     /**
-     * Converts a List object of Apps into a DTO
+     * Create and returns an AppListDTO with basic fields in the given apps.
      *
      * @param appList List of Apps
      * @param limit   maximum number of APIs returns
      * @param offset  starting index
-     * @return APIListDTO object containing APIDTOs
+     * @return APIListDTO
      */
-    public static AppListDTO fromAPIListToDTO(List<App> appList, int offset, int limit) {
+    public static AppListDTO getAppListDTOWithBasicFields(List<App> appList, int offset, int limit) {
         AppListDTO appListDTO = new AppListDTO();
-        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppList();
+        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppInfoList();
         if (appInfoDTOs == null) {
             appInfoDTOs = new ArrayList<>();
-            appListDTO.setAppList(appInfoDTOs);
+            appListDTO.setAppInfoList(appInfoDTOs);
         }
 
         //add the required range of objects to be returned
@@ -70,6 +70,33 @@ public class APPMappingUtil {
             appInfoDTOs.add(fromAppToInfoDTO(appList.get(i)));
         }
         appListDTO.setCount(appInfoDTOs.size());
+        return appListDTO;
+    }
+
+    /**
+     * Create and returns an AppListDTO with all fields in the given apps.
+     *
+     * @param appList List of Apps
+     * @param limit   maximum number of APIs returns
+     * @param offset  starting index
+     * @return AppListDTO
+     */
+    public static AppListDTO getAppListDTOWithAllFields(List<App> appList, int offset, int limit) {
+
+        AppListDTO appListDTO = new AppListDTO();
+        List<AppDTO> appDTOs = appListDTO.getAppList();
+        if (appDTOs == null) {
+            appDTOs = new ArrayList<>();
+            appListDTO.setAppList(appDTOs);
+        }
+
+        //add the required range of objects to be returned
+        int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
+        int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
+        for (int i = start; i <= end; i++) {
+            appDTOs.add(fromAppToDTO(appList.get(i)));
+        }
+        appListDTO.setCount(appDTOs.size());
         return appListDTO;
     }
 

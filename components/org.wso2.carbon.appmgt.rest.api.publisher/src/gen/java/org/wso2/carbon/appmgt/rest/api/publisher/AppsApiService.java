@@ -27,7 +27,7 @@ import java.io.InputStream;
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsAppTypeGet(String appType,String query,Integer limit,Integer offset,String accept,String ifNoneMatch);
+    public abstract Response appsAppTypeGet(String appType,String query, String fieldFilter, Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypePost(String appType,AppDTO body,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeChangeLifecyclePost(String appType,String action,String appId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);

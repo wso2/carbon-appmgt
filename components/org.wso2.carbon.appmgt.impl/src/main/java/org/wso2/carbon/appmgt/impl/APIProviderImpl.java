@@ -2417,7 +2417,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     private String getRxtAttributeName(String searchKey) {
 
-        String rxtAttributeName = null;
+        // Initialize the attribute name to empty string, since artifact.getAttribute() method is not nulllproof.
+        String rxtAttributeName = "";
 
         if(searchKey.equalsIgnoreCase("NAME")){
             rxtAttributeName = AppMConstants.API_OVERVIEW_NAME;
