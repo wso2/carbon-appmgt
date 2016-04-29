@@ -200,6 +200,9 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String MOBILE_APP_OVERVIEW_NAME = "overview_name";
+    public static final String MOBILE_APP_OVERVIEW_PROVIDER = "overview_provider";
+    public static final String MOBILE_APP_OVERVIEW_VERSION = "overview_version";
     public static final String MOBILE_APP_OVERVIEW_URL = "overview_url";
     public static final String MOBILE_APP_OVERVIEW_PACKAGE_NAME = "overview_packagename";
     public static final String MOBILE_APP_OVERVIEW_BUNDLE_VERSION = "overview_bundleversion";
@@ -574,7 +577,7 @@ public final class AppMConstants {
     public static final String CREATOR_ROLE = "internal/creator";
     public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String STORE_ADMIN_ROLE = "internal/store-admin";
-    public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
+    public static final String ANONYMOUS_ROLE = "SYSTEM/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
     public static final String WRITE_ACTION = "3";
@@ -659,6 +662,12 @@ public final class AppMConstants {
     //Mobile application binary file extensions
     public static final String MOBILE_APPS_ANDROID_EXT = "apk";
     public static final String MOBILE_APPS_IOS_EXT = ".ipa";
+
+    //Mobile application platform types
+    public static final String MOBILE_APPS_PLATFORM_ANDROID = "android";
+    public static final String MOBILE_APPS_PLATFORM_IOS = "ios";
+    public static final String MOBILE_APPS_PLATFORM_WEBAPP = "webapp";
+
 
     public static final String APPM_SAML2_CACHE_HIT = "appmSamlCacheHit";
     public static final String CACHE_STAT_PUBLISHED = "cacheStatPublished";

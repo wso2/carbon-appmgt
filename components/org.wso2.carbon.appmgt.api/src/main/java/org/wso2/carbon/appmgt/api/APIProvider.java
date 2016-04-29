@@ -263,7 +263,7 @@ public interface APIProvider extends APIManager {
      * @param mobileApp Mobile application
      * @throws AppManagementException if failed to add MobileApp
      */
-    public String addMobileApp(MobileApp mobileApp) throws AppManagementException;
+    public String createMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
@@ -400,16 +400,16 @@ public interface APIProvider extends APIManager {
                                                                                             AppManagementException;
 
     /**
-     * Search WebApp and Mobileapps. If type is not mentioned, it will search in all tpyes
      *
-     * @param searchTerm  Search Term
-     * @param searchType  Search Type
+     * Searches and returns the apps for the given search terms.
+     *
      * @param appType
-     * @return   Set of APIs
+     * @param searchTerms
+     * @return
      * @throws AppManagementException
      */
-    public List<WebApp> searchAppsWithOptionalType(String searchTerm, String searchType, String providerId, String appType) throws
-                                                                                            AppManagementException;
+    public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
+
 
     /**
      * Update the subscription status

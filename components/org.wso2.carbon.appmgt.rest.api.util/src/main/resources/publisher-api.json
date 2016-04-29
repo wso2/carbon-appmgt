@@ -697,7 +697,8 @@
             "required": [
                 "name",
                 "version",
-                "provider"
+                "provider",
+                "displayName"
             ],
             "properties": {
                 "id": {
