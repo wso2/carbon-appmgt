@@ -2320,7 +2320,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 isSubscribed = true;
             }
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
-            handleException("Error occurred while retrieving registry", e);
+            handleException("Error occurred while adding subscription registry resource for mobileapp with id :" +
+                    appId, e);
         }
         return isSubscribed;
     }
@@ -2335,8 +2336,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 isUnSubscribed = true;
             }
         } catch (org.wso2.carbon.registry.api.RegistryException e) {
-            log.error("" + path, e);
-            handleException("Error while deleting registry path: "+path, e);
+            handleException("Error occurred while removing subscription registry resource for mobileapp with id :" +
+                    appId, e);
         }
         return isUnSubscribed;
     }

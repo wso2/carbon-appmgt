@@ -43,7 +43,7 @@ var render = function (theme, data, meta, require) {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
                     recentApps: data.recentAssets,
-                    assetType: data.assetType
+                    assetType: data.type
                 }
             }
         ],
