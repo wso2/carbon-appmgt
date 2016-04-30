@@ -12,7 +12,7 @@
     var isDirectDownloadEnabled = mdmConfig.EnableDirectDownload == "true" ? true : false;
 
 
-    var performAction = function performAction (action, tenantId, type, app, params) {
+    var performAction = function performAction (action, tenantId, type, app, params, schedule) {
 
 
         //check security;
@@ -114,7 +114,7 @@
         if(isMDMOperationsEnabled){
             var operationsClass = Packages.org.wso2.carbon.appmgt.mobile.store.Operations;
             var operations = new operationsClass();
-            operations.performAction(stringify(currentUser), action, tenantId, type, app, params, null);
+            operations.performAction(stringify(currentUser), action, tenantId, type, app, params, schedule);
         }
 
 

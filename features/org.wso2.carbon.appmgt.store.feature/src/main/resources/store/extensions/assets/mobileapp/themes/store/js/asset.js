@@ -189,7 +189,12 @@ jQuery(function ($) {
 
 
 
-    $('#btn-add-gadget').click(function () {
+
+    $('#btn-schduled-install').click(function () {
+        $('#modalInstallApp').modal('hide');
+        $('#modalDevices').modal('show');
+        $('.device-image-block-modal').show();
+        $('.device-image-block-update-modal').hide();
        /* var elem = $(this);
         if (store.user) {
             isAssertTrue(elem.data('aid'), elem.data('type'));
@@ -231,6 +236,42 @@ jQuery(function ($) {
        
     });
 
+    $('#btn-schduled-update').click(function () {  
+        $('#modalUpdateApp').modal('hide');
+        $('#modalDevices').modal('show');
+        $('.device-image-block-modal').hide();
+        $('.device-image-block-update-modal').show();
+        
+        var device = getURLParameter("device");
+       appToInstall = $(this).data("app");
+	   devicePlatform = $(this).data("platform").toLowerCase();
+
+       var showDevices = false;
+		
+       $(".device-image-block-update-modal").each(function(index) {	
+			var platform = $(this).data("platform").toLowerCase();
+			if(devicePlatform != "webapp"){
+				if(devicePlatform != platform){
+					$(this).css("display", "none");
+				}else{
+					showDevices = true;
+				}
+			}else{
+				showDevices = true;
+			}
+		});
+		
+		if(showDevices == false){
+			$('.modal-body').html("<div class='offset2'>Sorry you dont have devices to install this app<div>");
+		}		
+		if(!(device > 0)){
+			$('#devicesList').modal('show');
+		}else{			
+			performUpdate(device, appToInstall);
+		}       
+    });
+
+    
     $('#btn-add-gadget-install').click(function () {
         appToInstall = $(this).data("app");
         performInstalltionUser(appToInstall);
