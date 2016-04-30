@@ -42,6 +42,9 @@
                         "type": "string"
                     },
                     {
+                        "$ref": "#/parameters/fieldFilter"
+                    },
+                    {
                         "$ref": "#/parameters/limit"
                     },
                     {
@@ -1905,14 +1908,14 @@
                 }
             }
         },
-        "/javapolicies/appid/{appId}": {
+        "/javapolicies": {
             "get": {
-                "x-scope": "appm:read",
+                "x-scope": "appm:create",
                 "summary": "Get available java policies",
                 "description": "Get available java policies.\n",
                 "parameters": [
                     {
-                        "$ref": "#/parameters/appId"
+                        "$ref": "#/parameters/isGlobal"
                     },
                     {
                         "$ref": "#/parameters/Accept"
@@ -1931,7 +1934,7 @@
                     "200": {
                         "description": "OK. \nQualifying App is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/JavaPolicy"
+                            "$ref": "#/definitions/JavaPolicyList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -2008,6 +2011,26 @@
             "description": "Application Context",
             "required": true,
             "type": "string"
+        },
+        "isGlobal": {
+            "name": "isGlobal",
+            "in": "query",
+            "description": "Either global policy or not. Default value is 'true'.",
+            "required": false,
+            "default": true,
+            "type": "boolean"
+        },
+        "fieldFilter": {
+            "name": "field-filter",
+            "description": "Used to limit the fields in response.\n\n\n\n\nSupported filters are [ **basic,all**]\n",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "default": "basic",
+            "enum": [
+                "basic",
+                "all"
+            ]
         },
         "limit": {
             "name": "limit",
@@ -2530,6 +2553,17 @@
                 }
             }
         },
+        "JavaPolicyList": {
+            "title": "Java Policy List",
+            "properties": {
+                "policyList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/JavaPolicy"
+                    }
+                }
+            }
+        },
         "JavaPolicy": {
             "title": "JavaPolicy object",
             "required": [
@@ -2551,11 +2585,6 @@
                 "displayOrder": {
                     "type": "integer",
                     "description": "display order of the policy in UI\n",
-                    "example": "1"
-                },
-                "applicationId": {
-                    "type": "string",
-                    "description": "mapped interna app id",
                     "example": "1"
                 }
             }

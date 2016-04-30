@@ -89,6 +89,7 @@ paths:
 
             given query string against App Name.
           type: string
+        - $ref: '#/parameters/fieldFilter'
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/Accept'
@@ -1379,14 +1380,14 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/javapolicies/appid/{appId}':
+  /javapolicies:
     get:
-      x-scope: 'appm:read'
+      x-scope: 'appm:create'
       summary: Get available java policies
       description: |
         Get available java policies.
       parameters:
-        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/isGlobal'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
         - $ref: '#/parameters/If-Modified-Since'
@@ -1396,7 +1397,7 @@ paths:
         '200':
           description: "OK. \nQualifying App is returned.\n"
           schema:
-            $ref: '#/definitions/JavaPolicy'
+            $ref: '#/definitions/JavaPolicyList'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -1458,6 +1459,29 @@ parameters:
     description: Application Context
     required: true
     type: string
+  isGlobal:
+    name: isGlobal
+    in: query
+    description: "Either global policy or not. Default value is 'true'."
+    required: false
+    default: true
+    type: boolean
+  fieldFilter:
+    name: field-filter
+    description: |
+      Used to limit the fields in response.
+
+
+
+
+      Supported filters are [ **basic,all**]
+    in: query
+    type: string
+    required: false
+    default: basic
+    enum:
+      - basic
+      - all
   limit:
     name: limit
     in: query
@@ -1888,6 +1912,13 @@ definitions:
       roleIds:
         type: object
         description: "List of Role Id's"
+  JavaPolicyList:
+    title: Java Policy List
+    properties:
+      policyList:
+        type: array
+        items:
+          $ref: '#/definitions/JavaPolicy'
   JavaPolicy:
     title: JavaPolicy object
     required:
@@ -1907,10 +1938,6 @@ definitions:
         type: integer
         description: |
           display order of the policy in UI
-        example: '1'
-      applicationId:
-        type: string
-        description: mapped interna app id
         example: '1'
   LifeCycle:
     title: LifeCycle object

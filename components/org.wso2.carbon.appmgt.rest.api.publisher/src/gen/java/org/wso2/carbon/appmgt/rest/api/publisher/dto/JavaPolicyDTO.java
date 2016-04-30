@@ -23,9 +23,6 @@ public class JavaPolicyDTO  {
   
   
   private Integer displayOrder = null;
-  
-  
-  private String applicationId = null;
 
   
   /**
@@ -78,19 +75,6 @@ public class JavaPolicyDTO  {
   }
 
   
-  /**
-   * mapped interna app id
-   **/
-  @ApiModelProperty(value = "mapped interna app id")
-  @JsonProperty("applicationId")
-  public String getApplicationId() {
-    return applicationId;
-  }
-  public void setApplicationId(String applicationId) {
-    this.applicationId = applicationId;
-  }
-
-  
 
   @Override
   public String toString()  {
@@ -101,7 +85,6 @@ public class JavaPolicyDTO  {
     sb.append("  displayName: ").append(displayName).append("\n");
     sb.append("  description: ").append(description).append("\n");
     sb.append("  displayOrder: ").append(displayOrder).append("\n");
-    sb.append("  applicationId: ").append(applicationId).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

@@ -7739,62 +7739,57 @@ public class AppMDAO {
 		return policyPartialNamesList;
 	}
 
-	/**
-	 * Fetch predefined all the non mandatory Java policy list with the mapped Application Id
-	 * If each policy is mapped with the given appId it will return the same appId else it will return NULL
-	 * The mandatory policies are excluded from the returned list
-	 * And also only includes the Global (application level) policies
-	 *
-	 * @param applicationUUId
-	 * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
-	 * @return array of all available java policies
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
-	 */
-	public static NativeArray getAvailableJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
-			throws AppManagementException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		NativeObject objPolicy;
-		NativeArray arrJavaPolicies = new NativeArray(0);
-		int count = 0;
+    /**
+     * Fetch predefined all the non mandatory Java policy list with the mapped Application Id If each policy is mapped
+     * with the given appId it will return the same appId else it will return NULL The mandatory policies are excluded
+     * from the returned list And also only includes the Global (application level) policies
+     *
+     * @param applicationUUId
+     * @param isGlobalPolicy  :if application level policy - true else if resource level policy - false
+     * @return array of all available java policies
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
+     */
+    public static JSONArray getAvailableJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
+            throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         Boolean isMandatory = false; //no need to show the mandatory fields as options
+        JSONArray arrJavaPolicies = new JSONArray();
 
-		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
-				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
-				"FROM APM_APP_JAVA_POLICY POL " +
-				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
-				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
-				"WHERE IS_MANDATORY= ? AND IS_GLOBAL= ? " +
-				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
+        String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
+                ",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
+                "FROM APM_APP_JAVA_POLICY POL " +
+                "LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
+                "LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+                "WHERE IS_MANDATORY= ? AND IS_GLOBAL= ? " +
+                "ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
-		try {
-			conn = APIMgtDBUtil.getConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, applicationUUId);
-			ps.setBoolean(2, isMandatory);
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, applicationUUId);
+            ps.setBoolean(2, isMandatory);
             ps.setBoolean(3, isGlobalPolicy);
             rs = ps.executeQuery();
-			while (rs.next()) {
-				objPolicy = new NativeObject();
-				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
-				objPolicy.put("displayName", objPolicy, rs.getString("DISPLAY_NAME"));
-				objPolicy.put("description", objPolicy, rs.getString("DESCRIPTION"));
-				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
-				objPolicy.put("applicationId", objPolicy, rs.getString("APP_ID"));
+            while (rs.next()) {
+                JSONObject objPolicy = new JSONObject();
+                objPolicy.put("javaPolicyId", rs.getInt("JAVA_POLICY_ID"));
+                objPolicy.put("displayName", rs.getString("DISPLAY_NAME"));
+                objPolicy.put("description", rs.getString("DESCRIPTION"));
+                objPolicy.put("displayOrder", rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+                objPolicy.put("applicationId", rs.getString("APP_ID"));
+                arrJavaPolicies.add(objPolicy);
+            }
 
-				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
-				count++;
-			}
-
-		} catch (SQLException e) {
-			handleException("SQL Error while executing the query to get available Java Policies : "
-					+ query + e.getMessage(), e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
-		}
-		return arrJavaPolicies;
-	}
+        } catch (SQLException e) {
+            handleException("SQL Error while executing the query to get available Java Policies : "
+                                    + query + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return arrJavaPolicies;
+    }
 
 	/**
 	 * save java policy and application mapping

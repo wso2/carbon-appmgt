@@ -6,8 +6,8 @@ import org.wso2.carbon.appmgt.rest.api.publisher.factories.JavapoliciesApiServic
 
 import io.swagger.annotations.ApiParam;
 
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.JavaPolicyListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.JavaPolicyDTO;
 
 import java.util.List;
 
@@ -27,10 +27,10 @@ public class JavapoliciesApi  {
    private final JavapoliciesApiService delegate = JavapoliciesApiServiceFactory.getJavapoliciesApi();
 
     @GET
-    @Path("/appid/{appId}")
+    
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get available java policies", notes = "Get available java policies.", response = JavaPolicyDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get available java policies", notes = "Get available java policies.", response = JavaPolicyListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nQualifying App is returned."),
         
@@ -40,12 +40,12 @@ public class JavapoliciesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
 
-    public Response javapoliciesAppidAppIdGet(@ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    public Response javapoliciesGet(@ApiParam(value = "Either global policy or not. Default value is 'true'.", defaultValue="true") @QueryParam("isGlobal") Boolean isGlobal,
     @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
-    return delegate.javapoliciesAppidAppIdGet(appId,accept,ifNoneMatch,ifModifiedSince);
+    return delegate.javapoliciesGet(isGlobal,accept,ifNoneMatch,ifModifiedSince);
     }
 }
 
