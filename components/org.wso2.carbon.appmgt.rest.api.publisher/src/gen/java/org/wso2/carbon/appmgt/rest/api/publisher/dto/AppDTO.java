@@ -783,6 +783,7 @@ public class AppDTO  {
     sb.append("  lifecycleAvailableActions: ").append(lifecycleAvailableActions).append("\n");
     sb.append("  createdTime: ").append(createdTime).append("\n");
     sb.append("  customProperties: ").append(customProperties).append("\n");
+    //sb.append("  previousVersionAppID: ").append(previousVersionAppID).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
