@@ -36,6 +36,7 @@ public class AndroidApplicationOperationUtil {
 	 * @throws DeviceApplicationException
 	 */
 	public static Operation createInstallAppOperation(MobileApp application, String schedule) throws
+
 			DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
@@ -71,6 +72,7 @@ public class AndroidApplicationOperationUtil {
 	 * @throws DeviceApplicationException
 	 */
 	public static Operation createUpdateAppOperation(MobileApp application, String schedule) throws
+
 			DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
@@ -105,8 +107,8 @@ public class AndroidApplicationOperationUtil {
 	 * @throws DeviceApplicationException
 	 */
 	public static Operation createAppUninstallOperation(MobileApp application, String schedule) throws
-			DeviceApplicationException {
 
+			DeviceApplicationException {
 		ProfileOperation operation = new ProfileOperation();
 		operation.setCode(MDMAppConstants.AndroidConstants.OPCODE_UNINSTALL_APPLICATION);
 		operation.setType(Operation.Type.PROFILE);
