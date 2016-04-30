@@ -484,6 +484,7 @@ public class APPMappingUtil {
         }
         mobileAppModel.setScreenShots(appDTO.getScreenshots());
         mobileAppModel.setRecentChanges(appDTO.getRecentChanges());
+        mobileAppModel.setPreviousVersionAppID(appDTO.getPreviousVersionAppID());
 
         if (appDTO.getTags() != null) {
             Set<String> apiTags = new HashSet<>(appDTO.getTags());
