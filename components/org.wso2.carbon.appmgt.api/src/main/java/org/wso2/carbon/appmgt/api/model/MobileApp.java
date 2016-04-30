@@ -47,6 +47,7 @@ public class MobileApp extends App{
     private APIStatus lifecycleStatus;
     private List<String> screenShots;
     private String createdTime;
+    private String previousVersionAppID;
 
     public String getCreatedTime() {
         return createdTime;
@@ -231,4 +232,12 @@ public class MobileApp extends App{
     public void setAppVisibility(String[] appVisibility) {
         this.appVisibility = appVisibility;
     }
+
+	public String getPreviousVersionAppID() {
+		return previousVersionAppID;
+	}
+
+	public void setPreviousVersionAppID(String previousVersionAppID) {
+		this.previousVersionAppID = previousVersionAppID;
+	}
 }

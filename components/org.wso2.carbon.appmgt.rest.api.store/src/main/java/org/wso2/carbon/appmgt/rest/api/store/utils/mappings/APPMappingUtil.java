@@ -374,6 +374,7 @@ public class APPMappingUtil {
         dto.setIcon(mobileApp.getThumbnail());
         dto.setAppType(mobileApp.getAppType());
         dto.setRecentChanges(mobileApp.getRecentChanges());
+        dto.setPreviousVersionAppID(mobileApp.getPreviousVersionAppID());
 
         return dto;
     }
