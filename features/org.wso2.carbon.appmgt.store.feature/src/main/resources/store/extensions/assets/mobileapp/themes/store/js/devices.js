@@ -41,6 +41,8 @@ $.ajax({
         $("#devicesList").append(item);
 
     }
+    
+    
 
 });
 
@@ -115,23 +117,36 @@ $(".device-image-block").click(function(index) {
 $("#devicesList").on( "click", ".device-image-block-modal", function() {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    performInstalltion(deviceId, devicePlatform, appToInstall);
+    var instantInstall = $('#instant-install').is(":checked");
+    if (!instantInstall) {
+        var scheduleInstall = $('#schedule-install').val();
+        performInstalltion(deviceId, devicePlatform, appToInstall, scheduleInstall);
+    } else {
+        performInstalltion(deviceId, devicePlatform, appToInstall, null);
+    }
 });
 
 $("#devicesList").on( "click", ".device-image-block-update-modal", function() {
     var deviceId = $(this).data("deviceId");
     var devicePlatform = $(this).data("devicePlatform"); // This will type in device identifier in mdm
-    performUpdate(deviceId, devicePlatform, appToInstall);
+    var instantUpdate = $('#instant-update').is(":checked");
+    if (!instantUpdate) {
+        var scheduleUpdate = $('#schedule-update').val();
+    	performUpdate(deviceId, devicePlatform, appToInstall, scheduleUpdate);
+    } else {
+    	performUpdate(deviceId, devicePlatform, appToInstall, null);
+    }
+    
 });
 
 
-function performInstalltion(deviceId, devicePlatform, app){
+function performInstalltion(deviceId, devicePlatform, app, schedule){
     jQuery.ajax({
         url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
               encodeURIComponent(devicePlatform) + "/install",
         type: "POST",
         dataType: "json",
-        data : {"asset": app}
+        data : {"asset": app, "schedule": schedule}
     });
 
     $( document ).ajaxComplete(function() {
@@ -152,13 +167,13 @@ function performInstalltion(deviceId, devicePlatform, app){
 }
 
 
-function performUpdate(deviceId, devicePlatform, app){
+function performUpdate(deviceId, devicePlatform, app, schedule){
     jQuery.ajax({
         url:  caramel.context +"/apps/devices/" + encodeURIComponent(deviceId) + "/" +
               encodeURIComponent(devicePlatform) + "/update",
         type: "POST",
         dataType: "json",
-        data : {"asset": app}
+        data : {"asset": app, "schedule": schedule}
     });
 
     $( document ).ajaxComplete(function() {
