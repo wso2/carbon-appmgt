@@ -26,6 +26,15 @@ import java.io.Serializable;
 public class EnterpriseApplication extends AndroidApplication implements Serializable {
 
 	private String url;
+	private String schedule;
+
+	public String getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(String schedule) {
+		this.schedule = schedule;
+	}
 
 	public String getUrl() {
 		return url;
