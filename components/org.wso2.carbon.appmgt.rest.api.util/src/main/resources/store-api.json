@@ -42,6 +42,9 @@
                         "type": "string"
                     },
                     {
+                        "$ref": "#/parameters/fieldFilter"
+                    },
+                    {
                         "$ref": "#/parameters/limit"
                     },
                     {
@@ -545,6 +548,18 @@
             "description": "App Type. Either webapp or mobileapp\n",
             "required": true,
             "type": "string"
+        },
+        "fieldFilter": {
+            "name": "field-filter",
+            "description": "Used to limit the fields in response.\n\n\n\n\nSupported filters are [ **basic,all**]\n",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "default": "basic",
+            "enum": [
+                "basic",
+                "all"
+            ]
         },
         "limit": {
             "name": "limit",

@@ -28,10 +28,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
@@ -192,8 +191,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
-                                   String ifNoneMatch) {
+    public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
+                                   String accept, String ifNoneMatch) {
         List<WebApp> allMatchedApps;
         AppListDTO appListDTO;
 
@@ -243,6 +242,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
         return null;
     }
+
 
     /**
      * Create an application
