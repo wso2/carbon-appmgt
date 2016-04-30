@@ -69,6 +69,7 @@ its own partion sinceit does not support tags--}}
 </div>
 
 {{!-- left-column - recent apps --}}
+
 {{#if recentApps}}
     <div class="add-margin-top-3x hidden-xs hidden-sm">
         <div class="section-title">{{t "Recent Apps"}}</div>
@@ -86,7 +87,11 @@ its own partion sinceit does not support tags--}}
                                 <span>{{defaultThumbnail.text}}</span>
                             </div>
                         {{else}}
-                            <img src="{{attributes.images_thumbnail}}" />
+                            {{#ifCond ../../../assetType "==" "mobileapp"}}
+                                <img src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}"/>
+                            {{else}}
+                                <img src="{{attributes.images_thumbnail}}"/>
+                            {{/ifCond}}
                         {{/if}}
                     </div>
                     <div class="recent-app-item-summery">
