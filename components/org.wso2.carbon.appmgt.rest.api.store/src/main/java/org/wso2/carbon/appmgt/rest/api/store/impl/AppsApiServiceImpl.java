@@ -85,7 +85,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantId", tenantId);
 
             appProvider.subscribeMobileApp(username, appId);
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+            //TODO:Need to extract the schedule string and pass instead of null
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -142,7 +143,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters);
+            //TODO:Need to extract the schedule string and pass instead of null
+            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
         } catch (UserStoreException e) {

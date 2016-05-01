@@ -189,7 +189,9 @@ jQuery(function ($) {
 
 
 
-    $('#btn-add-gadget').click(function () {
+    $('#btn-schduled-install').click(function () {
+        $('#modalInstallApp').modal('hide');
+        $('#modalDevices').modal('show');
         $('.device-image-block-modal').show();
         $('.device-image-block-update-modal').hide();
        /* var elem = $(this);
@@ -234,10 +236,13 @@ jQuery(function ($) {
     });
     
 
-    $('#btn-add-gadget-update').click(function () {  
+    $('#btn-schduled-update').click(function () {  
+        $('#modalUpdateApp').modal('hide');
+        $('#modalDevices').modal('show');
         $('.device-image-block-modal').hide();
         $('.device-image-block-update-modal').show();
-       var device = getURLParameter("device");
+        
+        var device = getURLParameter("device");
        appToInstall = $(this).data("app");
 	   devicePlatform = $(this).data("platform").toLowerCase();
 

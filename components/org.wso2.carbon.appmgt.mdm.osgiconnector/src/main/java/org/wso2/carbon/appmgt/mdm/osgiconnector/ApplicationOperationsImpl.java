@@ -159,13 +159,13 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				if (deviceIdentifier.getType().equals(Platform.android.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
-								.createInstallAppOperation(mobileApp);
+								.createInstallAppOperation(mobileApp, applicationOperationAction.getSchedule());
 					} else if (MDMAppConstants.UPDATE.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
-								.createUpdateAppOperation(mobileApp);
+								.createUpdateAppOperation(mobileApp, applicationOperationAction.getSchedule());
 					} else {
 						operation = AndroidApplicationOperationUtil
-								.createAppUninstallOperation(mobileApp);
+								.createAppUninstallOperation(mobileApp, applicationOperationAction.getSchedule());
 					}
 				} else if (deviceIdentifier.getType().equals(Platform.ios.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {

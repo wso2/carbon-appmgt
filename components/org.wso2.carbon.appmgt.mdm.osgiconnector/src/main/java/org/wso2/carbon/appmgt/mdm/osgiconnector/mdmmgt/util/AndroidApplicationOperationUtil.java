@@ -35,7 +35,7 @@ public class AndroidApplicationOperationUtil {
 	 * @return operation
 	 * @throws DeviceApplicationException
 	 */
-	public static Operation createInstallAppOperation(MobileApp application) throws
+	public static Operation createInstallAppOperation(MobileApp application, String schedule) throws
 	                                                                         DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
@@ -46,6 +46,7 @@ public class AndroidApplicationOperationUtil {
 				EnterpriseApplication enterpriseApplication = new EnterpriseApplication();
 				enterpriseApplication.setType(application.getType().toString());
 				enterpriseApplication.setUrl(application.getLocation());
+				enterpriseApplication.setSchedule(schedule);
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
@@ -68,7 +69,7 @@ public class AndroidApplicationOperationUtil {
 	 * @return operation
 	 * @throws DeviceApplicationException
 	 */
-	public static Operation createUpdateAppOperation(MobileApp application) throws
+	public static Operation createUpdateAppOperation(MobileApp application, String schedule) throws
 	                                                                         DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
@@ -79,6 +80,7 @@ public class AndroidApplicationOperationUtil {
 				EnterpriseApplication enterpriseApplication = new EnterpriseApplication();
 				enterpriseApplication.setType(application.getType().toString());
 				enterpriseApplication.setUrl(application.getLocation());
+				enterpriseApplication.setSchedule(schedule);
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
@@ -101,7 +103,7 @@ public class AndroidApplicationOperationUtil {
 	 * @return operation
 	 * @throws DeviceApplicationException
 	 */
-	public static Operation createAppUninstallOperation(MobileApp application) throws
+	public static Operation createAppUninstallOperation(MobileApp application, String schedule) throws
 	                                                                           DeviceApplicationException {
 
 		ProfileOperation operation = new ProfileOperation();
@@ -113,6 +115,7 @@ public class AndroidApplicationOperationUtil {
 				EnterpriseApplication enterpriseApplication = new EnterpriseApplication();
 				enterpriseApplication.setType(application.getType().toString());
 				enterpriseApplication.setAppIdentifier(application.getIdentifier());
+				enterpriseApplication.setSchedule(schedule);
 				operation.setPayLoad(enterpriseApplication.toJSON());
 				break;
 			case PUBLIC:
