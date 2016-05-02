@@ -446,6 +446,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince) {
         try {
+            CommonValidator.isValidAppType(appType);
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(appId, "id", null,
