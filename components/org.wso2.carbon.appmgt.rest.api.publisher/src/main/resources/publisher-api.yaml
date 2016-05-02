@@ -861,6 +861,44 @@ paths:
           description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
           schema:
             $ref: '#/definitions/Error'
+  '/apps/static-contents/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      summary: 'Retrieving images, pdf, documents files'
+      description: |
+        Retrieving images for banners, screenshots etc.
+      parameters:
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: "OK. \nStatic content Retrived successfully.\n"
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nRequested entity does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
   '/apps/{appType}/tags':
     get:
       x-scope: 'appm:read'
@@ -1495,6 +1533,12 @@ parameters:
     description: "Starting point within the complete list of items qualified.  \n"
     default: 0
     type: integer
+  fileName:
+    name: fileName
+    in: path
+    description: "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    required: true
+    type: string
   Accept:
     name: Accept
     in: header
