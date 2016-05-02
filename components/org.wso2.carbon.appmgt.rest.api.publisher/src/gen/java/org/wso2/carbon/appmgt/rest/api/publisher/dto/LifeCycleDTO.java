@@ -1,10 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -16,10 +17,7 @@ public class LifeCycleDTO  {
   private String state = null;
   
   
-  private String actions = null;
-  
-  
-  private String lifecycle = null;
+  private List<String> actions = new ArrayList<String>();
   
   
   private Boolean async = null;
@@ -41,23 +39,11 @@ public class LifeCycleDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("actions")
-  public String getActions() {
+  public List<String> getActions() {
     return actions;
   }
-  public void setActions(String actions) {
+  public void setActions(List<String> actions) {
     this.actions = actions;
-  }
-
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("lifecycle")
-  public String getLifecycle() {
-    return lifecycle;
-  }
-  public void setLifecycle(String lifecycle) {
-    this.lifecycle = lifecycle;
   }
 
   
@@ -81,7 +67,6 @@ public class LifeCycleDTO  {
     
     sb.append("  state: ").append(state).append("\n");
     sb.append("  actions: ").append(actions).append("\n");
-    sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  async: ").append(async).append("\n");
     sb.append("}\n");
     return sb.toString();

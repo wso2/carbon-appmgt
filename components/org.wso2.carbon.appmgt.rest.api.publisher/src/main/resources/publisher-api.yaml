@@ -603,7 +603,7 @@ paths:
           description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/appId/{appId}/lifecycle':
+  '/apps/{appType}/id/{appId}/lifecycle':
     get:
       x-scope: 'appm:read'
       summary: Get lifecycle details
@@ -642,7 +642,7 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/appId/{appId}/lifecycle-history':
+  '/apps/{appType}/id/{appId}/lifecycle-history':
     get:
       x-scope: 'appm:read'
       summary: Get lifecycle details
@@ -1945,9 +1945,9 @@ definitions:
       state:
         type: string
       actions:
-        type: string
-      lifecycle:
-        type: string
+        type: array
+        items:
+          type: string
       async:
         type: boolean
   Error:

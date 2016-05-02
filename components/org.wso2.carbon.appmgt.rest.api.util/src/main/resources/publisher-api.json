@@ -831,7 +831,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/lifecycle": {
+        "/apps/{appType}/id/{appId}/lifecycle": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get lifecycle details",
@@ -891,7 +891,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/lifecycle-history": {
+        "/apps/{appType}/id/{appId}/lifecycle-history": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get lifecycle details",
@@ -2596,10 +2596,10 @@
                     "type": "string"
                 },
                 "actions": {
-                    "type": "string"
-                },
-                "lifecycle": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "async": {
                     "type": "boolean"
