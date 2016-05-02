@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsStaticContentsFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypePost(String appType,AppDTO body,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);

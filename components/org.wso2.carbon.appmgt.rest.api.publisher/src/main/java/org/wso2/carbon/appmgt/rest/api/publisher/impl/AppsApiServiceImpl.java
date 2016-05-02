@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Tier;
@@ -68,7 +69,9 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -194,6 +197,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsStaticContentsFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
                                    String accept, String ifNoneMatch) {
         List<WebApp> allMatchedApps;
@@ -203,6 +211,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
         query = query == null ? "" : query;
+
         try {
             //check if a valid asset type is provided
             if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
@@ -213,31 +222,15 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
 
-            //if query parameter is not specified, This will search by name
-            String searchType = AppMConstants.SEARCH_CONTENT_NAME;
-            String searchContent = "";
-            if (!StringUtils.isBlank(query)) {
-                String[] querySplit = query.split(":");
-                if (querySplit.length == 2 && StringUtils.isNotBlank(querySplit[0]) && StringUtils
-                        .isNotBlank(querySplit[1])) {
-                    searchType = querySplit[0];
-                    searchContent = querySplit[1];
-                } else if (querySplit.length == 1) {
-                    searchContent = query;
-                } else {
-                    RestApiUtil.handleBadRequest("Provided query parameter '" + query + "' is invalid", log);
-                }
-            }
+            List<App> result = apiProvider.searchApps(appType, RestApiUtil.getSearchTerms(query));
 
-            //We should send null as the provider, Otherwise searchAPIs will return all APIs of the provider
-            // instead of looking at type and query
-            allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null, appType);
-            if (allMatchedApps.isEmpty()) {
+
+            if (result.isEmpty()) {
                 String errorMessage = "No result found.";
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
-            appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApps, offset, limit);
-            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, allMatchedApps.size());
+            appListDTO = APPMappingUtil.fromAPIListToDTO(result, offset, limit);
+            APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving Apps";
@@ -376,26 +369,29 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
                                           String ifModifiedSince) {
-        AppDTO apiToReturn;
+        AppDTO appDTO;
         try {
             //currently supports only mobile apps
             if (!appType.equals("mobileapp")) {
                 String errorMessage = "Type not supported.";
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
+
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String searchContent = appId;
-            String searchType = "id";
-            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(searchContent, searchType, null,
-                                                                                 appType);
-            if (allMatchedApps.isEmpty()) {
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+
+            if (result.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
-            WebApp webApp = allMatchedApps.get(0);
-            webApp.setType(appType);
-            apiToReturn = APPMappingUtil.fromAPItoDTO(webApp);
-            return Response.ok().entity(apiToReturn).build();
+
+            App app = result.get(0);
+            appDTO = APPMappingUtil.fromAppToDTO(app);
+
+            return Response.ok().entity(app).build();
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -447,23 +443,32 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince) {
         try {
             CommonValidator.isValidAppType(appType);
+
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            List<WebApp> allMatchedApps = apiProvider.searchAppsWithOptionalType(appId, "id", null,
-                                                                                 appType);
-            if (allMatchedApps.isEmpty()) {
+
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+            if (result.isEmpty()) {
                 String errorMessage = "Could not find requested application.";
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
-            WebApp webApp = allMatchedApps.get(0);
-            if (appType.equals(AppMConstants.APP_TYPE)) {
+
+            App app = result.get(0);
+
+            if (appType.equals(AppMConstants.WEBAPP_ASSET_TYPE)) {
+
+                WebApp webApp = (WebApp) app;
+
                 if (webApp.isAdvertiseOnly()) {
-                    removeArtifactOnly(webApp, username);
+                    removeRegistryArtifact(webApp, username);
                 } else {
                     apiProvider.deleteApp(webApp.getId(), webApp.getSsoProviderDetails());
                 }
             } else if (appType.equals(AppMConstants.MOBILE_ASSET_TYPE)) {
-                removeArtifactOnly(webApp, username);
+                removeRegistryArtifact(app, username);
             }
             return Response.ok().build();
         } catch (AppManagementException e) {
@@ -723,7 +728,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
 
     //remove artifact from registry
-    private void removeArtifactOnly(WebApp webApp, String username)
+    private void removeRegistryArtifact(App webApp, String username)
             throws RegistryException, AppManagementException, UserStoreException {
         String tenantDomainName = MultitenantUtils.getTenantDomain(username);
         String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);

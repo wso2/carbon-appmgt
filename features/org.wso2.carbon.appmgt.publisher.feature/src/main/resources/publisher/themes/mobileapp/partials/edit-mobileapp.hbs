@@ -109,7 +109,7 @@
 					
 					
 					<div data-provides="fileupload" class="fileupload fileupload-exists"><input type="hidden" value="" name="">
-						<div class="fileupload-preview fileupload-preview-banner thumbnail" style="line-height: 160px;"><img src="{{artifact.attributes.images_banner}}"></div>
+						<div class="fileupload-preview fileupload-preview-banner thumbnail" style="line-height: 160px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_banner}}"></div>
 						<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input type="file" id="txtBanner" name="bannerFile" value="{{artifact.attributes.images_banner}}">
@@ -133,7 +133,7 @@
 
 					{{#if artifact.attributes.images_screenshots.[0]}}
 					<div data-provides="fileupload" class="fileupload fileupload-exists"><input type="hidden" value="" name="">
-						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{artifact.attributes.images_screenshots.[0]}}"></div>
+						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[0]}}"></div>
 						<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot1" name="screenshot1File" class="uploadAction">
@@ -144,7 +144,7 @@
 
 					{{#if artifact.attributes.images_screenshots.[1]}}
 					<div data-provides="fileupload" class="fileupload fileupload-exists"><input type="hidden" value="" name="">
-						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{artifact.attributes.images_screenshots.[1]}}"></div>
+						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[1]}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot2" name="screenshot2File" class="uploadAction">
@@ -173,7 +173,7 @@
 
 					{{#if artifact.attributes.images_screenshots.[2]}}
 					<div data-provides="fileupload" class="fileupload fileupload-exists"><input type="hidden" value="" name="">
-						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{artifact.attributes.images_screenshots.[2]}}"></div>
+						<div class="fileupload-preview thumbnail" style="line-height: 240px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_screenshots.[2]}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input type="file" data-url="{{url "/api/apps/upload"}}" id="txtScreenShot3" name="screenshot3File" class="uploadAction">
@@ -210,7 +210,7 @@
 				<label for="txtIconfile" class="control-label col-sm-2">Icon file  <span style="color:#FF0000">*</span><br><small>(124px * 124px, .png)</small></label>
 				<div class="col-sm-10">
 					<div data-provides="fileupload" class="fileupload fileupload-exists"><input type="hidden" value="" name="">
-						<div class="fileupload-preview fileupload-preview-icon thumbnail" style="line-height: 160px;"><img src="{{artifact.attributes.images_thumbnail}}"></div>
+						<div class="fileupload-preview fileupload-preview-icon thumbnail" style="line-height: 160px;"><img src="{{url "/api/mobileapp/getfile/"}}{{artifact.attributes.images_thumbnail}}"></div>
 					<div>
 							<span class="btn btn-file"><span class="fileupload-new"><i class="icon-plus-sign"></i></span><span class="fileupload-exists"><i class="icon-edit"></i></span>
 								<input type="file" name="iconFile">

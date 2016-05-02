@@ -11,7 +11,7 @@
         <div class="app-assets">
             <a href="{{tenantedUrl "/assets"}}/{{type}}/{{id}}">
             <img class="app-assets-icon"
-                 src="{{#if attributes.images_thumbnail}}{{attributes.images_thumbnail}}{{/if}}">
+                 src="{{#if attributes.images_thumbnail}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}{{/if}}">
             </a>
             <div class="app-assets-info">
                 <div class="app-assets-name">

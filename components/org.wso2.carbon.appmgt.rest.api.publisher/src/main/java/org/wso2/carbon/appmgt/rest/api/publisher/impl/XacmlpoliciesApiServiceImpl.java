@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.rest.api.publisher.XacmlpoliciesApiService;
@@ -98,7 +99,7 @@ public class XacmlpoliciesApiServiceImpl extends XacmlpoliciesApiService {
                 return RestApiUtil.buildNotFoundException("Apps", null).getResponse();
             }
 
-            List<WebApp> allMatchedApps = new ArrayList<>();
+            List<App> allMatchedApps = new ArrayList<>();
             for (APIIdentifier identifier : apiIdentifiers) {
                 WebApp webApp = apiProvider.getAPI(identifier);
                 allMatchedApps.add(webApp);

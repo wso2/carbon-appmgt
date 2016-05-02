@@ -26,7 +26,7 @@ import java.util.Collections;
  * Provider's & system's view of WebApp
  */
 @SuppressWarnings("unused")
-public class WebApp extends MobileApp{
+public class WebApp extends App{
 
     private APIIdentifier id;
 
@@ -100,8 +100,6 @@ public class WebApp extends MobileApp{
 
     private String responseCache;
     private int cacheTimeout;
-
-    private String uuid;
     private String policyPartials;
     private String policyGroups; //Policy Groups Id's list
     private String javaPolicies; //Java policies(handlers) List
@@ -591,14 +589,6 @@ public class WebApp extends MobileApp{
  	public void setSsoEnabled(String ssoEnabled) {
  		this.ssoEnabled = ssoEnabled;
  	}
-
-    public void setUUID(String uuid){
-        this.uuid =  uuid;
-    }
-
-    public String getUUID(){
-        return  uuid;
-    }
 
 	public void setTokenEndpoint(String tokenEndpoint) {
         this.tokenEndpoint = tokenEndpoint;
