@@ -38,13 +38,25 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
+import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
+import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -96,7 +108,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
                                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
                         String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
-                                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+                                appManagerConfiguration.getFirstProperty(
+                                        AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
 
                         File binaryFile = new File(directoryLocation);
                         //Generate UUID for the uploading file
@@ -270,17 +283,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeAppIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeAppIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
-                                                             String ifNoneMatch) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
                                                           String ifNoneMatch, String ifModifiedSince) {
         UserIdListDTO userIdListDTO = new UserIdListDTO();
@@ -294,11 +296,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                         AppMConstants.ENABLE_SELF_SUBSCRIPTION));
                 Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                         AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-                if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
                     WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
                     Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
                     userIdListDTO.setUserIds(subscriberSet);
-                }else{
+                } else {
                     RestApiUtil.handleBadRequest("Subscription is disabled", log);
                 }
             } else {
@@ -440,6 +442,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdDelete(String appType, String appId, String ifMatch, String ifUnmodifiedSince) {
         try {
+            CommonValidator.isValidAppType(appType);
 
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
@@ -489,6 +492,53 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdCreateNewVersionPost(String appType, String appId, String contentType,
                                                            String ifModifiedSince) {
         return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
+        LifeCycleDTO lifeCycleDTO = new LifeCycleDTO();
+        try {
+            //Validate App Type
+            CommonValidator.isValidAppType(appType);
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            Registry registry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
+            boolean isAsynchronousFlow =
+                    org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor(
+                            "AM_APPLICATION_PUBLISH").isAsynchronus();
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, appType);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
+            //Validate App Id
+            if (artifact == null) {
+                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+            }
+
+            String state = artifact.getLifecycleState().toUpperCase();
+            String[] actions;
+            if (AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType)) {
+                actions = artifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+            } else {
+                actions = artifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
+            }
+
+            lifeCycleDTO.setActions(Arrays.asList(actions));
+            lifeCycleDTO.setAsync(isAsynchronousFlow);
+            lifeCycleDTO.setState(state);
+        } catch (Exception e) {
+            String errorMessage = "Error while retrieving lifecycle state of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(lifeCycleDTO).build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
+                                                          String ifNoneMatch) {
+        return Response.ok().build();
     }
 
     @Override
@@ -657,11 +707,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         boolean isContextExists = false;
         try {
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                if(StringUtils.isEmpty(appContext)){
+                if (StringUtils.isEmpty(appContext)) {
                     RestApiUtil.handleBadRequest("Webapp context is not provided", log);
                 }
 
-                if(appContext.indexOf("/") != 0){
+                if (appContext.indexOf("/") != 0) {
                     appContext = "/" + appContext;
                 }
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -688,7 +738,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
 
         GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
-                AppMConstants.MOBILE_ASSET_TYPE);
+                                                                                   AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
     }
 }

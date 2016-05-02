@@ -1,6 +1,5 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +8,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
 public class AdminInstallDTO  {
-  
+
+
   
   
   private String type = null;
