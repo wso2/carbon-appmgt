@@ -191,6 +191,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsStaticContentsFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
                                    String accept, String ifNoneMatch) {
         List<WebApp> allMatchedApps;
