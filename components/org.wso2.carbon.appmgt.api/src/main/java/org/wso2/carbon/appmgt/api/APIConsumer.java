@@ -458,4 +458,6 @@ public interface APIConsumer extends APIManager {
      */
     public boolean hasFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
+
+    public boolean isSubscribedToMobileApp(String userId, String appId) throws AppManagementException;
 }

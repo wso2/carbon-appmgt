@@ -201,6 +201,9 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
 
     public static final String IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String MOBILE_APP_OVERVIEW_NAME = "overview_name";
+    public static final String MOBILE_APP_OVERVIEW_PROVIDER = "overview_provider";
+    public static final String MOBILE_APP_OVERVIEW_VERSION = "overview_version";
     public static final String MOBILE_APP_OVERVIEW_URL = "overview_url";
     public static final String MOBILE_APP_OVERVIEW_PACKAGE_NAME = "overview_packagename";
     public static final String MOBILE_APP_OVERVIEW_BUNDLE_VERSION = "overview_bundleversion";

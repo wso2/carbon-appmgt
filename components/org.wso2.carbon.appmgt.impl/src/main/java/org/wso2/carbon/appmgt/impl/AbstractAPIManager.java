@@ -297,7 +297,6 @@ public abstract class AbstractAPIManager implements APIManager {
         return apiSortedList;
     }
 
-
     public WebApp getAPI(APIIdentifier identifier) throws AppManagementException {
         String apiPath = AppManagerUtil.getAPIPath(identifier);
         try {

@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * This class is used to store and process mobile application details
  */
-public class MobileApp {
+public class MobileApp extends App{
 
     private String appName;
     private String appId;
