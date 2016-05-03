@@ -44,7 +44,7 @@ public class WebAppFactory extends AppFactory {
     private static final Log log = LogFactory.getLog(WebAppFactory.class);
 
     @Override
-    public App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
+    public App doCreateApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
 
         WebApp webApp;
 

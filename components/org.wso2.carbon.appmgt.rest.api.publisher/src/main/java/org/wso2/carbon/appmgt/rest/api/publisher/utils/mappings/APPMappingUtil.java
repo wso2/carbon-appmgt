@@ -137,6 +137,7 @@ public class APPMappingUtil {
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
         appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setRating(app.getRating());
         return appInfoDTO;
 
     }
@@ -144,7 +145,18 @@ public class APPMappingUtil {
     private static AppInfoDTO fromWebAppToInfoDTO(WebApp app) {
 
         AppInfoDTO appInfoDTO = new AppInfoDTO();
+
+        appInfoDTO.setId(app.getUUID());
+
+        APIIdentifier apiId = app.getId();
+        appInfoDTO.setName(apiId.getApiName());
+        appInfoDTO.setVersion(apiId.getVersion());
+
+        String providerName = app.getId().getProviderName();
+        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+
         appInfoDTO.setDescription(app.getDescription());
+
         String context = app.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
@@ -152,13 +164,9 @@ public class APPMappingUtil {
             }
             appInfoDTO.setContext(context);
         }
-        appInfoDTO.setId(app.getUUID());
-        APIIdentifier apiId = app.getId();
-        appInfoDTO.setName(apiId.getApiName());
-        appInfoDTO.setVersion(apiId.getVersion());
-        String providerName = app.getId().getProviderName();
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+
         appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        appInfoDTO.setRating(app.getRating());
         return appInfoDTO;
 
     }
@@ -324,6 +332,7 @@ public class APPMappingUtil {
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
+        dto.setRating(webapp.getRating());
         Set<String> apiTags = webapp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
         tagsToReturn.addAll(apiTags);
@@ -370,6 +379,7 @@ public class APPMappingUtil {
         dto.setName(mobileApp.getAppName());
         dto.setVersion(mobileApp.getVersion());
         dto.setDescription(mobileApp.getDescription());
+        dto.setRating(mobileApp.getRating());
 
         Set<String> apiTags = mobileApp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
