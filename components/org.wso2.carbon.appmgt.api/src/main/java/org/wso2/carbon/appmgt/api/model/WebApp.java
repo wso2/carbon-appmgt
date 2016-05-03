@@ -104,10 +104,6 @@ public class WebApp extends App{
     private String policyGroups; //Policy Groups Id's list
     private String javaPolicies; //Java policies(handlers) List
     private String treatAsASite;
-    /**
-     * The average rating provided by the WebApp subscribers
-     */
-    private float rating;
 
     private boolean isLatest;
 
@@ -343,14 +339,6 @@ public class WebApp extends App{
 
     public void setStatus(APIStatus status) {
         this.status = status;
-    }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
     }
 
     public void setLatest(boolean latest) {
