@@ -32,6 +32,9 @@ public class AppInfoDTO  {
   
   private String lifecycleState = null;
 
+
+  private float rating = 0.0f;
+
   
   /**
    **/
@@ -117,7 +120,16 @@ public class AppInfoDTO  {
     this.lifecycleState = lifecycleState;
   }
 
-  
+
+  @ApiModelProperty(value = "User rating for the app")
+  @JsonProperty("rating")
+  public float getRating() {
+    return rating;
+  }
+  public void setRating(float rating) {
+    this.rating = rating;
+  }
+
 
   @Override
   public String toString()  {
@@ -131,6 +143,7 @@ public class AppInfoDTO  {
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
+    sb.append("  rating: ").append(rating).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
