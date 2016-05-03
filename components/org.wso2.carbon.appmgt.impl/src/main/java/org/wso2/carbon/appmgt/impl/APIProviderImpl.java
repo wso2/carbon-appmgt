@@ -2544,8 +2544,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public void getAllTags(String appType) throws AppManagementException {
-
+    public Set<Tag> getAllTags(String appType) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -2570,6 +2570,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             for (String fullTag : collection.getChildren()) {
 
                 String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
+                int numberOfOccurrence = Integer.parseInt(fullTag.substring(fullTag.indexOf(":")+1));
+                tagSet.add(new Tag(tagName, numberOfOccurrence));
             }
 
         } catch (RegistryException e) {
@@ -2577,12 +2579,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
+        return tagSet;
     }
 
     @Override
-    public void getAllTags(String appType, String appId) throws AppManagementException {
-        org.wso2.carbon.registry.core.Tag[] tags = null;
+    public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
         try {
+            org.wso2.carbon.registry.core.Tag[] tags = null;
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
@@ -2592,6 +2596,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (appArtifact != null) {
               String artifactPath = appArtifact.getPath();
                 tags = registry.getTags(artifactPath);
+                for(org.wso2.carbon.registry.core.Tag tag : tags){
+                    tagSet.add(new Tag(tag.getTagName()));
+                }
             } else {
                 handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
                         appId + ". Artifact does not exist");
@@ -2601,6 +2608,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
+        return tagSet;
     }
 
 }

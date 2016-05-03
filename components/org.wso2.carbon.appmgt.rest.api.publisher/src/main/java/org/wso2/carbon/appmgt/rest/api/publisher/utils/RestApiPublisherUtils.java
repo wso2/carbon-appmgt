@@ -20,10 +20,17 @@ package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.utils.CarbonUtils;
+
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * This class contains REST API Publisher related utility operations
@@ -40,6 +47,17 @@ public class RestApiPublisherUtils {
             uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));
         }
         return uuid;
+    }
+
+    public static String uploadFileIntoStorage(InputStream fileInputStream, String filename) throws AppManagementException {
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String directoryLocation = CarbonUtils.getCarbonHome() + File.separator +
+                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        File binaryFile = new File(directoryLocation);
+        //Generate UUID for the uploading file
+        RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
+        return directoryLocation + File.separator + filename;
     }
 
 }

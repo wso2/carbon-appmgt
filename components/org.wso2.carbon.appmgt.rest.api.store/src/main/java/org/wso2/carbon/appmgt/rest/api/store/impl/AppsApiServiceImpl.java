@@ -155,8 +155,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeGet(String appType, String query, Integer limit, Integer offset, String accept,
-                                   String ifNoneMatch) {
+    public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
+                                   String accept, String ifNoneMatch) {
         AppListDTO appListDTO;
 
         //setting default limit and offset values if they are not set
@@ -191,6 +191,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+
     @Override
     public Response appsAppTypeIdAppIdGet(String appType, String appId, String accept, String ifNoneMatch,
                                           String ifModifiedSince) {
@@ -224,6 +225,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
         return Response.ok().entity(appToReturn).build();
+    }
+
+    @Override
+    public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
+        return null;
     }
 
 

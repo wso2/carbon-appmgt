@@ -831,7 +831,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/lifecycle": {
+        "/apps/{appType}/id/{appId}/lifecycle": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get lifecycle details",
@@ -891,7 +891,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/lifecycle-history": {
+        "/apps/{appType}/id/{appId}/lifecycle-history": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get lifecycle details",
@@ -1134,6 +1134,63 @@
                 }
             }
         },
+        "/apps/mobile/binaries/{fileName}": {
+            "get": {
+                "x-scope": "appm:create",
+                "summary": "Retrieving mobile application binaries",
+                "description": "Retrieving .apk, .ipa binaries for mobile apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nMobile app binary content retrieved successfully.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/static-contents": {
             "post": {
                 "consumes": [
@@ -1219,7 +1276,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nStatic content Retrived successfully.\n",
+                        "description": "OK. \nStatic content Retrieved successfully.\n",
                         "schema": {
                             "type": "file"
                         },
@@ -2660,10 +2717,10 @@
                     "type": "string"
                 },
                 "actions": {
-                    "type": "string"
-                },
-                "lifecycle": {
-                    "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "async": {
                     "type": "boolean"
