@@ -3614,4 +3614,23 @@ public final class AppManagerUtil {
             throw new AppManagementException("Error while reading tenant conf file content", e);
         }
     }
+
+    public static boolean isUserAuthorized(String username, String resourcePath) throws AppManagementException {
+
+        boolean isAuthorized = false;
+        try {
+            String tenantDomain =
+                    MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
+            int tenantId =
+                    ServiceReferenceHolder.getInstance().getRealmService()
+                            .getTenantManager().getTenantId(tenantDomain);
+            AuthorizationManager authManager = null;
+
+            authManager = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId).getAuthorizationManager();
+            isAuthorized = authManager.isUserAuthorized(username, resourcePath, "authorize");
+        } catch (UserStoreException e) {
+            throw new AppManagementException("User " + username + " is not authorized to perform lifecycle action");
+        }
+        return isAuthorized;
+    }
 }

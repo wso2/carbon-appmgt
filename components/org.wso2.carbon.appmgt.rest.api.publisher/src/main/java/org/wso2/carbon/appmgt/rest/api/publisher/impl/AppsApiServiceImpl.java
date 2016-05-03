@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
@@ -379,27 +380,28 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeChangeLifecyclePost(String appType, String action, String appId, String ifMatch,
                                                    String ifUnmodifiedSince) {
+        CommonValidator.isValidAppType(appType);
         ResponseMessageDTO responseMessageDTO = new ResponseMessageDTO();
         try {
-            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
-                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
-                if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
-                    RestApiUtil.handleBadRequest(
-                            "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
-                                    ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
-                }
-                appProvider.changeLifeCycleStatus(appType, appId, action);
-            } else {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String[] allowedLifecycleActions = appProvider.getAllowedLifecycleActions(appId, appType);
+            if (!ArrayUtils.contains(allowedLifecycleActions, action)) {
+                RestApiUtil.handleBadRequest(
+                        "Action '" + action + "' is not allowed to perform on " + appType + " with id: " + appId +
+                                ". Allowed actions are " + Arrays.toString(allowedLifecycleActions), log);
             }
+            appProvider.changeLifeCycleStatus(appType, appId, action);
+
             responseMessageDTO.setMessage("Lifecycle status to be changed : " + action);
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
-            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+            if (RestApiUtil.isDueToResourceNotFound(e)) {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else if (RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleAuthorizationFailedError("The user is not permitted to perform lifecycle action '" +
+                        action + "' on " + appType + " with uuid " + appId, e, log);
             } else {
                 String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
