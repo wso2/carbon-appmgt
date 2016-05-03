@@ -32,6 +32,7 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -96,6 +97,11 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
         return Response.ok().build();
 
+    }
+
+    @Override
+    public Response appsEventPublishPost(String contentType, EventsDTO install) {
+        return null;
     }
 
     @Override
@@ -229,7 +235,20 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
-        return null;
+        try {
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) ||
+                    AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                appProvider.getAllTags(appType);
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error retrieving tags for " + appType + "s.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+
+        }
+        return Response.ok().build();
     }
 
 

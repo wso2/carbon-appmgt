@@ -3,6 +3,7 @@ package org.wso2.carbon.appmgt.rest.api.store;
 import io.swagger.annotations.ApiParam;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
@@ -43,6 +44,25 @@ public class AppsApi  {
     @ApiParam(value = ""  ) InstallDTO install)
     {
     return delegate.appsDownloadPost(contentType,install);
+    }
+    @POST
+    @Path("/event-publish")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Publish Stats", notes = "Publish User hit Stats details.", response = Void.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 202, message = "Accepted."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
+        
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nResource to be deleted does not exist.") })
+
+    public Response appsEventPublishPost(@ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
+    @ApiParam(value = ""  ) EventsDTO install)
+    {
+    return delegate.appsEventPublishPost(contentType,install);
     }
     @POST
     @Path("/uninstallation")

@@ -589,6 +589,51 @@
                     }
                 }
             }
+        },
+        "/apps/event-publish": {
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Publish Stats",
+                "description": "Publish User hit Stats details.\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "install",
+                        "schema": {
+                            "$ref": "#/definitions/Events"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -1000,6 +1045,14 @@
                         "tag3"
                     ],
                     "description": "List of Tags"
+                }
+            }
+        },
+        "Events": {
+            "title": "Events details",
+            "properties": {
+                "events": {
+                    "type": "object"
                 }
             }
         },
