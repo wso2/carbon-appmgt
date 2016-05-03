@@ -29,11 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -72,12 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -594,11 +585,14 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
+        List<String> tags = new ArrayList<>();
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                appProvider.getAllTags(appType, appId);
+                for(Tag tag : appProvider.getAllTags(appType, appId)){
+                    tags.add(tag.getName());
+                }
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -612,7 +606,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
             }
         }
-        return Response.ok().build();
+        return Response.ok().entity(tags).build();
     }
 
     /**
@@ -736,10 +730,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
+        Set<Tag> tagSet = new HashSet<>();
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                appProvider.getAllTags(appType);
+                tagSet = appProvider.getAllTags(appType);
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -748,7 +743,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
 
         }
-        return Response.ok().build();
+        return Response.ok().entity(tagSet).build();
     }
 
 
