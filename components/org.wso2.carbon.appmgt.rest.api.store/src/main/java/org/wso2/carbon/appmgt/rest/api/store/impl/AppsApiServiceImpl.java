@@ -22,9 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
@@ -34,6 +36,7 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -41,7 +44,9 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -235,20 +240,35 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
+        TagListDTO tagListDTO = new TagListDTO();
         try {
-            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType) ||
-                    AppMConstants.SITE_ASSET_TYPE.equals(appType)) {
-                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                appProvider.getAllTags(appType);
-            } else {
+            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
+            APIConsumer appConsumer = RestApiUtil.getLoggedInUserConsumer();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            Map<String, String> attributeMap = new HashMap<>();
+            if (AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType)) {
+                attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, "true");
+            }
+
+            List<String> tagList = new ArrayList<>();
+            Iterator tagIterator = appConsumer.getAllTags(tenantDomain, appType, attributeMap).iterator();
+            if (!tagIterator.hasNext()) {
+                return RestApiUtil.buildNotFoundException("Tags", null).getResponse();
+            }
+            while (tagIterator.hasNext()) {
+                Tag tag = (Tag) tagIterator.next();
+                tagList.add(tag.getName());
+            }
+            tagListDTO.setTags(tagList);
         } catch (AppManagementException e) {
             String errorMessage = "Error retrieving tags for " + appType + "s.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
-
         }
-        return Response.ok().build();
+        return Response.ok().entity(tagListDTO).build();
     }
 
 
