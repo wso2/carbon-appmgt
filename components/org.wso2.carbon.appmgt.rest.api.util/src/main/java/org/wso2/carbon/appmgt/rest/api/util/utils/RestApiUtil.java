@@ -23,8 +23,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.wso2.carbon.appmgt.api.*;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
@@ -38,12 +41,15 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -391,6 +397,29 @@ public class RestApiUtil {
         } finally {
             IOUtils.closeQuietly(outFileStream);
         }
+    }
+
+    public static File readFileFromStorage(String fileName) throws AppManagementException {
+        File storageFile = null;
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String filePath = CarbonUtils.getCarbonHome() + File.separator +
+                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
+        storageFile = new File(filePath);
+        if (!storageFile.exists() || storageFile.isDirectory()) {
+            throw new AppMgtResourceNotFoundException("Requested file '" + fileName + "' does not exist.");
+        }
+        return storageFile;
+    }
+
+    public static String readFileContentType(String filePath) throws AppManagementException{
+        String fileContentType = null;
+        try {
+         fileContentType = Files.probeContentType(Paths.get(filePath));
+        } catch (IOException e) {
+            throw new AppManagementException("Error occurred while reading file details from file "+filePath);
+        }
+        return fileContentType;
     }
 
     public static boolean isExistingUser(String username) {

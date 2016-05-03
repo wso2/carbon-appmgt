@@ -59,6 +59,26 @@ public class AppsApi  {
     {
     return delegate.appsMobileBinariesPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
     }
+    @GET
+    @Path("/mobile/binaries/{fileName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieving mobile application binaries", notes = "Retrieving .apk, .ipa binaries for mobile apps.", response = File.class)
+    @io.swagger.annotations.ApiResponses(value = {
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nMobile app binary content retrieved successfully."),
+
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error"),
+
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nRequested entity does not exist."),
+
+        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
+
+    public Response appsMobileBinariesFileNameGet(@ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("fileName") String fileName,
+    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+    {
+    return delegate.appsMobileBinariesFileNameGet(fileName,ifMatch,ifUnmodifiedSince);
+    }
     @POST
     @Path("/static-contents")
     @Consumes({ "multipart/form-data" })
