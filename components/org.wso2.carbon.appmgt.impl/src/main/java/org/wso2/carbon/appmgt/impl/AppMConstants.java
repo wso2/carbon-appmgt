@@ -713,5 +713,10 @@ public final class AppMConstants {
         public static final String MOBILE_APP = "application/vnd.wso2-mobileapp+xml";
     }
 
+    public static class LifecycleActions{
+        public static final String SUBMIT_FOR_REVIEW = "Submit for Review";
+        public static final String PUBLISH = "Publish";
+        public static final String UN_PUBLISH = "Unpublish";
+    }
 
 }

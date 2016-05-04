@@ -2295,14 +2295,38 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Change the lifecycle state of a given application
      *
-     * @param appType application type
-     * @param appId   application type
-     * @param action  lifecycle action perform on the application
+     * @param appType application type ie: webapp, mobileapp
+     * @param appId   application uuid
+     * @param lifecycleAction  lifecycle action perform on the application
      * @throws AppManagementException
      */
-    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+    public void changeLifeCycleStatus(String appType, String appId, String lifecycleAction) throws AppManagementException {
 
         try {
+            String requiredPermission = null;
+
+            if (AppMConstants.LifecycleActions.SUBMIT_FOR_REVIEW.equals(lifecycleAction)) {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_CREATE;
+
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_CREATE;
+                }
+            } else {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_PUBLISH;
+
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_PUBLISH;
+                }
+            }
+
+            if (!AppManagerUtil.checkPermissionQuietly(this.username, requiredPermission)) {
+                handleResourceAuthorizationException("The user " + this.username +
+                        " is not authorized to perform lifecycle action " + lifecycleAction + " on " +
+                        appType + " with uuid " + appId);
+            }
+            //Check whether the user has enough permissions to change lifecycle
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
@@ -2311,21 +2335,33 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
 
             if (appArtifact != null) {
+
+                if(!AppManagerUtil.isUserAuthorized(username,  RegistryUtils.getAbsolutePath(
+                        RegistryContext.getBaseInstance(), RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +
+                                appArtifact.getPath()))){
+                    handleResourceAuthorizationException("The user " + this.username +
+                            " is not authorized to" +appType + " with uuid " + appId);
+                }
                 //Change lifecycle status
                 if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
-                    appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.MOBILE_LIFE_CYCLE);
                 } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                    appArtifact.invokeAction(action, AppMConstants.WEBAPP_LIFE_CYCLE);
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.WEBAPP_LIFE_CYCLE);
                 }
                 if (log.isDebugEnabled()) {
                     String logMessage =
-                            "Lifecycle action " + action + " has been successfully performed on " + appType
-                                    + "with id" + appId;
+                            "Lifecycle action " + lifecycleAction + " has been successfully performed on " + appType
+                                    + " with id" + appId;
                     log.debug(logMessage);
                 }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
+
+
         } catch (GovernanceException e) {
-            handleException("Error occurred while performing lifecycle action : " + action + " on " + appType + " with id : " +
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType + " with id : " +
                     appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
@@ -2544,8 +2580,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public void getAllTags(String appType) throws AppManagementException {
-
+    public Set<Tag> getAllTags(String appType) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
@@ -2570,6 +2606,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             for (String fullTag : collection.getChildren()) {
 
                 String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
+                int numberOfOccurrence = Integer.parseInt(fullTag.substring(fullTag.indexOf(":")+1));
+                tagSet.add(new Tag(tagName, numberOfOccurrence));
             }
 
         } catch (RegistryException e) {
@@ -2577,12 +2615,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
+        return tagSet;
     }
 
     @Override
-    public void getAllTags(String appType, String appId) throws AppManagementException {
-        org.wso2.carbon.registry.core.Tag[] tags = null;
+    public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
         try {
+            org.wso2.carbon.registry.core.Tag[] tags = null;
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
@@ -2592,6 +2632,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             if (appArtifact != null) {
               String artifactPath = appArtifact.getPath();
                 tags = registry.getTags(artifactPath);
+                for(org.wso2.carbon.registry.core.Tag tag : tags){
+                    tagSet.add(new Tag(tag.getTagName()));
+                }
             } else {
                 handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
                         appId + ". Artifact does not exist");
@@ -2601,6 +2644,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
+        return tagSet;
     }
 
 }

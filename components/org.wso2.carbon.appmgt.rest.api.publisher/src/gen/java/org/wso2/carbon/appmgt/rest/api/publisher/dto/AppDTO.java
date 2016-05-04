@@ -79,7 +79,10 @@ public class AppDTO  {
   
   
   private String lifecycleState = null;
-  
+
+
+  private float rating = 0.0f;
+
   
   private String appUrL = null;
   
@@ -392,7 +395,15 @@ public class AppDTO  {
     this.lifecycleState = lifecycleState;
   }
 
-  
+  @ApiModelProperty(value = "User rating for the app")
+  @JsonProperty("rating")
+  public float getRating() {
+    return rating;
+  }
+  public void setRating(float rating) {
+    this.rating = rating;
+  }
+
   /**
    * URL of the asset
    **/
@@ -577,6 +588,7 @@ public class AppDTO  {
     sb.append("  resourceId: ").append(resourceId).append("\n");
     sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
+    sb.append("  rating: ").append(rating).append("\n");
     sb.append("  appUrL: ").append(appUrL).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
     sb.append("  category: ").append(category).append("\n");

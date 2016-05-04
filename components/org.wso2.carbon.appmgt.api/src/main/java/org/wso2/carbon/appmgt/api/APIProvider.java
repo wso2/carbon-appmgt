@@ -690,7 +690,7 @@ public interface APIProvider extends APIManager {
      * @param appType application type ie: webapp or mobileapp
      * @throws AppManagementException
      */
-    public void getAllTags(String appType) throws AppManagementException;
+    public Set<Tag> getAllTags(String appType) throws AppManagementException;
 
     /**
      * Retrieve all tags for a given application
@@ -698,5 +698,5 @@ public interface APIProvider extends APIManager {
      * @param appId application uuid
      * @throws AppManagementException
      */
-    public void getAllTags(String appType, String appId) throws AppManagementException;
+    public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException;
 }

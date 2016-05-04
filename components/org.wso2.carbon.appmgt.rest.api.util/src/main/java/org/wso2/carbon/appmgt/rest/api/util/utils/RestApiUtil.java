@@ -350,6 +350,21 @@ public class RestApiUtil {
     }
 
     /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
+     * @param description error description
+     * @param t        Throwable instance
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleAuthorizationFailedError(String description, Throwable t, Log log)
+            throws ForbiddenException{
+        ForbiddenException forbiddenException = buildAuthorizationFailedException(description);
+        log.error(forbiddenException.getMessage(), t);
+        throw forbiddenException;
+    }
+
+    /**
      * Returns a new NotFoundException
      *
      * @param resource Resource type
@@ -365,6 +380,17 @@ public class RestApiUtil {
         }
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT, 404l, description);
         return new NotFoundException(errorDTO);
+    }
+
+    /**
+     * Returns a new ForbiddenException
+     *
+     * @param description  Error description
+     * @return a new NotFoundException with the specified details as a response DTO
+     */
+    public static ForbiddenException buildAuthorizationFailedException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 403l, description);
+        return new ForbiddenException(errorDTO);
     }
 
     /**

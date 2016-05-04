@@ -25,6 +25,7 @@ public class App {
 
     private String type;
     private String uuid;
+    private float rating;
 
     public String getType() {
         return type;
@@ -40,5 +41,13 @@ public class App {
 
     public String getUUID(){
         return  uuid;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 }

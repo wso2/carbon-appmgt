@@ -40,7 +40,7 @@ import java.util.*;
 public class MobileAppFactory extends AppFactory {
 
     @Override
-    public App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
+    public App doCreateApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
 
         try {
 

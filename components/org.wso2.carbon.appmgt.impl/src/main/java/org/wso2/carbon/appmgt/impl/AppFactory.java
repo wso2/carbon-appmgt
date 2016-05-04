@@ -18,15 +18,31 @@
 
 package org.wso2.carbon.appmgt.impl;
 
+import com.google.gson.JsonObject;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.social.core.SocialActivityException;
+import org.wso2.carbon.social.core.service.SocialActivityService;
 
 /**
  * Parent class for the factories for app types.
  */
 public abstract class AppFactory {
+
+    private static final Log log = LogFactory.getLog(AppFactory.class);
+
+    public App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException{
+
+        App app = doCreateApp(artifact, registry);
+        setRating(app);
+
+        return app;
+    }
 
     /**
      *
@@ -37,6 +53,25 @@ public abstract class AppFactory {
      * @return
      * @throws AppManagementException
      */
-    public abstract App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException;
+    protected abstract App doCreateApp(GenericArtifact artifact, Registry registry) throws AppManagementException;
+
+    private void setRating(App app) throws AppManagementException {
+
+        try {
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(org.wso2.carbon.social.core.service.SocialActivityService.class, null);
+            JsonObject rating = socialActivityService.getRating(app.getType() + ":" + app.getUUID());
+
+            if(rating != null && rating.get("rating") != null){
+                app.setRating(rating.get("rating").getAsFloat());
+            }
+
+        } catch (SocialActivityException e) {
+            String errorMessage = String.format("Can't get the rating for the app '%s:%s'", app.getType(), app.getUUID());
+            log.error(errorMessage, e);
+            throw new AppManagementException(errorMessage, e);
+        }
+
+    }
 
 }
