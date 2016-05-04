@@ -2265,6 +2265,11 @@
                 "lifecycleState": {
                     "type": "string",
                     "example": "CREATED"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 }
             }
         },
@@ -2411,6 +2416,11 @@
                     "description": "lifecycle state of the asset\n",
                     "type": "string",
                     "example": "Created"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 },
                 "appUrL": {
                     "description": "URL of the asset\n",

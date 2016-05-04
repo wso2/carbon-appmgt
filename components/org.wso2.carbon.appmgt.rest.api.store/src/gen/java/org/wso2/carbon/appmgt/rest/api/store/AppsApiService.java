@@ -8,6 +8,7 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 
 import java.util.List;

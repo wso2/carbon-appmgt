@@ -1,9 +1,10 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.math.BigDecimal;
 
 
 
@@ -31,9 +32,9 @@ public class AppInfoDTO  {
   
   
   private String lifecycleState = null;
-
-
-  private float rating = 0.0f;
+  
+  
+  private BigDecimal rating = null;
 
   
   /**
@@ -120,16 +121,20 @@ public class AppInfoDTO  {
     this.lifecycleState = lifecycleState;
   }
 
-
+  
+  /**
+   * User rating for the app
+   **/
   @ApiModelProperty(value = "User rating for the app")
   @JsonProperty("rating")
-  public float getRating() {
+  public BigDecimal getRating() {
     return rating;
   }
-  public void setRating(float rating) {
+  public void setRating(BigDecimal rating) {
     this.rating = rating;
   }
 
+  
 
   @Override
   public String toString()  {

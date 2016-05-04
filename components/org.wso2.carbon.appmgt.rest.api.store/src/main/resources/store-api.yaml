@@ -147,7 +147,7 @@ paths:
         '200':
           description: "OK. \nApp rating is returned.\n"
           schema:
-            type: string
+            $ref: '#/definitions/AppRatingInfo'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -626,6 +626,11 @@ definitions:
       lifecycleState:
         type: string
         example: CREATED
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
   App:
     title: App object
     required:
@@ -719,6 +724,11 @@ definitions:
           Bundleversion of the asset
         type: string
         example: '1.0'
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
       category:
         description: |
           category of the asset
@@ -856,6 +866,13 @@ definitions:
           - tag2
           - tag3
         description: List of Tags
+  AppRatingInfo:
+    title: App rating details
+    properties:
+      rating:
+        type: number
+        description: "List of Role Id's"
+        example: 3
   Events:
     title: Events details
     required:

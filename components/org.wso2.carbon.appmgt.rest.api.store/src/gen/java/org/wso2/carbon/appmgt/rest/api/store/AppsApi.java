@@ -1,26 +1,23 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
-import org.wso2.carbon.appmgt.rest.api.store.dto.*;
-import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
+import io.swagger.annotations.ApiParam;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
 
-import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -139,7 +136,7 @@ public class AppsApi  {
     @Path("/{appType}/id/{appId}/rate")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = String.class)
+    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = AppRatingInfoDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nApp rating is returned."),
         

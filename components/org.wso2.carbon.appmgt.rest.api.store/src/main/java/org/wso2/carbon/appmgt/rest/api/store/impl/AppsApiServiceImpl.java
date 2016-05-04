@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
+import com.google.gson.JsonObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -34,6 +35,7 @@ import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
@@ -42,6 +44,9 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.social.core.SocialActivityException;
+import org.wso2.carbon.social.core.service.SocialActivityService;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -254,7 +259,24 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdRateGet(String appType, String appId, String accept, String ifNoneMatch,
                                               String ifModifiedSince) {
-        return null;
+        AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
+        try {
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(
+                    org.wso2.carbon.social.core.service.SocialActivityService.class, null);
+            JsonObject rating = socialActivityService.getRating(appType + ":" + appId);
+
+            if (rating != null && rating.get("rating") != null) {
+                appRatingInfoDTO.setRating(rating.get("rating").getAsBigDecimal());
+            } else {
+                return RestApiUtil.buildNotFoundException("Rating", appId).getResponse();
+            }
+
+        } catch (SocialActivityException e) {
+            String errorMessage = String.format("Can't get the rating for the app '%s:%s'", appType, appId);
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(appRatingInfoDTO).build();
     }
 
     @Override

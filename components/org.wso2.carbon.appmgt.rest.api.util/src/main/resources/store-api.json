@@ -190,7 +190,7 @@
                     "200": {
                         "description": "OK. \nApp rating is returned.\n",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/AppRatingInfo"
                         },
                         "headers": {
                             "Content-Type": {
@@ -827,6 +827,11 @@
                 "lifecycleState": {
                     "type": "string",
                     "example": "CREATED"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 }
             }
         },
@@ -936,6 +941,11 @@
                     "description": "Bundleversion of the asset\n",
                     "type": "string",
                     "example": "1.0"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 },
                 "category": {
                     "description": "category of the asset\n",
@@ -1109,6 +1119,16 @@
                         "tag3"
                     ],
                     "description": "List of Tags"
+                }
+            }
+        },
+        "AppRatingInfo": {
+            "title": "App rating details",
+            "properties": {
+                "rating": {
+                    "type": "number",
+                    "description": "List of Role Id's",
+                    "example": 3.0
                 }
             }
         },

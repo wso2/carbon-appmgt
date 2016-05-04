@@ -1,11 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -66,12 +68,12 @@ public class AppDTO  {
   
   
   private String lifecycleState = null;
-
-
-  private float rating = 0.0f;
-
-
+  
+  
   private String bundleversion = null;
+  
+  
+  private BigDecimal rating = null;
   
   
   private String category = null;
@@ -322,17 +324,7 @@ public class AppDTO  {
     this.lifecycleState = lifecycleState;
   }
 
-
-  @ApiModelProperty(value = "User rating for the app")
-  @JsonProperty("rating")
-  public float getRating() {
-    return rating;
-  }
-  public void setRating(float rating) {
-    this.rating = rating;
-  }
   
-
   /**
    * Bundleversion of the asset
    **/
@@ -343,6 +335,19 @@ public class AppDTO  {
   }
   public void setBundleversion(String bundleversion) {
     this.bundleversion = bundleversion;
+  }
+
+  
+  /**
+   * User rating for the app
+   **/
+  @ApiModelProperty(value = "User rating for the app")
+  @JsonProperty("rating")
+  public BigDecimal getRating() {
+    return rating;
+  }
+  public void setRating(BigDecimal rating) {
+    this.rating = rating;
   }
 
   
@@ -474,8 +479,8 @@ public class AppDTO  {
     sb.append("  thumbnailUrl: ").append(thumbnailUrl).append("\n");
     sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
-    sb.append("  rating: ").append(rating).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
+    sb.append("  rating: ").append(rating).append("\n");
     sb.append("  category: ").append(category).append("\n");
     sb.append("  displayName: ").append(displayName).append("\n");
     sb.append("  screenshots: ").append(screenshots).append("\n");
