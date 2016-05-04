@@ -1,12 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -79,10 +80,10 @@ public class AppDTO  {
   
   
   private String lifecycleState = null;
-
-
-  private float rating = 0.0f;
-
+  
+  
+  private BigDecimal rating = null;
+  
   
   private String appUrL = null;
   
@@ -395,15 +396,20 @@ public class AppDTO  {
     this.lifecycleState = lifecycleState;
   }
 
+  
+  /**
+   * User rating for the app
+   **/
   @ApiModelProperty(value = "User rating for the app")
   @JsonProperty("rating")
-  public float getRating() {
+  public BigDecimal getRating() {
     return rating;
   }
-  public void setRating(float rating) {
+  public void setRating(BigDecimal rating) {
     this.rating = rating;
   }
 
+  
   /**
    * URL of the asset
    **/

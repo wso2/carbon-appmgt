@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
-import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,8 +28,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -58,18 +61,19 @@ import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -159,10 +163,12 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                 contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
                 if (!contentType.startsWith("application")) {
-                    RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested", log);
+                    RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
+                                                 log);
                 }
             } else {
-                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported media type is requested", log);
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported media type is requested",
+                                             log);
             }
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
@@ -215,7 +221,8 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Retrieve a given static content from storage
-     * @param fileName request file name
+     *
+     * @param fileName          request file name
      * @param ifMatch
      * @param ifUnmodifiedSince
      * @return
@@ -224,9 +231,10 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsStaticContentsFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
         try {
             File staticContentFile = RestApiUtil.readFileFromStorage(fileName);
-            String contentType =  RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
-            if(!contentType.startsWith("image")){
-                RestApiUtil.handleBadRequest("Invalid file '"+fileName+"'with unsupported file type requested", log);
+            String contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+            if (!contentType.startsWith("image")) {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
+                                             log);
             }
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
             response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
@@ -235,7 +243,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             return response.build();
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError("Static Content", fileName, e,log);
+                RestApiUtil.handleResourceNotFoundError("Static Content", fileName, e, log);
             } else {
                 RestApiUtil.handleInternalServerError(
                         "Error occurred while retrieving static content : " + fileName + "from storage", e, log);
@@ -324,48 +332,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         return Response.ok().entity(appDTO).build();
     }
-
-    @Override
-    public Response appsAppTypeAppIdAppIdSubscriptionsGet(String appType, String appId, String accept,
-                                                          String ifNoneMatch, String ifModifiedSince) {
-        UserIdListDTO userIdListDTO = new UserIdListDTO();
-        try {
-            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-
-                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
-                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
-                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
-                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
-                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
-                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
-                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
-                    userIdListDTO.setUserIds(subscriberSet);
-                } else {
-                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
-                }
-            } else {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
-            }
-        } catch (AppManagementException e) {
-            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
-            } else {
-                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
-                RestApiUtil.handleInternalServerError(errorMessage, e, log);
-            }
-
-        }
-        return Response.ok().entity(userIdListDTO).build();
-    }
-
-    @Override
-    public Response appsAppTypeCacheGet(String appType, String query, Integer limit, Integer offset, String accept,
-                                        String ifNoneMatch) {
-        return null;
-    }
+    
 
     /**
      * Change lifecycle state of an application
@@ -401,7 +368,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                 RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
             } else if (RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleAuthorizationFailedError("The user is not permitted to perform lifecycle action '" +
-                        action + "' on " + appType + " with uuid " + appId, e, log);
+                                                                   action + "' on " + appType + " with uuid " + appId,
+                                                           e, log);
             } else {
                 String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
                 RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -586,13 +554,55 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
+                                                         String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdSubscriptionsGet(String appType, String appId, String accept, String ifNoneMatch,
+                                                       String ifModifiedSince) {
+        UserIdListDTO userIdListDTO = new UserIdListDTO();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                    userIdListDTO.setUserIds(subscriberSet);
+                } else {
+                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+
+        }
+        return Response.ok().entity(userIdListDTO).build();
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdTagsGet(String appType, String appId, String accept, String ifNoneMatch) {
         List<String> tags = new ArrayList<>();
         try {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
-                for(Tag tag : appProvider.getAllTags(appType, appId)){
+                for (Tag tag : appProvider.getAllTags(appType, appId)) {
                     tags.add(tag.getName());
                 }
             } else {
