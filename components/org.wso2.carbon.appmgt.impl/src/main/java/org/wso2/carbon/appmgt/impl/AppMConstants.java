@@ -578,7 +578,7 @@ public final class AppMConstants {
     public static final String CREATOR_ROLE = "internal/creator";
     public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String STORE_ADMIN_ROLE = "internal/store-admin";
-    public static final String ANONYMOUS_ROLE = "SYSTEM/wso2.anonymous.role";
+    public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
     public static final String WRITE_ACTION = "3";
@@ -716,7 +716,7 @@ public final class AppMConstants {
     public static class LifecycleActions{
         public static final String SUBMIT_FOR_REVIEW = "Submit for Review";
         public static final String PUBLISH = "Publish";
-        public static final String UN_PUBLISH = "Unpublish";
+        public static final String RE_PUBLISH = "Re-Publish";
     }
 
 }
