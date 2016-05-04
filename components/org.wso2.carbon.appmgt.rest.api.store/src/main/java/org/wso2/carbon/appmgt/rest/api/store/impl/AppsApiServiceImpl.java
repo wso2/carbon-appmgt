@@ -40,6 +40,8 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
+import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -53,7 +55,7 @@ import java.util.Map;
 public class AppsApiServiceImpl extends AppsApiService {
 
     private static final Log log = LogFactory.getLog(AppsApiServiceImpl.class);
-
+    BeanValidator beanValidator;
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
@@ -105,9 +107,20 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsEventPublishPost(String contentType, EventsDTO install) {
-        return null;
+    public Response appsEventPublishPost(EventsDTO events, String contentType) {
+        beanValidator = new BeanValidator();
+        //Validate common mandatory fields for mobile and webapp
+        beanValidator.validate(events);
+
+        if (events.getEvents().size() == 0) {
+            RestApiUtil.handleBadRequest("Invalid event stream", log);
+        }
+        APPMgtUiActivitiesBamDataPublisher appMgtBAMPublishObj = new APPMgtUiActivitiesBamDataPublisher();
+        //Pass data to java class to save
+        appMgtBAMPublishObj.processUiActivityObject(events.getEvents().toArray());
+        return Response.accepted().build();
     }
+
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
@@ -236,6 +249,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
         return Response.ok().entity(appToReturn).build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdRateGet(String appType, String appId, String accept, String ifNoneMatch,
+                                              String ifModifiedSince) {
+        return null;
     }
 
     @Override

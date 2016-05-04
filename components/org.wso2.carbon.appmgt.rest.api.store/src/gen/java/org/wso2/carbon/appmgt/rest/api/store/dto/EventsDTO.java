@@ -1,9 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -11,18 +14,19 @@ import io.swagger.annotations.ApiModelProperty;
 public class EventsDTO  {
   
   
-  
-  private Object events = null;
+  @NotNull
+  private List<Object> events = new ArrayList<Object>();
 
   
   /**
+   * User hit count per App related User Stats details stream
    **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(required = true, value = "User hit count per App related User Stats details stream")
   @JsonProperty("events")
-  public Object getEvents() {
+  public List<Object> getEvents() {
     return events;
   }
-  public void setEvents(Object events) {
+  public void setEvents(List<Object> events) {
     this.events = events;
   }
 

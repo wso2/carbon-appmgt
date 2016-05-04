@@ -129,6 +129,46 @@ paths:
           description: "Not Found. \nThe resource to be updated does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/rate':
+    get:
+      x-scope: 'appm:read'
+      summary: Get app rating details
+      description: |
+        Get rating details of an app.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: "OK. \nApp rating is returned.\n"
+          schema:
+            type: string
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
   /apps/download:
     post:
       x-scope: 'appm:subscribe'
@@ -443,7 +483,8 @@ paths:
         Publish User hit Stats details.
       parameters:
         - in: body
-          name: install
+          name: events
+          required: true
           schema:
             $ref: '#/definitions/Events'
         - $ref: '#/parameters/Content-Type'
@@ -817,9 +858,14 @@ definitions:
         description: List of Tags
   Events:
     title: Events details
+    required:
+      - events
     properties:
       events:
-        type: object
+        type: array
+        items:
+          type: object
+        description: User hit count per App related User Stats details stream
   Error:
     title: Error object returned with 4XX HTTP status
     required:
