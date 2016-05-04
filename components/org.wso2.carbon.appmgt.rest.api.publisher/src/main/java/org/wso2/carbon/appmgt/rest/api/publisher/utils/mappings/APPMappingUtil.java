@@ -32,6 +32,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class APPMappingUtil {
@@ -110,7 +111,7 @@ public class APPMappingUtil {
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
         appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
-        appInfoDTO.setRating(app.getRating());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -139,7 +140,7 @@ public class APPMappingUtil {
         }
 
         appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
-        appInfoDTO.setRating(app.getRating());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -305,7 +306,7 @@ public class APPMappingUtil {
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
-        dto.setRating(webapp.getRating());
+        dto.setRating(BigDecimal.valueOf(webapp.getRating()));
         Set<String> apiTags = webapp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
         tagsToReturn.addAll(apiTags);
@@ -352,7 +353,7 @@ public class APPMappingUtil {
         dto.setName(mobileApp.getAppName());
         dto.setVersion(mobileApp.getVersion());
         dto.setDescription(mobileApp.getDescription());
-        dto.setRating(mobileApp.getRating());
+        dto.setRating(BigDecimal.valueOf(mobileApp.getRating()));
 
         Set<String> apiTags = mobileApp.getTags();
         List<String> tagsToReturn = new ArrayList<>();

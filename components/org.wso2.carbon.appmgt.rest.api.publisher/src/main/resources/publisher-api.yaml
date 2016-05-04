@@ -523,7 +523,7 @@ paths:
           description: "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n"
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/appId/{appId}/subscriptions':
+  '/apps/{appType}/id/{appId}/subscriptions':
     get:
       x-scope: 'appm:read'
       summary: Get subscribed user list for an App
@@ -679,6 +679,43 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           description: "Not Found. \nThe resource to be updated does not exist.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/storage/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      summary: Retrieving file
+      description: |
+        Retrieving a file saved with an App.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nRequested entity does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/change-lifecycle':
@@ -912,7 +949,7 @@ paths:
         - MobileApps
       responses:
         '200':
-          description: "OK. \nStatic content Retrived successfully.\n"
+          description: "OK. \nStatic content Retrieved successfully.\n"
           schema:
             type: file
           headers:
@@ -992,96 +1029,6 @@ paths:
           description: "OK. \nList of Tiers is returned.\n"
           schema:
             $ref: '#/definitions/TierList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/cache':
-    get:
-      x-scope: 'appm:read'
-      summary: Get all Apps from Cache
-      description: |
-        Get a list of available Apps qualifying under a given search condition.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - name: query
-          in: query
-          description: >
-            **Search condition**.
-
-
-
-
-
-
-
-
-
-            You can search in attributes by using an **"attribute:"** modifier.
-
-
-
-
-
-
-
-
-
-            Eg. "provider:wso2" will match an App if the provider of the App
-            contains "wso2".
-
-
-
-
-
-
-
-
-
-            Supported attribute modifiers are [*provider, app_name, app_version,
-            app_id**]
-
-
-
-
-
-
-
-
-
-            If no advanced attribute modifier has been specified, search will
-            match the
-
-            given query string against App Name.
-          type: string
-        - $ref: '#/parameters/limit'
-        - $ref: '#/parameters/offset'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: "OK. \nList of qualifying Apps is returned.\n"
-          schema:
-            $ref: '#/definitions/AppList'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -1573,7 +1520,8 @@ parameters:
   fileName:
     name: fileName
     in: path
-    description: "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    description: |
+      File name.
     required: true
     type: string
   Accept:
@@ -1665,6 +1613,11 @@ definitions:
       lifecycleState:
         type: string
         example: CREATED
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
   App:
     title: App object
     required:
@@ -1789,6 +1742,11 @@ definitions:
           lifecycle state of the asset
         type: string
         example: Created
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
       appUrL:
         description: |
           URL of the asset

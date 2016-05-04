@@ -170,7 +170,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     put:
-      x-scope: 'appm:update'
+      x-scope: 'appm:read'
       summary: Change App rating
       description: |
         Change App rating
@@ -207,6 +207,43 @@ paths:
             $ref: '#/definitions/Error'
         '412':
           description: "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n"
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/storage/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      summary: Retrieving file
+      description: |
+        Retrieving a file saved with an App.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n"
+              type: string
+        '400':
+          description: "Bad Request. \nInvalid request or validation error\n"
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: "Not Found. \nRequested entity does not exist.\n"
           schema:
             $ref: '#/definitions/Error'
   /apps/download:
@@ -589,6 +626,13 @@ parameters:
     description: "Starting point within the complete list of items qualified.  \n"
     default: 0
     type: integer
+  fileName:
+    name: fileName
+    in: path
+    description: |
+      file name.
+    required: true
+    type: string
   Accept:
     name: Accept
     in: header
