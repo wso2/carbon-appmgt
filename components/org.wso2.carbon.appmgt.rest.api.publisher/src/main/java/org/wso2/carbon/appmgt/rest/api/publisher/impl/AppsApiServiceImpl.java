@@ -332,7 +332,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         return Response.ok().entity(appDTO).build();
     }
-    
+
 
     /**
      * Change lifecycle state of an application
