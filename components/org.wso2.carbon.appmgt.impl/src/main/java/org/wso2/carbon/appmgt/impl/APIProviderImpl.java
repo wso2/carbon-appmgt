@@ -2295,38 +2295,77 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Change the lifecycle state of a given application
      *
-     * @param appType application type
-     * @param appId   application type
-     * @param action  lifecycle action perform on the application
+     * @param appType application type ie: webapp, mobileapp
+     * @param appId   application uuid
+     * @param lifecycleAction  lifecycle action perform on the application
      * @throws AppManagementException
      */
-    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+    public void changeLifeCycleStatus(String appType, String appId, String lifecycleAction) throws AppManagementException {
 
         try {
+            String requiredPermission = null;
+
+            if (AppMConstants.LifecycleActions.SUBMIT_FOR_REVIEW.equals(lifecycleAction)) {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_CREATE;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_CREATE;
+                }
+            } else {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_PUBLISH;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_PUBLISH;
+                }
+            }
+
+            if (!AppManagerUtil.checkPermissionQuietly(this.username, requiredPermission)) {
+                handleResourceAuthorizationException("The user " + this.username +
+                        " is not authorized to perform lifecycle action " + lifecycleAction + " on " +
+                        appType + " with uuid " + appId);
+            }
+            //Check whether the user has enough permissions to change lifecycle
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
 
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                    getTenantId(this.tenantDomain);
+
+            //Get system registry for logged in tenant domain
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(systemRegistry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
 
             if (appArtifact != null) {
+                if(!AppManagerUtil.isUserAuthorized(username,  RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                        RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +appArtifact.getPath()))){
+                    //Throws resource authorization exception
+                    handleResourceAuthorizationException("The user " + this.username +
+                            " is not authorized to" +appType + " with uuid " + appId);
+                }
                 //Change lifecycle status
                 if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
-                    appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.MOBILE_LIFE_CYCLE);
                 } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                    appArtifact.invokeAction(action, AppMConstants.WEBAPP_LIFE_CYCLE);
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.WEBAPP_LIFE_CYCLE);
                 }
                 if (log.isDebugEnabled()) {
                     String logMessage =
-                            "Lifecycle action " + action + " has been successfully performed on " + appType
-                                    + "with id" + appId;
+                            "Lifecycle action " + lifecycleAction + " has been successfully performed on " + appType
+                                    + " with id" + appId;
                     log.debug(logMessage);
                 }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
-        } catch (GovernanceException e) {
-            handleException("Error occurred while performing lifecycle action : " + action + " on " + appType + " with id : " +
-                    appId, e);
+        }  catch (UserStoreException e) {
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
+                    " with id : " + appId+". Failed to retrieve tenant id for user : ", e);
+        } catch (RegistryException e) {
+            e.printStackTrace();
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
