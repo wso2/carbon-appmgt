@@ -261,6 +261,23 @@ public class AppsApiServiceImpl extends AppsApiService {
                                               String ifModifiedSince) {
         AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
         try {
+            //check App Type validity
+            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+
+            //check App Id validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(
                     org.wso2.carbon.social.core.service.SocialActivityService.class, null);
@@ -275,9 +292,57 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (SocialActivityException e) {
             String errorMessage = String.format("Can't get the rating for the app '%s:%s'", appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (AppManagementException e) {
+            String errorMessage = String.format("Internal error while retrieving the rating for the app '%s:%s'",
+                                                appType, appId);
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(appRatingInfoDTO).build();
     }
+
+    @Override
+    public Response appsAppTypeIdAppIdRatePut(String appType, String appId, AppRatingInfoDTO rating, String contentType,
+                                              String ifMatch, String ifUnmodifiedSince) {
+        try {
+            //check App Type validity
+            if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) ||
+                    AppMConstants.SITE_ASSET_TYPE.equalsIgnoreCase(appType)) == false) {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+
+            //check App Id validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(
+                    org.wso2.carbon.social.core.service.SocialActivityService.class, null);
+            String activity =
+                    "{\"verb\":\"post\",\"object\":{\"objectType\":\"review\",\"content\":" + rating.getReview() + "," +
+                            "\"rating\":" + rating.getRating() +
+                            ",\"likes\":{\"totalItems\":0},\"dislikes\":{\"totalItems\":0}}," + "\"target\":{\"id\":" +
+                            appId + "}}";
+            socialActivityService.publish(org.json.simple.JSONObject.escape(activity));
+
+        } catch (AppManagementException e) {
+            String errorMessage = String.format("Internal error while saving the rating for the app '%s:%s'",
+                                                appType, appId);
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (SocialActivityException e) {
+            String errorMessage = String.format("Social component error while saving the rating for the app '%s:%s'",
+                                                appType, appId);
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().build();
+    }
+
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {

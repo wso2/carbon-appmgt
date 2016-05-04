@@ -222,6 +222,69 @@
                         }
                     }
                 }
+            },
+            "put": {
+                "x-scope": "appm:update",
+                "summary": "Change App rating",
+                "description": "Change App rating\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "rating",
+                        "description": "App rating object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AppRatingInfo"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
             }
         },
         "/apps/download": {
@@ -767,6 +830,18 @@
             "in": "header",
             "description": "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n",
             "type": "string"
+        },
+        "If-Match": {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Validator for conditional requests; based on ETag.\n",
+            "type": "string"
+        },
+        "If-Unmodified-Since": {
+            "name": "If-Unmodified-Since",
+            "in": "header",
+            "description": "Validator for conditional requests; based on Last Modified header.\n",
+            "type": "string"
         }
     },
     "definitions": {
@@ -1129,6 +1204,15 @@
                     "type": "number",
                     "description": "List of Role Id's",
                     "example": 3.0
+                },
+                "review": {
+                    "type": "string",
+                    "description": "Comment/review about the app"
+                },
+                "id": {
+                    "type": "integer",
+                    "description": "Review Id",
+                    "example": 1
                 }
             }
         },

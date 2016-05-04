@@ -25,6 +25,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdRateGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdRatePut(String appType,String appId,AppRatingInfoDTO rating,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
 }
 
