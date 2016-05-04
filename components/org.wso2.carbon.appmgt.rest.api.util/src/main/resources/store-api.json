@@ -224,7 +224,7 @@
                 }
             },
             "put": {
-                "x-scope": "appm:update",
+                "x-scope": "appm:read",
                 "summary": "Change App rating",
                 "description": "Change App rating\n",
                 "parameters": [

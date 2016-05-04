@@ -303,6 +303,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdRatePut(String appType, String appId, AppRatingInfoDTO rating, String contentType,
                                               String ifMatch, String ifUnmodifiedSince) {
+        AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
         try {
             //check App Type validity
             if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
@@ -320,7 +321,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String errorMessage = "Could not find requested application.";
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
-
+            String tenantUserName = RestApiUtil.getLoggedInUsername() + "@" + RestApiUtil.getLoggedInUserTenantDomain();
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(
                     org.wso2.carbon.social.core.service.SocialActivityService.class, null);
@@ -328,8 +329,14 @@ public class AppsApiServiceImpl extends AppsApiService {
                     "{\"verb\":\"post\",\"object\":{\"objectType\":\"review\",\"content\":" + rating.getReview() + "," +
                             "\"rating\":" + rating.getRating() +
                             ",\"likes\":{\"totalItems\":0},\"dislikes\":{\"totalItems\":0}}," + "\"target\":{\"id\":" +
-                            appId + "}}";
-            socialActivityService.publish(org.json.simple.JSONObject.escape(activity));
+                            "\"" + appType + ":" + appId + "\"" + "},\"actor\":{\"id\":" + tenantUserName + "\"," +
+                            "objectType\":\"person\"}}";
+
+
+            long id = socialActivityService.publish(activity);
+            appRatingInfoDTO.setId((int) id);
+            appRatingInfoDTO.setRating(rating.getRating());
+            appRatingInfoDTO.setReview(rating.getReview());
 
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while saving the rating for the app '%s:%s'",
@@ -340,7 +347,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                                                 appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return Response.ok().build();
+        return Response.ok().entity(appRatingInfoDTO).build();
     }
 
 
