@@ -953,7 +953,6 @@
         },
         "/apps/{appType}/change-lifecycle": {
             "post": {
-                "x-scope": "appm:publish",
                 "summary": "Change App Status",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
