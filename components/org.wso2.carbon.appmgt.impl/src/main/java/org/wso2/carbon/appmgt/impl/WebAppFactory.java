@@ -96,8 +96,15 @@ public class WebAppFactory extends AppFactory {
             webApp.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             webApp.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
 
-            int cacheTimeout = Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
-            webApp.setCacheTimeout(cacheTimeout);
+            int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
+            if(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT) != null){
+                try {
+                    cacheTimeout = Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
+                } catch (NumberFormatException e) {
+                    log.warn(String.format("Error while parsing cache timeout for the web app '%s'. Setting the default value ''", webApp.getUUID(), cacheTimeout));
+                }
+            }
+            webApp.setCacheTimeout(cacheTimeout);webApp.setCacheTimeout(cacheTimeout);
 
             webApp.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
             webApp.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
