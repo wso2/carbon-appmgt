@@ -350,6 +350,12 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(appRatingInfoDTO).build();
     }
 
+    @Override
+    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
+                                                         String ifUnmodifiedSince) {
+        return null;
+    }
+
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
