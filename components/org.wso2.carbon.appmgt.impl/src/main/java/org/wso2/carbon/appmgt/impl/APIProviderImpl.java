@@ -2295,9 +2295,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Change the lifecycle state of a given application
      *
-     * @param appType application type ie: webapp, mobileapp
-     * @param appId   application uuid
-     * @param lifecycleAction  lifecycle action perform on the application
+     * @param appType         application type ie: webapp, mobileapp
+     * @param appId           application uuid
+     * @param lifecycleAction lifecycle action perform on the application
      * @throws AppManagementException
      */
     public void changeLifeCycleStatus(String appType, String appId, String lifecycleAction) throws AppManagementException {
@@ -2332,18 +2332,25 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
                     getTenantId(this.tenantDomain);
 
+            AuthorizationManager authManager =
+                    ServiceReferenceHolder.getInstance()
+                            .getRealmService()
+                            .getTenantUserRealm(tenantId)
+                            .getAuthorizationManager();
+
             //Get system registry for logged in tenant domain
             Registry systemRegistry = ServiceReferenceHolder.getInstance().
                     getRegistryService().getGovernanceSystemRegistry(tenantId);
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(systemRegistry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            String resourcePath = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                    RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + appArtifact.getPath());
 
             if (appArtifact != null) {
-                if(!AppManagerUtil.isUserAuthorized(username,  RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
-                        RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH +appArtifact.getPath()))){
+                if (!authManager.isUserAuthorized(username, resourcePath, "authorize")) {
                     //Throws resource authorization exception
                     handleResourceAuthorizationException("The user " + this.username +
-                            " is not authorized to" +appType + " with uuid " + appId);
+                            " is not authorized to" + appType + " with uuid " + appId);
                 }
                 //Change lifecycle status
                 if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
@@ -2351,6 +2358,16 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                     appArtifact.invokeAction(lifecycleAction, AppMConstants.WEBAPP_LIFE_CYCLE);
                 }
+
+                //If application is role restricted, deny read rights for Internal/everyone and system/wso2.anonymous.role roles
+                if ((AppMConstants.LifecycleActions.PUBLISH.equals(lifecycleAction) ||
+                        AppMConstants.LifecycleActions.RE_PUBLISH.equals(lifecycleAction)) &&
+                        !StringUtils.isBlank(appArtifact.getAttribute("overview_visibleRoles"))) {
+                    
+                    authManager.denyRole(AppMConstants.EVERYONE_ROLE, resourcePath, ActionConstants.GET);
+                    authManager.denyRole(AppMConstants.ANONYMOUS_ROLE, resourcePath, ActionConstants.GET);
+                }
+
                 if (log.isDebugEnabled()) {
                     String logMessage =
                             "Lifecycle action " + lifecycleAction + " has been successfully performed on " + appType
@@ -2361,11 +2378,12 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
                         appId + ". Artifact does not exist");
             }
-        }  catch (UserStoreException e) {
+        } catch (UserStoreException e) {
             handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
-                    " with id : " + appId+". Failed to retrieve tenant id for user : ", e);
+                    " with id : " + appId + ". Failed to retrieve tenant id for user : ", e);
         } catch (RegistryException e) {
-            e.printStackTrace();
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
+                    " with id : " + appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
