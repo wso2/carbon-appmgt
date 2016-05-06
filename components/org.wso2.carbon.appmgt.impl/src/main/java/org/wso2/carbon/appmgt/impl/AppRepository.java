@@ -15,7 +15,7 @@ public interface AppRepository {
      * @param app
      * @return
      */
-    long saveApp(App app);
+    String saveApp(App app);
 
 
 }

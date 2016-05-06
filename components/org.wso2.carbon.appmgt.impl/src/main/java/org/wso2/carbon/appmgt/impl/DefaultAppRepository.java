@@ -19,8 +19,8 @@ public class DefaultAppRepository implements AppRepository{
     }
 
     @Override
-    public long saveApp(App app) {
-        return 0;
+    public String saveApp(App app) {
+        return null;
     }
 
     private long savePolicyGroup(EntitlementPolicyGroup policyGroup){
