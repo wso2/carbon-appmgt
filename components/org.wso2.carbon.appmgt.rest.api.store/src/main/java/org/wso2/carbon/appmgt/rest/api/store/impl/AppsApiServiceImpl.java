@@ -257,6 +257,33 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdFavouriteAddToFavouritePost(String appType, String appId, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdFavouriteFavouritePageGet(String appType, String appId, String accept,
+                                                                String ifNoneMatch, String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdFavouriteFavouritePagePost(String appType, String appId, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdFavouriteFavouritePageDelete(String appType, String appId, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdFavouriteRemoveFromFavouritePost(String appType, String appId,
+                                                                       String contentType) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdRateGet(String appType, String appId, String accept, String ifNoneMatch,
                                               String ifModifiedSince) {
         AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
@@ -353,6 +380,33 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
                                                          String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdSubscriptionGet(String appType, String appId, String accept, String ifNoneMatch,
+                                                      String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdSubscriptionPost(String appType, String appId, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdSubscriptionWorkflowPost(String appType, String appId, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdSubscriptionUsersGet(String appType, String appId, String accept,
+                                                           String ifNoneMatch, String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdUnsubscriptionPost(String appType, String appId, String contentType) {
         return null;
     }
 

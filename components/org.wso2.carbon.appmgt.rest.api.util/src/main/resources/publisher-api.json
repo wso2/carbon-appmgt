@@ -917,7 +917,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Apps is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/LifeCycle"
+                            "$ref": "#/definitions/LifeCycleHistoryList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -1001,6 +1001,47 @@
                     },
                     "404": {
                         "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/discover": {
+            "post": {
+                "x-scope": "appm:create",
+                "summary": "Discover Apps",
+                "description": "Discover Apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1126,6 +1167,66 @@
                 }
             }
         },
+        "/apps/{appType}/stats/{statType}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get Stat summary",
+                "description": "Get Stat summary results.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/statType"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/StatSummary"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/mobile/binaries": {
             "post": {
                 "consumes": [
@@ -1240,6 +1341,66 @@
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get plist",
+                "description": "Plist file of the specified iOS (Apple) mobile app.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/tenantId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -2154,6 +2315,20 @@
             "required": true,
             "type": "string"
         },
+        "tenantId": {
+            "name": "tenantId",
+            "in": "path",
+            "description": "Tenant Id.\n",
+            "required": true,
+            "type": "string"
+        },
+        "statType": {
+            "name": "statType",
+            "in": "path",
+            "description": "Stat Type.\n",
+            "required": true,
+            "type": "string"
+        },
         "Accept": {
             "name": "Accept",
             "in": "header",
@@ -2721,6 +2896,105 @@
                 },
                 "async": {
                     "type": "boolean"
+                }
+            }
+        },
+        "LifeCycleHistory": {
+            "title": "LifeCycleHistory object",
+            "properties": {
+                "order": {
+                    "type": "integer",
+                    "description": "Sequence order Id.\n",
+                    "example": "1"
+                },
+                "state": {
+                    "type": "string",
+                    "description": "Current Lifecycle state.\n",
+                    "example": "Initial"
+                },
+                "targetState": {
+                    "type": "string",
+                    "description": "Next/target Lifecycle state.\n",
+                    "example": "Created"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "description": "Executed time.\n",
+                    "example": "2016-04-27 09:48:41.408"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "Executed user.\n",
+                    "example": "admin"
+                }
+            }
+        },
+        "LifeCycleHistoryList": {
+            "title": "List of lifecycle change activities",
+            "properties": {
+                "policyList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/LifeCycleHistory"
+                    }
+                }
+            }
+        },
+        "PListAssets": {
+            "title": "PList related Asset details.",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "example": "software-package"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "http://localhost:9763/api/appm/store/v1.0/apps/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
+                }
+            }
+        },
+        "PListInfo": {
+            "title": "PList object",
+            "properties": {
+                "PListAssets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PListAssets"
+                    }
+                },
+                "bundleIdentifier": {
+                    "type": "string"
+                },
+                "bundleVersion": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "PList": {
+            "title": "PList object",
+            "properties": {
+                "PListAssets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PListInfo"
+                    }
+                }
+            }
+        },
+        "StatSummary": {
+            "title": "Stat Summary details",
+            "properties": {
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
