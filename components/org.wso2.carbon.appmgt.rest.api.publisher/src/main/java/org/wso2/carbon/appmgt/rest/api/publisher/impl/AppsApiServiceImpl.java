@@ -185,6 +185,12 @@ public class AppsApiServiceImpl extends AppsApiService {
         return response.build();
     }
 
+    @Override
+    public Response appsMobileGetplistTenantTenantIdFileFileNameGet(String tenantId, String fileName, String accept,
+                                                                    String ifNoneMatch) {
+        return null;
+    }
+
     /**
      * Upload static contents like images into storage
      *
@@ -507,6 +513,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdDiscoverPost(String appType, String appId, String contentType,
+                                                   String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
         LifeCycleDTO lifeCycleDTO = new LifeCycleDTO();
         try {
@@ -737,6 +749,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType, String appId,
                                                                          Integer policyPartialId, String ifMatch,
                                                                          String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String accept, String ifNoneMatch) {
         return null;
     }
 

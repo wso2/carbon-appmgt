@@ -1,16 +1,37 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.appmgt.rest.api.publisher.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
+import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StatSummaryDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
 import javax.ws.rs.core.Response;
-import java.io.InputStream;
 
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsMobileGetplistTenantTenantIdFileFileNameGet(String tenantId,String fileName,String accept,String ifNoneMatch);
     public abstract Response appsStaticContentsPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
@@ -20,6 +41,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdPut(String appType,String appId,AppDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdLifecycleGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdStorageFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
@@ -31,6 +53,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdXacmlpoliciesGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdXacmlpoliciesPost(String appType,String appId,PolicyPartialIdListDTO body,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType,String appId,Integer policyPartialId,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeStatsStatTypeGet(String appType,String statType,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeValidateContextPost(String appType,String appContext,String contentType,String ifModifiedSince);
 }

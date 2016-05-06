@@ -1,13 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
+import java.math.BigDecimal;
+import java.util.*;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 
 
