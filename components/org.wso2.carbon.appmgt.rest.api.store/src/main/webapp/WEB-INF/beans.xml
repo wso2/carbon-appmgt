@@ -11,6 +11,7 @@
     <bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer" />
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
+            <bean class="org.wso2.carbon.appmgt.rest.api.store.TagsApi" />
             <bean class="org.wso2.carbon.appmgt.rest.api.store.AppsApi" />
             <bean class="org.wso2.carbon.appmgt.rest.api.store.DevicesApi" />
             <bean class="org.wso2.carbon.appmgt.rest.api.store.AdministrationApi" />
@@ -23,10 +24,10 @@
 
     <cxf:bus>
         <cxf:inInterceptors>
-            <ref bean="oauthInterceptor"/>
+            <ref bean="oauthInterceptor" />
         </cxf:inInterceptors>
     </cxf:bus>
 
-    <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor"/>
+    <bean id="oauthInterceptor" class="org.wso2.carbon.appmgt.rest.api.util.interceptors.auth.OAuthInterceptor" />
 
 </beans>

@@ -8,8 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "")
 public class AdminInstallDTO  {
-
-
+  
   
   
   private String type = null;

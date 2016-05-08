@@ -17,10 +17,9 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.Collections;
+import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
+
+import java.util.*;
 
 /**
  * Provider's & system's view of WebApp
@@ -44,6 +43,7 @@ public class WebApp extends App{
     private Date lastUpdated;
     private Set<Tier> availableTiers = new LinkedHashSet<Tier>();
     private AuthorizationPolicy authorizationPolicy;
+    private List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
     private Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
 
     private String ssoEnabled;
@@ -740,4 +740,18 @@ public class WebApp extends App{
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
     }
+
+    public void addAccessPolicyGroup(EntitlementPolicyGroup policyGroup){
+
+        if(this.accessPolicyGroups == null){
+            this.accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
+        }
+
+        this.accessPolicyGroups.add(policyGroup);
+    }
+
+    public List<EntitlementPolicyGroup> getAccessPolicyGroups(){
+        return this.accessPolicyGroups;
+    }
+
 }

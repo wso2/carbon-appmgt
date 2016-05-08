@@ -161,6 +161,722 @@
                 }
             }
         },
+        "/apps/{appType}/id/{appId}/rate": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get app rating details",
+                "description": "Get rating details of an app.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nApp rating is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppRatingInfo"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-scope": "appm:read",
+                "summary": "Change App rating",
+                "description": "Change App rating\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "rating",
+                        "description": "App rating object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/AppRatingInfo"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/storage/{fileName}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Retrieving file",
+                "description": "Retrieving a file saved with an App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/subscription": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "summary": "Subscribe App",
+                "description": "Subscribe to an existing App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Subscriptions"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get subscriptions for current user",
+                "description": "Get subscriptions for current user.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Subscriptions"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/subscription/users": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get subscribed user list",
+                "description": "Get subscribed user list for a given App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Subscriptions"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/UserIdList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/unsubscription": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "summary": "Un subscribe App",
+                "description": "Un subscribe to an existing App\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/subscription-workflow": {
+            "post": {
+                "x-scope": "appm:subscribe",
+                "summary": "Check for subscription workflow",
+                "description": "Check for subscription workflow.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Subscriptions"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/favourite/favourite-page": {
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Set as favourite page",
+                "description": "Set as favourite page.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Favourite"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-scope": "appm:read",
+                "summary": "Remove from favourite page",
+                "description": "Remove from favourite page.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Favourite"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "check if it is the favourite page",
+                "description": "check if it is the favourite page.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/FavouritePage"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/favourite/add-to-favourite": {
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Add to favourite Apps",
+                "description": "Add to favourite Apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Favourite"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/favourite/remove-from-favourite": {
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Remove from favourite Apps",
+                "description": "Remove from favourite Apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Favourite"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
@@ -589,6 +1305,112 @@
                     }
                 }
             }
+        },
+        "/apps/event-publish": {
+            "post": {
+                "x-scope": "appm:read",
+                "summary": "Publish Stats",
+                "description": "Publish User hit Stats details.\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "events",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Events"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/{tagName}/apps": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get apps with given tag",
+                "description": "Get app list with given tag.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/tagName"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nQualifying App is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/AppList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -632,6 +1454,20 @@
             "default": 0,
             "type": "integer"
         },
+        "fileName": {
+            "name": "fileName",
+            "in": "path",
+            "description": "file name.\n",
+            "required": true,
+            "type": "string"
+        },
+        "tagName": {
+            "name": "tagName",
+            "in": "path",
+            "description": "Tag name.\n",
+            "required": true,
+            "type": "string"
+        },
         "Accept": {
             "name": "Accept",
             "in": "header",
@@ -657,6 +1493,18 @@
             "name": "If-Modified-Since",
             "in": "header",
             "description": "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n",
+            "type": "string"
+        },
+        "If-Match": {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Validator for conditional requests; based on ETag.\n",
+            "type": "string"
+        },
+        "If-Unmodified-Since": {
+            "name": "If-Unmodified-Since",
+            "in": "header",
+            "description": "Validator for conditional requests; based on Last Modified header.\n",
             "type": "string"
         }
     },
@@ -718,6 +1566,11 @@
                 "lifecycleState": {
                     "type": "string",
                     "example": "CREATED"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 }
             }
         },
@@ -827,6 +1680,11 @@
                     "description": "Bundleversion of the asset\n",
                     "type": "string",
                     "example": "1.0"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 },
                 "category": {
                     "description": "category of the asset\n",
@@ -1000,6 +1858,47 @@
                         "tag3"
                     ],
                     "description": "List of Tags"
+                }
+            }
+        },
+        "AppRatingInfo": {
+            "title": "App rating details",
+            "properties": {
+                "rating": {
+                    "type": "number",
+                    "description": "List of Role Id's",
+                    "example": 3.0
+                },
+                "review": {
+                    "type": "string",
+                    "description": "Comment/review about the app"
+                },
+                "id": {
+                    "type": "integer",
+                    "description": "Review Id",
+                    "example": 1
+                }
+            }
+        },
+        "Events": {
+            "title": "Events details",
+            "required": ["events"],
+            "properties": {
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    },
+                    "description": "User hit count per App related User Stats details stream"
+                }
+            }
+        },
+        "FavouritePage": {
+            "title": "Favourite Page details",
+            "properties": {
+                "isDefaultPage": {
+                    "type": "boolean",
+                    "example": "true/false"
                 }
             }
         },

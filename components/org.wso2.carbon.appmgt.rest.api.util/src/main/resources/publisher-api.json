@@ -710,7 +710,7 @@
                 }
             }
         },
-        "/apps/{appType}/appId/{appId}/subscriptions": {
+        "/apps/{appType}/id/{appId}/subscriptions": {
             "get": {
                 "x-scope": "appm:read",
                 "summary": "Get subscribed user list for an App",
@@ -917,7 +917,7 @@
                     "200": {
                         "description": "OK. \nList of qualifying Apps is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/LifeCycle"
+                            "$ref": "#/definitions/LifeCycleHistoryList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -944,6 +944,104 @@
                     },
                     "404": {
                         "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/storage/{fileName}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Retrieving file",
+                "description": "Retrieving a file saved with an App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "MobileApps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/discover": {
+            "post": {
+                "x-scope": "appm:create",
+                "summary": "Discover Apps",
+                "description": "Discover Apps.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1069,6 +1167,66 @@
                 }
             }
         },
+        "/apps/{appType}/stats/{statType}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get Stat summary",
+                "description": "Get Stat summary results.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/statType"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Tags"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/StatSummary"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/mobile/binaries": {
             "post": {
                 "consumes": [
@@ -1183,6 +1341,66 @@
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}": {
+            "get": {
+                "x-scope": "appm:read",
+                "summary": "Get plist",
+                "description": "Plist file of the specified iOS (Apple) mobile app.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/tenantId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/PList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1395,75 +1613,6 @@
                         "description": "OK. \nList of Tiers is returned.\n",
                         "schema": {
                             "$ref": "#/definitions/TierList"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "description": "The content type of the body.",
-                                "type": "string"
-                            },
-                            "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/apps/{appType}/cache": {
-            "get": {
-                "x-scope": "appm:read",
-                "summary": "Get all Apps from Cache",
-                "description": "Get a list of available Apps qualifying under a given search condition.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "name": "query",
-                        "in": "query",
-                        "description": "**Search condition**.\n\n\n\n\nYou can search in attributes by using an **\"attribute:\"** modifier.\n\n\n\n\nEg. \"provider:wso2\" will match an App if the provider of the App contains \"wso2\".\n\n\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n",
-                        "type": "string"
-                    },
-                    {
-                        "$ref": "#/parameters/limit"
-                    },
-                    {
-                        "$ref": "#/parameters/offset"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
-                        "schema": {
-                            "$ref": "#/definitions/AppList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -2080,6 +2229,278 @@
                     }
                 }
             }
+        },
+        "/administration/businessowner": {
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get all Business owners",
+                "description": "Get a list of available Apps qualifying under a given search condition.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nList of qualifying Business Owner List is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwnerList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-scope": "appm:administration",
+                "summary": "Create a new Business Owner",
+                "description": "Create a new Business Owner\n",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "BusinessOwner object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwner"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Modified-Since"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n",
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwner"
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "The URL of the newly created resource.\n",
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional request\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/businessowner/{businessOwnerId}": {
+            "get": {
+                "x-scope": "appm:administration",
+                "summary": "Get a Business owners by Id",
+                "description": "Get a Business owners by Id.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/businessOwnerId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwner"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-scope": "appm:administration",
+                "summary": "Update an existing Business Owner",
+                "description": "Update an existing Business Owner.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/businessOwnerId"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "BusinessOwner object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwner"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n"
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-scope": "appm:administration",
+                "summary": "Delete Business Owner",
+                "description": "Delete an existing Business Owner.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/businessOwnerId"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -2162,7 +2583,28 @@
         "fileName": {
             "name": "fileName",
             "in": "path",
-            "description": "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n",
+            "description": "File name.\n",
+            "required": true,
+            "type": "string"
+        },
+        "tenantId": {
+            "name": "tenantId",
+            "in": "path",
+            "description": "Tenant Id.\n",
+            "required": true,
+            "type": "string"
+        },
+        "statType": {
+            "name": "statType",
+            "in": "path",
+            "description": "Stat Type.\n",
+            "required": true,
+            "type": "string"
+        },
+        "businessOwnerId": {
+            "name": "businessOwnerId",
+            "in": "path",
+            "description": "Business Owner Id.\n",
             "required": true,
             "type": "string"
         },
@@ -2264,6 +2706,11 @@
                 "lifecycleState": {
                     "type": "string",
                     "example": "CREATED"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 }
             }
         },
@@ -2410,6 +2857,11 @@
                     "description": "lifecycle state of the asset\n",
                     "type": "string",
                     "example": "Created"
+                },
+                "rating": {
+                    "description": "User rating for the app\n",
+                    "type": "number",
+                    "example": 4.0
                 },
                 "appUrL": {
                     "description": "URL of the asset\n",
@@ -2723,6 +3175,152 @@
                 },
                 "async": {
                     "type": "boolean"
+                }
+            }
+        },
+        "LifeCycleHistory": {
+            "title": "LifeCycleHistory object",
+            "properties": {
+                "order": {
+                    "type": "integer",
+                    "description": "Sequence order Id.\n",
+                    "example": "1"
+                },
+                "state": {
+                    "type": "string",
+                    "description": "Current Lifecycle state.\n",
+                    "example": "Initial"
+                },
+                "targetState": {
+                    "type": "string",
+                    "description": "Next/target Lifecycle state.\n",
+                    "example": "Created"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "description": "Executed time.\n",
+                    "example": "2016-04-27 09:48:41.408"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "Executed user.\n",
+                    "example": "admin"
+                }
+            }
+        },
+        "LifeCycleHistoryList": {
+            "title": "List of lifecycle change activities",
+            "properties": {
+                "policyList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/LifeCycleHistory"
+                    }
+                }
+            }
+        },
+        "PListAssets": {
+            "title": "PList related Asset details.",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "example": "software-package"
+                },
+                "url": {
+                    "type": "string",
+                    "example": "http://localhost:9763/api/appm/store/v1.0/apps/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
+                }
+            }
+        },
+        "PListInfo": {
+            "title": "PList object",
+            "properties": {
+                "PListAssets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PListAssets"
+                    }
+                },
+                "bundleIdentifier": {
+                    "type": "string"
+                },
+                "bundleVersion": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "PList": {
+            "title": "PList object",
+            "properties": {
+                "PListAssets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PListInfo"
+                    }
+                }
+            }
+        },
+        "StatSummary": {
+            "title": "Stat Summary details",
+            "properties": {
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "BusinessOwnerList": {
+            "title": "BusinessOwnerList details.",
+            "properties": {
+                "tierList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/BusinessOwner"
+                    }
+                }
+            }
+        },
+        "BusinessOwner": {
+            "title": "BusinessOwner object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "admin"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "admin@wso2.com"
+                },
+                "site": {
+                    "type": "string",
+                    "example": "www.wso2.com"
+                },
+                "properties": {
+                    "type": "array",
+                    "description": "List of Business owner properties",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "property1",
+                        "property2",
+                        "property3"
+                    ]
                 }
             }
         },

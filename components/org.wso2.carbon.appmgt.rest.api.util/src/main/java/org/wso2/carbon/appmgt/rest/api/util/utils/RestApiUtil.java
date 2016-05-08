@@ -91,6 +91,23 @@ public class RestApiUtil {
         return APIManagerFactory.getInstance().getAPIProvider(username);
     }
 
+
+    public static APIConsumer getConsumer(String subscriberName) throws AppManagementException {
+        return APIManagerFactory.getInstance().getAPIConsumer(subscriberName);
+    }
+
+    /**
+     * Returns an APIConsumer which is corresponding to the current logged in user taken from the carbon context
+     *
+     * @return an APIConsumer which is corresponding to the current logged in user
+     * @throws AppManagementException
+     */
+    public static APIConsumer getLoggedInUserConsumer() throws AppManagementException {
+        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        return APIManagerFactory.getInstance().getAPIConsumer(loggedInUser);
+    }
+
+
     /**
      * Logs the error, builds a BadRequestException with specified details and throws it
      *

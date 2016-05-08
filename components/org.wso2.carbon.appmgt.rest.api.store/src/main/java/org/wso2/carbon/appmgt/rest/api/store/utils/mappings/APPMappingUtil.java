@@ -37,6 +37,7 @@ import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.user.api.UserStoreException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -99,11 +100,11 @@ public class APPMappingUtil {
         return appInfoDTO;
     }
 
-    public static AppInfoDTO fromAppToInfoDTO(App app){
+    public static AppInfoDTO fromAppToInfoDTO(App app) {
 
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
             return fromWebAppToInfoDTO((WebApp) app);
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
             return fromMobileAppToInfoDTO((MobileApp) app);
         }
 
@@ -119,7 +120,7 @@ public class APPMappingUtil {
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
         appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
-        appInfoDTO.setRating(app.getRating());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -142,7 +143,7 @@ public class APPMappingUtil {
         String providerName = app.getId().getProviderName();
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
         appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
-        appInfoDTO.setRating(app.getRating());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -264,11 +265,11 @@ public class APPMappingUtil {
         return dto;
     }
 
-    public static AppDTO fromAppToDTO(App app){
+    public static AppDTO fromAppToDTO(App app) {
 
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
-            return fromWebAppToDTO((WebApp) app) ;
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+            return fromWebAppToDTO((WebApp) app);
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
             return fromMobileAppToDTO((MobileApp) app);
         }
 
@@ -276,7 +277,7 @@ public class APPMappingUtil {
 
     }
 
-    private static AppDTO fromWebAppToDTO(WebApp webapp){
+    private static AppDTO fromWebAppToDTO(WebApp webapp) {
 
         AppDTO dto = new AppDTO();
         dto.setName(webapp.getId().getApiName());
@@ -296,7 +297,7 @@ public class APPMappingUtil {
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
-        dto.setRating(webapp.getRating());
+        dto.setRating(BigDecimal.valueOf(webapp.getRating()));
         Set<String> apiTags = webapp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
         tagsToReturn.addAll(apiTags);
@@ -321,7 +322,7 @@ public class APPMappingUtil {
         return dto;
     }
 
-    private static AppDTO fromMobileAppToDTO(MobileApp mobileApp){
+    private static AppDTO fromMobileAppToDTO(MobileApp mobileApp) {
 
         AppDTO dto = new AppDTO();
 
@@ -329,7 +330,7 @@ public class APPMappingUtil {
         dto.setName(mobileApp.getAppName());
         dto.setVersion(mobileApp.getVersion());
         dto.setDescription(mobileApp.getDescription());
-        dto.setRating(mobileApp.getRating());
+        dto.setRating(BigDecimal.valueOf(mobileApp.getRating()));
 
         Set<String> apiTags = mobileApp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
