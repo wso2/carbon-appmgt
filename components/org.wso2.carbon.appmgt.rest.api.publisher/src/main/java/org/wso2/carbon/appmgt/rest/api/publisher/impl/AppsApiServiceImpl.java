@@ -294,6 +294,7 @@ public class AppsApiServiceImpl extends AppsApiService {
      */
     @Override
     public Response appsAppTypePost(String appType, AppDTO body, String contentType, String ifModifiedSince) {
+        CommonValidator.isValidAppType(appType);
         beanValidator = new BeanValidator();
         //Validate common mandatory fields for mobile and webapp
         beanValidator.validate(body);
@@ -308,13 +309,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 appDTO.setId(applicationId);
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 //TODO:Implement webapp logic
-            } else {
-                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
 
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceAlreadyExisting(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleConflictException("A mobile application already exists with the name : "
+                RestApiUtil.handleConflictException("A duplicate "+appType+" already exists with the name : "
                                                             + body.getName(), log);
             } else {
                 RestApiUtil.handleInternalServerError(
@@ -748,7 +747,14 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(tagSet).build();
     }
 
-
+    /**
+     * Validate webapp context
+     * @param appType application type
+     * @param appContext context of the webapp
+     * @param contentType
+     * @param ifModifiedSince
+     * @return whether context is valid or not
+     */
     @Override
     public Response appsAppTypeValidateContextPost(String appType, String appContext, String contentType,
                                                    String ifModifiedSince) {

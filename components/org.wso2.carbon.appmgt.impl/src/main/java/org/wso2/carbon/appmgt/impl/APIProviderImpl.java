@@ -2332,11 +2332,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
                     getTenantId(this.tenantDomain);
 
-            AuthorizationManager authManager =
-                    ServiceReferenceHolder.getInstance()
-                            .getRealmService()
-                            .getTenantUserRealm(tenantId)
-                            .getAuthorizationManager();
+            AuthorizationManager authManager = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantUserRealm(tenantId).getAuthorizationManager();
 
             //Get system registry for logged in tenant domain
             Registry systemRegistry = ServiceReferenceHolder.getInstance().
@@ -2363,7 +2360,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 if ((AppMConstants.LifecycleActions.PUBLISH.equals(lifecycleAction) ||
                         AppMConstants.LifecycleActions.RE_PUBLISH.equals(lifecycleAction)) &&
                         !StringUtils.isBlank(appArtifact.getAttribute("overview_visibleRoles"))) {
-                    
+
                     authManager.denyRole(AppMConstants.EVERYONE_ROLE, resourcePath, ActionConstants.GET);
                     authManager.denyRole(AppMConstants.ANONYMOUS_ROLE, resourcePath, ActionConstants.GET);
                 }
@@ -2413,7 +2410,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
                     actions = appArtifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
                 } else {
-                    handleException("Unsupported applicatio type : " + appType +" provided");
+                    handleException("Unsupported application type : " + appType +" provided");
                 }
             } else {
                 handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
