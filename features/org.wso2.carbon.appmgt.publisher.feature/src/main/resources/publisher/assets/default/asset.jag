@@ -785,6 +785,12 @@ function overridePermissions(assetId, artifactManager, permissions) {
         transitionExecution = lc.transitionExecution("Created", "Submit for Review");
     }else if(currentState=="Rejected"){
         transitionExecution = lc.transitionExecution("In-Review", "Reject");
+    }else if(currentState=="Unpublished"){
+        transitionExecution = lc.transitionExecution("Published", "Unpublish");
+    }else if(currentState=="Deprecated"){
+        transitionExecution = lc.transitionExecution("Unpublished", "Deprecate");
+    }else if(currentState=="Published"){
+        transitionExecution = lc.transitionExecution("Approved", "Publish");
     }
     var tenantId = server.current(session).tenantId;
 
