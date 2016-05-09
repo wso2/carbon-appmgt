@@ -25,6 +25,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.rest.api.publisher.AdministrationApiService;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BusinessOwnerDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
@@ -36,6 +37,31 @@ import javax.ws.rs.core.Response;
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
     BeanValidator beanValidator;
+
+    @Override
+    public Response administrationBusinessownerGet(String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response administrationBusinessownerPost(BusinessOwnerDTO body, String contentType, String ifModifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response administrationBusinessownerBusinessOwnerIdGet(String businessOwnerId, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response administrationBusinessownerBusinessOwnerIdPut(String businessOwnerId, BusinessOwnerDTO body, String contentType, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response administrationBusinessownerBusinessOwnerIdDelete(String businessOwnerId, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
 
     @Override
     public Response administrationPolicygroupsPolicyGroupIdAppsGet(Integer policyGroupId, String accept,
