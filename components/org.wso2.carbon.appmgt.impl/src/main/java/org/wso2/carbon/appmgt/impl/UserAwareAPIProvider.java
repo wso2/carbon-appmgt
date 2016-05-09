@@ -49,6 +49,12 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
+    public String createWebApp(WebApp webApp) throws AppManagementException {
+        checkCreatePermission();
+        return super.createWebApp(webApp);
+    }
+
+    @Override
     public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException {
         checkDocumentAddPermission();
         super.copyWebappDocumentations(api, newVersion);

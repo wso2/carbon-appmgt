@@ -450,17 +450,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public void addWebApp(WebApp app) throws AppManagementException {
         try {
             createAPI(app);
-            appMDAO.addWebApp(app);
-            if (AppManagerUtil.isAPIManagementEnabled()) {
-            	Cache contextCache = AppManagerUtil.getAPIContextCache();
-            	Boolean apiContext = null;
-            	if (contextCache.get(app.getContext()) != null) {
-            		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
-            	}
-            	if (apiContext == null) {
-                    contextCache.put(app.getContext(), true);
-                }
-            }
+//            appMDAO.addWebApp(app);
+//            if (AppManagerUtil.isAPIManagementEnabled()) {
+//            	Cache contextCache = AppManagerUtil.getAPIContextCache();
+//            	Boolean apiContext = null;
+//            	if (contextCache.get(app.getContext()) != null) {
+//            		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
+//            	}
+//            	if (apiContext == null) {
+//                    contextCache.put(app.getContext(), true);
+//                }
+//            }
         } catch (AppManagementException e) {
             throw new AppManagementException("Error in adding WebApp :"+app.getId().getApiName(),e);
         }
@@ -519,6 +519,63 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
         }
         return artifactId;
+    }
+
+    @Override
+    public String createWebApp(WebApp webApp) throws AppManagementException {
+        String artifactId = null;
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.WEBAPP_ASSET_TYPE);
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(webApp.getId().getApiName()));
+            GenericArtifact artifact = AppManagerUtil.createAPIArtifactContent(genericArtifact, webApp);
+            artifactManager.addGenericArtifact(artifact);
+            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+            String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
+            //provider ------provides----> WebApp
+            registry.addAssociation(providerPath, artifactPath, AppMConstants.PROVIDER_ASSOCIATION);
+//            Set<String> tagSet = webApp.getTags();
+//            if (tagSet != null && tagSet.size() > 0) {
+//                for (String tag : tagSet) {
+//                    registry.applyTag(artifactPath, tag);
+//                }
+//            }
+
+
+            if (webApp.getUrl() != null && !"".equals(webApp.getUrl())){
+                String path = AppManagerUtil.createEndpoint(webApp.getUrl(), registry);
+                if (path != null) {
+                    registry.addAssociation(artifactPath, path, CommonConstants.ASSOCIATION_TYPE01);
+                }
+            }
+            //write WebApp Status to a separate property. This is done to support querying APIs using custom query (SQL)
+            //to gain performance
+            String apiStatus = webApp.getStatus().getStatus();
+            saveAPIStatus(artifactPath, apiStatus);
+            String visibleRolesList = webApp.getVisibleRoles();
+            String[] visibleRoles = new String[0];
+            if (visibleRolesList != null) {
+                visibleRoles = visibleRolesList.split(",");
+            }
+            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles, artifactPath);
+            registry.commitTransaction();
+
+            /* Generate WebApp Definition for Swagger */
+
+
+        } catch (Exception e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException("Error while rolling back the transaction for WebApp: " +
+                        webApp.getId().getApiName(), re);
+            }
+            handleException("Error while performing registry transaction operation", e);
+        }
+        return "sssss";
+
     }
 
     /**

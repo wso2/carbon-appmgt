@@ -483,6 +483,21 @@ public class APPMappingUtil {
         return mobileAppModel;
     }
 
+    public static WebApp fromDTOToWebapp(AppDTO appDTO){
+        String providerName = RestApiUtil.getLoggedInUsername();
+        String appName = appDTO.getName();
+        String appVersion = appDTO.getVersion();
+        APIIdentifier apiIdentifier = new APIIdentifier(providerName, appName, appVersion);
+        WebApp webApp = new WebApp(apiIdentifier);
+        webApp.setUrl(appDTO.getAppUrL());
+        webApp.setContext(appDTO.getContext());
+        webApp.setDisplayName(appDTO.getDisplayName());
+        webApp.setStatus(APIStatus.CREATED);
+        webApp.setTransports("http");
+        webApp.setTreatAsASite("FALSE");
+        return webApp;
+    }
+
     private static boolean validateMandatoryField(String fieldName, Object fieldValue) {
 
         if (fieldValue == null) {

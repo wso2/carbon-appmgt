@@ -52,6 +52,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.publisher.utils.validation.AppDTOValidator;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
@@ -313,16 +314,20 @@ public class AppsApiServiceImpl extends AppsApiService {
         //Validate common mandatory fields for mobile and webapp
         beanValidator.validate(body);
         AppDTO appDTO = new AppDTO();
-
+        AppDTOValidator.validateAppDTO(appType, appDTO);
+        String applicationId = null;
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
 
                 MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
-                String applicationId = appProvider.createMobileApp(mobileApp);
+                applicationId = appProvider.createMobileApp(mobileApp);
                 appDTO.setId(applicationId);
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                //TODO:Implement webapp logic
+
+                WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
+                applicationId = appProvider.createWebApp(webApp);
+
             }
 
         } catch (AppManagementException e) {

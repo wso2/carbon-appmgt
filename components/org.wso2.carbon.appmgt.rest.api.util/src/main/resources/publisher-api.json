@@ -2808,14 +2808,8 @@
                 },
                 "transport": {
                     "description": "Supported transports for the App (http and/or https).\n",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "http",
-                        "https"
-                    ]
+                    "type": "string",
+                    "example":"https"
                 },
                 "tags": {
                     "type": "array",

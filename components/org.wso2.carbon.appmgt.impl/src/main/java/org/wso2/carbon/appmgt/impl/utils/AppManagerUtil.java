@@ -722,6 +722,7 @@ public final class AppManagerUtil {
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL, api.getSandboxUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WSDL, api.getWsdlUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WADL, api.getWadlUrl());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, api.getDisplayName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL, api.getThumbnailUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_STATUS, apiStatus);
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER, api.getTechnicalOwner());
