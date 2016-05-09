@@ -530,7 +530,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             registry.beginTransaction();
             GenericArtifact genericArtifact =
                     artifactManager.newGovernanceArtifact(new QName(webApp.getId().getApiName()));
-            GenericArtifact artifact = AppManagerUtil.createAPIArtifactContent(genericArtifact, webApp);
+            GenericArtifact artifact = AppManagerUtil.createWebAppArtifactContent(genericArtifact, webApp);
             artifactManager.addGenericArtifact(artifact);
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
             String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
@@ -544,22 +544,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 //            }
 
 
-            if (webApp.getUrl() != null && !"".equals(webApp.getUrl())){
-                String path = AppManagerUtil.createEndpoint(webApp.getUrl(), registry);
-                if (path != null) {
-                    registry.addAssociation(artifactPath, path, CommonConstants.ASSOCIATION_TYPE01);
-                }
-            }
-            //write WebApp Status to a separate property. This is done to support querying APIs using custom query (SQL)
-            //to gain performance
-            String apiStatus = webApp.getStatus().getStatus();
-            saveAPIStatus(artifactPath, apiStatus);
-            String visibleRolesList = webApp.getVisibleRoles();
-            String[] visibleRoles = new String[0];
-            if (visibleRolesList != null) {
-                visibleRoles = visibleRolesList.split(",");
-            }
-            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles, artifactPath);
+
+//            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles, artifactPath);
             registry.commitTransaction();
 
             /* Generate WebApp Definition for Swagger */

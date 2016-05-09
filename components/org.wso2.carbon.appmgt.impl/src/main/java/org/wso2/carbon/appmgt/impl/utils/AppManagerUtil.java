@@ -717,6 +717,7 @@ public final class AppManagerUtil {
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, api.getContext());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, api.getId().getProviderName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, api.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, api.getTreatAsASite());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, api.getUrl());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, api.getLogoutURL());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL, api.getSandboxUrl());
@@ -854,8 +855,38 @@ public final class AppManagerUtil {
 		return artifact;
 	}
 
+    public static GenericArtifact createWebAppArtifactContent(GenericArtifact artifact, WebApp api)
+            throws
+            AppManagementException {
+        try {
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, api.getId().getApiName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, api.getId().getVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, api.getContext());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, api.getId().getProviderName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, api.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, api.getTreatAsASite());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, api.getUrl());
 
-	/**
+
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, api.getDisplayName());
+
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, api.getTransports());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(
+                    api.isDefaultVersion()));
+
+
+
+        } catch (GovernanceException e) {
+            String msg = "Failed to create WebApp for : " + api.getId().getApiName();
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
+        return artifact;
+    }
+
+
+
+    /**
 	 * Create the Documentation from artifact
 	 * 
 	 * @param artifact

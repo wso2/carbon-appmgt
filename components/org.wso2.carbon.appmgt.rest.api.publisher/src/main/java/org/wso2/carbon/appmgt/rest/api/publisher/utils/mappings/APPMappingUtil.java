@@ -494,7 +494,7 @@ public class APPMappingUtil {
         webApp.setDisplayName(appDTO.getDisplayName());
         webApp.setStatus(APIStatus.CREATED);
         webApp.setTransports("http");
-        webApp.setTreatAsASite("FALSE");
+        webApp.setTreatAsASite(appDTO.getIsSite());
         return webApp;
     }
 
