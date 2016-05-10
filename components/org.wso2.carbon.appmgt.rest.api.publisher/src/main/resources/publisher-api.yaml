@@ -2343,6 +2343,67 @@ definitions:
             description: |
               Web application urk
             example: 'http://sample.com'
+      uriTemplates:
+        type: array
+        items:
+          type: object
+          properties:
+            urlPattern:
+              type: string
+              description: |
+                URL pattern of the URI
+              example: /user/details
+            httpVerb:
+              type: string
+              description: |
+                Http verb of the uri pattern
+              example: 'GET,POST,PUT,DELETE,OPTION'
+            policyGroupName:
+              type: string
+              description: |
+                The name of the uri template policy group
+              example: default
+      policyGroups:
+        type: array
+        items:
+          type: object
+          properties:
+            policyGroupName:
+              type: string
+              description: |
+                Name of the policy group
+              example: default
+            description:
+              type: string
+              description: |
+                Description of the policy group
+              example: Default policy group
+            throttlingTier:
+              type: string
+              description: |
+                Throttling tier
+              example: 'Bronze,Silver,Gold,Unlimited'
+            userRoles:
+              type: array
+              items:
+                type: string
+              description: |
+                The name of the uri template policy group
+              example:
+                - admin
+            partialMapping:
+              type: array
+              items:
+                type: string
+              description: |
+                Entitlement policy partial name list
+              example:
+                - sample
+            isAnonymousAccess:
+              type: string
+              description: |
+                Throttling tier
+              example: 'GET,POST,PUT,DELETE,OPTION'
       marketType:
         type: string
         example: 'enterprise,'
@@ -2392,12 +2453,8 @@ definitions:
       transport:
         description: |
           Supported transports for the App (http and/or https).
-        type: array
-        items:
-          type: string
-        example:
-          - http
-          - https
+        type: string
+        example: https
       tags:
         type: array
         items:

@@ -3,6 +3,7 @@ package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
 import java.math.BigDecimal;
 import java.util.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.Object;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,6 +27,12 @@ public class AppDTO  {
   
   
   private AppAppmetaDTO appmeta = null;
+  
+  
+  private List<Object> uriTemplates = new ArrayList<Object>();
+  
+  
+  private List<Object> policyGroups = new ArrayList<Object>();
   
   
   private String marketType = null;
@@ -58,7 +65,7 @@ public class AppDTO  {
   private Boolean isDefaultVersion = null;
   
   
-  private List<String> transport = new ArrayList<String>();
+  private String transport = null;
   
   
   private List<String> tags = new ArrayList<String>();
@@ -168,6 +175,30 @@ public class AppDTO  {
   }
   public void setAppmeta(AppAppmetaDTO appmeta) {
     this.appmeta = appmeta;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("uriTemplates")
+  public List<Object> getUriTemplates() {
+    return uriTemplates;
+  }
+  public void setUriTemplates(List<Object> uriTemplates) {
+    this.uriTemplates = uriTemplates;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("policyGroups")
+  public List<Object> getPolicyGroups() {
+    return policyGroups;
+  }
+  public void setPolicyGroups(List<Object> policyGroups) {
+    this.policyGroups = policyGroups;
   }
 
   
@@ -301,10 +332,10 @@ public class AppDTO  {
    **/
   @ApiModelProperty(value = "Supported transports for the App (http and/or https).")
   @JsonProperty("transport")
-  public List<String> getTransport() {
+  public String getTransport() {
     return transport;
   }
-  public void setTransport(List<String> transport) {
+  public void setTransport(String transport) {
     this.transport = transport;
   }
 
@@ -576,6 +607,8 @@ public class AppDTO  {
     sb.append("  name: ").append(name).append("\n");
     sb.append("  type: ").append(type).append("\n");
     sb.append("  appmeta: ").append(appmeta).append("\n");
+    sb.append("  uriTemplates: ").append(uriTemplates).append("\n");
+    sb.append("  policyGroups: ").append(policyGroups).append("\n");
     sb.append("  marketType: ").append(marketType).append("\n");
     sb.append("  recentChanges: ").append(recentChanges).append("\n");
     sb.append("  icon: ").append(icon).append("\n");

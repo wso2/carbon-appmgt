@@ -1,11 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 

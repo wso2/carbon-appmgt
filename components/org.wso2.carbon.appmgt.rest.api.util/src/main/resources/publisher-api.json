@@ -2761,6 +2761,73 @@
                         }
                     }
                 },
+                "uriTemplates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "urlPattern": {
+                                "type": "string",
+                                "description": "URL pattern of the URI \n",
+                                "example": "/user/details"
+                            },
+                            "httpVerb": {
+                                "type": "string",
+                                "description": "Http verb of the uri pattern\n",
+                                "example": "GET,POST,PUT,DELETE,OPTION"
+                            },
+                            "policyGroupName": {
+                                "type": "string",
+                                "description": "The name of the uri template policy group\n",
+                                "example": "default"
+                            }
+                        }
+                    }
+                },
+                "policyGroups": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "policyGroupName": {
+                                "type": "string",
+                                "description": "Name of the policy group \n",
+                                "example": "default"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Description of the policy group \n",
+                                "example": "Default policy group"
+                            },
+                            "throttlingTier": {
+                                "type": "string",
+                                "description": "Throttling tier\n",
+                                "example": "Bronze,Silver,Gold,Unlimited"
+                            },
+                            "userRoles": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "The name of the uri template policy group\n",
+                                "example": ["admin"]
+                            },
+                            "partialMapping": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "Entitlement policy partial name list\n",
+                                "example": ["sample"]
+                            },
+                            "isAnonymousAccess": {
+                                "type": "string",
+                                "description": "Throttling tier\n",
+                                "example": "GET,POST,PUT,DELETE,OPTION"
+                            }
+                        }
+                    }
+                },
                 "marketType": {
                     "type": "string",
                     "example": "enterprise,"
