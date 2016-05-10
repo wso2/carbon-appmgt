@@ -26,10 +26,38 @@ consumes:
   - application/json
 produces:
   - application/json
+x-wso2-security:
+  appm:
+    x-wso2-scopes:
+      - description: ''
+        roles: admin
+        name: 'appm:read'
+        key: 'appm:read'
+      - description: ''
+        roles: admin
+        name: 'appm:create'
+        key: 'appm:create'
+      - description: ''
+        roles: admin
+        name: 'appm:update'
+        key: 'appm:update'
+      - description: ''
+        roles: admin
+        name: 'appm:administration'
+        key: 'appm:administration'
+      - description: ''
+        roles: admin
+        name: 'appm:publish'
+        key: 'appm:publish'
 paths:
   '/apps/{appType}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp"
+      x-wso2-response: >-
+        {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get all Apps
       description: |
         Get a list of available Apps qualifying under a given search condition.
@@ -79,7 +107,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
@@ -94,24 +122,43 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     post:
       x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -v -X POST
+        'http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp' -d
+        '{"appmeta" :{"path" :
+        "/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk", "package" :
+        "home.jmstudios.calc", "version" :
+        "1.0"},"name":"sample","provider":"admin","platform":"android","version":"1.0.0",
+        "banner":"/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg","thumbnailUrl":"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg","screenshots":["/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg"],"displayName":"SampleDisplay","description":"sample
+        calculator
+        application","platform":"android","category":"Business",”marketType”:”enterprise”}'
+      x-wso2-request: >-
+        {"appmeta" :{"path" :
+        "/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk", "package" :
+        "home.jmstudios.calc", "version" :
+        "1.0"},"name":"sample","provider":"admin","platform":"android","version":"1.0.0",
+        "banner":"/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg","thumbnailUrl":"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg","screenshots":["/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg"],"displayName":"SampleDisplay","description":"sample
+        calculator
+        application","platform":"android","category":"Business",”marketType”:”enterprise”}
+      x-wso2-response: '{"id" : "aff9fb92-7e17-4ce8-8024-a747ff5aea41"}'
       summary: Create a new App
       description: |
         Create a new App
@@ -131,10 +178,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -155,19 +202,24 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9"
+      x-wso2-response: >-
+        {"displayName":null,"createdTime":"00000001461645676735","bundleVersion":"1","packageName":"undefined","description":"asdasd","version":"1","category":"Business","tags":[],"appType":"webapp","appName":"asd","appUrl":"http://wso2.com","banner":"/publisher/api/mobileapp/getfile/pduoTTAgbWAuFxm.JPG","marketType":null,"recentChanges":"-","appProvider":"admin","thumbnail":"/publisher/api/mobileapp/getfile/J3TM0iKb6OiapuG.JPG","screenShots":["/publisher/api/mobileapp/getfile/zq7kNCpZkfLsxic.JPG"],"appId":null,"platform":"webapp","appVisibility":null,"availableLifecycleActions":null,"lifecycleStatus":"INREVIEW","type":"mobileapp","uuid":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0}
       summary: Get app details
       description: |
         Get details of an app.
@@ -182,7 +234,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying App is returned.
           schema:
             $ref: '#/definitions/AppInfo'
@@ -197,24 +249,37 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     put:
       x-scope: 'appm:update'
+      x-wso2-curl: >-
+        curl -v -X PUT
+        'http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0'
+        -d '{"appmeta" :{"path" :
+        "/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk", "package" :
+        "home.jmstudios.calc", "version" :
+        "1.0"},"name":"sample","provider":"admin","platform":"android","version":"1.0.0","banner":"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg","thumbnailUrl":"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg","screenshots":["/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg"],"displayName":"fdyefyeufuegfyugefyue","description":"description","platform":"android","category":"public"}'
+      x-wso2-request: >-
+        {"appmeta" :{"path" :
+        "/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk", "package" :
+        "home.jmstudios.calc", "version" :
+        "1.0"},"name":"sample","provider":"admin","platform":"android","version":"1.0.0","banner":"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg","thumbnailUrl":"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg","screenshots":["/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg"],"displayName":"fdyefyeufuegfyugefyue","description":"description","platform":"android","category":"public"}
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Update an existing App
       description: |
         Update an existing App
@@ -236,7 +301,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Successful response with updated App object
           schema:
             $ref: '#/definitions/App'
@@ -256,30 +321,30 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modifed the last time. 
+                Date and time the resource has been modifed the last time.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -287,6 +352,11 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X DELETE -H "Authorization: Bearer
+        f126676fc6fc2d2d7828220c992c9b15"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Delete App
       description: |
         Delete an existing App
@@ -300,23 +370,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -325,6 +395,12 @@ paths:
   '/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}':
     delete:
       x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X DELETE -H "Authorization: Bearer
+        efef07b7645617b7f03b706b9aa3c4a5"  -d ''
+        "http://localhost:9763/api/appm/publisher/v1.0/
+        apps/webapp/id/af929140-1257-46ed-97c0-d26098e140e9/xacmlpolicies/4"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Delete policy partial mapping from an App
       description: |
         Delete policy partial mapping from an App
@@ -339,23 +415,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -364,6 +440,10 @@ paths:
   '/apps/{appType}/id/{appId}/tags':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/tags"
+      x-wso2-response: '{"tags":["w1","webapptag1","webapptag2"]}'
       summary: Get all Tags of an App
       description: |
         Get a list of available Tags relevant to given App Internal Id.
@@ -377,8 +457,8 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
-            List of qualifying Apps is returned.
+            OK.
+            List of Tags is returned.
           schema:
             $ref: '#/definitions/TagList'
           headers:
@@ -392,24 +472,30 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     put:
       x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X PUT -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
+        -d '{"tags":["tag1"]}'
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: '{"tags":["tag1"]}'
       summary: Add a new tag
       description: |
         Add a new tag into tag collection of a given application type.
@@ -431,50 +517,28 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
-            Successful response with updated App object
-          schema:
-            $ref: '#/definitions/App'
-          headers:
-            Location:
-              description: |
-                The URL of the newly created resource.
-              type: string
-            Content-Type:
-              description: |
-                The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional request.
-              type: string
-            Last-Modified:
-              description: |
-                Date and time the resource has been modifed the last time. 
-                Used by caches, or in conditional requests.
-              type: string
+            OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -482,9 +546,14 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       x-scope: 'appm:create'
-      summary: Delete Tags relevant to an App by App Internal Id
+      x-wso2-curl: >-
+        curl -X DELETE -H "Authorization: Bearer
+        e099014668a524870c2895fe0595f125"  -d '{"tags":["w2"]}'
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Delete Tags relevant to an App
       description: |
-        Delete an existing App
+        Delete Tags relevant to an App by AppId.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -502,23 +571,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -527,6 +596,20 @@ paths:
   '/apps/{appType}/id/{appId}/xacmlpolicies':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/xacmlpolicies"
+      x-wso2-response: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": policy1,"isSharedPartial":
+        true,"policyPartialDesc": null,,"policyPartialId": 1}
       summary: Get all XACML policies relevant to an App
       description: |
         Get a list of XACML policies relevant to an App.
@@ -540,7 +623,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of XACML policies is returned.
           schema:
             $ref: '#/definitions/PolicyPartialList'
@@ -555,23 +638,36 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     post:
+      x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": policy1,"isSharedPartial":
+        true,"policyPartialDesc": null}
       summary: Assign a policy partial to an App
       description: |
         Assign a policy partial to an App
@@ -597,19 +693,23 @@ paths:
             $ref: '#/definitions/Error'
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/subscriptions':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions"
+      x-wso2-response: '{"userIds":["admin","user1","user2"]}'
       summary: Get subscribed user list for an App
       description: |
         Get subscribed user list for an App.
@@ -624,7 +724,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying User List is returned.
           schema:
             $ref: '#/definitions/UserIdList'
@@ -639,19 +739,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -671,10 +771,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -695,22 +795,26 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/lifecycle':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/c9ddf00d-c42f-4299-931c-bcda69c68050/lifecycle"
+      x-wso2-response: '{"actions":["Reject","Approve"],"state":"IN-REVIEW","async":true}'
       summary: Get lifecycle details
       description: |
-        Get lifecycle details.
+        Get lifecycle details of an App.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -721,8 +825,8 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
-            List of qualifying Apps is returned.
+            OK.
+            Details of a lifecycle is returned.
           schema:
             $ref: '#/definitions/LifeCycle'
           headers:
@@ -736,25 +840,27 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/lifecycle-history':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Get lifecycle details
       description: |
         Get lifecycle details.
@@ -768,7 +874,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/LifeCycleHistoryList'
@@ -783,25 +889,28 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/storage/{fileName}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: Retrieving file
       description: |
         Retrieving a file saved with an App.
@@ -827,24 +936,27 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/discover':
     post:
       x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: Discover Apps
       description: |
         Discover Apps.
@@ -861,19 +973,81 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/throttlingtiers':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers"
+      x-wso2-response: >-
+        {"tierList":[{"tierSortKey":1,"tierName":"Bronze","tierDisplayName":"Bronze","tierDescription":"Allows
+        1 request(s) per
+        minute."},{"tierSortKey":20,"tierName":"Gold","tierDisplayName":"Gold","tierDescription":"Allows
+        20 request(s) per
+        minute."},{"tierSortKey":5,"tierName":"Silver","tierDisplayName":"Silver","tierDescription":"Allows
+        5 request(s) per
+        minute."},{"tierSortKey":10000,"tierName":"Unlimited","tierDisplayName":"Unlimited","tierDescription":"Allows
+        unlimited requests"}]}
+      summary: Get all Tiers
+      description: |
+        Get a list of Tiers.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Tiers
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Tiers is returned.
+          schema:
+            $ref: '#/definitions/TierList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/change-lifecycle':
     post:
       summary: Change App Status
+      x-scope: 'appm:publish'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       description: |
         Change the lifecycle of an App
       parameters:
@@ -912,7 +1086,7 @@ paths:
           schema:
             $ref: '#/definitions/ResponseMessage'
           description: |
-            OK. 
+            OK.
             Lifecycle changed successfully.
           headers:
             ETag:
@@ -923,25 +1097,25 @@ paths:
             Last-Modified:
               description: >
                 Date and time the App lifecycle has been modified the last
-                time. 
+                time.
 
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested App does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -950,6 +1124,8 @@ paths:
   '/apps/{appType}/validate-context':
     post:
       x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Validate App Context
       description: |
         Validate App Context.
@@ -966,19 +1142,22 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/stats/{statType}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: Get Stat summary
       description: |
         Get Stat summary results.
@@ -1006,19 +1185,70 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/tags':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
+        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/tags"
+      x-wso2-response: >-
+        [{"name":"webapptag1","noOfOccurrences":1},{"name":"webapptag2","noOfOccurrences":1},{"name":"webapptag3","noOfOccurrences":1}]
+      summary: Get all Tags
+      description: |
+        Get a list of available Tags relevant to given App Type.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Tags is returned.
+          schema:
+            $ref: '#/definitions/TagList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1027,6 +1257,9 @@ paths:
       consumes:
         - multipart/form-data
       x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: Uploading binary files
       description: |
         Uploading .apk/.IPA binary files.
@@ -1043,7 +1276,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Binary file uploaded successfully.
           schema:
             $ref: '#/definitions/Binary'
@@ -1055,24 +1288,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested App does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1081,6 +1314,8 @@ paths:
   '/apps/mobile/binaries/{fileName}':
     get:
       x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Retrieving mobile application binaries
       description: |
         Retrieving .apk, .ipa binaries for mobile apps.
@@ -1093,7 +1328,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Mobile app binary content retrieved successfully.
           schema:
             type: file
@@ -1105,24 +1340,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1131,6 +1366,8 @@ paths:
   '/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Get plist
       description: |
         Plist file of the specified iOS (Apple) mobile app.
@@ -1158,19 +1395,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1179,6 +1416,9 @@ paths:
       consumes:
         - multipart/form-data
       x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: 'Uploading images, pdf, documents files'
       description: |
         Uploading images for banners, screenshots etc.
@@ -1195,7 +1435,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Static content uploaded successfully.
           schema:
             $ref: '#/definitions/StaticContent'
@@ -1207,24 +1447,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1233,6 +1473,8 @@ paths:
   '/apps/static-contents/{fileName}':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: 'Retrieving images, pdf, documents files'
       description: |
         Retrieving images for banners, screenshots etc.
@@ -1245,7 +1487,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Static content Retrieved successfully.
           schema:
             type: file
@@ -1257,125 +1499,46 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/tags':
-    get:
-      x-scope: 'appm:read'
-      summary: Get all Tags
-      description: |
-        Get a list of available Tags relevant to given App Type.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-      tags:
-        - Tags
-      responses:
-        '200':
-          description: |
-            OK. 
-            List of qualifying Apps is returned.
-          schema:
-            $ref: '#/definitions/TagList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            The resource to be updated does not exist.
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/throttlingtiers':
-    get:
-      x-scope: 'appm:read'
-      summary: Get all Tiers
-      description: |
-        Get a list of Tiers.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-      tags:
-        - Tiers
-      responses:
-        '200':
-          description: |
-            OK. 
-            List of Tiers is returned.
-          schema:
-            $ref: '#/definitions/TierList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            The resource to be updated does not exist.
-          schema:
-            $ref: '#/definitions/Error'
   /xacmlpolicies/:
     get:
       x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer e819870696cc39494d12841b5094a411"
+        "http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies"
+      x-wso2-response: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": policy1,"isSharedPartial":
+        true,"policyPartialDesc": null,,"policyPartialId": 1}
       summary: Get all XACML policies
       description: |
         Get a list of XACML policies.
@@ -1389,7 +1552,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of XACML policies is returned.
           schema:
             $ref: '#/definitions/PolicyPartialList'
@@ -1404,25 +1567,30 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/xacmlpolicies/{policyPartialId}/apps':
     get:
       x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b"
+        "http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps"
+      x-wso2-response: >-
+        {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get all Apps mapped to a policy partial
       description: |
         Get a list of available Apps mapped to a policy partial.
@@ -1437,7 +1605,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
@@ -1452,28 +1620,33 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/administration/policygroups/{policyGroupId}/apps':
     get:
       x-scope: 'appm:read'
-      summary: Get apps associated with policy group
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b"
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/policygroups/1/apps"
+      x-wso2-response: >-
+        {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
+      summary: Get apps associated with a policy group
       description: |
-        Get apps associated with policy group.
+        Get apps associated with a given policy group.
       parameters:
         - $ref: '#/parameters/policyGroupId'
         - $ref: '#/parameters/Accept'
@@ -1484,7 +1657,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
@@ -1499,33 +1672,53 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   /administration/xacmlpolicies/validate:
     post:
       x-scope: 'appm:administration'
-      summary: Validate Policy contenr
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99"
+        -d '{  "policyPartial": "<Rule Effect="Permit"
+        RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition></Rule>"}'
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/validate"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: |-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition></Rule>"}
+      summary: Validate Policy content
       description: |
         Create a new App
       parameters:
         - in: body
           name: body
           description: |
-            App object that needs to be added
+            PolicyPartial object that needs to be added
           required: true
           schema:
             $ref: '#/definitions/PolicyPartial'
@@ -1537,34 +1730,57 @@ paths:
         '200':
           description: |
             OK.
-          headers:
-            ETag:
-              description: >
-                Entity Tag of the App. Used by caches, or in conditional
-                request.
-              type: string
-            Last-Modified:
-              description: >
-                Date and time the App lifecycle has been modified the last
-                time. 
-
-                Used by caches, or in conditional requests.
-              type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   /administration/xacmlpolicies/:
     post:
       x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
+        -d '{ "policyPartial": "<Rule Effect="Permit"
+        RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": "ddd",  "isSharedPartial": true,
+        "policyPartialDesc": null}'
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies"
+      x-wso2-response: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": "ddd","isSharedPartial":
+        true,"policyPartialDesc": null,"policyPartialIc": 2}
+      x-wso2-request: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": "ddd","isSharedPartial":
+        true,"policyPartialDesc": null}
       summary: Create a new Policy Partial
       description: |
         Create a new Policy Partial.
@@ -1572,7 +1788,7 @@ paths:
         - in: body
           name: body
           description: |
-            App object that needs to be added
+            PolicyPartial object that needs to be added
           required: true
           schema:
             $ref: '#/definitions/PolicyPartial'
@@ -1583,10 +1799,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -1607,19 +1823,45 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/administration/xacmlpolicies/{policyPartialId}':
     put:
       x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X PUT -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
+        -d '{  "policyPartial": "<Rule Effect="Permit"
+        RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>", "policyPartialName": "ddd", "isSharedPartial":
+        true,"policyPartialDesc": null}'
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": "ddd","isSharedPartial":
+        true,"policyPartialDesc": null}
       summary: Update an existing policy partial
       description: |
         Update an existing policy partial
@@ -1650,31 +1892,31 @@ paths:
             Last-Modified:
               description: >
                 Date and time the App lifecycle has been modified the last
-                time. 
+                time.
 
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1682,6 +1924,20 @@ paths:
             $ref: '#/definitions/Error'
     get:
       x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 5e3e12917945881407eaad1868ea4629"
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40"
+      x-wso2-response: >-
+        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
+              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
+                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
+                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
+              </Apply>
+        </Condition>
+
+        </Rule>","policyPartialName": "ddd","isSharedPartial":
+        true,"policyPartialDesc": null,"policyPartialIc": 2}
       summary: Get policy partial details
       description: |
         Get policy partial.
@@ -1695,7 +1951,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying App is returned.
           schema:
             $ref: '#/definitions/PolicyPartial'
@@ -1710,24 +1966,29 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     delete:
       x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X DELETE -H "Authorization: Bearer
+        5e3e12917945881407eaad1868ea4629"   -d ''
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Delete policy partial
       description: |
         Delete an existing policy partial
@@ -1740,123 +2001,33 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
           schema:
             $ref: '#/definitions/Error'
-  /roles:
-    get:
-      x-scope: 'appm:create'
-      summary: Get all Roles
-      description: |
-        Get a list of available Roles.
-      parameters:
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-      tags:
-        - Roles
-      responses:
-        '200':
-          description: |
-            OK. 
-            List of qualifying Roles are returned.
-          schema:
-            $ref: '#/definitions/RoleIdList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            The resource to be updated does not exist.
-          schema:
-            $ref: '#/definitions/Error'
-  /javapolicies:
-    get:
-      x-scope: 'appm:create'
-      summary: Get available java policies
-      description: |
-        Get available java policies.
-      parameters:
-        - $ref: '#/parameters/isGlobal'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - JavaPolicies
-      responses:
-        '200':
-          description: |
-            OK. 
-            Qualifying App is returned.
-          schema:
-            $ref: '#/definitions/JavaPolicyList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            The resource to be updated does not exist.
-          schema:
-            $ref: '#/definitions/Error'
   /administration/businessowner:
     get:
       x-scope: 'appm:administration'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Get all Business owners
       description: |
         Get a list of available Apps qualifying under a given search condition.
@@ -1868,7 +2039,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Business Owner List is returned.
           schema:
             $ref: '#/definitions/BusinessOwnerList'
@@ -1883,24 +2054,27 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     post:
       x-scope: 'appm:administration'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
       summary: Create a new Business Owner
       description: |
         Create a new Business Owner
@@ -1919,10 +2093,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -1943,19 +2117,21 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/administration/businessowner/{businessOwnerId}':
     get:
       x-scope: 'appm:administration'
+      x-wso2-curl: ''
+      x-wso2-response: ''
       summary: Get a Business owners by Id
       description: |
         Get a Business owners by Id.
@@ -1982,24 +2158,27 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
     put:
       x-scope: 'appm:administration'
+      x-wso2-curl: ''
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: ''
       summary: Update an existing Business Owner
       description: |
         Update an existing Business Owner.
@@ -2023,25 +2202,25 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -2049,6 +2228,10 @@ paths:
             $ref: '#/definitions/Error'
     delete:
       x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/businessowner/"
+      x-wso2-response: HTTP/1.1 200 OK
       summary: Delete Business Owner
       description: |
         Delete an existing Business Owner.
@@ -2061,26 +2244,130 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  /roles:
+    get:
+      x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
+        "http://localhost:9763/api/appm/publisher/v1.0/roles"
+      x-wso2-response: >-
+        {"roleIds": ["admin","Application/app_11_04_001",
+        "Application/app_11_04_002","Application/app_11_04_011"]}
+      summary: Get all Roles
+      description: |
+        Get a list of available Roles.
+      parameters:
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Roles
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Roles are returned.
+          schema:
+            $ref: '#/definitions/RoleIdList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /javapolicies:
+    get:
+      x-scope: 'appm:create'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
+        "http://localhost:9763/api/appm/publisher/v1.0/javapolicies"
+      x-wso2-response: >-
+        {"policyList": [{"id": 5,"displayName": "Publish
+        Statistics:","displayOrder": 5,"description": ""}]}
+      summary: Get available java policies
+      description: |
+        Get available java policies.
+      parameters:
+        - $ref: '#/parameters/isGlobal'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - JavaPolicies
+      responses:
+        '200':
+          description: |
+            OK.
+            Qualifying App is returned.
+          schema:
+            $ref: '#/definitions/JavaPolicyList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
 parameters:
@@ -2088,7 +2375,7 @@ parameters:
     name: appId
     in: path
     description: >
-      **APP ID** consisting of the **UUID** of the App. 
+      **APP ID** consisting of the **UUID** of the App.
 
       The combination of the provider of the app, name of the appId and the
       version is also accepted as a valid App ID.
@@ -2121,7 +2408,7 @@ parameters:
     name: appId
     in: query
     description: >
-      **appId ID** consisting of the **UUID** of the App. 
+      **appId ID** consisting of the **UUID** of the App.
 
       The combination of the provider of the appId, name of the appId and the
       version is also accepted as a valid App ID.
@@ -2169,7 +2456,7 @@ parameters:
     name: offset
     in: query
     description: |
-      Starting point within the complete list of items qualified.  
+      Starting point within the complete list of items qualified.
     default: 0
     type: integer
   fileName:
@@ -2228,7 +2515,7 @@ parameters:
     name: If-Modified-Since
     in: header
     description: |
-      Validator for conditional requests; based on Last Modified header of the 
+      Validator for conditional requests; based on Last Modified header of the
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -2255,13 +2542,13 @@ definitions:
       next:
         type: string
         description: |
-          Link to the next subset of resources qualified. 
+          Link to the next subset of resources qualified.
           Empty if no more resources are to be returned.
         example: /app?limit=1&offset=2&query=
       previous:
         type: string
         description: |
-          Link to the previous subset of resources qualified. 
+          Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /app?limit=1&offset=0&query=
       list:
@@ -2325,7 +2612,7 @@ definitions:
           path:
             type: string
             description: |
-              Application binary file API 
+              Application binary file API
             example: >-
               /publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa
           package:
@@ -2602,13 +2889,13 @@ definitions:
       next:
         type: string
         description: |
-          Link to the next subset of resources qualified. 
+          Link to the next subset of resources qualified.
           Empty if no more resources are to be returned.
         example: /xacmlpolicies?limit=1&offset=2&query=
       previous:
         type: string
         description: |
-          Link to the previous subset of resources qualified. 
+          Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /xacmlpolicies?limit=1&offset=0&query=
       policyList:
@@ -2814,7 +3101,7 @@ definitions:
       error:
         type: array
         description: |
-          If there are more than one error list them out. 
+          If there are more than one error list them out.
           For example, list out validation errors by each field.
         items:
           $ref: '#/definitions/ErrorListItem'
