@@ -703,6 +703,11 @@
           <artifactId>org.wso2.carbon.social.core</artifactId>
           <version>${carbon.store.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-codegen-maven-plugin</artifactId>
+            <version>${swagger.codegen.version}</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -818,6 +823,7 @@
     <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
 
       <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
+      <swagger.codegen.version>2.1.5</swagger.codegen.version>
 
       <!-- ReST API Versions -->
       <cxf.version>3.1.4</cxf.version>
