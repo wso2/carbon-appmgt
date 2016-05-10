@@ -2346,64 +2346,11 @@ definitions:
       uriTemplates:
         type: array
         items:
-          type: object
-          properties:
-            urlPattern:
-              type: string
-              description: |
-                URL pattern of the URI
-              example: /user/details
-            httpVerb:
-              type: string
-              description: |
-                Http verb of the uri pattern
-              example: 'GET,POST,PUT,DELETE,OPTION'
-            policyGroupName:
-              type: string
-              description: |
-                The name of the uri template policy group
-              example: default
+          $ref: '#/definitions/UriTemplate'
       policyGroups:
         type: array
         items:
-          type: object
-          properties:
-            policyGroupName:
-              type: string
-              description: |
-                Name of the policy group
-              example: default
-            description:
-              type: string
-              description: |
-                Description of the policy group
-              example: Default policy group
-            throttlingTier:
-              type: string
-              description: |
-                Throttling tier
-              example: 'Bronze,Silver,Gold,Unlimited'
-            userRoles:
-              type: array
-              items:
-                type: string
-              description: |
-                The name of the uri template policy group
-              example:
-                - admin
-            partialMapping:
-              type: array
-              items:
-                type: string
-              description: |
-                Entitlement policy partial name list
-              example:
-                - sample
-            isAnonymousAccess:
-              type: string
-              description: |
-                Throttling tier
-              example: 'GET,POST,PUT,DELETE,OPTION'
+          $ref: '#/definitions/PolicyGroups'
       marketType:
         type: string
         example: 'enterprise,'
@@ -2430,6 +2377,31 @@ definitions:
       version:
         type: string
         example: 1.0.0
+      logoutURL:
+        type: string
+        example: 'http://logout/sample'
+      businessOwnerName:
+        type: string
+        example: John
+      visibleTenants:
+        type: array
+        items:
+          type: string
+        example:
+          - eng.com
+          - hr.com
+      trackingCode:
+        type: string
+        example: AM_e82dggfde7877
+      skipGateway:
+        type: string
+        example: true/false
+      allowAnonymousAccess:
+        type: string
+        example: true/false
+      acsUrl:
+        type: string
+        example: 'http://apps.wso2.com'
       provider:
         description: >
           If the provider value is not given user invoking the api will be used
@@ -2848,6 +2820,62 @@ definitions:
           - property1
           - property2
           - property3
+  UriTemplate:
+    title: BusinessOwner object
+    properties:
+      urlPattern:
+        type: string
+        description: |
+          URL pattern of the URI
+        example: /user/details
+      httpVerb:
+        type: string
+        description: |
+          Http verb of the uri pattern
+        example: 'GET,POST,PUT,DELETE,OPTION'
+      policyGroupName:
+        type: string
+        description: |
+          The name of the uri template policy group
+        example: default
+  PolicyGroups:
+    properties:
+      policyGroupName:
+        type: string
+        description: |
+          Name of the policy group
+        example: default
+      description:
+        type: string
+        description: |
+          Description of the policy group
+        example: Default policy group
+      throttlingTier:
+        type: string
+        description: |
+          Throttling tier
+        example: 'Bronze,Silver,Gold,Unlimited'
+      userRoles:
+        type: array
+        items:
+          type: string
+        description: |
+          The name of the uri template policy group
+        example:
+          - admin
+      policyPartialMapping:
+        type: array
+        items:
+          type: string
+        description: |
+          Entitlement policy partial name list
+        example:
+          - sample
+      allowAnonymousAccess:
+        type: string
+        description: |
+          Allow anonymous access to mobile
+        example: 'GET,POST,PUT,DELETE,OPTION'
   Error:
     title: Error object returned with 4XX HTTP status
     required:

@@ -326,8 +326,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
+                webApp.setCreatedTime(RestApiPublisherUtils.getCreatedTimeEpoch());
                 applicationId = appProvider.createWebApp(webApp);
-
             }
 
         } catch (AppManagementException e) {

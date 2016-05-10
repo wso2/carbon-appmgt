@@ -750,6 +750,10 @@ public class WebApp extends App{
         this.accessPolicyGroups.add(policyGroup);
     }
 
+    public void setAccessPolicyGroups(List<EntitlementPolicyGroup> accessPolicyGroups) {
+        this.accessPolicyGroups = accessPolicyGroups;
+    }
+
     public List<EntitlementPolicyGroup> getAccessPolicyGroups(){
         return this.accessPolicyGroups;
     }

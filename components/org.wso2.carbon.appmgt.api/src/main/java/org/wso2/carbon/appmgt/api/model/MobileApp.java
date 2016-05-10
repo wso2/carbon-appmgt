@@ -38,7 +38,6 @@ public class MobileApp extends App{
     private String platform;
     private String marketType;
     private String appType;
-    private String banner;
     private String description;
     private String displayName;
     private String thumbnail;
@@ -56,7 +55,6 @@ public class MobileApp extends App{
         this.createdTime = createdTime;
     }
 
-    private String[] appVisibility;
     private Set<String> tags = new LinkedHashSet<String>();
 
     public Set<String> getTags() {
@@ -160,14 +158,6 @@ public class MobileApp extends App{
         this.appType = appType;
     }
 
-    public String getBanner() {
-        return banner;
-    }
-
-    public void setBanner(String banner) {
-        this.banner = banner;
-    }
-
     public String getDisplayName() {
         return displayName;
     }
@@ -224,11 +214,4 @@ public class MobileApp extends App{
         this.screenShots = screenShots;
     }
 
-    public String[] getAppVisibility() {
-        return appVisibility;
-    }
-
-    public void setAppVisibility(String[] appVisibility) {
-        this.appVisibility = appVisibility;
-    }
 }

@@ -1,9 +1,10 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UriTemplateDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
 import java.math.BigDecimal;
 import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.Object;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyGroupsDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,10 +30,10 @@ public class AppDTO  {
   private AppAppmetaDTO appmeta = null;
   
   
-  private List<Object> uriTemplates = new ArrayList<Object>();
+  private List<UriTemplateDTO> uriTemplates = new ArrayList<UriTemplateDTO>();
   
   
-  private List<Object> policyGroups = new ArrayList<Object>();
+  private List<PolicyGroupsDTO> policyGroups = new ArrayList<PolicyGroupsDTO>();
   
   
   private String marketType = null;
@@ -54,6 +55,27 @@ public class AppDTO  {
   
   @NotNull
   private String version = null;
+  
+  
+  private String logoutURL = null;
+  
+  
+  private String businessOwnerName = null;
+  
+  
+  private List<String> visibleTenants = new ArrayList<String>();
+  
+  
+  private String trackingCode = null;
+  
+  
+  private String skipGateway = null;
+  
+  
+  private String allowAnonymousAccess = null;
+  
+  
+  private String acsUrl = null;
   
   
   private String provider = null;
@@ -182,10 +204,10 @@ public class AppDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("uriTemplates")
-  public List<Object> getUriTemplates() {
+  public List<UriTemplateDTO> getUriTemplates() {
     return uriTemplates;
   }
-  public void setUriTemplates(List<Object> uriTemplates) {
+  public void setUriTemplates(List<UriTemplateDTO> uriTemplates) {
     this.uriTemplates = uriTemplates;
   }
 
@@ -194,10 +216,10 @@ public class AppDTO  {
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("policyGroups")
-  public List<Object> getPolicyGroups() {
+  public List<PolicyGroupsDTO> getPolicyGroups() {
     return policyGroups;
   }
-  public void setPolicyGroups(List<Object> policyGroups) {
+  public void setPolicyGroups(List<PolicyGroupsDTO> policyGroups) {
     this.policyGroups = policyGroups;
   }
 
@@ -286,6 +308,90 @@ public class AppDTO  {
   }
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("logoutURL")
+  public String getLogoutURL() {
+    return logoutURL;
+  }
+  public void setLogoutURL(String logoutURL) {
+    this.logoutURL = logoutURL;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("businessOwnerName")
+  public String getBusinessOwnerName() {
+    return businessOwnerName;
+  }
+  public void setBusinessOwnerName(String businessOwnerName) {
+    this.businessOwnerName = businessOwnerName;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("visibleTenants")
+  public List<String> getVisibleTenants() {
+    return visibleTenants;
+  }
+  public void setVisibleTenants(List<String> visibleTenants) {
+    this.visibleTenants = visibleTenants;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("trackingCode")
+  public String getTrackingCode() {
+    return trackingCode;
+  }
+  public void setTrackingCode(String trackingCode) {
+    this.trackingCode = trackingCode;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("skipGateway")
+  public String getSkipGateway() {
+    return skipGateway;
+  }
+  public void setSkipGateway(String skipGateway) {
+    this.skipGateway = skipGateway;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("allowAnonymousAccess")
+  public String getAllowAnonymousAccess() {
+    return allowAnonymousAccess;
+  }
+  public void setAllowAnonymousAccess(String allowAnonymousAccess) {
+    this.allowAnonymousAccess = allowAnonymousAccess;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("acsUrl")
+  public String getAcsUrl() {
+    return acsUrl;
+  }
+  public void setAcsUrl(String acsUrl) {
+    this.acsUrl = acsUrl;
   }
 
   
@@ -616,6 +722,13 @@ public class AppDTO  {
     sb.append("  description: ").append(description).append("\n");
     sb.append("  context: ").append(context).append("\n");
     sb.append("  version: ").append(version).append("\n");
+    sb.append("  logoutURL: ").append(logoutURL).append("\n");
+    sb.append("  businessOwnerName: ").append(businessOwnerName).append("\n");
+    sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
+    sb.append("  trackingCode: ").append(trackingCode).append("\n");
+    sb.append("  skipGateway: ").append(skipGateway).append("\n");
+    sb.append("  allowAnonymousAccess: ").append(allowAnonymousAccess).append("\n");
+    sb.append("  acsUrl: ").append(acsUrl).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  appDefinition: ").append(appDefinition).append("\n");
     sb.append("  isDefaultVersion: ").append(isDefaultVersion).append("\n");

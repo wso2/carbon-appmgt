@@ -39,8 +39,17 @@ public class URITemplate {
 	private List<String> throttlingTiers = new ArrayList<String>();
     private List<EntitlementPolicyPartialMapping> entitlementPolicyPartialMappings;
 	private int policyGroupId;
+	private String policyGroupName;
 
-    public URITemplate(){
+	public String getPolicyGroupName() {
+		return policyGroupName;
+	}
+
+	public void setPolicyGroupName(String policyGroupName) {
+		this.policyGroupName = policyGroupName;
+	}
+
+	public URITemplate(){
         entitlementPolicyPartialMappings = new ArrayList<EntitlementPolicyPartialMapping>();
     }
     public String getUserRoles() { return  userRoles; }

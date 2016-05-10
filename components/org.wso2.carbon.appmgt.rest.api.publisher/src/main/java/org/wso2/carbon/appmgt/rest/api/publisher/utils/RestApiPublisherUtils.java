@@ -21,16 +21,15 @@ package org.wso2.carbon.appmgt.rest.api.publisher.utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * This class contains REST API Publisher related utility operations
@@ -58,6 +57,20 @@ public class RestApiPublisherUtils {
         //Generate UUID for the uploading file
         RestApiUtil.transferFile(fileInputStream, filename, binaryFile.getAbsolutePath());
         return directoryLocation + File.separator + filename;
+    }
+
+    public static String getCreatedTimeEpoch() {
+
+        int prefix = AppMConstants.ASSET_CREATED_DATE_LENGTH;
+        long createdTimeStamp = new Date().getTime();
+        String time = String.valueOf(createdTimeStamp);
+
+        if (time.length() != prefix) {
+            for (int i = 0; i < prefix - time.length(); i++) {
+                time += "0";
+            }
+        }
+        return time;
     }
 
 }

@@ -20,6 +20,8 @@ package org.wso2.carbon.appmgt.api.model;
 
 import org.json.simple.JSONArray;
 
+import java.util.List;
+
 /**
  * EntitlementPolicyGroup class contains properties related to Policy Groups
  */
@@ -30,6 +32,16 @@ public class EntitlementPolicyGroup {
     private String userRoles;
     private boolean allowAnonymous;
     private JSONArray policyPartials; //XACML policies
+    private List<String> xacmlPolicyNames;
+
+    public List<String> getXacmlPolicyNames() {
+        return xacmlPolicyNames;
+    }
+
+    public void setXacmlPolicyNames(List<String> xacmlPolicyNames) {
+        this.xacmlPolicyNames = xacmlPolicyNames;
+    }
+
     private String policyDescription;
 
     public void setPolicyGroupId(int policyGroupId) {

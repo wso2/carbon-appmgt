@@ -20,17 +20,11 @@ package org.wso2.carbon.appmgt.impl;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.*;
 
@@ -74,7 +68,7 @@ public class MobileAppFactory extends AppFactory {
             mobileApp.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
             mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
             mobileApp.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            mobileApp.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
+            mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
                 List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
                         AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));

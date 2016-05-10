@@ -523,45 +523,65 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
+
+        String appId = createWebAppArtifact(webApp);
+        return appId;
+
+    }
+
+    private String createWebAppArtifact(WebApp webApp) throws AppManagementException {
         String artifactId = null;
+
+        GenericArtifactManager artifactManager = null;
         try {
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+            final String webAppName = webApp.getId().getApiName();
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+
+            artifactManager = AppManagerUtil.getArtifactManager(registry,
                     AppMConstants.WEBAPP_ASSET_TYPE);
+
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(webAppName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A duplicate web application already exists for name : " +
+                        webAppName);
+            }
             registry.beginTransaction();
             GenericArtifact genericArtifact =
                     artifactManager.newGovernanceArtifact(new QName(webApp.getId().getApiName()));
             GenericArtifact artifact = AppManagerUtil.createWebAppArtifactContent(genericArtifact, webApp);
             artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            changeLifeCycleStatus(AppMConstants.WEBAPP_LIFE_CYCLE, artifactId, APPLifecycleActions.CREATE.getStatus());
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+
+            Set<String> tagSet = webApp.getTags();
+            if (tagSet != null) {
+                for (String tag : tagSet) {
+                    registry.applyTag(artifactPath, tag);
+                }
+            }
+            if (webApp.getAppVisibility() != null) {
+                AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                        AppMConstants.API_RESTRICTED_VISIBILITY, webApp.getAppVisibility(), artifactPath);
+            }
             String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
             //provider ------provides----> WebApp
             registry.addAssociation(providerPath, artifactPath, AppMConstants.PROVIDER_ASSOCIATION);
-//            Set<String> tagSet = webApp.getTags();
-//            if (tagSet != null && tagSet.size() > 0) {
-//                for (String tag : tagSet) {
-//                    registry.applyTag(artifactPath, tag);
-//                }
-//            }
-
-
-
-//            AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles, artifactPath);
             registry.commitTransaction();
-
-            /* Generate WebApp Definition for Swagger */
-
-
-        } catch (Exception e) {
+        } catch (RegistryException e) {
             try {
                 registry.rollbackTransaction();
             } catch (RegistryException re) {
-                handleException("Error while rolling back the transaction for WebApp: " +
-                        webApp.getId().getApiName(), re);
+                handleException(
+                        "Error while rolling back the transaction for web application: "
+                                + webApp.getId().getApiName(), re);
             }
-            handleException("Error while performing registry transaction operation", e);
+            handleException("Error occurred while creating the web application : " + webApp.getId().getApiName(), e);
         }
-        return "sssss";
-
+        return artifactId;
     }
 
     /**
@@ -1707,7 +1727,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public void updateSubscription(APIIdentifier apiId,String subStatus,int appId) throws
                                                                                    AppManagementException {
-        appMDAO.updateSubscription(apiId,subStatus,appId);
+        appMDAO.updateSubscription(apiId, subStatus, appId);
     }
 
 	/**

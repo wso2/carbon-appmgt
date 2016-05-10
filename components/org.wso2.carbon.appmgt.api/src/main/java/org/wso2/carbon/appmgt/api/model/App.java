@@ -26,6 +26,17 @@ public class App {
     private String type;
     private String uuid;
     private float rating;
+    private String[] appVisibility;
+    private String banner;
+
+
+    public String[] getAppVisibility() {
+        return appVisibility;
+    }
+
+    public void setAppVisibility(String[] appVisibility) {
+        this.appVisibility = appVisibility;
+    }
 
     public String getType() {
         return type;
@@ -49,5 +60,13 @@ public class App {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public String getBanner() {
+        return banner;
+    }
+
+    public void setBanner(String banner) {
+        this.banner = banner;
     }
 }

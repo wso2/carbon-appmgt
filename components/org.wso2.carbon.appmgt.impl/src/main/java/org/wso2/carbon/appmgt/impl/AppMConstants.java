@@ -140,6 +140,8 @@ public final class AppMConstants {
 
     public static final String API_TENANT_CONF_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/" + API_TENANT_CONF;
 
+    public static final int ASSET_CREATED_DATE_LENGTH = 20;
+
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
     public static final String API_OVERVIEW_DISPLAY_NAME = "overview_displayName";
@@ -200,7 +202,11 @@ public final class AppMConstants {
     public static final String APP_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
 
-    public static final String IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String APP_IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String APP_IMAGES_BANNER = "images_banner";
+    public static final String APP_TRACKING_CODE = "overview_trackingCode";
+    public static final String APP_OVERVIEW_ACS_URL = "overview_acsUrl";
+
     public static final String MOBILE_APP_OVERVIEW_NAME = "overview_name";
     public static final String MOBILE_APP_OVERVIEW_PROVIDER = "overview_provider";
     public static final String MOBILE_APP_OVERVIEW_VERSION = "overview_version";
@@ -214,7 +220,6 @@ public final class AppMConstants {
     public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
     public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
     public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
-    public static final String MOBILE_APP_IMAGES_BANNER = "images_banner";
 
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";

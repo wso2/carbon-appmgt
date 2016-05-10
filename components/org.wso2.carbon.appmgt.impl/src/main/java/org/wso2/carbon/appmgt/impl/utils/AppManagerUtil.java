@@ -118,18 +118,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -206,7 +195,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -364,7 +353,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -470,7 +459,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -633,7 +622,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -840,7 +829,7 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
             String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
-            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER, mobileApp.getBanner());
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, mobileApp.getBanner());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID, mobileApp.getAppId());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
@@ -855,29 +844,41 @@ public final class AppManagerUtil {
 		return artifact;
 	}
 
-    public static GenericArtifact createWebAppArtifactContent(GenericArtifact artifact, WebApp api)
+    /**
+     * Generate WebApp GenericArtifact content from Webapp
+     * @param artifact Webapp GenericArtifact
+     * @param webApp WebApp
+     * @return GenericArtifact
+     * @throws AppManagementException
+     */
+    public static GenericArtifact createWebAppArtifactContent(GenericArtifact artifact, WebApp webApp)
             throws
             AppManagementException {
         try {
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, api.getId().getApiName());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, api.getId().getVersion());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, api.getContext());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, api.getId().getProviderName());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, api.getDescription());
-            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, api.getTreatAsASite());
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, api.getUrl());
-
-
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, api.getDisplayName());
-
-            artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, api.getTransports());
-            artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(
-                    api.isDefaultVersion()));
-
-
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, webApp.getId().getApiName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, webApp.getId().getVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, webApp.getContext());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(webApp.getId().getProviderName()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl());
+            artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, webApp.getThumbnailUrl());
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, webApp.getBanner());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(webApp.getAppVisibility()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS, webApp.getVisibleTenants());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, webApp.getTransports());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TIER, "Unlimited");
+            artifact.setAttribute(AppMConstants.APP_TRACKING_CODE, webApp.getTrackingCode());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, webApp.getCreatedTime());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, Boolean.toString(webApp.getAllowAnonymous()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
 
         } catch (GovernanceException e) {
-            String msg = "Failed to create WebApp for : " + api.getId().getApiName();
+            String msg = "Failed to create WebApp for : " + webApp.getId().getApiName();
             log.error(msg, e);
             throw new AppManagementException(msg, e);
         }
@@ -1896,7 +1897,7 @@ public final class AppManagerUtil {
 
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 			int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
 			try {

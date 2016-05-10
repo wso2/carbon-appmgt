@@ -2764,68 +2764,13 @@
                 "uriTemplates": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "urlPattern": {
-                                "type": "string",
-                                "description": "URL pattern of the URI \n",
-                                "example": "/user/details"
-                            },
-                            "httpVerb": {
-                                "type": "string",
-                                "description": "Http verb of the uri pattern\n",
-                                "example": "GET,POST,PUT,DELETE,OPTION"
-                            },
-                            "policyGroupName": {
-                                "type": "string",
-                                "description": "The name of the uri template policy group\n",
-                                "example": "default"
-                            }
-                        }
+                        "$ref": "#/definitions/UriTemplate"
                     }
                 },
                 "policyGroups": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "policyGroupName": {
-                                "type": "string",
-                                "description": "Name of the policy group \n",
-                                "example": "default"
-                            },
-                            "description": {
-                                "type": "string",
-                                "description": "Description of the policy group \n",
-                                "example": "Default policy group"
-                            },
-                            "throttlingTier": {
-                                "type": "string",
-                                "description": "Throttling tier\n",
-                                "example": "Bronze,Silver,Gold,Unlimited"
-                            },
-                            "userRoles": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "description": "The name of the uri template policy group\n",
-                                "example": ["admin"]
-                            },
-                            "partialMapping": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "description": "Entitlement policy partial name list\n",
-                                "example": ["sample"]
-                            },
-                            "isAnonymousAccess": {
-                                "type": "string",
-                                "description": "Throttling tier\n",
-                                "example": "GET,POST,PUT,DELETE,OPTION"
-                            }
-                        }
+                        "$ref": "#/definitions/PolicyGroups"
                     }
                 },
                 "marketType": {
@@ -2858,6 +2803,40 @@
                 "version": {
                     "type": "string",
                     "example": "1.0.0"
+                },
+                "logoutURL": {
+                    "type": "string",
+                    "example": "http://logout/sample"
+                },
+                "businessOwnerName": {
+                    "type": "string",
+                    "example": "John"
+                },
+                "visibleTenants": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "eng.com",
+                        "hr.com"
+                    ]
+                },
+                "trackingCode": {
+                    "type": "string",
+                    "example": "AM_e82dggfde7877"
+                },
+                "skipGateway": {
+                    "type": "string",
+                    "example": "true/false"
+                },
+                "allowAnonymousAccess": {
+                    "type": "string",
+                    "example": "true/false"
+                },
+                "acsUrl": {
+                    "type": "string",
+                    "example": "http://apps.wso2.com"
                 },
                 "provider": {
                     "description": "If the provider value is not given user invoking the api will be used as the provider.\n",
@@ -3382,6 +3361,67 @@
                         "property2",
                         "property3"
                     ]
+                }
+            }
+        },
+        "UriTemplate": {
+            "title": "URI Template Definition",
+            "properties": {
+                "urlPattern": {
+                    "type": "string",
+                    "description": "URL pattern of the URI \n",
+                    "example": "/user/details"
+                },
+                "httpVerb": {
+                    "type": "string",
+                    "description": "Http verb of the uri pattern\n",
+                    "example": "GET,POST,PUT,DELETE,OPTION"
+                },
+                "policyGroupName": {
+                    "type": "string",
+                    "description": "The name of the uri template policy group\n",
+                    "example": "default"
+                }
+            }
+        },
+        "PolicyGroups": {
+            "title": "Policy Group Definition",
+            "properties": {
+                "policyGroupName": {
+                    "type": "string",
+                    "description": "Name of the policy group \n",
+                    "example": "default"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the policy group \n",
+                    "example": "Default policy group"
+                },
+                "throttlingTier": {
+                    "type": "string",
+                    "description": "Throttling tier\n",
+                    "example": "Bronze,Silver,Gold,Unlimited"
+                },
+                "userRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "The name of the uri template policy group\n",
+                    "example": ["admin"]
+                },
+                "policyPartialMapping": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Entitlement policy partial name list\n",
+                    "example": ["sample"]
+                },
+                "allowAnonymousAccess": {
+                    "type": "string",
+                    "description": "Allow anonymous access to mobile \n",
+                    "example": "GET,POST,PUT,DELETE,OPTION"
                 }
             }
         },
