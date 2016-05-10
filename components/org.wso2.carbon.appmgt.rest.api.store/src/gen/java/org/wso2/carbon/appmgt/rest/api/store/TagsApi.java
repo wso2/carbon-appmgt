@@ -32,7 +32,7 @@ public class TagsApi  {
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Get apps with given tag", notes = "Get app list with given tag.", response = AppListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nQualifying App is returned."),
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nList of Apps is returned."),
         
         @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error."),
         

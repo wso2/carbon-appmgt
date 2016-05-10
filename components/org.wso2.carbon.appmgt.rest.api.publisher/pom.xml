@@ -171,6 +171,24 @@
                 </executions>
             </plugin>
 
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_webapp_rest_api_fork/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.publisher/src/main/resources/publisher-api.yaml</inputSpec>
+                            <language>dynamic-html</language>
+                            <templateDirectory>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_webapp_rest_api_fork/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.util/src/main/resources/doc-templates</templateDirectory>
+                            <output>src/main/resources/api-docs</output>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!--   Uncomment when needed to generate swagger based skeleton   -->
            <plugin>
                <groupId>org.wso2.maven.plugins</groupId>
