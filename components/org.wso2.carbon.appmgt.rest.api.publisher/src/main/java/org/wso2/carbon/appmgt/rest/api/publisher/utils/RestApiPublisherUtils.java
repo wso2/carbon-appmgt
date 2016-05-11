@@ -67,7 +67,7 @@ public class RestApiPublisherUtils {
 
         if (time.length() != prefix) {
             for (int i = 0; i < prefix - time.length(); i++) {
-                time += "0";
+                time =  "0"+time;
             }
         }
         return time;

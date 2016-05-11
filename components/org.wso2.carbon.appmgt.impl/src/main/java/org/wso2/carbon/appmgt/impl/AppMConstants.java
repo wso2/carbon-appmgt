@@ -149,7 +149,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_CONTEXT = "overview_context";
     public static final String API_OVERVIEW_DESCRIPTION = "overview_description";
     public static final String API_OVERVIEW_ENDPOINT_URL = "overview_webAppUrl";//ES converts names to Camel case
-    public static final String API_OVERVIEW_LOGOUT_URL = "overview_webAppUrl";
+    public static final String API_OVERVIEW_LOGOUT_URL = "overview_logoutUrl";
     public static final String API_OVERVIEW_SANDBOX_URL = "overview_sandboxUrl";
     public static final String API_OVERVIEW_WSDL = "overview_wsdl";
     public static final String API_OVERVIEW_WADL = "overview_wadl";
@@ -722,6 +722,7 @@ public final class AppMConstants {
         public static final String SUBMIT_FOR_REVIEW = "Submit for Review";
         public static final String PUBLISH = "Publish";
         public static final String RE_PUBLISH = "Re-Publish";
+        public static final String CREATE = "Create";
     }
 
 }
