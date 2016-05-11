@@ -53,12 +53,14 @@ require('/modules/publisher.js').exec(function(ctx) {
     function getBusinessOwner() {
         var businessOwnerList = apiProvider.getBusinessOwners();
         var ownersList = JSON.parse(stringify(businessOwnerList));
-        var nameList = new Array();
-        var nameList = new Array();
+        var nameList = [];
+        var businessOwnerNameAndEmail;
+        //nameList.push({id:-1, text:'--Select Business Owner--'});
         for (var i = 0; i < ownersList.length; i++) {
-            nameList.push(ownersList[i].businessOwnerName);
+            ownerNameAndEmail = ownersList[i].businessOwnerName + " (" + ownersList[i].businessOwnerEmail + ")";
+            nameList.push({id:ownersList[i].businessOwnerId, text:ownerNameAndEmail});
         }
-        return nameList;
+        return stringify(nameList);
     }
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
@@ -170,7 +172,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var path = artifact.path;
         var tags = rxtManager.registry.tags(path);
         var title = assetName;
-
         //get document related data
         var apiData = {};
         apiData.provider = model.get('overview.provider').value;
@@ -183,7 +184,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var appStoresDetail = {};
         appStoresDetail.app = apiData;
         appStoresDetail.externalStores = externalAppStores;
-
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);

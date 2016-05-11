@@ -39,8 +39,7 @@ public interface APIProvider extends APIManager {
      * @param businessOwnerId ID of the owner.
      * @throws AppManagementException
      */
-    public void deleteBusinessOwner(String businessOwnerId) throws
-                                                   AppManagementException;
+    public String deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
 
     /**
      * update a Business Owner.
@@ -57,7 +56,7 @@ public interface APIProvider extends APIManager {
      * @return
      * @throws AppManagementException
      */
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException;
+    public  List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException;
     /**
      * @return
      * @throws AppManagementException
@@ -65,11 +64,37 @@ public interface APIProvider extends APIManager {
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
 
     /**
+     * Return the owner properties of the given owner Id.
+     *
+     * @param ownerId Business owner Id.
+     * @return
+     * @throws AppManagementException if failed to get business owner.
+     */
+    public BusinessOwner getBusinessOwner(int ownerId) throws AppManagementException;
+
+    /**
+     * Get the business owners for a search value with pagination.
+     * @param startIndex
+     * @param pageSize
+     * @param searchValue
+     * @return
+     * @throws AppManagementException
+     */
+    public List<BusinessOwner> getBusinessOwnersWithPagination(int startIndex, int pageSize, String searchValue) throws
+                                                                                              AppManagementException;
+
+    /**
+     * Get the count of business owners.
+     * @return
+     * @throws AppManagementException
+     */
+    public  int getBusinessOwnersCount() throws AppManagementException;
+    /**
      * Save a Business Owner.
      * @return Integer
      * @throws AppManagementException
      */
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+    public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
     /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *

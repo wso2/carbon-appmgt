@@ -23,37 +23,42 @@ var businessOwnerApi = require('/modules/businessOwners-api.js');
 var uriMatcher = new URIMatcher(request.getRequestURI());
 var log = new Log();
 //POST patterns
-var saveOwner = '/{context}/apis/businessowners/save';
-var ownerList = '/{context}/apis/businessowners/list';
+var saveOrGetOwner = '/{context}/apis/businessowners';
 var ownerUpdate = '/{context}/apis/businessowners/update';
-var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
-var OwnerCustomProperties = '/{context}/apis/businessowners/details/{ownerId}';
+var deleteOrGetOwners = '/{context}/apis/businessowners/{ownerId}';
 
 if (method == 'GET') {
-    if (uriMatcher.match(ownerList)) {
-        print(businessOwnerApi.getBusinessOwner());
+    if (uriMatcher.match(saveOrGetOwner)) {
+        var draw = request.getParameter("draw");
+        var start = request.getParameter("start");
+        var length = request.getParameter("length");
+        var search = request.getParameter("search[value]");
+        print(businessOwnerApi.getBusinessOwners(start,length,draw, search));
     }
-    if (uriMatcher.match(OwnerCustomProperties)) {
-        print(businessOwnerApi.getBusineeOwnerDataCustomProperties(uriMatcher.elements().ownerId));
+    if (uriMatcher.match(deleteOrGetOwners)) {
+        print(businessOwnerApi.getBusinessOwner(uriMatcher.elements().ownerId));
     }
 }
 
 if (method == 'DELETE') {
-    if (uriMatcher.match(ownerDelete)) {
+    if (uriMatcher.match(deleteOrGetOwners)) {
         print(businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId));
     }
 }
 if (method == 'POST') {
-    if (uriMatcher.match(saveOwner)) {
+    if (uriMatcher.match(saveOrGetOwner)) {
         var businessOwnerName = request.getParameter("businessOwnerName");
         var businessOwnerEmail = request.getParameter("businessOwnerEmail");
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerProperties = request.getParameter("businessOwnerProperties");
 
-        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerProperties)));
+        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail,
+                                                              businessOwnerDescription, businessOwnerSite,
+                                                              businessOwnerProperties)));
     }
-
+}
+if (method == 'POST') {
     if (uriMatcher.match(ownerUpdate)) {
         var businessOwnerId = request.getParameter("businessOwnerId");
         var businessOwnerName = request.getParameter("businessOwnerName");

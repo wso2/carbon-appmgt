@@ -35,7 +35,6 @@ var render=function(theme,data,meta,require){
             heading = "Create New Web Application";
             break;
         case 'view':
-            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             data = require('/helpers/view-asset.js').merge(data);
             data.typeList = typeList;
             listPartial = 'view-asset';
@@ -48,10 +47,14 @@ var render=function(theme,data,meta,require){
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
-            data.businessOwnerName = businessOwnerName;
+            var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
+            if (businessOwnerAttribute != "null") {
+                var businessOwner =  apiProvider.getBusinessOwner(businessOwnerAttribute);
+                data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
+                data.businessOwner = businessOwner;
+            }
             break;
         case 'edit':
-            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
             if(data.artifact.lifecycleState == "Published"){
                 editEnabled = false;
@@ -67,7 +70,11 @@ var render=function(theme,data,meta,require){
             var copyOfData = parse(stringify(data));
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
-            data.businessOwnerName = businessOwnerName;
+            var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
+            if (businessOwnerAttribute != "null") {
+                var businessOwner =  apiProvider.getBusinessOwner(businessOwnerAttribute);
+                data.businessOwner = businessOwner;
+            }
             break;
         case 'lifecycle':
             listPartial='lifecycle-asset';

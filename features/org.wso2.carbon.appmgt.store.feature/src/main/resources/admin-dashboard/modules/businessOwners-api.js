@@ -50,10 +50,14 @@ function  updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerE
     return apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
 }
 
-var getBusinessOwner = function () {
-    return apiProvider.getBusinessOwners();
+function getBusinessOwners(start, length, draw, search) {
+    return apiProvider.getBusinessOwnersWithPagination(start, length, draw, search);
 };
 
-function getBusineeOwnerDataCustomProperties(ownerId) {
-    return apiProvider.getBusinessOwnerCustomProperties(ownerId);
+function getBusinessOwner(ownerId) {
+    return apiProvider.getBusinessOwner(ownerId);
+};
+
+function searchBusinessOwners(searchValue) {
+    return apiProvider.searchBusinessOwners(searchValue);
 };

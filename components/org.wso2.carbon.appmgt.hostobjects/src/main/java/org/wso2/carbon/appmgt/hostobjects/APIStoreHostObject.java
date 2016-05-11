@@ -40,6 +40,7 @@ import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperties;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -234,29 +235,29 @@ public class APIStoreHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
         }
 
-        String appId = args[0].toString();
+        int ownerId = Integer.valueOf(args[0].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(ownerId);
         NativeObject row = new NativeObject();
         row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
         row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
         row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
         row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
         row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-        Map<String, String> businessOwnerDetails = null;
-        businessOwnerDetails = businessOwner.getBusinessOwnerCustomProperties();
-        JSONObject businessOwnerDetailsObject = new JSONObject();
-        if(businessOwnerDetails != null) {
-            Set<String> keySet = businessOwnerDetails.keySet();
-            for (String key : keySet) {
-                businessOwnerDetailsObject.put(key, businessOwnerDetails.get(key));
+        List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+        if(businessOwnerPropertiesList != null) {
+            JSONObject businessOwnerPropertiesObject = new JSONObject();
+            for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
+                JSONObject businessOwnerPropertyObject = new JSONObject();
+                BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                businessOwnerPropertyObject.put("propertyValue", businessOwnerProperties.getPropertyValue());
+                businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperties.isShowingInStore());
+                businessOwnerPropertiesObject.put(businessOwnerProperties.getPropertyId(),businessOwnerPropertyObject);
             }
-            row.put("businessOwnerDeatails", row, businessOwnerDetailsObject.toJSONString());
+            row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
         } else {
-            row.put("businessOwnerDeatails", row, null);
+            row.put("businessOwnerProperties", row, null);
         }
-
-
         return row;
     }
 

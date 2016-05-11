@@ -106,6 +106,11 @@ $( document ).ready(function() {
         }
     });
 
+    $(".selectOwnerName").change(function() {
+        var data = $('.selectOwnerName').select2('data')[0]['id'];
+        $('#overview_businessOwner').val(data);
+    });
+
     $(".anonymous_checkbox").click(function(){
         var output = [];
         $( ".anonymous_checkbox" ).each(function( index ) {
