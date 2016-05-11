@@ -4241,6 +4241,21 @@ public class APIProviderHostObject extends ScriptableObject {
         return false;
     }
 
+    /**
+     * Returns binary file storage location configured in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return file storage location
+     * @throws AppManagementException
+     */
+    public static String jsFunction_getBinaryFileStorage(Context cx, Scriptable thisObj, Object[] args,
+                                                         Function funObj) throws AppManagementException {
+        return HostObjectUtils.getBinaryStorageConfiguration();
+    }
+
 }
 
 

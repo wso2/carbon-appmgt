@@ -71,6 +71,7 @@ require('/modules/publisher.js').exec(function(ctx) {
     };
 
     var saveFile = function(file){
+        var binaryFileLocation = apiProvider.getBinaryFileStorage();
         if(file!=undefined){
             var file_n= file.getName();
             file_n = "." + file_n.split('.').pop();
@@ -79,10 +80,10 @@ require('/modules/publisher.js').exec(function(ctx) {
             }
             var uid= makeid();
 
-            if(mam_config.filePreciseLocation.substring(0, 1) === "/"){
-                var file_name = mam_config.filePreciseLocation+uid+file_n;
-            }else{
-                var file_name = Packages.java.lang.System.getProperty("carbon.home") + "/" + mam_config.filePreciseLocation+uid+file_n;
+            if (mam_config.filePreciseLocation.substring(0, 1) === "/") {
+                var file_name = binaryFileLocation + uid + file_n;
+            } else {
+                var file_name = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + uid + file_n;
             }
 
 
@@ -96,20 +97,21 @@ require('/modules/publisher.js').exec(function(ctx) {
                 fileTemp.close();
             }
 
-            return contextPath + mam_config.fileAPILocation + uid + file_n;
+            return uid + file_n;
 
         }
         return "";
     };
 
     var copyFile = function(fileName){
+        var binaryFileLocation = apiProvider.getBinaryFileStorage();
         if(fileName){
             var fileLocation ;
 
             if(mam_config.filePreciseLocation.substring(0, 1) === "/"){
-                fileLocation = mam_config.filePreciseLocation;
+                fileLocation = binaryFileLocation;
             }else{
-                fileLocation = Packages.java.lang.System.getProperty("carbon.home") + "/" + mam_config.filePreciseLocation;
+                fileLocation = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation;
             }
             //check existence of file
             var oldFile = new File('file://'+fileLocation+fileName);
@@ -139,7 +141,7 @@ require('/modules/publisher.js').exec(function(ctx) {
             } finally{
                 fileTemp.close();
             }
-            return contextPath + mam_config.fileAPILocation + newFileName;
+            return newFileName;
         }
         return "";
     };

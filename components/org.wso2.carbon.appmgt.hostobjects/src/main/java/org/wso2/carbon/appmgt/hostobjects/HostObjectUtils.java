@@ -215,4 +215,15 @@ public class HostObjectUtils {
         subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
         return subscriptionCofig;
     }
+
+    /**
+     * Returns binary file storage location configuration
+     *
+     * @return storage location of images, mobile binaries
+     */
+    public static String getBinaryStorageConfiguration() {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        String binaryStorageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        return binaryStorageLocation;
+    }
 }

@@ -1726,4 +1726,18 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
             throws AppManagementException {
         return appMDAO.hasFavouritePage(username, tenantIdOfUser, tenantIdOfStore);
     }
+
+    @Override
+    public boolean isSubscribedToMobileApp(String userId, String appId) throws AppManagementException {
+        String path = "users/" + userId + "/subscriptions/mobileapp/" + appId;
+        boolean isSubscribed = false;
+        try {
+            if (registry.resourceExists(path)) {
+                isSubscribed = true;
+            }
+        } catch (org.wso2.carbon.registry.api.RegistryException e) {
+            handleException("Error while checking subscription in registry for mobileapp with id : " + appId, e);
+        }
+        return isSubscribed;
+    }
 }

@@ -1,0 +1,65 @@
+<%
+include('/extensions/assets/webapp/modules/jagg/jagg.jag');
+var storeObj = jagg.module("manager").getAPIStoreObj();
+
+var username = require('store').server.current(session);
+var caramel = require('caramel');
+
+var matcher = new URIMatcher(request.getRequestURI());
+matcher.match('/{context}/api/mobileapp/getfile/{filename}');
+var fileName = matcher.elements().filename;
+
+var binaryFileLocation = storeObj.getBinaryFileStorage();
+
+if (binaryFileLocation.substring(0, 1) === "/") {
+    var path = binaryFileLocation + fileName;
+} else {
+    var path = Packages.java.lang.System.getProperty("carbon.home") + "/" + binaryFileLocation + fileName;
+}
+
+var mime = "application/octet-stream"
+
+var ext = (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName) : undefined;
+ext = ext[0].toLowerCase();
+
+switch (ext) {
+
+    case "png"  :
+        mime = "image/png"
+        break;
+    case "jpg"  :
+        mime = "image/jpg"
+        break;
+    case "jpeg"  :
+        mime = "image/jpeg"
+        break;
+    case "apk":
+    case "ipa":
+        break;
+}
+
+try {
+    var file = new File("file://" + path);
+    if (file.isExists()) {
+        if (ext == "apk" || ext == "ipa") {
+            var username = require('store').server.current(session);
+            if (!username) {
+                response.sendRedirect(caramel.configs().context + "/login");
+            }
+        }
+        response.addHeader('Content-Type', mime);
+        file.open("r");
+        print(file.getStream());
+        file.close();
+    } else {
+        response.sendError(400);
+    }
+} catch (e) {
+    response.sendError(400);
+}
+
+function isUserSubscribed(){
+
+}
+
+%>
