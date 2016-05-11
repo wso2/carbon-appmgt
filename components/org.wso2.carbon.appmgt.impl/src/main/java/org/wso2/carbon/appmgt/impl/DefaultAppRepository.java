@@ -3,10 +3,7 @@ package org.wso2.carbon.appmgt.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -15,6 +12,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.h2.osgi.utils.CarbonUtils;
 import org.wso2.carbon.registry.api.RegistryService;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -85,7 +83,7 @@ public class DefaultAppRepository implements AppRepository {
                 savePolicyGroups(webApp, connection);
                 appId = saveRegistryArtifact(app);
                 saveAppToRDMS(webApp, connection);
-                saveServiceProvider(webApp, connection);
+                saveServiceProvider(webApp);
             } catch (SQLException e) {
                 try {
                     connection.rollback();
@@ -166,7 +164,42 @@ public class DefaultAppRepository implements AppRepository {
         return -1;
     }
 
-    private void saveServiceProvider(WebApp app, Connection connection) {
+    private void saveServiceProvider(WebApp app) {
+
+     SSOProvider ssoProvider = new SSOProvider();
+        APIIdentifier appIdentifier = app.getId();
+        String providerName = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.SSO_CONFIGURATOR_NAME);
+        String version = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.SSO_CONFIGURATOR_VERSION);
+        ssoProvider.setProviderName(providerName);
+        ssoProvider.setProviderVersion(version);
+
+
+//
+
+//        if (tenantIdVal != '-1234') {
+//            ssoProvider.setIssuerName(params.app_name + "-" + tenantDomain + "-" + params.app_verison);
+//        } else {
+//            ssoProvider.setIssuerName(params.app_name + "-" + params.app_verison);
+//        }
+//
+//        ssoProvider.setClaims(params.claims);
+//
+//        if(params.logout_url != null && params.logout_url != ' '){
+//            ssoProvider.setLogoutUrl(params.logout_url);
+//        }
+//
+//        webApp.setSsoProviderDetails(ssoProvider);
+//        webApp.setContmod-ext(params.app_context);
+//        webApp.setTransports(params.app_transport);
+//
+//        var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
+//        if(type == 'editConfig'){
+//            ssoConfigUtil.createSSOProvider(webApp, true);
+//        }else {
+//            ssoConfigUtil.createSSOProvider(webApp, false);
+//        }
 
     }
 

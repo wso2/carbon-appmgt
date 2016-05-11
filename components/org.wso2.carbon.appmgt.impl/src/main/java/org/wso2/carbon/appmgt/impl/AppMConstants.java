@@ -424,6 +424,10 @@ public final class AppMConstants {
     public static final String CORS_CONFIGURATION_ACCESS_CTL_ALLOW_METHODS = CORS_CONFIGURATION + "Access-Control-Allow-Methods";
 
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
+    public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
+    public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";
+    public static final String SSO_CONFIGURATOR_NAME = SSO_CONFIGURATOR + "name";
+    public static final String SSO_CONFIGURATOR_VERSION = SSO_CONFIGURATOR + "version";
     public static final String SSO_CONFIGURATION_IDENTITY_PROVIDER_URL = SSO_CONFIGURATION + "IdentityProviderUrl";
     public static final String SSO_CONFIGURATION_ENABLE_SSO_CONFIGURATION = SSO_CONFIGURATION + "EnableSamlSSOConfig";
     public static final String SSO_CONFIGURATION_IDENTITY_PROVIDER_MANAGER = SSO_CONFIGURATION + "IdPManager";
