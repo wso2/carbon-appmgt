@@ -26,7 +26,7 @@
         asset = store.asset('mobileapp', app);
 
 
-        if( asset.attributes.overview_visibility != "null"){
+        if(asset.attributes.overview_visibility){
 
                 var assetRoles = asset.attributes.overview_visibility.split(",");
                 var um = server.userManager(tenantId);
