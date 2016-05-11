@@ -56,7 +56,7 @@ public class TagsApiServiceImpl extends TagsApiService {
             }
             appIDListDTO.setAppIds(appIds);
         } catch (AppManagementException e) {
-            String errorMessage = "Error while retrieving Apps by tag:" + tagName;
+            String errorMessage = "Error while retrieving Apps by Tag:" + tagName;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(appIDListDTO).build();
