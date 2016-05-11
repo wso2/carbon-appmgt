@@ -39,7 +39,6 @@ public class MobileApp extends App{
     private String marketType;
     private String appType;
     private String description;
-    private String displayName;
     private String thumbnail;
     private String[] availableLifecycleActions;
     private String recentChanges;
@@ -156,14 +155,6 @@ public class MobileApp extends App{
 
     public void setAppType(String appType) {
         this.appType = appType;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public String getDescription() {
