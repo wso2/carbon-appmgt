@@ -11,12 +11,14 @@ import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.api.RegistryService;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -49,10 +51,10 @@ public class DefaultAppRepository implements AppRepository {
         try {
             String loggedInUsername = CarbonContext.getThreadLocalCarbonContext().getUsername();
 
-            this.tenantDomain = MultitenantUtils.getTenantDomain(username);
             this.username = MultitenantUtils.getTenantAwareUsername(loggedInUsername);
+            this.tenantDomain = MultitenantUtils.getTenantDomain(username);
             ;
-            this.tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(username);
+            this.tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomain);
             AppManagerUtil.loadTenantRegistry(tenantId);
             this.registry = ServiceReferenceHolder.getInstance().
                     getRegistryService().getGovernanceUserRegistry(username, tenantId);
@@ -66,6 +68,7 @@ public class DefaultAppRepository implements AppRepository {
 
     @Override
     public String saveApp(App app) throws AppManagementException {
+        String appId = null;
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
 
@@ -80,7 +83,7 @@ public class DefaultAppRepository implements AppRepository {
 
             try {
                 savePolicyGroups(webApp, connection);
-                saveRegistryArtifact(app);
+                appId = saveRegistryArtifact(app);
                 saveAppToRDMS(webApp, connection);
                 saveServiceProvider(webApp, connection);
             } catch (SQLException e) {
@@ -94,7 +97,7 @@ public class DefaultAppRepository implements AppRepository {
         }
 
 
-        return null;
+        return appId;
     }
 
     private void savePolicyGroups(WebApp app, Connection connection) throws SQLException {
@@ -188,6 +191,11 @@ public class DefaultAppRepository implements AppRepository {
 
         GenericArtifactManager artifactManager = null;
         try {
+            //Check whether the user has enough permissions to change lifecycle
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
             artifactManager = AppManagerUtil.getArtifactManager(registry,
                     AppMConstants.WEBAPP_ASSET_TYPE);
             registry.beginTransaction();
@@ -197,8 +205,16 @@ public class DefaultAppRepository implements AppRepository {
             artifactManager.addGenericArtifact(appArtifact);
             artifactId = appArtifact.getId();
 
+            //Get system registry for logged in tenant domain
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GenericArtifactManager systemRegistryArtifactManager = AppManagerUtil.getArtifactManager(systemRegistry,
+                    AppMConstants.WEBAPP_ASSET_TYPE);
+            GenericArtifact systemRegistryArtifact = artifactManager.getGenericArtifact(artifactId);
+
+
             //Promote app lifecycle 'Initial' --> 'Created'
-            appArtifact.invokeAction(AppMConstants.LifecycleActions.CREATE, AppMConstants.WEBAPP_LIFE_CYCLE);
+            systemRegistryArtifact.invokeAction(AppMConstants.LifecycleActions.CREATE, AppMConstants.WEBAPP_LIFE_CYCLE);
             String artifactPath = GovernanceUtils.getArtifactPath(registry, appArtifact.getId());
 
             Set<String> tagSet = webApp.getTags();
@@ -213,6 +229,9 @@ public class DefaultAppRepository implements AppRepository {
             }
             String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
             registry.addAssociation(providerPath, artifactPath, AppMConstants.PROVIDER_ASSOCIATION);
+
+
+
             registry.commitTransaction();
         } catch (RegistryException e) {
             try {

@@ -313,8 +313,8 @@ public class AppsApiServiceImpl extends AppsApiService {
         beanValidator = new BeanValidator();
         //Validate common mandatory fields for mobile and webapp
         beanValidator.validate(body);
-        AppDTO appDTO = new AppDTO();
-        AppDTOValidator.validateAppDTO(appType, appDTO);
+        Map<String, String> response = new HashMap<>();
+        AppDTOValidator.validateAppDTO(appType, body);
         String applicationId = null;
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -322,14 +322,13 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                 MobileApp mobileApp = APPMappingUtil.fromDTOtoMobileApp(body);
                 applicationId = appProvider.createMobileApp(mobileApp);
-                appDTO.setId(applicationId);
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
 
                 WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
                 webApp.setCreatedTime(RestApiPublisherUtils.getCreatedTimeEpoch());
                 applicationId = appProvider.createWebApp(webApp);
             }
-
+            response.put("AppId", applicationId);
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceAlreadyExisting(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
                 RestApiUtil.handleConflictException("A duplicate "+appType+" already exists with the name : "
@@ -340,7 +339,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
 
-        return Response.ok().entity(appDTO).build();
+        return Response.ok().entity(response).build();
     }
 
 

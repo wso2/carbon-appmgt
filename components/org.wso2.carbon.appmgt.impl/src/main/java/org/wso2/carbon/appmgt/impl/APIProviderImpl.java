@@ -524,7 +524,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
 
-        String appId = createWebAppArtifact(webApp);
+        AppRepository appRepository = new DefaultAppRepository();
+        String appId = appRepository.saveApp(webApp);
         return appId;
 
     }
