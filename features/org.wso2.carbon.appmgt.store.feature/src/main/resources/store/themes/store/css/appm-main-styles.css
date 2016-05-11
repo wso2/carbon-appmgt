@@ -313,6 +313,16 @@ header .header-action:active {
 .app-tile .summery > h4 {
     margin-top: 5px;
     margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.app-tile .summery a h4 {
+    margin-top: 5px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .app-tile .summery > h5 {
