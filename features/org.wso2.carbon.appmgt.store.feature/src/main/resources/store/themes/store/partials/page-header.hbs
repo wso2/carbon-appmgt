@@ -2,10 +2,29 @@
 <div class="pull-left hidden-xs">
     <h3 class="page-title">{{t title}}</h3>
 </div>
+{{!-- add home page setting option for favouriete page--}}
+{{#if myFav}}
+    <div class="page-title-setting dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" title="Settings for this page">
+            <i class="fw fw-settings fw-rotate-90">&nbsp;</i><span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+        <a href="#">
+            {{#if isHomePage}}
+                <i id="rmv-home">Remove from home page</i></a>
+                <i id="set-home" style="display: none">Set this page as Home</i>
 
+            {{else}}
+                <i id="set-home">Set this page as Home</i>
+                <i id="rmv-home" style="display: none">Remove from home page</i>
+            {{/if}}
+            </a>
+        </ul>
+    </div>
+{{/if}}
 {{!-- page header - sorting options --}}
 {{#if sorting}}
-    <div class="sorting-options pull-right float-remove-xs text-center-xs">
+    <div class="sorting-options pull-right">
         <div class="btn-group" role="group">
             {{#each sorting.options}}
                 <a href="{{tenantedUrl this.url}}" class="btn btn-default" title="{{t title}}">

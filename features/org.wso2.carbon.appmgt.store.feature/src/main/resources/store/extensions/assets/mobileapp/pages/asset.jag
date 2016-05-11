@@ -18,10 +18,15 @@ require('/modules/store.js').exec(function (ctx) {
             mdmConfig = parse(String((new Packages.org.wso2.carbon.appmgt.mobile.store.MDMConfig()).getConfigs()));
             devicesClass = new Packages.org.wso2.carbon.appmgt.mobile.store.Devices();
 
-        caramel = require('caramel');
-
+    caramel = require('caramel');
+    var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
     var storeHostObj = jagg.module("manager").getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(tenantDomain);
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+    var subscriptionConfig = require('../../../../themes/store/js/subscription-config.js');
+    var isSelfSubscriptionEnabled = subscriptionConfig.isSelfSubscriptionEnabled();
+    var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptionEnabled();
 
     var isNotCatalog = mdmConfig.IsCatalog == "true" ? false : true;
 
@@ -59,6 +64,15 @@ require('/modules/store.js').exec(function (ctx) {
         return;
     }
 
+    if (asset) {
+        var assetLifecycleState = asset.lifecycleState;
+        //If the asset is not in "Published" or "Deprecated" state, webapp overview page should not be accessible
+        if (assetLifecycleState != "Published" && assetLifecycleState != "Deprecated") {
+            response.sendError(404, 'Requested asset with assset is : ' + asset.id + 'cannot be found. It is in ' +
+            assetLifecycleState + 'state.');
+        }
+    }
+
     if (store.isuserasset(aid, type)) {
         inDashboard = true;
     }
@@ -70,14 +84,24 @@ require('/modules/store.js').exec(function (ctx) {
                 devices =  parse(String(devicesClass.getDevicesList(stringify(user), user.tenantId, "user", [user.username])));
         }
 
-        var headerData = site.header(tenantId, {
-            sso: sso,
-            user: user,
-            isSelfSignUpEnabledForTenant : isSelfSignupEnabledForTenant
-        });
-        headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
-        headerData.domain = tenantDomain;
+    var headerData = site.header(tenantId, {
+        sso: sso,
+        user: user,
+        isSelfSignUpEnabledForTenant: isSelfSignupEnabledForTenant
+    });
+    headerData.isSelfSignUpEnabledForTenant = isSelfSignupEnabledForTenant;
+    headerData.domain = tenantDomain;
+    headerData.assetType = "mobileapp";
 
+    var searchQuery = { search: "", searchTerm: "overview_name"};
+
+    //set rating
+    var ratings = JSON.parse(social.getRating("mobileapp:" + asset.id));
+    if (ratings) {
+        asset.rating = Math.floor(ratings.rating);
+    } else {
+        asset.rating = 0;
+    }
 
     caramel.render({
         title: asset.attributes.overview_name + ' | Store | WSO2 App Manager',
@@ -91,9 +115,7 @@ require('/modules/store.js').exec(function (ctx) {
 
         navigation: site.navigation(tenantId),
         search: {
-            search: {title: type},
-            isTopAssets: false,
-            searchFields: rxtAttributes
+                query: searchQuery
         },
         isSocial: configs.socialCommentsEnable,
 
@@ -102,14 +124,17 @@ require('/modules/store.js').exec(function (ctx) {
         inDashboard: inDashboard,
         asset: asset,
         config : mdmUIConfig,
-        tags: [
-            {
-                url: '/assets/' + type + '/?page=1&tag=',
-                data: store.tags(type)
-            }
-        ],
+        tags: {
+             data: {allTags: store.tags(type), searchedTag: ""}
+        },
         myAssets: { user: user, type: type, title: title },
-        recentAssets: store.recentAssets(type)
+        recentAssets: store.recentAssets(type),
+        assetType: "mobileapp",
+        config: {
+            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+            isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+            enabledTypeList: enabledTypeList
+        }
     });
 }, request, response, session);
 %>

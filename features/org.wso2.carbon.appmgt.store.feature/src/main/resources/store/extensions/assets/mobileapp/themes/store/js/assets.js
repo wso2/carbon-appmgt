@@ -8,21 +8,6 @@
 var opened = false, currentPage = 1, infiniteScroll = null;
 
 $(function() {
-
-
-
-	$('#category-select').on('change', function(){
-		var selected = $(this).find("option:selected").val();
-		location.href = caramel.tenantedUrl("/assets/mobileapp?query=category:\"" + selected + "\"");
-	});
-
-	$('#platform-select').on('change', function(){
-		var selected = $(this).find("option:selected").val();
-		location.href = caramel.tenantedUrl("/assets/mobileapp?query=platform:\"" + selected + "\"");
-	});
-
-
-
 	var visibleToDevices = function(){
 		var ua = navigator.userAgent;
 		var checker = {
@@ -192,6 +177,29 @@ $(function() {
 		$('#my-assets').slideToggle("fast");
 	});
 
-	//caramel.loaded('js', 'assets');
-	//caramel.loaded('js', 'sort-assets');
+    var searchTour = new Tour({
+
+                                        storage: false,
+                                        steps: [
+                                            {
+                                                element: ".input-group",
+                                                title: "Change the Search term",
+                                                placement: "bottom",
+                                                content: "Change the search term here"
+                                            },
+                                            {
+                                                element: ".input-group-btn",
+                                                title: "Change the query type",
+                                                placement: "bottom",
+                                                content: "You can change what you want to search by selecting one of \"App Name\" or \"App Provider\" " +
+                                                         "or \"Category\" or \"Platform\""
+                                            }
+                                        ]
+                                    });
+
+
+    $('#no-apps-search-jumbotron').on('click', function(e){
+        searchTour.init(true);
+        searchTour.start(false);
+    });
 });

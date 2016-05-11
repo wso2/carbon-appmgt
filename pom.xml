@@ -4,7 +4,7 @@
   <groupId>org.wso2.carbon.appmgt</groupId>
   <artifactId>carbon-appmgt</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.3-SNAPSHOT</version>
+  <version>1.1.4-SNAPSHOT</version>
   <name>WSO2 Carbon - App Management Aggregator Pom</name>
   <url>http://wso2.org</url>
 
@@ -28,22 +28,32 @@
     <module>components/org.wso2.carbon.appmgt.gateway</module>
     <module>components/org.wso2.carbon.appmgt.usage</module>
     <module>components/org.wso2.carbon.appmgt.core</module>
+    <module>components/org.wso2.carbon.appmgt.oauth.core</module>
+    <module>components/org.wso2.carbon.appmgt.oauth.webapp</module>
     <module>components/org.wso2.carbon.appmgt.oauth.endpoint</module>
     <module>components/org.wso2.carbon.appmgt.mobile</module>
-    <module>components/org.wso2.carbon.appmgt.mdm.wso2mdm</module>
+    <module>components/org.wso2.carbon.appmgt.mdm.restconnector</module>
     <module>components/org.wso2.carbon.appmgt.mdm.wso2emm</module>
     <module>components/org.wso2.carbon.appmgt.services.api</module>
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
+    <module>components/org.wso2.carbon.appmgt.mdm.osgiconnector</module>
     <module>features/org.wso2.carbon.appmgt.core.feature</module>
   	<module>features/org.wso2.carbon.appmgt.gateway.feature</module>
   	<module>features/org.wso2.carbon.appmgt.publisher.feature</module>
   	<module>features/org.wso2.carbon.appmgt.store.feature</module>
   	<module>features/org.wso2.carbon.appmgt.feature</module>
     <module>features/org.wso2.carbon.appmgt.mobile</module>
-  	<module>features/org.wso2.carbon.appmgt.mdm.wso2mdm.feature</module>
+  	<module>features/org.wso2.carbon.appmgt.mdm.restconnector.feature</module>
   	<module>features/org.wso2.carbon.appmgt.mdm.wso2emm.feature</module>
   	<module>features/org.wso2.carbon.appmgt.services.api.feature</module>
+    <module>features/org.wso2.carbon.appmgt.mdm.osgiconnector.feature</module>
+    <module>components/org.wso2.carbon.appmgt.rest.api.util</module>
+    <module>components/org.wso2.carbon.appmgt.rest.api.publisher</module>
+    <module>components/org.wso2.carbon.appmgt.rest.api.store</module>
+    <module>features/org.wso2.carbon.appmgt.oauth.feature</module>
+    <module>features/org.wso2.carbon.appmgt.rest.api.store.feature</module>
+    <module>features/org.wso2.carbon.appmgt.rest.api.publisher.feature</module>
   </modules>
 
   <build>
@@ -88,6 +98,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -163,8 +178,24 @@
     </pluginRepository>
   </pluginRepositories>
 
+
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.eclipse.osgi</groupId>
+        <artifactId>org.eclipse.osgi</artifactId>
+        <version>${eclipse.osgi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.osgi</groupId>
+        <artifactId>org.eclipse.osgi.services</artifactId>
+        <version>${eclipse.osgi.service.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.devicemgt</groupId>
+        <artifactId>org.wso2.carbon.policy.mgt.core</artifactId>
+        <version>${carbon.device.mgt.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple.wso2</groupId>
         <artifactId>json-simple</artifactId>
@@ -174,11 +205,6 @@
         <groupId>org.wso2.carbon</groupId>
         <artifactId>org.wso2.carbon.core</artifactId>
         <version>${carbon.kernel.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.wso2.carbon</groupId>
-        <artifactId>org.wso2.carbon.throttle.core</artifactId>
-        <version>${carbon.throttle.version}</version>
       </dependency>
       <dependency>
         <groupId>org.wso2.carbon</groupId>
@@ -209,6 +235,11 @@
       <dependency>
         <groupId>org.apache.synapse</groupId>
         <artifactId>synapse-core</artifactId>
+        <version>${synapse.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>synapse-commons</artifactId>
         <version>${synapse.version}</version>
       </dependency>
       <dependency>
@@ -322,6 +353,11 @@
         <version>${carbon.identity.oauth.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.wso2.carbon.identity</groupId>
+        <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
+        <version>${identity.oauth.common.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>org.wso2.carbon.webapp.mgt.stub</artifactId>
         <version>${carbon.webapp.mgt.stub}</version>
@@ -377,7 +413,7 @@
         <version>${idp.mgt.stub.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
         <version>${carbon.mediation.security.stub}</version>
       </dependency>
@@ -401,6 +437,11 @@
         <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
         <version>${identity.application.mgt.version}</version>
       </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.identity</groupId>
+            <artifactId>org.wso2.carbon.identity.application.mgt</artifactId>
+            <version>${carbon.identity.version}</version>
+        </dependency>
       <dependency>
         <groupId>org.wso2.carbon.identity</groupId>
         <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
@@ -593,6 +634,76 @@
         <artifactId>org.wso2.carbon.device.mgt.core</artifactId>
         <version>${carbon.device.mgt.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+        <artifactId>axiom</artifactId>
+        <version>${axiom.wso2.version}</version>
+      </dependency>
+
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.oauth.core</artifactId>
+            <version>${carbon.appmgt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.oauth.webapp</artifactId>
+            <version>${carbon.appmgt.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.rest.api.util</artifactId>
+            <version>${carbon.appmgt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.rest.api.publisher</artifactId>
+            <version>${carbon.appmgt.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.rest.api.store</artifactId>
+            <version>${carbon.appmgt.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.rest.api.storeadmin</artifactId>
+            <version>${carbon.appmgt.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring-web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>${swagger-jaxrs.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -602,19 +713,26 @@
     <project.scm.id>github-scm</project.scm.id>
 
     <!-- AppM Component Version -->
-    <carbon.appmgt.version>1.1.3-SNAPSHOT</carbon.appmgt.version>
-    <carbon.appmgt.bundle.version>1.1.3</carbon.appmgt.bundle.version>
+    <carbon.appmgt.version>1.1.4-SNAPSHOT</carbon.appmgt.version>
+    <carbon.appmgt.bundle.version>1.1.4</carbon.appmgt.bundle.version>
     <carbon.appmgt.imp.pkg.version>[1.1.0, 1.2.0)</carbon.appmgt.imp.pkg.version>
 
+    <carbon.device.mgt.version>1.0.3</carbon.device.mgt.version>
+    <carbon.device.mgt.version.range>[0.8.0, 2.0.0)</carbon.device.mgt.version.range>
+
+
+    <eclipse.osgi.version>3.8.1.v20120830-144521</eclipse.osgi.version>
+    <eclipse.osgi.service.version>3.3.100.v20120522-1822</eclipse.osgi.service.version>
+
 	<!-- Carbon kernel version -->
-    <carbon.kernel.version>4.4.3</carbon.kernel.version>
+    <carbon.kernel.version>4.4.5</carbon.kernel.version>
     <carbon.kernel.base.version>4.4.0</carbon.kernel.base.version>
     <carbon.kernel.pkg.version>[4.4.0,4.5.0)</carbon.kernel.pkg.version>
     <carbon.proxyadmin.server.version>4.2.2</carbon.proxyadmin.server.version>
     <carbon.mediation.version>4.6.0</carbon.mediation.version>
     <carbon.mediation.pkg.version>[4.6.0,4.7.0)</carbon.mediation.pkg.version>
-    <carbon.identity.version>5.0.7</carbon.identity.version>
-    <carbon.identity.base.version>5.0.7</carbon.identity.base.version>
+    <carbon.identity.version>5.0.9-SNAPSHOT</carbon.identity.version>
+    <carbon.identity.base.version>5.0.9-SNAPSHOT</carbon.identity.base.version>
     <carbon.identity.auth.version>4.4.1</carbon.identity.auth.version>
     <carbon.identity.thrift.auth.version>${carbon.identity.version}</carbon.identity.thrift.auth.version>
     <carbon.identity.scim.version>${carbon.identity.version}</carbon.identity.scim.version>
@@ -623,13 +741,12 @@
     <carbon.user.mgt.pkg.version>[5.0.7, 5.1.0)</carbon.user.mgt.pkg.version>
     <carbon.deployment.version>4.4.1</carbon.deployment.version>
     <carbon.commons.version>4.4.3</carbon.commons.version>
-    <carbon.registry.version>4.4.8</carbon.registry.version>
-    <carbon.governance.version>4.5.8</carbon.governance.version>
+    <carbon.registry.version>4.5.3-alpha</carbon.registry.version>
+    <carbon.governance.version>4.6.2-alpha2</carbon.governance.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
     <carbon.store.version>1.4.0</carbon.store.version>
-    <carbon.device.mgt.version>0.9.1</carbon.device.mgt.version>
     <carbon.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.registry.imp.pkg.version>
     <commons.logging.imp.pkg.version>[1.2.0, 1.3.0)</commons.logging.imp.pkg.version>
     <carbon.governance.pkg.version>[4.4.0, 4.6.0)</carbon.governance.pkg.version>
@@ -640,7 +757,7 @@
     <bam.presentation.stub.version>4.2.0</bam.presentation.stub.version>
     <carbon.claim.mgt.stub>5.0.7</carbon.claim.mgt.stub>
     <carbon.identity.user.profile.stub>5.0.7</carbon.identity.user.profile.stub>
-    <carbon.mediation.security.stub>4.2.0</carbon.mediation.security.stub>
+    <carbon.mediation.security.stub>4.6.1-BETA</carbon.mediation.security.stub>
     <carbon.webapp.mgt.stub>4.2.0</carbon.webapp.mgt.stub>
 
     <!-- P2 Plugin Version -->
@@ -652,7 +769,7 @@
     <axis2.osgi.version.range>[1.6.1.wso2v10, 1.7.0)</axis2.osgi.version.range>
 
     <!-- Apache Axiom -->
-    <axiom.osgi.version.range>[1.2.11.wso2v4, 1.3.0)</axiom.osgi.version.range>
+    <axiom.osgi.version.range>[1.2.11.wso2v10, 1.3.0)</axiom.osgi.version.range>
 
     <maven-scr-plugin.version>1.7.2</maven-scr-plugin.version>
     <maven-bundle-plugin.version>2.5.3</maven-bundle-plugin.version>
@@ -685,8 +802,8 @@
     <!-- Misc Versions -->
     <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>
     <json-simple.wso2.version>1.1.wso2v1</json-simple.wso2.version>
-    <axiom.wso2.version>1.2.11.wso2v5</axiom.wso2.version>
-    <synapse.version>2.1.3-wso2v5</synapse.version>
+    <axiom.wso2.version>1.2.11.wso2v10</axiom.wso2.version>
+    <synapse.version>2.1.7-wso2v2</synapse.version>
     <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
     <rhino.js.pkg.version>[1.7.0, 1.8.0)</rhino.js.pkg.version>
     <google.code.gson.version>2.1</google.code.gson.version>
@@ -700,6 +817,16 @@
 
     <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
     <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
+
+      <wso2-uri-templates.version>1.6.5</wso2-uri-templates.version>
+
+      <!-- ReST API Versions -->
+      <cxf.version>3.1.4</cxf.version>
+      <jackson.version>1.8.6</jackson.version>
+      <spring-web.version>4.1.6.RELEASE</spring-web.version>
+      <hibernate-validator.version>5.0.2.Final</hibernate-validator.version>
+      <swagger-jaxrs.version>1.5.2</swagger-jaxrs.version>
+
   </properties>
 
 </project>

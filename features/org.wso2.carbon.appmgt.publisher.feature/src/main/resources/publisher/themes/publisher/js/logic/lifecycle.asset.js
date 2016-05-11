@@ -115,11 +115,11 @@ $(function(){
 
                 var out='<ul>';
 
-                var obj = response;
+                var checkListItems = response.checkListItems;
 
-                for(var index in obj.checkListItems){
+                for (var index in checkListItems) {
 
-                   var current=obj.checkListItems[index];
+                   var current = checkListItems[index];
 
                    out+='<li><input type="checkbox" onclick="onCheckListItemClick(this,'+index+')" ';
 

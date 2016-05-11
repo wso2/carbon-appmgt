@@ -12,6 +12,23 @@ $(function () {
         $('#btn-signin').text('Sign In').removeClass('disabled');
     };
 
+    var isEnableEmailUsername = function () {
+        var isEmailUsername = false;
+        caramel.ajax({
+                         type: 'POST',
+                         url: '/apis/user/emailLogin',
+                         async: false,
+                         success: function (data) {
+                             isEmailUsername = data.isEmailUsername
+                             return isEmailUsername;
+                         },
+                         contentType: 'application/json',
+                         dataType: 'json'
+                     });
+        return isEmailUsername;
+    }
+
+
     var login = function () {
         if (!$("#form-login").valid())
             return;
@@ -58,6 +75,15 @@ $(function () {
         if (username.indexOf("/") > -1) {
             errorMessage = "Domain";
             return errorMessage;
+        }
+        if (!isEnableEmailUsername()) {
+            var tenantDomain = getURLTenantDomain();
+            if (tenantDomain == "null" || tenantDomain == "carbon.super") {
+                if (username.indexOf("@") > -1) {
+                    errorMessage = "Domain";
+                    return errorMessage;
+                }
+            }
         }
         return errorMessage;
     }

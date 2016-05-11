@@ -15,7 +15,7 @@
                             </div>
                         {{else}}
                             <div class="ratio-responsive-img">
-                                <img src="{{attributes.images_thumbnail}}" />
+                                <img src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{attributes.images_thumbnail}}" />
                             </div>
                         {{/if}}
 
@@ -24,10 +24,10 @@
                 </a>
 
                 <div class="summery">
+                    <a href="{{tenantedUrl "/assets/mobileapp"}}/{{id}}">
                     <h4>{{attributes.overview_displayName}}</h4>
                     <h5>{{attributes.overview_version}}</h5>
-
-                    <p>{{attributes.overview_provider}}</p>
+                    </a>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
@@ -49,12 +49,12 @@
     <div class="pull-right-lg pull-right-md text-center-sm text-center-xs add-padding-bottom-2x">
         <div class="btn-group" role="group">
             {{#if leftNav}}
-                <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}"
+                <a href="{{tenantedUrl "/assets/mobileapp?"}}{{this.urlQuery}}{{t "page="}}{{this.leftNav}}"
                    class="btn btn-default btn-lg" title="Previous">
                     <i class="fw fw-left fw-lg"></i>
                 </a>
                 {{#if rightNav}}
-                    <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}"
+                    <a href="{{tenantedUrl "/assets/mobileapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}"
                        class="btn btn-default btn-lg" title="Next">
                         <i class="fw fw-right fw-lg"></i>
                     </a>
@@ -68,7 +68,7 @@
                     <a href="#" class="btn btn-default btn-lg disabled" title="Previous">
                         <i class="fw fw-left fw-lg"></i>
                     </a>
-                    <a href="{{tenantedUrl "/extensions/assets/webapp/myapps?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}"
+                    <a href="{{tenantedUrl "/assets/mobileapp?"}}{{this.urlQuery}}{{t "page="}}{{this.rightNav}}"
                        class="btn btn-default btn-lg" title="Next">
                         <i class="fw fw-right fw-lg"></i>
                     </a>

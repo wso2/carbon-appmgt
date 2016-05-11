@@ -25,7 +25,7 @@ var resources = function (page, meta) {
     o.js.push('logic/asset/overview/asset-utilization.js');
     o.js.push('logic/asset/overview/overview.js');
     o.code.push('asset/asset-metadata.hbs');
-    
+
     o.css.push('cstyles.css');
     return o;
 };

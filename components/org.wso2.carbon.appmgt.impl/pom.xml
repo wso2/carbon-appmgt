@@ -12,13 +12,13 @@
     <parent>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>carbon-appmgt</artifactId>
-        <version>1.1.3-SNAPSHOT</version>
+        <version>1.1.4-SNAPSHOT</version>
 	<relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.appmgt.impl</artifactId>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.4-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - APP Management Implementation </name>
     <repositories>
@@ -34,6 +34,10 @@
         </repository>
     </repositories>
   <dependencies>
+      <dependency>
+        <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+        <artifactId>axiom</artifactId>
+      </dependency>
     	<dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.user.core</artifactId>
@@ -129,7 +133,7 @@
            <artifactId>org.wso2.carbon.idp.mgt.stub</artifactId>
         </dependency>
 	<dependency>
-	   <groupId>org.wso2.carbon</groupId>
+	   <groupId>org.wso2.carbon.mediation</groupId>
 	   <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
 	</dependency>
         <dependency>
@@ -209,6 +213,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
                 <configuration>
+                   <skipTests>true</skipTests>
                     <systemProperties>
                         <property>
                             <name>APIManagerDBConfigurationPath</name>

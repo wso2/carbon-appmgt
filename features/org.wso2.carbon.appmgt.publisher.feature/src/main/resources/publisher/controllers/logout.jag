@@ -5,9 +5,11 @@
     var currentSession = require('store').server.current(session);
     var caramel = require('caramel');
     var contextPath = caramel.configs().context;
+    var auditLog = require('/modules/auditLog/logger.js');
 
     if(currentSession) {
         var user = currentSession.username;//session.get("LOGGED_IN_USER");
+        var tenantId = currentSession.tenantId;
         if (user === null) {
             response.sendRedirect('/store');
         } else {
@@ -25,6 +27,7 @@
             var log = new Log();
 
             log.debug("portal session index : " + sso_sessions[session.getId()]);
+            auditLog.writeLog(tenantId, user, "UserSignedOut","Logout","", "", "");
 
             %>
                 <div>

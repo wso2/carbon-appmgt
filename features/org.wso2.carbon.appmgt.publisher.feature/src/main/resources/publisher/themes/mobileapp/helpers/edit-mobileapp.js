@@ -12,17 +12,17 @@ var resources = function (page, meta) {
 };
 
 var selectCategory = function (data) {
-    var arr = [];
+    var selectedCategories = [];
     var currentCategory = data.artifact.attributes['overview_category'];
     var categories = selectCategories(data.data.fields);
 
     for (var i in categories) {
-        arr.push({
+        selectedCategories.push({
             cat: categories[i],
             sel: (currentCategory == categories[i])
         });
     }
-    data.categorySelect = arr;
+    data.categorySelect = selectedCategories;
     return data;
 };
 

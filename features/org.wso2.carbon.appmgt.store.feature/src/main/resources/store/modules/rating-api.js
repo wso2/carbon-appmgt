@@ -45,9 +45,9 @@ var api = {};
     };
     /**
      * The function adds rating details to the provided assets
-     * @param {[type]} assets   [description]
-     * @param {[type]} tenantId [description]
-     * @param {[type]} username [description]
+     * @param {[type]} assets   [businessOwnerDescription]
+     * @param {[type]} tenantId [businessOwnerDescription]
+     * @param {[type]} username [businessOwnerDescription]
      */
     api.addRatings = function(assets,am,tenantId, username) {
         var carbon = require('carbon');
@@ -111,19 +111,29 @@ var api = {};
                     /*asset = store.asset(type, aid);
                      asset.indashboard = store.isuserasset(aid, type);*/
                     asset = am.get(aid);
-                    var treatAsASite = asset.attributes.overview_treatAsASite.toLocaleLowerCase();
-                    var isDefaultVersion = asset.attributes.overview_makeAsDefaultVersion;
-
-                    if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0 &&
-                        treatAsASite == siteFlag) {
-                        if (isMultipleVersionEnabledFlag) {
+                    if(!asset) {
+                        continue;
+                    }
+                    if(type == 'mobileapp') {
+                        if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0){
                             assets.push(asset);
-                        } else {
-                            if (isDefaultVersion == "true") {
-                                assets.push(asset);
-                            }
                         }
+                    } else {
+                        //site or webapp
+                        var treatAsASite = asset.attributes.overview_treatAsASite.toLocaleLowerCase();
+                        var isDefaultVersion = asset.attributes.overview_makeAsDefaultVersion;
 
+                        if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0 &&
+                            treatAsASite == siteFlag) {
+                            if (isMultipleVersionEnabledFlag) {
+                                assets.push(asset);
+                            } else {
+                                if (isDefaultVersion == "true") {
+                                    assets.push(asset);
+                                }
+                            }
+
+                        }
                     }
 
 

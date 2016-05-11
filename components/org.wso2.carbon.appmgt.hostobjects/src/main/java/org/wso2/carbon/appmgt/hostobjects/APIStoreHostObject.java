@@ -29,13 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jaggeryjs.scriptengine.exceptions.ScriptException;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.*;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.APIIdentifier;
@@ -43,6 +39,7 @@ import org.wso2.carbon.appmgt.api.model.APIKey;
 import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -218,6 +215,49 @@ public class APIStoreHostObject extends ScriptableObject {
             handleException("WebApp key manager URL unspecified");
         }
         return url;
+    }
+
+    /**
+     * Retrieve the business Owner
+     * @param cx      Rhino context
+     * @param thisObj Scriptable object
+     * @param args    Passing arguments
+     * @param funObj  Function object
+     * @return shared policy partials
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException
+     */
+    public static NativeObject jsFunction_getBusinessOwner(Context cx, Scriptable thisObj, Object[] args, Function funObj)
+            throws
+            AppManagementException {
+
+        if (args == null || args.length != 1) {
+            throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
+        }
+
+        String appId = args[0].toString();
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(appId);
+        NativeObject row = new NativeObject();
+        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
+        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
+        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
+        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
+        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+        Map<String, String> businessOwnerDetails = null;
+        businessOwnerDetails = businessOwner.getBusinessOwnerCustomProperties();
+        JSONObject businessOwnerDetailsObject = new JSONObject();
+        if(businessOwnerDetails != null) {
+            Set<String> keySet = businessOwnerDetails.keySet();
+            for (String key : keySet) {
+                businessOwnerDetailsObject.put(key, businessOwnerDetails.get(key));
+            }
+            row.put("businessOwnerDeatails", row, businessOwnerDetailsObject.toJSONString());
+        } else {
+            row.put("businessOwnerDeatails", row, null);
+        }
+
+
+        return row;
     }
 
     /**
@@ -888,14 +928,18 @@ public class APIStoreHostObject extends ScriptableObject {
         String assetType =  null;
         if (args != null && isStringArray(args)) {
             //There will be separate two calls for this method with one argument and with three arguments.
-            if (args.length == 1) {
+            if (args.length == 2) {
                 tenantDomain = args[0].toString();
+                assetType = args[1].toString();
             }
             if (args.length == 3) {
                 tenantDomain = args[0].toString();
                 assetType = args[1].toString();
                 attributeMap.put(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, args[2].toString());
             }
+        } else {
+            String errorMessage = "Invalid number or invalid type of arguments";
+            handleException(errorMessage);
         }
         APIConsumer appConsumer = getAPIConsumer(thisObj);
         try {
@@ -1582,7 +1626,8 @@ public class APIStoreHostObject extends ScriptableObject {
     }
 
     public static boolean jsFunction_addAPISubscription(Context cx,
-                            Scriptable thisObj, Object[] args, Function funObj) throws AppManagementException {
+                            Scriptable thisObj, Object[] args, Function funObj)
+            throws AppManagementException, ScriptException, UserStoreException {
         if (!isStringArray(args)) {
             return false;
         }
@@ -1599,6 +1644,10 @@ public class APIStoreHostObject extends ScriptableObject {
             trustedIdp = args[7].toString();
         }
 
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+
+        addSubscriber(userId, thisObj);
+
         APIIdentifier apiIdentifier = new APIIdentifier(providerName, apiName, version);
         apiIdentifier.setTier(tier);
 
@@ -1612,7 +1661,6 @@ public class APIStoreHostObject extends ScriptableObject {
                 PrivilegedCarbonContext.startTenantFlow();
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
             }
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             WebApp api = apiConsumer.getAPI(apiIdentifier);
 
 	    	/* Tenant based validation for subscription*/
@@ -2163,31 +2211,35 @@ public class APIStoreHostObject extends ScriptableObject {
         return null;
     }
 
-    public static boolean jsFunction_addSubscriber(Context cx,
-                                                   Scriptable thisObj, Object[] args, Function funObj)
+    private static boolean addSubscriber(String userId, Scriptable thisObj)
             throws ScriptException, AppManagementException, UserStoreException {
 
-        if (args!=null && isStringArray(args)) {
-            Subscriber subscriber = new Subscriber((String) args[0]);
+        APIConsumer apiConsumer = getAPIConsumer(thisObj);
+        Subscriber subscriber = apiConsumer.getSubscriber(userId);
+        if (subscriber == null) {
+            subscriber = new Subscriber(userId);
             subscriber.setSubscribedDate(new Date());
             //TODO : need to set the proper email
             subscriber.setEmail("");
-            APIConsumer apiConsumer = getAPIConsumer(thisObj);
             try {
-                int tenantId=ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(MultitenantUtils.getTenantDomain((String) args[0]));
+                int tenantId =
+                        ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                                              .getTenantId(
+                                                      MultitenantUtils.getTenantDomain(userId));
                 subscriber.setTenantId(tenantId);
                 apiConsumer.addSubscriber(subscriber);
             } catch (AppManagementException e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
                 return false;
             } catch (Exception e) {
-                handleException("Error while adding the subscriber"+subscriber.getName(), e);
+                handleException("Error while adding the subscriber" + subscriber.getName(), e);
                 return false;
             }
             return true;
         }
         return false;
     }
+
 
     public static boolean jsFunction_sleep(Context cx,
                                            Scriptable thisObj, Object[] args, Function funObj){
@@ -3436,7 +3488,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject row = new NativeObject();
                 row.put("appName", row, identifier.getApiName());
-                row.put("appProvider", row, identifier.getProviderName());
+                row.put("appProvider", row, AppManagerUtil.replaceEmailDomain(identifier.getProviderName()));
                 row.put("version", row, identifier.getVersion());
                 row.put("context", row, app.getContext());
                 row.put("thumburl", row, AppManagerUtil.prependWebContextRoot(app.getThumbnailUrl()));
@@ -3594,7 +3646,8 @@ public class APIStoreHostObject extends ScriptableObject {
                 NativeObject attributes = new NativeObject();
                 attributes.put("overview_name", attributes, identifier.getApiName());
                 attributes.put("overview_displayName", attributes, app.getDisplayName());
-                attributes.put("overview_provider", attributes, identifier.getProviderName());
+                attributes.put("overview_provider", attributes, AppManagerUtil.replaceEmailDomain(
+                        identifier.getProviderName()));
                 attributes.put("overview_context", attributes, app.getContext());
                 attributes.put("overview_version", attributes, identifier.getVersion());
                 attributes.put("overview_appTenant", attributes, app.getAppTenant());
@@ -3606,7 +3659,7 @@ public class APIStoreHostObject extends ScriptableObject {
 
                 NativeObject asset = new NativeObject();
                 asset.put("id", asset, app.getUUID());
-                asset.put("lifeCycleStatus", asset, lifeCycleStatus);
+                asset.put("lifecycleState", asset, lifeCycleStatus);
                 asset.put("accessUrl", asset, accessUrl);
                 asset.put("attributes", asset, attributes);
 
@@ -3822,4 +3875,73 @@ public class APIStoreHostObject extends ScriptableObject {
         }
         return subscriptionConfiguration;
     }
+
+	/**
+     * Returns the enabled asset type list in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static NativeArray jsFunction_getEnabledAssetTypeList(Context cx, Scriptable thisObj,
+                                                                 Object[] args, Function funObj)
+            throws AppManagementException {
+        NativeArray availableAssetTypes = new NativeArray(0);
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+        for (int i = 0; i < typeList.size(); i++) {
+            availableAssetTypes.put(i, availableAssetTypes, typeList.get(i));
+        }
+        return availableAssetTypes;
+    }
+
+	/**
+     * Returns asset type enabled or not in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return
+     * @throws AppManagementException
+     */
+    public static boolean jsFunction_isAssetTypeEnabled(Context cx, Scriptable thisObj,
+                                                        Object[] args, Function funObj)
+            throws AppManagementException {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid argument type. App name should be a String.");
+        }
+        String assetType = (String) args[0];
+        List<String> typeList = HostObjectComponent.getEnabledAssetTypeList();
+
+        for (String type : typeList) {
+            if (assetType.equals(type)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns binary file storage location configured in app-manager.xml
+     *
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return file storage location
+     * @throws AppManagementException
+     */
+    public static String jsFunction_getBinaryFileStorage(Context cx, Scriptable thisObj, Object[] args,
+                                                               Function funObj) throws AppManagementException {
+        return HostObjectUtils.getBinaryStorageConfiguration();
+    }
+
 }

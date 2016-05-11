@@ -30,6 +30,16 @@ import java.util.Set;
 public interface APIConsumer extends APIManager {
 
     /**
+     * Returns the details of the owner of the given app.
+     *
+     * @param appId
+     * @return
+     * @throws AppManagementException
+     */
+    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException;
+
+
+    /**
      * @param subscriberId id of the Subscriber
      * @return Subscriber
      * @throws AppManagementException if failed to get Subscriber
@@ -448,4 +458,6 @@ public interface APIConsumer extends APIManager {
      */
     public boolean hasFavouritePage(String username, int tenantIdOfUser, int tenantIdOfStore)
             throws AppManagementException;
+
+    public boolean isSubscribedToMobileApp(String userId, String appId) throws AppManagementException;
 }

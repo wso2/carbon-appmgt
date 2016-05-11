@@ -51,11 +51,11 @@ $(function () {
                     }
                 },
                 error: function (response) {
-                    showDeleteModel("Asset is not successfully deleted", "Delete Failed", type);
+                    showDeleteModel("Asset is not successfully deleted", "Deletion Failed", type);
                     $(parent).children().attr('disabled', false);
                 }
             });
-        }else {
+        } else {
             $(parent).children().attr('disabled', false);
         }
 

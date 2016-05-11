@@ -243,7 +243,7 @@
                                 <i class="icon-edit"></i>
                             </div>
                             <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
-                                {{#if this}}<img src="{{this}}" />{{/if}}
+                                {{#if this}}<img src="{{url "/api/mobileapp/getfile/"}}{{this}}" />{{/if}}
                             </div>
                             <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
                                  data-trigger="fileupload" title="Add banner">
@@ -252,7 +252,7 @@
                             <span>
                                 <input type="file" id="imgBanner" name="images.banner"
                                        accept="image/*" />
-                                <input type="hidden" name="images.banner" value="{{this}}" />
+                                <input type="hidden" name="images.oldbanner" value="{{this}}" />
                             </span>
                         </div>
                     {{/with}}
@@ -277,7 +277,7 @@
                                 <i class="icon-edit"></i>
                             </div>
                             <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
-                                {{#if this}}<img src="{{this}}" />{{/if}}
+                                {{#if this}}<img src="{{url "/api/mobileapp/getfile/"}}{{this}}" />{{/if}}
                             </div>
                             <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
                                  data-trigger="fileupload" title="Add screenshot">
@@ -286,7 +286,7 @@
                             <span>
                                 <input type="file" id="imgScreenshot{{index}}"
                                        name="images.screenshot{{index}}" accept="image/*" />
-                                <input type="hidden" name="images.screenshot{{index}}"
+                                <input type="hidden" name="images.oldscreenshot{{index}}"
                                        value="{{this}}" />
                             </span>
                         </div>
@@ -307,7 +307,7 @@
                                 <i class="icon-edit"></i>
                             </div>
                             <div class="fileupload-exists fileupload-preview thumbnail fileupload-preview-thumbnail col-sm-12">
-                                {{#if this}}<img src="{{this}}" />{{/if}}
+                                {{#if this}}<img src="{{url "/api/mobileapp/getfile/"}}{{this}}" />{{/if}}
                             </div>
                             <div class="fileupload-new thumbnail fileupload-preview-thumbnail fileupload-add-btn col-sm-12"
                                  data-trigger="fileupload" title="Add icon">
@@ -316,7 +316,7 @@
                             <span>
                                 <input type="file" id="imgThumbnail" name="images.thumbnail"
                                        accept="image/*" />
-                                <input type="hidden" name="images.thumbnail" value="{{this}}" />
+                                <input type="hidden" name="images.oldthumbnail" value="{{this}}" />
                             </span>
                         </div>
                     {{/with}}

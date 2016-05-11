@@ -1,6 +1,7 @@
 <%
 include('/jagg/jagg.jag');
 var favourites = jagg.module("favourites");
+var auditLog = require('/modules/auditLog/logger.js');
 
 require('/modules/store.js').exec(function (ctx) {
     var log = new Log();
@@ -47,6 +48,11 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                     storeTenantDomain);
+        auditLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite","Webapp",  "{" +
+                                                                                  "providerName='" + provider + '\'' +
+                                                                                  ", apiName='" + name + '\'' +
+                                                                                  ", version='" +version + '\'' +
+                                                                                  '}' , "", "");
         return content;
     };
 
@@ -61,6 +67,11 @@ require('/modules/store.js').exec(function (ctx) {
 
         var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                          storeTenantDomain);
+        auditLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite","Webapp", "{" +
+                                                                                    "providerName='" + provider + '\'' +
+                                                                                    ", apiName='" +  name + '\'' +
+                                                                                    ", version='" + version + '\'' +
+                                                                                    '}' , "", "");
         return content
     };
 
@@ -78,13 +89,17 @@ require('/modules/store.js').exec(function (ctx) {
         var action = matcher.elements().action;
         response.status = 200;
         response.contentType = "application/json";
+        var userName = user.username;
+        var tenantIdOfUser = user.tenantId;
 
         switch (action) {
             case "set-favourite-page":
                 response.content = setFavouritePage();
+                auditLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage","", "" , "", "");
                 return;
             case "remove-favourite-page":
                 response.content = removeFavouritePage();
+                auditLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage","", "" , "", "");
                 return;
             case "add-favourite-app":
                 response.content = addToFavouriteApps();

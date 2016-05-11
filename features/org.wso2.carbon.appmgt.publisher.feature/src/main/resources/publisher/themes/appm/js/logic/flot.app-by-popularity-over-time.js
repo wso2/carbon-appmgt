@@ -1,4 +1,3 @@
-var parsedResponse;
 $(function () {
     drawGraphs();
 });
@@ -13,6 +12,7 @@ function drawGraphs() {
 
     var from = dateRange.split('to')[0].trim() + ":00";
     var to = dateRange.split('to')[1].trim() + ":00";
+    var ajaxResponse;
 
     $.ajax({
                async: false,
@@ -23,9 +23,9 @@ function drawGraphs() {
                    'endDate': to
                },
                success: function (response) {
-                   parsedResponse = response;
-                   drawPopularityOverTime(parsedResponse);
+                   drawPopularityOverTime(response);
                    $('#spinner').hide();
+                   ajaxResponse = response;
                },
                error: function (response) {
                    alert('Error occurred at statistics graph rendering');
@@ -35,7 +35,7 @@ function drawGraphs() {
     $('.btn-remove').on('click', function () {
         $(this).parents('.graph-maximized').removeClass('graph-maximized');
         $('.backdrop').hide();
-        drawPopularityOverTime(parsedResponse);
+        drawPopularityOverTime(ajaxResponse);
     });
 
 }

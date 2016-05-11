@@ -21,17 +21,9 @@ import org.apache.axis2.clustering.state.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.commons.throttle.core.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.dto.APIKeyValidationInfoDTO;
-import org.wso2.carbon.throttle.core.AccessInformation;
-import org.wso2.carbon.throttle.core.AccessRateController;
-import org.wso2.carbon.throttle.core.ConcurrentAccessController;
-import org.wso2.carbon.throttle.core.RoleBasedAccessRateController;
-import org.wso2.carbon.throttle.core.Throttle;
-import org.wso2.carbon.throttle.core.ThrottleConfiguration;
-import org.wso2.carbon.throttle.core.ThrottleConstants;
-import org.wso2.carbon.throttle.core.ThrottleContext;
-import org.wso2.carbon.throttle.core.ThrottleException;
 
 public class ThrottleManager {
 	

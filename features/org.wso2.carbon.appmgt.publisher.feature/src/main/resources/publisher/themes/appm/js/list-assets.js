@@ -36,41 +36,30 @@ $(".btn-action").click(function (e) {
         return false;
     }
 
-	if (action == "Reject") {
-		showCommentModel("Reason for Rejection", action, app, "webapp");
+    if (action == "Reject") {
+        showCommentModel("Reason for Rejection", action, app, "webapp");
     } else {
-        if (action == "Unpublish" && isDefault) {
-            var publishedVersionsAvailable = isPublishedVersionsAvailable(provider, name);
-            if (publishedVersionsAvailable) {
-                var faultMsg = "'" + action + "' is not permitted as this is the default version of the WebApp. "
-                               + "Please select other version of this WebApp as the default version and proceed.";
-                var status = "Not Allowed";
-                showMessageModel(faultMsg, status, 'webapp');
-                $(parent).children().attr('disabled', false);
-                return false;
-            }
-        }
         jQuery.ajax({
-			url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
-			type: 'PUT',
-			success: function (data, text) {
-				var msg = data.messages[0];
-				for (var i = 1; i < data.messages.length; i++) {
-					msg = msg + "</br>" + data.messages[i];
-				}
-				//showMessageModel(msg, data.status, 'webapp');
-                location.reload();
-			},
-			error: function (request, status, error) {
-				var data = jQuery.parseJSON(request.responseText);
-				var msg = data.messages[0];
-				for (var i = 1; i < data.messages.length; i++) {
-					msg = msg + "</br>" + data.messages[i];
-				}
-				showMessageModel(msg, data.status, 'webapp');
-			}
-		});
-	}
+                        url: caramel.context + '/api/lifecycle/' + action + '/webapp/' + app,
+                        type: 'PUT',
+                        success: function (data, text) {
+                            var msg = data.messages[0];
+                            for (var i = 1; i < data.messages.length; i++) {
+                                msg = msg + "</br>" + data.messages[i];
+                            }
+                            //showMessageModel(msg, data.status, 'webapp');
+                            location.reload();
+                        },
+                        error: function (request, status, error) {
+                            var data = jQuery.parseJSON(request.responseText);
+                            var msg = data.messages[0];
+                            for (var i = 1; i < data.messages.length; i++) {
+                                msg = msg + "</br>" + data.messages[i];
+                            }
+                            showMessageModel(msg, data.status, 'webapp');
+                        }
+                    });
+    }
 
 	// Stop even propagation since it would trigger the click event listeners for the table rows.
 	e.stopPropagation();
@@ -232,24 +221,4 @@ function isPublishedToExternalStore(action, provider, name, version) {
 
     }
     return publishedInExternalStores;
-}
-
-
-function isPublishedVersionsAvailable(provider, name) {
-    var result;
-    $.ajax({
-               url: caramel.context + '/api/asset/get/uuid/list/statepp/' + 'webapp' + '/' + provider + '/' + name + '/'
-                    + 'Published',
-               type: 'GET',
-               async: false,
-               contentType: 'application/json',
-               dataType: 'json', // the type of data that you're expecting back from the server
-               success: function (responseData, status, xhr) {
-                   result = (parseInt(responseData.count) > 1);
-               },
-               error: function () {
-                   result = false;
-               }
-           });
-    return result;
 }

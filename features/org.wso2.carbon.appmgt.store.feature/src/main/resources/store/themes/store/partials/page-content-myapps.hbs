@@ -6,7 +6,7 @@
                 <div class="app-tile">
                     <a href="{{accessUrl}}" target="_blank" data-id="{{id}}"
                        data-name="{{attributes.overview_name}}" data-version="{{attributes.overview_version}}"
-                       data-context="{{attributes.overview_context}}" class="hover-overlay-container">
+                       data-context="{{attributes.overview_context}}" data-stats="usage" class="hover-overlay-container">
                         <div class="ratio-responsive-4by3">
                             {{> ribbons/favorite}}
                             {{#ifCond attributes.overview_advertiseOnly "==" "true"}}
@@ -35,15 +35,15 @@
                     </a>
 
                     <div class="summery">
+                        <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
                         <h4>{{attributes.overview_displayName}}</h4>
                         <h5>{{attributes.overview_version}}</h5>
-
-                        <p>{{attributes.overview_provider}}</p>
+                        </a>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
 
-                        <div class="more-menu pull-right">
+                        <div class="more-menu pull-right dropup">
                             <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
                                title="Click for more options">
                                 <i class="fw fw-ellipsis fw-rotate-90"></i>
@@ -51,7 +51,7 @@
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
-                                        class="display-none-lg" {{/unless}}>
+                                        style="display: none" {{/unless}}>
                                         <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="remove-from-fav">
@@ -59,7 +59,7 @@
                                         </a>
                                     </li>
                                     <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
-                                        class="display-none-lg" {{/if}}>
+                                        style="display: none" {{/if}}>
                                         <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="add-to-fav">
@@ -79,7 +79,6 @@
                                 {{/ifCond}}
                                 {{#if ../../user}}
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe" data-name="{{attributes.overview_name}}"
                                                    data-provider="{{attributes.overview_provider}}"
@@ -87,7 +86,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
                             </ul>
@@ -116,15 +114,15 @@
                     </a>
 
                     <div class="summery">
+                        <a href="{{tenantedUrl "/assets/"}}{{../../assetType}}/{{id}}">
                         <h4>{{attributes.overview_displayName}}</h4>
                         <h5>{{attributes.overview_version}}</h5>
-
-                        <p>{{attributes.overview_provider}}</p>
+                        </a>
                     <span class="rating">
                         {{assetRating rating}}
                     </span>
 
-                        <div class="more-menu pull-right">
+                        <div class="more-menu pull-right dropup">
                             <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
                                title="Click for more options">
                                 <i class="fw fw-ellipsis fw-rotate-90"></i>
@@ -132,7 +130,7 @@
                             <ul class="more-menu-items dropdown-menu">
                                 {{#if ../../user}}
                                     <li id="listItemRmvFavorite-{{id}}" {{#unless isFavourite}}
-                                        class="display-none-lg" {{/unless}}>
+                                        style="display: none" {{/unless}}>
                                         <a href="#" id="rmv-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="remove-from-fav">
@@ -140,7 +138,7 @@
                                         </a>
                                     </li>
                                     <li id="listItemAddFavorite-{{id}}" {{#if isFavourite}}
-                                        class="display-none-lg" {{/if}}>
+                                        style="display: none" {{/if}}>
                                         <a href="#" id="add-{{id}}" data-name="{{attributes.overview_name}}"
                                            data-provider="{{attributes.overview_provider}}"
                                            data-version="{{attributes.overview_version}}" class="add-to-fav">
@@ -150,7 +148,6 @@
 
 
                                     {{#if ../../../config.isSelfSubscriptionEnabled}}
-                                        {{#if ../../../../config.isEnterpriseSubscriptionEnabled}}
                                             <li>
                                                 <a href="#" class="btnUnsubscribe"
                                                    data-name="{{attributes.overview_name}}"
@@ -159,7 +156,6 @@
                                                     {{t "Un-Subscribe"}}
                                                 </a>
                                             </li>
-                                        {{/if}}
                                     {{/if}}
                                 {{/if}}
 

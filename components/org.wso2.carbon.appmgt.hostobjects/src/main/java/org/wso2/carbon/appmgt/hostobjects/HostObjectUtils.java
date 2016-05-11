@@ -168,19 +168,26 @@ public class HostObjectUtils {
             throw new IllegalArgumentException("Invalid argument. App name cannot be empty.");
         }
 
-        String[] wordsInAppName = StringUtils.split(appName);
-        int firstCodePoint, secondCodePoint;
-        if (wordsInAppName.length == 1) {
-            // one word
-            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
-            secondCodePoint = wordsInAppName[0].codePointAt(Character.charCount(firstCodePoint));
+        String defaultThumbnailText;
+        if (appName.length() == 1) {
+            // only one character in the app name
+            defaultThumbnailText = appName;
         } else {
-            // two or more words
-            firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
-            secondCodePoint = wordsInAppName[1].codePointAt(0);
+            // there are more than one character in the app name
+            String[] wordsInAppName = StringUtils.split(appName);
+            int firstCodePoint, secondCodePoint;
+            if (wordsInAppName.length == 1) {
+                // one word
+                firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+                secondCodePoint = wordsInAppName[0].codePointAt(Character.charCount(firstCodePoint));
+            } else {
+                // two or more words
+                firstCodePoint = Character.toTitleCase(wordsInAppName[0].codePointAt(0));
+                secondCodePoint = wordsInAppName[1].codePointAt(0);
+            }
+            defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
+                    Character.toChars(secondCodePoint)).toString();
         }
-        String defaultThumbnailText = (new StringBuffer()).append(Character.toChars(firstCodePoint)).append(
-                Character.toChars(secondCodePoint)).toString();
         String defaultThumbnailColor = DEFAULT_THUMBNAIL_COLORS[Math.abs(appName.hashCode()) %
                 DEFAULT_THUMBNAIL_COLORS.length];
 
@@ -207,5 +214,16 @@ public class HostObjectUtils {
         subscriptionCofig.put("EnableSelfSubscription", selfSubscriptionStatus);
         subscriptionCofig.put("EnableEnterpriseSubscription", enterpriseSubscriptionStatus);
         return subscriptionCofig;
+    }
+
+    /**
+     * Returns binary file storage location configuration
+     *
+     * @return storage location of images, mobile binaries
+     */
+    public static String getBinaryStorageConfiguration() {
+        AppManagerConfiguration config = HostObjectComponent.getAPIManagerConfiguration();
+        String binaryStorageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        return binaryStorageLocation;
     }
 }

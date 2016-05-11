@@ -35,7 +35,9 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType,
+                    hideTag: hideTag(data)
                 }
             }
         ],
@@ -49,7 +51,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "My Web Apps",
+                    title: "Web Apps",
                     sorting: createSortOptions(data.user, data.config)
                 }
             }
@@ -66,7 +68,14 @@ var render = function (theme, data, meta, require) {
 function createSortOptions(user, config) {
     var isSelfSubscriptionEnabled = config.isSelfSubscriptionEnabled;
     var isEnterpriseSubscriptionEnabled = config.isEnterpriseSubscriptionEnabled;
-    var url = "/extensions/assets/webapp/myapps?sort=";
+    var subscriptionOn = true;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
+    }
+    var url = "/extensions/assets/webapp/apps?sort=";
+    if(subscriptionOn){
+        url = "/extensions/assets/webapp/myapps?sort=";
+    }
     var sortOptions = {};
     var sortByPopularity = {url: url + "popular", title: "Sort by Popularity", class: "fw fw-star"};
     var sortByAlphabet = {url: url + "az", title: "Sort by Alphabetical Order", class: "fw fw-list-sort"};
@@ -75,7 +84,7 @@ function createSortOptions(user, config) {
 
     var options = [];
 
-    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+    if (!subscriptionOn) {
         options.push(sortByAlphabet);
         options.push(sortByRecent);// recently added
         options.push(sortByPopularity);
@@ -94,21 +103,48 @@ function createSortOptions(user, config) {
 }
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
-        {
-            active: true, partial: 'my-apps', url :"/extensions/assets/webapp/myapps"
-        }
-    ];
-
-    if(data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=webapp"
-                                });
+    var enabledTypeList = data.config.enabledTypeList;
+    var leftNavigationData = [];
+    var subscriptionOn = true;
+    if (!data.config.isSelfSubscriptionEnabled && !data.config.isEnterpriseSubscriptionEnabled) {
+        subscriptionOn = false;
     }
-    if (data.navigation.showAllAppsLink) {
-        leftNavigationData.push({
-                                    active: false, partial: 'all-apps', url :  "/assets/webapp"
-                                });
+    var currentAppType = 'webapp';
+
+    if(subscriptionOn) {
+        var data =  { active: true, partial: currentAppType, url: "/assets/"+currentAppType,
+            myapps: true, myappsUrl: "/extensions/assets/"+currentAppType+"/myapps" };
+        leftNavigationData.push(data)
+        for (var i = 0; i < enabledTypeList.length; i++) {
+                if (enabledTypeList[i] != currentAppType) {
+                        leftNavigationData.push({
+                                                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                                     enabledTypeList[i]
+                                                });
+
+                }
+
+        }
+    } else {
+        var data =  { active: true, partial: currentAppType, url: "/extensions/assets/webapp/apps"};
+        leftNavigationData.push(data)
+        for (var i = 0; i < enabledTypeList.length; i++) {
+                if (enabledTypeList[i] != currentAppType) {
+                    if (enabledTypeList[i] == 'mobileapp') {
+                        leftNavigationData.push({
+                                                    active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                                     enabledTypeList[i]
+                                                });
+                    } else {
+                        leftNavigationData.push({
+                                                    active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
+                                                                                                     enabledTypeList[i] + "/apps"
+                                                });
+                    }
+
+                }
+
+        }
     }
 
     return leftNavigationData;
@@ -119,9 +155,18 @@ function getTagUrl(data) {
     var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
     var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
     if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-        tagUrl = '/extensions/assets/webapp/myapps';
+        tagUrl = '/extensions/assets/webapp/apps';
     } else {
         tagUrl = '/assets/webapp';
     }
     return tagUrl;
+}
+
+function hideTag(data){
+    var isSelfSubscriptionEnabled = data.config.isSelfSubscriptionEnabled;
+    var isEnterpriseSubscriptionEnabled = data.config.isEnterpriseSubscriptionEnabled;
+    if (!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
+        return false;
+    }
+    return true;
 }

@@ -18,6 +18,11 @@
  */
 
 include('../modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("site")) {
+    response.sendError(404,'Resource does not exist');
+}
 
 var AuthService;
 var authenticator;
@@ -35,7 +40,7 @@ var WEBAPP_TYPE = 'webapp';
 var SITE_TYPE = 'site';
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging, current, total, mainPage, subPage, title, selectedCategory, key,
+    var options, assets, paging, current, total, url, mainPage, subPage, title, selectedCategory, key,
             log = ctx.log,
             sso = ctx.sso,
             query = ctx.params.query,
@@ -57,8 +62,8 @@ require('/modules/store.js').exec(function (ctx) {
         tag = null;
     }
 
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -84,6 +89,9 @@ require('/modules/store.js').exec(function (ctx) {
             httpsPort = process.getProperty('https.port');
 
     var isSite = 'true';//To get the sites tags
+    var context = caramel.configs().context;
+    var tagUrl = context + '/assets/site';
+    url = '/assets/' + customType + '/?' + (tag ? 'tag=' + tag + '&' : '') + (query ? 'query=' + query + '&' : '');
 
     avaliablePages = store.getAvailablePages(type, ctx.request, ctx.session);
     paging = store.assetsPagingOverrided(request, avaliablePages);
@@ -258,46 +266,59 @@ require('/modules/store.js').exec(function (ctx) {
                 }
             });
         } else if (paging.sort == 'usage') {
-            var urlQuery = 'sort=' + paging.sort + '&';
+            var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
+            urlQuery = 'sort=' + paging.sort + '&';
             server.privileged(function () {
                 var userName = user ? user.username : "";
                 var index = 0, maxTry = 0;
-                var getNextassetSet = function () {
+                var getNextAssetSet = function () {
                     var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                     var appMgtDaoObj = new appMgtDaoService();
-
-                    var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                    var offset = paging.start + index;
+                    var result = appMgtDaoObj.getAppsByHitCount(userName, offset, PAGE_SIZE);
                     if (log.isDebugEnabled()) {
                         var recordCount = 0;
                         if (result != null) {
-                            recordCount = result.length;
+                            recordCount = JSON.parse(result).length;
                         }
                         log.debug("Query executed successfully to get the assets hit count. " + recordCount
-                                + " records found");
+                                          + " records found");
                     }
                     index += PAGE_SIZE;
-                    if (result.length > 0) {
+                    if (JSON.parse(result).length > 0) {
                         return JSON.parse(result);
                     } else {
                         return {};
                     }
                 };
-
                 assets = [];
-                while (assets.length < PAGE_SIZE && maxTry < 10) {
+                var done = false;
+                while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                     maxTry++;
-                    var result = getNextassetSet();
+                    var result = [];
+                    if ((paging.start + index) < totalAppCount) {
+                        result = getNextAssetSet();
+                    }
+                    if (result.length < PAGE_SIZE) {
+                        done = true;
+                    }
                     for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                         var aid = String(result[n].UUID);
                         try {
                             var asset = store.asset(type, aid);
-                            asset.indashboard = store.isuserasset(aid, type);
-                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0) >= 0) {
-                                assets.push(asset);
+                            if (!asset) {
+                                continue;
+                            }
+                            if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
+                                    >= 0) {
+                                //filter web apps
+                                if (asset.attributes.overview_treatAsASite == "TRUE") {
+                                    assets.push(asset);
+                                }
                             }
                         } catch (e) {
                             log.warn("error retrieving asset from store ,information might be stale in table. id=" +
-                                    aid);
+                                     aid);
                         }
                     }
                 }
@@ -313,16 +334,9 @@ require('/modules/store.js').exec(function (ctx) {
     // Else assets should be queried to decide whether there are assets available for the next page.
 
     var nextPageAvailable = false;
-
+    var availablePages = store.getAvailablePages(type, ctx.request, ctx.session);
     if (assets.length == PAGE_SIZE) {
-
-        // Get the starting index, offset etc .. of the assumed next page.
-        var nextPage = store.buildNextPage(request, avaliablePages);
-
-        // Query the assets with the assumed 'next page'
-        var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
-
-        if (nextAssetSet.length > 0) {
+        if (currentPage < availablePages) {
             nextPageAvailable = true;
         }
     }
@@ -398,6 +412,7 @@ require('/modules/store.js').exec(function (ctx) {
         } else {
             recentAssets[i].rating = 0;
         }
+        setDefaultThumbnail(recentAssets[i]);
         siteRecentAssets.push(recentAssets[i]);
     }
 
@@ -417,17 +432,19 @@ require('/modules/store.js').exec(function (ctx) {
                        },
                        type: type,
                        tags: {
-                           data: store.tags(type, isSite)
+                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
                        },
                        assets: assets,
-                       assetType : 'site',
+                       assetType: 'site',
                        pagination: {
                            leftNav: leftnav,
                            rightNav: rightnav,
                            urlQuery: urlQuery
                        },
-                       recentAssets: siteRecentAssets
+                       recentAssets: siteRecentAssets,
+                       enabledTypeList: enabledTypeList
                    });
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {

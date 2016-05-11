@@ -128,6 +128,7 @@ var engine = caramel.engine('handlebars', (function () {
 
             });
 
+            //return the current tenant domain based on tenanted url
             Handlebars.registerHelper('currentTenant', function (path) {
                 var uri = request.getRequestURI();//current page path
                 var matcher = new URIMatcher(uri);

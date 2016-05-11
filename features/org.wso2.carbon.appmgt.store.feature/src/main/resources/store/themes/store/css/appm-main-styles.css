@@ -78,6 +78,23 @@ header .header-action:active {
     line-height: 30px;
 }
 
+.navbar-search, .navbar-search .navbar {
+    min-height: 40px;
+}
+
+.navbar-menu-toggle {
+    float: left;
+    height: 40px;
+    padding: 0;
+    line-height: 47px;
+    font-size: 16px;
+    background:#1A78D8;
+    color: #ffffff;
+}
+.navbar-menu-toggle:hover, .navbar-menu-toggle:focus, .navbar-menu-toggle:active {
+    color: #ffffff;
+    background: #0F5296;
+}
 /**/
 /*========== SEARCH ==========*/
 .search-bar {
@@ -131,6 +148,9 @@ header .header-action:active {
     font-weight: 100;
 }
 
+.search-field {
+    padding-left: 10px;
+}
 .search-box .search-by, .search-box .search-by-dropdown {
     background-color: #002760 !important;
     color: #fff !important;
@@ -142,13 +162,13 @@ header .header-action:active {
 }
 
 .search-box .search-by-dropdown li a {
-    background-color: #002760 ;
-    color: #fff ;
+    background-color: #002760;
+    color: #fff;
 }
 
 .search-box .search-by-dropdown li a:hover,
 .search-box .search-by-dropdown li a:active,
-.search-box .search-by-dropdown li a:focus{
+.search-box .search-by-dropdown li a:focus {
     background-color: #004D86 !important;
     color: #fff;
 }
@@ -182,15 +202,38 @@ header .header-action:active {
     height: 0;
 }
 
-.page-title {
+.page-header .page-title {
     margin: 0;
-    padding-top: 5px;
+    padding-top: 6px;
+    display: inline-block;
 }
 
-.sorting-options > button {
+.page-header .page-title-setting {
+    display: inline-block;
+    margin-left: 5px;
+    padding-top: 10px;
+}
+
+.page-header .page-title-setting > a {
+    padding: 5px 5px 5px 5px;
+    opacity: 0.7;
+}
+
+.page-header .page-title-setting > a:hover,
+.page-header .page-title-setting > a:active,
+.page-header .page-title-setting > a:focus,
+.page-header .page-title-setting.open > a {
+    opacity: 1;
+    background-color: #e4e4e4;
+}
+
+.page-header .sorting-options > button {
     padding: 0 5px 0 5px;
 }
 
+.page-content .page-title {
+    margin-left: 0px;
+}
 /**/
 /*========== NO APPS ==========*/
 .no-apps {
@@ -264,7 +307,7 @@ header .header-action:active {
 
 .app-tile .summery {
     padding: 10px 0 10px 10px;
-    max-width: 96%;
+    max-width: 100%;
 }
 
 .app-tile .summery > h4 {
@@ -285,7 +328,7 @@ header .header-action:active {
 }
 
 .app-tile .summery > .more-menu {
-    position: relative;
+    /*position: relative;*/
 }
 
 .app-tile .summery > .more-menu .more-menu-btn {
@@ -294,7 +337,6 @@ header .header-action:active {
     background-color: #F7F7F7;
     color: #838383;
     padding: 10px;
-    margin-right: -10px;
     margin-top: -10px;
 }
 
@@ -307,7 +349,6 @@ header .header-action:active {
 }
 
 .app-tile .summery > .more-menu .more-menu-items {
-    margin-right: -10px;
     margin-top: 0;
 }
 
@@ -476,6 +517,7 @@ a.disabled {
     background: rgba(0, 0, 0, .6);
     cursor: not-allowed;
 }
+
 /**/
 /*========== COLORS ==========*/
 /*
@@ -570,6 +612,14 @@ active: background 10% lighter, border 5% darker
     background-color: #C64700;
 }
 
+.background-color-inactive {
+    background-color: #C10D15;
+}
+
+.background-color-deprecated {
+    background-color: #FFCC00;
+}
+
 /*========== MOBILE PLATFORM COLORS ========*/
 .background-color-android {
     background-color: #a4c639;
@@ -583,10 +633,108 @@ active: background 10% lighter, border 5% darker
     background-color: #00bcf2;
 }
 
-.background-color-inactive {
-    background-color: #C10D15;
+/*=============== MOBILE ENTERPRISE INSTALL MODAL =========*/
+.ep-install-modal {
+    background: white !important;
+    color: black !important;
 }
 
-.background-color-deprecated {
-    background-color: #FFCC00;
+.ep-install-modal .dataTables_filter label {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
+.ep-install-modal .dataTables_filter label input {
+    margin: 0 0 0 0 !important;
+    min-width: 258px !important;
+}
+
+/*TODO: Remove following ID selectors*/
+.ep-install-modal .dataTables_info {
+    float: none !important;
+}
+
+.ep-install-modal .dataTables_paginate {
+    float: none !important;
+}
+
+.ep-install-modal .dataTables_paginate .paginate_enabled_next{
+    color: #1b63ff;
+    margin-left: 5px;
+}
+
+.ep-install-modal .dataTables_paginate .paginate_enabled_previous{
+    color: #1b63ff;
+}
+
+.ep-install-modal .dataTables_paginate .paginate_disabled_next{
+    margin-left: 5px;
+}
+
+.ep-install-modal .modal-header button {
+    color: #000000;
+}
+
+#noty_center_layout_container {
+    z-index: 100000001 !important;
+}
+
+/*=================MOBILE DEVICE INSTALL MODAL*==============*/
+.modal-dialog-devices .pager li>a {
+    background-color: transparent !important;
+}
+.modal-dialog-devices .thumbnail {
+    background-color: transparent; !important;
+    border: none !important;
+}
+/*---*/
+
+/*===================HOME PAGE SEE MORE OPTION==============*/
+.title {
+    width: auto;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 3px solid #3a9ecf;
+    float: left;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 100;
+}
+
+.fav-app-title {
+    width: auto;
+    padding: 0 10px;
+    height: 50px;
+    border-bottom: 3px solid #3a9ecf;
+    float: left;
+    padding-top: 14px;
+    font-size: 20px;
+    font-weight: 100;
+    margin-bottom: 10px;
+}
+
+.more {
+    color:#000;
+    float:right;
+    background-image:url(../img/more-icon.png)!important;
+    background-position:center left;
+    background-repeat:no-repeat;
+    text-transform:uppercase;
+    padding:23px 3px 16px 36px !important
+}
+
+a.more:hover {
+    color:#3a9ecf;
+    text-decoration:none;
+    background-image:url(../img/more-icon-hover-blue.png)!important;
+    background-position:center left;
+    background-repeat:no-repeat
+}
+
+a.more:active {
+    background-color:none
+}
+
+a.more:focus {
+    border:none
+}
+/*---*/

@@ -429,6 +429,35 @@ Store.prototype.subscriptions = function (type) {
     return assetz;
 };
 
+
+Store.prototype.searchSubscriptions = function (type, searchAttribute, searchValue) {
+    var registry = this.registry,
+        that = this,
+        path = this.subscriptionSpace(type),
+        result = {},
+        apps = [];
+    if (!type) {
+        return;
+    }
+    var appIdPaths = registry.content(path);
+    appIdPaths.forEach(function (path) {
+        var app = that.asset(type, path.substr(path.lastIndexOf('/') + 1));
+        if (app.attributes[searchAttribute].indexOf(searchValue) > -1) {
+            apps.push(app);
+        }
+    });
+    result[type] = apps;
+    return result;
+};
+
+Store.prototype.isSubscribed = function (type, id) {
+    var path = this.subscriptionSpace(type) + '/' + id;
+    if (this.registry.exists(path)) {
+        return true;
+    }
+    return false;
+};
+
 Store.prototype.configs = function () {
     return configs(this.tenantId);
 };
@@ -463,6 +492,9 @@ Store.prototype.tags = function (type) {
 };
 
 /**
+ * @type Type of asset
+ * @isSite - String value of TRUE or FALSE, used to get the tags of webapp and sites separately
+ *
  * Returns all tags which relevant to type and flag
  */
 Store.prototype.tags = function (type, isSite) {
@@ -473,15 +505,21 @@ Store.prototype.tags = function (type, isSite) {
 
     // Supports only 'webapp' type as of now.
     // If type = undefined retrieve tags without any filtering.
-
+    var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
+    var tenantdomain = carbonContext.getTenantDomain();
+    var storeObj = jagg.module("manager").getAPIStoreObj();
     if (type == RESOURCE_TYPE_WEBAPP || type == RESOURCE_TYPE_SITE) {
-        var carbonContext = Packages.org.wso2.carbon.context.CarbonContext.getThreadLocalCarbonContext();
-        var tenantdomain = carbonContext.getTenantDomain();
-        var storeObj = jagg.module("manager").getAPIStoreObj();
-        tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        if(isSite) {
+            //isSite value is given,get tags of  webapp or site based on isSite value
+            tagz = storeObj.getAllTags(String(tenantdomain), type, isSite);
+        } else {
+            //Get both webapp ans site tags
+            tagz = storeObj.getAllTags(String(tenantdomain), type);
+        }
         return tagz;
     } else if (type == RESOURCE_TYPE_MOBILEAPP) {
-        return tagz;
+        tagz = storeObj.getAllTags(String(tenantdomain), type);
+        return tagz
     } else if (type) {
         log.warn("Retrieving tags : Type " + type + " is not supported.");
         return tagz;
@@ -489,6 +527,32 @@ Store.prototype.tags = function (type, isSite) {
 
     return tagz;
 };
+
+Store.prototype.allTags = function () {
+    var TAG_QUERY = '/_system/config/repository/components/org.wso2.carbon.registry/queries/allTags';
+    var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
+    var tagsDetail = registry.query(TAG_QUERY);
+    var tags = [];
+    var tagCount = {};
+    for (var i = 0; i < tagsDetail.length; i++) {
+        var components = tagsDetail[i].split(':');
+        var tag = components[1];
+        if (!tagCount[tag]) {
+            tagCount[tag] = 1;
+        } else {
+            tagCount[tag] += 1;
+        }
+    }
+
+    for (var key in tagCount) {
+        if (tagCount.hasOwnProperty(key)) {
+            var tag = {"name": key, "count": tagCount[key]};
+            tags.push(tag);
+        }
+    }
+    return tags;
+
+}
 
 Store.prototype.comments = function (aid, paging) {
     var registry = this.registry || this.servmod.anonRegistry(this.tenantId);
@@ -532,67 +596,19 @@ Store.prototype.rate = function (aid, rating) {
  * @param paging
  */
 Store.prototype.assets = function (type, paging) {
-
-    //var type=(type=='null')?null:type;
-
-    //Check if a type has been provided
-    /*if(!type){
-     log.debug('Returning an empty [] for Store.assets.');
-     return [];
-     }*/
-
     var options = {};
     options = obtainViewQuery(options);
     options = {"attributes": options};
     var i;
     var newPaging = PaginationFormBuilder(paging);
-    //var assetz = this.assetManager(type).list(paging);
-
     var assetz = this.assetManager(type).search(options, newPaging);
-
     var assetszReturn = [];
-
 
     for (i = 0; i < assetz.length; i++) {
         assetz[i].indashboard = this.isuserasset(assetz[i].id, type);
-
-
-        if(assetz[i].type == "mobileapp"){
-            if( assetz[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = assetz[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        assetszReturn.push(assetz[i]);
-                    }
-                }
-
-            }else{
-                assetszReturn.push(assetz[i]);
-            }
-        }else{
             if(assetszReturn.length == 0){
                 assetszReturn = assetz;
             }
-
-        }
-
-
-
-
-
-
-
-        //print(assetz);
-
-
     }
     return assetszReturn;
 };
@@ -649,7 +665,7 @@ Store.prototype.tagged = function (type, tag, paging) {
 
 
 Store.prototype.taggeds = function (type, options, paging) {
-
+    var log = new Log();
     var i, length, types, assets;
 
     options = obtainViewQuery(options);
@@ -717,6 +733,14 @@ Store.prototype.getAvailablePages = function (type,req,session) {
     var appCount = artifactManager.count();
     var pageNumber = Math.ceil(appCount/PAGE_SIZE);
     return pageNumber;
+};
+
+Store.prototype.getTotalAssetCount = function (type,req,session) {
+    var managers= storeManagers(req,session,this.tenantId);
+    var rxtManager = managers.rxtManager;
+    var artifactManager = rxtManager.getArtifactManager(type);
+    var appCount = artifactManager.count();
+    return appCount;
 };
 
 Store.prototype.getCurrentPage = function(currentIndex){
@@ -791,38 +815,9 @@ Store.prototype.recentAssets = function (type, count, options) {
         recent[i].rating = this.rating(recent[i].path).average;
         recent[i].indashboard = this.isuserasset(recent[i].id, type);
 
-
-        if(recent[i].type == "mobileapp"){
-            if( recent[i].attributes.overview_visibility != "null"){
-
-                if(this.user){
-                    var assetRoles = recent[i].attributes.overview_visibility.split(",");
-                    var server = require('store').server;
-                    var um = server.userManager(this.tenantId);
-                    var userRoles = um.getRoleListOfUser(this.user.username);
-
-                    commonRoles = userRoles.filter(function(n) {
-                        return assetRoles.indexOf(String(n)) != -1
-                    });
-                    if(commonRoles.length > 0){
-                        recentReturn.push(recent[i]);
-                    }
-                }
-
-            }else{
-                recentReturn.push(recent[i]);
-            }
-        }else{
-            if(recentReturn.length == 0){
-                recentReturn = recent;
-            }
-
+        if (recentReturn.length == 0) {
+            recentReturn = recent;
         }
-
-
-
-
-
     }
     return recentReturn;
 };
@@ -1268,4 +1263,7 @@ Store.prototype.getReferer = function (request) {
     }
     return referer;
 };
+
+
+
 

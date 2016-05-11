@@ -5,7 +5,7 @@
         <div class="hidden-xs col-sm-7 col-md-6 col-lg-6 add-padding-1x">
             <div class="ratio-responsive-16by9 hover-overlay-container">
                 <div class="ratio-responsive-img">
-                    <img src="{{#if asset.attributes.images_banner}}{{ asset.attributes.images_banner}}{{/if}}">
+                    <img src="{{#if asset.attributes.images_banner}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_banner}}{{/if}}">
                 </div>
             </div>
         </div>
@@ -15,7 +15,7 @@
                 <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5 add-padding-1x">
                     <div class="ratio-responsive-4by3">
                         <div class="ratio-responsive-img">
-                            <img src="{{#if asset.attributes.images_thumbnail}}{{ asset.attributes.images_thumbnail}}{{/if}}" />
+                            <img src="{{#if asset.attributes.images_thumbnail}}{{tenantedUrl "/api/mobileapp/getfile/"}}{{ asset.attributes.images_thumbnail}}{{/if}}" />
                         </div>
                         <div class="app-thumbnail-type background-color-android col-xs-2 col-sm-3 col-md-3 col-lg-3">
                             <span><i class="fw {{iconImage asset.attributes.overview_platform}}"></i></span>
@@ -35,7 +35,7 @@
                     </p>
 
                                     <span class="rating">
-                                        {{assetRating rating}}
+                                        {{assetRating asset.rating}}
                                     </span>
                     {{!--buttons --}}
                     <div class="actions">
@@ -106,7 +106,7 @@
                         {{#if this}}
                             <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
                                 <div class="thumbnail">
-                                    <img class="img-responsive" src="{{this}}" />
+                                    <img class="img-responsive" src="{{tenantedUrl "/api/mobileapp/getfile/"}}{{this}}" />
                                 </div>
                             </div>
                         {{/if}}
@@ -116,7 +116,7 @@
             {{!--user review tab content--}}
             <div id="menu3" class="tab-pane fade">
                 <div class="row">
-                    <iframe name="socialIfr" id="socialIfr" class="col-lg-12 col-md-12 col-sm-12 "
+                    <iframe name="socialIfr" id="socialIfr" class="col-lg-12 col-md-12 col-sm-4 "
                             style="border: none;"
                             src="{{socialURL}}/?target={{type}}:{{asset.id}}&user={{user.username}}">
                     </iframe>
@@ -132,7 +132,8 @@
     <div class="modal-dialog-devices">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Install {{ asset.attributes.overview_displayName}}</h4>
             </div>
             <div class="modal-body">
@@ -144,21 +145,25 @@
 
 
                             </div>
-                            <a data-slide="prev" href="#media" class="left carousel-control">‹</a>
-                            <a data-slide="next" href="#media" class="right carousel-control">›</a>
+                            <ul class="pager">
+                                <li><a data-slide="prev" href="#media">Prev</a></li>
+                                <li><a data-slide="next" href="#media">Next</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 
 <div class="modal fade" id="modalEnterpriseInstall">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content ep-install-modal">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Enterprise Install</h4>
@@ -198,8 +203,10 @@
 
             </div>
             <div class="modal-footer">
-                <button id="btn-apps-ent-install" class="btn btn-primary">Install</button>
-                <button id="btn-apps-ent-uninstall" class="btn btn-danger">Uninstall</button>
+                <div>
+                    <button id="btn-apps-ent-install" class="btn btn-primary">Install</button>
+                    <button id="btn-apps-ent-uninstall" class="btn btn-danger">Uninstall</button>
+                </div>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

@@ -1,5 +1,5 @@
 <td data-column="thumbnail">
-    <img src="{{this.attributes.images_thumbnail}}" />
+    <img src="{{url "/api/mobileapp/getfile/"}}{{this.attributes.images_thumbnail}}" />
 </td>
 <td data-column="displayName" class="asset-listing-name">
     <a href='{{url "/asset/mobileapp/"}}{{this.id}}'>

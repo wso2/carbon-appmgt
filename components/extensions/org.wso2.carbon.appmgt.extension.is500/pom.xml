@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~
+  ~ WSO2 Inc. licenses this file to you under the Apache License,
+  ~ Version 2.0 (the "License"); you may not use this file except
+  ~ in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.wso2.carbon.appmgt</groupId>
+        <artifactId>carbon-appmgt</artifactId>
+        <version>1.1.4-SNAPSHOT</version>
+	<relativePath>../../../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.appmgt.extension.is500</artifactId>
+    <version>1.1.4-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>AppM WSO2 IS v5.0.0 bridge component</name>
+
+    <properties>
+        <extension.carbon.identity.application.mgt.version>4.2.0</extension.carbon.identity.application.mgt.version>
+        <extension.carbon.identity.sso.saml.version>4.2.2</extension.carbon.identity.sso.saml.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.api</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.application.mgt.stub</artifactId>
+            <version>${extension.carbon.identity.application.mgt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.sso.saml.stub</artifactId>
+            <version>${extension.carbon.identity.sso.saml.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Private-Package>
+                            org.wso2.carbon.appmgt.impl.idp.sso.is500.internal
+                        </Private-Package>
+                        <Export-Package>
+                            !org.wso2.carbon.appmgt.impl.idp.sso.is500.internal,
+                            org.wso2.carbon.appmgt.impl.idp.sso.is500.*,
+                            org.wso2.carbon.identity.application.mgt.stub.*;version="${extension.carbon.identity.application.mgt.version}",
+                            org.wso2.carbon.identity.sso.saml.stub.*;version="${extension.carbon.identity.sso.saml.version}"
+                        </Export-Package>
+                        <Embed-Dependency>
+                            org.wso2.carbon.identity.application.mgt.stub.*,
+                            org.wso2.carbon.identity.sso.saml.stub.*;scope=compile|runtime
+                        </Embed-Dependency>
+                        <Embed-Transitive>false</Embed-Transitive>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-scr-scrdescriptor</id>
+                        <goals>
+                            <goal>scr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

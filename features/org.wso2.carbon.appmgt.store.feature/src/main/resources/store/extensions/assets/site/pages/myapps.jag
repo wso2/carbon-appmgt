@@ -21,6 +21,12 @@ var authenticator;
 var caramel;
 
 include('../modules/jagg/jagg.jag');
+var manager = jagg.module("manager");
+var storeHostObj = manager.getAPIStoreObj();
+if(!storeHostObj.isAssetTypeEnabled("site")) {
+    response.sendError(404,'Resource does not exist');
+}
+
 var storeServer = require('store').server;
 var carbon = require('carbon');
 var user = storeServer.current(session);
@@ -33,7 +39,7 @@ if (user) {
 var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
-    var options, assets, paging,
+    var options, assets, paging, url,
             log = ctx.log,
             sso = ctx.sso,
             query = ctx.params.query,
@@ -49,9 +55,9 @@ require('/modules/store.js').exec(function (ctx) {
 
     caramel = require('caramel');
     //Check whether to show register link in myapps page
-    var manager = jagg.module("manager");
-    var storeHostObj = manager.getAPIStoreObj();
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
+    //Get the list of enabled app types
+    var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
 
     //Get the subscription configuration options
     var subscriptionUtil = require('../../../../themes/store/js/subscription-config.js');
@@ -65,7 +71,6 @@ require('/modules/store.js').exec(function (ctx) {
 
     var isSite = 'true';//To get the site tags
     var context = caramel.configs().context;
-
     var leftnav, rightnav, urlQuery;//For pagination
     
     var headerData = site.header(tenantId, {
@@ -89,7 +94,6 @@ require('/modules/store.js').exec(function (ctx) {
     var currIndex = paging.start + 1;
     var currentPage = store.getCurrentPage(currIndex);
 
-    var storeHostObj = jagg.module("manager").getAPIStoreObj();
     var isMultipleVersionDisplayEnabled = storeHostObj.isDisplayMultipleVersionsEnabled();
     if (log.isDebugEnabled()) {
         log.debug("Multiple version display in store is : " + isMultipleVersionDisplayEnabled);
@@ -186,7 +190,6 @@ require('/modules/store.js').exec(function (ctx) {
                             aid = String(result[n].id);
                             try {
                                 asset = store.asset(type, aid);
-                                asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
                                         >= 0) {
                                     assets.push(asset);
@@ -201,6 +204,7 @@ require('/modules/store.js').exec(function (ctx) {
 
             }
             else if (paging.sort == 'usage') { //sort by usage in myapps page
+                var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
                 urlQuery = 'sort=' + paging.sort + '&';
                 server.privileged(function () {
                     var userName = user ? user.username : "";
@@ -208,8 +212,8 @@ require('/modules/store.js').exec(function (ctx) {
                     var getNextAssetSet = function () {
                         var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
                         var appMgtDaoObj = new appMgtDaoService();
-
-                        var result = appMgtDaoObj.getAppsByHitCount(userName, (paging.start + index), PAGE_SIZE);
+                        var offset = paging.start + index;
+                        var result = appMgtDaoObj.getAppsByHitCount(userName, offset, PAGE_SIZE);
                         if (log.isDebugEnabled()) {
                             var recordCount = 0;
                             if (result != null) {
@@ -225,29 +229,28 @@ require('/modules/store.js').exec(function (ctx) {
                             return {};
                         }
                     };
-
                     assets = [];
                     var done = false;
                     while (assets.length < PAGE_SIZE && maxTry < 10 && !done) {
                         maxTry++;
-                        //var result = getNextAssetSet();
-
-                        var result;
-                        if ((paging.start + index) < PAGE_SIZE) {
+                        var result = [];
+                        if ((paging.start + index) < totalAppCount) {
                             result = getNextAssetSet();
                         }
-
-                        if (result.length < 12) {
+                        if (result.length < PAGE_SIZE) {
                             done = true;
                         }
                         for (var n = 0; n < result.length && assets.length < PAGE_SIZE; n++) {
                             var aid = String(result[n].UUID);
                             try {
                                 var asset = store.asset(type, aid);
-                                asset.indashboard = store.isuserasset(aid, type);
+                                if (!asset) {
+                                    continue;
+                                }
+                               // asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
-                                    >= 0) {
-                                    //filter sites
+                                        >= 0) {
+                                    //filter web apps
                                     if (asset.attributes.overview_treatAsASite == "TRUE") {
                                         assets.push(asset);
                                     }
@@ -261,7 +264,9 @@ require('/modules/store.js').exec(function (ctx) {
                 });
             }
             else { //myapps page request
-                urlQuery = 'sort=' + paging.sort + '&';
+                if(paging.sort != "null") {
+                    urlQuery = 'sort=' + paging.sort + '&'
+                }
                 assets = store.search(SITE_OPTIONS, paging);
             }
         }
@@ -298,12 +303,7 @@ require('/modules/store.js').exec(function (ctx) {
         var nextPageAvailable = false;
 
         if (assets.length == PAGE_SIZE) {
-            // Get the starting index, offset etc .. of the assumed next page.
-            var nextPage = store.buildNextPage(request, availablePages);
-
-            // Query the assets with the assumed 'next page'
-            var nextAssetSet = store.search(SITE_OPTIONS, nextPage);
-            if (nextAssetSet.length > 0) {
+            if (currentPage < availablePages) {
                 nextPageAvailable = true;
             }
         }
@@ -314,9 +314,6 @@ require('/modules/store.js').exec(function (ctx) {
 
         if (currentPage - 1 > 0) {
             leftnav = currentPage - 1;
-        }
-        if (nextPageAvailable && (assets.length == PAGE_SIZE)) {
-            rightnav = currentPage + 1;
         }
     };
 
@@ -383,6 +380,7 @@ require('/modules/store.js').exec(function (ctx) {
             } else {
                 searchOption = "SEARCH_BY_APP_NAME";
             }
+            query = require('/modules/search.js').build(query);
             if (user) {
                 assets = subsApp.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
@@ -437,19 +435,11 @@ require('/modules/store.js').exec(function (ctx) {
      */
     var isActive = function (asset) {
         var active = false;
-        if(!isSelfSubscriptionEnabled && !isEnterpriseSubscriptionEnabled) {
-            var lifeCycleState = asset.lifecycleState.toUpperCase();
-            if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
-                active = true;
-            }
-            asset.lifecycleState = lifeCycleState;
-        } else {
-            if (asset.lifeCycleStatus == "PUBLISHED" || asset.lifeCycleStatus == "DEPRECATED") {
-                active = true;
-            }
-            //when getting asset from apm db attribute name is different.
-            asset.lifecycleState = asset.lifeCycleStatus;
+        var lifeCycleState = asset.lifecycleState.toUpperCase();
+        if (lifeCycleState == "PUBLISHED" || lifeCycleState == "DEPRECATED") {
+            active = true;
         }
+        asset.lifecycleState = lifeCycleState;
         return active
     };
     /*------------------------------Retrieve apps based on subscription options -Start---------------------------------*/
@@ -490,11 +480,12 @@ require('/modules/store.js').exec(function (ctx) {
                        },
                        type: type,
                        tags: {
-                           data: store.tags(type, isSite)
+                           data: {allTags: store.tags(type, isSite), searchedTag: tag}
                        },
                        config: {
                            isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled
+                           isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                           enabledTypeList: enabledTypeList
                        },
                        assets: assets,
                        assetType: 'site',
@@ -504,12 +495,16 @@ require('/modules/store.js').exec(function (ctx) {
                            urlQuery: urlQuery
                        },
                        recentAssets: webAppRecentAssets
-
                    });
+
 }, request, response, session);
 
 function getServiceDir(serviceName) {
     return '../services/' + serviceName;
 }
 
+function getTags(type, store) {
+    var paging = {"start": 0, "count": 120000,"paginationLimit":120000};
+    return store.taggeds(type, options, paging)
+};
 %>

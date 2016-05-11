@@ -35,7 +35,8 @@ var render = function (theme, data, meta, require) {
                 context: {
                     navigation: createLeftNavLinks(data),
                     tags: data.tags,
-                    recentApps: require('/helpers/asset.js').formatRatings(data.recentAssets)
+                    recentApps: data.recentAssets,
+                    assetType: data.assetType
                 }
             }
         ],
@@ -49,7 +50,7 @@ var render = function (theme, data, meta, require) {
             {
                 partial: 'page-header',
                 context: {
-                    title: "All Web Apps",
+                    title: "Sites",
                     sorting: createSortOptions(data)
                 }
             }
@@ -84,19 +85,31 @@ function createSortOptions(data) {
 
 
 function createLeftNavLinks(data) {
-    var leftNavigationData = [
-        {
-            active: true, partial: 'all-apps', url: "/assets/site"
-        }
-    ];
+    var enabledTypeList = data.enabledTypeList;
+    var currentAppType = 'site';
+    var leftNavigationData = [];
 
-    leftNavigationData.push({
-                                active: false, partial: 'my-apps', url: "/extensions/assets/site/myapps"
-                            });
-    if (data.user) {
-        leftNavigationData.push({
-                                    active: false, partial: 'my-favorites', url: "/assets/favouriteapps?type=site"
-                                });
+    if(data.user) {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/"+currentAppType,
+            myapps: false, myappsUrl: "/extensions/assets/"+currentAppType+"/myapps"
+        }
+        leftNavigationData.push(data)
+    } else {
+        var data =  {
+            active: true, partial: currentAppType, url: "/assets/" + currentAppType
+        }
+        leftNavigationData.push(data)
+    }
+
+    for (var i = 0; i < enabledTypeList.length; i++) {
+        if (enabledTypeList[i] != currentAppType) {
+            leftNavigationData.push({
+                                        active: false, partial: enabledTypeList[i], url: "/assets/" +
+                                                                                         enabledTypeList[i]
+                                    });
+        }
+
     }
     return leftNavigationData;
 }

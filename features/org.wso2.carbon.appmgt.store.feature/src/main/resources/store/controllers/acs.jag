@@ -2,6 +2,7 @@
 include('/extensions/assets/webapp/modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
+var auditLog = require('/modules/auditLog/logger.js');
 
 (function () {
     var log = new Log(),
@@ -86,7 +87,7 @@ var storeHostObj = manager.getAPIStoreObj();
 
                         session.put("LOGGED_IN_USER", sessionObj.loggedInUser);
                         session.put("Loged", "true");
-                        session.put("tenantId",tenantId)
+                        session.put("tenantId",tenantId);
 
                         username = username + "";
                         var userDetails = {};
@@ -114,6 +115,7 @@ var storeHostObj = manager.getAPIStoreObj();
                             if (log.isDebugEnabled()) {
                                 log.debug('User has been set to : ' + sessionObj.loggedInUser);
                             }
+                            auditLog.writeLog(tenantId, username, "UserSignedIn","Login","", "", "");
                             //check whether login request came by clicking the login url and do redirect
                             // to myfavourites page if user has already selected it as homepage.
                             //in store login url is in the format of /login?header=true
@@ -122,13 +124,17 @@ var storeHostObj = manager.getAPIStoreObj();
                                 if(!urlTenantDomain){
                                     urlTenantDomain = "carbon.super";
                                 }
-                                var isFavouritePageSelected = manager.hasFavouritePage(username,tenantId,urlTenantDomain).status;
-                                if (isFavouritePageSelected) {
-                                    var favPage = configs.pages.favouritePage;
-                                    relayState = contextPath + favPage;
-                                } else {
-                                    //remove the query param
-                                    relayState.replace(queryParam, "");
+                                var enabledTypeList = storeHostObj.getEnabledAssetTypeList();
+                                //when only mobile app is enabled do not check for favourite home page
+                                if (!(enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp")) {
+                                    var isFavouritePageSelected = manager.hasFavouritePage(username, tenantId, urlTenantDomain).status;
+                                    if (isFavouritePageSelected) {
+                                        var favPage = configs.pages.favouritePage;
+                                        relayState = contextPath + favPage;
+                                    } else {
+                                        //remove the query param
+                                        relayState.replace(queryParam, "");
+                                    }
                                 }
                             }
 

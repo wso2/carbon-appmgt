@@ -23,6 +23,7 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
 (function () {
     var userModule = require('/modules/user.js');
     var logged = userModule.current(session);
+    var auditLog = require('/modules/auditLog/logger.js');
 
     if (logged) {
         var username = String(logged.username) + '@' + logged.tenantDomain;
@@ -35,12 +36,29 @@ var matcher = new URIMatcher(request.getRequestURI()), method = request.getMetho
             var activity = JSON.parse(request.getParameter('activity'));
             activity.actor = {"id": username, "objectType": "person"};
             var id = social.publish(JSON.stringify(activity));
+            var parameters = request.getAllParameters();
+            var name = parameters.name;
+            var version = parameters.version;
+            var provider = parameters.provider;
+            var storeTenantDomain = parameters.storeTenantDomain;
+            var userName = user.username;
 
             var result = {
                 success: Boolean(id),
                 id: id
             };
-
+            auditLog.writeLog(logged.tenantDomain.tenantId, username, "UserReviewedAnApplication", "Webapp", "{" +
+                                                                                                             "providerName='"
+                                                                                                             + provider
+                                                                                                             + '\'' +
+                                                                                                             ", apiName='"
+                                                                                                             + name
+                                                                                                             + '\'' +
+                                                                                                             ", version='"
+                                                                                                             + version
+                                                                                                             + '\'' +
+                                                                                                             '}', "",
+                              "");
             print(result);
         } else {
             var carbon = require('carbon');

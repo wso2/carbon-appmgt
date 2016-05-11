@@ -1,7 +1,10 @@
 {{!-- page content - favourite apps --}}
 {{#each favouriteApps}}
     <div class="row page-title">
-        <h4>{{type}}</h4>
+        <div class="container-fluid">
+            <div class="fav-app-title">{{type}}</div><!--title-->
+
+        </div>
     </div>
     <div class="row">
         {{#each assets}}
@@ -10,7 +13,7 @@
                     <div class="app-tile">
                         <a href="{{gatewayUrl}}" target="_blank" data-id="{{uuid}}"
                            data-name="{{appName}}" data-version="{{version}}"
-                           data-context="{{context}}" class="hover-overlay-container accessUrl">
+                           data-context="{{context}}" data-stats="usage" class="hover-overlay-container">
                             <div class="ratio-responsive-4by3">
                                 {{#ifCond lifecycleState "==" "DEPRECATED"}}
                                     {{> ribbons/deprecated}}
@@ -33,12 +36,11 @@
                             <h4>{{appDisplayName}}</h4>
                             <h5>{{version}}</h5>
 
-                            <p>{{appProvider}}</p>
                          <span class="rating">
                              {{assetRating rating}}
                          </span>
 
-                            <div class="more-menu pull-right">
+                            <div class="more-menu pull-right dropup">
                                 <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
                                    title="Click for more options">
                                     <i class="fw fw-ellipsis fw-rotate-90"></i>
@@ -87,7 +89,7 @@
                              {{assetRating rating}}
                          </span>
 
-                            <div class="more-menu pull-right">
+                            <div class="more-menu pull-right dropup">
                                 <a href="#" class="more-menu-btn dropdown-toggle" data-toggle="dropdown"
                                    title="Click for more options">
                                     <i class="fw fw-ellipsis fw-rotate-90"></i>
