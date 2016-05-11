@@ -21,8 +21,16 @@ public class DefaultAppRepository implements AppRepository{
     @Override
     public String saveApp(App app) {
 
+        savePolicyGroups(app);
+        saveRegistryArtifact(app);
+        saveAppToRDMS(app);
+        saveServiceProvider(app);
 
         return null;
+    }
+
+    private void savePolicyGroups(App app) {
+
     }
 
     private long savePolicyGroup(EntitlementPolicyGroup policyGroup){
@@ -31,6 +39,14 @@ public class DefaultAppRepository implements AppRepository{
 
     private String saveRegistryArtifact(App app){
         return null;
+    }
+
+    private long saveAppToRDMS(App app){
+        return -1;
+    }
+
+    private void saveServiceProvider(App app){
+
     }
 
 }
