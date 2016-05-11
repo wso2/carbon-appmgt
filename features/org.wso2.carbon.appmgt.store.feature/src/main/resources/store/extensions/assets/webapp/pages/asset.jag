@@ -213,11 +213,14 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['overview_provider'] = provider;
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
-            businessOwner = storeHostObj.getBusinessOwner(asset.id);
-            if(businessOwner != null && businessOwner.businessOwnerName != null) {
-                businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
-                ownerName = businessOwnerCustomData[0].value;
+            if(asset.attributes.overview_businessOwner != "null") {
+                businessOwner = storeHostObj.getBusinessOwner(asset.attributes.overview_businessOwner);
+                if(businessOwner != null && businessOwner.businessOwnerName != null) {
+                    businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+                    ownerName = businessOwnerCustomData[0].value;
+                }
             }
+
             //Remove the current asset from the assets list.
             for (var i = 0; i < assetsFromProvider.assets.length; i++) {
                 if (assetsFromProvider.assets[i].id === asset.id) {

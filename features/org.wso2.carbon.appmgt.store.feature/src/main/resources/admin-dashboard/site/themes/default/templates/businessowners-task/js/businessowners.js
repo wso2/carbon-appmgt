@@ -71,30 +71,39 @@ function completeIfInTag(cm) {
     });
 }
 
-
-$(document).ready(function () {
-    // Get shared partials
-    $.ajax({
-               url: context + '/apis/businessowners/list',
-               type: 'GET',
-               contentType: 'application/json',
-               dataType: 'json',
-               success: function (data) {
-                   for (var i = 0; i < data.length; i++) {
-                       businessOwnersArray.push({
-                                                    businessOwnerId: data[i].businessOwnerId,
-                                                    businessOwnerName: data[i].businessOwnerName,
-                                                    businessOwnerEmail: data[i].businessOwnerEmail,
-                                                    businessOwnerDescription: data[i].businessOwnerDescription,
-                                                    businessOwnerSite: data[i].businessOwnerSite
-                                                });
-                   }
-                   updateOwners();
-               },
-               error: function () {
-               }
-           });
-    $('#policy-name').select();
+$(document).ready(function() {
+    $('#ownersTable').DataTable({
+          "processing": true,
+          "serverSide": true,
+          "paging": true,
+          "ordering": true,
+          "order": [[1, "asc"]],
+          "ajax": context + '/apis/businessowners',
+          "columns": [{
+              "id": "Id",
+               "searchable": false
+          }, {
+              "id": "Name",
+              "searchable": false
+          },{
+              "id": "Email",
+              "searchable": true
+          }, {
+              "id": "Site Link",
+              "searchable": true
+          }, {
+             "id": "Description",
+             "searchable": true
+          }, {
+             "render": function (data, type, full, meta) {
+                return '<a data-target="" ' +
+                       'data-toggle="modal" class="owner-edit-button">' +
+                       '<i class="icon-edit"></i></a> &nbsp<a'
+                       +' class="owner-delete-button"><i class="icon-trash"></i>' +
+                       '</a>';
+             }
+          }]
+    });
 });
 
 //save event
@@ -112,8 +121,15 @@ $(document).on("click", "#btn-owner-save", function () {
         while (i > 1) {
             var key_id = "#key-".concat(i - 1);
             var val_id = "#value-".concat(i - 1);
+            var showInStoreId = "showInStore-".concat(i - 1);
             var key = $(key_id).val();
-            var value = $(val_id).val();
+            var value = [];
+            value.push($(val_id).val());
+            if(document.getElementById(showInStoreId).checked) {
+                value.push(true);
+            } else {
+                value.push(false);
+            }
             ownerProperties[key] = value;
             i--;
         }
@@ -155,7 +171,6 @@ function updateOwners() {
     }
     $.each(businessOwnersArray, function (index, obj) {
         if (obj != null) {
-
             $('#ownerPartialsTable tbody').append('<tr><td>' +
                                                   obj.businessOwnerName + '</td> <td>' + obj.businessOwnerEmail + '</td> <td>'
                                                   + obj.businessOwnerSite + '</td> <td>' + obj.businessOwnerDescription
@@ -171,13 +186,18 @@ function updateOwners() {
     });
 
 }
-function GetDynamicTextBox(index, key, value) {
+function GetDynamicTextBox(index, key, value, showInStore) {
     var id_key = "key-".concat(index);
     var id_val = "value-".concat(index);
+    var check_val = "showInStore-".concat(index);
     var id_btn = "btn-".concat(index);
+    var checkBoxStatus;
+    if (showInStore) {
+        checkBoxStatus = "checked";
+    }
     return '<input name = "key" type="text" id="' + id_key + '" value="' + key + '"/>&nbsp &nbsp &nbsp &nbsp' +
            '<input name="value" type="text" id="' + id_val + '" value="' + value
-           + '"/>&nbsp &nbsp &nbsp &nbsp<button id="' + index
+           + '"/>&nbsp &nbsp &nbsp &nbsp<input type="checkbox" name="showInStore" id="'+check_val+'" ' + checkBoxStatus +'>&nbsp &nbsp &nbsp &nbsp<button id="' + index
            + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button>'
 }
 
@@ -194,7 +214,7 @@ function removeFields(index) {
 
 $(document).on("click", "#btn-owner-add-field", function () {
     var div = $("<div />");
-    div.html(GetDynamicTextBox(extraFieldCount, "", ""));
+    div.html(GetDynamicTextBox(extraFieldCount, "", "", ""));
     $("#businessOwnerOther").append(div);
     extraFieldCount++;
 });
@@ -222,17 +242,26 @@ $(document).on("click", ".owner-edit-button", function () {
             $('#businessOwnerDescription').val(obj.businessOwnerDescription);
 
             $.ajax({
-                       url: context + '/apis/businessowners/details/' + obj.businessOwnerId,
+                       url: context + '/apis/businessowners/' + obj.businessOwnerId,
                        type: 'GET',
                        contentType: 'application/json',
                        dataType: 'json',
                        success: function (data) {
-                          businessOwnerDetails = data.businessOwnerDeatails;
+                          businessOwnerDetails = data.businessOwnerProperties;
                            var ownerDataObject = JSON.parse(businessOwnerDetails);
                            var i = 1;
+                           var xx = '<h5>Property &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp'
+                                    + ' &nbsp &nbsp &nbsp &nbsp &nbsp '
+                                    + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value '
+                                    + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
+                                    +'&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Show in Store</h5><br>';
+                           $("#businessOwnerOther").append(xx);
                            for(var key in ownerDataObject){
+                               var ownerProperties = ownerDataObject[key];
+                               var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
+
                                var div = $("<div />");
-                                           div.html(GetDynamicTextBox(i, key, ownerDataObject[key]));
+                                           div.html(GetDynamicTextBox(i, key, ownerProperty["propertyValue"], ownerProperty["isShowingInStore"]));
                                           $("#businessOwnerOther").append(div);
                                i ++;
                                extraFieldCount = i;
@@ -251,7 +280,7 @@ $(document).on("click", ".owner-edit-button", function () {
 $(document).on("click", ".owner-delete-button", function () {
     var ownerId = $(this).data("ownerId");
     $.ajax({
-               url: context + '/apis/businessowners/delete/' + ownerId,
+               url: context + '/apis/businessowners/' + ownerId,
                type: 'DELETE',
                contentType: 'application/json',
                dataType: 'json',
@@ -272,3 +301,42 @@ $(document).on('click', '#btn-owner-cancel', function(){
 $(document).on("click", "#btn-owner-add-new", function () {
     location.replace(context + "/tasks?task=businessowners-new")
 });
+
+//$('#search-button').on('click', search);
+
+$('#businessOwnerSearch').keypress(function(e) {
+    if (e.which == 13)
+        search();
+});
+
+function search() {
+    var searchBusinessOwner = $('#businessOwnerSearch').val();
+    if (searchBusinessOwner != "") {
+        $.ajax({
+                   url: context + '/apis/businessowners/search/' + searchBusinessOwner,
+                   type: 'GET',
+                   contentType: 'application/json',
+                   dataType: 'json',
+                   success: function (data) {
+                       businessOwnersArray = [];
+                       for (var i = 0; i < data.length; i++) {
+                           businessOwnersArray.push({
+                                                        businessOwnerId: data[i].businessOwnerId,
+                                                        businessOwnerName: data[i].businessOwnerName,
+                                                        businessOwnerEmail: data[i].businessOwnerEmail,
+                                                        businessOwnerDescription: data[i].businessOwnerDescription,
+                                                        businessOwnerSite: data[i].businessOwnerSite
+                                                    });
+                       }
+                       alert(context);
+                       //location.replace("https://localhost:9443/admin-dashboard/tasks?task=businessowners");
+                       updateOwners();
+                       //Showalert("Owner Deleted Successfully ", "alert-success", "statusSuccess");
+                       //location.reload();
+                   },
+                   error: function (response) {
+                       Showalert('Error occured while deleting the business owner', "alert-error", "statusError");
+                   }
+               });
+    }
+}

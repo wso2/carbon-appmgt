@@ -34,10 +34,14 @@
                                         </div>
                                     {{/each}}
 
-                                    <div>
-                                        <label><b>Business Owner: </b></label>
-                                        <span>{{businessOwnerName}}</span> <br />
-                                    </div>
+                                    {{#if businessOwner.businessOwnerName}}
+                                        <div>
+                                            <label><b>Business Owner: </b></label>
+                                            <span>
+                                                {{businessOwner.businessOwnerName}} ({{businessOwner.businessOwnerEmail}})
+                                            </span> <br />
+                                        </div>
+                                    {{/if}}
                                     {{#each newViewData.main}}
                                         <div>
                                             <label><b>{{label}}: </b></label>
@@ -60,6 +64,9 @@
                                         <li><a href="#nav-pills-tab-5" data-toggle="tab">External Stores</a></li>
                                     {{/compare}}
                                 {{/compare}}
+                            {{/if}}
+                            {{#if businessOwner.businessOwnerName}}
+                                <li><a href="#nav-pills-tab-6" data-toggle="tab">Business Owner Details</a></li>
                             {{/if}}
                         </ul>
                         <div class="tab-content app-overview-inner">
@@ -203,10 +210,15 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="tab-pane fade" id="nav-pills-tab-6">
+                                {{#each businessOwnerViewData}}
+                                    <div class="row">
+                                        <div class="col-sm-3"><b>{{name}}</b></div>
+                                        <div class="col-sm-9">{{value}}</div>
+                                    </div>
+                                {{/each}}
+                            </div>
                         </div>
-
-
 
                     </div>
                 </div>

@@ -18,8 +18,12 @@
             <div class="form-group">
                 <label class="control-label col-sm-2">Owner :  </label>
                 <div class="col-sm-10">
-                    <input id='overview_businessOwner' name='overview_businessOwner' class="col-lg-6 col-sm-12 col-xs-12" type='text' value=''  placeholder=" Owner Name"  />
+                    <select id = "businessOwnerName" class="selectOwnerName">
+                        <option></option>
+                    </select>
                 </div>
+                <input type="hidden" required="" class="col-lg-6 col-sm-12 col-xs-12" name="overview_businessOwner"
+                       id="overview_businessOwner">
             </div>
             <div class="form-group">
                 <label class="control-label col-sm-2">Make As Default Version: </label>

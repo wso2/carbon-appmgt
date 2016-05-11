@@ -887,3 +887,8 @@ legend + .control-group {
     text-align: center;
     margin-top: 60px;
 }
+
+.no-owner {
+    text-align: center;
+    margin-top: 60px;
+}

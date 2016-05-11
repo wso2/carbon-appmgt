@@ -29,12 +29,20 @@
                                 {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
                                     value="Provider"
                                 {{else}}
+                                    {{#ifCond searchQuery.searchTerm "==" "overview_owner"}}
+                                        value="Owner"
+                                    {{else}}
                                     value="Name"
+                                    {{/ifCond}}
                                 {{/ifCond}}>
                                 {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
                                     By Provider
                                 {{else}}
-                                    By Name
+                                    {{#ifCond searchQuery.searchTerm "==" "overview_owner"}}
+                                        By Business Owner
+                                    {{else}}
+                                       {{dump searchQuery.searchTerm}}
+                                    {{/ifCond}}
                                 {{/ifCond}}
                                 <span class="caret"></span>
                             </button>
@@ -44,6 +52,7 @@
                                 data-target="#searchSelect">
                                 <li data-value="Provider"><a>By Provider</a></li>
                                 <li data-value="Name"><a>By Name</a></li>
+                                <li data-value="Business Owner"><a>By Business Owner</a></li>
                             </ul>
                             <button type="button" class="btn" id="searchBtn">
                                 <i class="fw fw-search"></i>

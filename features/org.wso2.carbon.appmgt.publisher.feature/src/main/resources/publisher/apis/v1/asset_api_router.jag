@@ -426,6 +426,9 @@ require('/modules/publisher.js').exec(function(ctx) {
 
             //Customize the resource for the current app
             dataInjector.inject(artifact,DataInjectorModes.DISPLAY);
+            var businessOwner = apiProvider.getBusinessOwner(artifact.attributes["overview_businessOwner"]);
+            artifact.attributes["overview_businessOwnerName"] = businessOwner.businessOwnerName;
+            artifact.attributes["overview_businessOwnerEMail"] = businessOwner.businessOwnerEmail;
 
             response.contentType = CONTENT_TYPE_JSON;
             print(artifact);

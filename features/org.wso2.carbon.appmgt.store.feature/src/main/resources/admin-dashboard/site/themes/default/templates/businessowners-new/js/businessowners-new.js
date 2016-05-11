@@ -99,15 +99,20 @@ $(document).on("click", "#btn-owner-partial-new", function () {
 function GetDynamicTextBox(value) {
     var id_key = "key-".concat(value);
     var id_val = "value-".concat(value);
+    var check_val = "showInStore-".concat(value);
     if(value == 0){
         return '<h5>Property &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
-               + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value</h5><br>'
-               + '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp' +
-               '<input name="value" type="text" id="'+id_val+'"/>'
+               + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value '
+               + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
+               +'&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Show in Store</h5><br>'
+               + '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp'
+               + '<input name="value" type="text" id="'+id_val+'"/>&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp'
+               + '<input type="checkbox" name="showInStore" id="'+check_val+'"/>';
 
     }
     return '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp' +
-           '<input name="value" type="text" id="'+id_val+'"/>'
+           '<input name="value" type="text" id="'+id_val+'"/>&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp'
+           + '<input type="checkbox" name="showInStore" id="'+check_val+'"/>';
 }
 //save event
 $(document).on("click", "#btn-owner-save", function () {
@@ -116,20 +121,27 @@ $(document).on("click", "#btn-owner-save", function () {
     var ownerMail = $('#businessOwnerEmail').val();
     var description = $('#businessOwnerDesc').val();
     var siteLink = $('#businessOwnerSite').val();
-    var ownerDetails = {};
+    var ownerProperties = {};
 
     if(fieldCount > 0){
         var i = fieldCount;
         while(i > 0){
             var key_id = "#key-".concat(i-1);
             var val_id = "#value-".concat(i-1);
+            var showInStoreId = "showInStore-".concat(i-1);
             var key = $(key_id).val();
-            var value = $(val_id).val();
-            ownerDetails[key] = value;
+            var value = [];
+            value.push($(val_id).val());
+            if(document.getElementById(showInStoreId).checked) {
+                value.push(true);
+            } else {
+                value.push(false);
+            }
+            ownerProperties[key] = value;
             i--;
         }
     }
-    var details = JSON.stringify(ownerDetails);
+    var details = JSON.stringify(ownerProperties);
     if(!isEmail(ownerMail)){
         Showalert("Enter a Valid E-mail address","alert-error", "statusError");
         return;
@@ -148,7 +160,7 @@ $(document).on("click", "#btn-owner-save", function () {
     }
 
     $.ajax({
-               url: context + '/apis/businessowners/save',
+               url: context + '/apis/businessowners',
                type: 'POST',
                contentType: 'application/x-www-form-urlencoded',
                async: false,
@@ -169,4 +181,3 @@ $(document).on("click", "#btn-owner-save", function () {
 
 location.replace(context + "/tasks?task=businessowners");
    });
-
