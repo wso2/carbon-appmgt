@@ -1,5 +1,6 @@
 package org.wso2.carbon.appmgt.impl;
 
+import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
 
 /**
@@ -15,7 +16,7 @@ public interface AppRepository {
      * @param app
      * @return
      */
-    String saveApp(App app);
+    String saveApp(App app) throws AppManagementException;
 
 
 }
