@@ -25,6 +25,7 @@ public class App {
 
     private String type;
     private String uuid;
+    private String displayName;
     private float rating;
     private String[] appVisibility;
     private String banner;
@@ -52,6 +53,14 @@ public class App {
 
     public String getUUID(){
         return  uuid;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public float getRating() {
