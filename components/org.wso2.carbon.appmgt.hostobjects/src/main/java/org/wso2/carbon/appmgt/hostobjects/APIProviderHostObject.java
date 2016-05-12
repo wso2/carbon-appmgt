@@ -452,30 +452,34 @@ public class APIProviderHostObject extends ScriptableObject {
         if (args[0] == null || args[0] == "null") {
             handleException("Error while reading business owner. Owner id is null");
         }
-        NativeArray myn = new NativeArray(0);
-        int ownerId = Integer.valueOf(args[0].toString());
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        BusinessOwner businessOwner = apiProvider.getBusinessOwner(ownerId);
         NativeObject row = new NativeObject();
-        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-        row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
-        row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
-        row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
-        row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
-        row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-        List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
-        if(businessOwnerPropertiesList != null) {
-            JSONObject businessOwnerPropertiesObject = new JSONObject();
-            for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
-                JSONObject businessOwnerPropertyObject = new JSONObject();
-                BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                businessOwnerPropertyObject.put("propertyValue", businessOwnerProperties.getPropertyValue());
-                businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperties.isShowingInStore());
-                businessOwnerPropertiesObject.put(businessOwnerProperties.getPropertyId(),businessOwnerPropertyObject);
+        int ownerId;
+        try {
+            ownerId = Integer.valueOf(args[0].toString());
+            APIProvider apiProvider = getAPIProvider(thisObj);
+            BusinessOwner businessOwner = apiProvider.getBusinessOwner(ownerId);
+            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
+            row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
+            row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
+            row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
+            row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
+            row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
+            List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+            if(businessOwnerPropertiesList != null) {
+                JSONObject businessOwnerPropertiesObject = new JSONObject();
+                for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
+                    JSONObject businessOwnerPropertyObject = new JSONObject();
+                    BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                    businessOwnerPropertyObject.put("propertyValue", businessOwnerProperties.getPropertyValue());
+                    businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperties.isShowingInStore());
+                    businessOwnerPropertiesObject.put(businessOwnerProperties.getPropertyId(),businessOwnerPropertyObject);
+                }
+                row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
+            } else {
+                row.put("businessOwnerProperties", row, null);
             }
-            row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
-        } else {
-            row.put("businessOwnerProperties", row, null);
+        } catch (NumberFormatException e) {
+            log.warn("Business owner id : " + args[0] + " is not an integer.", e);
         }
         return row;
     }
@@ -491,6 +495,9 @@ public class APIProviderHostObject extends ScriptableObject {
      */
     public static NativeObject jsFunction_getBusinessOwnersWithPagination(Context cx, Scriptable thisObj, Object[] args,
                                                            Function funObj) throws AppManagementException {
+        if (args==null||args.length != 4) {
+            handleException("Invalid number of input parameters received when searching business owners.");
+        }
         NativeArray myn = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(thisObj);
         int startIndex = Integer.parseInt(args[0].toString());

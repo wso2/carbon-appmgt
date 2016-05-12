@@ -79,29 +79,19 @@ $(document).ready(function() {
           "ordering": true,
           "order": [[1, "asc"]],
           "ajax": context + '/apis/businessowners',
-          "columns": [{
-              "id": "Id",
-               "searchable": false
-          }, {
-              "id": "Name",
-              "searchable": false
-          },{
-              "id": "Email",
-              "searchable": true
-          }, {
-              "id": "Site Link",
-              "searchable": true
-          }, {
-             "id": "Description",
-             "searchable": true
-          }, {
-             "render": function (data, type, full, meta) {
-                return '<a data-target="" ' +
-                       'data-toggle="modal" class="owner-edit-button">' +
-                       '<i class="icon-edit"></i></a> &nbsp<a'
-                       +' class="owner-delete-button"><i class="icon-trash"></i>' +
-                       '</a>';
-             }
+          "columnDefs": [
+              {
+                  "targets": [0],
+                  "visible": false
+              },
+             {
+                "render": function (data, type, row) {
+                    return '<a data-target="" ' +
+                           'data-toggle="modal" data-owner-id="' + row[0] + '" class="owner-edit-button">' +
+                           '<i class="icon-edit"></i></a> &nbsp<a'
+                           +' class="owner-delete-button" data-owner-id="' + row[0] + '"><i class="icon-trash"></i></a>';
+                },
+                "targets": -1
           }]
     });
 });
@@ -186,7 +176,7 @@ function updateOwners() {
     });
 
 }
-function GetDynamicTextBox(index, key, value, showInStore) {
+function GetDynamicTextBox(hasHeader, index, key, value, showInStore) {
     var id_key = "key-".concat(index);
     var id_val = "value-".concat(index);
     var check_val = "showInStore-".concat(index);
@@ -195,20 +185,27 @@ function GetDynamicTextBox(index, key, value, showInStore) {
     if (showInStore) {
         checkBoxStatus = "checked";
     }
-    return '<input name = "key" type="text" id="' + id_key + '" value="' + key + '"/>&nbsp &nbsp &nbsp &nbsp' +
-           '<input name="value" type="text" id="' + id_val + '" value="' + value
-           + '"/>&nbsp &nbsp &nbsp &nbsp<input type="checkbox" name="showInStore" id="'+check_val+'" ' + checkBoxStatus +'>&nbsp &nbsp &nbsp &nbsp<button id="' + index
-           + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button>'
+    if (!hasHeader) {
+        var tableHeader = '<tr><th>Property</th><th>Value</th><th>Show in Store</th><th></th></tr>';
+            $("#editCustomPropertyTable").append(tableHeader);
+    }
+    var fieldValue = '<tr><td><input name = "key" type="text" id="' + id_key + '" value="' + key + '"/></td>'
+           + '<td><input name="value" type="text" id="' + id_val + '" value="' + value +'"/></td><td>'
+           +'<input type="checkbox" name="showInStore" id="'+check_val+'" ' + checkBoxStatus +'/></td><td><button id="' + index
+           + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button></td></tr>';
+    $("#editCustomPropertyTable").append(fieldValue);
 }
 
 function removeFields(index) {
     var id_key = "#" + "key-".concat(index);
     var id_val = "#" + "value-".concat(index);
+    var check_val = "showInStore-".concat(index);
     var id_btn = "#" + index;
     $(id_key).val("");
     $(id_val).val("");
     $(id_key).hide();
     $(id_val).hide();
+    $(check_val).hide();
     $(id_btn).hide();
 }
 
@@ -221,6 +218,7 @@ $(document).on("click", "#btn-owner-add-field", function () {
 
 //edit event
 $(document).on("click", ".owner-edit-button", function () {
+    $('#businessOwnerOther').empty();
     var ownerId = $(this).data("ownerId");
     editedOwnerId = ownerId;
     $('#businessOwnerName').val("");
@@ -233,46 +231,36 @@ $(document).on("click", ".owner-edit-button", function () {
     jQuery('html, body').animate({
                                      scrollTop: section.offset().top
                                  }, 1000);
-
-    $.each(businessOwnersArray, function (index, obj) {
-        if (obj != null && obj.businessOwnerId == ownerId) {
-            $('#businessOwnerName').val(obj.businessOwnerName);
-            $('#businessOwnerEmail').val(obj.businessOwnerEmail);
-            $('#businessOwnerSite').val(obj.businessOwnerSite);
-            $('#businessOwnerDescription').val(obj.businessOwnerDescription);
-
-            $.ajax({
-                       url: context + '/apis/businessowners/' + obj.businessOwnerId,
-                       type: 'GET',
-                       contentType: 'application/json',
-                       dataType: 'json',
-                       success: function (data) {
-                          businessOwnerDetails = data.businessOwnerProperties;
-                           var ownerDataObject = JSON.parse(businessOwnerDetails);
-                           var i = 1;
-                           var xx = '<h5>Property &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp'
-                                    + ' &nbsp &nbsp &nbsp &nbsp &nbsp '
-                                    + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value '
-                                    + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
-                                    +'&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Show in Store</h5><br>';
-                           $("#businessOwnerOther").append(xx);
-                           for(var key in ownerDataObject){
-                               var ownerProperties = ownerDataObject[key];
-                               var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
-
-                               var div = $("<div />");
-                                           div.html(GetDynamicTextBox(i, key, ownerProperty["propertyValue"], ownerProperty["isShowingInStore"]));
-                                          $("#businessOwnerOther").append(div);
-                               i ++;
-                               extraFieldCount = i;
-                           }
-                       },
-                       error: function () {
+    $.ajax({
+               url: context + '/apis/businessowners/' + editedOwnerId,
+               type: 'GET',
+               contentType: 'application/json',
+               dataType: 'json',
+               success: function (data) {
+                   $('#businessOwnerName').val(data.businessOwnerName);
+                   $('#businessOwnerEmail').val(data.businessOwnerEmail);
+                   $('#businessOwnerSite').val(data.businessOwnerSite);
+                   $('#businessOwnerDescription').val(data.businessOwnerDescription);
+                   businessOwnerDetails = data.businessOwnerProperties;
+                   var ownerDataObject = JSON.parse(businessOwnerDetails);
+                   var noOfCustomProperties = Object.keys(ownerDataObject).length;
+                   if(noOfCustomProperties > 0) {
+                       var i = 1;
+                       var tableHeader = '<tr><th>Property</th><th>Value</th><th>Show in Store</th><th></th></tr>';
+                       $("#editCustomPropertyTable").append(tableHeader);
+                       var hasHeader = true;
+                       for(var key in ownerDataObject){
+                           var ownerProperties = ownerDataObject[key];
+                           var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
+                           GetDynamicTextBox(hasHeader, i, key, ownerProperty["propertyValue"], ownerProperty["isShowingInStore"]);
+                           i ++;
+                           extraFieldCount = i;
                        }
-                   });
-
-    }
-});
+                   }
+               },
+               error: function () {
+               }
+           });
 });
 
 
@@ -301,42 +289,3 @@ $(document).on('click', '#btn-owner-cancel', function(){
 $(document).on("click", "#btn-owner-add-new", function () {
     location.replace(context + "/tasks?task=businessowners-new")
 });
-
-//$('#search-button').on('click', search);
-
-$('#businessOwnerSearch').keypress(function(e) {
-    if (e.which == 13)
-        search();
-});
-
-function search() {
-    var searchBusinessOwner = $('#businessOwnerSearch').val();
-    if (searchBusinessOwner != "") {
-        $.ajax({
-                   url: context + '/apis/businessowners/search/' + searchBusinessOwner,
-                   type: 'GET',
-                   contentType: 'application/json',
-                   dataType: 'json',
-                   success: function (data) {
-                       businessOwnersArray = [];
-                       for (var i = 0; i < data.length; i++) {
-                           businessOwnersArray.push({
-                                                        businessOwnerId: data[i].businessOwnerId,
-                                                        businessOwnerName: data[i].businessOwnerName,
-                                                        businessOwnerEmail: data[i].businessOwnerEmail,
-                                                        businessOwnerDescription: data[i].businessOwnerDescription,
-                                                        businessOwnerSite: data[i].businessOwnerSite
-                                                    });
-                       }
-                       alert(context);
-                       //location.replace("https://localhost:9443/admin-dashboard/tasks?task=businessowners");
-                       updateOwners();
-                       //Showalert("Owner Deleted Successfully ", "alert-success", "statusSuccess");
-                       //location.reload();
-                   },
-                   error: function (response) {
-                       Showalert('Error occured while deleting the business owner', "alert-error", "statusError");
-                   }
-               });
-    }
-}

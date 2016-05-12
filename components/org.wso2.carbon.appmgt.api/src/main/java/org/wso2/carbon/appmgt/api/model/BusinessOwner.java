@@ -31,10 +31,6 @@ public class BusinessOwner {
     private String businessOwnerSite;
     private List<BusinessOwnerProperties> businessOwnerPropertiesList;
 
-    public BusinessOwner() {
-
-    }
-
     public void setBusinessOwnerId(int businessOwnerId) {
         this.businessOwnerId = businessOwnerId;
     }

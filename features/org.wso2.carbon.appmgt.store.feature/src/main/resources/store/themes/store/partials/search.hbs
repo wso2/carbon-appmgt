@@ -29,8 +29,8 @@
                                 {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
                                     value="Provider"
                                 {{else}}
-                                    {{#ifCond searchQuery.searchTerm "==" "overview_owner"}}
-                                        value="Owner"
+                                    {{#ifCond searchQuery.searchTerm "==" "overview_businessOwner"}}
+                                        value="Business Owner"
                                     {{else}}
                                     value="Name"
                                     {{/ifCond}}
@@ -38,10 +38,10 @@
                                 {{#ifCond searchQuery.searchTerm "==" "overview_provider"}}
                                     By Provider
                                 {{else}}
-                                    {{#ifCond searchQuery.searchTerm "==" "overview_owner"}}
+                                    {{#ifCond searchQuery.searchTerm "==" "overview_businessOwner"}}
                                         By Business Owner
                                     {{else}}
-                                       {{dump searchQuery.searchTerm}}
+                                       By Name
                                     {{/ifCond}}
                                 {{/ifCond}}
                                 <span class="caret"></span>

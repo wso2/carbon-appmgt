@@ -21,7 +21,8 @@
                                 <input id="businessOwnerSite" type="text" class="form-control" style="width: 30%"
                                 maxlength="500" onchange="checkFilled();"/>
                                      <br>
-                                         <div id = "newProperties"> <div id="TextBoxContainer"></div><a id="btn-owner-partial-new" class="btn  btn-success">Add New Property</a> </div><br>
+                                         <div id = "newProperties"> <table id="customPropertyTable"></table><a
+                                         id="btn-owner-partial-new" class="btn  btn-success">Add New Property</a> </div><br>
 
                             <a id="btn-owner-save" class="btn btn-primary">Save</a>
                                                             </div>

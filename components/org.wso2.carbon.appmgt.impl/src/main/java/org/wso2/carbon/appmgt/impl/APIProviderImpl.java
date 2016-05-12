@@ -118,14 +118,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Get custom properties of a given business owner.
-     * @param ownerId
+     * @param businessOwnerId
      * @return
      * @throws AppManagementException
      */
     @Override
 
-    public List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwnerCustomPropertiesById(ownerId);
+    public List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int businessOwnerId) throws
+                                                                                               AppManagementException {
+        return appMDAO.getBusinessOwnerCustomPropertiesById(businessOwnerId);
     }
 
 
@@ -141,13 +142,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Get business owners.
-     * @param ownerId Business owner Id.
+     * @param businessOwnerId Business owner Id.
      * @return
      * @throws AppManagementException
      */
     @Override
-    public BusinessOwner getBusinessOwner(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwner(ownerId);
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId);
     }
 
     /**

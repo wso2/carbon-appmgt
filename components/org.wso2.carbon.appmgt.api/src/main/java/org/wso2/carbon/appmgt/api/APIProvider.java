@@ -52,11 +52,11 @@ public interface APIProvider extends APIManager {
 
      /* *
      *Get business ower data.
-     * @param ownerId
+     * @param businessOwnerId
      * @return
      * @throws AppManagementException
      */
-    public  List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException;
+    public  List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int businessOwnerId) throws AppManagementException;
     /**
      * @return
      * @throws AppManagementException
@@ -66,11 +66,11 @@ public interface APIProvider extends APIManager {
     /**
      * Return the owner properties of the given owner Id.
      *
-     * @param ownerId Business owner Id.
+     * @param businessOwnerId Business owner Id.
      * @return
      * @throws AppManagementException if failed to get business owner.
      */
-    public BusinessOwner getBusinessOwner(int ownerId) throws AppManagementException;
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
      * Get the business owners for a search value with pagination.
