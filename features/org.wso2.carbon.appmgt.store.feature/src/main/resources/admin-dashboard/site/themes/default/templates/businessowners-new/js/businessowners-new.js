@@ -90,10 +90,8 @@ function checkFilled() {
 checkFilled();
 //add new fields
 $(document).on("click", "#btn-owner-partial-new", function () {
-    var div = $("<div />");
-    div.html(GetDynamicTextBox(fieldCount));
+    $("#customPropertyTable").append(GetDynamicTextBox(fieldCount));
     fieldCount++;
-    $("#TextBoxContainer").append(div);
 });
 
 function GetDynamicTextBox(value) {
@@ -101,18 +99,13 @@ function GetDynamicTextBox(value) {
     var id_val = "value-".concat(value);
     var check_val = "showInStore-".concat(value);
     if(value == 0){
-        return '<h5>Property &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
-               + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Value '
-               + '&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp '
-               +'&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Show in Store</h5><br>'
-               + '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp'
-               + '<input name="value" type="text" id="'+id_val+'"/>&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp'
-               + '<input type="checkbox" name="showInStore" id="'+check_val+'"/>';
-
+        return '<tr><th>Property</th><th>Value</th><th>Show in Store</th></tr><tr><td><input name = "key" type="text" id="'+id_key+'"/></td>'
+               + '<td><input name="value" type="text" id="'+id_val+'"/></td><td>'
+               +'<input type="checkbox" name="showInStore" id="'+check_val+'"/></td></tr>';
     }
-    return '<input name = "key" type="text" id="'+id_key+'"/>&nbsp &nbsp &nbsp &nbsp' +
-           '<input name="value" type="text" id="'+id_val+'"/>&nbsp &nbsp &nbsp &nbsp&nbsp &nbsp &nbsp &nbsp'
-           + '<input type="checkbox" name="showInStore" id="'+check_val+'"/>';
+    return '<tr><td><input name = "key" type="text" id="'+id_key+'"/></td>'
+           + '<td><input name="value" type="text" id="'+id_val+'"/></td><td>'
+           +'<input type="checkbox" name="showInStore" id="'+check_val+'"/></td></tr>';
 }
 //save event
 $(document).on("click", "#btn-owner-save", function () {

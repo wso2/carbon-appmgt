@@ -85,6 +85,7 @@ import org.wso2.carbon.identity.oauth.common.OAuthConstants;
 import org.wso2.carbon.identity.oauth.config.OAuthServerConfiguration;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
+import org.wso2.carbon.utils.xml.StringUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -217,10 +218,10 @@ public class AppMDAO {
     /**
      * Delete a given business owner.
      *
-     * @param ownerId
+     * @param businessOwnerId
      * @return
      */
-    public String deleteBusinessOwner(String ownerId) throws AppManagementException {
+    public String deleteBusinessOwner(String businessOwnerId) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToDeleteRecord = null;
@@ -228,22 +229,22 @@ public class AppMDAO {
         String deletedOwnerId = "";
         try {
             if (log.isDebugEnabled()) {
-                log.debug("Deleting a Business Owner :" + ownerId);
+                log.debug("Deleting a Business Owner :" + businessOwnerId);
             }
             connection = APIMgtDBUtil.getConnection();
 
             String queryToDeleteRecordTwo = "DELETE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
 
             statementToDeleteRecordTwo = connection.prepareStatement(queryToDeleteRecordTwo);
-            statementToDeleteRecordTwo.setString(1, ownerId);
+            statementToDeleteRecordTwo.setString(1, businessOwnerId);
             statementToDeleteRecordTwo.executeUpdate();
 
             String queryToDeleteRecord = "DELETE FROM BUSINESS_OWNER WHERE OWNER_ID = ?";
 
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
-            statementToDeleteRecord.setString(1, ownerId);
+            statementToDeleteRecord.setString(1, businessOwnerId);
             statementToDeleteRecord.executeUpdate();
-            deletedOwnerId = ownerId;
+            deletedOwnerId = businessOwnerId;
         } catch (SQLException e) {
             if (connection != null) {
                 try {
@@ -302,7 +303,7 @@ public class AppMDAO {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
                     BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
-                    if(propertyId != null && propertyId.trim() != "" && !propertyId.isEmpty()) {
+                    if(StringUtils.isEmpty(propertyId)) {
                         statementToInsertRecordTwo.setInt(1, businessOwner.getBusinessOwnerId());
                         statementToInsertRecordTwo.setString(2, propertyId);
                         statementToInsertRecordTwo.setString(3, businessOwnerProperties.getPropertyValue());
@@ -456,7 +457,7 @@ public class AppMDAO {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
                     BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
-                    if(propertyId != null && propertyId.trim() != "" && !propertyId.isEmpty()) {
+                    if(StringUtils.isEmpty(propertyId)) {
                         statementToInsertBusinessOwnerDetails.setString(1, propertyId);
                         statementToInsertBusinessOwnerDetails.setString(2, businessOwnerProperties.getPropertyValue());
                         statementToInsertBusinessOwnerDetails.setBoolean(3, businessOwnerProperties.isShowingInStore());
@@ -495,16 +496,21 @@ public class AppMDAO {
         List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();
         ResultSet businessOwnerResultSet = null;
 
-        String queryToGetBusinessOwner = "SELECT * FROM BUSINESS_OWNER WHERE OWNER_NAME LIKE ? OR " +
-                "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ? LIMIT ? , ? ";
-
         try {
             connection = APIMgtDBUtil.getConnection();
+            String queryToGetBusinessOwner = "SELECT * FROM BUSINESS_OWNER WHERE OWNER_NAME LIKE ? OR " +
+                    "OWNER_EMAIL LIKE ? OR OWNER_SITE LIKE ? OR OWNER_DESC LIKE ? ";
+            if (connection.getMetaData().getDriverName().contains("Oracle")) {
+                queryToGetBusinessOwner += "WHERE ROWNUM >= ? AND ROWNUM <= ?";
+            } else {
+                queryToGetBusinessOwner += "LIMIT ? , ? ";
+            }
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
-            statementToGetBusinessOwners.setString(1, "%" + searchValue + "%");
-            statementToGetBusinessOwners.setString(2, "%" + searchValue + "%");
-            statementToGetBusinessOwners.setString(3, "%" + searchValue + "%");
-            statementToGetBusinessOwners.setString(4, "%" + searchValue + "%");
+            searchValue = "%" + searchValue + "%";
+            statementToGetBusinessOwners.setString(1, searchValue);
+            statementToGetBusinessOwners.setString(2, searchValue);
+            statementToGetBusinessOwners.setString(3, searchValue);
+            statementToGetBusinessOwners.setString(4, searchValue);
             statementToGetBusinessOwners.setInt(5, startIndex);
             statementToGetBusinessOwners.setInt(6, pageSize);
             businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
