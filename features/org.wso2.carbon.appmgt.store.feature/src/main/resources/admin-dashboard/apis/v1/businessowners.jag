@@ -23,30 +23,32 @@ var businessOwnerApi = require('/modules/businessOwners-api.js');
 var uriMatcher = new URIMatcher(request.getRequestURI());
 var log = new Log();
 //POST patterns
-var saveOrGetOwner = '/{context}/apis/businessowners';
+var addBusinessOwner = '/{context}/apis/businessowners';
+var getBusinessOwners = '/{context}/apis/businessowners';
 var ownerUpdate = '/{context}/apis/businessowners/update';
-var deleteOrGetOwners = '/{context}/apis/businessowners/{ownerId}';
+var deleteBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
+var getBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
 
 if (method == 'GET') {
-    if (uriMatcher.match(saveOrGetOwner)) {
+    if (uriMatcher.match(getBusinessOwners)) {
         var draw = request.getParameter("draw");
         var start = request.getParameter("start");
         var length = request.getParameter("length");
         var search = request.getParameter("search[value]");
-        print(businessOwnerApi.getBusinessOwners(start,length,draw, search));
+        print(businessOwnerApi.getBusinessOwners(start, length, draw, search));
     }
-    if (uriMatcher.match(deleteOrGetOwners)) {
+    if (uriMatcher.match(getBusinessOwner)) {
         print(businessOwnerApi.getBusinessOwner(uriMatcher.elements().ownerId));
     }
 }
 
 if (method == 'DELETE') {
-    if (uriMatcher.match(deleteOrGetOwners)) {
+    if (uriMatcher.match(deleteBusinessOwner)) {
         print(businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId));
     }
 }
 if (method == 'POST') {
-    if (uriMatcher.match(saveOrGetOwner)) {
+    if (uriMatcher.match(addBusinessOwner)) {
         var businessOwnerName = request.getParameter("businessOwnerName");
         var businessOwnerEmail = request.getParameter("businessOwnerEmail");
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");

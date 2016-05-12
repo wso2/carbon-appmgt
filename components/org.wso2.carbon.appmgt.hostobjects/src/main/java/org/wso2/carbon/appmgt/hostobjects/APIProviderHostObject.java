@@ -49,7 +49,7 @@ import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
 import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperties;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
@@ -287,7 +287,7 @@ public class APIProviderHostObject extends ScriptableObject {
      * @return entitlement policy partial id
      * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
      */
-    public static String jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
+    public static void jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
                                                      Object[] args,
                                                      Function funObj) throws
                                                                       AppManagementException {
@@ -299,8 +299,7 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         String ownerId = args[0].toString();
         APIProvider apiProvider = getAPIProvider(thisObj);
-        String deletedOwnerId = apiProvider.deleteBusinessOwner(ownerId);
-        return deletedOwnerId;
+        apiProvider.deleteBusinessOwner(ownerId);
     }
 
     /**
@@ -325,7 +324,7 @@ public class APIProviderHostObject extends ScriptableObject {
             handleException("Error while saving business owner. Owner content is null");
         }
         BusinessOwner businessOwner = new BusinessOwner();
-        List<BusinessOwnerProperties> businessOwnerProperties = new ArrayList<BusinessOwnerProperties>();
+        List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
 
         businessOwner.setBusinessOwnerId(Integer.parseInt(args[0].toString()));
         businessOwner.setBusinessOwnerName(args[1].toString());
@@ -346,14 +345,14 @@ public class APIProviderHostObject extends ScriptableObject {
             JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
             String propertyValue = businessOwnerValuesObject.get(0).toString();
             String showInStore = businessOwnerValuesObject.get(1).toString();
-            BusinessOwnerProperties businessOwnerPropertiesValues = new BusinessOwnerProperties();
-            businessOwnerPropertiesValues.setPropertyId(key);
-            businessOwnerPropertiesValues.setPropertyValue(propertyValue);
-            businessOwnerPropertiesValues.setShowingInStore(Boolean.parseBoolean(showInStore));
+            BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
+            businessOwnerProperty.setPropertyId(key);
+            businessOwnerProperty.setPropertyValue(propertyValue);
+            businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(showInStore));
 
-            businessOwnerProperties.add(businessOwnerPropertiesValues);
+            businessOwnerPropertiesList.add(businessOwnerProperty);
         }
-        businessOwner.setBusinessOwnerPropertiesList(businessOwnerProperties);
+        businessOwner.setBusinessOwnerPropertiesList(businessOwnerPropertiesList);
         APIProvider apiProvider = getAPIProvider(thisObj);
         apiProvider.updateBusinessOwner(businessOwner);
     }
@@ -384,12 +383,12 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeObject businessOwnerDataObject = new NativeObject();
         APIProvider apiProvider = getAPIProvider(thisObj);
-        List<BusinessOwnerProperties> businessOwnerPropertiesList = apiProvider
+        List<BusinessOwnerProperty> businessOwnerPropertiesList = apiProvider
                 .getBusinessOwnerCustomProperties(businessOwnerId);
         JSONObject businessOwnerPropertiesObject = new JSONObject();
         if(businessOwnerPropertiesList != null) {
             for(int i =0 ; i < businessOwnerPropertiesList.size(); i++) {
-                BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                 businessOwnerPropertiesObject.put("PropertyId", businessOwnerProperties.getPropertyId());
                 businessOwnerPropertiesObject.put("PropertyValue", businessOwnerProperties.getPropertyValue());
                 businessOwnerPropertiesObject.put("ShowInStore", businessOwnerProperties.isShowingInStore());
@@ -464,15 +463,15 @@ public class APIProviderHostObject extends ScriptableObject {
             row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
             row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
             row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-            List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+            List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
             if(businessOwnerPropertiesList != null) {
                 JSONObject businessOwnerPropertiesObject = new JSONObject();
                 for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                     JSONObject businessOwnerPropertyObject = new JSONObject();
-                    BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                    businessOwnerPropertyObject.put("propertyValue", businessOwnerProperties.getPropertyValue());
-                    businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperties.isShowingInStore());
-                    businessOwnerPropertiesObject.put(businessOwnerProperties.getPropertyId(),businessOwnerPropertyObject);
+                    BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
+                    businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
+                    businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
+                    businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyId(),businessOwnerPropertyObject);
                 }
                 row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
             } else {
@@ -485,7 +484,7 @@ public class APIProviderHostObject extends ScriptableObject {
     }
 
     /**
-     * Get business owners with pagination.
+     * Search business owners with pagination
      * @param cx
      * @param thisObj
      * @param args
@@ -493,18 +492,17 @@ public class APIProviderHostObject extends ScriptableObject {
      * @return
      * @throws AppManagementException
      */
-    public static NativeObject jsFunction_getBusinessOwnersWithPagination(Context cx, Scriptable thisObj, Object[] args,
+    public static NativeObject jsFunction_searchBusinessOwners(Context cx, Scriptable thisObj, Object[] args,
                                                            Function funObj) throws AppManagementException {
         if (args==null||args.length != 4) {
             handleException("Invalid number of input parameters received when searching business owners.");
         }
-        NativeArray myn = new NativeArray(0);
         APIProvider apiProvider = getAPIProvider(thisObj);
         int startIndex = Integer.parseInt(args[0].toString());
         int pageSize = Integer.parseInt(args[1].toString());
         int currentPage = Integer.parseInt(args[2].toString());
         String searchValue = args[3].toString();
-        List<BusinessOwner> businessOwnerList = apiProvider.getBusinessOwnersWithPagination(startIndex, pageSize, searchValue);
+        List<BusinessOwner> businessOwnerList = apiProvider.searchBusinessOwners(startIndex, pageSize, searchValue);
         int totalBusinessOwners = apiProvider.getBusinessOwnersCount();
         NativeObject nativeObject = new NativeObject();
         nativeObject.put("draw", nativeObject, currentPage);
@@ -518,7 +516,6 @@ public class APIProviderHostObject extends ScriptableObject {
 
         NativeArray businessOwnersNativeArray = new NativeArray(0);
         int businessOwnersArrayCount = 0;
-
 
         for (BusinessOwner businessOwner : businessOwnerList) {
             NativeArray businessOwnerArray = new NativeArray(0);
@@ -551,7 +548,7 @@ public class APIProviderHostObject extends ScriptableObject {
                                                    Function funObj) throws
                                                                     AppManagementException, ParseException {
         BusinessOwner businessOwner = new BusinessOwner();
-        List<BusinessOwnerProperties> businessOwnerProperties = new ArrayList<BusinessOwnerProperties>();
+        List<BusinessOwnerProperty> businessOwnerProperties = new ArrayList<BusinessOwnerProperty>();
 
         if (args == null || args.length != 5) {
             handleException("Invalid number of input parameters.");
@@ -574,7 +571,7 @@ public class APIProviderHostObject extends ScriptableObject {
             JSONArray businessOwnerValuesObject = (JSONArray) entry.getValue();
             String propertyValue = businessOwnerValuesObject.get(0).toString();
             Boolean showInStore = Boolean.parseBoolean(businessOwnerValuesObject.get(1).toString());
-            BusinessOwnerProperties businessOwnerPropertiesValues = new BusinessOwnerProperties();
+            BusinessOwnerProperty businessOwnerPropertiesValues = new BusinessOwnerProperty();
             businessOwnerPropertiesValues.setPropertyId(key);
             businessOwnerPropertiesValues.setPropertyValue(propertyValue);
             businessOwnerPropertiesValues.setShowingInStore(showInStore);

@@ -103,8 +103,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public String deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
-         return appMDAO.deleteBusinessOwner(businessOwnerId);
+    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+         appMDAO.deleteBusinessOwner(businessOwnerId);
     }
     /**
      *Update a business owner.
@@ -124,7 +124,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
 
-    public List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int businessOwnerId) throws
+    public List<BusinessOwnerProperty> getBusinessOwnerCustomProperties(int businessOwnerId) throws
                                                                                                AppManagementException {
         return appMDAO.getBusinessOwnerCustomPropertiesById(businessOwnerId);
     }
@@ -152,7 +152,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
-     * Search business owners with paginations.
+     * Search business owners with pagination.
      * @param startIndex
      * @param pageSize
      * @param searchValue
@@ -160,9 +160,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public  List<BusinessOwner> getBusinessOwnersWithPagination(int startIndex, int pageSize, String searchValue) throws
+    public  List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
                                                                                           AppManagementException {
-        return appMDAO.getBusinessOwnersWithPagination(startIndex, pageSize, searchValue);
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue);
     }
 
     @Override

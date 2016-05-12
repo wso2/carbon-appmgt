@@ -186,14 +186,20 @@ function GetDynamicTextBox(hasHeader, index, key, value, showInStore) {
         checkBoxStatus = "checked";
     }
     if (!hasHeader) {
-        var tableHeader = '<tr><th>Property</th><th>Value</th><th>Show in Store</th><th></th></tr>';
-            $("#editCustomPropertyTable").append(tableHeader);
+        var tableHeader =  '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
+                           + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
+                           + '<div class="span2"></div></div> ';
+        $("#editCustomProperties").append(tableHeader);
     }
-    var fieldValue = '<tr><td><input name = "key" type="text" id="' + id_key + '" value="' + key + '"/></td>'
-           + '<td><input name="value" type="text" id="' + id_val + '" value="' + value +'"/></td><td>'
-           +'<input type="checkbox" name="showInStore" id="'+check_val+'" ' + checkBoxStatus +'/></td><td><button id="' + index
-           + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove</button></td></tr>';
-    $("#editCustomPropertyTable").append(fieldValue);
+
+    var fieldValue = '<div class="row-fluid"><div class="span3 div-custom">'
+                     + '<input name = "key" type="text" id="'+id_key+'" value="' + key + '"/></div>'
+                     + '<div class="span3 div-custom"><input name="value" type="text" id="' + id_val
+                     +'" value="' + value +'"/></div><div class="span2 div-custom"><input type="checkbox" '
+                     + 'name="showInStore" id="'+check_val+'"' + checkBoxStatus +'/></div><div class="span2">'
+                     + '<button id="' + index + '" class="btn  btn-info" onClick = "removeFields(this.id)">Remove'
+                     + '</button></div></div>';
+    $("#editCustomProperties").append(fieldValue);
 }
 
 function removeFields(index) {
@@ -246,8 +252,10 @@ $(document).on("click", ".owner-edit-button", function () {
                    var noOfCustomProperties = Object.keys(ownerDataObject).length;
                    if(noOfCustomProperties > 0) {
                        var i = 1;
-                       var tableHeader = '<tr><th>Property</th><th>Value</th><th>Show in Store</th><th></th></tr>';
-                       $("#editCustomPropertyTable").append(tableHeader);
+                       var tableHeader =  '<div class="row-fluid div-custom header-div"><div class="span3">Property</div>'
+                                          + '<div class="span3">Value</div><div class="span2">Show in Store</div>'
+                                          + '<div class="span2"></div></div> ';
+                       $("#editCustomProperties").append(tableHeader);
                        var hasHeader = true;
                        for(var key in ownerDataObject){
                            var ownerProperties = ownerDataObject[key];

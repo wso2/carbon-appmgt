@@ -39,7 +39,7 @@ import org.wso2.carbon.appmgt.api.model.AppStore;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.AuthenticatedIDP;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperties;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
 import org.wso2.carbon.appmgt.api.model.JavaPolicy;
@@ -219,9 +219,8 @@ public class AppMDAO {
      * Delete a given business owner.
      *
      * @param businessOwnerId
-     * @return
      */
-    public String deleteBusinessOwner(String businessOwnerId) throws AppManagementException {
+    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToDeleteRecord = null;
@@ -244,7 +243,6 @@ public class AppMDAO {
             statementToDeleteRecord = connection.prepareStatement(queryToDeleteRecord);
             statementToDeleteRecord.setString(1, businessOwnerId);
             statementToDeleteRecord.executeUpdate();
-            deletedOwnerId = businessOwnerId;
         } catch (SQLException e) {
             if (connection != null) {
                 try {
@@ -257,7 +255,6 @@ public class AppMDAO {
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToDeleteRecord, connection, null);
         }
-        return deletedOwnerId;
     }
 
     /**
@@ -298,12 +295,12 @@ public class AppMDAO {
                     "VALUES(?,?,?, ?)";
 
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
-            List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+            List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
             if (businessOwnerPropertiesList != null) {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
-                    BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                    BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
-                    if(StringUtils.isEmpty(propertyId)) {
+                    if(!StringUtils.isEmpty(propertyId)) {
                         statementToInsertRecordTwo.setInt(1, businessOwner.getBusinessOwnerId());
                         statementToInsertRecordTwo.setString(2, propertyId);
                         statementToInsertRecordTwo.setString(3, businessOwnerProperties.getPropertyValue());
@@ -335,12 +332,11 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public List<BusinessOwnerProperties> getBusinessOwnerCustomPropertiesById(int businessOwnerId)
+    public List<BusinessOwnerProperty> getBusinessOwnerCustomPropertiesById(int businessOwnerId)
             throws AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwnersDetails = null;
-        List<BusinessOwnerProperties> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperties>();
+        List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
         String queryToGetKeyValue = "SELECT KEY, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
         try {
@@ -349,21 +345,19 @@ public class AppMDAO {
             statementToGetBusinessOwnersDetails.setInt(1, businessOwnerId);
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
-                BusinessOwnerProperties businessOwnerProperties = new BusinessOwnerProperties();
-                businessOwnerProperties.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("KEY"));
-                businessOwnerProperties.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
-                businessOwnerProperties.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
+                BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("KEY"));
+                businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
+                businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
                         ("SHOW_IN_STORE")));
-                businessOwnerPropertiesList.add(businessOwnerProperties);
+                businessOwnerPropertiesList.add(businessOwnerProperty);
             }
-
         } catch (SQLException e) {
             handleException("Failed to retrieve business owners Data", e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, connection,
                                              resultSetOfbusinessOwnerDetails);
         }
-
         return businessOwnerPropertiesList;
     }
 
@@ -452,12 +446,12 @@ public class AppMDAO {
                             "(LAST_INSERT_ID(),?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
-            List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+            List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
             if (businessOwnerPropertiesList != null) {
                 for (int i = 0 ; i < businessOwnerPropertiesList.size(); i++) {
-                    BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
+                    BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
                     String propertyId = businessOwnerProperties.getPropertyId();
-                    if(StringUtils.isEmpty(propertyId)) {
+                    if(!StringUtils.isEmpty(propertyId)) {
                         statementToInsertBusinessOwnerDetails.setString(1, propertyId);
                         statementToInsertBusinessOwnerDetails.setString(2, businessOwnerProperties.getPropertyValue());
                         statementToInsertBusinessOwnerDetails.setBoolean(3, businessOwnerProperties.isShowingInStore());
@@ -481,16 +475,15 @@ public class AppMDAO {
     }
 
     /**
-     * Get business owners with pagination.
+     * Search business owners.
      * @param startIndex
      * @param pageSize
      * @param searchValue
      * @return
      * @throws AppManagementException
      */
-    public List<BusinessOwner> getBusinessOwnersWithPagination(int startIndex, int pageSize, String searchValue) throws
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
                                                                                               AppManagementException {
-
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
         List<BusinessOwner> businessOwnersList = new ArrayList<BusinessOwner>();

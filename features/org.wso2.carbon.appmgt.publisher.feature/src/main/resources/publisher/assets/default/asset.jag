@@ -55,7 +55,6 @@ require('/modules/publisher.js').exec(function(ctx) {
         var ownersList = JSON.parse(stringify(businessOwnerList));
         var nameList = [];
         var businessOwnerNameAndEmail;
-        //nameList.push({id:-1, text:'--Select Business Owner--'});
         for (var i = 0; i < ownersList.length; i++) {
             ownerNameAndEmail = ownersList[i].businessOwnerName + " (" + ownersList[i].businessOwnerEmail + ")";
             nameList.push({id:ownersList[i].businessOwnerId, text:ownerNameAndEmail});

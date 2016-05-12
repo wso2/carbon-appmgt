@@ -20,7 +20,7 @@ package org.wso2.carbon.appmgt.api.model;
 import java.util.List;
 
 /**
- * Business owner DTO class.
+ * Business owner model class.
  */
 public class BusinessOwner {
 
@@ -29,7 +29,7 @@ public class BusinessOwner {
     private String businessOwnerEmail;
     private String businessOwnerDescription;
     private String businessOwnerSite;
-    private List<BusinessOwnerProperties> businessOwnerPropertiesList;
+    private List<BusinessOwnerProperty> businessOwnerPropertiesList;
 
     public void setBusinessOwnerId(int businessOwnerId) {
         this.businessOwnerId = businessOwnerId;
@@ -71,12 +71,11 @@ public class BusinessOwner {
         return businessOwnerSite;
     }
 
-    public List<BusinessOwnerProperties> getBusinessOwnerPropertiesList() {
+    public List<BusinessOwnerProperty> getBusinessOwnerPropertiesList() {
         return businessOwnerPropertiesList;
     }
 
-    public void setBusinessOwnerPropertiesList(
-            List<BusinessOwnerProperties> businessOwnerPropertiesList) {
+    public void setBusinessOwnerPropertiesList(List<BusinessOwnerProperty> businessOwnerPropertiesList) {
         this.businessOwnerPropertiesList = businessOwnerPropertiesList;
     }
 
