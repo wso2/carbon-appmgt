@@ -20,7 +20,7 @@
     <script src="assets/js/main.js" type="text/javascript"></script>
     <script src="assets/js/marked.min.js" type="text/javascript"></script>
 
-    <title>WSO2 APP Manager - Publisher API : v1.0.0</title>
+    <title>WSO2 APP Manager - Store API : v1.0.0</title>
 
 
     <!-- Custom CSS -->
@@ -76,98 +76,62 @@
                 
                     
                         <hr/>
-                        <span class="class-name">AppApi</span>
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                
-                                    
-                                        <li id="op-appsAppTypeValidateContextPost"><a href="#!/operations#AppApi#appsAppTypeValidateContextPost">Validate App Context</a></li>
-                                    
-                                
-                            </ul>
-                        </li>
-                    
-                        <hr/>
                         <span class="class-name">AppsApi</span>
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-administrationXacmlpoliciesPolicyPartialIdDelete"><a href="#!/operations#AppsApi#administrationXacmlpoliciesPolicyPartialIdDelete">Delete policy partial</a></li>
+                                        <li id="op-administrationAppsDownloadPost"><a href="#!/operations#AppsApi#administrationAppsDownloadPost">Enterprise Download/Install App</a></li>
                                     
-                                        <li id="op-appsAppTypeChangeLifecyclePost"><a href="#!/operations#AppsApi#appsAppTypeChangeLifecyclePost">Change App Status</a></li>
+                                        <li id="op-administrationAppsUninstallationPost"><a href="#!/operations#AppsApi#administrationAppsUninstallationPost">Enterprise Uninstall App</a></li>
                                     
                                         <li id="op-appsAppTypeGet"><a href="#!/operations#AppsApi#appsAppTypeGet">Get all Apps</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdCreateNewVersionPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdCreateNewVersionPost">Create a new version of an App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdDelete"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDelete">Delete App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdDiscoverPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDiscoverPost">Discover Apps</a></li>
-                                    
                                         <li id="op-appsAppTypeIdAppIdGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdGet">Get app details</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdPut"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdPut">Update an existing App</a></li>
+                                        <li id="op-appsAppTypeIdAppIdRateGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdRateGet">Get app rating details</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdSubscriptionsGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdSubscriptionsGet">Get subscribed user list for an App</a></li>
+                                        <li id="op-appsAppTypeIdAppIdRatePut"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdRatePut">Change App rating</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesGet">Get all XACML policies relevant to an App</a></li>
+                                        <li id="op-appsAppTypeIdAppIdUnsubscriptionPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdUnsubscriptionPost">Un subscribe App</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete">Delete policy partial mapping from an App</a></li>
+                                        <li id="op-appsDownloadPost"><a href="#!/operations#AppsApi#appsDownloadPost">Download App</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesPost">Assign a policy partial to an App</a></li>
+                                        <li id="op-appsEventPublishPost"><a href="#!/operations#AppsApi#appsEventPublishPost">Publish Stats</a></li>
                                     
-                                        <li id="op-appsAppTypePost"><a href="#!/operations#AppsApi#appsAppTypePost">Create a new App</a></li>
+                                        <li id="op-appsFavouritePageGet"><a href="#!/operations#AppsApi#appsFavouritePageGet">check if it is the favourite page</a></li>
                                     
-                                        <li id="op-appsMobileGetplistTenantTenantIdFileFileNameGet"><a href="#!/operations#AppsApi#appsMobileGetplistTenantTenantIdFileFileNameGet">Get plist</a></li>
-                                    
-                                        <li id="op-xacmlpoliciesPolicyPartialIdAppsGet"><a href="#!/operations#AppsApi#xacmlpoliciesPolicyPartialIdAppsGet">Get all Apps mapped to a policy partial</a></li>
+                                        <li id="op-appsUninstallationPost"><a href="#!/operations#AppsApi#appsUninstallationPost">Uninstall App</a></li>
                                     
                                 
                             </ul>
                         </li>
                     
                         <hr/>
-                        <span class="class-name">BusinessOwnerApi</span>
+                        <span class="class-name">DevicesApi</span>
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-administrationBusinessownerBusinessOwnerIdDelete"><a href="#!/operations#BusinessOwnerApi#administrationBusinessownerBusinessOwnerIdDelete">Delete Business Owner</a></li>
-                                    
-                                        <li id="op-administrationBusinessownerBusinessOwnerIdGet"><a href="#!/operations#BusinessOwnerApi#administrationBusinessownerBusinessOwnerIdGet">Get a Business owners by Id</a></li>
-                                    
-                                        <li id="op-administrationBusinessownerBusinessOwnerIdPut"><a href="#!/operations#BusinessOwnerApi#administrationBusinessownerBusinessOwnerIdPut">Update an existing Business Owner</a></li>
-                                    
-                                        <li id="op-administrationBusinessownerGet"><a href="#!/operations#BusinessOwnerApi#administrationBusinessownerGet">Get all Business owners</a></li>
-                                    
-                                        <li id="op-administrationBusinessownerPost"><a href="#!/operations#BusinessOwnerApi#administrationBusinessownerPost">Create a new Business Owner</a></li>
+                                        <li id="op-devicesGet"><a href="#!/operations#DevicesApi#devicesGet">Get all Devices</a></li>
                                     
                                 
                             </ul>
                         </li>
                     
                         <hr/>
-                        <span class="class-name">JavaPoliciesApi</span>
+                        <span class="class-name">FavouriteApi</span>
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-javapoliciesGet"><a href="#!/operations#JavaPoliciesApi#javapoliciesGet">Get available java policies</a></li>
+                                        <li id="op-appsAppTypeIdAppIdAddToFavouritePost"><a href="#!/operations#FavouriteApi#appsAppTypeIdAppIdAddToFavouritePost">Add to favourite Apps</a></li>
                                     
-                                
-                            </ul>
-                        </li>
-                    
-                        <hr/>
-                        <span class="class-name">LifecycleApi</span>
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                
+                                        <li id="op-appsAppTypeIdAppIdRemoveFromFavouritePost"><a href="#!/operations#FavouriteApi#appsAppTypeIdAppIdRemoveFromFavouritePost">Remove from favourite Apps</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdLifecycleGet"><a href="#!/operations#LifecycleApi#appsAppTypeIdAppIdLifecycleGet">Get lifecycle details</a></li>
+                                        <li id="op-appsFavouritePageDelete"><a href="#!/operations#FavouriteApi#appsFavouritePageDelete">Remove from favourite page</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdLifecycleHistoryGet"><a href="#!/operations#LifecycleApi#appsAppTypeIdAppIdLifecycleHistoryGet">Get lifecycle details</a></li>
+                                        <li id="op-appsFavouritePagePost"><a href="#!/operations#FavouriteApi#appsFavouritePagePost">Set as favourite page</a></li>
                                     
                                 
                             </ul>
@@ -181,26 +145,6 @@
                                     
                                         <li id="op-appsAppTypeIdAppIdStorageFileNameGet"><a href="#!/operations#MobileAppsApi#appsAppTypeIdAppIdStorageFileNameGet">Retrieving file</a></li>
                                     
-                                        <li id="op-appsMobileBinariesFileNameGet"><a href="#!/operations#MobileAppsApi#appsMobileBinariesFileNameGet">Retrieving mobile application binaries</a></li>
-                                    
-                                        <li id="op-appsMobileBinariesPost"><a href="#!/operations#MobileAppsApi#appsMobileBinariesPost">Uploading binary files</a></li>
-                                    
-                                        <li id="op-appsStaticContentsFileNameGet"><a href="#!/operations#MobileAppsApi#appsStaticContentsFileNameGet">Retrieving images, pdf, documents files</a></li>
-                                    
-                                        <li id="op-appsStaticContentsPost"><a href="#!/operations#MobileAppsApi#appsStaticContentsPost">Uploading images, pdf, documents files</a></li>
-                                    
-                                
-                            </ul>
-                        </li>
-                    
-                        <hr/>
-                        <span class="class-name">PolicyGroupsApi</span>
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                
-                                    
-                                        <li id="op-administrationPolicygroupsPolicyGroupIdAppsGet"><a href="#!/operations#PolicyGroupsApi#administrationPolicygroupsPolicyGroupIdAppsGet">Get apps associated with a policy group</a></li>
-                                    
                                 
                             </ul>
                         </li>
@@ -211,7 +155,25 @@
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-rolesGet"><a href="#!/operations#RolesApi#rolesGet">Get all Roles</a></li>
+                                        <li id="op-administrationRolesGet"><a href="#!/operations#RolesApi#administrationRolesGet">Get all Roles</a></li>
+                                    
+                                
+                            </ul>
+                        </li>
+                    
+                        <hr/>
+                        <span class="class-name">SubscriptionsApi</span>
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
+                                
+                                    
+                                        <li id="op-appsAppTypeIdAppIdSubscriptionGet"><a href="#!/operations#SubscriptionsApi#appsAppTypeIdAppIdSubscriptionGet">Get subscriptions for current user</a></li>
+                                    
+                                        <li id="op-appsAppTypeIdAppIdSubscriptionPost"><a href="#!/operations#SubscriptionsApi#appsAppTypeIdAppIdSubscriptionPost">Subscribe App</a></li>
+                                    
+                                        <li id="op-appsAppTypeIdAppIdSubscriptionUsersGet"><a href="#!/operations#SubscriptionsApi#appsAppTypeIdAppIdSubscriptionUsersGet">Get subscribed user list</a></li>
+                                    
+                                        <li id="op-appsAppTypeIdAppIdSubscriptionWorkflowPost"><a href="#!/operations#SubscriptionsApi#appsAppTypeIdAppIdSubscriptionWorkflowPost">Check for subscription workflow</a></li>
                                     
                                 
                             </ul>
@@ -223,47 +185,21 @@
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-appsAppTypeIdAppIdTagsDelete"><a href="#!/operations#TagsApi#appsAppTypeIdAppIdTagsDelete">Delete Tags relevant to an App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdTagsGet"><a href="#!/operations#TagsApi#appsAppTypeIdAppIdTagsGet">Get all Tags of an App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdTagsPut"><a href="#!/operations#TagsApi#appsAppTypeIdAppIdTagsPut">Add a new tag</a></li>
-                                    
-                                        <li id="op-appsAppTypeStatsStatTypeGet"><a href="#!/operations#TagsApi#appsAppTypeStatsStatTypeGet">Get Stat summary</a></li>
-                                    
                                         <li id="op-appsAppTypeTagsGet"><a href="#!/operations#TagsApi#appsAppTypeTagsGet">Get all Tags</a></li>
                                     
-                                
-                            </ul>
-                        </li>
-                    
-                        <hr/>
-                        <span class="class-name">TiersApi</span>
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                
-                                    
-                                        <li id="op-appsAppTypeIdAppIdThrottlingtiersGet"><a href="#!/operations#TiersApi#appsAppTypeIdAppIdThrottlingtiersGet">Get all Tiers</a></li>
+                                        <li id="op-tagsTagNameAppsAppTypeGet"><a href="#!/operations#TagsApi#tagsTagNameAppsAppTypeGet">Get apps with given tag</a></li>
                                     
                                 
                             </ul>
                         </li>
                     
                         <hr/>
-                        <span class="class-name">XACMLPoliciesApi</span>
+                        <span class="class-name">UsersApi</span>
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 
                                     
-                                        <li id="op-administrationXacmlpoliciesPolicyPartialIdGet"><a href="#!/operations#XACMLPoliciesApi#administrationXacmlpoliciesPolicyPartialIdGet">Get policy partial details</a></li>
-                                    
-                                        <li id="op-administrationXacmlpoliciesPolicyPartialIdPut"><a href="#!/operations#XACMLPoliciesApi#administrationXacmlpoliciesPolicyPartialIdPut">Update an existing policy partial</a></li>
-                                    
-                                        <li id="op-administrationXacmlpoliciesPost"><a href="#!/operations#XACMLPoliciesApi#administrationXacmlpoliciesPost">Create a new Policy Partial</a></li>
-                                    
-                                        <li id="op-administrationXacmlpoliciesValidatePost"><a href="#!/operations#XACMLPoliciesApi#administrationXacmlpoliciesValidatePost">Validate Policy content</a></li>
-                                    
-                                        <li id="op-xacmlpoliciesGet"><a href="#!/operations#XACMLPoliciesApi#xacmlpoliciesGet">Get all XACML policies</a></li>
+                                        <li id="op-administrationUsersGet"><a href="#!/operations#UsersApi#administrationUsersGet">Get all Users</a></li>
                                     
                                 
                             </ul>
@@ -277,7 +213,23 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
+                                <li id="def-AdminInstall"><a href="#!/models#AdminInstall">AdminInstall</a></li>
+                            </ul>
+                        </li>
+                    
+                
+                    
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
                                 <li id="def-App"><a href="#!/models#App">App</a></li>
+                            </ul>
+                        </li>
+                    
+                
+                    
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
+                                <li id="def-AppIdList"><a href="#!/models#AppIdList">AppIdList</a></li>
                             </ul>
                         </li>
                     
@@ -301,7 +253,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-App_appmeta"><a href="#!/models#App_appmeta">App_appmeta</a></li>
+                                <li id="def-AppRatingInfo"><a href="#!/models#AppRatingInfo">AppRatingInfo</a></li>
                             </ul>
                         </li>
                     
@@ -309,7 +261,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-Binary"><a href="#!/models#Binary">Binary</a></li>
+                                <li id="def-DeviceInfo"><a href="#!/models#DeviceInfo">DeviceInfo</a></li>
                             </ul>
                         </li>
                     
@@ -317,23 +269,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-BusinessOwner"><a href="#!/models#BusinessOwner">BusinessOwner</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-BusinessOwnerList"><a href="#!/models#BusinessOwnerList">BusinessOwnerList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-BusinessOwnerProperties"><a href="#!/models#BusinessOwnerProperties">BusinessOwnerProperties</a></li>
+                                <li id="def-DeviceList"><a href="#!/models#DeviceList">DeviceList</a></li>
                             </ul>
                         </li>
                     
@@ -357,7 +293,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-JavaPolicy"><a href="#!/models#JavaPolicy">JavaPolicy</a></li>
+                                <li id="def-Events"><a href="#!/models#Events">Events</a></li>
                             </ul>
                         </li>
                     
@@ -365,7 +301,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-JavaPolicyList"><a href="#!/models#JavaPolicyList">JavaPolicyList</a></li>
+                                <li id="def-FavouritePage"><a href="#!/models#FavouritePage">FavouritePage</a></li>
                             </ul>
                         </li>
                     
@@ -373,95 +309,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-LifeCycle"><a href="#!/models#LifeCycle">LifeCycle</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-LifeCycleHistory"><a href="#!/models#LifeCycleHistory">LifeCycleHistory</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-LifeCycleHistoryList"><a href="#!/models#LifeCycleHistoryList">LifeCycleHistoryList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PList"><a href="#!/models#PList">PList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PListAssets"><a href="#!/models#PListAssets">PListAssets</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PListInfo"><a href="#!/models#PListInfo">PListInfo</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyGroups"><a href="#!/models#PolicyGroups">PolicyGroups</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyPartial"><a href="#!/models#PolicyPartial">PolicyPartial</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyPartialIdList"><a href="#!/models#PolicyPartialIdList">PolicyPartialIdList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyPartialInfo"><a href="#!/models#PolicyPartialInfo">PolicyPartialInfo</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyPartialList"><a href="#!/models#PolicyPartialList">PolicyPartialList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-ResponseMessage"><a href="#!/models#ResponseMessage">ResponseMessage</a></li>
+                                <li id="def-Install"><a href="#!/models#Install">Install</a></li>
                             </ul>
                         </li>
                     
@@ -477,47 +325,7 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
-                                <li id="def-StatSummary"><a href="#!/models#StatSummary">StatSummary</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-StaticContent"><a href="#!/models#StaticContent">StaticContent</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
                                 <li id="def-TagList"><a href="#!/models#TagList">TagList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-Tier"><a href="#!/models#Tier">Tier</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-TierList"><a href="#!/models#TierList">TierList</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-UriTemplate"><a href="#!/models#UriTemplate">UriTemplate</a></li>
                             </ul>
                         </li>
                     
@@ -544,10 +352,7 @@
                         <div class="main-content">
                             <h2>Introduction</h2>
 
-                            <p class="marked">This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.
-
-
-
+                            <p class="marked">This document specifies a **RESTful API** for WSO2 **APP Manager** - Store.
 
 It is written with [swagger 2](http://swagger.io/).
 </p>
@@ -585,7 +390,7 @@ It is written with [swagger 2](http://swagger.io/).
                                     <div class="paragraph">
                                         <p class="marked">Host: apis.wso2.com</p>
 
-                                        <p class="marked">BasePath: /api/appm/publisher/v1.0</p>
+                                        <p class="marked">BasePath: /api/appm/store/v1.0</p>
                                         <code>Scheme: [HTTP]</code>
                                     </div>
                                     <h3>Consumes</h3>
