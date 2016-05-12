@@ -30,13 +30,13 @@ import java.util.Set;
 public interface APIConsumer extends APIManager {
 
     /**
-     * Returns the details of the owner of the given app.
+     * Returns the details of the owner for a given owner Id.
      *
-     * @param appId
+     * @param businessOwnerId Id of business owner.
      * @return
      * @throws AppManagementException
      */
-    public BusinessOwner getBusinessOwner(String appId) throws AppManagementException;
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
 
     /**
