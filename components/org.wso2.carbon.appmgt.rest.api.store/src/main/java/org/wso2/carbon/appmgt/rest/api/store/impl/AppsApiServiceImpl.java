@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.appmgt.rest.api.store.impl;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -40,6 +41,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +99,41 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
         return Response.ok().build();
 
+    }
+
+    @Override
+    public Response appsMobileBinariesFileNameGet(String fileName) {
+        File staticContentFile = null;
+        String contentType = null;
+        try {
+            String fileExtension = FilenameUtils.getExtension(fileName);
+            if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
+                    AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
+
+                staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+
+                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+                if (!contentType.startsWith("application")) {
+                    RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
+                            log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported media type is requested",
+                        log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError("Static Content", fileName, e, log);
+            } else {
+                RestApiUtil.handleInternalServerError(
+                        "Error occurred while retrieving mobile binary : " + fileName + "from storage", e, log);
+            }
+        }
+        Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
+        response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
+                + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
+        response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
+        return response.build();
     }
 
     @Override

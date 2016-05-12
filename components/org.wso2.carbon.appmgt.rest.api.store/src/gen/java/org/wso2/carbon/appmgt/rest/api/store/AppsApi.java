@@ -1,20 +1,25 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
-import io.swagger.annotations.ApiParam;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.*;
+import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import io.swagger.annotations.ApiParam;
+
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
+import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
 import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -42,6 +47,24 @@ public class AppsApi  {
     @ApiParam(value = ""  ) InstallDTO install)
     {
     return delegate.appsDownloadPost(contentType,install);
+    }
+    @GET
+    @Path("/mobile/binaries/{fileName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieving mobile application binaries", notes = "Retrieving .apk, .ipa binaries for mobile apps.", response = File.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nMobile app binary content retrieved successfully."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error"),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested entity does not exist."),
+        
+        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.") })
+
+    public Response appsMobileBinariesFileNameGet(@ApiParam(value = "File name.",required=true ) @PathParam("fileName") String fileName)
+    {
+    return delegate.appsMobileBinariesFileNameGet(fileName);
     }
     @POST
     @Path("/uninstallation")
