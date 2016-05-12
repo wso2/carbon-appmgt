@@ -26,6 +26,7 @@ import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.Tag;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
@@ -148,9 +149,11 @@ public class AppsApiServiceImpl extends AppsApiService {
             boolean hasFavouritePage = apiConsumer.hasFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
             favouritePageDTO.setIsDefaultPage(hasFavouritePage);
         } catch (UserStoreException e) {
-            RestApiUtil.handleInternalServerError("User Store Error occurred while saving Favourite page", e, log);
+            RestApiUtil.handleInternalServerError("User Store Error occurred while retrieving Favourite page details",
+                                                  e, log);
         } catch (AppManagementException e) {
-            RestApiUtil.handleInternalServerError("Internal Error occurred while saving Favourite page", e, log);
+            RestApiUtil.handleInternalServerError("Internal Error occurred while retrieving Favourite page details", e,
+                                                  log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -206,9 +209,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
             apiConsumer.removeFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
         } catch (UserStoreException e) {
-            RestApiUtil.handleInternalServerError("User Store Error occurred while saving Favourite page", e, log);
+            RestApiUtil.handleInternalServerError("User Store Error occurred while removing Favourite page", e, log);
         } catch (AppManagementException e) {
-            RestApiUtil.handleInternalServerError("Internal Error occurred while saving Favourite page", e, log);
+            RestApiUtil.handleInternalServerError("Internal Error occurred while removing Favourite page", e, log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -348,12 +351,126 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdFavouriteAppPost(String appType, String appId, String contentType) {
-        return null;
+        boolean isTenantFlowStarted = false;
+        try {
+            //check if a valid asset type is provided
+            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
+                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE) && !appType.equalsIgnoreCase(
+                    AppMConstants.SITE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
+            //logged user's username
+            String username = RestApiUtil.getLoggedInUsername();
+            //logged user's tenant domain
+            String tenantDomainOfUser = RestApiUtil.getLoggedInUserTenantDomain();
+            //logged user's tenant id
+            int tenantIdOfUser = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainOfUser);
+            if (tenantDomainOfUser != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomainOfUser)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomainOfUser, true);
+            }
+            //tenant id of the store
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            //get app details by id
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+            //check if it's valid app
+            if (result.isEmpty() || result.size() == 0) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+            AppDTO appDTO = APPMappingUtil.fromAppToDTO(result.get(0));
+            String providerName = appDTO.getProvider();
+            String apiName = appDTO.getName();
+            String version = appDTO.getVersion();
+
+            APIIdentifier identifier = new APIIdentifier(providerName, apiName, version);
+            boolean isFavouriteApp = apiConsumer.isFavouriteApp(identifier, username, tenantIdOfUser, tenantIdOFStore);
+
+            //add to favourite if it is not already added
+            if (!isFavouriteApp) {
+                apiConsumer.addToFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOFStore);
+            }
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User Store Error occurred while adding as Favourite", e, log);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while adding as Favourite", e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
     @Override
     public Response appsAppTypeIdAppIdFavouriteAppDelete(String appType, String appId, String contentType) {
-        return null;
+        boolean isTenantFlowStarted = false;
+        try {
+            //check if a valid asset type is provided
+            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
+                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE) && !appType.equalsIgnoreCase(
+                    AppMConstants.SITE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
+            //logged user's username
+            String username = RestApiUtil.getLoggedInUsername();
+            //logged user's tenant domain
+            String tenantDomainOfUser = RestApiUtil.getLoggedInUserTenantDomain();
+            //logged user's tenant id
+            int tenantIdOfUser = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainOfUser);
+            if (tenantDomainOfUser != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomainOfUser)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomainOfUser, true);
+            }
+            //tenant id of the store
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            //get app details by id
+            List<App> result = apiProvider.searchApps(appType, searchTerms);
+            //check if it's valid app
+            if (result.isEmpty() || result.size() == 0) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+            AppDTO appDTO = APPMappingUtil.fromAppToDTO(result.get(0));
+            String providerName = appDTO.getProvider();
+            String apiName = appDTO.getName();
+            String version = appDTO.getVersion();
+
+            APIIdentifier identifier = new APIIdentifier(providerName, apiName, version);
+            boolean isFavouriteApp = apiConsumer.isFavouriteApp(identifier, username, tenantIdOfUser, tenantIdOFStore);
+
+            //remove from favourite if is it a favourite app
+            if (isFavouriteApp) {
+                apiConsumer.removeFromFavouriteApps(identifier, username, tenantIdOfUser, tenantIdOFStore);
+            }
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User Store Error occurred while adding as Favourite", e, log);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while adding as Favourite", e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
     @Override
