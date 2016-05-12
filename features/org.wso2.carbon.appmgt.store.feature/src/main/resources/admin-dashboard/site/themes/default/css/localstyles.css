@@ -892,7 +892,12 @@ legend + .control-group {
     text-align: center;
     margin-top: 60px;
 }
-#editCustomPropertyTable,#customPropertyTable td {
-    text-align:center;
+
+.div-custom {
+    text-align: center;
     vertical-align:middle;
+}
+
+.header-div {
+    font-weight: bold;
 }

@@ -90,7 +90,7 @@ function checkFilled() {
 checkFilled();
 //add new fields
 $(document).on("click", "#btn-owner-partial-new", function () {
-    $("#customPropertyTable").append(GetDynamicTextBox(fieldCount));
+    $("#customPropertyList").append(GetDynamicTextBox(fieldCount));
     fieldCount++;
 });
 
@@ -99,13 +99,16 @@ function GetDynamicTextBox(value) {
     var id_val = "value-".concat(value);
     var check_val = "showInStore-".concat(value);
     if(value == 0){
-        return '<tr><th>Property</th><th>Value</th><th>Show in Store</th></tr><tr><td><input name = "key" type="text" id="'+id_key+'"/></td>'
-               + '<td><input name="value" type="text" id="'+id_val+'"/></td><td>'
-               +'<input type="checkbox" name="showInStore" id="'+check_val+'"/></td></tr>';
+        return '<div class="row-fluid div-custom header-div"><div class="span3">Property</div><div class="span3">Value</div><div'
+               + ' class="span2">Show in Store</div></div><div class="row-fluid div-custom"><div class="span3">'
+               + '<input name = "key" type="text" id="'+id_key+'"/></div>'
+               + '<div class="span3"><input name="value" type="text" id="'+id_val+'"/></div>'
+               + '<div class="span2"><input type="checkbox" name="showInStore" id="'+check_val+'"/></div></div> ';
     }
-    return '<tr><td><input name = "key" type="text" id="'+id_key+'"/></td>'
-           + '<td><input name="value" type="text" id="'+id_val+'"/></td><td>'
-           +'<input type="checkbox" name="showInStore" id="'+check_val+'"/></td></tr>';
+    return '<div class="row-fluid div-custom"><div class="span3">'
+           + '<input name = "key" type="text" id="'+id_key+'"/></div>'
+           + '<div class="span3"><input name="value" type="text" id="'+id_val+'"/></div>'
+           + '<div class="span2"><input type="checkbox" name="showInStore" id="'+check_val+'"/></div></div>';
 }
 //save event
 $(document).on("click", "#btn-owner-save", function () {

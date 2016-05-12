@@ -8,6 +8,7 @@ var businessOwnerCustomData;
 var log = new Log();
 var businessOwner = "";
 var  ownerName;
+var ownerEmail;
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
@@ -218,6 +219,7 @@ require('/modules/store.js').exec(function (ctx) {
                 if(businessOwner != null && businessOwner.businessOwnerName != null) {
                     businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;
+                    ownerEmail = businessOwnerCustomData[1].value;
                 }
             }
 
@@ -551,7 +553,8 @@ require('/modules/store.js').exec(function (ctx) {
             },
                            assetType: 'webapp',
                            businessOwnerData: businessOwnerCustomData,
-                           businessOwnerName: ownerName
+                           businessOwnerName: ownerName,
+                           businessOwnerEmail: ownerEmail
         });
     }
 

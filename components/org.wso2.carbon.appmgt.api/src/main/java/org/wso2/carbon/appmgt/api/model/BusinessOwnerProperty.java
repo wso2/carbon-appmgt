@@ -18,9 +18,9 @@
 package org.wso2.carbon.appmgt.api.model;
 
 /**
- * Business owner properties DTO.
+ * Business owner property model class.
  */
-public class BusinessOwnerProperties {
+public class BusinessOwnerProperty {
     private String propertyId;
     private String propertyValue;
     private boolean isShowingInStore;

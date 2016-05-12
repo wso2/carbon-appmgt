@@ -40,7 +40,7 @@ import org.wso2.carbon.appmgt.api.model.APIRating;
 import org.wso2.carbon.appmgt.api.model.APIStatus;
 import org.wso2.carbon.appmgt.api.model.Application;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperties;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
 import org.wso2.carbon.appmgt.api.model.Comment;
 import org.wso2.carbon.appmgt.api.model.Documentation;
 import org.wso2.carbon.appmgt.api.model.DocumentationType;
@@ -244,15 +244,15 @@ public class APIStoreHostObject extends ScriptableObject {
         row.put("businessOwnerEmail", row, businessOwner.getBusinessOwnerEmail());
         row.put("businessOwnerDescription", row, businessOwner.getBusinessOwnerDescription());
         row.put("businessOwnerSite", row, businessOwner.getBusinessOwnerSite());
-        List<BusinessOwnerProperties> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
+        List<BusinessOwnerProperty> businessOwnerPropertiesList = businessOwner.getBusinessOwnerPropertiesList();
         if(businessOwnerPropertiesList != null) {
             JSONObject businessOwnerPropertiesObject = new JSONObject();
             for (int i = 0; i < businessOwnerPropertiesList.size(); i++) {
                 JSONObject businessOwnerPropertyObject = new JSONObject();
-                BusinessOwnerProperties businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                businessOwnerPropertyObject.put("propertyValue", businessOwnerProperties.getPropertyValue());
-                businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperties.isShowingInStore());
-                businessOwnerPropertiesObject.put(businessOwnerProperties.getPropertyId(),businessOwnerPropertyObject);
+                BusinessOwnerProperty businessOwnerProperty = businessOwnerPropertiesList.get(i);
+                businessOwnerPropertyObject.put("propertyValue", businessOwnerProperty.getPropertyValue());
+                businessOwnerPropertyObject.put("isShowingInStore", businessOwnerProperty.isShowingInStore());
+                businessOwnerPropertiesObject.put(businessOwnerProperty.getPropertyId(),businessOwnerPropertyObject);
             }
             row.put("businessOwnerProperties", row, businessOwnerPropertiesObject.toJSONString());
         } else {

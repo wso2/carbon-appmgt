@@ -39,7 +39,7 @@ public interface APIProvider extends APIManager {
      * @param businessOwnerId ID of the owner.
      * @throws AppManagementException
      */
-    public String deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
+    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
 
     /**
      * update a Business Owner.
@@ -56,7 +56,8 @@ public interface APIProvider extends APIManager {
      * @return
      * @throws AppManagementException
      */
-    public  List<BusinessOwnerProperties> getBusinessOwnerCustomProperties(int businessOwnerId) throws AppManagementException;
+    public List<BusinessOwnerProperty> getBusinessOwnerCustomProperties(int businessOwnerId) throws
+                                                                                             AppManagementException;
     /**
      * @return
      * @throws AppManagementException
@@ -73,14 +74,14 @@ public interface APIProvider extends APIManager {
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
     /**
-     * Get the business owners for a search value with pagination.
+     * Search the business owners with page limitation.
      * @param startIndex
      * @param pageSize
      * @param searchValue
      * @return
      * @throws AppManagementException
      */
-    public List<BusinessOwner> getBusinessOwnersWithPagination(int startIndex, int pageSize, String searchValue) throws
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
                                                                                               AppManagementException;
 
     /**

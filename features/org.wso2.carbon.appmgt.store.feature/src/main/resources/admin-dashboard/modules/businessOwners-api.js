@@ -21,37 +21,23 @@ var apiProvider = jagg.module('manager').getAPIProviderObj();
 var log = new Log();
 
 function deleteOwner(ownerId){
-    var partialId = deleteBusinessOwner(ownerId);
-    var response = {"id": partialId};
-    return response;
-}
-
-function deleteBusinessOwner(ownerId){
     return apiProvider.deleteBusinessOwner(ownerId);
 }
 
 function saveOwner(ownerName, ownerMail, description, sitelink, ownerDetails) {
-    var partialId = saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails);
+    var partialId = apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails);
     var response = {"id": partialId};
     return response;
-}
-
-function saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails) {
-    return apiProvider.saveBusinessOwner(ownerName, ownerMail, description, sitelink, ownerDetails);
 }
 
 function updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails) {
-    var partialId = updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
+    var partialId = apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
     var response = {"id": partialId};
     return response;
 }
 
-function  updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails) {
-    return apiProvider.updateBusinessOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
-}
-
 function getBusinessOwners(start, length, draw, search) {
-    return apiProvider.getBusinessOwnersWithPagination(start, length, draw, search);
+    return apiProvider.searchBusinessOwners(start, length, draw, search);
 };
 
 function getBusinessOwner(ownerId) {
