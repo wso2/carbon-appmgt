@@ -37,6 +37,7 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
@@ -44,6 +45,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.social.core.SocialActivityException;
 import org.wso2.carbon.social.core.service.SocialActivityService;
@@ -126,6 +128,94 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.accepted().build();
     }
 
+    @Override
+    public Response appsFavouritePageGet(String accept, String ifNoneMatch) {
+        FavouritePageDTO favouritePageDTO = new FavouritePageDTO();
+        boolean isTenantFlowStarted = false;
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainOfUser = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantIdOfUser = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainOfUser);
+            if (tenantDomainOfUser != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomainOfUser)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomainOfUser, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            boolean hasFavouritePage = apiConsumer.hasFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
+            favouritePageDTO.setIsDefaultPage(hasFavouritePage);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User Store Error occurred while saving Favourite page", e, log);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while saving Favourite page", e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().entity(favouritePageDTO).build();
+    }
+
+    @Override
+    public Response appsFavouritePagePost() {
+        boolean isTenantFlowStarted = false;
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainOfUser = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantIdOfUser = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainOfUser);
+            if (tenantDomainOfUser != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomainOfUser)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomainOfUser, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            apiConsumer.setFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User Store Error occurred while saving Favourite page", e, log);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while saving Favourite page", e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response appsFavouritePageDelete() {
+        boolean isTenantFlowStarted = false;
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainOfUser = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantIdOfUser = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainOfUser);
+            if (tenantDomainOfUser != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(
+                    tenantDomainOfUser)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomainOfUser, true);
+            }
+            int tenantIdOFStore = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            APIConsumer apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            apiConsumer.removeFavouritePage(username, tenantIdOfUser, tenantIdOFStore);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User Store Error occurred while saving Favourite page", e, log);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while saving Favourite page", e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
+    }
 
     @Override
     public Response appsUninstallationPost(String contentType, InstallDTO install) {
@@ -257,29 +347,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdFavouriteAddToFavouritePost(String appType, String appId, String contentType) {
+    public Response appsAppTypeIdAppIdFavouriteAppPost(String appType, String appId, String contentType) {
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdFavouriteFavouritePageGet(String appType, String appId, String accept,
-                                                                String ifNoneMatch, String ifModifiedSince) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdFavouriteFavouritePagePost(String appType, String appId, String contentType) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdFavouriteFavouritePageDelete(String appType, String appId, String contentType) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdFavouriteRemoveFromFavouritePost(String appType, String appId,
-                                                                       String contentType) {
+    public Response appsAppTypeIdAppIdFavouriteAppDelete(String appType, String appId, String contentType) {
         return null;
     }
 
@@ -376,6 +449,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         }
         return Response.ok().entity(appRatingInfoDTO).build();
     }
+
 
     @Override
     public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,

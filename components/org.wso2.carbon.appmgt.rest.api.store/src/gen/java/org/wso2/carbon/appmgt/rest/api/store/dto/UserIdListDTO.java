@@ -32,7 +32,6 @@ public class UserIdListDTO  {
   public String toString()  {
     StringBuilder sb = new StringBuilder();
     sb.append("class UserIdListDTO {\n");
-    
     sb.append("  userIds: ").append(userIds).append("\n");
     sb.append("}\n");
     return sb.toString();
