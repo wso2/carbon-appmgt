@@ -32,11 +32,11 @@ public interface APIConsumer extends APIManager {
     /**
      * Returns the details of the owner for a given owner Id.
      *
-     * @param ownerId Id of business owner.
+     * @param businessOwnerId Id of business owner.
      * @return
      * @throws AppManagementException
      */
-    public BusinessOwner getBusinessOwner(int ownerId) throws AppManagementException;
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
 
 
     /**

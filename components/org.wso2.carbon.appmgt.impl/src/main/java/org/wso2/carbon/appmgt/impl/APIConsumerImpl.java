@@ -111,13 +111,13 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     /**
      * Get business owner for a given business owner id.
-     * @param ownerId Id of business owner.
+     * @param businessOwnerId Id of business owner.
      * @return
      * @throws AppManagementException
      */
     @Override
-    public BusinessOwner  getBusinessOwner(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwner(ownerId);
+    public BusinessOwner  getBusinessOwner(int businessOwnerId) throws AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId);
     }
 
 

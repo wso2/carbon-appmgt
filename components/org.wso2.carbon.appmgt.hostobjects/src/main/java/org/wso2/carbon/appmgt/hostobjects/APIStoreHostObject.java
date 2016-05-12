@@ -235,9 +235,9 @@ public class APIStoreHostObject extends ScriptableObject {
             throw new AppManagementException("Invalid number of arguments. Arguments length should be one.");
         }
 
-        int ownerId = Integer.valueOf(args[0].toString());
+        int businessOwnerId = Integer.valueOf(args[0].toString());
         APIConsumer apiConsumer = getAPIConsumer(thisObj);
-        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(ownerId);
+        BusinessOwner businessOwner = apiConsumer.getBusinessOwner(businessOwnerId);
         NativeObject row = new NativeObject();
         row.put("businessOwnerId", row, businessOwner.getBusinessOwnerId());
         row.put("businessOwnerName", row, businessOwner.getBusinessOwnerName());
