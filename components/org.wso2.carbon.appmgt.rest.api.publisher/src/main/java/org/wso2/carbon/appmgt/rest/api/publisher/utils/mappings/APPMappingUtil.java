@@ -542,12 +542,16 @@ public class APPMappingUtil {
             Set<String> apiTags = new HashSet<>(appDTO.getTags());
             webApp.addTags(apiTags);
         }
-        List<String> visibleRoleList = new ArrayList<String>();
-        visibleRoleList = appDTO.getVisibleRoles();
+
+        List<String>  visibleRoleList = appDTO.getVisibleRoles();
         if (visibleRoleList != null) {
             String[] visibleRoles = new String[visibleRoleList.size()];
             visibleRoles = visibleRoleList.toArray(visibleRoles);
             webApp.setAppVisibility(visibleRoles);
+        }
+        List<String> claimsList = appDTO.getClaims();
+        if(claimsList != null){
+            webApp.setClaims(claimsList);
         }
         return webApp;
     }

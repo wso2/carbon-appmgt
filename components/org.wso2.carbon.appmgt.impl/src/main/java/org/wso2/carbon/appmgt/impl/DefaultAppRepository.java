@@ -83,7 +83,7 @@ public class DefaultAppRepository implements AppRepository {
                 savePolicyGroups(webApp, connection);
                 appId = saveRegistryArtifact(app);
                 saveAppToRDMS(webApp, connection);
-                saveServiceProvider(webApp);
+                saveServiceProvider(webApp, true);
             } catch (SQLException e) {
                 try {
                     connection.rollback();
@@ -164,7 +164,7 @@ public class DefaultAppRepository implements AppRepository {
         return -1;
     }
 
-    private void saveServiceProvider(WebApp app) {
+    private void saveServiceProvider(WebApp app, boolean isCreate) {
 
      SSOProvider ssoProvider = new SSOProvider();
 
@@ -181,8 +181,14 @@ public class DefaultAppRepository implements AppRepository {
         } else {
             issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
         }
-        
-        ArrayList<String> claims = new ArrayList<>();
+
+        List<String> claims;
+
+        if (app.getClaims() != null) {
+            claims = app.getClaims();
+        } else {
+            claims = new ArrayList<>();
+        }
         claims.add("http://wso2.org/claims/role");
 
         ssoProvider.setIssuerName(issuerName);
@@ -193,7 +199,8 @@ public class DefaultAppRepository implements AppRepository {
 
         app.setSsoProviderDetails(ssoProvider);
         SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
-        ssoConfiguratorUtil.createSSOProvider(app, true);
+
+        ssoConfiguratorUtil.createSSOProvider(app, isCreate);
     }
 
     private Connection getRDBMSConnectionWithoutAutoCommit() throws SQLException {

@@ -2924,6 +2924,16 @@
                         "hr.com"
                     ]
                 },
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "http://wso2.org/claims/otherphone",
+                        "http://wso2.org/claims/address"
+                    ]
+                },
                 "trackingCode": {
                     "type": "string",
                     "example": "AM_e82dggfde7877"
