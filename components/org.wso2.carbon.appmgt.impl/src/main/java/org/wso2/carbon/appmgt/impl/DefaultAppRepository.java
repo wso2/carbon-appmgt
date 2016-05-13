@@ -1,12 +1,11 @@
 package org.wso2.carbon.appmgt.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -15,11 +14,13 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
+import org.wso2.carbon.h2.osgi.utils.CarbonUtils;
 import org.wso2.carbon.registry.api.RegistryService;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.namespace.QName;
@@ -85,7 +86,7 @@ public class DefaultAppRepository implements AppRepository {
                 savePolicyGroups(webApp, connection);
                 appId = saveRegistryArtifact(app);
                 saveAppToRDMS(webApp, connection);
-                saveServiceProvider(webApp, connection);
+                saveServiceProvider(webApp);
             } catch (SQLException e) {
                 try {
                     connection.rollback();
@@ -166,8 +167,37 @@ public class DefaultAppRepository implements AppRepository {
         return -1;
     }
 
-    private void saveServiceProvider(WebApp app, Connection connection) {
+    private void saveServiceProvider(WebApp app) {
 
+     SSOProvider ssoProvider = new SSOProvider();
+
+        String providerName = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.SSO_CONFIGURATOR_NAME);
+        String version = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
+                getFirstProperty(AppMConstants.SSO_CONFIGURATOR_VERSION);
+        ssoProvider.setProviderName(providerName);
+        ssoProvider.setProviderVersion(version);
+        String issuerName = null;
+        APIIdentifier appIdentifier = app.getId();
+        if (MultitenantConstants.SUPER_TENANT_ID != this.tenantId) {
+            issuerName = appIdentifier.getApiName() + "-" + tenantDomain + "-" + appIdentifier.getVersion();
+        } else {
+            issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
+        }
+
+
+        String [] claims = new String[2];
+        claims[0] = "http://wso2.org/claims/role";
+        claims[1] = "http://wso2.org/claims/otherphone";
+        ssoProvider.setIssuerName(issuerName);
+        ssoProvider.setClaims(claims);
+        if(!StringUtils.isNotEmpty(app.getLogoutURL())){
+            ssoProvider.setLogoutUrl(app.getLogoutURL());
+        }
+
+        app.setSsoProviderDetails(ssoProvider);
+        SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
+        ssoConfiguratorUtil.createSSOProvider(app, true);
     }
 
     private Connection getRDBMSConnectionWithoutAutoCommit() throws SQLException {

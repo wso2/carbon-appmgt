@@ -2486,7 +2486,7 @@ parameters:
     description: |
       Business Owner Id.
     required: true
-    type: string
+    type: integer
   Accept:
     name: Accept
     in: header
@@ -3077,7 +3077,7 @@ definitions:
   BusinessOwnerList:
     title: BusinessOwnerList details.
     properties:
-      tierList:
+      businessOwnerList:
         type: array
         items:
           $ref: '#/definitions/BusinessOwner'
@@ -3100,15 +3100,21 @@ definitions:
         example: www.wso2.com
       properties:
         type: array
-        description: List of Business owner properties
         items:
-          type: string
-        example:
-          - property1
-          - property2
-          - property3
+          $ref: '#/definitions/BusinessOwnerProperties'
+  BusinessOwnerProperties:
+    title: BusinessOwnerProperties object
+    properties:
+      key:
+        type: string
+        example: age
+      value:
+        type: string
+        example: '20'
+      isVisible:
+        type: boolean
   UriTemplate:
-    title: BusinessOwner object
+    title: URI Template Definition
     properties:
       urlPattern:
         type: string
@@ -3126,6 +3132,7 @@ definitions:
           The name of the uri template policy group
         example: default
   PolicyGroups:
+    title: Policy Group Definition
     properties:
       policyGroupName:
         type: string

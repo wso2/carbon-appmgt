@@ -1,11 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -29,7 +29,7 @@ public class BusinessOwnerDTO  {
   private String site = null;
   
   
-  private List<String> properties = new ArrayList<String>();
+  private List<BusinessOwnerPropertiesDTO> properties = new ArrayList<BusinessOwnerPropertiesDTO>();
 
   
   /**
@@ -93,14 +93,13 @@ public class BusinessOwnerDTO  {
 
   
   /**
-   * List of Business owner properties
    **/
-  @ApiModelProperty(value = "List of Business owner properties")
+  @ApiModelProperty(value = "")
   @JsonProperty("properties")
-  public List<String> getProperties() {
+  public List<BusinessOwnerPropertiesDTO> getProperties() {
     return properties;
   }
-  public void setProperties(List<String> properties) {
+  public void setProperties(List<BusinessOwnerPropertiesDTO> properties) {
     this.properties = properties;
   }
 

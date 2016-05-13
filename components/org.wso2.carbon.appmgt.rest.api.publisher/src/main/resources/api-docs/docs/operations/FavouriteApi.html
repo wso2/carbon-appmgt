@@ -4,17 +4,17 @@
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdFavouriteAppDelete"></a>Remove from favourite Apps</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdAddToFavouritePost"></a>Add to favourite Apps</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Remove from favourite Apps.\n</p>
+            <p class="marked">Add to favourite Apps.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/favourite-app</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/add-to-favourite</code>
 
             <h4 class="section-heading">HTTP Method</h4>
-            <code>DELETE</code>
+            <code>POST</code>
 
             <h4 class="section-heading">Scope</h4>
             
@@ -24,13 +24,13 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/add-to-favourite&quot;</code></div>
             
             
 
             
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdFavouriteAppDelete">
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdAddToFavouritePost">
                 <h4 class="section-heading">
                     Sample Response
                     
@@ -39,7 +39,7 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdFavouriteAppDelete" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-appsAppTypeIdAppIdAddToFavouritePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -107,7 +107,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -185,7 +185,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -198,7 +198,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -211,7 +211,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -224,7 +224,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -239,14 +239,14 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdFavouriteAppPost"></a>Add to favourite Apps</h3>
+            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdRemoveFromFavouritePost"></a>Remove from favourite Apps</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Add to favourite Apps.\n</p>
+            <p class="marked">Remove from favourite Apps.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/favourite-app</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/remove-from-favourite</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -259,13 +259,13 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/remove-from-favourite&quot;</code></div>
             
             
 
             
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdFavouriteAppPost">
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdRemoveFromFavouritePost">
                 <h4 class="section-heading">
                     Sample Response
                     
@@ -274,7 +274,7 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdFavouriteAppPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-appsAppTypeIdAppIdRemoveFromFavouritePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -342,7 +342,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -420,7 +420,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -433,7 +433,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -446,7 +446,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -459,7 +459,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -573,7 +573,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -586,7 +586,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -599,7 +599,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -612,7 +612,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -718,7 +718,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -731,7 +731,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -744,7 +744,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -757,7 +757,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 

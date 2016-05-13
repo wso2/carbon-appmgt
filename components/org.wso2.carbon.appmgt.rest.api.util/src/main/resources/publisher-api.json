@@ -2708,7 +2708,7 @@
             "in": "path",
             "description": "Business Owner Id.\n",
             "required": true,
-            "type": "string"
+            "type": "integer"
         },
         "Accept": {
             "name": "Accept",
@@ -2957,7 +2957,7 @@
                 "transport": {
                     "description": "Supported transports for the App (http and/or https).\n",
                     "type": "string",
-                    "example":"https"
+                    "example": "https"
                 },
                 "tags": {
                     "type": "array",
@@ -3422,7 +3422,7 @@
         "BusinessOwnerList": {
             "title": "BusinessOwnerList details.",
             "properties": {
-                "tierList": {
+                "businessOwnerList": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/BusinessOwner"
@@ -3454,15 +3454,25 @@
                 },
                 "properties": {
                     "type": "array",
-                    "description": "List of Business owner properties",
                     "items": {
-                        "type": "string"
-                    },
-                    "example": [
-                        "property1",
-                        "property2",
-                        "property3"
-                    ]
+                        "$ref": "#/definitions/BusinessOwnerProperties"
+                    }
+                }
+            }
+        },
+        "BusinessOwnerProperties": {
+            "title": "BusinessOwnerProperties object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "example": "age"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "20"
+                },
+                "isVisible": {
+                    "type": "boolean"
                 }
             }
         },

@@ -1,7 +1,7 @@
 <div class="main-content">
     
 
-        <h2>AppList</h2>
+        <h2>PolicyGroups</h2>
             <table class="table table-hover">
                 <colgroup>
                     <col style="width: 10%;"/>
@@ -23,67 +23,67 @@
                 
                     <tr>
                         <td class="parameter">
-                            <p>count</p>
+                            <p>policyGroupName</p>
                             <p class="param-required">
                                 
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Number of App returned.\n</p></td>
-                        <td class="parameter">
-                            
-                                <a href="#!/models#integer">integer</a>
-                            
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">1</p></td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            <p>next</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked">Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n</p></td>
+                        <td class="parameter"><p class="marked">Name of the policy group\n</p></td>
                         <td class="parameter">
                             
                                 <a href="#!/models#string">string</a>
                             
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">/app?limit=1&amp;offset=2&amp;query=</p></td>
+                        <td class="parameter"> <p class="marked">default</p></td>
                     </tr>
                 
                     <tr>
                         <td class="parameter">
-                            <p>previous</p>
+                            <p>description</p>
                             <p class="param-required">
                                 
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n</p></td>
+                        <td class="parameter"><p class="marked">Description of the policy group\n</p></td>
                         <td class="parameter">
                             
                                 <a href="#!/models#string">string</a>
                             
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">/app?limit=1&amp;offset=0&amp;query=</p></td>
+                        <td class="parameter"> <p class="marked">Default policy group</p></td>
                     </tr>
                 
                     <tr>
                         <td class="parameter">
-                            <p>appList</p>
+                            <p>throttlingTier</p>
                             <p class="param-required">
                                 
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked"></p></td>
+                        <td class="parameter"><p class="marked">Throttling tier\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#string">string</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">Bronze,Silver,Gold,Unlimited</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>userRoles</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">The name of the uri template policy group\n</p></td>
                         <td class="parameter">
                             
                                 <a href="#!/models#array">array</a>
@@ -91,6 +91,42 @@
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
                         <td class="parameter"> <p class="marked">null</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>policyPartialMapping</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">Entitlement policy partial name list\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#array">array</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>allowAnonymousAccess</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">Allow anonymous access to mobile\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#string">string</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">GET,POST,PUT,DELETE,OPTION</p></td>
                     </tr>
                 
                 </tbody>
