@@ -28,10 +28,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The default implementation of DefaultAppRepository which uses RDBMS and Carbon registry for persistence.
@@ -184,13 +181,12 @@ public class DefaultAppRepository implements AppRepository {
         } else {
             issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
         }
+        
+        ArrayList<String> claims = new ArrayList<>();
+        claims.add("http://wso2.org/claims/role");
 
-
-        String [] claims = new String[2];
-        claims[0] = "http://wso2.org/claims/role";
-        claims[1] = "http://wso2.org/claims/otherphone";
         ssoProvider.setIssuerName(issuerName);
-        ssoProvider.setClaims(claims);
+        ssoProvider.setClaims((String[]) claims.toArray());
         if(!StringUtils.isNotEmpty(app.getLogoutURL())){
             ssoProvider.setLogoutUrl(app.getLogoutURL());
         }
