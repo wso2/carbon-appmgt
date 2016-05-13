@@ -432,6 +432,18 @@ $(function() {
     	});
 
 
+	var data =  $("#owner_list").val();
+	data = jQuery.parseJSON(data);
+
+	$(document).ready(function() {
+		$("#businessOwnerName").select2({
+		    placeholder: 'Select an option',
+			data:data,
+			allowClear: true
+		});
+	});
+
+
 	function loadProviders(providers_data){
 		 for(var i=0;i<providers_data.length;i++){
 			  var x = providers_data[i];

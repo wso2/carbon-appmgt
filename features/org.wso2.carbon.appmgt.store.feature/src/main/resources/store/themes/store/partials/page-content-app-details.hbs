@@ -49,7 +49,7 @@
                     Version : {{asset.attributes.overview_version}}<br>
                     By : {{asset.attributes.overview_provider}}<br>
                     {{#if businessOwnerName}}
-                    Business Owner : {{businessOwnerName}}<br>
+                    Business Owner : {{businessOwnerName}} ({{businessOwnerEmail}})<br>
                     {{/if}}
                     Status: {{asset.lifecycleState}}
                 </p>
@@ -152,10 +152,11 @@
         <div id="menu4" class="tab-pane fade">
             <div class="row">
                 {{#each businessOwnerData}}
-                    <div>
-                        <label><b>&nbsp&nbsp&nbsp{{name}} &nbsp&nbsp&nbsp:&nbsp&nbsp&nbsp </b></label>
-                        <span>{{value}}</span><br />
-                    </div>{{/each}}
+                    <div class="row">
+                        <div class="col-sm-3"><b>{{name}}</b></div>
+                        <div class="col-sm-9">{{value}}</div>
+                    </div>
+                {{/each}}
             </div>
         </div>
     </div>
