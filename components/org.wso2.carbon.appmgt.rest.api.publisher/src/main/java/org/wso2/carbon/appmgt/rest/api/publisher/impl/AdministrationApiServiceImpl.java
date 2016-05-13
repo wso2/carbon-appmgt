@@ -24,20 +24,22 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.rest.api.publisher.AdministrationApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BusinessOwnerDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BusinessOwnerListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BusinessOwnerPropertiesDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialDTO;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
+import org.wso2.carbon.utils.xml.StringUtils;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
@@ -48,23 +50,35 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
         BusinessOwnerListDTO businessOwnerListDTO = new BusinessOwnerListDTO();
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            //get policy details related to id
+            //get business owner related to id.
             List<BusinessOwnerDTO> businessOwnerDTOList = new ArrayList<>();
             List<BusinessOwner> businessOwners = apiProvider.getBusinessOwners();
+            List<BusinessOwnerProperty> businessOwnerPropertyList;
             if (businessOwners.isEmpty()) {
                 return RestApiUtil.buildNotFoundException("Business Owners", null).getResponse();
             }
 
             for (BusinessOwner businessOwner : businessOwners) {
-                BusinessOwnerDTO businessOwnerDTO =  new BusinessOwnerDTO();
+                BusinessOwnerDTO businessOwnerDTO = new BusinessOwnerDTO();
+                businessOwnerDTO.setId(businessOwner.getBusinessOwnerId());
                 businessOwnerDTO.setName(businessOwner.getBusinessOwnerName());
                 businessOwnerDTO.setEmail(businessOwner.getBusinessOwnerEmail());
                 businessOwnerDTO.setDescription(businessOwner.getBusinessOwnerDescription());
                 businessOwnerDTO.setSite(businessOwner.getBusinessOwnerSite());
+                businessOwnerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
+                List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = new ArrayList<>();
+                //save custom properties of the owner.
+                for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
+                    BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
+                    businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                    businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
+                    businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
+                    businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
+                }
+                businessOwnerDTO.setProperties(businessOwnerPropertiesDTOList);
                 businessOwnerDTOList.add(businessOwnerDTO);
             }
             businessOwnerListDTO.setBusinessOwnerList(businessOwnerDTOList);
-
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving business owners.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -79,31 +93,60 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
         BusinessOwnerDTO businessOwnerDTO = new BusinessOwnerDTO();
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String ownerName = body.getName().trim();
-            String ownerEmail = body.getName().trim();
-            String ownerDescription = body.getName().trim();
-            String ownerSite = body.getName().trim();
-            if (ownerName.isEmpty()) {
-                RestApiUtil.handleBadRequest("Business owner name cannot be empty", log);
+            String ownerName = body.getName();
+            String ownerEmail = body.getEmail();
+            String ownerDescription = body.getDescription();
+            String ownerSite = body.getSite();
+            if (StringUtils.isEmpty(ownerName)) {
+                RestApiUtil.handleBadRequest("Business owner name cannot be null or empty.", log);
             }
-            if (ownerEmail.trim().isEmpty()) {
-                RestApiUtil.handleBadRequest("Business owner email cannot be empty", log);
+            if (StringUtils.isEmpty(ownerEmail)) {
+                RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
-            businessOwner.setBusinessOwnerName(ownerName);
-            businessOwner.setBusinessOwnerEmail(ownerEmail);
+            businessOwner.setBusinessOwnerName(ownerName.trim());
+            businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
             businessOwner.setBusinessOwnerDescription(ownerDescription);
             businessOwner.setBusinessOwnerSite(ownerSite);
-            //save business owner
+            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = body.getProperties();
+            List<BusinessOwnerProperty> businessOwnerPropertyList = new ArrayList<>();
+            for (BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO : businessOwnerPropertiesDTOList) {
+                BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
+                String propertyId = businessOwnerPropertiesDTO.getKey();
+                String propertyValue = businessOwnerPropertiesDTO.getValue();
+                Boolean isVisible = businessOwnerPropertiesDTO.getIsVisible();
+                if (StringUtils.isEmpty(propertyId) || StringUtils.isEmpty(propertyValue) || isVisible == null) {
+                    RestApiUtil.handleBadRequest("Business owner properties cannot be empty or null.", log);
+                }
+                businessOwnerProperty.setPropertyId(propertyId.trim());
+                businessOwnerProperty.setPropertyValue(propertyValue.trim());
+                businessOwnerProperty.setShowingInStore(isVisible);
+                businessOwnerPropertyList.add(businessOwnerProperty);
+            }
+            businessOwner.setBusinessOwnerPropertiesList(businessOwnerPropertyList);
+
+            //save business owner.
             int ownerId = apiProvider.saveBusinessOwner(businessOwner);
 
-            //retrieved saved business owner by id
+            //Retrieve the added business owner to send in the response payload.
             BusinessOwner addedBusinessOwner = apiProvider.getBusinessOwner(ownerId);
             businessOwnerDTO.setId(ownerId);
             businessOwnerDTO.setName(addedBusinessOwner.getBusinessOwnerName());
             businessOwnerDTO.setEmail(addedBusinessOwner.getBusinessOwnerEmail());
             businessOwnerDTO.setDescription(addedBusinessOwner.getBusinessOwnerDescription());
             businessOwnerDTO.setSite(addedBusinessOwner.getBusinessOwnerSite());
+
+            List<BusinessOwnerProperty> ownerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
+            List<BusinessOwnerPropertiesDTO> ownerPropertiesDTOList = new ArrayList<>();
+            //save custom properties of the owner.
+            for (BusinessOwnerProperty ownerProperty : ownerPropertyList) {
+                BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
+                businessOwnerPropertiesDTO.setKey(ownerProperty.getPropertyId());
+                businessOwnerPropertiesDTO.setValue(ownerProperty.getPropertyValue());
+                businessOwnerPropertiesDTO.setIsVisible(ownerProperty.isShowingInStore());
+                ownerPropertiesDTOList.add(businessOwnerPropertiesDTO);
+            }
+            businessOwnerDTO.setProperties(ownerPropertiesDTOList);
         } catch (AppManagementException e) {
             String errorMessage = "Error while saving Business Owner.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -113,19 +156,29 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
     @Override
     public Response administrationBusinessownerBusinessOwnerIdGet(String businessOwnerId, String accept, String ifNoneMatch) {
-        BusinessOwnerDTO businessOwnerDTO =  new BusinessOwnerDTO();
+        BusinessOwnerDTO businessOwnerDTO = new BusinessOwnerDTO();
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             //get policy details related to id
-            BusinessOwner businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
+            BusinessOwner businessOwner = apiProvider.getBusinessOwner(Integer.parseInt(businessOwnerId));
             if (businessOwner == null) {
-                return RestApiUtil.buildNotFoundException("Business Owner ", businessOwnerId)
-                        .getResponse();
+                return RestApiUtil.buildNotFoundException("Business Owner ", businessOwnerId).getResponse();
             }
             businessOwnerDTO.setName(businessOwner.getBusinessOwnerName());
             businessOwnerDTO.setEmail(businessOwner.getBusinessOwnerEmail());
             businessOwnerDTO.setDescription(businessOwner.getBusinessOwnerDescription());
             businessOwnerDTO.setSite(businessOwner.getBusinessOwnerSite());
+            businessOwnerDTO.setId(businessOwner.getBusinessOwnerId());
+            List<BusinessOwnerProperty> businessOwnerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
+            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = new ArrayList<>();
+            for (BusinessOwnerProperty businessOwnerProperty : businessOwnerPropertyList) {
+                BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
+                businessOwnerPropertiesDTO.setKey(businessOwnerProperty.getPropertyId());
+                businessOwnerPropertiesDTO.setValue(businessOwnerProperty.getPropertyValue());
+                businessOwnerPropertiesDTO.setIsVisible(businessOwnerProperty.isShowingInStore());
+                businessOwnerPropertiesDTOList.add(businessOwnerPropertiesDTO);
+            }
+            businessOwnerDTO.setProperties(businessOwnerPropertiesDTOList);
 
         } catch (AppManagementException e) {
             String errorMessage = "Error while retrieving details of business owner Business owner Id : " +
@@ -139,25 +192,42 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     public Response administrationBusinessownerBusinessOwnerIdPut(String businessOwnerId, BusinessOwnerDTO body, String contentType, String ifMatch, String ifUnmodifiedSince) {
         beanValidator = new BeanValidator();
         beanValidator.validate(body);
-       try {
+        try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String ownerName = body.getName().trim();
-            String ownerEmail = body.getName().trim();
-            String ownerDescription = body.getName().trim();
-            String ownerSite = body.getName().trim();
-            if (ownerName.isEmpty()) {
-                RestApiUtil.handleBadRequest("Business owner name cannot be empty", log);
+            String ownerName = body.getName();
+            String ownerEmail = body.getEmail();
+            String ownerDescription = body.getDescription();
+            String ownerSite = body.getSite();
+            if (StringUtils.isEmpty(ownerName)) {
+                RestApiUtil.handleBadRequest("Business owner name cannot be null or empty.", log);
             }
-            if (ownerEmail.trim().isEmpty()) {
-                RestApiUtil.handleBadRequest("Business owner email cannot be empty", log);
+            if (StringUtils.isEmpty(ownerEmail)) {
+                RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
             businessOwner.setBusinessOwnerId(Integer.parseInt(businessOwnerId));
-            businessOwner.setBusinessOwnerName(ownerName);
-            businessOwner.setBusinessOwnerEmail(ownerEmail);
+            businessOwner.setBusinessOwnerName(ownerName.trim());
+            businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
             businessOwner.setBusinessOwnerDescription(ownerDescription);
             businessOwner.setBusinessOwnerSite(ownerSite);
+            List<BusinessOwnerPropertiesDTO> businessOwnerPropertiesDTOList = body.getProperties();
 
+            List<BusinessOwnerProperty> businessOwnerPropertyList = new ArrayList<>();
+            for (BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO : businessOwnerPropertiesDTOList) {
+                String propertyId = businessOwnerPropertiesDTO.getKey();
+                String propertyValue = businessOwnerPropertiesDTO.getValue();
+                Boolean isVisible = businessOwnerPropertiesDTO.getIsVisible();
+                if (StringUtils.isEmpty(propertyId) || StringUtils.isEmpty(propertyValue) || isVisible == null) {
+                    RestApiUtil.handleBadRequest("Business owner properties cannot be null or empty.", log);
+                }
+
+                BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
+                businessOwnerProperty.setPropertyId(propertyId);
+                businessOwnerProperty.setPropertyValue(propertyValue);
+                businessOwnerProperty.setShowingInStore(isVisible);
+                businessOwnerPropertyList.add(businessOwnerProperty);
+            }
+            businessOwner.setBusinessOwnerPropertiesList(businessOwnerPropertyList);
             apiProvider.updateBusinessOwner(businessOwner);
         } catch (AppManagementException e) {
             String errorMessage = "Error while updating Business owner for business owner Id " + businessOwnerId;
