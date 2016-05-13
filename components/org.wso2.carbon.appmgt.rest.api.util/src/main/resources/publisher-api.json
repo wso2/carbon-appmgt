@@ -2708,7 +2708,7 @@
             "in": "path",
             "description": "Business Owner Id.\n",
             "required": true,
-            "type": "string"
+            "type": "integer"
         },
         "Accept": {
             "name": "Accept",
