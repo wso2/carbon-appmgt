@@ -1,9 +1,11 @@
 package org.wso2.carbon.appmgt.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
@@ -18,6 +20,7 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.namespace.QName;
@@ -167,40 +170,34 @@ public class DefaultAppRepository implements AppRepository {
     private void saveServiceProvider(WebApp app) {
 
      SSOProvider ssoProvider = new SSOProvider();
-        APIIdentifier appIdentifier = app.getId();
+
         String providerName = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
                 getFirstProperty(AppMConstants.SSO_CONFIGURATOR_NAME);
         String version = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
                 getFirstProperty(AppMConstants.SSO_CONFIGURATOR_VERSION);
         ssoProvider.setProviderName(providerName);
         ssoProvider.setProviderVersion(version);
+        String issuerName = null;
+        APIIdentifier appIdentifier = app.getId();
+        if (MultitenantConstants.SUPER_TENANT_ID != this.tenantId) {
+            issuerName = appIdentifier.getApiName() + "-" + tenantDomain + "-" + appIdentifier.getVersion();
+        } else {
+            issuerName = appIdentifier.getApiName() + "-" + appIdentifier.getVersion();
+        }
 
 
-//
+        String [] claims = new String[2];
+        claims[0] = "http://wso2.org/claims/role";
+        claims[1] = "http://wso2.org/claims/otherphone";
+        ssoProvider.setIssuerName(issuerName);
+        ssoProvider.setClaims(claims);
+        if(!StringUtils.isNotEmpty(app.getLogoutURL())){
+            ssoProvider.setLogoutUrl(app.getLogoutURL());
+        }
 
-//        if (tenantIdVal != '-1234') {
-//            ssoProvider.setIssuerName(params.app_name + "-" + tenantDomain + "-" + params.app_verison);
-//        } else {
-//            ssoProvider.setIssuerName(params.app_name + "-" + params.app_verison);
-//        }
-//
-//        ssoProvider.setClaims(params.claims);
-//
-//        if(params.logout_url != null && params.logout_url != ' '){
-//            ssoProvider.setLogoutUrl(params.logout_url);
-//        }
-//
-//        webApp.setSsoProviderDetails(ssoProvider);
-//        webApp.setContmod-ext(params.app_context);
-//        webApp.setTransports(params.app_transport);
-//
-//        var ssoConfigUtil = Packages.org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
-//        if(type == 'editConfig'){
-//            ssoConfigUtil.createSSOProvider(webApp, true);
-//        }else {
-//            ssoConfigUtil.createSSOProvider(webApp, false);
-//        }
-
+        app.setSsoProviderDetails(ssoProvider);
+        SSOConfiguratorUtil ssoConfiguratorUtil = new SSOConfiguratorUtil();
+        ssoConfiguratorUtil.createSSOProvider(app, true);
     }
 
     private Connection getRDBMSConnectionWithoutAutoCommit() throws SQLException {
