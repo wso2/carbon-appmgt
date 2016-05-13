@@ -7,23 +7,23 @@ import io.swagger.annotations.ApiModelProperty;
 
 
 @ApiModel(description = "")
-public class UserIdListDTO  {
+public class AppIdListDTO  {
   
   
   
-  private Object userIds = null;
+  private Object appIds = null;
 
   
   /**
-   * List of User Names
+   * List of App Id's
    **/
-  @ApiModelProperty(value = "List of User Names")
-  @JsonProperty("userIds")
-  public Object getUserIds() {
-    return userIds;
+  @ApiModelProperty(value = "List of App Id's")
+  @JsonProperty("appIds")
+  public Object getAppIds() {
+    return appIds;
   }
-  public void setUserIds(Object userIds) {
-    this.userIds = userIds;
+  public void setAppIds(Object appIds) {
+    this.appIds = appIds;
   }
 
   
@@ -31,8 +31,9 @@ public class UserIdListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UserIdListDTO {\n");
-    sb.append("  userIds: ").append(userIds).append("\n");
+    sb.append("class AppIdListDTO {\n");
+    
+    sb.append("  appIds: ").append(appIds).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

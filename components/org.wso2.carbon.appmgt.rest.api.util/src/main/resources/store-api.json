@@ -664,24 +664,13 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/favourite/favourite-page": {
+        "/apps/favourite-page": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite/favourite-page\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Set as favourite page",
                 "description": "Set as favourite page.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "$ref": "#/parameters/Content-Type"
-                    }
-                ],
                 "tags": [
                     "Favourite"
                 ],
@@ -717,22 +706,11 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite/favourite-page\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "",
                 "summary": "Remove from favourite page",
                 "description": "Remove from favourite page.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "$ref": "#/parameters/Content-Type"
-                    }
-                ],
                 "tags": [
                     "Favourite"
                 ],
@@ -768,25 +746,16 @@
             },
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite/favourite-page\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "{\"isDefaultPage\": true}",
                 "summary": "check if it is the favourite page",
                 "description": "check if it is the favourite page.\n",
                 "parameters": [
                     {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
                         "$ref": "#/parameters/Accept"
                     },
                     {
                         "$ref": "#/parameters/If-None-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
                     }
                 ],
                 "tags": [
@@ -830,10 +799,10 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/favourite/add-to-favourite": {
+        "/apps/{appType}/id/{appId}/favourite-app": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite/add-to-favourite\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Add to favourite Apps",
                 "description": "Add to favourite Apps.\n",
@@ -872,20 +841,12 @@
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
-                    },
-                    "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
                     }
                 }
-            }
-        },
-        "/apps/{appType}/id/{appId}/favourite/remove-from-favourite": {
-            "post": {
+            },
+            "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite/remove-from-favourite\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Remove from favourite Apps",
                 "description": "Remove from favourite Apps.\n",
@@ -921,12 +882,6 @@
                     },
                     "404": {
                         "description": "Not Found. \nResource to be deleted does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1432,16 +1387,25 @@
                 }
             }
         },
-        "/tags/{tagName}/apps": {
+        "/tags/{tagName}/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" \"http://localhost:9763/api/appm/store/v1.0/apps/tags/hr/apps\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" \"http://localhost:9763/api/appm/store/v1.0/tags/hr/apps\"",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get apps with given tag",
-                "description": "Get app list with given tag.\n",
+                "description": "Get app list with given tag for particular asset type.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/tagName"
+                    },
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
                     },
                     {
                         "$ref": "#/parameters/Accept"
@@ -1458,9 +1422,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK. \nList of Apps is returned.\n",
+                        "description": "OK. \nList of Apps Id's returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppList"
+                            "$ref": "#/definitions/AppIdList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -1887,6 +1851,15 @@
                 "roleIds": {
                     "type": "object",
                     "description": "List of Role Id's"
+                }
+            }
+        },
+        "AppIdList": {
+            "title": "App Id List",
+            "properties": {
+                "appIds": {
+                    "type": "object",
+                    "description": "List of App Id's"
                 }
             }
         },

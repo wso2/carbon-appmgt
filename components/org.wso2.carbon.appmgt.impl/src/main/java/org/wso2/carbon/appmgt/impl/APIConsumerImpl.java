@@ -1734,4 +1734,8 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
         return isSubscribed;
     }
+
+    public Map<String, Set<WebApp>> getTaggedAPIs() {
+        return taggedAPIs;
+    }
 }

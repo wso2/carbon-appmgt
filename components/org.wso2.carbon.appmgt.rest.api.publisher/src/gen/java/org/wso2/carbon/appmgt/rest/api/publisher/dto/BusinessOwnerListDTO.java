@@ -1,12 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BusinessOwnerDTO;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -15,18 +14,18 @@ public class BusinessOwnerListDTO  {
   
   
   
-  private List<BusinessOwnerDTO> tierList = new ArrayList<BusinessOwnerDTO>();
+  private List<BusinessOwnerDTO> businessOwnerList = new ArrayList<BusinessOwnerDTO>();
 
   
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("tierList")
-  public List<BusinessOwnerDTO> getTierList() {
-    return tierList;
+  @JsonProperty("businessOwnerList")
+  public List<BusinessOwnerDTO> getBusinessOwnerList() {
+    return businessOwnerList;
   }
-  public void setTierList(List<BusinessOwnerDTO> tierList) {
-    this.tierList = tierList;
+  public void setBusinessOwnerList(List<BusinessOwnerDTO> businessOwnerList) {
+    this.businessOwnerList = businessOwnerList;
   }
 
   
@@ -36,7 +35,7 @@ public class BusinessOwnerListDTO  {
     StringBuilder sb = new StringBuilder();
     sb.append("class BusinessOwnerListDTO {\n");
     
-    sb.append("  tierList: ").append(tierList).append("\n");
+    sb.append("  businessOwnerList: ").append(businessOwnerList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

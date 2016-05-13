@@ -204,9 +204,9 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_webapp_rest_api_fork/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.store/src/main/resources/store-api.yaml</inputSpec>
+                            <inputSpec>${basedir}/src/main/resources/store-api.yaml</inputSpec>
                             <language>dynamic-html</language>
-                            <templateDirectory>/Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_webapp_rest_api_fork/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.util/src/main/resources/doc-templates</templateDirectory>
+                            <templateDirectory>${basedir}/../org.wso2.carbon.appmgt.rest.api.util/src/main/resources/doc-templates</templateDirectory>
                             <output>src/main/resources/api-docs</output>
                         </configuration>
                     </execution>
@@ -220,7 +220,7 @@
                 <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <inputSpec>
-                        /Users/lahiruC/Documents/Developments/AppManager/Other_Source_codes/feature_webapp_rest_api_fork/carbon-appmgt/components/org.wso2.carbon.appmgt.rest.api.store/src/main/resources/store-api.yaml
+                        ${basedir}/src/main/resources/store-api.yaml
                     </inputSpec>
                 </configuration>
             </plugin>
