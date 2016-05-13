@@ -46,6 +46,9 @@
             <field type="text" required="true">
                 <name>Display Name</name>
             </field>
+            <field type="text">
+                <name>Business Owner</name>
+            </field>
 
             <field type="text" required="true">
                 <name>Transports</name>

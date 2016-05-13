@@ -34,10 +34,14 @@
                                         </div>
                                     {{/each}}
 
-                                    <div>
-                                        <label><b>Business Owner: </b></label>
-                                        <span>{{businessOwnerName}}</span> <br />
-                                    </div>
+                                    {{#if businessOwner.businessOwnerName}}
+                                        <div>
+                                            <label><b>Business Owner: </b></label>
+                                            <span>
+                                                {{businessOwner.businessOwnerName}} ({{businessOwner.businessOwnerEmail}})
+                                            </span> <br />
+                                        </div>
+                                    {{/if}}
                                     {{#each newViewData.main}}
                                         <div>
                                             <label><b>{{label}}: </b></label>
@@ -61,6 +65,7 @@
                                     {{/compare}}
                                 {{/compare}}
                             {{/if}}
+                            <li><a href="#nav-pills-tab-6" data-toggle="tab">Business Owner Details</a></li>
                         </ul>
                         <div class="tab-content app-overview-inner">
                             <div class="tab-pane fade active in" id="nav-pills-tab-1">
@@ -203,10 +208,21 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="tab-pane fade" id="nav-pills-tab-6">
+                                {{#if businessOwner.businessOwnerName}}
+                                    {{#each businessOwnerViewData}}
+                                        <div class="row">
+                                            <div class="col-sm-3"><b>{{name}}</b></div>
+                                            <div class="col-sm-9">{{value}}</div>
+                                        </div>
+                                    {{/each}}
+                                {{else}}
+                                    <div class="col-md-4 col-sm-4 col-xs-4 col-md-offset-0">
+                                        {{t "No Business owner found"}}
+                                    </div>
+                                {{/if}}
+                            </div>
                         </div>
-
-
 
                     </div>
                 </div>
