@@ -112,6 +112,14 @@ $( document ).ready(function() {
     });
 
     /**
+     * This contains the business owner id.
+     */
+    $(".selectOwnerName").change(function() {
+        var data = $('.selectOwnerName').select2('data')[0]['id'];
+        $('#overview_businessOwner').val(data);
+    });
+
+    /**
      * This enable/disable role based authorization adhere with anonymous access property value
      */
     $('#anonymousAccessToUrlPattern').change(function(){

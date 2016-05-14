@@ -27,11 +27,29 @@ import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
+import org.wso2.carbon.appmgt.api.model.AppStore;
+import org.wso2.carbon.appmgt.api.model.BusinessOwner;
+import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
+import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
+import org.wso2.carbon.appmgt.api.model.JavaPolicy;
+import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Provider;
+import org.wso2.carbon.appmgt.api.model.SSOProvider;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
 import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.Usage;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -53,7 +71,12 @@ import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.common.CommonConstants;
-import org.wso2.carbon.registry.core.*;
+import org.wso2.carbon.registry.core.ActionConstants;
+import org.wso2.carbon.registry.core.Association;
+import org.wso2.carbon.registry.core.CollectionImpl;
+import org.wso2.carbon.registry.core.Registry;
+import org.wso2.carbon.registry.core.RegistryConstants;
+import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.jdbc.realm.RegistryAuthorizationManager;
@@ -118,14 +141,15 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Get custom properties of a given business owner.
-     * @param ownerId
+     * @param businessOwnerId
      * @return
      * @throws AppManagementException
      */
     @Override
 
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwnerCustomPropertiesById(ownerId);
+    public List<BusinessOwnerProperty> getBusinessOwnerCustomProperties(int businessOwnerId) throws
+                                                                                               AppManagementException {
+        return appMDAO.getBusinessOwnerCustomPropertiesById(businessOwnerId);
     }
 
 
@@ -135,9 +159,38 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
         return appMDAO.getBusinessOwners();
+    }
+
+    /**
+     * Get business owners.
+     * @param businessOwnerId Business owner Id.
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId);
+    }
+
+    /**
+     * Search business owners with pagination.
+     * @param startIndex
+     * @param pageSize
+     * @param searchValue
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public  List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
+                                                                                          AppManagementException {
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue);
+    }
+
+    @Override
+    public  int getBusinessOwnersCount() throws AppManagementException {
+        return appMDAO.getBusinessOwnersCount();
     }
 
     /**
@@ -146,8 +199,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.saveBusinessOwner(businessOwner);
+    public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        return appMDAO.saveBusinessOwner(businessOwner);
     }
 
     /**
