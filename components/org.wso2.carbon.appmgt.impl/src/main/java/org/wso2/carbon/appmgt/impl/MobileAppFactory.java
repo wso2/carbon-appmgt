@@ -81,6 +81,9 @@ public class MobileAppFactory extends AppFactory {
 
             mobileApp.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+            if (artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY) != null) {
+                mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY).split(","));
+            }
 
             return mobileApp;
 
