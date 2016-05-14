@@ -32,13 +32,13 @@ public class TagsApi  {
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Get apps with given tag", notes = "Get app list with given tag for particular asset type.", response = AppIdListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK. \nList of Apps Id's returned."),
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nList of Apps Id's returned."),
         
-        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request. \nInvalid request or validation error."),
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error."),
         
-        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden. \nThe request must be conditional but no condition has been specified."),
+        @io.swagger.annotations.ApiResponse(code = 403, message = "Forbidden.\nThe request must be conditional but no condition has been specified."),
         
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found. \nThe resource to be updated does not exist.") })
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nThe resource to be updated does not exist.") })
 
     public Response tagsTagNameAppsAppTypeGet(@ApiParam(value = "Tag name.",required=true ) @PathParam("tagName") String tagName,
     @ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
@@ -46,7 +46,7 @@ public class TagsApi  {
     @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
     @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch,
-    @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
     return delegate.tagsTagNameAppsAppTypeGet(tagName,appType,limit,offset,accept,ifNoneMatch,ifModifiedSince);
     }

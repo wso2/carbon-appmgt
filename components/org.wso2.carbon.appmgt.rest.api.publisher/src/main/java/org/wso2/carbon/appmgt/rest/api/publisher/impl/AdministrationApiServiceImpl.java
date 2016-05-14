@@ -155,14 +155,15 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdGet(String businessOwnerId, String accept, String ifNoneMatch) {
+    public Response administrationBusinessownerBusinessOwnerIdGet(Integer businessOwnerId, String accept,
+                                                                  String ifNoneMatch) {
         BusinessOwnerDTO businessOwnerDTO = new BusinessOwnerDTO();
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             //get policy details related to id
-            BusinessOwner businessOwner = apiProvider.getBusinessOwner(Integer.parseInt(businessOwnerId));
+            BusinessOwner businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
             if (businessOwner == null) {
-                return RestApiUtil.buildNotFoundException("Business Owner ", businessOwnerId).getResponse();
+                return RestApiUtil.buildNotFoundException("Business Owner ", businessOwnerId.toString()).getResponse();
             }
             businessOwnerDTO.setName(businessOwner.getBusinessOwnerName());
             businessOwnerDTO.setEmail(businessOwner.getBusinessOwnerEmail());
@@ -189,7 +190,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdPut(String businessOwnerId, BusinessOwnerDTO body, String contentType, String ifMatch, String ifUnmodifiedSince) {
+    public Response administrationBusinessownerBusinessOwnerIdPut(Integer businessOwnerId, BusinessOwnerDTO body,
+                                                                  String contentType, String ifMatch,
+                                                                  String ifUnmodifiedSince) {
         beanValidator = new BeanValidator();
         beanValidator.validate(body);
         try {
@@ -205,7 +208,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 RestApiUtil.handleBadRequest("Business owner email cannot be null or empty.", log);
             }
             BusinessOwner businessOwner = new BusinessOwner();
-            businessOwner.setBusinessOwnerId(Integer.parseInt(businessOwnerId));
+            businessOwner.setBusinessOwnerId(businessOwnerId);
             businessOwner.setBusinessOwnerName(ownerName.trim());
             businessOwner.setBusinessOwnerEmail(ownerEmail.trim());
             businessOwner.setBusinessOwnerDescription(ownerDescription);
@@ -237,11 +240,12 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdDelete(String businessOwnerId, String ifMatch, String ifUnmodifiedSince) {
+    public Response administrationBusinessownerBusinessOwnerIdDelete(Integer businessOwnerId, String ifMatch,
+                                                                     String ifUnmodifiedSince) {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             //delete the business owner.
-            apiProvider.deleteBusinessOwner(businessOwnerId);
+            apiProvider.deleteBusinessOwner(businessOwnerId.toString());
         } catch (AppManagementException e) {
             ErrorDTO errorDTO = RestApiUtil.getErrorDTO(e.getMessage(), 500l, e.getCause().getMessage());
             throw new InternalServerErrorException(errorDTO);
@@ -249,11 +253,6 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
         return Response.ok().build();
     }
 
-    @Override
-    public Response administrationPolicygroupsPolicyGroupIdAppsGet(Integer policyGroupId, String accept,
-                                                                   String ifNoneMatch, String ifModifiedSince) {
-        return null;
-    }
 
     @Override
     public Response administrationXacmlpoliciesPost(PolicyPartialDTO body, String contentType, String ifModifiedSince) {
@@ -274,6 +273,7 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                                                                            body.getPolicyPartial(),
                                                                            body.getIsSharedPartial(), currentUser,
                                                                            body.getPolicyPartialDesc());
+            policyPartialDTO.setPolicyPartialId(policyPartialId);
         } catch (AppManagementException e) {
             String errorMessage = "Error while saving XACML policy";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);

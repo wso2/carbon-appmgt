@@ -1,32 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.publisher;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
-
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ErrorDTO;
-import java.io.File;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.StatSummaryDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
 
 import javax.ws.rs.core.Response;
+import java.io.InputStream;
 
 public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
@@ -42,6 +22,9 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsPost(String appType,String appId,InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsFileNameDelete(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdLifecycleGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdStorageFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
