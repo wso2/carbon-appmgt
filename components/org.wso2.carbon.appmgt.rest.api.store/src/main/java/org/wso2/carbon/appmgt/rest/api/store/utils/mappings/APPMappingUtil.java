@@ -261,9 +261,7 @@ public class APPMappingUtil {
 
         dto.setType(model.getType());
         dto.setDisplayName(model.getDisplayName());
-        dto.setCreatedtime(model.getDisplayName());
         dto.setCreatedtime(model.getCreatedTime());
-
 
         return dto;
     }
@@ -319,7 +317,7 @@ public class APPMappingUtil {
         dto.setType(webapp.getType());
 
         dto.setDisplayName(webapp.getDisplayName());
-        dto.setCreatedtime(webapp.getDisplayName());
+        dto.setCreatedtime(webapp.getCreatedTime());
 
         return dto;
     }
