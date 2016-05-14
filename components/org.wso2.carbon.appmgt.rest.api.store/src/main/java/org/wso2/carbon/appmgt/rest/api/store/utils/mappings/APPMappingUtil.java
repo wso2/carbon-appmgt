@@ -291,7 +291,10 @@ public class APPMappingUtil {
     private static boolean isVisibilityAllowed(App app) {
         try {
             String[] appVisibilityRoles = app.getAppVisibility();
-            if (appVisibilityRoles != null && appVisibilityRoles.length > 0) {
+            if (appVisibilityRoles == null) {
+                //no restrictions
+                return true;
+            } else {
                 PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
                 RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
                 String[] roleNames = null;
