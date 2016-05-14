@@ -3460,7 +3460,7 @@
         "LifeCycleHistoryList": {
             "title": "List of lifecycle change activities",
             "properties": {
-                "policyList": {
+                "lifeCycleHistoryList": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/LifeCycleHistory"
