@@ -141,4 +141,8 @@ public final class RestApiConstants {
             + "an internal error. Please contact administrator.";
 
     public static final int SUPER_USER_TENANT_ID = -1234;
+
+    public static final String HISTORY_PATH =
+            "/repository/components/org.wso2.carbon.governance/lifecycles/history/";
+
 }

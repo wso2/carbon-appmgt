@@ -68,7 +68,10 @@ public class APPMappingUtil {
         int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
         int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            appInfoDTOs.add(fromAppToInfoDTO(appList.get(i)));
+            AppInfoDTO appInfoDTO = fromAppToInfoDTO(appList.get(i));
+            if (appInfoDTO != null) {
+                appInfoDTOs.add(appInfoDTO);
+            }
         }
         appListDTO.setCount(appInfoDTOs.size());
         return appListDTO;
@@ -101,13 +104,13 @@ public class APPMappingUtil {
     }
 
     public static AppInfoDTO fromAppToInfoDTO(App app) {
-
-        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-            return fromWebAppToInfoDTO((WebApp) app);
-        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-            return fromMobileAppToInfoDTO((MobileApp) app);
+        if ((APIStatus.PUBLISHED).equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToInfoDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToInfoDTO((MobileApp) app);
+            }
         }
-
         return null;
     }
 
@@ -119,7 +122,7 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
@@ -266,15 +269,14 @@ public class APPMappingUtil {
     }
 
     public static AppDTO fromAppToDTO(App app) {
-
-        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-            return fromWebAppToDTO((WebApp) app);
-        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-            return fromMobileAppToDTO((MobileApp) app);
+        if (APIStatus.PUBLISHED.equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToDTO((MobileApp) app);
+            }
         }
-
         return null;
-
     }
 
     private static AppDTO fromWebAppToDTO(WebApp webapp) {

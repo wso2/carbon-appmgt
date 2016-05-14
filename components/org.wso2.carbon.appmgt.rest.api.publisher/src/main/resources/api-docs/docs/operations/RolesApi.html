@@ -4,33 +4,33 @@
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="administrationRolesGet"></a>Get all Roles</h3>
+            <h3 class="operation-heading"><a name="rolesGet"></a>Get all Roles</h3>
 
             <p class="marked"></p>
 
             <p class="marked">Get a list of available Roles.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/administration/roles</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.0/roles</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
 
             <h4 class="section-heading">Scope</h4>
             
-                <code>appm:administration</code>
+                <code>appm:create</code>
             
             
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/roles&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/roles&quot;</code></div>
             
             
 
             
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-administrationRolesGet">
+            <div class="pointer" data-toggle="collapse" data-target="#response-rolesGet">
                 <h4 class="section-heading">
                     Sample Response
                     
@@ -39,7 +39,7 @@
             </h4>
             </div>
             
-                <div id="response-administrationRolesGet" class="pre collapse"><code class="json">{&quot;roleIds&quot;: [&quot;admin&quot;,&quot;Application/app_11_04_001&quot;, &quot;Application/app_11_04_002&quot;,&quot;Application/app_11_04_011&quot;]}</code></div>
+                <div id="response-rolesGet" class="pre collapse"><code class="json">{&quot;roleIds&quot;: [&quot;admin&quot;,&quot;Application/app_11_04_001&quot;, &quot;Application/app_11_04_002&quot;,&quot;Application/app_11_04_011&quot;]}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -60,66 +60,6 @@
                     <th>Default</th>
                 </tr>
                 </thead>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            <span class="param-in">Query </span>
-                            
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>limit</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Maximum size of resource array to return.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                Integer
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked">25</p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            <span class="param-in">Query </span>
-                            
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>offset</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                Integer
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked">0</p>
-                        </td>
-                    </tr>
                 
                     <tr>
                         <td class="parameter">
@@ -202,7 +142,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Roles are returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\nList of Roles are returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 

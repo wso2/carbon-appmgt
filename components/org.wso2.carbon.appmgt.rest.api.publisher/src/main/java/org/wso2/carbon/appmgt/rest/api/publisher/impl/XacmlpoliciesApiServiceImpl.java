@@ -106,6 +106,11 @@ public class XacmlpoliciesApiServiceImpl extends XacmlpoliciesApiService {
             }
             //set App list
             appListDTO = APPMappingUtil.fromAPIListToDTO(allMatchedApps, offset, limit);
+            if (appListDTO == null) {
+                String errorMessage = "No result found.";
+                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            }
+
             //set pagination
             APPMappingUtil.setPaginationParams(appListDTO, "", offset, limit, allMatchedApps.size());
 

@@ -42,7 +42,6 @@ public class MobileApp extends App{
     private String thumbnail;
     private String[] availableLifecycleActions;
     private String recentChanges;
-    private APIStatus lifecycleStatus;
     private List<String> screenShots;
     private String createdTime;
 
@@ -187,14 +186,6 @@ public class MobileApp extends App{
 
     public void setRecentChanges(String recentChanges) {
         this.recentChanges = recentChanges;
-    }
-
-    public APIStatus getLifecycleStatus() {
-        return lifecycleStatus;
-    }
-
-    public void setLifecycleStatus(APIStatus lifecycleStatus) {
-        this.lifecycleStatus = lifecycleStatus;
     }
 
     public List<String> getScreenShots() {

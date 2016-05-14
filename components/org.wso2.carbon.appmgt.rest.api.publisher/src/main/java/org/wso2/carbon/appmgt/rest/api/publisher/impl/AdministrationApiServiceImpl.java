@@ -49,25 +49,24 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdGet(String businessOwnerId, String accept, String ifNoneMatch) {
+    public Response administrationBusinessownerBusinessOwnerIdGet(Integer businessOwnerId, String accept,
+                                                                  String ifNoneMatch) {
         return null;
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdPut(String businessOwnerId, BusinessOwnerDTO body, String contentType, String ifMatch, String ifUnmodifiedSince) {
+    public Response administrationBusinessownerBusinessOwnerIdPut(Integer businessOwnerId, BusinessOwnerDTO body,
+                                                                  String contentType, String ifMatch,
+                                                                  String ifUnmodifiedSince) {
         return null;
     }
 
     @Override
-    public Response administrationBusinessownerBusinessOwnerIdDelete(String businessOwnerId, String ifMatch, String ifUnmodifiedSince) {
+    public Response administrationBusinessownerBusinessOwnerIdDelete(Integer businessOwnerId, String ifMatch,
+                                                                     String ifUnmodifiedSince) {
         return null;
     }
 
-    @Override
-    public Response administrationPolicygroupsPolicyGroupIdAppsGet(Integer policyGroupId, String accept,
-                                                                   String ifNoneMatch, String ifModifiedSince) {
-        return null;
-    }
 
     @Override
     public Response administrationXacmlpoliciesPost(PolicyPartialDTO body, String contentType, String ifModifiedSince) {

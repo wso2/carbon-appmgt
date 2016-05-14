@@ -59,9 +59,9 @@ public class MobileAppFactory extends AppFactory {
             //Set Lifecycle status
             if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
                 if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
-                    mobileApp.setLifecycleStatus(APIStatus.INREVIEW);
+                    mobileApp.setLifeCycleStatus(APIStatus.INREVIEW);
                 } else {
-                    mobileApp.setLifecycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                    mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
                 }
             }
 

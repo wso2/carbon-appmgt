@@ -19,6 +19,7 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
@@ -38,11 +40,13 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
@@ -57,6 +61,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
@@ -67,6 +72,7 @@ import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +81,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -331,7 +339,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             response.put("AppId", applicationId);
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceAlreadyExisting(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleConflictException("A duplicate "+appType+" already exists with the name : "
+                RestApiUtil.handleConflictException("A duplicate " + appType + " already exists with the name : "
                                                             + body.getName(), log);
             } else {
                 RestApiUtil.handleInternalServerError(
@@ -392,9 +400,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO appDTO;
         try {
-            //currently supports only mobile apps
-            if (!appType.equals("mobileapp")) {
-                String errorMessage = "Type not supported.";
+            if (!appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
 
@@ -412,7 +419,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             App app = result.get(0);
             appDTO = APPMappingUtil.fromAppToDTO(app);
 
-            return Response.ok().entity(app).build();
+            return Response.ok().entity(appDTO).build();
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -522,6 +529,24 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdDocsPost(String appType, String appId, InputStream fileInputStream,
+                                               Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsFileNameGet(String appType, String appId, String fileName, String ifMatch,
+                                                      String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsFileNameDelete(String appType, String appId, String fileName, String ifMatch,
+                                                         String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
         LifeCycleDTO lifeCycleDTO = new LifeCycleDTO();
         try {
@@ -565,7 +590,61 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
                                                           String ifNoneMatch) {
-        return Response.ok().build();
+        LifeCycleHistoryListDTO lifeCycleHistoryListDTO = new LifeCycleHistoryListDTO();
+        try {
+            //Validate App Type
+            CommonValidator.isValidAppType(appType);
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            Registry registry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
+            boolean isAsynchronousFlow =
+                    org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor(
+                            "AM_APPLICATION_PUBLISH").isAsynchronus();
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, appType);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
+            String historyRegPath = getHistoryPath(artifact);
+            String historyResourceStr = IOUtils.toString(registry.get(historyRegPath).getContentStream());
+
+            JSONObject historyResourceObj = XML.toJSONObject(historyResourceStr);
+
+            Pattern regex = Pattern.compile("(<item>.*<\\/item>)", Pattern.DOTALL);
+            Matcher matcher = regex.matcher(historyResourceStr);
+            if (matcher.find()) {
+                String DataElements = matcher.group(1);
+                historyResourceObj = XML.toJSONObject(DataElements);
+            }
+
+            //Validate App Id
+            if (artifact == null) {
+                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+            }
+
+            //todo: need to iterate the xml and return the correct DTO
+
+        } catch (WorkflowException e) {
+            String errorMessage = "WorkflowException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (GovernanceException e) {
+            String errorMessage = "GovernanceException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (IOException e) {
+            String errorMessage = "IOException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UserStoreException e) {
+            String errorMessage = "UserStoreException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (RegistryException e) {
+            String errorMessage = "RegistryException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (JSONException e) {
+            String errorMessage = "JSONException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(lifeCycleHistoryListDTO).build();
     }
 
     @Override
@@ -780,8 +859,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Validate webapp context
-     * @param appType application type
-     * @param appContext context of the webapp
+     *
+     * @param appType         application type
+     * @param appContext      context of the webapp
      * @param contentType
      * @param ifModifiedSince
      * @return whether context is valid or not
@@ -825,5 +905,13 @@ public class AppsApiServiceImpl extends AppsApiService {
         GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
                                                                                    AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
+    }
+
+    private String getHistoryPath(GenericArtifact genericArtifact) throws GovernanceException {
+        String assetPath = genericArtifact.getPath();
+        //Replace the / in the assetPath
+        String partialHistoryPath = assetPath.replace("/", "_");
+        String fullPath = RestApiConstants.HISTORY_PATH + "__system_governance" + partialHistoryPath;
+        return fullPath;
     }
 }
