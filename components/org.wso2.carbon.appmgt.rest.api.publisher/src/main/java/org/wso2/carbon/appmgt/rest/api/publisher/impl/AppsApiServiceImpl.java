@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
@@ -40,12 +41,12 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
@@ -81,8 +82,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -601,33 +600,32 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             Registry registry = ServiceReferenceHolder.getInstance().
                     getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
-            boolean isAsynchronousFlow =
-                    org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory.getInstance().getWorkflowExecutor(
-                            "AM_APPLICATION_PUBLISH").isAsynchronus();
             GenericArtifactManager artifactManager = new GenericArtifactManager(registry, appType);
             GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
-            String historyRegPath = getHistoryPath(artifact);
-            String historyResourceStr = IOUtils.toString(registry.get(historyRegPath).getContentStream());
-
-            JSONObject historyResourceObj = XML.toJSONObject(historyResourceStr);
-
-            Pattern regex = Pattern.compile("(<item>.*<\\/item>)", Pattern.DOTALL);
-            Matcher matcher = regex.matcher(historyResourceStr);
-            if (matcher.find()) {
-                String DataElements = matcher.group(1);
-                historyResourceObj = XML.toJSONObject(DataElements);
-            }
-
             //Validate App Id
             if (artifact == null) {
                 RestApiUtil.handleBadRequest("Invalid App Id.", log);
             }
 
-            //todo: need to iterate the xml and return the correct DTO
+            String historyRegPath = getHistoryPath(artifact);
+            String historyResourceXMLStr = IOUtils.toString(registry.get(historyRegPath).getContentStream());
+            JSONObject historyResourceObj = XML.toJSONObject(historyResourceXMLStr);
 
-        } catch (WorkflowException e) {
-            String errorMessage = "WorkflowException while retrieving lifecycle History of app with id : " + appId;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            JSONArray historyResourceJsonArray = (historyResourceObj.getJSONObject("lifecycleHistory")).getJSONArray(
+                    "item");
+            List<LifeCycleHistoryDTO> lifeCycleHistoryDTOList = new ArrayList<>();
+            //iterate life cycle history json
+            for (int i = 0; i < historyResourceJsonArray.length() - 1; i++) {
+                JSONObject lifecycleHistoryStateObj = (JSONObject) historyResourceJsonArray.get(i);
+                LifeCycleHistoryDTO lifeCycleHistoryDTO = new LifeCycleHistoryDTO();
+                lifeCycleHistoryDTO.setOrder(Integer.parseInt(lifecycleHistoryStateObj.get("order").toString()));
+                lifeCycleHistoryDTO.setState(lifecycleHistoryStateObj.get("state").toString());
+                lifeCycleHistoryDTO.setTargetState(lifecycleHistoryStateObj.get("targetState").toString());
+                lifeCycleHistoryDTO.setTimestamp(lifecycleHistoryStateObj.get("timestamp").toString());
+                lifeCycleHistoryDTO.setUser(lifecycleHistoryStateObj.get("user").toString());
+                lifeCycleHistoryDTOList.add(lifeCycleHistoryDTO);
+            }
+            lifeCycleHistoryListDTO.setLifeCycleHistoryList(lifeCycleHistoryDTOList);
         } catch (GovernanceException e) {
             String errorMessage = "GovernanceException while retrieving lifecycle History of app with id : " + appId;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
