@@ -37,10 +37,10 @@ import java.util.Date;
 public class RestApiPublisherUtils {
 
     private static final Log log = LogFactory.getLog(RestApiPublisherUtils.class);
+    final static String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     public static String generateBinaryUUID() {
 
-        String possibleCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         String uuid = "";
         for (int i = 0; i < 15; i++) {
             uuid += possibleCharacters.charAt((int) Math.floor(Math.random() * possibleCharacters.length()));

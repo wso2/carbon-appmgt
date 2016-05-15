@@ -19,6 +19,7 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -36,6 +37,7 @@ import org.wso2.carbon.appmgt.api.model.Tier;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
@@ -67,14 +69,10 @@ import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -202,17 +200,39 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return API path of the uploaded static content
      */
     @Override
-    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
-                                           String ifUnmodifiedSince) {
-        StaticContentDTO staticContentDTO = new StaticContentDTO();
+    public Response appsStaticContentsPost(String appType, InputStream fileInputStream, Attachment fileDetail,
+                                           String ifMatch, String ifUnmodifiedSince) {
+
+        CommonValidator.isValidAppType(appType);
+        Map<String,String> response = new HashMap<>();
         try {
             if (fileInputStream != null) {
                 if ("image".equals(fileDetail.getContentType().getType())) {
                     String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
                             RestApiConstants.CONTENT_DISPOSITION_FILENAME));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                    RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
-                    staticContentDTO.setPath(filename);
+                    if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                        RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
+                        response.put("id", filename);
+                    }else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                        File tempFile = null;
+                        try {
+                            tempFile = File.createTempFile("temp", ".tmp");
+                            try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+                                IOUtils.copy(fileInputStream, outputStream);
+                            }
+
+                        DefaultAppRepository defaultAppRepository = new DefaultAppRepository();
+                        UUID contentUUID = UUID.randomUUID();
+                        defaultAppRepository.storeStaticContents(contentUUID.toString(), filename, (int) tempFile.length(),
+                                fileDetail.getContentType().getType(), fileInputStream);
+                            response.put("id", contentUUID.toString());
+                        } catch (IOException e) {
+                            RestApiUtil.handleInternalServerError("Error occurred while uploading static content", e, log);
+                        }finally {
+                            tempFile.delete();
+                        }
+                    }
                 } else {
                     RestApiUtil.handleBadRequest("Invalid file is provided with unsupported Media type.", log);
                 }
@@ -223,7 +243,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(
                     "Error occurred while parsing binary file archive and retrieving information", e, log);
         }
-        return Response.ok().entity(staticContentDTO).build();
+        return Response.ok().entity(response).build();
     }
 
     /**
@@ -566,12 +586,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
                                                           String ifNoneMatch) {
         return Response.ok().build();
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                         String ifUnmodifiedSince) {
-        return null;
     }
 
     @Override

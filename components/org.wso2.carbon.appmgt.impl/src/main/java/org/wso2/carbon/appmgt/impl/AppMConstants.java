@@ -520,6 +520,9 @@ public final class AppMConstants {
     public static final String SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL = "IsExternalRole";
     public static final String SELF_SIGN_UP_REG_ROLE_PERMISSIONS = "Permissions";
 
+    public static final String APPM_DATA_SOURCES = "DataSources.";
+    public static final String APPM_DATA_SOURCES_STORAGE = APPM_DATA_SOURCES + "Storage";
+
     //TODO: move this to a common place (& Enum) to be accessible by all components
     public static class KeyValidationStatus {
         public static final int API_AUTH_GENERAL_ERROR       = 900900;

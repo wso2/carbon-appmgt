@@ -9,21 +9,24 @@ import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
-import org.wso2.carbon.h2.osgi.utils.CarbonUtils;
 import org.wso2.carbon.registry.api.RegistryService;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -98,6 +101,48 @@ public class DefaultAppRepository implements AppRepository {
         return appId;
     }
 
+    /**
+     * Save static content into storage
+     *
+     * @param contentId     static content id
+     * @param fileName      content filename
+     * @param contentLength content length
+     * @param contentType   content type
+     * @param inputStream   file input stream
+     * @return
+     */
+    @Override
+    public String storeStaticContents(String contentId, String fileName, int contentLength, String contentType,
+                                      InputStream inputStream) throws AppManagementException {
+        Connection connection = null;
+
+        PreparedStatement preparedStatement = null;
+        String query =
+                "INSERT INTO resource (uuid,tenantId,fileName,contentLength,contentType,content) VALUES (?,?,?,?,?,?)";
+        try {
+            connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, contentId);
+            preparedStatement.setString(2, this.tenantDomain);
+            preparedStatement.setString(3, fileName);
+            preparedStatement.setInt(4, contentLength);
+            preparedStatement.setString(5, contentType);
+            preparedStatement.setBlob(6, inputStream);
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(String.format("Couldn't rollback save operation for the static content"), e1);
+            }
+            handleException("Error occurred while saving static content :" + fileName, e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+        return contentId;
+    }
+
     private void savePolicyGroups(WebApp app, Connection connection) throws SQLException {
 
         for (EntitlementPolicyGroup policyGroup : app.getAccessPolicyGroups()) {
@@ -166,7 +211,7 @@ public class DefaultAppRepository implements AppRepository {
 
     private void saveServiceProvider(WebApp app, boolean isCreate) {
 
-     SSOProvider ssoProvider = new SSOProvider();
+        SSOProvider ssoProvider = new SSOProvider();
 
         String providerName = ServiceReferenceHolder.getInstance().getAPIManagerConfigurationService().getAPIManagerConfiguration().
                 getFirstProperty(AppMConstants.SSO_CONFIGURATOR_NAME);
@@ -193,7 +238,7 @@ public class DefaultAppRepository implements AppRepository {
 
         ssoProvider.setIssuerName(issuerName);
         ssoProvider.setClaims((String[]) claims.toArray());
-        if(!StringUtils.isNotEmpty(app.getLogoutURL())){
+        if (!StringUtils.isNotEmpty(app.getLogoutURL())) {
             ssoProvider.setLogoutUrl(app.getLogoutURL());
         }
 
@@ -214,6 +259,14 @@ public class DefaultAppRepository implements AppRepository {
     private Connection getRDBMSConnection(boolean setAutoCommit) throws SQLException {
 
         Connection connection = APIMgtDBUtil.getConnection();
+        connection.setAutoCommit(setAutoCommit);
+
+        return connection;
+    }
+
+    private Connection getStorageRDBMSConnection(boolean setAutoCommit) throws SQLException {
+
+        Connection connection = AppMgtDataSourceProvider.getStorageDBConnection();
         connection.setAutoCommit(setAutoCommit);
 
         return connection;
@@ -262,7 +315,6 @@ public class DefaultAppRepository implements AppRepository {
             }
             String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
             registry.addAssociation(providerPath, artifactPath, AppMConstants.PROVIDER_ASSOCIATION);
-
 
 
             registry.commitTransaction();

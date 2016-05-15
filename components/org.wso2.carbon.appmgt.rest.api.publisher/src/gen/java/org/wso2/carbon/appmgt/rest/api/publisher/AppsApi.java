@@ -117,12 +117,13 @@ public class AppsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.") })
 
-    public Response appsStaticContentsPost(@ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
+    public Response appsStaticContentsPost(@ApiParam(value = "Application type",required=true) @QueryParam("appType") String appType,
+    @ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
     @ApiParam(value = "Document to upload : details") @Multipart(value = "file" , required = false) Attachment fileDetail,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
     {
-    return delegate.appsStaticContentsPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
+    return delegate.appsStaticContentsPost(appType,fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/static-contents/{fileName}")
@@ -356,26 +357,6 @@ public class AppsApi  {
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
     {
     return delegate.appsAppTypeIdAppIdLifecycleHistoryGet(appType,appId,accept,ifNoneMatch);
-    }
-    @GET
-    @Path("/{appType}/id/{appId}/storage/{fileName}")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Retrieving file", notes = "Retrieving a file saved with an App.", response = File.class)
-    @io.swagger.annotations.ApiResponses(value = { 
-        @io.swagger.annotations.ApiResponse(code = 200, message = "OK."),
-        
-        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error"),
-        
-        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested entity does not exist.") })
-
-    public Response appsAppTypeIdAppIdStorageFileNameGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
-    @ApiParam(value = "**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
-    @ApiParam(value = "File name.",required=true ) @PathParam("fileName") String fileName,
-    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
-    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
-    {
-    return delegate.appsAppTypeIdAppIdStorageFileNameGet(appType,appId,fileName,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/{appType}/id/{appId}/subscriptions")

@@ -32,7 +32,7 @@ public abstract class AppsApiService {
     public abstract Response appsMobileBinariesPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileGetplistTenantTenantIdFileFileNameGet(String tenantId,String fileName,String accept,String ifNoneMatch);
-    public abstract Response appsStaticContentsPost(InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsStaticContentsPost(String appType,InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsStaticContentsFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypePost(String appType,AppDTO body,String contentType,String ifModifiedSince);
@@ -44,7 +44,6 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdLifecycleGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType,String appId,String accept,String ifNoneMatch);
-    public abstract Response appsAppTypeIdAppIdStorageFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdSubscriptionsGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdTagsGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdTagsPut(String appType,String appId,TagListDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);

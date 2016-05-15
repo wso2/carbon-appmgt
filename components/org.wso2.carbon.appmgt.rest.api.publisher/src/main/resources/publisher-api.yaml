@@ -905,52 +905,6 @@ paths:
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/storage/{fileName}':
-    get:
-      x-scope: 'appm:read'
-      x-wso2-curl: ''
-      x-wso2-response: ''
-      x-wso2-request: ''
-      summary: Retrieving file
-      description: |
-        Retrieving a file saved with an App.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/fileName'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
-      tags:
-        - MobileApps
-      responses:
-        '200':
-          description: |
-            OK.
-          schema:
-            type: file
-          headers:
-            ETag:
-              description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
-                request.
-              type: string
-            Last-Modified:
-              description: |
-                Date and time the resource has been modified the last.
-                Used by caches, or in conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request.
-            Invalid request or validation error
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found.
-            Requested entity does not exist.
-          schema:
-            $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/discover':
     post:
       x-scope: 'appm:create'
@@ -1428,6 +1382,11 @@ paths:
           description: Document to upload
           type: file
           required: false
+        - name: appType
+          description: Application type
+          in: query
+          type: string
+          required: true
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
       tags:
