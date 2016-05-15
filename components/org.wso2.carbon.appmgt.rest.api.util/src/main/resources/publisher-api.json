@@ -1104,6 +1104,182 @@
                 }
             }
         },
+        "/apps/{appType}/id/{appId}/docs":{
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "x-scope": "appm:create",
+                "x-wso2-curl": "",
+                "x-wso2-response": "",
+                "x-wso2-request": "",
+                "summary": "Uploading document",
+                "description": "Uploading document files against an App.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "file",
+                        "description": "Document to upload",
+                        "type": "file",
+                        "required": false
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nDocument uploaded successfully.\n",
+                        "schema": {
+                            "$ref": "#/definitions/StaticContent"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/docs/{fileName}": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "",
+                "x-wso2-response": "",
+                "summary": "Retrieving document",
+                "description": "Retrieving document.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nDocument Retrieved successfully.\n",
+                        "schema": {
+                            "type": "file"
+                        },
+                        "headers": {
+                            "ETag": {
+                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
+                                "type": "string"
+                            },
+                            "Last-Modified": {
+                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested entity does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "412": {
+                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-scope": "appm:create",
+                "x-wso2-curl": "",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "summary": "Delete Document",
+                "description": "Delete an existing Document\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/fileName"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Match"
+                    },
+                    {
+                        "$ref": "#/parameters/If-Unmodified-Since"
+                    }
+                ],
+                "tags": [
+                    "Apps"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nResource successfully deleted.\n"
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nResource to be deleted does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/{appType}/change-lifecycle": {
             "post": {
                 "summary": "Change App Status",
@@ -1758,68 +1934,6 @@
                 ],
                 "tags": [
                     "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nList of qualifying Apps is returned.\n",
-                        "schema": {
-                            "$ref": "#/definitions/AppList"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "description": "The content type of the body.",
-                                "type": "string"
-                            },
-                            "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/administration/policygroups/{policyGroupId}/apps": {
-            "get": {
-                "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b\" \"http://localhost:9763/api/appm/publisher/v1.0/administration/policygroups/1/apps\"",
-                "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
-                "summary": "Get apps associated with a policy group",
-                "description": "Get apps associated with a given policy group.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/policyGroupId"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
-                    }
-                ],
-                "tags": [
-                    "PolicyGroups"
                 ],
                 "responses": {
                     "200": {
@@ -2567,13 +2681,6 @@
             "required": true,
             "type": "string"
         },
-        "policyGroupId": {
-            "name": "policyGroupId",
-            "in": "path",
-            "description": "policy group id\n",
-            "required": true,
-            "type": "integer"
-        },
         "policyPartialId": {
             "name": "policyPartialId",
             "in": "path",
@@ -3310,7 +3417,7 @@
         "LifeCycleHistoryList": {
             "title": "List of lifecycle change activities",
             "properties": {
-                "policyList": {
+                "lifeCycleHistoryList": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/LifeCycleHistory"

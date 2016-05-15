@@ -35,13 +35,17 @@ var log = new Log();
                       name : "Description",
                       value : businessOwner.businessOwnerDescription
                   });
-    var details = businessOwner.businessOwnerDeatails;
+    var details = businessOwner.businessOwnerProperties;
     details = JSON.parse(details);
     for(var key in details){
-        owner.push({
-                       name : key,
-                       value : details[key]
-                   });
+        var ownerProperties = details[key];
+        var ownerProperty = JSON.parse(JSON.stringify(ownerProperties));
+        if(ownerProperty["isShowingInStore"]) {
+            owner.push({
+                           name : key,
+                           value : ownerProperty["propertyValue"]
+                       });
+        }
     }
 
     return owner;

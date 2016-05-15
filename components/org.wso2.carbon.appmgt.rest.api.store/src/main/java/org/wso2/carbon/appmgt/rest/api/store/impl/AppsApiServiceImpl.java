@@ -303,7 +303,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String errorMessage = "No result found.";
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
+
             appListDTO = APPMappingUtil.fromAPIListToDTO(result, offset, limit);
+            if (appListDTO.getCount() == 0) {
+                String errorMessage = "No result found.";
+                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            }
+
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
@@ -320,8 +326,8 @@ public class AppsApiServiceImpl extends AppsApiService {
         AppDTO appToReturn = null;
         try {
             //currently supports only mobile apps
-            if (!appType.equals("mobileapp")) {
-                String errorMessage = "Type not supported.";
+            if (!appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
 
@@ -335,6 +341,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             appToReturn = APPMappingUtil.fromAppToDTO(result.get(0));
+            if (appToReturn == null) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
 
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
@@ -347,6 +357,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
         return Response.ok().entity(appToReturn).build();
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsFileNameGet(String appType, String appId, String fileName, String ifMatch,
+                                                      String ifUnmodifiedSince) {
+        return null;
     }
 
     @Override
@@ -388,6 +404,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             AppDTO appDTO = APPMappingUtil.fromAppToDTO(result.get(0));
+            if (appDTO == null) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
             String providerName = appDTO.getProvider();
             String apiName = appDTO.getName();
             String version = appDTO.getVersion();
@@ -450,6 +470,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             AppDTO appDTO = APPMappingUtil.fromAppToDTO(result.get(0));
+            if (appDTO == null) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
             String providerName = appDTO.getProvider();
             String apiName = appDTO.getName();
             String version = appDTO.getVersion();

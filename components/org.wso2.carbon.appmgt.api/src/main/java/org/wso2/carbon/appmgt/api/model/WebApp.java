@@ -17,9 +17,12 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provider's & system's view of WebApp
@@ -115,9 +118,7 @@ public class WebApp extends App{
     private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
-    private String lifeCycleName;
 
-    private APIStatus lifeCycleStatus;
 
     //Asset Type : either webapp or mobile app
     private String type;
@@ -684,22 +685,6 @@ public class WebApp extends App{
 
     public void setAdvertisedAppUuid(String advertisedAppUuid) {
         this.advertisedAppUuid = advertisedAppUuid;
-    }
-
-    public void setLifeCycleName(String lifeCycleName) {
-        this.lifeCycleName = lifeCycleName;
-    }
-
-    public String getLifeCycleName() {
-        return lifeCycleName;
-    }
-
-    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
-        this.lifeCycleStatus = lifeCycleStatus;
-    }
-
-    public APIStatus getLifeCycleStatus() {
-        return lifeCycleStatus;
     }
 
     public String getType() {

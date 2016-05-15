@@ -22,8 +22,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.APIStatus;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
@@ -35,7 +41,10 @@ import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.registry.core.ActionConstants;
+import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,7 +77,10 @@ public class APPMappingUtil {
         int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
         int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            appInfoDTOs.add(fromAppToInfoDTO(appList.get(i)));
+            AppInfoDTO appInfoDTO = fromAppToInfoDTO(appList.get(i));
+            if (appInfoDTO != null) {
+                appInfoDTOs.add(appInfoDTO);
+            }
         }
         appListDTO.setCount(appInfoDTOs.size());
         return appListDTO;
@@ -101,13 +113,14 @@ public class APPMappingUtil {
     }
 
     public static AppInfoDTO fromAppToInfoDTO(App app) {
-
-        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-            return fromWebAppToInfoDTO((WebApp) app);
-        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-            return fromMobileAppToInfoDTO((MobileApp) app);
+        //check if app visibility is permitted and the lifecycle status published
+        if (isVisibilityAllowed(app) && (APIStatus.PUBLISHED).equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToInfoDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToInfoDTO((MobileApp) app);
+            }
         }
-
         return null;
     }
 
@@ -119,7 +132,7 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
@@ -258,23 +271,55 @@ public class APPMappingUtil {
 
         dto.setType(model.getType());
         dto.setDisplayName(model.getDisplayName());
-        dto.setCreatedtime(model.getDisplayName());
         dto.setCreatedtime(model.getCreatedTime());
-
 
         return dto;
     }
 
     public static AppDTO fromAppToDTO(App app) {
-
-        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
-            return fromWebAppToDTO((WebApp) app);
-        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
-            return fromMobileAppToDTO((MobileApp) app);
+        //check if app visibility is permitted and the lifecycle status published
+        if (isVisibilityAllowed(app) && APIStatus.PUBLISHED.equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToDTO((MobileApp) app);
+            }
         }
-
         return null;
+    }
 
+    private static boolean isVisibilityAllowed(App app) {
+        try {
+            String[] appVisibilityRoles = app.getAppVisibility();
+            if (appVisibilityRoles == null) {
+                //no restrictions
+                return true;
+            } else {
+                PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+                String[] roleNames = null;
+                String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+                int tenantId = 0;
+                tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                        tenantDomainName);
+                UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                UserStoreManager manager = realm.getUserStoreManager();
+                roleNames = manager.getRoleListOfUser(RestApiUtil.getLoggedInUsername());
+
+                for (String roleName : roleNames) {
+                    for (String appVisibilityRole : appVisibilityRoles) {
+                        if (appVisibilityRole.equals(roleName)) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
+            return false;
+        } catch (UserStoreException e) {
+            log.error("Error while initializing User store");
+            return false;
+        }
     }
 
     private static AppDTO fromWebAppToDTO(WebApp webapp) {
@@ -317,7 +362,7 @@ public class APPMappingUtil {
         dto.setType(webapp.getType());
 
         dto.setDisplayName(webapp.getDisplayName());
-        dto.setCreatedtime(webapp.getDisplayName());
+        dto.setCreatedtime(webapp.getCreatedTime());
 
         return dto;
     }

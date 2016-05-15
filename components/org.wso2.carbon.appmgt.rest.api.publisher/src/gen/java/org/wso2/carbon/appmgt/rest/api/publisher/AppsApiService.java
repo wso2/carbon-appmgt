@@ -42,6 +42,9 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsPost(String appType,String appId,InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsFileNameGet(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsFileNameDelete(String appType,String appId,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdLifecycleGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType,String appId,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdSubscriptionsGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);

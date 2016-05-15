@@ -36,7 +36,15 @@ $(function() {
             showAlert("Invalid URL. Please type a valid Web App URL.", 'error');
         }
     });
-		
+
+	var data =  $("#owner_list").val();
+	data = jQuery.parseJSON(data);
+
+	$(document).ready(function() {
+		$(".selectOwnerName").select2({data: data,allowClear: true,placeholder: "Select a business Owner"});
+	});
+
+
 	  // let's fill all the permissions
     $.each($('.perm-check'), function () {
         // var checkbox = $(checkbox);
@@ -87,7 +95,7 @@ $(function() {
 			showAlert('Error adding providers.', 'error');
 	        }
 	});
-    	
+
     }
 
     function loadProviders(providers_data){

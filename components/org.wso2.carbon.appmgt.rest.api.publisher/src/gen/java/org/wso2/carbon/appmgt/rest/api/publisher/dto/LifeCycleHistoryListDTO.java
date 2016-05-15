@@ -1,12 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryDTO;
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -15,18 +14,18 @@ public class LifeCycleHistoryListDTO  {
   
   
   
-  private List<LifeCycleHistoryDTO> policyList = new ArrayList<LifeCycleHistoryDTO>();
+  private List<LifeCycleHistoryDTO> lifeCycleHistoryList = new ArrayList<LifeCycleHistoryDTO>();
 
   
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("policyList")
-  public List<LifeCycleHistoryDTO> getPolicyList() {
-    return policyList;
+  @JsonProperty("lifeCycleHistoryList")
+  public List<LifeCycleHistoryDTO> getLifeCycleHistoryList() {
+    return lifeCycleHistoryList;
   }
-  public void setPolicyList(List<LifeCycleHistoryDTO> policyList) {
-    this.policyList = policyList;
+  public void setLifeCycleHistoryList(List<LifeCycleHistoryDTO> lifeCycleHistoryList) {
+    this.lifeCycleHistoryList = lifeCycleHistoryList;
   }
 
   
@@ -36,7 +35,7 @@ public class LifeCycleHistoryListDTO  {
     StringBuilder sb = new StringBuilder();
     sb.append("class LifeCycleHistoryListDTO {\n");
     
-    sb.append("  policyList: ").append(policyList).append("\n");
+    sb.append("  lifeCycleHistoryList: ").append(lifeCycleHistoryList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
