@@ -369,10 +369,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdFavouriteAppPost(String appType, String appId, String contentType) {
         boolean isTenantFlowStarted = false;
         try {
-            //check if a valid asset type is provided
-            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
-                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE) && !appType.equalsIgnoreCase(
-                    AppMConstants.SITE_ASSET_TYPE)) {
+            //check if a valid asset type is provided. Currently support only webapps
+            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
@@ -435,10 +433,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdFavouriteAppDelete(String appType, String appId, String contentType) {
         boolean isTenantFlowStarted = false;
         try {
-            //check if a valid asset type is provided
-            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
-                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE) && !appType.equalsIgnoreCase(
-                    AppMConstants.SITE_ASSET_TYPE)) {
+            //check if a valid asset type is provided. Currently support only webapps
+            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE)) {
                 String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
