@@ -449,9 +449,6 @@ public class RestApiUtil {
         String filePath = CarbonUtils.getCarbonHome() + File.separator +
                 appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
         storageFile = new File(filePath);
-        if (!storageFile.exists() || storageFile.isDirectory()) {
-            throw new AppMgtResourceNotFoundException("Requested file '" + fileName + "' does not exist.");
-        }
         return storageFile;
     }
 

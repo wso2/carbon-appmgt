@@ -33,7 +33,7 @@ public abstract class AppsApiService {
     public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsMobileGetplistTenantTenantIdFileFileNameGet(String tenantId,String fileName,String accept,String ifNoneMatch);
     public abstract Response appsStaticContentsPost(String appType,InputStream fileInputStream,Attachment fileDetail,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsStaticContentsFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsStaticContentsFileNameGet(String appType,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypePost(String appType,AppDTO body,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeChangeLifecyclePost(String appType,String action,String appId,String ifMatch,String ifUnmodifiedSince);

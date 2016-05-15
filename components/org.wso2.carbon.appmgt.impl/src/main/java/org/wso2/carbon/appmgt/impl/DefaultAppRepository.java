@@ -91,8 +91,8 @@ public class DefaultAppRepository implements AppRepository {
      * @return
      */
     @Override
-    public String storeStaticContents(String contentId, String fileName, int contentLength, String contentType,
-                                      InputStream inputStream) throws AppManagementException {
+    public String persistStaticContents(String contentId, String fileName, int contentLength, String contentType,
+                                        InputStream inputStream) throws AppManagementException {
         Connection connection = null;
 
         PreparedStatement preparedStatement = null;
@@ -120,6 +120,37 @@ public class DefaultAppRepository implements AppRepository {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
         return contentId;
+    }
+
+    @Override
+    public InputStream getStaticContent(String contentId) throws AppManagementException {
+        Connection connection = null;
+        InputStream inputStream = null;
+
+        PreparedStatement preparedStatement = null;
+        String query = "SELECT CONTENT,CONTENTTYPE FROM resource WHERE UUID = ?";
+        ResultSet staticContent = null;
+        try {
+            connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, contentId);
+            staticContent = preparedStatement.executeQuery();
+            while (staticContent.next()){
+                Blob staticContentBlob = staticContent.getBlob("UUID");
+                inputStream = staticContentBlob.getBinaryStream();
+            }
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(String.format("Couldn't rollback save operation for the static content"), e1);
+            }
+            handleException("Error occurred while saving static content :" + contentId, e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+        return inputStream;
+
     }
 
     private String persistWebApp(WebApp webApp) throws AppManagementException {

@@ -30,8 +30,15 @@ public interface AppRepository {
      * @param inputStream file input stream
      * @return
      */
-    public String storeStaticContents(String contentId, String fileName, int contentLength, String contentType,
-                                      InputStream inputStream) throws AppManagementException;
+    public String persistStaticContents(String contentId, String fileName, int contentLength, String contentType,
+                                        InputStream inputStream) throws AppManagementException;
+
+    /**
+     * Retrieve the given static content from storage
+     * @param contentId static content uuid
+     * @return content stream
+     */
+    public InputStream getStaticContent(String contentId) throws AppManagementException;
 
 
 }

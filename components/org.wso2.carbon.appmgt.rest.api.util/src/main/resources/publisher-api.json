@@ -1796,6 +1796,13 @@
                 "description": "Retrieving images for banners, screenshots etc.\n",
                 "parameters": [
                     {
+                        "name": "appType",
+                        "description": "Application type",
+                        "in": "query",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
                         "$ref": "#/parameters/fileName"
                     },
                     {

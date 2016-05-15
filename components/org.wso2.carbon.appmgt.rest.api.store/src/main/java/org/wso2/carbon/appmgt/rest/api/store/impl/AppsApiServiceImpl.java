@@ -599,7 +599,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdSubscriptionGet(String appType, String appId, String accept, String ifNoneMatch,
+    public Response appsAppTypeIdAppIdcriptionGet(String appType, String appId, String accept, String ifNoneMatch,
                                                       String ifModifiedSince) {
         return null;
     }
