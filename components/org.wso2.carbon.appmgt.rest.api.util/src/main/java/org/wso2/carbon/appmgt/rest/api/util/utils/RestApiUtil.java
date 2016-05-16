@@ -352,6 +352,20 @@ public class RestApiUtil {
     /**
      * Logs the error, builds a NotFoundException with specified details and throws it
      *
+     * @param resource requested resource
+     * @param id       id of resource
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleResourceNotFoundError(String resource, String id, Log log)
+            throws NotFoundException {
+        NotFoundException notFoundException = buildNotFoundException(resource, id);
+        throw notFoundException;
+    }
+
+    /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
      * @param description error description
      * @param t        Throwable instance
      * @param log      Log instance

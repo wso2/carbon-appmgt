@@ -93,7 +93,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                         //Generate UUID for the uploading file
                         String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
+
+                        FileContent fileContent = new FileContent();
+                        fileContent.setContent(fileInputStream);
+                        fileContent.setFileName(filename);
+                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         ZipFileReading zipFileReading = new ZipFileReading();
 
                         String information = null;
@@ -191,31 +195,30 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         CommonValidator.isValidAppType(appType);
         Map<String, String> response = new HashMap<>();
+
         try {
             if (fileInputStream != null) {
+                FileContent fileContent = new FileContent();
                 if ("image".equals(fileDetail.getContentType().getType())) {
                     String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
                             RestApiConstants.CONTENT_DISPOSITION_FILENAME));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
+                    fileContent.setFileName(filename);
+                    fileContent.setContent(fileInputStream);
                     if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
-                        RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
+                        RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         response.put("id", filename);
                     } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
-                        File tempFile = null;
                         try {
-                            tempFile = File.createTempFile("temp", ".tmp");
-                            OutputStream outputStream = new FileOutputStream(tempFile);
-                            IOUtils.copy(fileInputStream, outputStream);
-
                             DefaultAppRepository defaultAppRepository = new DefaultAppRepository();
                             UUID contentUUID = UUID.randomUUID();
-                            defaultAppRepository.persistStaticContents(contentUUID.toString(), filename, (int) tempFile.length(),
-                                    fileDetail.getContentType().toString(), fileInputStream);
-                            response.put("id", contentUUID.toString());
+                            fileContent.setUuid(contentUUID.toString());
+                            fileContent.setContentLength(fileInputStream.available());
+                            fileContent.setContentType(fileDetail.getContentType().toString());
+                            defaultAppRepository.persistStaticContents(fileContent);
+                            response.put("id", contentUUID.toString() + File.separator + filename);
                         } catch (IOException e) {
                             RestApiUtil.handleInternalServerError("Error occurred while uploading static content", e, log);
-                        } finally {
-                            tempFile.delete();
                         }
                     }
                 } else {
@@ -250,24 +253,28 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
 
                 staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 OutputStream outputStream = null;
                 AppRepository appRepository = new DefaultAppRepository();
                 try {
-                    InputStream fileInputStream = appRepository.getStaticContent(fileName);
+                    FileContent fileContent = appRepository.getStaticContent(fileName);
                     staticContentFile = File.createTempFile("temp", ".tmp");
                     outputStream = new FileOutputStream(staticContentFile);
-                    IOUtils.copy(fileInputStream, outputStream);
+                    IOUtils.copy(fileContent.getContent(), outputStream);
+                    contentType = fileContent.getContentType();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    RestApiUtil.handleBadRequest("Error occurred while retrieving static content '" + fileName + "'", log);
                 }
-
             }
-            contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+            if (staticContentFile == null || !staticContentFile.exists()) {
+                RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+            }
             if (!contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
                         log);
             }
+
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
             response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
                     + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");

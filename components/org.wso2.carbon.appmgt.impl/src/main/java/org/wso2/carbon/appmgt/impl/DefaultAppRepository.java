@@ -82,31 +82,25 @@ public class DefaultAppRepository implements AppRepository {
 
     /**
      * Save static content into storage
-     *
-     * @param contentId     static content id
-     * @param fileName      content filename
-     * @param contentLength content length
-     * @param contentType   content type
-     * @param inputStream   file input stream
-     * @return
+     * @param fileContent file content details
+     * @throws AppManagementException
      */
     @Override
-    public String persistStaticContents(String contentId, String fileName, int contentLength, String contentType,
-                                        InputStream inputStream) throws AppManagementException {
+    public void persistStaticContents(FileContent fileContent) throws AppManagementException {
         Connection connection = null;
 
         PreparedStatement preparedStatement = null;
         String query =
-                "INSERT INTO resource (uuid,tenantId,fileName,contentLength,contentType,content) VALUES (?,?,?,?,?,?)";
+                "INSERT INTO resource (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES (?,?,?,?,?,?)";
         try {
             connection = AppMgtDataSourceProvider.getStorageDBConnection();
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, contentId);
+            preparedStatement.setString(1, fileContent.getUuid());
             preparedStatement.setString(2, this.tenantDomain);
-            preparedStatement.setString(3, fileName);
-            preparedStatement.setInt(4, contentLength);
-            preparedStatement.setString(5, contentType);
-            preparedStatement.setBlob(6, inputStream);
+            preparedStatement.setString(3, fileContent.getFileName());
+            preparedStatement.setInt(4, fileContent.getContentLength());
+            preparedStatement.setString(5, fileContent.getContentType());
+            preparedStatement.setBlob(6, fileContent.getContent());
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
@@ -115,41 +109,44 @@ public class DefaultAppRepository implements AppRepository {
             } catch (SQLException e1) {
                 handleException(String.format("Couldn't rollback save operation for the static content"), e1);
             }
-            handleException("Error occurred while saving static content :" + fileName, e);
+            handleException("Error occurred while saving static content :" + fileContent.getFileName(), e);
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
-        return contentId;
     }
 
     @Override
-    public InputStream getStaticContent(String contentId) throws AppManagementException {
+    public FileContent getStaticContent(String contentId)throws AppManagementException {
         Connection connection = null;
-        InputStream inputStream = null;
+        FileContent fileContent = null;
 
         PreparedStatement preparedStatement = null;
-        String query = "SELECT CONTENT,CONTENTTYPE FROM resource WHERE UUID = ?";
-        ResultSet staticContent = null;
+        ResultSet resultSet = null;
         try {
+            String query = "SELECT CONTENT,CONTENTTYPE FROM resource WHERE FILENAME = ? AND TENANTID = ?";
             connection = AppMgtDataSourceProvider.getStorageDBConnection();
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, contentId);
-            staticContent = preparedStatement.executeQuery();
-            while (staticContent.next()){
-                Blob staticContentBlob = staticContent.getBlob("UUID");
-                inputStream = staticContentBlob.getBinaryStream();
+            preparedStatement.setString(2, this.tenantDomain);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Blob staticContentBlob = resultSet.getBlob("CONTENT");
+                InputStream inputStream = staticContentBlob.getBinaryStream();
+                fileContent = new FileContent();
+                fileContent.setContentType(resultSet.getString("CONTENTTYPE"));
+                fileContent.setContent(inputStream);
             }
         } catch (SQLException e) {
             try {
                 connection.rollback();
             } catch (SQLException e1) {
-                handleException(String.format("Couldn't rollback save operation for the static content"), e1);
+                handleException(String.format("Couldn't rollback retrieve operation for the static content '"+contentId+"'"), e1);
             }
             handleException("Error occurred while saving static content :" + contentId, e);
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
         }
-        return inputStream;
+        return fileContent;
 
     }
 
