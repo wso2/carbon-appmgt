@@ -26,6 +26,8 @@ public class App {
     private String type;
     private String uuid;
     private float rating;
+    private APIStatus lifeCycleStatus;
+    private String[] appVisibility;
 
     public String getType() {
         return type;
@@ -49,5 +51,21 @@ public class App {
 
     public void setRating(float rating) {
         this.rating = rating;
+    }
+
+    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
+        this.lifeCycleStatus = lifeCycleStatus;
+    }
+
+    public APIStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
+    }
+
+    public String[] getAppVisibility() {
+        return appVisibility;
+    }
+
+    public void setAppVisibility(String[] appVisibility) {
+        this.appVisibility = appVisibility;
     }
 }

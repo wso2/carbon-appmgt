@@ -39,6 +39,32 @@ public class APPMappingUtil {
     private static final Log log = LogFactory.getLog(APPMappingUtil.class);
 
     /**
+     * Converts a List object of APIs into a DTO
+     *
+     * @param appList List of Apps
+     * @param limit   maximum number of APIs returns
+     * @param offset  starting index
+     * @return APIListDTO object containing AppInfoDTOs
+     */
+    public static AppListDTO fromAPIListToDTO(List<App> appList, int offset, int limit) {
+        AppListDTO appListDTO = new AppListDTO();
+        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppInfoList();
+        if (appInfoDTOs == null) {
+            appInfoDTOs = new ArrayList<>();
+            appListDTO.setAppInfoList(appInfoDTOs);
+        }
+
+        //add the required range of objects to be returned
+        int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
+        int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
+        for (int i = start; i <= end; i++) {
+            appInfoDTOs.add(fromAppToInfoDTO(appList.get(i)));
+        }
+        appListDTO.setCount(appInfoDTOs.size());
+        return appListDTO;
+    }
+
+    /**
      * Create and returns an AppListDTO with basic fields in the given apps.
      *
      * @param appList List of Apps
@@ -136,7 +162,7 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         appInfoDTO.setRating(app.getRating());
         return appInfoDTO;
 
@@ -145,16 +171,7 @@ public class APPMappingUtil {
     private static AppInfoDTO fromWebAppToInfoDTO(WebApp app) {
 
         AppInfoDTO appInfoDTO = new AppInfoDTO();
-
         appInfoDTO.setId(app.getUUID());
-
-        APIIdentifier apiId = app.getId();
-        appInfoDTO.setName(apiId.getApiName());
-        appInfoDTO.setVersion(apiId.getVersion());
-
-        String providerName = app.getId().getProviderName();
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-
         appInfoDTO.setDescription(app.getDescription());
 
         String context = app.getContext();
@@ -164,7 +181,12 @@ public class APPMappingUtil {
             }
             appInfoDTO.setContext(context);
         }
-
+        appInfoDTO.setId(app.getUUID());
+        APIIdentifier apiId = app.getId();
+        appInfoDTO.setName(apiId.getApiName());
+        appInfoDTO.setVersion(apiId.getVersion());
+        String providerName = app.getId().getProviderName();
+        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
         appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         appInfoDTO.setRating(app.getRating());
         return appInfoDTO;

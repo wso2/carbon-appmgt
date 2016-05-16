@@ -87,7 +87,6 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantId", tenantId);
 
             appProvider.subscribeMobileApp(username, appId);
-            //TODO:Need to extract the schedule string and pass instead of null
             mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
 
         } catch (AppManagementException | MobileApplicationException e) {
@@ -180,7 +179,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            //TODO:Need to extract the schedule string and pass instead of null
             mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
@@ -259,6 +257,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             appToReturn = APPMappingUtil.fromAppToDTO(result.get(0));
+            if (appToReturn == null) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
 
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the

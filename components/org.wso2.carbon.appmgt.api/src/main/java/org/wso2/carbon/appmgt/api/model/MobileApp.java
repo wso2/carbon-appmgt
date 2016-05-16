@@ -58,6 +58,7 @@ public class MobileApp extends App{
     }
 
     private String[] appVisibility;
+
     private Set<String> tags = new LinkedHashSet<String>();
 
     public Set<String> getTags() {
