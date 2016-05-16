@@ -1,28 +1,8 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
-import org.wso2.carbon.appmgt.rest.api.store.*;
-import org.wso2.carbon.appmgt.rest.api.store.dto.*;
-
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
-import java.io.File;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-<<<<<<< HEAD
-import java.io.File;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
-=======
->>>>>>> 17e16177774da2a62e304a7f7077c0baa284f78b
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
-
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 
 import javax.ws.rs.core.Response;
 
