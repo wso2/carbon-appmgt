@@ -44,7 +44,6 @@ public class MobileApp extends App{
     private String thumbnail;
     private String[] availableLifecycleActions;
     private String recentChanges;
-    private APIStatus lifecycleStatus;
     private List<String> screenShots;
     private String createdTime;
 
@@ -56,7 +55,7 @@ public class MobileApp extends App{
         this.createdTime = createdTime;
     }
 
-    private String[] appVisibility;
+
     private Set<String> tags = new LinkedHashSet<String>();
 
     public Set<String> getTags() {
@@ -208,14 +207,6 @@ public class MobileApp extends App{
         this.recentChanges = recentChanges;
     }
 
-    public APIStatus getLifecycleStatus() {
-        return lifecycleStatus;
-    }
-
-    public void setLifecycleStatus(APIStatus lifecycleStatus) {
-        this.lifecycleStatus = lifecycleStatus;
-    }
-
     public List<String> getScreenShots() {
         return screenShots;
     }
@@ -224,11 +215,4 @@ public class MobileApp extends App{
         this.screenShots = screenShots;
     }
 
-    public String[] getAppVisibility() {
-        return appVisibility;
-    }
-
-    public void setAppVisibility(String[] appVisibility) {
-        this.appVisibility = appVisibility;
-    }
 }

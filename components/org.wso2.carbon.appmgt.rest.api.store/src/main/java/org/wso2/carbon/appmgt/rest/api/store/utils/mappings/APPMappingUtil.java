@@ -24,12 +24,18 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.user.api.UserStoreManager;
+import org.wso2.carbon.user.core.service.RealmService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +67,10 @@ public class APPMappingUtil {
         int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
         int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            appInfoDTOs.add(fromAppToInfoDTO(appList.get(i)));
+            AppInfoDTO appInfoDTO = fromAppToInfoDTO(appList.get(i));
+            if (appInfoDTO != null) {
+                appInfoDTOs.add(appInfoDTO);
+            }
         }
         appListDTO.setCount(appInfoDTOs.size());
         return appListDTO;
@@ -94,13 +103,13 @@ public class APPMappingUtil {
     }
 
     public static AppInfoDTO fromAppToInfoDTO(App app){
-
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
-            return fromWebAppToInfoDTO((WebApp) app);
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
-            return fromMobileAppToInfoDTO((MobileApp) app);
+        if (isVisibilityAllowed(app) && APIStatus.PUBLISHED.equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToInfoDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToInfoDTO((MobileApp) app);
+            }
         }
-
         return null;
     }
 
@@ -112,7 +121,7 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         return appInfoDTO;
 
     }
@@ -257,16 +266,51 @@ public class APPMappingUtil {
     }
 
     public static AppDTO fromAppToDTO(App app){
-
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
-            return fromWebAppToDTO((WebApp) app) ;
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
-            return fromMobileAppToDTO((MobileApp) app);
+        if (isVisibilityAllowed(app) && APIStatus.PUBLISHED.equals(app.getLifeCycleStatus())) {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+                return fromWebAppToDTO((WebApp) app);
+            } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
+                return fromMobileAppToDTO((MobileApp) app);
+            }
         }
-
         return null;
 
     }
+
+    private static boolean isVisibilityAllowed(App app) {
+        try {
+            String[] appVisibilityRoles = app.getAppVisibility();
+            if (appVisibilityRoles == null) {
+                //no restrictions
+                return true;
+            } else {
+                PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
+                String[] roleNames = null;
+                String tenantDomainName = RestApiUtil.getLoggedInUserTenantDomain();
+                int tenantId = 0;
+                tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                        tenantDomainName);
+                UserRealm realm = realmService.getTenantUserRealm(tenantId);
+                UserStoreManager manager = realm.getUserStoreManager();
+                roleNames = manager.getRoleListOfUser(RestApiUtil.getLoggedInUsername());
+
+                for (String roleName : roleNames) {
+                    for (String appVisibilityRole : appVisibilityRoles) {
+                        if (appVisibilityRole.equals(roleName)) {
+                            return true;
+                        }
+                    }
+                }
+
+            }
+            return false;
+        } catch (UserStoreException e) {
+            log.error("Error while initializing User store");
+            return false;
+        }
+    }
+
 
     private static AppDTO fromWebAppToDTO(WebApp webapp){
 

@@ -120,8 +120,6 @@ public class WebApp extends App{
 
     private String lifeCycleName;
 
-    private APIStatus lifeCycleStatus;
-
     //Asset Type : either webapp or mobile app
     private String type;
 
@@ -711,14 +709,6 @@ public class WebApp extends App{
 
     public String getLifeCycleName() {
         return lifeCycleName;
-    }
-
-    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
-        this.lifeCycleStatus = lifeCycleStatus;
-    }
-
-    public APIStatus getLifeCycleStatus() {
-        return lifeCycleStatus;
     }
 
     public String getType() {

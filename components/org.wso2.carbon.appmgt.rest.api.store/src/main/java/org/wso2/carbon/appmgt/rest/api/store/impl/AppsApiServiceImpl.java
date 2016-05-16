@@ -182,6 +182,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
             appListDTO = APPMappingUtil.fromAPIListToDTO(result, offset, limit);
+            if (appListDTO.getCount() == 0) {
+                String errorMessage = "No result found.";
+                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            }
+
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());
             return Response.ok().entity(appListDTO).build();
         } catch (AppManagementException e) {
@@ -212,6 +217,10 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
             }
             appToReturn = APPMappingUtil.fromAppToDTO(result.get(0));
+            if (appToReturn == null) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
 
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the

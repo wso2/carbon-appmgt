@@ -109,7 +109,7 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
         return appInfoDTO;
 
     }
