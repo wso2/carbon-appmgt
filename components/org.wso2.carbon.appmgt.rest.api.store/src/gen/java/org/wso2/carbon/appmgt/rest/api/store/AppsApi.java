@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiParam;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
@@ -262,7 +263,7 @@ public class AppsApi  {
     @Path("/{appType}/id/{appId}/rate")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = AppRatingInfoDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = AppRatingListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nApp rating is returned."),
         
@@ -274,11 +275,13 @@ public class AppsApi  {
 
     public Response appsAppTypeIdAppIdRateGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "Maximum size of resource array to return.", defaultValue="25") @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
     @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
-    return delegate.appsAppTypeIdAppIdRateGet(appType,appId,accept,ifNoneMatch,ifModifiedSince);
+    return delegate.appsAppTypeIdAppIdRateGet(appType,appId,limit,offset,accept,ifNoneMatch,ifModifiedSince);
     }
     @PUT
     @Path("/{appType}/id/{appId}/rate")

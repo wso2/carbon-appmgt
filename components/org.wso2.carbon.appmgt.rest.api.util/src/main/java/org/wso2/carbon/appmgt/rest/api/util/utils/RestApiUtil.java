@@ -213,6 +213,34 @@ public class RestApiUtil {
     }
 
     /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAPIPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APIS_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAppRatingPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APP_RATE_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
      * Returns the next/previous offset/limit parameters properly when current offset, limit and size parameters are
      * specified
      *

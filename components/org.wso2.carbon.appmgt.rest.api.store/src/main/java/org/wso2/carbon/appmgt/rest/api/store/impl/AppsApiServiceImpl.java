@@ -37,6 +37,7 @@ import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
@@ -494,9 +495,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdRateGet(String appType, String appId, String accept, String ifNoneMatch,
-                                              String ifModifiedSince) {
-        AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
+    public Response appsAppTypeIdAppIdRateGet(String appType, String appId, Integer limit, Integer offset,
+                                              String accept, String ifNoneMatch, String ifModifiedSince) {
+        AppRatingListDTO appRatingListDTO = new AppRatingListDTO();
+        limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
+        offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
+
         try {
             //check App Type validity
             if ((AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType) ||
@@ -519,13 +523,33 @@ public class AppsApiServiceImpl extends AppsApiService {
             SocialActivityService socialActivityService = (SocialActivityService) carbonContext.getOSGiService(
                     org.wso2.carbon.social.core.service.SocialActivityService.class, null);
             JsonObject rating = socialActivityService.getRating(appType + ":" + appId);
-
             if (rating != null && rating.get("rating") != null) {
-                appRatingInfoDTO.setRating(rating.get("rating").getAsBigDecimal());
+                appRatingListDTO.setOverallRating(rating.get("rating").getAsBigDecimal());
+
+                JSONObject socialObj;
+                socialObj = new JSONObject(socialActivityService.getSocialObjectJson(appType + ":" + appId, "asc",
+                                                                                     offset, limit));
+                org.json.JSONArray socialArr = socialObj.getJSONArray("attachments");
+                List<AppRatingInfoDTO> appRatingInfoDTOList = new ArrayList<>();
+                for (int i = 0; i < socialArr.length(); i++) {
+                    AppRatingInfoDTO appRatingInfoDTO = new AppRatingInfoDTO();
+                    JSONObject ratingObj = (JSONObject) ((JSONObject) socialArr.get(i)).get("object");
+                    appRatingInfoDTO.setRating(Integer.parseInt(ratingObj.get("rating").toString()));
+                    appRatingInfoDTO.setId(Integer.parseInt(ratingObj.get("id").toString()));
+                    appRatingInfoDTO.setReview(ratingObj.get("content").toString());
+                    appRatingInfoDTO.setLikes(Integer.parseInt(((JSONObject) (ratingObj.get("likes"))).get("totalItems")
+                                                                       .toString()));
+                    appRatingInfoDTO.setDislikes(Integer.parseInt(((JSONObject) (ratingObj.get("dislikes"))).get(
+                            "totalItems").toString()));
+                    appRatingInfoDTOList.add(appRatingInfoDTO);
+                }
+                int totalRecords = rating.get("count").getAsInt();
+                APPMappingUtil.setAppRatingPaginationParams(appRatingListDTO, offset, limit, totalRecords);
+                appRatingListDTO.setRatingDetails(appRatingInfoDTOList);
+                appRatingListDTO.setCount(appRatingInfoDTOList.size());
             } else {
                 return RestApiUtil.buildNotFoundException("Rating", appId).getResponse();
             }
-
         } catch (SocialActivityException e) {
             String errorMessage = String.format("Can't get the rating for the app '%s:%s'", appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -533,8 +557,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             String errorMessage = String.format("Internal error while retrieving the rating for the app '%s:%s'",
                                                 appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (JSONException e) {
+            String errorMessage = String.format(
+                    "JSONException occurred while casting. Can't get the rating for the app '%s:%s'", appType, appId);
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return Response.ok().entity(appRatingInfoDTO).build();
+        return Response.ok().entity(appRatingListDTO).build();
     }
 
     @Override

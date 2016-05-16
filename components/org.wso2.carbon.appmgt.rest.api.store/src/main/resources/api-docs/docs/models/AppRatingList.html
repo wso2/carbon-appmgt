@@ -1,7 +1,7 @@
 <div class="main-content">
     
 
-        <h2>AppRatingInfo</h2>
+        <h2>AppRatingList</h2>
             <table class="table table-hover">
                 <colgroup>
                     <col style="width: 10%;"/>
@@ -23,7 +23,61 @@
                 
                     <tr>
                         <td class="parameter">
-                            <p>rating</p>
+                            <p>count</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">Number of Ratings returned.\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#integer">integer</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">1</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>next</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#string">string</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">/rate?limit=1&amp;offset=2</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>previous</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td class="parameter"><p class="marked">Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.\n</p></td>
+                        <td class="parameter">
+                            
+                                <a href="#!/models#string">string</a>
+                            
+                        </td>
+                        <td class="parameter"> <p class="marked">null</p></td>
+                        <td class="parameter"> <p class="marked">/rate?limit=1&amp;offset=0</p></td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <p>overallRating</p>
                             <p class="param-required">
                                 
                                 optional
@@ -32,83 +86,29 @@
                         <td class="parameter"><p class="marked">List of Role Id&#39;s</p></td>
                         <td class="parameter">
                             
-                                <a href="#!/models#integer">integer</a>
+                                <a href="#!/models#number">number</a>
                             
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">3</p></td>
+                        <td class="parameter"> <p class="marked">3.0</p></td>
                     </tr>
                 
                     <tr>
                         <td class="parameter">
-                            <p>review</p>
+                            <p>ratingDetails</p>
                             <p class="param-required">
                                 
                                 optional
                             </p>
                         </td>
-                        <td class="parameter"><p class="marked">Comment/review about the app</p></td>
+                        <td class="parameter"><p class="marked"></p></td>
                         <td class="parameter">
                             
-                                <a href="#!/models#string">string</a>
+                                <a href="#!/models#array">array</a>
                             
                         </td>
                         <td class="parameter"> <p class="marked">null</p></td>
                         <td class="parameter"> <p class="marked">null</p></td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            <p>id</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked">Review Id</p></td>
-                        <td class="parameter">
-                            
-                                <a href="#!/models#integer">integer</a>
-                            
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">1</p></td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            <p>likes</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked">No of likes</p></td>
-                        <td class="parameter">
-                            
-                                <a href="#!/models#integer">integer</a>
-                            
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">1</p></td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            <p>dislikes</p>
-                            <p class="param-required">
-                                
-                                optional
-                            </p>
-                        </td>
-                        <td class="parameter"><p class="marked">No of dislikes</p></td>
-                        <td class="parameter">
-                            
-                                <a href="#!/models#integer">integer</a>
-                            
-                        </td>
-                        <td class="parameter"> <p class="marked">null</p></td>
-                        <td class="parameter"> <p class="marked">1</p></td>
                     </tr>
                 
                 </tbody>
