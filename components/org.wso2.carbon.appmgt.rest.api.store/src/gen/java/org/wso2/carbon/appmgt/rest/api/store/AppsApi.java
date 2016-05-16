@@ -1,29 +1,37 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
+import org.wso2.carbon.appmgt.rest.api.store.dto.*;
+import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
+import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
+
 import io.swagger.annotations.ApiParam;
+<<<<<<< HEAD
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+=======
+
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
+>>>>>>> 17e16177774da2a62e304a7f7077c0baa284f78b
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import java.io.File;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
+
+import java.util.List;
+
+import java.io.InputStream;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -129,6 +137,47 @@ public class AppsApi  {
     public Response appsFavouritePageDelete()
     {
     return delegate.appsFavouritePageDelete();
+    }
+    @GET
+    @Path("/mobile/binaries/{fileName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieving mobile application binaries", notes = "Retrieving .apk, .ipa binaries for mobile apps.", response = File.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nMobile app binary content retrieved successfully."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error"),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested entity does not exist."),
+        
+        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.") })
+
+    public Response appsMobileBinariesFileNameGet(@ApiParam(value = "file name.",required=true ) @PathParam("fileName") String fileName,
+    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+    {
+    return delegate.appsMobileBinariesFileNameGet(fileName,ifMatch,ifUnmodifiedSince);
+    }
+    @GET
+    @Path("/static-contents/{fileName}")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Retrieving images, pdf, documents files", notes = "Retrieving images for banners, screenshots etc.", response = File.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nStatic content Retrieved successfully."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error"),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested entity does not exist."),
+        
+        @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.") })
+
+    public Response appsStaticContentsFileNameGet(@ApiParam(value = "Application type",required=true) @QueryParam("appType") String appType,
+    @ApiParam(value = "file name.",required=true ) @PathParam("fileName") String fileName,
+    @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
+    @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
+    {
+    return delegate.appsStaticContentsFileNameGet(appType,fileName,ifMatch,ifUnmodifiedSince);
     }
     @POST
     @Path("/uninstallation")

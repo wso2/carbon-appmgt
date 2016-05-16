@@ -1567,6 +1567,11 @@ paths:
           description: Document to upload
           type: file
           required: false
+        - name: appType
+          description: Application type
+          in: query
+          type: string
+          required: true
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
       tags:
@@ -1618,6 +1623,11 @@ paths:
       description: |
         Retrieving images for banners, screenshots etc.
       parameters:
+        - name: appType
+          description: Application type
+          in: query
+          type: string
+          required: true
         - $ref: '#/parameters/fileName'
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
@@ -2757,6 +2767,13 @@ definitions:
         example:
           - eng.com
           - hr.com
+      claims:
+        type: array
+        items:
+          type: string
+        example:
+          - 'http://wso2.org/claims/otherphone'
+          - 'http://wso2.org/claims/address'
       trackingCode:
         type: string
         example: AM_e82dggfde7877

@@ -117,12 +117,13 @@ public class AppsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
 
-    public Response appsStaticContentsPost(@ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
+    public Response appsStaticContentsPost(@ApiParam(value = "Application type",required=true) @QueryParam("appType") String appType,
+    @ApiParam(value = "Document to upload") @Multipart(value = "file", required = false) InputStream fileInputStream,
     @ApiParam(value = "Document to upload : details") @Multipart(value = "file" , required = false) Attachment fileDetail,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
     {
-    return delegate.appsStaticContentsPost(fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
+    return delegate.appsStaticContentsPost(appType,fileInputStream,fileDetail,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/static-contents/{fileName}")
@@ -138,11 +139,12 @@ public class AppsApi  {
         
         @io.swagger.annotations.ApiResponse(code = 412, message = "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.") })
 
-    public Response appsStaticContentsFileNameGet(@ApiParam(value = "File name.",required=true ) @PathParam("fileName") String fileName,
+    public Response appsStaticContentsFileNameGet(@ApiParam(value = "Application type",required=true) @QueryParam("appType") String appType,
+    @ApiParam(value = "File name.",required=true ) @PathParam("fileName") String fileName,
     @ApiParam(value = "Validator for conditional requests; based on ETag."  )@HeaderParam("If-Match") String ifMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header."  )@HeaderParam("If-Unmodified-Since") String ifUnmodifiedSince)
     {
-    return delegate.appsStaticContentsFileNameGet(fileName,ifMatch,ifUnmodifiedSince);
+    return delegate.appsStaticContentsFileNameGet(appType,fileName,ifMatch,ifUnmodifiedSince);
     }
     @GET
     @Path("/{appType}")

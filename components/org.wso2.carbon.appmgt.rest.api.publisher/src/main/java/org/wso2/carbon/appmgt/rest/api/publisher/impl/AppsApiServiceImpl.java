@@ -31,30 +31,15 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tag;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.AppRepository;
+import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.validation.AppDTOValidator;
@@ -72,16 +57,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -116,7 +93,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                         //Generate UUID for the uploading file
                         String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
+
+                        FileContent fileContent = new FileContent();
+                        fileContent.setContent(fileInputStream);
+                        fileContent.setFileName(filename);
+                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         ZipFileReading zipFileReading = new ZipFileReading();
 
                         String information = null;
@@ -160,16 +141,16 @@ public class AppsApiServiceImpl extends AppsApiService {
      */
     @Override
     public Response appsMobileBinariesFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
-        File staticContentFile = null;
+        File binaryFile = null;
         String contentType = null;
         try {
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
-                staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                binaryFile = RestApiUtil.readFileFromStorage(fileName);
 
-                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+                contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
                 if (!contentType.startsWith("application")) {
                     RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
                                                  log);
@@ -186,7 +167,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Error occurred while retrieving mobile binary : " + fileName + "from storage", e, log);
             }
         }
-        Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
+        Response.ResponseBuilder response = Response.ok((Object) binaryFile);
         response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
                 + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
         response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
@@ -209,17 +190,37 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return API path of the uploaded static content
      */
     @Override
-    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
-                                           String ifUnmodifiedSince) {
-        StaticContentDTO staticContentDTO = new StaticContentDTO();
+    public Response appsStaticContentsPost(String appType, InputStream fileInputStream, Attachment fileDetail,
+                                           String ifMatch, String ifUnmodifiedSince) {
+
+        CommonValidator.isValidAppType(appType);
+        Map<String, String> response = new HashMap<>();
+
         try {
             if (fileInputStream != null) {
+                FileContent fileContent = new FileContent();
                 if ("image".equals(fileDetail.getContentType().getType())) {
                     String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
                             RestApiConstants.CONTENT_DISPOSITION_FILENAME));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                    RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
-                    staticContentDTO.setPath(filename);
+                    fileContent.setFileName(filename);
+                    fileContent.setContent(fileInputStream);
+                    if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                        RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
+                        response.put("id", filename);
+                    } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                        try {
+                            DefaultAppRepository defaultAppRepository = new DefaultAppRepository();
+                            UUID contentUUID = UUID.randomUUID();
+                            fileContent.setUuid(contentUUID.toString());
+                            fileContent.setContentLength(fileInputStream.available());
+                            fileContent.setContentType(fileDetail.getContentType().toString());
+                            defaultAppRepository.persistStaticContents(fileContent);
+                            response.put("id", contentUUID.toString() + File.separator + filename);
+                        } catch (IOException e) {
+                            RestApiUtil.handleInternalServerError("Error occurred while uploading static content", e, log);
+                        }
+                    }
                 } else {
                     RestApiUtil.handleBadRequest("Invalid file is provided with unsupported Media type.", log);
                 }
@@ -230,7 +231,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(
                     "Error occurred while parsing binary file archive and retrieving information", e, log);
         }
-        return Response.ok().entity(staticContentDTO).build();
+        return Response.ok().entity(response).build();
     }
 
     /**
@@ -242,14 +243,42 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return
      */
     @Override
-    public Response appsStaticContentsFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsStaticContentsFileNameGet(String appType, String fileName, String ifMatch, String ifUnmodifiedSince) {
+        CommonValidator.isValidAppType(appType);
+        File staticContentFile = null;
+        String contentType = null;
+
         try {
-            File staticContentFile = RestApiUtil.readFileFromStorage(fileName);
-            String contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+
+                staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                if (staticContentFile == null) {
+                    RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                }
+                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+            } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                OutputStream outputStream = null;
+                AppRepository appRepository = new DefaultAppRepository();
+                try {
+                    FileContent fileContent = appRepository.getStaticContent(fileName);
+                    if (fileContent == null) {
+                        RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                    }
+                    staticContentFile = File.createTempFile("temp", ".tmp");
+                    outputStream = new FileOutputStream(staticContentFile);
+                    IOUtils.copy(fileContent.getContent(), outputStream);
+                    contentType = fileContent.getContentType();
+                } catch (IOException e) {
+                    RestApiUtil.handleBadRequest("Error occurred while retrieving static content '" + fileName + "'", log);
+                }
+            }
+
             if (!contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
-                                             log);
+                        log);
             }
+
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
             response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
                     + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");

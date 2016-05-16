@@ -1,15 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UriTemplateDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
-import java.math.BigDecimal;
-import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyGroupsDTO;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -64,6 +62,9 @@ public class AppDTO  {
   
   
   private List<String> visibleTenants = new ArrayList<String>();
+  
+  
+  private List<String> claims = new ArrayList<String>();
   
   
   private String trackingCode = null;
@@ -344,6 +345,18 @@ public class AppDTO  {
   }
   public void setVisibleTenants(List<String> visibleTenants) {
     this.visibleTenants = visibleTenants;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("claims")
+  public List<String> getClaims() {
+    return claims;
+  }
+  public void setClaims(List<String> claims) {
+    this.claims = claims;
   }
 
   
@@ -725,6 +738,7 @@ public class AppDTO  {
     sb.append("  logoutURL: ").append(logoutURL).append("\n");
     sb.append("  businessOwnerName: ").append(businessOwnerName).append("\n");
     sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
+    sb.append("  claims: ").append(claims).append("\n");
     sb.append("  trackingCode: ").append(trackingCode).append("\n");
     sb.append("  skipGateway: ").append(skipGateway).append("\n");
     sb.append("  allowAnonymousAccess: ").append(allowAnonymousAccess).append("\n");

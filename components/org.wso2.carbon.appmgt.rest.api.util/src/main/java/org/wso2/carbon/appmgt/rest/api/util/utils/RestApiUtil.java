@@ -380,6 +380,20 @@ public class RestApiUtil {
     /**
      * Logs the error, builds a NotFoundException with specified details and throws it
      *
+     * @param resource requested resource
+     * @param id       id of resource
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleResourceNotFoundError(String resource, String id, Log log)
+            throws NotFoundException {
+        NotFoundException notFoundException = buildNotFoundException(resource, id);
+        throw notFoundException;
+    }
+
+    /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
      * @param description error description
      * @param t        Throwable instance
      * @param log      Log instance
@@ -477,9 +491,6 @@ public class RestApiUtil {
         String filePath = CarbonUtils.getCarbonHome() + File.separator +
                 appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
         storageFile = new File(filePath);
-        if (!storageFile.exists() || storageFile.isDirectory()) {
-            throw new AppMgtResourceNotFoundException("Requested file '" + fileName + "' does not exist.");
-        }
         return storageFile;
     }
 

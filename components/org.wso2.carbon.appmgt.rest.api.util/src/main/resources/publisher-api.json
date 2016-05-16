@@ -998,66 +998,6 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/storage/{fileName}": {
-            "get": {
-                "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
-                "summary": "Retrieving file",
-                "description": "Retrieving a file saved with an App.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "$ref": "#/parameters/fileName"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Unmodified-Since"
-                    }
-                ],
-                "tags": [
-                    "MobileApps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK.\n",
-                        "schema": {
-                            "type": "file"
-                        },
-                        "headers": {
-                            "ETag": {
-                                "description": "Entity Tag of the changed App. Used by caches, or in conditional request.\n",
-                                "type": "string"
-                            },
-                            "Last-Modified": {
-                                "description": "Date and time the resource has been modified the last. \nUsed by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nRequested entity does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
         "/apps/{appType}/id/{appId}/discover": {
             "post": {
                 "x-scope": "appm:create",
@@ -1793,6 +1733,13 @@
                         "required": false
                     },
                     {
+                        "name": "appType",
+                        "description": "Application type",
+                        "in": "query",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
                         "$ref": "#/parameters/If-Match"
                     },
                     {
@@ -1848,6 +1795,13 @@
                 "summary": "Retrieving images, pdf, documents files",
                 "description": "Retrieving images for banners, screenshots etc.\n",
                 "parameters": [
+                    {
+                        "name": "appType",
+                        "description": "Application type",
+                        "in": "query",
+                        "type": "string",
+                        "required": true
+                    },
                     {
                         "$ref": "#/parameters/fileName"
                     },
@@ -3029,6 +2983,16 @@
                     "example": [
                         "eng.com",
                         "hr.com"
+                    ]
+                },
+                "claims": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "http://wso2.org/claims/otherphone",
+                        "http://wso2.org/claims/address"
                     ]
                 },
                 "trackingCode": {

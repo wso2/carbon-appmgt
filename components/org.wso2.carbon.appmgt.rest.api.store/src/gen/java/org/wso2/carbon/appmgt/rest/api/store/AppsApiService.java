@@ -7,10 +7,14 @@ import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
+import java.io.File;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+<<<<<<< HEAD
 import java.io.File;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
+=======
+>>>>>>> 17e16177774da2a62e304a7f7077c0baa284f78b
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
@@ -28,6 +32,8 @@ public abstract class AppsApiService {
     public abstract Response appsFavouritePageGet(String accept,String ifNoneMatch);
     public abstract Response appsFavouritePagePost();
     public abstract Response appsFavouritePageDelete();
+    public abstract Response appsMobileBinariesFileNameGet(String fileName,String ifMatch,String ifUnmodifiedSince);
+    public abstract Response appsStaticContentsFileNameGet(String appType,String fileName,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsUninstallationPost(String contentType,InstallDTO install);
     public abstract Response appsAppTypeGet(String appType,String query,String fieldFilter,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);

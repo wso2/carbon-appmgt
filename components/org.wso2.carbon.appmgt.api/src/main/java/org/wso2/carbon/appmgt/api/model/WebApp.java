@@ -48,6 +48,8 @@ public class WebApp extends App{
     private List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
     private Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
 
+    private List<String> claims = new ArrayList<>();
+
     private String ssoEnabled;
     private String idpProviderUrl;
     private String saml2SsoIssuer;
@@ -732,6 +734,14 @@ public class WebApp extends App{
 
     public List<EntitlementPolicyGroup> getAccessPolicyGroups(){
         return this.accessPolicyGroups;
+    }
+
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
     }
 
 }
