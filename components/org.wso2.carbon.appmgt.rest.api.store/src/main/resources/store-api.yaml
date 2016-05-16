@@ -179,6 +179,8 @@ paths:
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
         - $ref: '#/parameters/If-Modified-Since'
@@ -190,7 +192,7 @@ paths:
             OK.
             App rating is returned.
           schema:
-            $ref: '#/definitions/AppRatingInfo'
+            $ref: '#/definitions/AppRatingList'
           headers:
             Content-Type:
               description: The content type of the body.
@@ -1868,11 +1870,39 @@ definitions:
           - tag2
           - tag3
         description: List of Tags
+  AppRatingList:
+    title: App Rating List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of Ratings returned.
+        example: 1
+      next:
+        type: string
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /rate?limit=1&offset=2
+      previous:
+        type: string
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /rate?limit=1&offset=0
+      overallRating:
+        type: number
+        description: List of Role Id's
+        example: 3
+      ratingDetails:
+        type: array
+        items:
+          $ref: '#/definitions/AppRatingInfo'
   AppRatingInfo:
     title: App rating details
     properties:
       rating:
-        type: number
+        type: integer
         description: List of Role Id's
         example: 3
       review:
@@ -1881,6 +1911,14 @@ definitions:
       id:
         type: integer
         description: Review Id
+        example: 1
+      likes:
+        type: integer
+        description: No of likes
+        example: 1
+      dislikes:
+        type: integer
+        description: No of dislikes
         example: 1
   Events:
     title: Events details

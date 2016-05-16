@@ -1,30 +1,29 @@
 package org.wso2.carbon.appmgt.rest.api.store;
 
-import org.wso2.carbon.appmgt.rest.api.store.dto.*;
-import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
-
 import io.swagger.annotations.ApiParam;
-
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
-import java.io.File;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.factories.AppsApiServiceFactory;
 
-import java.util.List;
-
-import java.io.InputStream;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.*;
+import java.io.File;
 
 @Path("/apps")
 @Consumes({ "application/json" })
@@ -305,7 +304,7 @@ public class AppsApi  {
     @Path("/{appType}/id/{appId}/rate")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
-    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = AppRatingInfoDTO.class)
+    @io.swagger.annotations.ApiOperation(value = "Get app rating details", notes = "Get rating details of an app.", response = AppRatingListDTO.class)
     @io.swagger.annotations.ApiResponses(value = { 
         @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nApp rating is returned."),
         
@@ -317,11 +316,13 @@ public class AppsApi  {
 
     public Response appsAppTypeIdAppIdRateGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "Maximum size of resource array to return.", defaultValue="25") @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
     @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
-    return delegate.appsAppTypeIdAppIdRateGet(appType,appId,accept,ifNoneMatch,ifModifiedSince);
+    return delegate.appsAppTypeIdAppIdRateGet(appType,appId,limit,offset,accept,ifNoneMatch,ifModifiedSince);
     }
     @PUT
     @Path("/{appType}/id/{appId}/rate")
