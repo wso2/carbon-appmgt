@@ -3521,7 +3521,7 @@
                 "result": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "object"
                     }
                 }
             }
