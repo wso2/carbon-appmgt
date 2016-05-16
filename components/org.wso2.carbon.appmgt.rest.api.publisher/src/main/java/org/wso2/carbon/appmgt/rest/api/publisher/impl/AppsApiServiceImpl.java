@@ -253,12 +253,18 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
 
                 staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                if (staticContentFile == null) {
+                    RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                }
                 contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 OutputStream outputStream = null;
                 AppRepository appRepository = new DefaultAppRepository();
                 try {
                     FileContent fileContent = appRepository.getStaticContent(fileName);
+                    if (fileContent == null) {
+                        RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                    }
                     staticContentFile = File.createTempFile("temp", ".tmp");
                     outputStream = new FileOutputStream(staticContentFile);
                     IOUtils.copy(fileContent.getContent(), outputStream);
@@ -267,9 +273,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     RestApiUtil.handleBadRequest("Error occurred while retrieving static content '" + fileName + "'", log);
                 }
             }
-            if (staticContentFile == null || !staticContentFile.exists()) {
-                RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
-            }
+
             if (!contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
                         log);
