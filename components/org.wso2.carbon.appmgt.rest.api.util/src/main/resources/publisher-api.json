@@ -1104,7 +1104,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs":{
+        "/apps/{appType}/id/{appId}/docs": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -1417,6 +1417,20 @@
                     },
                     {
                         "$ref": "#/parameters/statType"
+                    },
+                    {
+                        "name": "startTimeStamp",
+                        "description": "Start date/time of the stat analysis (2016-04-19#10:32:00)",
+                        "in": "query",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "endTimeStamp",
+                        "description": "end date/time of the stat analysis (2016-04-19#10:32:00)",
+                        "in": "query",
+                        "type": "string",
+                        "required": false
                     },
                     {
                         "$ref": "#/parameters/Accept"
