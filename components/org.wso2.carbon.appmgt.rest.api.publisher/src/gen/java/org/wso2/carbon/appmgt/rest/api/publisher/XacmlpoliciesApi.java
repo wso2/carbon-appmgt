@@ -49,7 +49,7 @@ public class XacmlpoliciesApi  {
     return delegate.xacmlpoliciesGet(limit,offset,accept,ifNoneMatch);
     }
     @GET
-    @Path("/{policyPartialId}/apps")
+    @Path("/{policyPartialId}/apps/{appType}")
     @Consumes({ "application/json" })
     @Produces({ "application/json" })
     @io.swagger.annotations.ApiOperation(value = "Get all Apps mapped to a policy partial", notes = "Get a list of available Apps mapped to a policy partial.", response = AppListDTO.class)
@@ -62,13 +62,14 @@ public class XacmlpoliciesApi  {
         
         @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nThe resource to be updated does not exist.") })
 
-    public Response xacmlpoliciesPolicyPartialIdAppsGet(@ApiParam(value = "policy partial id",required=true ) @PathParam("policyPartialId") Integer policyPartialId,
+    public Response xacmlpoliciesPolicyPartialIdAppsAppTypeGet(@ApiParam(value = "policy partial id",required=true ) @PathParam("policyPartialId") Integer policyPartialId,
+    @ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "Maximum size of resource array to return.", defaultValue="25") @QueryParam("limit") Integer limit,
     @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
     @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
     @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
     {
-    return delegate.xacmlpoliciesPolicyPartialIdAppsGet(policyPartialId,limit,offset,accept,ifNoneMatch);
+    return delegate.xacmlpoliciesPolicyPartialIdAppsAppTypeGet(policyPartialId,appType,limit,offset,accept,ifNoneMatch);
     }
 }
 

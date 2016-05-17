@@ -159,7 +159,7 @@
                             <directory>src/main/webapp</directory>
                         </resource>
                     </webResources>
-                    <warName>api#appm#store#v1.0</warName>
+                    <warName>api#appm#store#v1.1</warName>
                 </configuration>
             </plugin>
 

@@ -844,27 +844,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesGet(String appType, String appId, String accept,
-                                                       String ifNoneMatch) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesPost(String appType, String appId, PolicyPartialIdListDTO body,
-                                                        String contentType, String ifModifiedSince) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType, String appId,
-                                                                         Integer policyPartialId, String ifMatch,
-                                                                         String ifUnmodifiedSince) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
-                                                String endTimeStamp, String accept, String ifNoneMatch) {
+                                                String endTimeStamp, Integer limit, String accept, String ifNoneMatch) {
         return null;
     }
 

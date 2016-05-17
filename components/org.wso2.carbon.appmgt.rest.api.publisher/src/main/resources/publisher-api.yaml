@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.0
+  version: 1.1.0
   title: WSO2 APP Manager - Publisher API
   description: >
     This document specifies a **RESTful API** for WSO2 **APP Manager** -
@@ -107,7 +107,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
@@ -122,19 +122,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -178,10 +178,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -202,13 +202,13 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -216,7 +216,7 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15" 
+        curl -X GET -H "Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15"
         "http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9"
       x-wso2-response: >-
         {"displayName":null,"createdTime":"00000001461645676735","bundleVersion":"1","packageName":"undefined","description":"asdasd","version":"1","category":"Business","tags":[],"appType":"webapp","appName":"asd","appUrl":"http://wso2.com","banner":"/publisher/api/mobileapp/getfile/pduoTTAgbWAuFxm.JPG","marketType":null,"recentChanges":"-","appProvider":"admin","thumbnail":"/publisher/api/mobileapp/getfile/J3TM0iKb6OiapuG.JPG","screenShots":["/publisher/api/mobileapp/getfile/zq7kNCpZkfLsxic.JPG"],"appId":null,"platform":"webapp","appVisibility":null,"availableLifecycleActions":null,"lifecycleStatus":"INREVIEW","type":"mobileapp","uuid":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0}
@@ -234,7 +234,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying App is returned.
           schema:
             $ref: '#/definitions/AppInfo'
@@ -249,19 +249,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -301,7 +301,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Successful response with updated App object
           schema:
             $ref: '#/definitions/App'
@@ -321,30 +321,30 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modifed the last time. 
+                Date and time the resource has been modifed the last time.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -370,68 +370,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
-
-            The request has not been performed because one of the preconditions
-            is not met.
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}':
-    delete:
-      x-scope: 'appm:create'
-      x-wso2-curl: >-
-        curl -X DELETE -H "Authorization: Bearer
-        efef07b7645617b7f03b706b9aa3c4a5"  -d ''
-        "http://localhost:9763/api/appm/publisher/v1.0/
-        apps/webapp/id/af929140-1257-46ed-97c0-d26098e140e9/xacmlpolicies/4"
-      x-wso2-response: HTTP/1.1 200 OK
-      summary: Delete policy partial mapping from an App
-      description: |
-        Delete policy partial mapping from an App
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/policyPartialId'
-        - $ref: '#/parameters/If-Match'
-        - $ref: '#/parameters/If-Unmodified-Since'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: |
-            OK. 
-            Resource successfully deleted.
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            Resource to be deleted does not exist.
-          schema:
-            $ref: '#/definitions/Error'
-        '412':
-          description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -441,7 +396,7 @@ paths:
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125" 
+        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
         "http://localhost:9763/api/appm/store/v1.0/apps/webapp/tags"
       x-wso2-response: '{"tags":["w1","webapptag1","webapptag2"]}'
       summary: Get all Tags of an App
@@ -457,7 +412,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of Tags is returned.
           schema:
             $ref: '#/definitions/TagList'
@@ -472,19 +427,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -520,25 +475,25 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -571,136 +526,26 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
-          schema:
-            $ref: '#/definitions/Error'
-  '/apps/{appType}/id/{appId}/xacmlpolicies':
-    get:
-      x-scope: 'appm:read'
-      x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer e099014668a524870c2895fe0595f125"
-        "http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/xacmlpolicies"
-      x-wso2-response: >-
-        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>","policyPartialName": policy1,"isSharedPartial":
-        true,"policyPartialDesc": null,,"policyPartialId": 1}
-      summary: Get all XACML policies relevant to an App
-      description: |
-        Get a list of XACML policies relevant to an App.
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - $ref: '#/parameters/Accept'
-        - $ref: '#/parameters/If-None-Match'
-      tags:
-        - Apps
-      responses:
-        '200':
-          description: |
-            OK. 
-            List of XACML policies is returned.
-          schema:
-            $ref: '#/definitions/PolicyPartialList'
-          headers:
-            Content-Type:
-              description: The content type of the body.
-              type: string
-            ETag:
-              description: >
-                Entity Tag of the response resource. Used by caches, or in
-                conditional requests.
-              type: string
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '403':
-          description: |
-            Forbidden. 
-            The request must be conditional but no condition has been specified.
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: |
-            Not Found. 
-            The resource to be updated does not exist.
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      x-scope: 'appm:create'
-      x-wso2-curl: ''
-      x-wso2-response: >-
-        {"policyPartial": "<Rule Effect="Permit" RuleId="Rule001"><Condition>
-              <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of">
-                 <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
-                 <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">admin</AttributeValue>
-                 <AttributeDesignator AttributeId="http://wso2.org/claims/role" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" DataType="http://www.w3.org/2001/XMLSchema#string" MustBePresent="true"/>
-              </Apply>
-        </Condition>
-
-        </Rule>","policyPartialName": policy1,"isSharedPartial":
-        true,"policyPartialDesc": null}
-      summary: Assign a policy partial to an App
-      description: |
-        Assign a policy partial to an App
-      parameters:
-        - $ref: '#/parameters/appType'
-        - $ref: '#/parameters/appId'
-        - in: body
-          name: body
-          description: |
-            App object that needs to be added
-          required: true
-          schema:
-            $ref: '#/definitions/PolicyPartialIdList'
-        - $ref: '#/parameters/Content-Type'
-        - $ref: '#/parameters/If-Modified-Since'
-      tags:
-        - Apps
-      responses:
-        '202':
-          description: |
-            Accepted.
-          schema:
-            $ref: '#/definitions/Error'
-        '400':
-          description: |
-            Bad Request. 
-            Invalid request or validation error.
-          schema:
-            $ref: '#/definitions/Error'
-        '415':
-          description: |
-            Unsupported Media Type. 
-            The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}/subscriptions':
@@ -724,7 +569,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying User List is returned.
           schema:
             $ref: '#/definitions/UserIdList'
@@ -739,19 +584,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -771,10 +616,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -795,13 +640,13 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -825,7 +670,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Details of a lifecycle is returned.
           schema:
             $ref: '#/definitions/LifeCycle'
@@ -840,19 +685,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -874,7 +719,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/LifeCycleHistoryList'
@@ -889,19 +734,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -927,13 +772,13 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -965,7 +810,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of Tiers is returned.
           schema:
             $ref: '#/definitions/TierList'
@@ -980,19 +825,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1028,7 +873,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Document uploaded successfully.
           schema:
             $ref: '#/definitions/StaticContent'
@@ -1040,18 +885,18 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1244,7 +1089,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Document Retrieved successfully.
           schema:
             type: file
@@ -1256,24 +1101,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1297,17 +1142,17 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1355,7 +1200,7 @@ paths:
           schema:
             $ref: '#/definitions/ResponseMessage'
           description: |
-            OK. 
+            OK.
             Lifecycle changed successfully.
           headers:
             ETag:
@@ -1366,25 +1211,25 @@ paths:
             Last-Modified:
               description: >
                 Date and time the App lifecycle has been modified the last
-                time. 
+                time.
 
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested App does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1411,13 +1256,13 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -1439,9 +1284,14 @@ paths:
           type: string
           required: false
         - name: endTimeStamp
-          description: 'end date/time of the stat analysis (2016-04-19#10:32:00)'
+          description: 'End date/time of the stat analysis (2016-04-19#10:32:00)'
           in: query
           type: string
+          required: false
+        - name: limit
+          description: Limit of records
+          in: query
+          type: integer
           required: false
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
@@ -1464,19 +1314,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1500,7 +1350,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of Tags is returned.
           schema:
             $ref: '#/definitions/TagList'
@@ -1515,19 +1365,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1555,7 +1405,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Binary file uploaded successfully.
           schema:
             $ref: '#/definitions/Binary'
@@ -1567,24 +1417,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested App does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1607,7 +1457,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Mobile app binary content retrieved successfully.
           schema:
             type: file
@@ -1619,24 +1469,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1674,19 +1524,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1719,7 +1569,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Static content uploaded successfully.
           schema:
             $ref: '#/definitions/StaticContent'
@@ -1731,24 +1581,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1776,7 +1626,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Static content Retrieved successfully.
           schema:
             type: file
@@ -1788,24 +1638,24 @@ paths:
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last. 
+                Date and time the resource has been modified the last.
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Requested entity does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -1841,7 +1691,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of XACML policies is returned.
           schema:
             $ref: '#/definitions/PolicyPartialList'
@@ -1856,28 +1706,28 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
-  '/xacmlpolicies/{policyPartialId}/apps':
+  '/xacmlpolicies/{policyPartialId}/apps/{appType}':
     get:
       x-scope: 'appm:read'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b" 
-        "http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps"
+        curl -X GET -H "Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b"
+        "http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp"
       x-wso2-response: >-
         {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get all Apps mapped to a policy partial
@@ -1885,6 +1735,7 @@ paths:
         Get a list of available Apps mapped to a policy partial.
       parameters:
         - $ref: '#/parameters/policyPartialId'
+        - $ref: '#/parameters/appType'
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/Accept'
@@ -1894,7 +1745,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
@@ -1909,19 +1760,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -1969,13 +1820,13 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -1993,7 +1844,7 @@ paths:
               </Apply>
         </Condition>
 
-        </Rule>","policyPartialName": "ddd",  "isSharedPartial": true, 
+        </Rule>","policyPartialName": "ddd",  "isSharedPartial": true,
         "policyPartialDesc": null}'
         "http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies"
       x-wso2-response: >-
@@ -2036,10 +1887,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -2060,13 +1911,13 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -2129,31 +1980,31 @@ paths:
             Last-Modified:
               description: >
                 Date and time the App lifecycle has been modified the last
-                time. 
+                time.
 
                 Used by caches, or in conditional requests.
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -2188,7 +2039,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying App is returned.
           schema:
             $ref: '#/definitions/PolicyPartial'
@@ -2203,19 +2054,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -2238,23 +2089,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -2276,7 +2127,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of qualifying Business Owner List is returned.
           schema:
             $ref: '#/definitions/BusinessOwnerList'
@@ -2291,19 +2142,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -2330,10 +2181,10 @@ paths:
       responses:
         '201':
           description: >
-            Created. 
+            Created.
 
             Successful response with the newly created object as entity in the
-            body. 
+            body.
 
             Location header contains URL of newly created entity.
           schema:
@@ -2354,13 +2205,13 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '415':
           description: |
-            Unsupported Media Type. 
+            Unsupported Media Type.
             The entity of the request was in a not supported format.
           schema:
             $ref: '#/definitions/Error'
@@ -2395,19 +2246,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -2439,25 +2290,25 @@ paths:
             OK.
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -2481,23 +2332,23 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Resource successfully deleted.
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
         '412':
           description: >
-            Precondition Failed. 
+            Precondition Failed.
 
             The request has not been performed because one of the preconditions
             is not met.
@@ -2507,7 +2358,7 @@ paths:
     get:
       x-scope: 'appm:create'
       x-wso2-curl: >-
-        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e" 
+        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
         "http://localhost:9763/api/appm/publisher/v1.0/roles"
       x-wso2-response: >-
         {"roleIds": ["admin","Application/app_11_04_001",
@@ -2523,7 +2374,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             List of Roles are returned.
           schema:
             $ref: '#/definitions/RoleIdList'
@@ -2538,19 +2389,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -2576,7 +2427,7 @@ paths:
       responses:
         '200':
           description: |
-            OK. 
+            OK.
             Qualifying App is returned.
           schema:
             $ref: '#/definitions/JavaPolicyList'
@@ -2591,19 +2442,19 @@ paths:
               type: string
         '400':
           description: |
-            Bad Request. 
+            Bad Request.
             Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
           description: |
-            Forbidden. 
+            Forbidden.
             The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
           description: |
-            Not Found. 
+            Not Found.
             The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
@@ -2612,7 +2463,7 @@ parameters:
     name: appId
     in: path
     description: >
-      **APP ID** consisting of the **UUID** of the App. 
+      **APP ID** consisting of the **UUID** of the App.
 
       The combination of the provider of the app, name of the appId and the
       version is also accepted as a valid App ID.
@@ -2638,7 +2489,7 @@ parameters:
     name: appId
     in: query
     description: >
-      **appId ID** consisting of the **UUID** of the App. 
+      **appId ID** consisting of the **UUID** of the App.
 
       The combination of the provider of the appId, name of the appId and the
       version is also accepted as a valid App ID.
@@ -2686,7 +2537,7 @@ parameters:
     name: offset
     in: query
     description: |
-      Starting point within the complete list of items qualified.  
+      Starting point within the complete list of items qualified.
     default: 0
     type: integer
   fileName:
@@ -2752,7 +2603,7 @@ parameters:
     name: If-Modified-Since
     in: header
     description: |
-      Validator for conditional requests; based on Last Modified header of the 
+      Validator for conditional requests; based on Last Modified header of the
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -2779,13 +2630,13 @@ definitions:
       next:
         type: string
         description: |
-          Link to the next subset of resources qualified. 
+          Link to the next subset of resources qualified.
           Empty if no more resources are to be returned.
         example: /app?limit=1&offset=2&query=
       previous:
         type: string
         description: |
-          Link to the previous subset of resources qualified. 
+          Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /app?limit=1&offset=0&query=
       list:
@@ -2849,7 +2700,7 @@ definitions:
           path:
             type: string
             description: |
-              Application binary file API 
+              Application binary file API
             example: >-
               /publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa
           package:
@@ -3233,13 +3084,13 @@ definitions:
       next:
         type: string
         description: |
-          Link to the next subset of resources qualified. 
+          Link to the next subset of resources qualified.
           Empty if no more resources are to be returned.
         example: /xacmlpolicies?limit=1&offset=2&query=
       previous:
         type: string
         description: |
-          Link to the previous subset of resources qualified. 
+          Link to the previous subset of resources qualified.
           Empty if current subset is the first subset returned.
         example: /xacmlpolicies?limit=1&offset=0&query=
       policyList:
@@ -3259,12 +3110,6 @@ definitions:
         description: |
           name of the policy
         example: policy1
-  PolicyPartialIdList:
-    title: XACML policy partial Id's
-    properties:
-      xacmlPolicyIds:
-        type: object
-        description: List of XACML policy partial Id's
   UserIdList:
     title: User List
     properties:
@@ -3434,7 +3279,7 @@ definitions:
       urlPattern:
         type: string
         description: |
-          URL pattern of the URI 
+          URL pattern of the URI
         example: /user/details
       httpVerb:
         type: string
@@ -3452,12 +3297,12 @@ definitions:
       policyGroupName:
         type: string
         description: |
-          Name of the policy group 
+          Name of the policy group
         example: default
       description:
         type: string
         description: |
-          Description of the policy group 
+          Description of the policy group
         example: Default policy group
       throttlingTier:
         type: string
@@ -3483,7 +3328,7 @@ definitions:
       allowAnonymousAccess:
         type: string
         description: |
-          Allow anonymous access to mobile 
+          Allow anonymous access to mobile
         example: 'GET,POST,PUT,DELETE,OPTION'
   Error:
     title: Error object returned with 4XX HTTP status
