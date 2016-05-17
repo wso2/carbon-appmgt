@@ -675,12 +675,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                         String ifUnmodifiedSince) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeIdAppIdSubscriptionsGet(String appType, String appId, String accept, String ifNoneMatch,
                                                        String ifModifiedSince) {
         UserIdListDTO userIdListDTO = new UserIdListDTO();
@@ -862,9 +856,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String accept, String ifNoneMatch) {
+    public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
+                                                String endTimeStamp, String accept, String ifNoneMatch) {
         return null;
     }
+
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
