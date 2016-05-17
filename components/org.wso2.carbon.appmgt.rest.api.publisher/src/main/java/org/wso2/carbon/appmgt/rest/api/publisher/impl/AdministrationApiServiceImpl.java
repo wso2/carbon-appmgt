@@ -333,23 +333,21 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                                                                   String ifUnmodifiedSince) {
         beanValidator = new BeanValidator();
         beanValidator.validate(body);
-        PolicyPartialDTO policyPartialDTO = new PolicyPartialDTO();
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
             String currentUser = RestApiUtil.getLoggedInUsername();
             if (body.getPolicyPartial().trim().isEmpty()) {
                 RestApiUtil.handleBadRequest("XACML Policy Content cannot be empty", log);
             }
+            EntitlementPolicyPartial entitlementPolicyPartial = apiProvider.getPolicyPartial(policyPartialId);
+            if (entitlementPolicyPartial == null) {
+                return RestApiUtil.buildNotFoundException("XACML Policy Partial", policyPartialId.toString())
+                        .getResponse();
+            }
+
             //update policy
             apiProvider.updateEntitlementPolicyPartial(policyPartialId, body.getPolicyPartial(), currentUser,
                                                        body.getIsSharedPartial(), body.getPolicyPartialDesc());
-            //retrieved updated policy details by id
-            EntitlementPolicyPartial entitlementPolicyPartial = apiProvider.getPolicyPartial(policyPartialId);
-            policyPartialDTO.setPolicyPartialId(policyPartialId);
-            policyPartialDTO.setPolicyPartialName(entitlementPolicyPartial.getPolicyPartialName());
-            policyPartialDTO.setPolicyPartial(entitlementPolicyPartial.getPolicyPartialContent());
-            policyPartialDTO.setPolicyPartialDesc(entitlementPolicyPartial.getDescription());
-            policyPartialDTO.setIsSharedPartial(entitlementPolicyPartial.isShared());
         } catch (AppManagementException e) {
             String errorMessage = "Error while updating XACML policy";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);

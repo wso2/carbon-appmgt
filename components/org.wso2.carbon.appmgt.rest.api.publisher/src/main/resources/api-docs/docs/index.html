@@ -20,7 +20,7 @@
     <script src="assets/js/main.js" type="text/javascript"></script>
     <script src="assets/js/marked.min.js" type="text/javascript"></script>
 
-    <title>WSO2 APP Manager - Publisher API : v1.0.0</title>
+    <title>WSO2 APP Manager - Publisher API : v1.1.0</title>
 
 
     <!-- Custom CSS -->
@@ -76,12 +76,40 @@
                 
                     
                         <hr/>
+                        <span class="class-name">APIDocumentApi</span>
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
+                                
+                                    
+                                        <li id="op-appsAppTypeIdAppIdDocsGet"><a href="#!/operations#APIDocumentApi#appsAppTypeIdAppIdDocsGet">Get API Documents</a></li>
+                                    
+                                        <li id="op-appsAppTypeIdAppIdDocsPost"><a href="#!/operations#APIDocumentApi#appsAppTypeIdAppIdDocsPost">Add a new document</a></li>
+                                    
+                                
+                            </ul>
+                        </li>
+                    
+                        <hr/>
                         <span class="class-name">AppApi</span>
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 
                                     
                                         <li id="op-appsAppTypeValidateContextPost"><a href="#!/operations#AppApi#appsAppTypeValidateContextPost">Validate App Context</a></li>
+                                    
+                                
+                            </ul>
+                        </li>
+                    
+                        <hr/>
+                        <span class="class-name">AppDocumentsApi</span>
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
+                                
+                                    
+                                        <li id="op-appsAppTypeIdAppIdDocsDocumentIdContentPost"><a href="#!/operations#AppDocumentsApi#appsAppTypeIdAppIdDocsDocumentIdContentPost">Uploading document</a></li>
+                                    
+                                        <li id="op-appsAppTypeIdAppIdDocsDocumentIdGet"><a href="#!/operations#AppDocumentsApi#appsAppTypeIdAppIdDocsDocumentIdGet">Retrieving document</a></li>
                                     
                                 
                             </ul>
@@ -105,11 +133,7 @@
                                     
                                         <li id="op-appsAppTypeIdAppIdDiscoverPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDiscoverPost">Discover Apps</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdDocsFileNameDelete"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDocsFileNameDelete">Delete Document</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdDocsFileNameGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDocsFileNameGet">Retrieving document</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdDocsPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDocsPost">Uploading document</a></li>
+                                        <li id="op-appsAppTypeIdAppIdDocsDocumentIdDelete"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdDocsDocumentIdDelete">Delete Document</a></li>
                                     
                                         <li id="op-appsAppTypeIdAppIdGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdGet">Get app details</a></li>
                                     
@@ -117,17 +141,11 @@
                                     
                                         <li id="op-appsAppTypeIdAppIdSubscriptionsGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdSubscriptionsGet">Get subscribed user list for an App</a></li>
                                     
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesGet"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesGet">Get all XACML policies relevant to an App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete">Delete policy partial mapping from an App</a></li>
-                                    
-                                        <li id="op-appsAppTypeIdAppIdXacmlpoliciesPost"><a href="#!/operations#AppsApi#appsAppTypeIdAppIdXacmlpoliciesPost">Assign a policy partial to an App</a></li>
-                                    
                                         <li id="op-appsAppTypePost"><a href="#!/operations#AppsApi#appsAppTypePost">Create a new App</a></li>
                                     
                                         <li id="op-appsMobileGetplistTenantTenantIdFileFileNameGet"><a href="#!/operations#AppsApi#appsMobileGetplistTenantTenantIdFileFileNameGet">Get plist</a></li>
                                     
-                                        <li id="op-xacmlpoliciesPolicyPartialIdAppsGet"><a href="#!/operations#AppsApi#xacmlpoliciesPolicyPartialIdAppsGet">Get all Apps mapped to a policy partial</a></li>
+                                        <li id="op-xacmlpoliciesPolicyPartialIdAppsAppTypeGet"><a href="#!/operations#AppsApi#xacmlpoliciesPolicyPartialIdAppsAppTypeGet">Get all Apps mapped to a policy partial</a></li>
                                     
                                 
                             </ul>
@@ -333,6 +351,22 @@
                     
                         <li class="section-box">
                             <ul class="nav nav-stacked">
+                                <li id="def-Document"><a href="#!/models#Document">Document</a></li>
+                            </ul>
+                        </li>
+                    
+                
+                    
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
+                                <li id="def-DocumentList"><a href="#!/models#DocumentList">DocumentList</a></li>
+                            </ul>
+                        </li>
+                    
+                
+                    
+                        <li class="section-box">
+                            <ul class="nav nav-stacked">
                                 <li id="def-Error"><a href="#!/models#Error">Error</a></li>
                             </ul>
                         </li>
@@ -422,14 +456,6 @@
                         <li class="section-box">
                             <ul class="nav nav-stacked">
                                 <li id="def-PolicyPartial"><a href="#!/models#PolicyPartial">PolicyPartial</a></li>
-                            </ul>
-                        </li>
-                    
-                
-                    
-                        <li class="section-box">
-                            <ul class="nav nav-stacked">
-                                <li id="def-PolicyPartialIdList"><a href="#!/models#PolicyPartialIdList">PolicyPartialIdList</a></li>
                             </ul>
                         </li>
                     
@@ -549,7 +575,7 @@ It is written with [swagger 2](http://swagger.io/).
                                     <h3>Version information</h3>
 
                                     <div class="paragraph">
-                                        <p class="marked">1.0.0</p>
+                                        <p class="marked">1.1.0</p>
                                     </div>
 
                                     
