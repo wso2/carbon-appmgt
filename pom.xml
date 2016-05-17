@@ -811,7 +811,7 @@
     <orbit.version.amber>0.22.1358727.wso2v3</orbit.version.amber>
     <jsoup.version>1.8.1</jsoup.version>
     <httpmime.version>4.3.6</httpmime.version>
-    <jackson.version>1.4.0</jackson.version>
+
     <googlecode.plist.version>1.8</googlecode.plist.version>
     <bcprov.wso2.version>1.49.wso2v1</bcprov.wso2.version>
 

@@ -18,12 +18,13 @@ package org.wso2.carbon.appmgt.rest.api.util.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.*;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @ApiModel(description = "")
 public class ErrorDTO {
 

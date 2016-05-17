@@ -21,11 +21,12 @@ package org.wso2.carbon.appmgt.rest.api.store.dto;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.validation.constraints.NotNull;
 
 
-
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @ApiModel(description = "")
 public class ErrorListItemDTO  {
   
