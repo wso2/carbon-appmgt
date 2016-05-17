@@ -274,7 +274,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 }
             }
 
-            if (!contentType.startsWith("image")) {
+            if (contentType != null && !contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
                         log);
             }
@@ -557,20 +557,27 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsPost(String appType, String appId, InputStream fileInputStream,
-                                               Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsGet(String appType, String appId, Integer limit, Integer offset, String accept, String ifNoneMatch) {
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                      String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsPost(String appId, String appType, DocumentDTO body, String contentType) {
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsFileNameDelete(String appType, String appId, String fileName, String ifMatch,
-                                                         String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdDelete(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId, InputStream fileInputStream, Attachment fileDetail, String inlineContent, String ifMatch, String ifUnmodifiedSince) {
         return null;
     }
 
@@ -836,11 +843,9 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(tierListDTO).build();
     }
 
-
-
     @Override
     public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
-                                                String endTimeStamp, String accept, String ifNoneMatch) {
+                                                String endTimeStamp, Integer limit, String accept, String ifNoneMatch) {
         return null;
     }
 

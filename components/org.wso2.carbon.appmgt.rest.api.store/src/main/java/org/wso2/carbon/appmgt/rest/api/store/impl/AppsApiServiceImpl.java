@@ -28,25 +28,21 @@ import org.json.JSONObject;
 import org.wso2.carbon.appmgt.api.APIConsumer;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
+import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.EventsDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.FavouritePageDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.*;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -65,11 +61,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AppsApiServiceImpl extends AppsApiService {
 
@@ -98,7 +90,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -161,10 +153,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             favouritePageDTO.setIsDefaultPage(hasFavouritePage);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store Error occurred while retrieving Favourite page details",
-                                                  e, log);
+                    e, log);
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while retrieving Favourite page details", e,
-                                                  log);
+                    log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -283,7 +275,8 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return
      */
     @Override
-    public Response appsStaticContentsFileNameGet(String appType, String fileName, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsStaticContentsFileNameGet(String appType, String fileName, String ifMatch,
+                                                  String ifUnmodifiedSince) {
         CommonValidator.isValidAppType(appType);
         File staticContentFile = null;
         String contentType = null;
@@ -302,7 +295,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                     IOUtils.copy(fileContent.getContent(), outputStream);
                     contentType = fileContent.getContentType();
                 } catch (IOException e) {
-                    RestApiUtil.handleBadRequest("Error occurred while retrieving static content '" + fileName + "'", log);
+                    RestApiUtil.handleInternalServerError("Error occurred while retrieving static content '" +
+                            fileName + "'", e, log);
                 }
             }
             if (staticContentFile == null || !staticContentFile.exists()) {
@@ -354,7 +348,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -636,7 +630,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                 JSONObject socialObj;
                 socialObj = new JSONObject(socialActivityService.getSocialObjectJson(appType + ":" + appId, "asc",
-                                                                                     offset, limit));
+                        offset, limit));
                 org.json.JSONArray socialArr = socialObj.getJSONArray("attachments");
                 List<AppRatingInfoDTO> appRatingInfoDTOList = new ArrayList<>();
                 for (int i = 0; i < socialArr.length(); i++) {
@@ -646,7 +640,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     appRatingInfoDTO.setId(Integer.parseInt(ratingObj.get("id").toString()));
                     appRatingInfoDTO.setReview(ratingObj.get("content").toString());
                     appRatingInfoDTO.setLikes(Integer.parseInt(((JSONObject) (ratingObj.get("likes"))).get("totalItems")
-                                                                       .toString()));
+                            .toString()));
                     appRatingInfoDTO.setDislikes(Integer.parseInt(((JSONObject) (ratingObj.get("dislikes"))).get(
                             "totalItems").toString()));
                     appRatingInfoDTOList.add(appRatingInfoDTO);
@@ -663,7 +657,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while retrieving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (JSONException e) {
             String errorMessage = String.format(
@@ -713,11 +707,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while saving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (SocialActivityException e) {
             String errorMessage = String.format("Social component error while saving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(appRatingInfoDTO).build();
@@ -730,31 +724,234 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Retrieve subscription of the given user for a given app
+     * @param appType
+     * @param appId
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdSubscriptionGet(String appType, String appId, String accept, String ifNoneMatch,
                                                       String ifModifiedSince) {
-        return null;
+
+        APIConsumer apiConsumer = null;
+        boolean isTenantFlowStarted = false;
+        String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
+        try {
+            apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = AppManagerUtil.getTenantId(username);
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            WebApp webApp = apiConsumer.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, username);
+
+            Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
+                    Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
+            if (subscription != null) {
+
+
+            }
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription details of webapp with id : "
+                    + appId + " for user " + username, e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
+    /**
+     * Adding subscription for a given app
+     *
+     * @param appType     application type ie: webapp, mobileapp
+     * @param appId       application uuid
+     * @param contentType
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdSubscriptionPost(String appType, String appId, String contentType) {
-        return null;
+
+        APIConsumer apiConsumer = null;
+        boolean isTenantFlowStarted = false;
+        String userName = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
+        try {
+            apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = AppManagerUtil.getTenantId(userName);
+
+            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                    AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+            Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                    AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+            if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                //Check for subscriber existence
+                Subscriber subscriber = apiConsumer.getSubscriber(userName);
+                if (subscriber == null) {
+                    subscriber = new Subscriber(userName);
+                    subscriber.setSubscribedDate(new Date());
+                    subscriber.setEmail("");
+                    subscriber.setTenantId(tenantId);
+                    apiConsumer.addSubscriber(subscriber);
+                }
+
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                WebApp webApp = apiConsumer.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+                appIdentifier.setTier(AppMConstants.UNLIMITED_TIER);
+
+            /* Tenant based validation for subscription*/
+                String userDomain = MultitenantUtils.getTenantDomain(userName);
+                boolean subscriptionAllowed = false;
+                if (!userDomain.equals(tenantDomain)) {
+                    String subscriptionAvailability = webApp.getSubscriptionAvailability();
+                    if (AppMConstants.SUBSCRIPTION_TO_ALL_TENANTS.equals(subscriptionAvailability)) {
+                        subscriptionAllowed = true;
+                    } else if (AppMConstants.SUBSCRIPTION_TO_SPECIFIC_TENANTS.equals(subscriptionAvailability)) {
+                        String subscriptionAllowedTenants = webApp.getSubscriptionAvailableTenants();
+                        String allowedTenants[] = null;
+                        if (subscriptionAllowedTenants != null) {
+                            allowedTenants = subscriptionAllowedTenants.split(",");
+                            if (allowedTenants != null) {
+                                for (String tenant : allowedTenants) {
+                                    if (tenant != null && userDomain.equals(tenant.trim())) {
+                                        subscriptionAllowed = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    subscriptionAllowed = true;
+                }
+
+                if (!subscriptionAllowed) {
+                    throw new AppManagementException("Subscription is not allowed for " + userDomain);
+                }
+                int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
+                //TODO: Handle enterprise subscription
+                String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
+            }else{
+                RestApiUtil.handleBadRequest("Subscription is disabled", log);
+            }
+        } catch (AppManagementException e) {
+            RestApiUtil.handleBadRequest("Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
     @Override
     public Response appsAppTypeIdAppIdSubscriptionWorkflowPost(String appType, String appId, String contentType) {
-        return null;
+        WorkflowExecutor workflowExecutor = null;
+        try {
+            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+        } catch (WorkflowException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription workflow status", e, log);
+        }
+        boolean isAsynchronousFlow = workflowExecutor.isAsynchronus();
+        return Response.ok().entity(isAsynchronousFlow).build();
     }
 
+    /**
+     * @param appType
+     * @param appId
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdSubscriptionUsersGet(String appType, String appId, String accept,
                                                            String ifNoneMatch, String ifModifiedSince) {
-        return null;
+        UserIdListDTO userIdListDTO = new UserIdListDTO();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                    userIdListDTO.setUserIds(subscriberSet);
+                } else {
+                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().entity(userIdListDTO).build();
     }
 
+    /**
+     * Remove subscription of a given user for a given application
+     *
+     * @param appType
+     * @param appId
+     * @param contentType
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdUnsubscriptionPost(String appType, String appId, String contentType) {
-        return null;
+
+        APIConsumer apiConsumer = null;
+        boolean isTenantFlowStarted = false;
+        String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
+        try {
+            apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            WebApp webApp = apiConsumer.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            apiConsumer.removeAPISubscription(appIdentifier, username, AppMConstants.DEFAULT_APPLICATION_NAME);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleBadRequest("Error occurred while removing subscription user '" + username +
+                    "' for webapp with id " + appId, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
 

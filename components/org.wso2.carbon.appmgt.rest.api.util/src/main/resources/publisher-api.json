@@ -937,7 +937,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs": {
+        "/apps/{appType}/id/{appId}/docs/{documentId}/content": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -956,10 +956,20 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
+                        "$ref": "#/parameters/documentId"
+                    },
+                    {
                         "in": "formData",
                         "name": "file",
                         "description": "Document to upload",
                         "type": "file",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "inlineContent",
+                        "description": "Inline content of the document",
+                        "type": "string",
                         "required": false
                     },
                     {
@@ -970,7 +980,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "App Documents"
                 ],
                 "responses": {
                     "200": {
@@ -1004,7 +1014,134 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs/{fileName}": {
+        "/apps/{appType}/id/{appId}/docs": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification API Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
+                "summary": "Get API Documents",
+                "description": "Get a list of documents belonging to an API.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "API Document"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK. \nDocument list is returned.\n",
+                        "schema": {
+                            "$ref": "#/definitions/DocumentList"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "304": {
+                        "description": "Not Modified. \nEmpty body because the client has already the latest version of the requested resource.\n"
+                    },
+                    "404": {
+                        "description": "Not Found. \nRequested API does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "406": {
+                        "description": "Not Acceptable. \nThe requested media type is not supported\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-scope": "appm:create",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer cdcc8cf6016ed10620edf3a1d3c5ef2b\" -H \"Content-Type: application/json\" -X POST -d @data.json \"http://127.0.0.1:9763/api/am/publisher/v0.9/apis/96077508-fd01-4fae-bc64-5de0e2baf43c/documents\"",
+                "x-wso2-request": "{\n    \"visibility\": \"API_LEVEL\",\n    \"sourceType\": \"INLINE\",\n    \"sourceUrl\": null,\n    \"otherTypeName\": null,\n    \"summary\": \"This is a sample documentation\",\n    \"name\": \"Introduction to PhoneVerification API\",\n    \"type\": \"HOWTO\"\n}",
+                "x-wso2-response": "HTTP/1.1 201 Created\nLocation: http://localhost:9763/api/am/publisher/v0.9/apis/890a4f4d-09eb-4877-a323-57f6ce2ed79b/documents/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\nContent-Type: application/json\n\n{\n   \"visibility\": \"API_LEVEL\",\n   \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"Introduction to PhoneVerification API\",\n   \"type\": \"HOWTO\"\n}",
+                "summary": "Add a new document",
+                "description": "Add a new document to an API\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/appId"
+                    },
+                    {
+                        "$ref": "#/parameters/appType"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Document object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        }
+                    },
+                    {
+                        "$ref": "#/parameters/Content-Type"
+                    }
+                ],
+                "tags": [
+                    "API Document"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created. \nSuccessful response with the newly created Document object as entity in the body. \nLocation header contains URL of newly added document.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Document"
+                        },
+                        "headers": {
+                            "Location": {
+                                "description": "Location to the newly created Document.\n",
+                                "type": "string"
+                            },
+                            "Content-Type": {
+                                "description": "The content type of the body.\n",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. \nUsed by caches, or in conditional request.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "415": {
+                        "description": "Unsupported media type. \nThe entity of the request was in a not supported format.\n"
+                    }
+                }
+            }
+        },
+        "/apps/{appType}/id/{appId}/docs/{documentId}": {
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "",
@@ -1019,7 +1156,7 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
-                        "$ref": "#/parameters/fileName"
+                        "$ref": "#/parameters/documentId"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -1029,7 +1166,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "App Documents"
                 ],
                 "responses": {
                     "200": {
@@ -1082,7 +1219,7 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
-                        "$ref": "#/parameters/fileName"
+                        "$ref": "#/parameters/documentId"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -1260,9 +1397,16 @@
                     },
                     {
                         "name": "endTimeStamp",
-                        "description": "end date/time of the stat analysis (2016-04-19#10:32:00)",
+                        "description": "End date/time of the stat analysis (2016-04-19#10:32:00)",
                         "in": "query",
                         "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "limit",
+                        "description": "Limit of records",
+                        "in": "query",
+                        "type": "integer",
                         "required": false
                     },
                     {
@@ -2600,6 +2744,13 @@
             "required": true,
             "type": "string"
         },
+        "documentId": {
+            "name": "documentId",
+            "in": "path",
+            "description": "Document uuid.\n",
+            "required": true,
+            "type": "string"
+        },
         "tenantId": {
             "name": "tenantId",
             "in": "path",
@@ -2992,6 +3143,93 @@
                     "description": "asset created timestamp",
                     "type": "string",
                     "example": "00000001459919490157"
+                }
+            }
+        },
+        "DocumentList": {
+            "title": "Document List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of Documents returned.\n",
+                    "example": 1
+                },
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=2"
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "example": "/apis/01234567-0123-0123-0123-012345678901/documents?limit=1&offset=0"
+                },
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Document"
+                    }
+                }
+            }
+        },
+        "Document": {
+            "title": "Document",
+            "required": [
+                "name",
+                "type",
+                "sourceType"
+            ],
+            "properties": {
+                "documentId": {
+                    "type": "string",
+                    "example": "01234567-0123-0123-0123-012345678901"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "CalculatorDoc"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "HOWTO",
+                        "SAMPLES",
+                        "PUBLIC_FORUM",
+                        "SUPPORT_FORUM",
+                        "API_MESSAGE_FORMAT",
+                        "SWAGGER_DOC",
+                        "OTHER"
+                    ],
+                    "example": "HOWTO"
+                },
+                "summary": {
+                    "type": "string",
+                    "example": "Summary of Calculator Documentation"
+                },
+                "sourceType": {
+                    "type": "string",
+                    "enum": [
+                        "INLINE",
+                        "URL",
+                        "FILE"
+                    ],
+                    "example": "INLINE"
+                },
+                "sourceUrl": {
+                    "type": "string",
+                    "example": ""
+                },
+                "otherTypeName": {
+                    "type": "string",
+                    "example": ""
+                },
+                "visibility": {
+                    "type": "string",
+                    "enum": [
+                        "OWNER_ONLY",
+                        "PRIVATE",
+                        "API_LEVEL"
+                    ],
+                    "example": "API_LEVEL"
                 }
             }
         },

@@ -258,6 +258,15 @@ public interface APIConsumer extends APIManager {
     public Comment[] getComments(APIIdentifier identifier) throws AppManagementException;
 
     /**
+     * Returns details of an WebApp
+     *
+     * @param uuid uuid of the A
+     * @return An WebApp object related to the given identifier or null
+     * @throws AppManagementException if failed get WebApp from APIIdentifier
+     */
+    public WebApp getWebApp(String uuid) throws AppManagementException;
+
+    /**
      * Adds an application
      *
      * @param application Application
