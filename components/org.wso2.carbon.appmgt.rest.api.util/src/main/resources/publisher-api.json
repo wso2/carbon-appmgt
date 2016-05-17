@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "title": "WSO2 APP Manager - Publisher API",
         "description": "This document specifies a **RESTful API** for WSO2 **APP Manager** - Publisher.\n\n\n\n\nIt is written with [swagger 2](http://swagger.io/).\n",
         "contact": {

@@ -147,7 +147,7 @@
                             <directory>src/main/webapp</directory>
                         </resource>
                     </webResources>
-                    <warName>api#appm#publisher#v1.0</warName>
+                    <warName>api#appm#publisher#v1.1</warName>
                 </configuration>
             </plugin>
 
