@@ -35,6 +35,9 @@ import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
 import org.wso2.carbon.appmgt.mobile.store.Operations;
 import org.wso2.carbon.appmgt.mobile.utils.MobileApplicationException;
 import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
@@ -849,7 +852,14 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsAppTypeIdAppIdSubscriptionWorkflowPost(String appType, String appId, String contentType) {
-        return null;
+        WorkflowExecutor workflowExecutor = null;
+        try {
+            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_SUBSCRIPTION_CREATION");
+        } catch (WorkflowException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription workflow status", e, log);
+        }
+        boolean isAsynchronousFlow = workflowExecutor.isAsynchronus();
+        return Response.ok().entity(isAsynchronousFlow).build();
     }
 
     /**
