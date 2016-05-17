@@ -1,11 +1,11 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import java.util.*;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -14,17 +14,17 @@ public class StatSummaryDTO  {
   
   
   
-  private List<String> result = new ArrayList<String>();
+  private List<Object> result = new ArrayList<Object>();
 
   
   /**
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("result")
-  public List<String> getResult() {
+  public List<Object> getResult() {
     return result;
   }
-  public void setResult(List<String> result) {
+  public void setResult(List<Object> result) {
     this.result = result;
   }
 

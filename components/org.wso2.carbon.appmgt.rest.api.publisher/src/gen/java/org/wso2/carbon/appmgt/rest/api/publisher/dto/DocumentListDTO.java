@@ -1,16 +1,17 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
 @ApiModel(description = "")
-public class PolicyPartialListDTO  {
+public class DocumentListDTO  {
   
   
   
@@ -23,13 +24,13 @@ public class PolicyPartialListDTO  {
   private String previous = null;
   
   
-  private List<PolicyPartialInfoDTO> policyList = new ArrayList<PolicyPartialInfoDTO>();
+  private List<DocumentDTO> list = new ArrayList<DocumentDTO>();
 
   
   /**
-   * Number of App returned.
+   * Number of Documents returned.
    **/
-  @ApiModelProperty(value = "Number of App returned.")
+  @ApiModelProperty(value = "Number of Documents returned.")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -68,12 +69,12 @@ public class PolicyPartialListDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("policyList")
-  public List<PolicyPartialInfoDTO> getPolicyList() {
-    return policyList;
+  @JsonProperty("list")
+  public List<DocumentDTO> getList() {
+    return list;
   }
-  public void setPolicyList(List<PolicyPartialInfoDTO> policyList) {
-    this.policyList = policyList;
+  public void setList(List<DocumentDTO> list) {
+    this.list = list;
   }
 
   
@@ -81,12 +82,12 @@ public class PolicyPartialListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PolicyPartialListDTO {\n");
+    sb.append("class DocumentListDTO {\n");
     
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  policyList: ").append(policyList).append("\n");
+    sb.append("  list: ").append(list).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

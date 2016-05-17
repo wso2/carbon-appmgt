@@ -29,6 +29,8 @@ public class App {
     private float rating;
     private String[] appVisibility;
     private String banner;
+    private String lifeCycleName;
+    private APIStatus lifeCycleStatus;
 
 
     public String[] getAppVisibility() {
@@ -78,4 +80,21 @@ public class App {
     public void setBanner(String banner) {
         this.banner = banner;
     }
+
+    public void setLifeCycleName(String lifeCycleName) {
+        this.lifeCycleName = lifeCycleName;
+    }
+
+    public String getLifeCycleName() {
+        return lifeCycleName;
+    }
+
+    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
+        this.lifeCycleStatus = lifeCycleStatus;
+    }
+
+    public APIStatus getLifeCycleStatus() {
+        return lifeCycleStatus;
+    }
+
 }

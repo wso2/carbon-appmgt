@@ -19,37 +19,27 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tag;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
+import org.wso2.carbon.appmgt.impl.AppRepository;
+import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.StaticContentDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.validation.AppDTOValidator;
@@ -57,6 +47,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
+import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.registry.core.Registry;
@@ -66,15 +57,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -109,7 +93,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                         //Generate UUID for the uploading file
                         String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
+
+                        FileContent fileContent = new FileContent();
+                        fileContent.setContent(fileInputStream);
+                        fileContent.setFileName(filename);
+                        String filePath = RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
                         ZipFileReading zipFileReading = new ZipFileReading();
 
                         String information = null;
@@ -153,16 +141,16 @@ public class AppsApiServiceImpl extends AppsApiService {
      */
     @Override
     public Response appsMobileBinariesFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
-        File staticContentFile = null;
+        File binaryFile = null;
         String contentType = null;
         try {
             String fileExtension = FilenameUtils.getExtension(fileName);
             if (AppMConstants.MOBILE_APPS_ANDROID_EXT.equals(fileExtension) ||
                     AppMConstants.MOBILE_APPS_IOS_EXT.equals(fileExtension)) {
 
-                staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                binaryFile = RestApiUtil.readFileFromStorage(fileName);
 
-                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+                contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
                 if (!contentType.startsWith("application")) {
                     RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
                                                  log);
@@ -179,7 +167,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Error occurred while retrieving mobile binary : " + fileName + "from storage", e, log);
             }
         }
-        Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
+        Response.ResponseBuilder response = Response.ok((Object) binaryFile);
         response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
                 + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
         response.header(RestApiConstants.HEADER_CONTENT_TYPE, contentType);
@@ -202,17 +190,37 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return API path of the uploaded static content
      */
     @Override
-    public Response appsStaticContentsPost(InputStream fileInputStream, Attachment fileDetail, String ifMatch,
-                                           String ifUnmodifiedSince) {
-        StaticContentDTO staticContentDTO = new StaticContentDTO();
+    public Response appsStaticContentsPost(String appType, InputStream fileInputStream, Attachment fileDetail,
+                                           String ifMatch, String ifUnmodifiedSince) {
+
+        CommonValidator.isValidAppType(appType);
+        Map<String, String> response = new HashMap<>();
+
         try {
             if (fileInputStream != null) {
+                FileContent fileContent = new FileContent();
                 if ("image".equals(fileDetail.getContentType().getType())) {
                     String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
                             RestApiConstants.CONTENT_DISPOSITION_FILENAME));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
-                    RestApiPublisherUtils.uploadFileIntoStorage(fileInputStream, filename);
-                    staticContentDTO.setPath(filename);
+                    fileContent.setFileName(filename);
+                    fileContent.setContent(fileInputStream);
+                    if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                        RestApiPublisherUtils.uploadFileIntoStorage(fileContent);
+                        response.put("id", filename);
+                    } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                        try {
+                            DefaultAppRepository defaultAppRepository = new DefaultAppRepository(null);
+                            UUID contentUUID = UUID.randomUUID();
+                            fileContent.setUuid(contentUUID.toString());
+                            fileContent.setContentLength(fileInputStream.available());
+                            fileContent.setContentType(fileDetail.getContentType().toString());
+                            defaultAppRepository.persistStaticContents(fileContent);
+                            response.put("id", contentUUID.toString() + File.separator + filename);
+                        } catch (IOException e) {
+                            RestApiUtil.handleInternalServerError("Error occurred while uploading static content", e, log);
+                        }
+                    }
                 } else {
                     RestApiUtil.handleBadRequest("Invalid file is provided with unsupported Media type.", log);
                 }
@@ -223,7 +231,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(
                     "Error occurred while parsing binary file archive and retrieving information", e, log);
         }
-        return Response.ok().entity(staticContentDTO).build();
+        return Response.ok().entity(response).build();
     }
 
     /**
@@ -235,14 +243,42 @@ public class AppsApiServiceImpl extends AppsApiService {
      * @return
      */
     @Override
-    public Response appsStaticContentsFileNameGet(String fileName, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsStaticContentsFileNameGet(String appType, String fileName, String ifMatch, String ifUnmodifiedSince) {
+        CommonValidator.isValidAppType(appType);
+        File staticContentFile = null;
+        String contentType = null;
+
         try {
-            File staticContentFile = RestApiUtil.readFileFromStorage(fileName);
-            String contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
-            if (!contentType.startsWith("image")) {
-                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
-                                             log);
+
+            if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+
+                staticContentFile = RestApiUtil.readFileFromStorage(fileName);
+                if (staticContentFile == null) {
+                    RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                }
+                contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
+            } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                OutputStream outputStream = null;
+                AppRepository appRepository = new DefaultAppRepository(null);
+                try {
+                    FileContent fileContent = appRepository.getStaticContent(fileName);
+                    if (fileContent == null) {
+                        RestApiUtil.handleResourceNotFoundError("Static Content", fileName, log);
+                    }
+                    staticContentFile = File.createTempFile("temp", ".tmp");
+                    outputStream = new FileOutputStream(staticContentFile);
+                    IOUtils.copy(fileContent.getContent(), outputStream);
+                    contentType = fileContent.getContentType();
+                } catch (IOException e) {
+                    RestApiUtil.handleBadRequest("Error occurred while retrieving static content '" + fileName + "'", log);
+                }
             }
+
+            if (contentType != null && !contentType.startsWith("image")) {
+                RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
+                        log);
+            }
+
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
             response.header(RestApiConstants.HEADER_CONTENT_DISPOSITION, RestApiConstants.CONTENT_DISPOSITION_ATTACHMENT
                     + "; " + RestApiConstants.CONTENT_DISPOSITION_FILENAME + "=\"" + fileName + "\"");
@@ -331,7 +367,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             response.put("AppId", applicationId);
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceAlreadyExisting(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
-                RestApiUtil.handleConflictException("A duplicate "+appType+" already exists with the name : "
+                RestApiUtil.handleConflictException("A duplicate " + appType + " already exists with the name : "
                                                             + body.getName(), log);
             } else {
                 RestApiUtil.handleInternalServerError(
@@ -392,9 +428,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO appDTO;
         try {
-            //currently supports only mobile apps
-            if (!appType.equals("mobileapp")) {
-                String errorMessage = "Type not supported.";
+            if (!appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
+                String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
 
@@ -412,7 +447,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             App app = result.get(0);
             appDTO = APPMappingUtil.fromAppToDTO(app);
 
-            return Response.ok().entity(app).build();
+            return Response.ok().entity(appDTO).build();
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the
             // existence of the resource
@@ -522,6 +557,31 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdDocsGet(String appType, String appId, Integer limit, Integer offset, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsPost(String appId, String appType, DocumentDTO body, String contentType) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdDelete(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId, InputStream fileInputStream, Attachment fileDetail, String inlineContent, String ifMatch, String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdLifecycleGet(String appType, String appId, String accept, String ifNoneMatch) {
         LifeCycleDTO lifeCycleDTO = new LifeCycleDTO();
         try {
@@ -565,13 +625,60 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeIdAppIdLifecycleHistoryGet(String appType, String appId, String accept,
                                                           String ifNoneMatch) {
-        return Response.ok().build();
-    }
+        LifeCycleHistoryListDTO lifeCycleHistoryListDTO = new LifeCycleHistoryListDTO();
+        try {
+            //Validate App Type
+            CommonValidator.isValidAppType(appType);
+            String username = RestApiUtil.getLoggedInUsername();
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            Registry registry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceUserRegistry(tenantUserName, tenantId);
+            GenericArtifactManager artifactManager = new GenericArtifactManager(registry, appType);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(appId);
+            //Validate App Id
+            if (artifact == null) {
+                RestApiUtil.handleBadRequest("Invalid App Id.", log);
+            }
 
-    @Override
-    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                         String ifUnmodifiedSince) {
-        return null;
+            String historyRegPath = getHistoryPath(artifact);
+            String historyResourceXMLStr = IOUtils.toString(registry.get(historyRegPath).getContentStream());
+            JSONObject historyResourceObj = XML.toJSONObject(historyResourceXMLStr);
+
+            JSONArray historyResourceJsonArray = (historyResourceObj.getJSONObject("lifecycleHistory")).getJSONArray(
+                    "item");
+            List<LifeCycleHistoryDTO> lifeCycleHistoryDTOList = new ArrayList<>();
+            //iterate life cycle history json
+            for (int i = 0; i < historyResourceJsonArray.length() - 1; i++) {
+                JSONObject lifecycleHistoryStateObj = (JSONObject) historyResourceJsonArray.get(i);
+                LifeCycleHistoryDTO lifeCycleHistoryDTO = new LifeCycleHistoryDTO();
+                lifeCycleHistoryDTO.setOrder(Integer.parseInt(lifecycleHistoryStateObj.get("order").toString()));
+                lifeCycleHistoryDTO.setState(lifecycleHistoryStateObj.get("state").toString());
+                lifeCycleHistoryDTO.setTargetState(lifecycleHistoryStateObj.get("targetState").toString());
+                lifeCycleHistoryDTO.setTimestamp(lifecycleHistoryStateObj.get("timestamp").toString());
+                lifeCycleHistoryDTO.setUser(lifecycleHistoryStateObj.get("user").toString());
+                lifeCycleHistoryDTOList.add(lifeCycleHistoryDTO);
+            }
+            lifeCycleHistoryListDTO.setLifeCycleHistoryList(lifeCycleHistoryDTOList);
+        } catch (GovernanceException e) {
+            String errorMessage = "GovernanceException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (IOException e) {
+            String errorMessage = "IOException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (UserStoreException e) {
+            String errorMessage = "UserStoreException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (RegistryException e) {
+            String errorMessage = "RegistryException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        } catch (JSONException e) {
+            String errorMessage = "JSONException while retrieving lifecycle History of app with id : " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(lifeCycleHistoryListDTO).build();
     }
 
     @Override
@@ -756,9 +863,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String accept, String ifNoneMatch) {
+    public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
+                                                String endTimeStamp, String accept, String ifNoneMatch) {
         return null;
     }
+
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {
@@ -767,6 +876,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 tagSet = appProvider.getAllTags(appType);
+                if (tagSet.isEmpty()) {
+                    return RestApiUtil.buildNotFoundException("Tags", null).getResponse();
+                }
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
@@ -780,8 +892,9 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Validate webapp context
-     * @param appType application type
-     * @param appContext context of the webapp
+     *
+     * @param appType         application type
+     * @param appContext      context of the webapp
      * @param contentType
      * @param ifModifiedSince
      * @return whether context is valid or not
@@ -825,5 +938,13 @@ public class AppsApiServiceImpl extends AppsApiService {
         GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
                                                                                    AppMConstants.MOBILE_ASSET_TYPE);
         artifactManager.removeGenericArtifact(webApp.getUUID());
+    }
+
+    private String getHistoryPath(GenericArtifact genericArtifact) throws GovernanceException {
+        String assetPath = genericArtifact.getPath();
+        //Replace the / in the assetPath
+        String partialHistoryPath = assetPath.replace("/", "_");
+        String fullPath = RestApiConstants.HISTORY_PATH + "__system_governance" + partialHistoryPath;
+        return fullPath;
     }
 }

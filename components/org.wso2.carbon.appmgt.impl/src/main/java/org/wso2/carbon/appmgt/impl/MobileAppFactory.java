@@ -59,9 +59,9 @@ public class MobileAppFactory extends AppFactory {
             //Set Lifecycle status
             if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
                 if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
-                    mobileApp.setLifecycleStatus(APIStatus.INREVIEW);
+                    mobileApp.setLifeCycleStatus(APIStatus.INREVIEW);
                 } else {
-                    mobileApp.setLifecycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                    mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
                 }
             }
 
@@ -81,6 +81,9 @@ public class MobileAppFactory extends AppFactory {
 
             mobileApp.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+            if (artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY) != null) {
+                mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY).split(","));
+            }
 
             return mobileApp;
 

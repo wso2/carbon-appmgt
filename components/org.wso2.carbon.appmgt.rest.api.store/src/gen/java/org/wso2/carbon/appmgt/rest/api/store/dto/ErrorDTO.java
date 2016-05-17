@@ -1,12 +1,12 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
+import org.wso2.carbon.appmgt.rest.api.store.dto.ErrorListItemDTO;
+import java.util.*;
+
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -82,9 +82,9 @@ public class ErrorDTO  {
 
   
   /**
-   * If there are more than one error list them out. \nFor example, list out validation errors by each field.
+   * If there are more than one error list them out.\nFor example, list out validation errors by each field.
    **/
-  @ApiModelProperty(value = "If there are more than one error list them out. \nFor example, list out validation errors by each field.")
+  @ApiModelProperty(value = "If there are more than one error list them out.\nFor example, list out validation errors by each field.")
   @JsonProperty("error")
   public List<ErrorListItemDTO> getError() {
     return error;

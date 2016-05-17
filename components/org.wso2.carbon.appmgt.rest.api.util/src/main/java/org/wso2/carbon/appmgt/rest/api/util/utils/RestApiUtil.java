@@ -213,6 +213,34 @@ public class RestApiUtil {
     }
 
     /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAPIPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APIS_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAppRatingPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APP_RATE_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
      * Returns the next/previous offset/limit parameters properly when current offset, limit and size parameters are
      * specified
      *
@@ -352,6 +380,20 @@ public class RestApiUtil {
     /**
      * Logs the error, builds a NotFoundException with specified details and throws it
      *
+     * @param resource requested resource
+     * @param id       id of resource
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleResourceNotFoundError(String resource, String id, Log log)
+            throws NotFoundException {
+        NotFoundException notFoundException = buildNotFoundException(resource, id);
+        throw notFoundException;
+    }
+
+    /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
      * @param description error description
      * @param t        Throwable instance
      * @param log      Log instance
@@ -449,9 +491,6 @@ public class RestApiUtil {
         String filePath = CarbonUtils.getCarbonHome() + File.separator +
                 appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
         storageFile = new File(filePath);
-        if (!storageFile.exists() || storageFile.isDirectory()) {
-            throw new AppMgtResourceNotFoundException("Requested file '" + fileName + "' does not exist.");
-        }
         return storageFile;
     }
 

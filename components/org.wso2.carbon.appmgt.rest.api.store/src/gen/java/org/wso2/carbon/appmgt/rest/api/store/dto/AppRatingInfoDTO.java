@@ -1,10 +1,9 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.math.BigDecimal;
 
 
 
@@ -13,13 +12,19 @@ public class AppRatingInfoDTO  {
   
   
   
-  private BigDecimal rating = null;
+  private Integer rating = null;
   
   
   private String review = null;
   
   
   private Integer id = null;
+  
+  
+  private Integer likes = null;
+  
+  
+  private Integer dislikes = null;
 
   
   /**
@@ -27,10 +32,10 @@ public class AppRatingInfoDTO  {
    **/
   @ApiModelProperty(value = "List of Role Id's")
   @JsonProperty("rating")
-  public BigDecimal getRating() {
+  public Integer getRating() {
     return rating;
   }
-  public void setRating(BigDecimal rating) {
+  public void setRating(Integer rating) {
     this.rating = rating;
   }
 
@@ -61,6 +66,32 @@ public class AppRatingInfoDTO  {
   }
 
   
+  /**
+   * No of likes
+   **/
+  @ApiModelProperty(value = "No of likes")
+  @JsonProperty("likes")
+  public Integer getLikes() {
+    return likes;
+  }
+  public void setLikes(Integer likes) {
+    this.likes = likes;
+  }
+
+  
+  /**
+   * No of dislikes
+   **/
+  @ApiModelProperty(value = "No of dislikes")
+  @JsonProperty("dislikes")
+  public Integer getDislikes() {
+    return dislikes;
+  }
+  public void setDislikes(Integer dislikes) {
+    this.dislikes = dislikes;
+  }
+
+  
 
   @Override
   public String toString()  {
@@ -70,6 +101,8 @@ public class AppRatingInfoDTO  {
     sb.append("  rating: ").append(rating).append("\n");
     sb.append("  review: ").append(review).append("\n");
     sb.append("  id: ").append(id).append("\n");
+    sb.append("  likes: ").append(likes).append("\n");
+    sb.append("  dislikes: ").append(dislikes).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

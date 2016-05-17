@@ -14,6 +14,7 @@ import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -26,6 +27,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.namespace.QName;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.*;
 
@@ -54,6 +56,76 @@ public class DefaultAppRepository implements AppRepository {
 
         return null;
     }
+
+    /**
+     * Save static content into storage
+     * @param fileContent file content details
+     * @throws AppManagementException
+     */
+    @Override
+    public void persistStaticContents(FileContent fileContent) throws AppManagementException {
+        Connection connection = null;
+
+        PreparedStatement preparedStatement = null;
+        String query = "INSERT INTO resource (UUID,TENANTID,FILENAME,CONTENTLENGTH,CONTENTTYPE,CONTENT) VALUES (?,?,?,?,?,?)";
+        try {
+            connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, fileContent.getUuid());
+            preparedStatement.setString(2, getTenantDomainOfCurrentUser());
+            preparedStatement.setString(3, fileContent.getFileName());
+            preparedStatement.setInt(4, fileContent.getContentLength());
+            preparedStatement.setString(5, fileContent.getContentType());
+            preparedStatement.setBlob(6, fileContent.getContent());
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(String.format("Couldn't rollback save operation for the static content"), e1);
+            }
+            handleException("Error occurred while saving static content :" + fileContent.getFileName(), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+    }
+
+    @Override
+    public FileContent getStaticContent(String contentId)throws AppManagementException {
+        Connection connection = null;
+        FileContent fileContent = null;
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = "SELECT CONTENT,CONTENTTYPE FROM resource WHERE FILENAME = ? AND TENANTID = ?";
+            connection = AppMgtDataSourceProvider.getStorageDBConnection();
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, contentId);
+            preparedStatement.setString(2, getTenantDomainOfCurrentUser());
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Blob staticContentBlob = resultSet.getBlob("CONTENT");
+                InputStream inputStream = staticContentBlob.getBinaryStream();
+                fileContent = new FileContent();
+                fileContent.setContentType(resultSet.getString("CONTENTTYPE"));
+                fileContent.setContent(inputStream);
+            }
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                handleException(String.format("Couldn't rollback retrieve operation for the static content '"+contentId+"'"), e1);
+            }
+            handleException("Error occurred while saving static content :" + contentId, e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, connection, null);
+        }
+        return fileContent;
+
+    }
+
 
     private String persistWebApp(WebApp webApp) throws AppManagementException {
 

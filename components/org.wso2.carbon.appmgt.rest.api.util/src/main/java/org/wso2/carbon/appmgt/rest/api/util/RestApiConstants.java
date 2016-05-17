@@ -57,6 +57,7 @@ public final class RestApiConstants {
     public static final String API_VERSION_PARAM = "{version}";
 
     //todo better to take from cxf level
+    public static final String RESOURCE_PATH_RATE = "/rate";
     public static final String RESOURCE_PATH_APPS = "/apps";
     public static final String RESOURCE_PATH_DEVICES = "/devices";
     public static final String RESOURCE_PATH_ROLES = "/roles";
@@ -92,6 +93,9 @@ public final class RestApiConstants {
 
     public static final String APIS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
+
+    public static final String APP_RATE_GET_PAGINATION_URL =
+            RESOURCE_PATH_RATE + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
 
     public static final String DEVICES_GET_PAGINATION_URL =
             RESOURCE_PATH_DEVICES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
@@ -141,4 +145,8 @@ public final class RestApiConstants {
             + "an internal error. Please contact administrator.";
 
     public static final int SUPER_USER_TENANT_ID = -1234;
+
+    public static final String HISTORY_PATH =
+            "/repository/components/org.wso2.carbon.governance/lifecycles/history/";
+
 }

@@ -17,9 +17,12 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provider's & system's view of WebApp
@@ -44,6 +47,8 @@ public class WebApp extends App{
     private AuthorizationPolicy authorizationPolicy;
     private List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
     private Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
+
+    private List<String> claims = new ArrayList<>();
 
     private String ssoEnabled;
     private String idpProviderUrl;
@@ -113,9 +118,7 @@ public class WebApp extends App{
     private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
-    private String lifeCycleName;
 
-    private APIStatus lifeCycleStatus;
 
     //Asset Type : either webapp or mobile app
     private String type;
@@ -684,22 +687,6 @@ public class WebApp extends App{
         this.advertisedAppUuid = advertisedAppUuid;
     }
 
-    public void setLifeCycleName(String lifeCycleName) {
-        this.lifeCycleName = lifeCycleName;
-    }
-
-    public String getLifeCycleName() {
-        return lifeCycleName;
-    }
-
-    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
-        this.lifeCycleStatus = lifeCycleStatus;
-    }
-
-    public APIStatus getLifeCycleStatus() {
-        return lifeCycleStatus;
-    }
-
     public String getType() {
         return type;
     }
@@ -747,6 +734,14 @@ public class WebApp extends App{
 
     public List<EntitlementPolicyGroup> getAccessPolicyGroups(){
         return this.accessPolicyGroups;
+    }
+
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
     }
 
 }

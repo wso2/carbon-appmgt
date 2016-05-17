@@ -1,16 +1,17 @@
-package org.wso2.carbon.appmgt.rest.api.publisher.dto;
+package org.wso2.carbon.appmgt.rest.api.store.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 
 
 @ApiModel(description = "")
-public class PolicyPartialListDTO  {
+public class AppRatingListDTO  {
   
   
   
@@ -23,13 +24,16 @@ public class PolicyPartialListDTO  {
   private String previous = null;
   
   
-  private List<PolicyPartialInfoDTO> policyList = new ArrayList<PolicyPartialInfoDTO>();
+  private BigDecimal overallRating = null;
+  
+  
+  private List<AppRatingInfoDTO> ratingDetails = new ArrayList<AppRatingInfoDTO>();
 
   
   /**
-   * Number of App returned.
+   * Number of Ratings returned.
    **/
-  @ApiModelProperty(value = "Number of App returned.")
+  @ApiModelProperty(value = "Number of Ratings returned.")
   @JsonProperty("count")
   public Integer getCount() {
     return count;
@@ -66,14 +70,27 @@ public class PolicyPartialListDTO  {
 
   
   /**
+   * List of Role Id's
+   **/
+  @ApiModelProperty(value = "List of Role Id's")
+  @JsonProperty("overallRating")
+  public BigDecimal getOverallRating() {
+    return overallRating;
+  }
+  public void setOverallRating(BigDecimal overallRating) {
+    this.overallRating = overallRating;
+  }
+
+  
+  /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("policyList")
-  public List<PolicyPartialInfoDTO> getPolicyList() {
-    return policyList;
+  @JsonProperty("ratingDetails")
+  public List<AppRatingInfoDTO> getRatingDetails() {
+    return ratingDetails;
   }
-  public void setPolicyList(List<PolicyPartialInfoDTO> policyList) {
-    this.policyList = policyList;
+  public void setRatingDetails(List<AppRatingInfoDTO> ratingDetails) {
+    this.ratingDetails = ratingDetails;
   }
 
   
@@ -81,12 +98,13 @@ public class PolicyPartialListDTO  {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class PolicyPartialListDTO {\n");
+    sb.append("class AppRatingListDTO {\n");
     
     sb.append("  count: ").append(count).append("\n");
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
-    sb.append("  policyList: ").append(policyList).append("\n");
+    sb.append("  overallRating: ").append(overallRating).append("\n");
+    sb.append("  ratingDetails: ").append(ratingDetails).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

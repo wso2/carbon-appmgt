@@ -152,7 +152,7 @@ public class AppMDAO {
 
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
-        BusinessOwner businessOwner = new BusinessOwner();
+        BusinessOwner businessOwner = null;
         ResultSet businessOwnerResultSet = null;
 
         String queryToGetBusinessOwner = "SELECT OWNER_NAME, OWNER_EMAIL, OWNER_DESC, OWNER_SITE FROM BUSINESS_OWNER " +
@@ -165,6 +165,7 @@ public class AppMDAO {
             businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
 
             if (businessOwnerResultSet.next()) {
+                businessOwner = new BusinessOwner();
                 businessOwner.setBusinessOwnerId(businessOwnerId);
                 businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
@@ -391,6 +392,7 @@ public class AppMDAO {
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
                 businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
                 businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
+                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId));
                 businessOwnersList.add(businessOwner);
             }
         } catch (SQLException e) {
