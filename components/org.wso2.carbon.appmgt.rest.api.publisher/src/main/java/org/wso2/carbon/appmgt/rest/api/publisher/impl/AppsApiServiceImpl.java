@@ -557,6 +557,16 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdDocsGet(String appType, String appId, Integer limit, Integer offset, String accept, String ifNoneMatch) {
+        return null;
+    }
+
+    @Override
+    public Response appsAppTypeIdAppIdDocsPost(String appId, String appType, DocumentDTO body, String contentType) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
         return null;
     }

@@ -12,6 +12,8 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
@@ -42,6 +44,8 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdDocsGet(String appType,String appId,Integer limit,Integer offset,String accept,String ifNoneMatch);
+    public abstract Response appsAppTypeIdAppIdDocsPost(String appId,String appType,DocumentDTO body,String contentType);
     public abstract Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType,String appId,String documentId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdDocsDocumentIdDelete(String appType,String appId,String documentId,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType,String appId,String documentId,InputStream fileInputStream,Attachment fileDetail,String inlineContent,String ifMatch,String ifUnmodifiedSince);

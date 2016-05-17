@@ -15,6 +15,8 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
@@ -316,6 +318,48 @@ public class AppsApi  {
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
     return delegate.appsAppTypeIdAppIdDiscoverPost(appType,appId,contentType,ifModifiedSince);
+    }
+    @GET
+    @Path("/{appType}/id/{appId}/docs")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Get API Documents", notes = "Get a list of documents belonging to an API.", response = DocumentListDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 200, message = "OK.\nDocument list is returned."),
+        
+        @io.swagger.annotations.ApiResponse(code = 304, message = "Not Modified.\nEmpty body because the client has already the latest version of the requested resource."),
+        
+        @io.swagger.annotations.ApiResponse(code = 404, message = "Not Found.\nRequested API does not exist."),
+        
+        @io.swagger.annotations.ApiResponse(code = 406, message = "Not Acceptable.\nThe requested media type is not supported") })
+
+    public Response appsAppTypeIdAppIdDocsGet(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
+    @ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "Maximum size of resource array to return.", defaultValue="25") @QueryParam("limit") Integer limit,
+    @ApiParam(value = "Starting point within the complete list of items qualified.", defaultValue="0") @QueryParam("offset") Integer offset,
+    @ApiParam(value = "Media types acceptable for the response. Default is JSON."  , defaultValue="JSON")@HeaderParam("Accept") String accept,
+    @ApiParam(value = "Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec."  )@HeaderParam("If-None-Match") String ifNoneMatch)
+    {
+    return delegate.appsAppTypeIdAppIdDocsGet(appType,appId,limit,offset,accept,ifNoneMatch);
+    }
+    @POST
+    @Path("/{appType}/id/{appId}/docs")
+    @Consumes({ "application/json" })
+    @Produces({ "application/json" })
+    @io.swagger.annotations.ApiOperation(value = "Add a new document", notes = "Add a new document to an API", response = DocumentDTO.class)
+    @io.swagger.annotations.ApiResponses(value = { 
+        @io.swagger.annotations.ApiResponse(code = 201, message = "Created.\nSuccessful response with the newly created Document object as entity in the body.\nLocation header contains URL of newly added document."),
+        
+        @io.swagger.annotations.ApiResponse(code = 400, message = "Bad Request.\nInvalid request or validation error"),
+        
+        @io.swagger.annotations.ApiResponse(code = 415, message = "Unsupported media type.\nThe entity of the request was in a not supported format.") })
+
+    public Response appsAppTypeIdAppIdDocsPost(@ApiParam(value = "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
+    @ApiParam(value = "Document object that needs to be added" ,required=true ) DocumentDTO body,
+    @ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType)
+    {
+    return delegate.appsAppTypeIdAppIdDocsPost(appId,appType,body,contentType);
     }
     @GET
     @Path("/{appType}/id/{appId}/docs/{documentId}")
