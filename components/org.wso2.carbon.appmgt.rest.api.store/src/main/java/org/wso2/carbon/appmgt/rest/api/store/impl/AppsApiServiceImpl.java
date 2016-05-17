@@ -35,6 +35,7 @@ import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.workflow.WorkflowConstants;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowException;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutor;
 import org.wso2.carbon.appmgt.impl.workflow.WorkflowExecutorFactory;
@@ -854,7 +855,7 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdSubscriptionWorkflowPost(String appType, String appId, String contentType) {
         WorkflowExecutor workflowExecutor = null;
         try {
-            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor("AM_SUBSCRIPTION_CREATION");
+            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
         } catch (WorkflowException e) {
             RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription workflow status", e, log);
         }
