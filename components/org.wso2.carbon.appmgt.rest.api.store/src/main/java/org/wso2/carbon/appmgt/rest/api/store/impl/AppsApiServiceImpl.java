@@ -30,6 +30,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
@@ -791,6 +792,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 throw new AppManagementException("Subscription is not allowed for " + userDomain);
             }
             int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
+            //TODO: Handle enterprise subscription
             apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
         } catch (AppManagementException e) {
             RestApiUtil.handleBadRequest("Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
@@ -807,10 +809,48 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     *
+     * @param appType
+     * @param appId
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdSubscriptionUsersGet(String appType, String appId, String accept,
                                                            String ifNoneMatch, String ifModifiedSince) {
-        return null;
+        UserIdListDTO userIdListDTO = new UserIdListDTO();
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+
+                AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                        getAPIManagerConfigurationService().getAPIManagerConfiguration();
+                Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+                Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                        AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+                if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                    WebApp webApp = appProvider.getAppDetailsFromUUID(appId);
+                    Set<Subscriber> subscriberSet = appProvider.getSubscribersOfAPI(webApp.getId());
+                    userIdListDTO.setUserIds(subscriberSet);
+                } else {
+                    RestApiUtil.handleBadRequest("Subscription is disabled", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while changing lifecycle state of app with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().entity(userIdListDTO).build();
     }
 
     /**
