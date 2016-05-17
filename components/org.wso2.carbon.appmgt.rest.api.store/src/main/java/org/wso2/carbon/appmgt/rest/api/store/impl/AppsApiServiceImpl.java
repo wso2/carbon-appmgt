@@ -813,9 +813,40 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Remove subscription of a given user for a given application
+     * @param appType
+     * @param appId
+     * @param contentType
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdUnsubscriptionPost(String appType, String appId, String contentType) {
-        return null;
+
+        APIConsumer apiConsumer = null;
+        boolean isTenantFlowStarted = false;
+        String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
+        try {
+            apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+            WebApp webApp = apiConsumer.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            apiConsumer.removeAPISubscription(appIdentifier, username, AppMConstants.DEFAULT_APPLICATION_NAME);
+        } catch (AppManagementException e) {
+            RestApiUtil.handleBadRequest("Error occurred while removing subscription user '" + username +
+                    "' for webapp with id " + appId, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
 
