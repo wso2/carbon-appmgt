@@ -214,8 +214,9 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['overview_provider'] = provider;
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
-            if(asset.attributes.overview_businessOwner.trim() != "") {
-                businessOwner = storeHostObj.getBusinessOwner(asset.attributes.overview_businessOwner);
+            var overviewBusinessOwner = asset.attributes.overview_businessOwner;
+            if(overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
+                businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner);
                 if(businessOwner != null && businessOwner.businessOwnerName != null) {
                     businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;

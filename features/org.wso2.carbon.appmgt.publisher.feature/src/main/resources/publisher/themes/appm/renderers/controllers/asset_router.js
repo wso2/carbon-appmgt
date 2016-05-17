@@ -48,8 +48,7 @@ var render=function(theme,data,meta,require){
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
-            businessOwnerAttribute = businessOwnerAttribute.trim();
-            if (businessOwnerAttribute != "") {
+            if (businessOwnerAttribute != null &&  businessOwnerAttribute.trim() != "") {
                 var businessOwner =  apiProvider.getBusinessOwner(businessOwnerAttribute);
                 data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
                 data.businessOwner = businessOwner;
@@ -72,8 +71,7 @@ var render=function(theme,data,meta,require){
             data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
             var businessOwnerId = data.artifact.attributes.overview_businessOwner;
-            businessOwnerId = businessOwnerId.trim();
-            if (businessOwnerId != "") {
+            if (businessOwnerId != null &&  businessOwnerId.trim() != "") {
                 var businessOwner =  apiProvider.getBusinessOwner(businessOwnerId);
                 data.businessOwner = businessOwner;
             }
