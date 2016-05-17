@@ -557,20 +557,17 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsPost(String appType, String appId, InputStream fileInputStream,
-                                               Attachment fileDetail, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsFileNameGet(String appType, String appId, String fileName, String ifMatch,
-                                                      String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsDocumentIdDelete(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
         return null;
     }
 
     @Override
-    public Response appsAppTypeIdAppIdDocsFileNameDelete(String appType, String appId, String fileName, String ifMatch,
-                                                         String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId, InputStream fileInputStream, Attachment fileDetail, String inlineContent, String ifMatch, String ifUnmodifiedSince) {
         return null;
     }
 
