@@ -34,6 +34,7 @@ import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -191,6 +192,39 @@ public class APPMappingUtil {
 
         appListDTO.setNext(paginatedNext);
         appListDTO.setPrevious(paginatedPrevious);
+    }
+
+
+    /**
+     * Sets pagination urls for a AppRatingListDTO object given pagination parameters and url parameters
+     *
+     * @param appRatingListDTO a AppListDTO object
+     * @param limit            max number of objects returned
+     * @param offset           starting index
+     * @param size             max offset
+     */
+    public static void setAppRatingPaginationParams(AppRatingListDTO appRatingListDTO, int offset, int limit,
+                                                    int size) {
+
+        //acquiring pagination parameters and setting pagination urls
+        Map<String, Integer> paginatedParams = RestApiUtil.getPaginationParams(offset, limit, size);
+        String paginatedPrevious = "";
+        String paginatedNext = "";
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
+            paginatedPrevious = RestApiUtil
+                    .getAppRatingPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
+                                              paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT));
+        }
+
+        if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
+            paginatedNext = RestApiUtil
+                    .getAppRatingPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
+                                              paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT));
+        }
+
+        appRatingListDTO.setNext(paginatedNext);
+        appRatingListDTO.setPrevious(paginatedPrevious);
     }
 
     /**

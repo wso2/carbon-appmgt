@@ -204,6 +204,12 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
                         "$ref": "#/parameters/Accept"
                     },
                     {
@@ -220,7 +226,7 @@
                     "200": {
                         "description": "OK. \nApp rating is returned.\n",
                         "schema": {
-                            "$ref": "#/definitions/AppRatingInfo"
+                            "$ref": "#/definitions/AppRatingList"
                         },
                         "headers": {
                             "Content-Type": {
@@ -2106,13 +2112,44 @@
                 }
             }
         },
+        "AppRatingList": {
+            "title": "App Rating List",
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "description": "Number of Ratings returned.\n",
+                    "example": 1
+                },
+                "next": {
+                    "type": "string",
+                    "description": "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n",
+                    "example": "/rate?limit=1&offset=2"
+                },
+                "previous": {
+                    "type": "string",
+                    "description": "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n",
+                    "example": "/rate?limit=1&offset=0"
+                },
+                "overallRating": {
+                    "type": "number",
+                    "description": "List of Role Id's",
+                    "example": 3.0
+                },
+                "ratingDetails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AppRatingInfo"
+                    }
+                }
+            }
+        },
         "AppRatingInfo": {
             "title": "App rating details",
             "properties": {
                 "rating": {
-                    "type": "number",
+                    "type": "integer",
                     "description": "List of Role Id's",
-                    "example": 3.0
+                    "example": 3
                 },
                 "review": {
                     "type": "string",
@@ -2121,6 +2158,16 @@
                 "id": {
                     "type": "integer",
                     "description": "Review Id",
+                    "example": 1
+                },
+                "likes": {
+                    "type": "integer",
+                    "description": "No of likes",
+                    "example": 1
+                },
+                "dislikes": {
+                    "type": "integer",
+                    "description": "No of dislikes",
                     "example": 1
                 }
             }

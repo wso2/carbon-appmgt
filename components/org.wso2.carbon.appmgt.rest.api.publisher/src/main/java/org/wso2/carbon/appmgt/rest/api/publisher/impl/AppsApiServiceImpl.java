@@ -675,6 +675,12 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
+    public Response appsAppTypeIdAppIdStorageFileNameGet(String appType, String appId, String fileName, String ifMatch,
+                                                         String ifUnmodifiedSince) {
+        return null;
+    }
+
+    @Override
     public Response appsAppTypeIdAppIdSubscriptionsGet(String appType, String appId, String accept, String ifNoneMatch,
                                                        String ifModifiedSince) {
         UserIdListDTO userIdListDTO = new UserIdListDTO();
@@ -867,6 +873,9 @@ public class AppsApiServiceImpl extends AppsApiService {
             if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType) || AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
                 tagSet = appProvider.getAllTags(appType);
+                if (tagSet.isEmpty()) {
+                    return RestApiUtil.buildNotFoundException("Tags", null).getResponse();
+                }
             } else {
                 RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
             }
