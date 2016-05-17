@@ -1,13 +1,15 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
 
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.validation.constraints.NotNull;
 
 
-
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @ApiModel(description = "")
 public class BinaryDTO  {
   
