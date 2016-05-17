@@ -16,6 +16,6 @@ import javax.ws.rs.core.Response;
 
 public abstract class XacmlpoliciesApiService {
     public abstract Response xacmlpoliciesGet(Integer limit,Integer offset,String accept,String ifNoneMatch);
-    public abstract Response xacmlpoliciesPolicyPartialIdAppsGet(Integer policyPartialId,Integer limit,Integer offset,String accept,String ifNoneMatch);
+    public abstract Response xacmlpoliciesPolicyPartialIdAppsAppTypeGet(Integer policyPartialId,String appType,Integer limit,Integer offset,String accept,String ifNoneMatch);
 }
 

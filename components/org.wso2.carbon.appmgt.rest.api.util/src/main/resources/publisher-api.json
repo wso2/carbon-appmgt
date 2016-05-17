@@ -400,58 +400,6 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/xacmlpolicies/{policyPartialId}": {
-            "delete": {
-                "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer efef07b7645617b7f03b706b9aa3c4a5\"  -d '' \"http://localhost:9763/api/appm/publisher/v1.0/ apps/webapp/id/af929140-1257-46ed-97c0-d26098e140e9/xacmlpolicies/4\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "summary": "Delete policy partial mapping from an App",
-                "description": "Delete policy partial mapping from an App\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "$ref": "#/parameters/policyPartialId"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Match"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Unmodified-Since"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nResource successfully deleted.\n"
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nResource to be deleted does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "412": {
-                        "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
         "/apps/{appType}/id/{appId}/tags": {
             "get": {
                 "x-scope": "appm:read",
@@ -629,121 +577,6 @@
                     },
                     "412": {
                         "description": "Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/apps/{appType}/id/{appId}/xacmlpolicies": {
-            "get": {
-                "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/xacmlpolicies\"",
-                "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": policy1,\"isSharedPartial\": true,\"policyPartialDesc\": null,,\"policyPartialId\": 1}",
-                "summary": "Get all XACML policies relevant to an App",
-                "description": "Get a list of XACML policies relevant to an App.\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "$ref": "#/parameters/Accept"
-                    },
-                    {
-                        "$ref": "#/parameters/If-None-Match"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK. \nList of XACML policies is returned.\n",
-                        "schema": {
-                            "$ref": "#/definitions/PolicyPartialList"
-                        },
-                        "headers": {
-                            "Content-Type": {
-                                "description": "The content type of the body.",
-                                "type": "string"
-                            },
-                            "ETag": {
-                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": policy1,\"isSharedPartial\": true,\"policyPartialDesc\": null}",
-                "summary": "Assign a policy partial to an App",
-                "description": "Assign a policy partial to an App\n",
-                "parameters": [
-                    {
-                        "$ref": "#/parameters/appType"
-                    },
-                    {
-                        "$ref": "#/parameters/appId"
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "App object that needs to be added\n",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/PolicyPartialIdList"
-                        }
-                    },
-                    {
-                        "$ref": "#/parameters/Content-Type"
-                    },
-                    {
-                        "$ref": "#/parameters/If-Modified-Since"
-                    }
-                ],
-                "tags": [
-                    "Apps"
-                ],
-                "responses": {
-                    "202": {
-                        "description": "Accepted.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request. \nInvalid request or validation error.\n",
-                        "schema": {
-                            "$ref": "#/definitions/Error"
-                        }
-                    },
-                    "415": {
-                        "description": "Unsupported Media Type. \nThe entity of the request was in a not supported format.\n",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }
@@ -1929,16 +1762,19 @@
                 }
             }
         },
-        "/xacmlpolicies/{policyPartialId}/apps": {
+        "/xacmlpolicies/{policyPartialId}/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b\"  \"http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b\"  \"http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp\"",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get all Apps mapped to a policy partial",
                 "description": "Get a list of available Apps mapped to a policy partial.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/policyPartialId"
+                    },
+                    {
+                        "$ref": "#/parameters/appType"
                     },
                     {
                         "$ref": "#/parameters/limit"
@@ -3322,15 +3158,6 @@
                     "type": "string",
                     "description": "name of the policy\n",
                     "example": "policy1"
-                }
-            }
-        },
-        "PolicyPartialIdList": {
-            "title": "XACML policy partial Id's",
-            "properties": {
-                "xacmlPolicyIds": {
-                    "type": "object",
-                    "description": "List of XACML policy partial Id's"
                 }
             }
         },
