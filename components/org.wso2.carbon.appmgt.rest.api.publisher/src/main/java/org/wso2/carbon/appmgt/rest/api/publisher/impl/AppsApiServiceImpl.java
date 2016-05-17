@@ -274,7 +274,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 }
             }
 
-            if (!contentType.startsWith("image")) {
+            if (contentType != null && !contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
                         log);
             }

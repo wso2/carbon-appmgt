@@ -86,7 +86,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -149,10 +149,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             favouritePageDTO.setIsDefaultPage(hasFavouritePage);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store Error occurred while retrieving Favourite page details",
-                                                  e, log);
+                    e, log);
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while retrieving Favourite page details", e,
-                                                  log);
+                    log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -344,7 +344,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                                                 log);
+                            log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -626,7 +626,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                 JSONObject socialObj;
                 socialObj = new JSONObject(socialActivityService.getSocialObjectJson(appType + ":" + appId, "asc",
-                                                                                     offset, limit));
+                        offset, limit));
                 org.json.JSONArray socialArr = socialObj.getJSONArray("attachments");
                 List<AppRatingInfoDTO> appRatingInfoDTOList = new ArrayList<>();
                 for (int i = 0; i < socialArr.length(); i++) {
@@ -636,7 +636,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     appRatingInfoDTO.setId(Integer.parseInt(ratingObj.get("id").toString()));
                     appRatingInfoDTO.setReview(ratingObj.get("content").toString());
                     appRatingInfoDTO.setLikes(Integer.parseInt(((JSONObject) (ratingObj.get("likes"))).get("totalItems")
-                                                                       .toString()));
+                            .toString()));
                     appRatingInfoDTO.setDislikes(Integer.parseInt(((JSONObject) (ratingObj.get("dislikes"))).get(
                             "totalItems").toString()));
                     appRatingInfoDTOList.add(appRatingInfoDTO);
@@ -653,7 +653,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while retrieving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (JSONException e) {
             String errorMessage = String.format(
@@ -703,11 +703,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while saving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (SocialActivityException e) {
             String errorMessage = String.format("Social component error while saving the rating for the app '%s:%s'",
-                                                appType, appId);
+                    appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(appRatingInfoDTO).build();
@@ -720,16 +720,59 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Retrieve subscription of the given user for a given app
+     * @param appType
+     * @param appId
+     * @param accept
+     * @param ifNoneMatch
+     * @param ifModifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdSubscriptionGet(String appType, String appId, String accept, String ifNoneMatch,
                                                       String ifModifiedSince) {
-        return null;
+
+        APIConsumer apiConsumer = null;
+        boolean isTenantFlowStarted = false;
+        String username = AppManagerUtil.replaceEmailDomain(RestApiUtil.getLoggedInUsername());
+        try {
+            apiConsumer = RestApiUtil.getLoggedInUserConsumer();
+
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            int tenantId = AppManagerUtil.getTenantId(username);
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                isTenantFlowStarted = true;
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            }
+
+            WebApp webApp = apiConsumer.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, username);
+
+            Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
+                    Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
+            if (subscription != null) {
+
+
+            }
+        } catch (AppManagementException e) {
+            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription details of webapp with id : "
+                    + appId + " for user " + username, e, log);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return Response.ok().build();
     }
 
     /**
      * Adding subscription for a given app
-     * @param appType application type ie: webapp, mobileapp
-     * @param appId application uuid
+     *
+     * @param appType     application type ie: webapp, mobileapp
+     * @param appId       application uuid
      * @param contentType
      * @return
      */
@@ -793,7 +836,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
             //TODO: Handle enterprise subscription
-            apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
+            String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
         } catch (AppManagementException e) {
             RestApiUtil.handleBadRequest("Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
         } finally {
@@ -810,7 +853,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     /**
-     *
      * @param appType
      * @param appId
      * @param accept
@@ -855,6 +897,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Remove subscription of a given user for a given application
+     *
      * @param appType
      * @param appId
      * @param contentType
