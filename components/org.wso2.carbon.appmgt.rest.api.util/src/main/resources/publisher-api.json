@@ -1104,7 +1104,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs": {
+        "/apps/{appType}/id/{appId}/docs/{documentId}/content": {
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -1123,10 +1123,20 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
+                        "$ref": "#/parameters/documentId"
+                    },
+                    {
                         "in": "formData",
                         "name": "file",
                         "description": "Document to upload",
                         "type": "file",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "inlineContent",
+                        "description": "Inline content of the document",
+                        "type": "string",
                         "required": false
                     },
                     {
@@ -1137,7 +1147,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "App Documents"
                 ],
                 "responses": {
                     "200": {
@@ -1171,7 +1181,7 @@
                 }
             }
         },
-        "/apps/{appType}/id/{appId}/docs/{fileName}": {
+        "/apps/{appType}/id/{appId}/docs/{documentId}": {
             "get": {
                 "x-scope": "appm:read",
                 "x-wso2-curl": "",
@@ -1186,7 +1196,7 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
-                        "$ref": "#/parameters/fileName"
+                        "$ref": "#/parameters/documentId"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -1196,7 +1206,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "App Documents"
                 ],
                 "responses": {
                     "200": {
@@ -1249,7 +1259,7 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
-                        "$ref": "#/parameters/fileName"
+                        "$ref": "#/parameters/documentId"
                     },
                     {
                         "$ref": "#/parameters/If-Match"
@@ -2761,6 +2771,13 @@
             "name": "fileName",
             "in": "path",
             "description": "File name.\n",
+            "required": true,
+            "type": "string"
+        },
+        "documentId": {
+            "name": "documentId",
+            "in": "path",
+            "description": "Document uuid.\n",
             "required": true,
             "type": "string"
         },
