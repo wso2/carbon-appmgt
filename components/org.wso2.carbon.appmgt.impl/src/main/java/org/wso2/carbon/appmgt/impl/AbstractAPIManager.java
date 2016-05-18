@@ -536,6 +536,66 @@ public abstract class AbstractAPIManager implements APIManager {
         return documentation;
     }
 
+    /**
+     * Checks whether the given document already exists for the given api
+     *
+     * @param identifier API Identifier
+     * @param docName Name of the document
+     * @return true if document already exists for the given api
+     * @throws AppManagementException if failed to check existence of the documentation
+     */
+    public boolean isDocumentationExist(APIIdentifier identifier, String docName) throws AppManagementException {
+        String docPath = AppMConstants.API_ROOT_LOCATION + RegistryConstants.PATH_SEPARATOR +
+                identifier.getProviderName() + RegistryConstants.PATH_SEPARATOR +
+                identifier.getApiName() + RegistryConstants.PATH_SEPARATOR +
+                identifier.getVersion() + RegistryConstants.PATH_SEPARATOR +
+                AppMConstants.DOC_DIR + RegistryConstants.PATH_SEPARATOR + docName;
+        try {
+            return registry.resourceExists(docPath);
+        } catch (RegistryException e) {
+            handleException("Failed to check existence of the document :" + docPath, e);
+        }
+        return false;
+    }
+
+    /**
+     * Get a documentation by artifact Id
+     *
+     * @param docId artifact id of the document
+     * @param requestedTenantDomain tenant domain of the registry where the artifact is located
+     * @return Document object which represents the artifact id
+     * @throws AppManagementException
+     */
+    public Documentation getDocumentation(String docId, String requestedTenantDomain) throws AppManagementException {
+        Documentation documentation = null;
+        try {
+            Registry registryType;
+            boolean isTenantMode = (requestedTenantDomain != null);
+            //Tenant store anonymous mode if current tenant and the required tenant is not matching
+            if ((isTenantMode && this.tenantDomain == null) || (isTenantMode && isTenantDomainNotMatching(
+                    requestedTenantDomain))) {
+                int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager()
+                        .getTenantId(requestedTenantDomain);
+                registryType = ServiceReferenceHolder.getInstance().
+                        getRegistryService()
+                        .getGovernanceUserRegistry(CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME, tenantId);
+            } else {
+                registryType = registry;
+            }
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registryType,
+                    AppMConstants.DOCUMENTATION_KEY);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(docId);
+            if (null != artifact) {
+                documentation = AppManagerUtil.getDocumentation(artifact);
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to get documentation details", e);
+        } catch (org.wso2.carbon.user.api.UserStoreException e) {
+            handleException("Failed to get documentation details", e);
+        }
+        return documentation;
+    }
+
     public String getDocumentationContent(APIIdentifier identifier, String documentationName)
             throws AppManagementException {
         String contentPath = AppManagerUtil.getAPIDocPath(identifier) +
@@ -803,6 +863,13 @@ public abstract class AbstractAPIManager implements APIManager {
         tiers.addAll(tierMap.values());
         PrivilegedCarbonContext.endTenantFlow();
         return tiers;
+    }
+
+    private boolean isTenantDomainNotMatching(String tenantDomain) {
+        if (this.tenantDomain != null) {
+            return !(this.tenantDomain.equals(tenantDomain));
+        }
+        return true;
     }
 
 }

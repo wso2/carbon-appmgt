@@ -55,6 +55,9 @@ public final class AppMConstants {
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
 
     public static final String DOCUMENTATION_KEY = "document";
+    public static final String DOCUMENTATION_RESOURCE_MAP_DATA = "Data";
+    public static final String DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE = "contentType";
+    public static final String DOCUMENTATION_RESOURCE_MAP_NAME = "name";
 
     //association type between provider and APIImpl
     public static final String PROVIDER_ASSOCIATION = "provides";

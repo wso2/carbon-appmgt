@@ -577,11 +577,37 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public String createWebApp(WebApp webApp) throws AppManagementException {
 
-        AppRepository appRepository = new DefaultAppRepository();
+        AppRepository appRepository = new DefaultAppRepository(registry);
         String appId = appRepository.saveApp(webApp);
         return appId;
 
     }
+
+    /**
+     * Retrieve webapp for the given uuid
+     * @param uuid uuid of the Application
+     * @return Webapp
+     * @throws AppManagementException
+     */
+    @Override
+    public WebApp getWebApp(String uuid) throws AppManagementException {
+        GenericArtifact artifact = null;
+        WebApp webApp = null;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
+            artifact = artifactManager.getGenericArtifact(uuid);
+            if (artifact == null) {
+                handleResourceNotFoundException("Webapp does not exist with app id :" + uuid);
+            }
+            webApp = AppManagerUtil.getAPI(artifact, registry);
+
+        } catch (GovernanceException e) {
+            handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
+        }
+        return webApp;
+    }
+
 
     private String createWebAppArtifact(WebApp webApp) throws AppManagementException {
         String artifactId = null;
@@ -1428,6 +1454,45 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 registry.delete(docContentPath);
             }
 
+        } catch (RegistryException e) {
+            handleException("Failed to delete documentation", e);
+        }
+    }
+
+    /**
+     *
+     * @param apiId   APIIdentifier
+     * @param docId UUID of the doc
+     * @throws AppManagementException if failed to remove documentation
+     */
+    public void removeDocumentation(APIIdentifier apiId, String docId)
+            throws AppManagementException {
+        String docPath ;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.DOCUMENTATION_KEY);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(docId);
+            docPath = artifact.getPath();
+            String docFilePath =  artifact.getAttribute(AppMConstants.DOC_FILE_PATH);
+
+            if(docFilePath!=null)
+            {
+                File tempFile = new File(docFilePath);
+                String fileName = tempFile.getName();
+                docFilePath = AppManagerUtil.getDocumentationFilePath(apiId,fileName);
+                if(registry.resourceExists(docFilePath))
+                {
+                    registry.delete(docFilePath);
+                }
+            }
+
+            Association[] associations = registry.getAssociations(docPath,
+                    AppMConstants.DOCUMENTATION_KEY);
+
+            for (Association association : associations) {
+                registry.delete(association.getDestinationPath());
+            }
         } catch (RegistryException e) {
             handleException("Failed to delete documentation", e);
         }

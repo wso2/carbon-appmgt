@@ -287,7 +287,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 OutputStream outputStream = null;
-                AppRepository appRepository = new DefaultAppRepository();
+                AppRepository appRepository = new DefaultAppRepository(null);
                 try {
                     FileContent fileContent = appRepository.getStaticContent(fileName);
                     staticContentFile = File.createTempFile("temp", ".tmp");
@@ -790,57 +790,68 @@ public class AppsApiServiceImpl extends AppsApiService {
             apiConsumer = RestApiUtil.getLoggedInUserConsumer();
             String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
             int tenantId = AppManagerUtil.getTenantId(userName);
-            //Check for subscriber existence
-            Subscriber subscriber = apiConsumer.getSubscriber(userName);
-            if (subscriber == null) {
-                subscriber = new Subscriber(userName);
-                subscriber.setSubscribedDate(new Date());
-                subscriber.setEmail("");
-                subscriber.setTenantId(tenantId);
-                apiConsumer.addSubscriber(subscriber);
-            }
 
-            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                isTenantFlowStarted = true;
-                PrivilegedCarbonContext.startTenantFlow();
-                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            }
-            WebApp webApp = apiConsumer.getWebApp(appId);
-            APIIdentifier appIdentifier = webApp.getId();
-            appIdentifier.setTier(AppMConstants.UNLIMITED_TIER);
+            AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                    getAPIManagerConfigurationService().getAPIManagerConfiguration();
+            Boolean isSelfSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                    AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+            Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                    AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+            if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+                //Check for subscriber existence
+                Subscriber subscriber = apiConsumer.getSubscriber(userName);
+                if (subscriber == null) {
+                    subscriber = new Subscriber(userName);
+                    subscriber.setSubscribedDate(new Date());
+                    subscriber.setEmail("");
+                    subscriber.setTenantId(tenantId);
+                    apiConsumer.addSubscriber(subscriber);
+                }
+
+                if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                    isTenantFlowStarted = true;
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                }
+                WebApp webApp = apiConsumer.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+                appIdentifier.setTier(AppMConstants.UNLIMITED_TIER);
 
             /* Tenant based validation for subscription*/
-            String userDomain = MultitenantUtils.getTenantDomain(userName);
-            boolean subscriptionAllowed = false;
-            if (!userDomain.equals(tenantDomain)) {
-                String subscriptionAvailability = webApp.getSubscriptionAvailability();
-                if (AppMConstants.SUBSCRIPTION_TO_ALL_TENANTS.equals(subscriptionAvailability)) {
-                    subscriptionAllowed = true;
-                } else if (AppMConstants.SUBSCRIPTION_TO_SPECIFIC_TENANTS.equals(subscriptionAvailability)) {
-                    String subscriptionAllowedTenants = webApp.getSubscriptionAvailableTenants();
-                    String allowedTenants[] = null;
-                    if (subscriptionAllowedTenants != null) {
-                        allowedTenants = subscriptionAllowedTenants.split(",");
-                        if (allowedTenants != null) {
-                            for (String tenant : allowedTenants) {
-                                if (tenant != null && userDomain.equals(tenant.trim())) {
-                                    subscriptionAllowed = true;
-                                    break;
+                String userDomain = MultitenantUtils.getTenantDomain(userName);
+                boolean subscriptionAllowed = false;
+                if (!userDomain.equals(tenantDomain)) {
+                    String subscriptionAvailability = webApp.getSubscriptionAvailability();
+                    if (AppMConstants.SUBSCRIPTION_TO_ALL_TENANTS.equals(subscriptionAvailability)) {
+                        subscriptionAllowed = true;
+                    } else if (AppMConstants.SUBSCRIPTION_TO_SPECIFIC_TENANTS.equals(subscriptionAvailability)) {
+                        String subscriptionAllowedTenants = webApp.getSubscriptionAvailableTenants();
+                        String allowedTenants[] = null;
+                        if (subscriptionAllowedTenants != null) {
+                            allowedTenants = subscriptionAllowedTenants.split(",");
+                            if (allowedTenants != null) {
+                                for (String tenant : allowedTenants) {
+                                    if (tenant != null && userDomain.equals(tenant.trim())) {
+                                        subscriptionAllowed = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
+                } else {
+                    subscriptionAllowed = true;
                 }
-            } else {
-                subscriptionAllowed = true;
-            }
 
-            if (!subscriptionAllowed) {
-                throw new AppManagementException("Subscription is not allowed for " + userDomain);
+                if (!subscriptionAllowed) {
+                    throw new AppManagementException("Subscription is not allowed for " + userDomain);
+                }
+                int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
+                //TODO: Handle enterprise subscription
+                String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
+            }else{
+                RestApiUtil.handleBadRequest("Subscription is disabled", log);
             }
-            int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
-            //TODO: Handle enterprise subscription
-            String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
         } catch (AppManagementException e) {
             RestApiUtil.handleBadRequest("Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
         } finally {

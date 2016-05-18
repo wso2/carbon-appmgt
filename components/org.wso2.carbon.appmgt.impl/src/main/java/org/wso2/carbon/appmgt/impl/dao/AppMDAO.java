@@ -339,7 +339,7 @@ public class AppMDAO {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT KEY, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
+        String queryToGetKeyValue = "SELECT `KEY`, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
