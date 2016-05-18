@@ -51,7 +51,7 @@ public final class RestApiConstants {
     public static final String TIER_LEVEL_PARAM = "{tierLevel}";
     public static final String SUBSCRIBER_PARAM = "{subscriber}";
     public static final String GROUPID_PARAM = "{groupId}";
-    public static final String APIID_PARAM = "{apiId}";
+    public static final String APPID_PARAM = "{appId}";
     public static final String APPLICATIONID_PARAM = "{applicationId}";
     public static final String DOCUMENTID_PARAM = "{documentId}";
     public static final String API_VERSION_PARAM = "{version}";
@@ -73,7 +73,7 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_TIERS_APPLICATION = RESOURCE_PATH_TIERS + "/application";
     public static final String RESOURCE_PATH_TIERS_RESOURCE = RESOURCE_PATH_TIERS + "/resource";
     public static final String RESOURCE_PATH_TAGS = "/tags";
-    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APIID_PARAM + "/documents";
+    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APPID_PARAM + "/documents";
     public static final String RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID = RESOURCE_PATH_DOCUMENTS + "/" + DOCUMENTID_PARAM;
     public static final String RESOURCE_PATH_DOCUMENT_CONTENT = RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID + "/content";
     public static final String REST_API_STORE_CONTEXT = "store_rest_api";
@@ -116,7 +116,7 @@ public final class RestApiConstants {
 
     public static final String SUBSCRIPTIONS_GET_PAGINATION_URL_APIID =
             RESOURCE_PATH_SUBSCRIPTIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&apiId="
-                    + APIID_PARAM + "&groupId=" + GROUPID_PARAM;
+                    + APPID_PARAM + "&groupId=" + GROUPID_PARAM;
 
     public static final String SUBSCRIPTIONS_GET_PAGINATION_URL_APPLICATIONID =
             RESOURCE_PATH_SUBSCRIPTIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&applicationId="

@@ -42,6 +42,7 @@ import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
+import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.DocumentationMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.validation.AppDTOValidator;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -58,6 +59,8 @@ import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -561,8 +564,67 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Add documentation to a given app
+     * @param appId application uuid
+     * @param appType application type
+     * @param body
+     * @param contentType
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdDocsPost(String appId, String appType, DocumentDTO body, String contentType) {
+
+        CommonValidator.isValidAppType(appType);
+        try {
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                Documentation documentation = DocumentationMappingUtil.fromDTOtoDocumentation(body);
+                String documentName = body.getName();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+                if (body.getType() == DocumentDTO.TypeEnum.OTHER && StringUtils.isBlank(body.getOtherTypeName())) {
+                    //check otherTypeName for not null if doc type is OTHER
+                    RestApiUtil.handleBadRequest("otherTypeName cannot be empty if type is OTHER.", log);
+                }
+                String sourceUrl = body.getSourceUrl();
+                if (body.getSourceType() == DocumentDTO.SourceTypeEnum.URL &&
+                        (StringUtils.isBlank(sourceUrl) || !RestApiUtil.isURL(sourceUrl))) {
+                    RestApiUtil.handleBadRequest("Invalid document sourceUrl Format", log);
+                }
+                //this will fail if user does not have access to the API or the API does not exist
+
+                WebApp webApp = appProvider.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+                if (appProvider.isDocumentationExist(appIdentifier, documentName)) {
+                    String errorMessage = "Requested document '" + documentName + "' already exists";
+                    RestApiUtil.handleConflictException(errorMessage, log);
+                }
+                appProvider.addDocumentation(appIdentifier, documentation);
+
+                //retrieve the newly added document
+                String newDocumentId = documentation.getId();
+                documentation = appProvider.getDocumentation(newDocumentId, tenantDomain);
+                DocumentDTO newDocumentDTO = DocumentationMappingUtil.fromDocumentationToDTO(documentation);
+                String uriString = RestApiConstants.RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID
+                        .replace(RestApiConstants.APPID_PARAM, appId)
+                        .replace(RestApiConstants.DOCUMENTID_PARAM, newDocumentId);
+                URI uri = new URI(uriString);
+                return Response.created(uri).entity(newDocumentDTO).build();
+            }else {
+                RestApiUtil.handleBadRequest("App type "+ appType + " not supported", log);
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while adding the document for "+appType+" with id : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (URISyntaxException e) {
+            String errorMessage = "Error while retrieving location for document " + body.getName() + " of App " + appId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
         return null;
     }
 
