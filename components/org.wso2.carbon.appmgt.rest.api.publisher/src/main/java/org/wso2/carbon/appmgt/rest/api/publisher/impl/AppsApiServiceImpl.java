@@ -47,6 +47,12 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
+import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
+import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
+import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
+import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
@@ -858,9 +864,177 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
                                                 String endTimeStamp, String accept, String ifNoneMatch) {
-        return null;
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String username = RestApiUtil.getLoggedInUsername();
+                String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+                String providerName = RestApiConstants.STATS_ALL_PROVIDERS;
+                int limit = 10;
+                switch (statType) {
+                    case "getAppsByEndPoint":
+                        statSummaryDTO = getAppsByEndPoint(appProvider, tenantDomainName);
+                        break;
+                    case "getSubscriberCountByAPIs":
+                        statSummaryDTO = getSubscriberCountByAPIs(appProvider, providerName, startTimeStamp,
+                                                                  endTimeStamp);
+                        break;
+                    case "getSubscribedAPIsByUsers":
+                        statSummaryDTO = getSubscribedAPIsByUsers(appProvider, startTimeStamp, endTimeStamp);
+                        break;
+                    case "getAPIUsageByUser":
+                        statSummaryDTO = getAPIUsageByUser(providerName, username, tenantDomainName, startTimeStamp,
+                                                           endTimeStamp);
+                        break;
+                    case "getAPIResponseTime":
+                        statSummaryDTO = getAPIResponseTime(providerName, username, tenantDomainName, startTimeStamp,
+                                                            endTimeStamp, limit);
+                        break;
+                    case "getAPIUsageByPage":
+                        statSummaryDTO = getAPIUsageByPage(providerName, username, tenantDomainName, startTimeStamp,
+                                                           endTimeStamp);
+                        break;
+                    case "getCacheHit":
+                        statSummaryDTO = getCacheHits(providerName, username, startTimeStamp, endTimeStamp);
+                        break;
+                    default:
+                        RestApiUtil.handleBadRequest("Unsupported statistics type '" + statType + "' provided", log);
+                }
+            } else {
+                RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+            }
+        } catch (AppManagementException e) {
+            String errorMessage = "Error occurred while retrieving statistics details for " + statType;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return Response.ok().entity(statSummaryDTO).build();
     }
 
+    private StatSummaryDTO getAppsByEndPoint(APIProvider appProvider, String tenantDomainName) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            List<WebApp> appList = appProvider.getAppsWithEndpoint(tenantDomainName);
+            List<Object> appObjectList = new ArrayList<>();
+            for (WebApp webApp : appList) {
+                appObjectList.add(webApp);
+            }
+            statSummaryDTO.setResult(appObjectList);
+        } catch (AppManagementException e) {
+            String errorMessage = "Error occurred while retrieving statistics of apps by end point.";
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getAPIUsageByUser(String providerName, String userName, String tenantDomainName, String
+            startTimeStamp, String endTimeStamp) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            APIUsageStatisticsClient statisticsClient = new APIUsageStatisticsClient(userName);
+            List<APIUsageByUserDTO> appUsageByUserList = statisticsClient.getAPIUsageByUser(providerName, startTimeStamp,
+                                                                                  endTimeStamp, tenantDomainName);
+            List<Object> appObjectList = new ArrayList<>();
+            for (APIUsageByUserDTO appUsageByUser : appUsageByUserList) {
+                appObjectList.add(appUsageByUser);
+            }
+            statSummaryDTO.setResult(appObjectList);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            String errorMessage = "Error occurred while retrieving statistics of app usage by users for the period " +
+                    startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getAPIUsageByPage(String providerName, String userName, String
+            tenantDomainName, String startTimeStamp, String endTimeStamp) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            List<APIPageUsageDTO> appUsageByPageList = client.getAPIUsageByPage(providerName, startTimeStamp,
+                                                                                endTimeStamp, tenantDomainName);
+            List<Object> appObjectList = new ArrayList<>();
+            for (APIPageUsageDTO appUsageByPage : appUsageByPageList) {
+                appObjectList.add(appUsageByPage);
+            }
+            statSummaryDTO.setResult(appObjectList);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            String errorMessage = "Error occurred while retrieving statistics of app usage by page for the period " +
+                    startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getAPIResponseTime(String providerName, String userName, String
+            tenantDomainName, String startTimeStamp, String endTimeStamp, int limit) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
+            List<APIResponseTimeDTO> appResponseTimeList = client.getResponseTimesByAPIs(providerName, startTimeStamp,
+                                                                    endTimeStamp, limit, tenantDomainName);
+            List<Object> appObjectList = new ArrayList<>();
+            for (APIResponseTimeDTO appResponseTime : appResponseTimeList) {
+                appObjectList.add(appResponseTime);
+            }
+            statSummaryDTO.setResult(appObjectList);
+        } catch (APIMgtUsageQueryServiceClientException e) {
+            String errorMessage = "Error occurred while retrieving statistics of app response time for the period "
+                    + startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getSubscriberCountByAPIs(APIProvider appProvider, String providerName, String
+            startTimeStamp, String endTimeStamp) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            Boolean isSubscriptionEnabled = RestApiUtil.isSubscriptionEnable();
+            Map<String, Long> subscriptions = appProvider.getSubscriptionCountByAPPs(providerName, startTimeStamp,
+                                                                                     endTimeStamp,
+                                                                                     isSubscriptionEnabled);
+        } catch (AppManagementException e) {
+            String errorMessage = "Error occurred while retrieving statistics of subscribers count by apps for the " +
+                    "period " + startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getSubscribedAPIsByUsers(APIProvider appProvider, String startTimeStamp,
+                                                    String endTimeStamp) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            Map<String, List> subscribedApps = appProvider.getSubscribedAPPsByUsers(startTimeStamp, endTimeStamp);
+        } catch (AppManagementException e) {
+            String errorMessage = "Error occurred while retrieving statistics of subscribed apps by users for the " +
+                    "period " + startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
+
+    private StatSummaryDTO getCacheHits(String providerName, String username, String startTimeStamp, String
+            endTimeStamp) {
+        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
+        try {
+            APIUsageStatisticsClient client = new APIUsageStatisticsClient(username);
+            List<APPMCacheCountDTO> cacheHitCountList = client.getCacheHitCount(providerName, startTimeStamp,
+                                                                                endTimeStamp);
+            List<Object> listObject = new ArrayList<>();
+            for (APPMCacheCountDTO cacheHitCount : cacheHitCountList) {
+                listObject.add(cacheHitCount);
+            }
+            statSummaryDTO.setResult(listObject);
+        } catch (Exception e) {
+            String errorMessage = "Error occurred while retrieving statistics of cache hits for the period " +
+                    startTimeStamp + "to " + endTimeStamp;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+        return statSummaryDTO;
+    }
 
     @Override
     public Response appsAppTypeTagsGet(String appType, String accept, String ifNoneMatch) {

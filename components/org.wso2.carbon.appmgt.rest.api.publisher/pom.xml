@@ -93,6 +93,11 @@
             <artifactId>org.wso2.carbon.appmgt.mobile</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.appmgt</groupId>
+            <artifactId>org.wso2.carbon.appmgt.usage.client</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.hibernate</groupId>
