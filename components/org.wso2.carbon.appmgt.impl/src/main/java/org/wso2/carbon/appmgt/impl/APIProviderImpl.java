@@ -1460,6 +1460,45 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     *
+     * @param apiId   APIIdentifier
+     * @param docId UUID of the doc
+     * @throws AppManagementException if failed to remove documentation
+     */
+    public void removeDocumentation(APIIdentifier apiId, String docId)
+            throws AppManagementException {
+        String docPath ;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.DOCUMENTATION_KEY);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(docId);
+            docPath = artifact.getPath();
+            String docFilePath =  artifact.getAttribute(AppMConstants.DOC_FILE_PATH);
+
+            if(docFilePath!=null)
+            {
+                File tempFile = new File(docFilePath);
+                String fileName = tempFile.getName();
+                docFilePath = AppManagerUtil.getDocumentationFilePath(apiId,fileName);
+                if(registry.resourceExists(docFilePath))
+                {
+                    registry.delete(docFilePath);
+                }
+            }
+
+            Association[] associations = registry.getAssociations(docPath,
+                    AppMConstants.DOCUMENTATION_KEY);
+
+            for (Association association : associations) {
+                registry.delete(association.getDestinationPath());
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to delete documentation", e);
+        }
+    }
+
+    /**
      * Adds Documentation to an WebApp
      *
      * @param apiId         APIIdentifier

@@ -681,14 +681,19 @@ public class AppsApiServiceImpl extends AppsApiService {
         Documentation documentation;
         DocumentDTO documentDTO = null;
         try {
-            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
-            documentation = apiProvider.getDocumentation(documentId, tenantDomain);
-            if (documentation == null) {
-                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
-            }
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                //TODO:Check App access prmissions
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+                documentation = appProvider.getDocumentation(documentId, tenantDomain);
+                if (documentation == null) {
+                    RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                }
 
-            documentDTO = DocumentationMappingUtil.fromDocumentationToDTO(documentation);
+                documentDTO = DocumentationMappingUtil.fromDocumentationToDTO(documentation);
+            }else {
+                RestApiUtil.handleBadRequest("App type "+ appType + " not supported", log);
+            }
         } catch (AppManagementException e) {
             //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
@@ -701,9 +706,41 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().entity(documentDTO).build();
     }
 
+    /**
+     * Delete a documentation for a given document id
+     * @param appType appType
+     * @param appId application id
+     * @param documentId document Id
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdDocsDocumentIdDelete(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
-        return null;
+        Documentation documentation;
+        try {
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+                String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+                WebApp webApp = appProvider.getWebApp(appId);
+                APIIdentifier appIdentifier = webApp.getId();
+                documentation = appProvider.getDocumentation(documentId, tenantDomain);
+                if (documentation == null) {
+                    RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                }
+                appProvider.removeDocumentation(appIdentifier, documentId);
+            }
+
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving API : " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().build();
     }
 
     @Override
