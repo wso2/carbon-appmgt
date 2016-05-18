@@ -1020,7 +1020,7 @@
                 "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://127.0.0.1:9763/apps/webapp/id/8328392-d88d-dwu9-333r-r3\"",
                 "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n   \"previous\": \"\",\n   \"list\":    [\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"INLINE\",\n         \"sourceUrl\": null,\n         \"otherTypeName\": null,\n         \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n         \"summary\": \"This is a sample documentation for v1.0.0\",\n         \"name\": \"PhoneVerification App Documentation\",\n         \"type\": \"HOWTO\"\n      },\n            {\n         \"visibility\": \"API_LEVEL\",\n         \"sourceType\": \"URL\",\n         \"sourceUrl\": \"http://wiki.cdyne.com/index.php/Phone_Verification\",\n         \"otherTypeName\": null,\n         \"documentId\": \"4145df31-04f1-440c-8d08-68952874622c\",\n         \"summary\": \"This is the URL for online documentation\",\n         \"name\": \"Online Documentation\",\n         \"type\": \"SAMPLES\"\n      }\n   ],\n   \"next\": \"\",\n   \"count\": 2\n}",
                 "summary": "Get App Documents",
-                "description": "Get a list of documents belonging to an API.\n",
+                "description": "Get a list of documents belonging to an APP.\n",
                 "parameters": [
                     {
                         "$ref": "#/parameters/appType"

@@ -559,8 +559,47 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     *  Returns all the documents of the given APP uuid that matches to the search condition
+     *
+     * @param appType application type ie:webapp,mobileapp
+     * @param appId application identifier
+     * @param limit
+     * @param offset
+     * @param accept
+     * @param ifNoneMatch
+     * @return matched documents as a list if DocumentDTOs
+     */
     @Override
     public Response appsAppTypeIdAppIdDocsGet(String appType, String appId, Integer limit, Integer offset, String accept, String ifNoneMatch) {
+        //pre-processing
+        //setting default limit and offset values if they are not set
+        limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
+        offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
+
+        try {
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            //this will fail if user does not have access to the API or the API does not exist
+
+            WebApp webApp = appProvider.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+
+            List<Documentation> allDocumentation = appProvider.getAllDocumentation(appIdentifier);
+            DocumentListDTO documentListDTO = DocumentationMappingUtil.fromDocumentationListToDTO(allDocumentation,
+                    offset, limit);
+            DocumentationMappingUtil
+                    .setPaginationParams(documentListDTO, appId, offset, limit, allDocumentation.size());
+            return Response.ok().entity(documentListDTO).build();
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String msg = "Error while retrieving documents of App "+appType +" with appId "+ appId;
+                RestApiUtil.handleInternalServerError(msg, e, log);
+            }
+        }
         return null;
     }
 
