@@ -743,8 +743,69 @@ public class AppsApiServiceImpl extends AppsApiService {
         return Response.ok().build();
     }
 
+    /**
+     * Document content upload
+     * @param appType application type
+     * @param appId application uuid
+     * @param documentId documentation id
+     * @param fileInputStream document content stream
+     * @param fileDetail document file details
+     * @param inlineContent
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
-    public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId, InputStream fileInputStream, Attachment fileDetail, String inlineContent, String ifMatch, String ifUnmodifiedSince) {
+    public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId,
+                                                                InputStream fileInputStream, Attachment fileDetail,
+                                                                String inlineContent, String ifMatch, String ifUnmodifiedSince) {
+        Documentation documentation;
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            WebApp webApp = appProvider.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            documentation = appProvider.getDocumentation(documentId, tenantDomain);
+            if (documentation == null) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                return null;
+            }
+
+            //gets the content depending on the type of the document
+            if (documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
+                String resource = documentation.getFilePath();
+                Map<String, Object> docResourceMap = AppManagerUtil.getDocument(username, resource, tenantDomain);
+                Object fileDataStream = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_DATA);
+                Object contentType = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE);
+                contentType = contentType == null ? RestApiConstants.APPLICATION_OCTET_STREAM : contentType;
+                String name = docResourceMap.get(AppMConstants.DOCUMENTATION_RESOURCE_MAP_NAME).toString();
+                return Response.ok(fileDataStream)
+                        .header(RestApiConstants.HEADER_CONTENT_TYPE, contentType)
+                        .header(RestApiConstants.HEADER_CONTENT_DISPOSITION, "attachment; filename=\"" + name + "\"")
+                        .build();
+            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
+                String content = appProvider.getDocumentationContent(appIdentifier, documentation.getName());
+                return Response.ok(content)
+                        .header(RestApiConstants.HEADER_CONTENT_TYPE, AppMConstants.DOCUMENTATION_INLINE_CONTENT_TYPE)
+                        .build();
+            } else if (documentation.getSourceType().equals(Documentation.DocumentSourceType.URL)) {
+                String sourceUrl = documentation.getSourceUrl();
+                return Response.seeOther(new URI(sourceUrl)).build();
+            }
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document " + documentId + " of the API " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (URISyntaxException e) {
+            String errorMessage = "Error while retrieving source URI location of " + documentId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
         return null;
     }
 
