@@ -886,7 +886,65 @@ public final class AppManagerUtil {
         return artifact;
     }
 
+    /**
+     * This method used to Downloaded Uploaded Documents from publisher
+     *
+     * @param userName     logged in username
+     * @param resourceUrl  resource want to download
+     * @param tenantDomain loggedUserTenantDomain
+     * @return map that contains Data of the resource
+     * @throws AppManagementException
+     */
+    public static Map<String, Object> getDocument(String userName, String resourceUrl, String tenantDomain)
+            throws AppManagementException {
+        Map<String, Object> documentMap = new HashMap<String, Object>();
 
+        InputStream inStream = null;
+        String[] resourceSplitPath =
+                resourceUrl.split(RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH);
+        if (resourceSplitPath.length == 2) {
+            resourceUrl = resourceSplitPath[1];
+        } else {
+           handleException("Invalid resource Path " + resourceUrl);
+        }
+        Resource apiDocResource;
+        Registry registryType = null;
+        boolean isTenantFlowStarted = false;
+        try {
+            int tenantId;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                PrivilegedCarbonContext.startTenantFlow();
+                isTenantFlowStarted = true;
+
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            } else {
+                tenantId = MultitenantConstants.SUPER_TENANT_ID;
+            }
+
+            userName = MultitenantUtils.getTenantAwareUsername(userName);
+            registryType = ServiceReferenceHolder
+                    .getInstance().
+                            getRegistryService().getGovernanceUserRegistry(userName, tenantId);
+            if (registryType.resourceExists(resourceUrl)) {
+                apiDocResource = registryType.get(resourceUrl);
+                inStream = apiDocResource.getContentStream();
+                documentMap.put("Data", inStream);
+                documentMap.put("contentType", apiDocResource.getMediaType());
+                String[] content = apiDocResource.getPath().split("/");
+                documentMap.put("name", content[content.length - 1]);
+            }
+        } catch (RegistryException e) {
+            String msg = "Couldn't retrieve registry for User " + userName + " Tenant " + tenantDomain;
+            log.error(msg, e);
+            handleException(msg, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return documentMap;
+    }
 
     /**
 	 * Create the Documentation from artifact
@@ -3667,4 +3725,16 @@ public final class AppManagerUtil {
         }
         return isAuthorized;
     }
+
+    public static void handleException(String msg, Throwable t) throws AppManagementException {
+        log.error(msg, t);
+        throw new AppManagementException(msg, t);
+    }
+
+    private static void handleException(String msg) throws AppManagementException {
+        log.error(msg);
+        throw new AppManagementException(msg);
+    }
+
+
 }

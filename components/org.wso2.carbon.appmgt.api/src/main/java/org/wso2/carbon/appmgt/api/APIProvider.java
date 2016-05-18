@@ -367,6 +367,16 @@ public interface APIProvider extends APIManager {
      * @param updateGatewayConfig Whether the changes should be pushed to the WebApp gateway or not
      * @throws AppManagementException on error
      */
+
+    /**
+     * Returns details of an WebApp
+     *
+     * @param uuid uuid of the A
+     * @return An WebApp object related to the given identifier or null
+     * @throws AppManagementException if failed get WebApp from APIIdentifier
+     */
+    public WebApp getWebApp(String uuid) throws AppManagementException;
+
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException;
 
@@ -398,6 +408,16 @@ public interface APIProvider extends APIManager {
     public void removeDocumentation(APIIdentifier apiId,
                                     String docType, String docName) throws AppManagementException;
 
+
+    /**
+     * Removes a given documentation
+     *
+     * @param appId   APIIdentifier
+     * @param documentId UUID of the doc
+     * @throws AppManagementException if failed to remove documentation
+     */
+    public void removeDocumentation(APIIdentifier appId, String documentId)throws AppManagementException;
+
     /**
      * Adds Documentation to an WebApp
      *
@@ -425,7 +445,7 @@ public interface APIProvider extends APIManager {
      * @param identifier,        WebApp identifier
      * @param documentationName, name of the inline documentation
      * @param text,              content of the inline documentation
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws AppManagementException
      *          if failed to add the document as a resource to registry
      */
     public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text)
