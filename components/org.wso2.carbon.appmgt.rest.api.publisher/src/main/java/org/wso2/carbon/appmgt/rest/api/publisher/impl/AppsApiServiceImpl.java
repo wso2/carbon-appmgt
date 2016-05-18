@@ -667,9 +667,38 @@ public class AppsApiServiceImpl extends AppsApiService {
         return null;
     }
 
+    /**
+     * Retrieve documentation for a given documentationId and for a given app id
+     * @param appType application type ie: webapp,mobileapp
+     * @param appId application uuid
+     * @param documentId  documentID
+     * @param ifMatch
+     * @param ifUnmodifiedSince
+     * @return
+     */
     @Override
     public Response appsAppTypeIdAppIdDocsDocumentIdGet(String appType, String appId, String documentId, String ifMatch, String ifUnmodifiedSince) {
-        return null;
+        Documentation documentation;
+        DocumentDTO documentDTO = null;
+        try {
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+            documentation = apiProvider.getDocumentation(documentId, tenantDomain);
+            if (documentation == null) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+            }
+
+            documentDTO = DocumentationMappingUtil.fromDocumentationToDTO(documentation);
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document : " + documentId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        }
+        return Response.ok().entity(documentDTO).build();
     }
 
     @Override
