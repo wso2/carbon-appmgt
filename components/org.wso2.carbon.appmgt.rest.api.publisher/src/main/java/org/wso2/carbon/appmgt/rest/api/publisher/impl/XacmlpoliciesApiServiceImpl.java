@@ -26,6 +26,7 @@ import org.wso2.carbon.appmgt.api.model.APIIdentifier;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.rest.api.publisher.XacmlpoliciesApiService;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialInfoDTO;
@@ -84,8 +85,12 @@ public class XacmlpoliciesApiServiceImpl extends XacmlpoliciesApiService {
     }
 
     @Override
-    public Response xacmlpoliciesPolicyPartialIdAppsGet(Integer policyPartialId, Integer limit, Integer offset,
-                                                        String accept, String ifNoneMatch) {
+    public Response xacmlpoliciesPolicyPartialIdAppsAppTypeGet(Integer policyPartialId, String appType, Integer limit,
+                                                               Integer offset, String accept, String ifNoneMatch) {
+        //Currently supports only webapps.
+        if (!AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+            RestApiUtil.handleBadRequest("Unsupported application type '" + appType + "' provided", log);
+        }
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
         offset = offset != null ? offset : RestApiConstants.PAGINATION_OFFSET_DEFAULT;
@@ -102,6 +107,7 @@ public class XacmlpoliciesApiServiceImpl extends XacmlpoliciesApiService {
             List<App> allMatchedApps = new ArrayList<>();
             for (APIIdentifier identifier : apiIdentifiers) {
                 WebApp webApp = apiProvider.getAPI(identifier);
+                webApp.setType(appType);
                 allMatchedApps.add(webApp);
             }
             //set App list
@@ -123,4 +129,6 @@ public class XacmlpoliciesApiServiceImpl extends XacmlpoliciesApiService {
         }
         return Response.ok().entity(appListDTO).build();
     }
+
+
 }

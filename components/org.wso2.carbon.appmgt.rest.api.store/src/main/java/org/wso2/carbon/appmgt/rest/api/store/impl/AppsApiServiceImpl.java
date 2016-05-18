@@ -287,7 +287,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 OutputStream outputStream = null;
-                AppRepository appRepository = new DefaultAppRepository();
+                AppRepository appRepository = new DefaultAppRepository(null);
                 try {
                     FileContent fileContent = appRepository.getStaticContent(fileName);
                     staticContentFile = File.createTempFile("temp", ".tmp");

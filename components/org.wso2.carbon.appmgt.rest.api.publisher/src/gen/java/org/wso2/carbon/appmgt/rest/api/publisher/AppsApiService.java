@@ -19,8 +19,6 @@ import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialListDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyPartialIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.dto.StatSummaryDTO;
 
 import java.util.List;
@@ -56,10 +54,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdTagsPut(String appType,String appId,TagListDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdTagsDelete(String appType,String appId,TagListDTO body,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdThrottlingtiersGet(String appType,String appId,String accept,String ifNoneMatch);
-    public abstract Response appsAppTypeIdAppIdXacmlpoliciesGet(String appType,String appId,String accept,String ifNoneMatch);
-    public abstract Response appsAppTypeIdAppIdXacmlpoliciesPost(String appType,String appId,PolicyPartialIdListDTO body,String contentType,String ifModifiedSince);
-    public abstract Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType,String appId,Integer policyPartialId,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsAppTypeStatsStatTypeGet(String appType,String statType,String startTimeStamp,String endTimeStamp,String accept,String ifNoneMatch);
+    public abstract Response appsAppTypeStatsStatTypeGet(String appType,String statType,String startTimeStamp,String endTimeStamp,Integer limit,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeTagsGet(String appType,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeValidateContextPost(String appType,String appContext,String contentType,String ifModifiedSince);
 }

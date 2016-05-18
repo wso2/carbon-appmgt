@@ -213,7 +213,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                         response.put("id", filename);
                     } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                         try {
-                            DefaultAppRepository defaultAppRepository = new DefaultAppRepository();
+                            DefaultAppRepository defaultAppRepository = new DefaultAppRepository(null);
                             UUID contentUUID = UUID.randomUUID();
                             fileContent.setUuid(contentUUID.toString());
                             fileContent.setContentLength(fileInputStream.available());
@@ -262,7 +262,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 contentType = RestApiUtil.readFileContentType(staticContentFile.getAbsolutePath());
             } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
                 OutputStream outputStream = null;
-                AppRepository appRepository = new DefaultAppRepository();
+                AppRepository appRepository = new DefaultAppRepository(null);
                 try {
                     FileContent fileContent = appRepository.getStaticContent(fileName);
                     if (fileContent == null) {
@@ -906,27 +906,8 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesGet(String appType, String appId, String accept,
-                                                       String ifNoneMatch) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesPost(String appType, String appId, PolicyPartialIdListDTO body,
-                                                        String contentType, String ifModifiedSince) {
-        return null;
-    }
-
-    @Override
-    public Response appsAppTypeIdAppIdXacmlpoliciesPolicyPartialIdDelete(String appType, String appId,
-                                                                         Integer policyPartialId, String ifMatch,
-                                                                         String ifUnmodifiedSince) {
-        return null;
-    }
-
-    @Override
     public Response appsAppTypeStatsStatTypeGet(String appType, String statType, String startTimeStamp,
-                                                String endTimeStamp, String accept, String ifNoneMatch) {
+                                                String endTimeStamp, Integer limit, String accept, String ifNoneMatch) {
         return null;
     }
 
