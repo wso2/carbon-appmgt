@@ -9,12 +9,14 @@ import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.dto.Environment;
+import org.wso2.carbon.appmgt.impl.dto.SubscriptionWorkflowDTO;
 import org.wso2.carbon.appmgt.impl.idp.sso.SSOConfiguratorUtil;
 import org.wso2.carbon.appmgt.impl.idp.sso.model.SSOEnvironment;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
+import org.wso2.carbon.appmgt.impl.workflow.*;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
@@ -25,11 +27,13 @@ import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 /**
  * The default implementation of DefaultAppRepository which uses RDBMS and Carbon registry for persistence.
@@ -45,6 +49,9 @@ public class DefaultAppRepository implements AppRepository {
 
     public DefaultAppRepository(Registry registry){
         this.registry = registry;
+    }
+
+    public DefaultAppRepository(){
     }
 
     @Override
@@ -126,6 +133,407 @@ public class DefaultAppRepository implements AppRepository {
 
     }
 
+    @Override
+    public int addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException {
+        Connection connection = null;
+        int subscriptionId = -1;
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(true);
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+            //Check for subscriber existence
+            Subscriber subscriber = getSubscriber(connection, subscriberName);
+            int applicationId = -1;
+            int subscriberId = -1;
+            if (subscriber == null) {
+                subscriber = new Subscriber(subscriberName);
+                subscriber.setSubscribedDate(new Date());
+                subscriber.setEmail("");
+                subscriber.setTenantId(tenantId);
+                subscriberId = addSubscriber(connection, subscriber);
+
+                subscriber.setId(subscriberId);
+                // Add default application
+                Application defaultApp = new Application(applicationName, subscriber);
+                defaultApp.setTier(AppMConstants.UNLIMITED_TIER);
+                applicationId = addApplication(connection, defaultApp, subscriber);
+            }else{
+                applicationId = getApplicationId(connection, AppMConstants.DEFAULT_APPLICATION_NAME, subscriber);
+            }
+            APIIdentifier appIdentifier = webApp.getId();
+
+            /* Tenant based validation for subscription*/
+            String userTenantDomain = MultitenantUtils.getTenantDomain(subscriberName);
+            String appProviderTenantDomain = MultitenantUtils.getTenantDomain(
+                    AppManagerUtil.replaceEmailDomainBack(appIdentifier.getProviderName()));
+            boolean subscriptionAllowed = false;
+            if (!userTenantDomain.equals(appProviderTenantDomain)) {
+                String subscriptionAvailability = webApp.getSubscriptionAvailability();
+                if (AppMConstants.SUBSCRIPTION_TO_ALL_TENANTS.equals(subscriptionAvailability)) {
+                    subscriptionAllowed = true;
+                } else if (AppMConstants.SUBSCRIPTION_TO_SPECIFIC_TENANTS.equals(subscriptionAvailability)) {
+                    String subscriptionAllowedTenants = webApp.getSubscriptionAvailableTenants();
+                    String allowedTenants[] = null;
+                    if (subscriptionAllowedTenants != null) {
+                        allowedTenants = subscriptionAllowedTenants.split(",");
+                        if (allowedTenants != null) {
+                            for (String tenant : allowedTenants) {
+                                if (tenant != null && userTenantDomain.equals(tenant.trim())) {
+                                    subscriptionAllowed = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                subscriptionAllowed = true;
+            }
+
+            if (!subscriptionAllowed) {
+                throw new AppManagementException("Subscription is not allowed for " + userTenantDomain);
+            }
+            subscriptionId =
+                    persistSubscription(connection, webApp, applicationId, Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL, null);
+        } catch (SQLException e) {
+            handleException("Error occurred in obtaining database connection.", e);
+        }
+        return subscriptionId;
+    }
+
+    private int persistSubscription(Connection connection, WebApp webApp, int applicationId, String subscriptionType,
+                                     String trustedIDPs)throws AppManagementException {
+
+        int subscriptionId = -1;
+        APIIdentifier appIdentifier = webApp.getId();
+        if (APIStatus.PUBLISHED.equals(webApp.getStatus())) {
+
+            Subscription subscription = getSubscription(connection, appIdentifier, applicationId, subscriptionType);
+            //If subscription already exists, then update
+            if (subscription != null) {
+                subscriptionId = subscription.getSubscriptionId();
+                if (Subscription.SUBSCRIPTION_TYPE_ENTERPRISE.equals(subscriptionType)) {
+                    updateSubscription(connection, subscriptionId, subscriptionType, trustedIDPs, subscription.getSubscriptionStatus());
+                } else if (Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL.equals(subscriptionType)) {
+                    updateSubscription(connection, subscriptionId, subscriptionType, trustedIDPs, AppMConstants.SubscriptionStatus.ON_HOLD);
+                }
+            }else{
+                subscriptionId = addSubscription(connection, appIdentifier, subscriptionType,
+                        applicationId, AppMConstants.SubscriptionStatus.ON_HOLD, trustedIDPs);
+            }
+        }
+        return subscriptionId;
+    }
+
+    private void executeWorkflow(WebApp webApp, int applicationId, String userId, int subscriptionId,String subscribedTier)throws WorkflowException{
+
+        try{
+
+            WorkflowExecutor addSubscriptionWFExecutor = WorkflowExecutorFactory.getInstance().
+                    getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+
+            SubscriptionWorkflowDTO workflowDTO = new SubscriptionWorkflowDTO();
+            workflowDTO.setStatus(WorkflowStatus.CREATED);
+            workflowDTO.setCreatedTime(System.currentTimeMillis());
+            workflowDTO.setTenantDomain("carbon.super");
+            workflowDTO.setTenantId(-1234);
+            workflowDTO.setExternalWorkflowReference(addSubscriptionWFExecutor.generateUUID());
+            workflowDTO.setWorkflowReference(String.valueOf(subscriptionId));
+            workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+            workflowDTO.setCallbackUrl(addSubscriptionWFExecutor.getCallbackURL());
+            workflowDTO.setApiName(webApp.getId().getApiName());
+            workflowDTO.setApiContext(webApp.getContext());
+            workflowDTO.setApiVersion(webApp.getId().getVersion());
+            workflowDTO.setApiProvider(webApp.getId().getProviderName());
+            workflowDTO.setTierName(subscribedTier);
+            workflowDTO.setApplicationName(AppMConstants.DEFAULT_APPLICATION_NAME);
+            workflowDTO.setSubscriber(userId);
+
+            addSubscriptionWFExecutor.execute(workflowDTO);
+
+        }catch (Exception e){
+            throw new WorkflowException("Cannot execute workflow. ", e);
+        }
+    }
+
+    private int addSubscription(Connection connection, APIIdentifier appIdentifier, String subscriptionType, int applicationId,
+                               String status, String trustedIdps) throws AppManagementException {
+
+        ResultSet appIdResultSet = null;
+        ResultSet subscriptionIdResultSet = null;
+        PreparedStatement preparedStmtToGetApp = null;
+        PreparedStatement preparedStmtToInsertSubscription = null;
+
+        int subscriptionId = -1;
+        int apiId = -1;
+
+        try {
+            String getAppIdQuery = "SELECT APP_ID FROM APM_APP API WHERE APP_PROVIDER = ? AND APP_NAME = ? AND APP_VERSION = ?";
+            preparedStmtToGetApp = connection.prepareStatement(getAppIdQuery);
+            preparedStmtToGetApp.setString(1, AppManagerUtil.replaceEmailDomainBack(appIdentifier.getProviderName()));
+            preparedStmtToGetApp.setString(2, appIdentifier.getApiName());
+            preparedStmtToGetApp.setString(3, appIdentifier.getVersion());
+            appIdResultSet = preparedStmtToGetApp.executeQuery();
+            if (appIdResultSet.next()) {
+                apiId = appIdResultSet.getInt("APP_ID");
+            }
+            preparedStmtToGetApp.close();
+
+            if (apiId == -1) {
+                String msg = "Unable to retrieve the WebApp ID for webapp with name '" + appIdentifier.getApiName() +
+                        "' version '"+appIdentifier.getVersion()+ "'";
+                log.error(msg);
+                throw new AppManagementException(msg);
+            }
+
+            // This query to update the APM_SUBSCRIPTION table
+            String sqlQuery =
+                    "INSERT INTO APM_SUBSCRIPTION (TIER_ID,SUBSCRIPTION_TYPE, APP_ID, " +
+                            "APPLICATION_ID,SUB_STATUS, TRUSTED_IDP, SUBSCRIPTION_TIME) "
+                            + "VALUES (?,?,?,?,?,?,?)";
+
+            // Adding data to the APM_SUBSCRIPTION table
+            preparedStmtToInsertSubscription =
+                    connection.prepareStatement(sqlQuery, new String[] {AppMConstants.SUBSCRIPTION_FIELD_SUBSCRIPTION_ID});
+            if (connection.getMetaData().getDriverName().contains("PostgreSQL")) {
+                preparedStmtToInsertSubscription = connection.prepareStatement(sqlQuery, new String[] { "subscription_id" });
+            }
+
+            byte count = 0;
+            preparedStmtToInsertSubscription.setString(++count, appIdentifier.getTier());
+            preparedStmtToInsertSubscription.setString(++count, subscriptionType);
+            preparedStmtToInsertSubscription.setInt(++count, apiId);
+            preparedStmtToInsertSubscription.setInt(++count, applicationId);
+            preparedStmtToInsertSubscription.setString(++count, status != null ? status : AppMConstants.SubscriptionStatus.UNBLOCKED);
+            preparedStmtToInsertSubscription.setString(++count, trustedIdps);
+            preparedStmtToInsertSubscription.setTimestamp(++count, new Timestamp(new java.util.Date().getTime()));
+
+            preparedStmtToInsertSubscription.executeUpdate();
+            subscriptionIdResultSet = preparedStmtToInsertSubscription.getGeneratedKeys();
+            while (subscriptionIdResultSet.next()) {
+                subscriptionId = Integer.valueOf(subscriptionIdResultSet.getString(1)).intValue();
+            }
+
+            // finally commit transaction
+            connection.commit();
+
+        } catch (SQLException e) {
+            handleException("Failed to add subscriber data ", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToGetApp, null, appIdResultSet);
+            APIMgtDBUtil.closeAllConnections(preparedStmtToInsertSubscription, null, subscriptionIdResultSet);
+        }
+        return subscriptionId;
+    }
+
+    private void updateSubscription(Connection connection, int subscriptionId, String subscriptionType,
+                                    String trustedIDPs, String subscriptionStatus) throws AppManagementException {
+
+        PreparedStatement preparedStmtToUpdateSubscription = null;
+        ResultSet resultSet = null;
+
+        try{
+            String queryToUpdateSubscription =
+                    "UPDATE APM_SUBSCRIPTION " +
+                            "SET SUBSCRIPTION_TYPE = ?, TRUSTED_IDP = ? , SUB_STATUS = ?" +
+                            "WHERE SUBSCRIPTION_ID = ?";
+
+            preparedStmtToUpdateSubscription = connection.prepareStatement(queryToUpdateSubscription);
+            preparedStmtToUpdateSubscription.setString(1, subscriptionType);
+            preparedStmtToUpdateSubscription.setString(2, trustedIDPs);
+            preparedStmtToUpdateSubscription.setString(3, subscriptionStatus);
+            preparedStmtToUpdateSubscription.setInt(4, subscriptionId);
+
+            preparedStmtToUpdateSubscription.executeUpdate();
+            connection.commit();
+        }catch (SQLException e){
+            handleException(String.format("Failed updating subscription with Id : %d", subscriptionId), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToUpdateSubscription, connection, resultSet);
+        }
+    }
+
+    private Subscription getSubscription(Connection connection, APIIdentifier appIdentifier, int applicationId,
+                                         String subscriptionTyp) throws AppManagementException {
+        PreparedStatement preparedStatement = null;
+        ResultSet subscriptionsResultSet = null;
+        Subscription subscription = null;
+
+        try{
+            String queryToGetSubscriptionId =
+                    "SELECT SUBSCRIPTION_ID, SUB.APP_ID, APPLICATION_ID, SUBSCRIPTION_TYPE, SUB_STATUS, TRUSTED_IDP " +
+                    "FROM APM_SUBSCRIPTION SUB, APM_APP APP " +
+                    "WHERE SUB.APP_ID = APP.APP_ID AND APP.APP_PROVIDER = ? AND APP.APP_NAME = ? " +
+                    "AND APP.APP_VERSION = ? AND SUB.APPLICATION_ID = ? AND SUB.SUBSCRIPTION_TYPE = ?";
+
+            preparedStatement = connection.prepareStatement(queryToGetSubscriptionId);
+            preparedStatement.setString(1, AppManagerUtil.replaceEmailDomainBack(appIdentifier.getProviderName()));
+            preparedStatement.setString(2, appIdentifier.getApiName());
+            preparedStatement.setString(3, appIdentifier.getVersion());
+            preparedStatement.setInt(4, applicationId);
+            preparedStatement.setString(5, subscriptionTyp);
+            subscriptionsResultSet = preparedStatement.executeQuery();
+
+            if (subscriptionsResultSet.next()) {
+                subscription = new Subscription();
+                subscription.setSubscriptionId(subscriptionsResultSet.getInt(AppMConstants.SUBSCRIPTION_FIELD_SUBSCRIPTION_ID));
+                subscription.setWebAppId(subscriptionsResultSet.getInt(AppMConstants.SUBSCRIPTION_FIELD_APP_ID));
+                subscription.setApplicationId(subscriptionsResultSet.getInt(AppMConstants.APPLICATION_ID));
+                subscription.setSubscriptionType(subscriptionsResultSet.getString(AppMConstants.SUBSCRIPTION_FIELD_TYPE));
+                subscription.setSubscriptionStatus(subscriptionsResultSet.getString(AppMConstants.SUBSCRIPTION_FIELD_SUB_STATUS));
+
+                String trustedIdpsJson = subscriptionsResultSet.getString(AppMConstants.SUBSCRIPTION_FIELD_TRUSTED_IDP);
+                Object decodedJson = null;
+                if (trustedIdpsJson != null) {
+                    decodedJson = JSONValue.parse(trustedIdpsJson);
+                }
+                if(decodedJson != null){
+                    for(Object item : (JSONArray)decodedJson){
+                        subscription.addTrustedIdp(item.toString());
+                    }
+                }
+            }
+        }catch (SQLException e){
+            handleException(String.format("Failed to get subscription for app identifier : %d and application id : %s",
+                    appIdentifier.toString(), appIdentifier), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, subscriptionsResultSet);
+        }
+        return subscription;
+    }
+
+    private int getApplicationId(Connection connection, String applicationName, Subscriber subscriber) throws AppManagementException {
+
+        PreparedStatement preparedStmtToGetApplicationId = null;
+        ResultSet applicationIdResultSet = null;
+        int applicationId = 0;
+
+        String sqlQuery = "SELECT APPLICATION_ID FROM APM_APPLICATION WHERE SUBSCRIBER_ID= ? AND  NAME= ?";
+
+        try {
+            preparedStmtToGetApplicationId = connection.prepareStatement(sqlQuery);
+            preparedStmtToGetApplicationId.setInt(1, subscriber.getId());
+            preparedStmtToGetApplicationId.setString(2, applicationName);
+            applicationIdResultSet = preparedStmtToGetApplicationId.executeQuery();
+
+            while (applicationIdResultSet.next()) {
+                applicationId = applicationIdResultSet.getInt("APPLICATION_ID");
+            }
+
+        } catch (SQLException e) {
+            handleException("Error occurred while retrieving application '" + applicationName + "' for subscriber '" +
+                    subscriber.getName() + "'", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToGetApplicationId, null, applicationIdResultSet);
+        }
+        return applicationId;
+    }
+
+    private Subscriber getSubscriber(Connection connection, String subscriberName) throws AppManagementException {
+        Subscriber subscriber = null;
+        PreparedStatement preparedStmtToGetSubscriber = null;
+        ResultSet subscribersResultSet = null;
+
+        int tenantId = AppManagerUtil.getTenantId(subscriberName);
+
+
+        String sqlQuery =
+                "SELECT SUBSCRIBER_ID, USER_ID, TENANT_ID, EMAIL_ADDRESS, DATE_SUBSCRIBED FROM " +
+                        "APM_SUBSCRIBER WHERE USER_ID = ? AND TENANT_ID = ?";
+        try {
+
+            preparedStmtToGetSubscriber = connection.prepareStatement(sqlQuery);
+            preparedStmtToGetSubscriber.setString(1, subscriberName);
+            preparedStmtToGetSubscriber.setInt(2, tenantId);
+            subscribersResultSet = preparedStmtToGetSubscriber.executeQuery();
+
+            if (subscribersResultSet.next()) {
+                subscriber =
+                        new Subscriber(
+                                subscribersResultSet.getString(AppMConstants.SUBSCRIBER_FIELD_EMAIL_ADDRESS));
+                subscriber.setEmail(subscribersResultSet.getString(AppMConstants.SUBSCRIBER_FIELD_EMAIL_ADDRESS));
+                subscriber.setId(subscribersResultSet.getInt(AppMConstants.SUBSCRIBER_FIELD_SUBSCRIBER_ID));
+                subscriber.setName(subscriberName);
+                subscriber.setSubscribedDate(subscribersResultSet.getDate(AppMConstants.SUBSCRIBER_FIELD_DATE_SUBSCRIBED));
+                subscriber.setTenantId(subscribersResultSet.getInt(AppMConstants.SUBSCRIBER_FIELD_TENANT_ID));
+            }
+
+        } catch (SQLException e) {
+            handleException("Failed to get Subscriber for :" + subscriberName, e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToGetSubscriber, null, subscribersResultSet);
+        }
+        return subscriber;
+    }
+
+    private int addSubscriber(Connection connection, Subscriber subscriber) throws AppManagementException {
+        ResultSet subscriberIdResultSet = null;
+        PreparedStatement preparedStmtToAddSubscriber = null;
+        int subscriberId = -1;
+        try {
+            String query = "INSERT INTO APM_SUBSCRIBER (USER_ID, TENANT_ID, EMAIL_ADDRESS, " +
+                    "DATE_SUBSCRIBED) VALUES (?,?,?,?)";
+
+            preparedStmtToAddSubscriber =
+                    connection.prepareStatement(query, new String[]{AppMConstants.SUBSCRIBER_FIELD_SUBSCRIBER_ID});
+            preparedStmtToAddSubscriber.setString(1, subscriber.getName());
+            preparedStmtToAddSubscriber.setInt(2, subscriber.getTenantId());
+            preparedStmtToAddSubscriber.setString(3, subscriber.getEmail());
+            preparedStmtToAddSubscriber.setTimestamp(4, new Timestamp(subscriber.getSubscribedDate().getTime()));
+            preparedStmtToAddSubscriber.executeUpdate();
+
+            subscriberIdResultSet = preparedStmtToAddSubscriber.getGeneratedKeys();
+            if (subscriberIdResultSet.next()) {
+                subscriberId = Integer.valueOf(subscriberIdResultSet.getString(1)).intValue();
+            }
+            connection.commit();
+        } catch (SQLException e) {
+            handleException("Error occurred while adding subscriber with name '" + subscriber.getName(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToAddSubscriber, null, subscriberIdResultSet);
+        }
+        return subscriberId;
+    }
+
+    private int addApplication(Connection connection, Application application, Subscriber subscriber) throws AppManagementException {
+
+        PreparedStatement preparedStmtToAddApplication = null;
+        ResultSet applicationIdResultSet = null;
+        int applicationId = -1;
+        try {
+            // This query to update the APM_APPLICATION table
+            String sqlQuery =
+                    "INSERT INTO APM_APPLICATION " +
+                            "(NAME, SUBSCRIBER_ID, APPLICATION_TIER, CALLBACK_URL, DESCRIPTION, APPLICATION_STATUS) " +
+                            "VALUES (?,?,?,?,?,?)";
+
+            preparedStmtToAddApplication = connection.prepareStatement(sqlQuery, new String[]{AppMConstants.APPLICATION_ID});
+            if (connection.getMetaData().getDriverName().contains("PostgreSQL")) {
+                preparedStmtToAddApplication = connection.prepareStatement(sqlQuery, new String[]{"application_id"});
+            }
+            preparedStmtToAddApplication.setString(1, application.getName());
+            preparedStmtToAddApplication.setInt(2, subscriber.getId());
+            preparedStmtToAddApplication.setString(3, application.getTier());
+            preparedStmtToAddApplication.setString(4, application.getCallbackUrl());
+            preparedStmtToAddApplication.setString(5, application.getDescription());
+
+            if (application.getName().equals(AppMConstants.DEFAULT_APPLICATION_NAME)) {
+                preparedStmtToAddApplication.setString(6, AppMConstants.ApplicationStatus.APPLICATION_APPROVED);
+            } else {
+                preparedStmtToAddApplication.setString(6, AppMConstants.ApplicationStatus.APPLICATION_CREATED);
+            }
+            preparedStmtToAddApplication.executeUpdate();
+            applicationIdResultSet = preparedStmtToAddApplication.getGeneratedKeys();
+            while (applicationIdResultSet.next()) {
+                applicationId = Integer.parseInt(applicationIdResultSet.getString(1));
+            }
+        } catch (SQLException e) {
+            handleException("Error occurred while adding application '" + application.getName() + "' for subscriber '" +
+                    subscriber.getName() + "'", e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStmtToAddApplication, null, applicationIdResultSet);
+        }
+        return applicationId;
+    }
 
     private String persistWebApp(WebApp webApp) throws AppManagementException {
 

@@ -489,4 +489,7 @@ public interface APIConsumer extends APIManager {
      * @return Tagged Apps
      */
     public Map<String, Set<WebApp>> getTaggedAPIs();
+
+    public void addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException;
+
 }

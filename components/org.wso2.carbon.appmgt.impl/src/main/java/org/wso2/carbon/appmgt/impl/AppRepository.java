@@ -3,6 +3,7 @@ package org.wso2.carbon.appmgt.impl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 
 import java.io.InputStream;
 
@@ -36,5 +37,6 @@ public interface AppRepository {
      */
     public FileContent getStaticContent(String contentId) throws AppManagementException;
 
+    public int addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException;
 
 }
