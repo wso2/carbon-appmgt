@@ -1087,36 +1087,41 @@ public class AppsApiServiceImpl extends AppsApiService {
                 String username = RestApiUtil.getLoggedInUsername();
                 String tenantDomainName = MultitenantUtils.getTenantDomain(username);
                 String providerName = RestApiConstants.STATS_ALL_PROVIDERS;
-                if (!statType.equals("getEndPointsPerApp")) {
-                    if (StringUtils.isEmpty(startTimeStamp) || StringUtils.isEmpty(endTimeStamp)) {
-                        String errorMessage = "Start timestamp and end timestamp cannot be null or empty";
-                        RestApiUtil.buildBadRequestException(errorMessage);
-                    }
-                }
+
                 switch (statType) {
-                    case "getEndPointsPerApp":
+                    case "getAppEndpoints":
                         statSummaryDTO = getEndPointsPerApp(appProvider, tenantDomainName);
                         break;
                     case "getSubscriptionCountsPerApp":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
                         statSummaryDTO = getSubscriptionCountsPerApp(appProvider, providerName, startTimeStamp,
                                                                      endTimeStamp);
                         break;
                     case "getSubscriptionsPerApp":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
                         statSummaryDTO = getSubscriptionsPerApp(appProvider, startTimeStamp, endTimeStamp);
                         break;
                     case "getAppUsagePerUser":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
                         statSummaryDTO = getAppUsagePerUser(providerName, username, tenantDomainName, startTimeStamp,
                                                             endTimeStamp);
                         break;
-                    case "getAppResponseTimes":
-                        statSummaryDTO = getAppResponseTimes(providerName, username, tenantDomainName, startTimeStamp,
-                                                             endTimeStamp, limit);
+                    case "getAppResponseTime":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
+                        if (limit == null || StringUtils.isEmpty(limit.toString())) {
+                            String errorMessage = "Limit cannot be null or empty";
+                            RestApiUtil.handleBadRequest(errorMessage, log);
+                        }
+                        statSummaryDTO = getAppResponseTime(providerName, username, tenantDomainName, startTimeStamp,
+                                                            endTimeStamp, limit);
                         break;
                     case "getAppUsagePerPage":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
                         statSummaryDTO = getAppUsagePerPage(providerName, username, tenantDomainName, startTimeStamp,
                                                             endTimeStamp);
                         break;
                     case "getCacheHit":
+                        validateTimeStamp(startTimeStamp, endTimeStamp);
                         statSummaryDTO = getCacheHits(providerName, username, startTimeStamp, endTimeStamp);
                         break;
                     default:
@@ -1131,6 +1136,22 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(statSummaryDTO).build();
+    }
+
+    private void validateTimeStamp(String startTimeStamp, String endTimeStamp) {
+        if (StringUtils.isEmpty(startTimeStamp) || StringUtils.isEmpty(endTimeStamp)) {
+            String errorMessage = "Start timestamp and end timestamp cannot be null or empty";
+            RestApiUtil.handleBadRequest(errorMessage, log);
+        } else {
+            // Regex to validate YYYY-MM-DD hh:mm:ss format."
+            String timeStampFormat = "([0-9]{1,4})-(0?[1-9]|1[012])-(0?[1-9]|[1-2][0-9]|3[01]) " +
+                    "(0?[0-9]|1[0-9]|2[0-3]):(0?[0-9]|[1-5][0-9]):(0?[0-9]|[1-5][0-9])";
+            if(!startTimeStamp.matches(timeStampFormat) || !endTimeStamp.matches(timeStampFormat)) {
+                String errorMessage = "Start timestamp and end timestamp should be in YYYY-MM-DD HH:MM:SS" +
+                        " format";
+                RestApiUtil.handleBadRequest(errorMessage, log);
+            }
+        }
     }
 
     private StatSummaryDTO getEndPointsPerApp(APIProvider appProvider, String tenantDomainName) {
@@ -1189,7 +1210,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         return statSummaryDTO;
     }
 
-    private StatSummaryDTO getAppResponseTimes(String providerName, String userName, String
+    private StatSummaryDTO getAppResponseTime(String providerName, String userName, String
             tenantDomainName, String startTimeStamp, String endTimeStamp, int limit) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
