@@ -3221,15 +3221,6 @@
                 "otherTypeName": {
                     "type": "string",
                     "example": ""
-                },
-                "visibility": {
-                    "type": "string",
-                    "enum": [
-                        "OWNER_ONLY",
-                        "PRIVATE",
-                        "API_LEVEL"
-                    ],
-                    "example": "API_LEVEL"
                 }
             }
         },
