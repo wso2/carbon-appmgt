@@ -30,7 +30,7 @@ import org.wso2.carbon.appmgt.usage.publisher.DataPublisherUtil;
 import org.wso2.carbon.appmgt.usage.publisher.service.APIMGTConfigReaderService;
 import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.tomcat.api.CarbonTomcatService;
 import org.wso2.carbon.user.core.service.RealmService;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -91,9 +91,9 @@ public class UsageComponent {
     /**
      * Fetch the data publisher which has been registered under the tenant domain.
      * @param tenantDomain - The tenant domain under which the data publisher is registered
-     * @return - Instance of the LoadBalancingDataPublisher which was registered. Null if not registered.
+     * @return - Instance of the DataPublisher which was registered. Null if not registered.
      */
-    public static LoadBalancingDataPublisher getDataPublisher(String tenantDomain){
+    public static DataPublisher getDataPublisher(String tenantDomain){
         if(APPManagerConfigurationServiceComponent.getDataPublisherMap().containsKey(tenantDomain)){
             return APPManagerConfigurationServiceComponent.getDataPublisherMap().get(tenantDomain);
         }
@@ -101,13 +101,13 @@ public class UsageComponent {
     }
 
     /**
-     * Adds a LoadBalancingDataPublisher to the data publisher map.
+     * Adds a DataPublisher to the data publisher map.
      * @param tenantDomain - The tenant domain under which the data publisher will be registered.
-     * @param dataPublisher - Instance of the LoadBalancingDataPublisher
+     * @param dataPublisher - Instance of the DataPublisher
      * @throws DataPublisherAlreadyExistsException - If a data publisher has already been registered under the
      * tenant domain
      */
-    public static void addDataPublisher(String tenantDomain, LoadBalancingDataPublisher dataPublisher)
+    public static void addDataPublisher(String tenantDomain, DataPublisher dataPublisher)
             throws DataPublisherAlreadyExistsException {
         if(APPManagerConfigurationServiceComponent.getDataPublisherMap().containsKey(tenantDomain)){
             throw new DataPublisherAlreadyExistsException("A DataPublisher has already been created for the tenant " +

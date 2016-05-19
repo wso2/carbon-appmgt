@@ -17,17 +17,8 @@
 */
 package org.wso2.carbon.appmgt.usage.publisher.dto;
 
-import org.wso2.carbon.appmgt.usage.publisher.APIMgtUsagePublisherConstants;
 import org.wso2.carbon.appmgt.usage.publisher.DataPublisherUtil;
 import org.wso2.carbon.appmgt.usage.publisher.internal.APPManagerConfigurationServiceComponent;
-import org.wso2.carbon.appmgt.usage.publisher.service.APIMGTConfigReaderService;
-import org.wso2.carbon.databridge.agent.thrift.DataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
-import org.wso2.carbon.databridge.commons.exception.DifferentStreamDefinitionAlreadyDefinedException;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-import org.wso2.carbon.databridge.commons.exception.NoStreamDefinitionExistException;
-import org.wso2.carbon.databridge.commons.exception.StreamDefinitionException;
 
 public class DataBridgeRequestPublisherDTO extends RequestPublisherDTO {
 

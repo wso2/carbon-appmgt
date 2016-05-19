@@ -20,7 +20,19 @@ package org.wso2.carbon.appmgt.usage.publisher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.appmgt.usage.publisher.internal.APPManagerConfigurationServiceComponent;
+import org.wso2.carbon.appmgt.usage.publisher.internal.DataPublisherAlreadyExistsException;
+import org.wso2.carbon.appmgt.usage.publisher.internal.UsageComponent;
+import org.wso2.carbon.appmgt.usage.publisher.service.APIMGTConfigReaderService;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.databridge.agent.DataPublisher;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.exception.TransportException;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -29,8 +41,7 @@ import java.util.Enumeration;
 
 public class DataPublisherUtil {
 
-    private static final Log log = LogFactory
-            .getLog(DataPublisherUtil.class);
+    private static final Log log = LogFactory.getLog(DataPublisherUtil.class);
 
     private static String hostAddress = null;
     public static final String HOST_NAME = "HostName";
@@ -86,5 +97,38 @@ public class DataPublisherUtil {
 
     public static void setEnabledMetering(boolean enabledMetering) {
         isEnabledMetering = enabledMetering;
+    }
+
+    static DataPublisher getDataPublisher() {
+        String tenantDomain = CarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+        //Get DataPublisher which has been registered for the tenant.
+        DataPublisher dataPublisher = UsageComponent.getDataPublisher(tenantDomain);
+
+        APIMGTConfigReaderService apimgtConfigReaderService = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService();
+
+        //If a DataPublisher had not been registered for the tenant.
+        if (dataPublisher == null && apimgtConfigReaderService.getBamServerURL() != null) {
+            String serverUser = apimgtConfigReaderService.getBamServerUser();
+            String serverPassword = apimgtConfigReaderService.getBamServerPassword();
+            String serverURL = apimgtConfigReaderService.getBamServerURL();
+
+            try {
+                //Create new DataPublisher for the tenant.
+                dataPublisher = new DataPublisher(null, serverURL, null, serverUser, serverPassword);
+
+                //Add created DataPublisher.
+                UsageComponent.addDataPublisher(tenantDomain, dataPublisher);
+            } catch (DataPublisherAlreadyExistsException e) {
+                log.warn("Attempting to register a data publisher for the tenant " + tenantDomain +
+                        " when one already exists. Returning existing data publisher");
+                return UsageComponent.getDataPublisher(tenantDomain);
+            } catch (DataEndpointConfigurationException | DataEndpointException | DataEndpointAuthenticationException |
+                    DataEndpointAgentConfigurationException | TransportException e) {
+                log.error("Error while creating data publisher", e);
+            }
+        }
+
+        return dataPublisher;
     }
 }

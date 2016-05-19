@@ -42,12 +42,12 @@
             <artifactId>org.wso2.carbon.appmgt.gateway</artifactId>     
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.commons</groupId>
-            <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
+            <groupId>org.wso2.carbon.multitenancy</groupId>
+            <artifactId>org.wso2.carbon.tenant.usage.agent</artifactId>
         </dependency>
-	    <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.usage.agent</artifactId>
+        <dependency>
+            <groupId>org.wso2.carbon.analytics-common</groupId>
+            <artifactId>org.wso2.carbon.databridge.agent</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
@@ -73,6 +73,7 @@
                             org.wso2.carbon.appmgt.usage.publisher.*
                         </Export-Package>
                         <Import-Package>
+                            org.wso2.carbon.databridge.commons.exception;version="${carbon.databridge.agent.imp.pkg.version}",
                             javax.servlet;version="${javax.servlet.imp.pkg.version}",
                             javax.servlet.http;version="${javax.servlet.imp.pkg.version}",
                             javax.servlet.resources;version="${javax.servlet.imp.pkg.version}",
