@@ -4,6 +4,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
+import org.wso2.carbon.appmgt.api.APIProvider;
+import org.wso2.carbon.appmgt.api.AppManagementException;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.store.AdministrationApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AdminInstallDTO;
@@ -30,8 +34,10 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class AdministrationApiServiceImpl extends AdministrationApiService {
     private static final Log log = LogFactory.getLog(AdministrationApiServiceImpl.class);
@@ -61,6 +67,16 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
         try {
             String appId = install.getAppId();
+            //check app validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             String username = RestApiUtil.getLoggedInUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
@@ -138,6 +154,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
         } catch (RegistryException e) {
             log.error("Error while initializing Registry.");
             RestApiUtil.buildInternalServerErrorException();
+        } catch (AppManagementException e) {
+            log.error("Error while Downloading the App.");
+            RestApiUtil.buildInternalServerErrorException();
         }
 
         return null;
@@ -166,6 +185,16 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
 
         try {
             String appId = install.getAppId();
+            //check app validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             String username = RestApiUtil.getLoggedInUsername();
             String tenantDomainName = MultitenantUtils.getTenantDomain(username);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
@@ -241,6 +270,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             RestApiUtil.buildInternalServerErrorException();
         } catch (RegistryException e) {
             log.error("Error while initializing Registry.");
+            RestApiUtil.buildInternalServerErrorException();
+        } catch (AppManagementException e) {
+            log.error("Error while Uninstalling the App.");
             RestApiUtil.buildInternalServerErrorException();
         }
 

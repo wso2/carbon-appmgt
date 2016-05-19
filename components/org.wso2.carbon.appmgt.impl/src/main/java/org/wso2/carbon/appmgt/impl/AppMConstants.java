@@ -244,10 +244,12 @@ public final class AppMConstants {
     //tables columns for subscription
     public static final String SUBSCRIPTION_FIELD_SUBSCRIPTION_ID = "SUBSCRIPTION_ID";
     public static final String SUBSCRIPTION_FIELD_TIER_ID = "TIER_ID";
-    public static final String SUBSCRIPTION_FIELD_API_ID = "APP_ID";
+    public static final String SUBSCRIPTION_FIELD_APP_ID = "APP_ID";
     public static final String SUBSCRIPTION_FIELD_ACCESS_TOKEN = "ACCESS_TOKEN";
     public static final String SUBSCRIPTION_FIELD_LAST_ACCESS = "LAST_ACCESSED";
     public static final String SUBSCRIPTION_FIELD_SUB_STATUS = "SUB_STATUS";
+    public static final String SUBSCRIPTION_FIELD_TYPE = "SUBSCRIPTION_TYPE";
+    public static final String SUBSCRIPTION_FIELD_TRUSTED_IDP = "TRUSTED_IDP";
 
     public static final String SUBSCRIPTION_KEY_TYPE = "KEY_TYPE";
     public static final String SUBSCRIPTION_USER_TYPE = "USER_TYPE";

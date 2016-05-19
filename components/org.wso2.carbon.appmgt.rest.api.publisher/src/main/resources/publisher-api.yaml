@@ -1034,7 +1034,7 @@ paths:
             $ref: '#/definitions/Document'
         - $ref: '#/parameters/Content-Type'
       tags:
-        - API Document
+        - App Documents
       responses:
         '201':
           description: >
@@ -2975,13 +2975,6 @@ definitions:
       otherTypeName:
         type: string
         example: ''
-      visibility:
-        type: string
-        enum:
-          - OWNER_ONLY
-          - PRIVATE
-          - API_LEVEL
-        example: API_LEVEL
   Binary:
     title: upload binary
     required:

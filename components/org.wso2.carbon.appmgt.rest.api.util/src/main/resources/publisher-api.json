@@ -1417,7 +1417,7 @@
                     }
                 ],
                 "tags": [
-                    "Tags"
+                    "Stats"
                 ],
                 "responses": {
                     "200": {
@@ -2267,8 +2267,8 @@
         "/administration/businessowner": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-response": "{\"businessOwnerList\": [{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}]}",
                 "summary": "Get all Business owners",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
                 "parameters": [
@@ -2321,9 +2321,9 @@
             },
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}",
                 "summary": "Create a new Business Owner",
                 "description": "Create a new Business Owner\n",
                 "parameters": [
@@ -2385,8 +2385,8 @@
         "/administration/businessowner/{businessOwnerId}": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1\"",
+                "x-wso2-response": "{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}",
                 "summary": "Get a Business owners by Id",
                 "description": "Get a Business owners by Id.\n",
                 "parameters": [
@@ -2442,9 +2442,9 @@
             },
             "put": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "",
+                "x-wso2-request": "{\"site\": \"newSysUser.lk\",\"email\": \"newSysUser@gmail.com\",\"description\":\"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}",
                 "summary": "Update an existing Business Owner",
                 "description": "Update an existing Business Owner.\n",
                 "parameters": [
@@ -2505,7 +2505,7 @@
             },
             "delete": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.0/administration/businessowner/\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Business Owner",
                 "description": "Delete an existing Business Owner.\n",
@@ -3221,15 +3221,6 @@
                 "otherTypeName": {
                     "type": "string",
                     "example": ""
-                },
-                "visibility": {
-                    "type": "string",
-                    "enum": [
-                        "OWNER_ONLY",
-                        "PRIVATE",
-                        "API_LEVEL"
-                    ],
-                    "example": "API_LEVEL"
                 }
             }
         },

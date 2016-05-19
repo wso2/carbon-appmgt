@@ -70,7 +70,6 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     @Override
     public Response appsDownloadPost(String contentType, InstallDTO install) {
-        String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
         String username = RestApiUtil.getLoggedInUsername();
         try {
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -79,6 +78,16 @@ public class AppsApiServiceImpl extends AppsApiService {
                     tenantDomainName);
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
+
+            //check app validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             Operations mobileOperation = new Operations();
             String action = "install";
             String[] parameters = null;
@@ -90,7 +99,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                            log);
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -153,10 +162,10 @@ public class AppsApiServiceImpl extends AppsApiService {
             favouritePageDTO.setIsDefaultPage(hasFavouritePage);
         } catch (UserStoreException e) {
             RestApiUtil.handleInternalServerError("User Store Error occurred while retrieving Favourite page details",
-                    e, log);
+                                                  e, log);
         } catch (AppManagementException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while retrieving Favourite page details", e,
-                    log);
+                                                  log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -245,11 +254,11 @@ public class AppsApiServiceImpl extends AppsApiService {
                 contentType = RestApiUtil.readFileContentType(binaryFile.getAbsolutePath());
                 if (!contentType.startsWith("application")) {
                     RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported file type requested",
-                            log);
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "' with unsupported media type is requested",
-                        log);
+                                             log);
             }
         } catch (AppManagementException e) {
             if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
@@ -296,7 +305,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     contentType = fileContent.getContentType();
                 } catch (IOException e) {
                     RestApiUtil.handleInternalServerError("Error occurred while retrieving static content '" +
-                            fileName + "'", e, log);
+                                                                  fileName + "'", e, log);
                 }
             }
             if (staticContentFile == null || !staticContentFile.exists()) {
@@ -304,7 +313,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
             if (!contentType.startsWith("image")) {
                 RestApiUtil.handleBadRequest("Invalid file '" + fileName + "'with unsupported file type requested",
-                        log);
+                                             log);
             }
 
             Response.ResponseBuilder response = Response.ok((Object) staticContentFile);
@@ -337,6 +346,15 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
             String appId = install.getAppId();
+            //check app validity
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", appId);
+            List<App> result = appProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, appId).getResponse();
+            }
+
             Operations mobileOperation = new Operations();
             String action = "uninstall";
             String[] parameters = null;
@@ -348,7 +366,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
-                            log);
+                                                 log);
                 }
             } else {
                 RestApiUtil.handleBadRequest("Invalid installation type.", log);
@@ -630,7 +648,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
                 JSONObject socialObj;
                 socialObj = new JSONObject(socialActivityService.getSocialObjectJson(appType + ":" + appId, "asc",
-                        offset, limit));
+                                                                                     offset, limit));
                 org.json.JSONArray socialArr = socialObj.getJSONArray("attachments");
                 List<AppRatingInfoDTO> appRatingInfoDTOList = new ArrayList<>();
                 for (int i = 0; i < socialArr.length(); i++) {
@@ -640,7 +658,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     appRatingInfoDTO.setId(Integer.parseInt(ratingObj.get("id").toString()));
                     appRatingInfoDTO.setReview(ratingObj.get("content").toString());
                     appRatingInfoDTO.setLikes(Integer.parseInt(((JSONObject) (ratingObj.get("likes"))).get("totalItems")
-                            .toString()));
+                                                                       .toString()));
                     appRatingInfoDTO.setDislikes(Integer.parseInt(((JSONObject) (ratingObj.get("dislikes"))).get(
                             "totalItems").toString()));
                     appRatingInfoDTOList.add(appRatingInfoDTO);
@@ -657,7 +675,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while retrieving the rating for the app '%s:%s'",
-                    appType, appId);
+                                                appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (JSONException e) {
             String errorMessage = String.format(
@@ -707,11 +725,11 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         } catch (AppManagementException e) {
             String errorMessage = String.format("Internal error while saving the rating for the app '%s:%s'",
-                    appType, appId);
+                                                appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         } catch (SocialActivityException e) {
             String errorMessage = String.format("Social component error while saving the rating for the app '%s:%s'",
-                    appType, appId);
+                                                appType, appId);
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return Response.ok().entity(appRatingInfoDTO).build();
@@ -726,6 +744,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
     /**
      * Retrieve subscription of the given user for a given app
+     *
      * @param appType
      * @param appId
      * @param accept
@@ -756,14 +775,15 @@ public class AppsApiServiceImpl extends AppsApiService {
             int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, username);
 
             Subscription subscription = apiConsumer.getSubscription(appIdentifier, applicationId,
-                    Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
+                                                                    Subscription.SUBSCRIPTION_TYPE_INDIVIDUAL);
             if (subscription != null) {
 
 
             }
         } catch (AppManagementException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription details of webapp with id : "
-                    + appId + " for user " + username, e, log);
+            RestApiUtil.handleInternalServerError(
+                    "Error occurred while retrieving subscription details of webapp with id : "
+                            + appId + " for user " + username, e, log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -797,7 +817,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                     AppMConstants.ENABLE_SELF_SUBSCRIPTION));
             Boolean isEnterpriseSubscriptionEnabled = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
                     AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
-            if(isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
+            if (isSelfSubscriptionEnabled || isEnterpriseSubscriptionEnabled) {
                 //Check for subscriber existence
                 Subscriber subscriber = apiConsumer.getSubscriber(userName);
                 if (subscriber == null) {
@@ -848,12 +868,14 @@ public class AppsApiServiceImpl extends AppsApiService {
                 }
                 int applicationId = AppManagerUtil.getApplicationId(AppMConstants.DEFAULT_APPLICATION_NAME, userName);
                 //TODO: Handle enterprise subscription
-                String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName, applicationId, null);
-            }else{
+                String subscriptionStatus = apiConsumer.addSubscription(appIdentifier, "INDIVIDUAL", userName,
+                                                                        applicationId, null);
+            } else {
                 RestApiUtil.handleBadRequest("Subscription is disabled", log);
             }
         } catch (AppManagementException e) {
-            RestApiUtil.handleBadRequest("Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
+            RestApiUtil.handleBadRequest(
+                    "Error while subscribing the user:" + userName + " for " + appType + " with appId :" + appId, log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();
@@ -866,9 +888,11 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdSubscriptionWorkflowPost(String appType, String appId, String contentType) {
         WorkflowExecutor workflowExecutor = null;
         try {
-            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+            workflowExecutor = WorkflowExecutorFactory.getInstance().getWorkflowExecutor(
+                    WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
         } catch (WorkflowException e) {
-            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription workflow status", e, log);
+            RestApiUtil.handleInternalServerError("Error occurred while retrieving subscription workflow status", e,
+                                                  log);
         }
         boolean isAsynchronousFlow = workflowExecutor.isAsynchronus();
         return Response.ok().entity(isAsynchronousFlow).build();
@@ -945,7 +969,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             apiConsumer.removeAPISubscription(appIdentifier, username, AppMConstants.DEFAULT_APPLICATION_NAME);
         } catch (AppManagementException e) {
             RestApiUtil.handleBadRequest("Error occurred while removing subscription user '" + username +
-                    "' for webapp with id " + appId, log);
+                                                 "' for webapp with id " + appId, log);
         } finally {
             if (isTenantFlowStarted) {
                 PrivilegedCarbonContext.endTenantFlow();

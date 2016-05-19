@@ -1795,6 +1795,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     artifactManager.newGovernanceArtifact(new QName(documentation.getName()));
             artifactManager.addGenericArtifact(
                     AppManagerUtil.createDocArtifactContent(artifact, apiId, documentation));
+            documentation.setId(artifact.getId());
             String apiPath = AppManagerUtil.getAPIPath(apiId);
             //Adding association from api to documentation . (WebApp -----> doc)
             registry.addAssociation(apiPath, artifact.getPath(),

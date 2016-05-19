@@ -3,7 +3,7 @@ package org.wso2.carbon.appmgt.impl;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.App;
 import org.wso2.carbon.appmgt.api.model.FileContent;
-import org.wso2.carbon.governance.api.exception.GovernanceException;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 
 import java.io.InputStream;
 import java.util.List;
@@ -51,7 +51,7 @@ public interface AppRepository {
      * @return
      * @throws AppManagementException
      */
-    public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException, GovernanceException;
+    public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException;
 
     /**
      * Save static content into storage
@@ -68,5 +68,6 @@ public interface AppRepository {
      */
     public FileContent getStaticContent(String contentId) throws AppManagementException;
 
+    public int addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException;
 
 }
