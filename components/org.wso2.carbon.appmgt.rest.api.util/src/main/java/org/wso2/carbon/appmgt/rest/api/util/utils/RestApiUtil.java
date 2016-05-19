@@ -552,6 +552,18 @@ public class RestApiUtil {
         }
     }
 
+    public static boolean isSubscriptionEnable() {
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        Boolean selfSubscriptionStatus = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+        boolean isSubscriptionEnable = (selfSubscriptionStatus || enterpriseSubscriptionStatus);
+        return isSubscriptionEnable;
+    }
+
     /**
      *
      * Returns the seach terms of the given query string.
