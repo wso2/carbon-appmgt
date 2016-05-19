@@ -1382,6 +1382,38 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         }
     }
 
+    //This method has been introduced for rest-api workflow execution
+    private void executeWorkflow(WebApp webApp, String applicationName, String userId, int subscriptionId, String subscribedTier) throws AppManagementException {
+
+
+        WorkflowExecutor addSubscriptionWFExecutor = null;
+        try {
+            addSubscriptionWFExecutor = WorkflowExecutorFactory.getInstance().
+                    getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+            SubscriptionWorkflowDTO workflowDTO = new SubscriptionWorkflowDTO();
+            workflowDTO.setStatus(WorkflowStatus.CREATED);
+            workflowDTO.setCreatedTime(System.currentTimeMillis());
+            workflowDTO.setTenantDomain(tenantDomain);
+            workflowDTO.setTenantId(tenantId);
+            workflowDTO.setExternalWorkflowReference(addSubscriptionWFExecutor.generateUUID());
+            workflowDTO.setWorkflowReference(String.valueOf(subscriptionId));
+            workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
+            workflowDTO.setCallbackUrl(addSubscriptionWFExecutor.getCallbackURL());
+            workflowDTO.setApiName(webApp.getId().getApiName());
+            workflowDTO.setApiContext(webApp.getContext());
+            workflowDTO.setApiVersion(webApp.getId().getVersion());
+            workflowDTO.setApiProvider(webApp.getId().getProviderName());
+            workflowDTO.setTierName(subscribedTier);
+            workflowDTO.setApplicationName(applicationName);
+            workflowDTO.setSubscriber(userId);
+
+            addSubscriptionWFExecutor.execute(workflowDTO);
+        } catch (WorkflowException e) {
+            handleException("Error occurred while executing Subscription workflow for webapp with name '" +
+                    webApp.getId().getApiName() + "' with version '" + webApp.getId().getVersion());
+        }
+    }
+
     public void removeSubscription(APIIdentifier identifier, String userId, int applicationId)
             throws AppManagementException {
         appMDAO.removeSubscription(identifier, applicationId);
@@ -1389,7 +1421,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     public void removeAPISubscription(APIIdentifier identifier, String userId, String applicationName)
             throws AppManagementException {
-        appMDAO.removeAPISubscription(identifier,userId ,applicationName);
+        appMDAO.removeAPISubscription(identifier, userId, applicationName);
         /*if (AppManagerUtil.isAPIGatewayKeyCacheEnabled()) {
             invalidateCachedKeys(applicationId, identifier);
         }*/
@@ -1416,8 +1448,21 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
         return appMDAO.getComments(identifier);
     }
 
+    /**
+     * Retrieve webapp from the UUID
+     * @param uuid uuid of the application
+     * @return WebApp
+     * @throws AppManagementException
+     */
     @Override
     public WebApp getWebApp(String uuid) throws AppManagementException {
+        boolean isTenantFlowStarted = false;
+
+        if (tenantDomain != null && !org.wso2.carbon.base.MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            isTenantFlowStarted = true;
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+        }
         GenericArtifact artifact = null;
         WebApp webApp = null;
 
@@ -1431,6 +1476,10 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
         } catch (GovernanceException e) {
             handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
         }
         return webApp;
     }
@@ -1762,5 +1811,13 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
 
     public Map<String, Set<WebApp>> getTaggedAPIs() {
         return taggedAPIs;
+    }
+
+    @Override
+    public void addSubscription(String subscriberName, WebApp webApp, String applicationName) throws AppManagementException {
+        AppRepository appRepository = new DefaultAppRepository();
+        webApp.getId().setTier(AppMConstants.UNLIMITED_TIER);
+        int subscriptionId = appRepository.addSubscription(subscriberName, webApp, applicationName);
+        executeWorkflow(webApp, applicationName, subscriberName, subscriptionId, webApp.getId().getTier());
     }
 }
