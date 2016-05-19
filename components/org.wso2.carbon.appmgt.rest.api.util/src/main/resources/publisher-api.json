@@ -3629,6 +3629,11 @@
         "UriTemplate": {
             "title": "URI Template Definition",
             "properties": {
+				"id": {
+                    "type": "integer",
+                    "description": "ID of the URI Template \n",
+                    "example": "1"
+                },
                 "urlPattern": {
                     "type": "string",
                     "description": "URL pattern of the URI \n",
@@ -3643,12 +3648,22 @@
                     "type": "string",
                     "description": "The name of the uri template policy group\n",
                     "example": "default"
+                },
+				"policyGroupId": {
+                    "type": "integer",
+                    "description": "Database ID of the associated policy group.\n",
+                    "example": "default"
                 }
             }
         },
         "PolicyGroups": {
             "title": "Policy Group Definition",
             "properties": {
+				"policyGroupId": {
+                    "type": "integer",
+                    "description": "Id of the policy group \n",
+                    "example": "1"
+                },
                 "policyGroupName": {
                     "type": "string",
                     "description": "Name of the policy group \n",

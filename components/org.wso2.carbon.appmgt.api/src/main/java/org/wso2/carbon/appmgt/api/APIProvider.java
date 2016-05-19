@@ -753,4 +753,12 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException;
+
+    /**
+     * Updates the given app.
+     *
+     * @param app
+     * @throws AppManagementException
+     */
+    void updateApp(App app)throws AppManagementException;
 }

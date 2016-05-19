@@ -10,9 +10,11 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel(description = "")
 public class UriTemplateDTO  {
-  
-  
-  
+
+
+  private Integer id = null;
+
+
   private String urlPattern = null;
   
   
@@ -21,7 +23,23 @@ public class UriTemplateDTO  {
   
   private String policyGroupName = null;
 
-  
+
+  private Integer policyGroupId = null;
+
+
+  /**
+   * URI template Id
+   **/
+  @ApiModelProperty(value = "ID of the URI Template")
+  @JsonProperty("id")
+  public Integer getId() {
+    return id;
+  }
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+
   /**
    * URL pattern of the URI
    **/
@@ -60,7 +78,19 @@ public class UriTemplateDTO  {
     this.policyGroupName = policyGroupName;
   }
 
-  
+
+  /**
+   * Database ID of the associated policy group.
+   **/
+  @ApiModelProperty(value = "Database ID of the associated policy group.")
+  @JsonProperty("getPolicyGroupId")
+  public Integer getPolicyGroupId() {
+    return policyGroupId;
+  }
+  public void setPolicyGroupId(Integer policyGroupId) {
+    this.policyGroupId = policyGroupId;
+  }
+
 
   @Override
   public String toString()  {
@@ -73,4 +103,5 @@ public class UriTemplateDTO  {
     sb.append("}\n");
     return sb.toString();
   }
+
 }

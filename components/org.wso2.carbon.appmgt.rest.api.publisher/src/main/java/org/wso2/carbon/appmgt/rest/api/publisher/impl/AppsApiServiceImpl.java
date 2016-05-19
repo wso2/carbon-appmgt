@@ -431,10 +431,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                                           String ifModifiedSince) {
         AppDTO appDTO;
         try {
-            if (!appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
-                String errorMessage = "Invalid Asset Type : " + appType;
-                RestApiUtil.handleBadRequest(errorMessage, log);
-            }
 
             Map<String, String> searchTerms = new HashMap<String, String>();
             searchTerms.put("id", appId);
@@ -492,7 +488,19 @@ public class AppsApiServiceImpl extends AppsApiService {
             } catch (AppManagementException e) {
                 RestApiUtil.handleInternalServerError("Error occurred while ", e, log);
             }
-        } else {
+        } else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+
+            try {
+                APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+                WebApp webApp = APPMappingUtil.fromDTOToWebapp(body);
+                apiProvider.updateApp(webApp);
+
+            } catch (AppManagementException e) {
+                e.printStackTrace();
+            }
+
+
+        } else{
             RestApiUtil.handleBadRequest("Invalid application type :" + appType, log);
         }
         return Response.accepted().build();

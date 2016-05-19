@@ -948,6 +948,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new AppManagementException("Invalid WebApp update operation involving WebApp status changes");
         }
     }
+
+    @Override
+    public void updateApp(App app) throws AppManagementException {
+        AppRepository appRepository = new DefaultAppRepository(registry);
+        appRepository.updateApp(app);
+    }
+
     /**
      * Updates an existing WebApp
      *
@@ -2078,16 +2085,21 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException {
 
-        List<App> apps = new ArrayList<App>();
-        List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
 
-        for(GenericArtifact artifact : appArtifacts){
-            if(isSearchHit(artifact, searchTerms)){
-                apps.add(createApp(artifact, appType));
+        // If the app type is 'webapp' use the App Repository implementation path.
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)){
+            return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
+        }else{
+            List<App> apps = new ArrayList<App>();
+            List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
+
+            for(GenericArtifact artifact : appArtifacts){
+                if(isSearchHit(artifact, searchTerms)){
+                    apps.add(createApp(artifact, appType));
+                }
             }
+            return apps;
         }
-
-        return apps;
     }
 
 

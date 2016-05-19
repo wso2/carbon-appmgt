@@ -65,9 +65,6 @@ public class WebAppFactory extends AppFactory {
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
             webApp.setLastUpdated(registry.get(artifactPath).getLastModified());
 
-            // TODO revert this once proper db saving is done
-            webApp.setRating(1f);
-
             webApp.setUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL));
             webApp.setLogoutURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL));
             webApp.setDisplayName(artifact.getAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME));
@@ -147,45 +144,6 @@ public class WebAppFactory extends AppFactory {
             }
 
             webApp.setLatest(Boolean.valueOf(artifact.getAttribute(AppMConstants.API_OVERVIEW_IS_LATEST)));
-
-            Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
-            List<String> uriTemplateNames = new ArrayList<String>();
-            List<URLMapping> urlPatterns = AppMDAO.getURITemplatesPerAPIAsString(apiId);
-
-            for (URLMapping urlMapping : urlPatterns) {
-                URITemplate uriTemplate = new URITemplate();
-                String uTemplate = urlMapping.getUrlPattern();
-                String method = urlMapping.getHttpMethod();
-                String authType = urlMapping.getHttpMethod();
-                String throttlingTier = urlMapping.getThrottlingTier();
-                String userRoles = urlMapping.getUserRoles();
-
-                uriTemplate.setHTTPVerb(method);
-                uriTemplate.setAuthType(authType);
-                uriTemplate.setThrottlingTier(throttlingTier);
-                uriTemplate.setHttpVerbs(method);
-                uriTemplate.setAuthTypes(authType);
-                uriTemplate.setUriTemplate(uTemplate);
-                uriTemplate.setResourceURI(webApp.getUrl());
-                uriTemplate.setResourceSandboxURI(webApp.getSandboxUrl());
-                uriTemplate.setThrottlingTiers(throttlingTier);
-                uriTemplate.setUserRoles(userRoles);
-                // Checking for duplicate uri template names
-                if (uriTemplateNames.contains(uTemplate)) {
-                    for (URITemplate tmp : uriTemplates) {
-                        if (uTemplate.equals(tmp.getUriTemplate())) {
-                            tmp.setHttpVerbs(method);
-                            tmp.setAuthTypes(authType);
-                            tmp.setThrottlingTiers(throttlingTier);
-                            break;
-                        }
-                    }
-                } else {
-                    uriTemplates.add(uriTemplate);
-                }
-                uriTemplateNames.add(uTemplate);
-            }
-            webApp.setUriTemplates(uriTemplates);
 
             Set<String> tags = new HashSet<String>();
             org.wso2.carbon.registry.core.Tag[] tag = registry.getTags(artifactPath);

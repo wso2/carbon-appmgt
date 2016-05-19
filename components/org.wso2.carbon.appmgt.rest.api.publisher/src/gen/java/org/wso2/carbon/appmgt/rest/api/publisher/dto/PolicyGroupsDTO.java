@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel(description = "")
 public class PolicyGroupsDTO  {
-  
-  
+
+  private Integer policyGroupId = null;
   
   private String policyGroupName = null;
   
@@ -31,7 +31,17 @@ public class PolicyGroupsDTO  {
   
   private String allowAnonymousAccess = null;
 
-  
+
+  @ApiModelProperty(value = "Id of the policy group")
+  @JsonProperty("policyGroupId")
+  public Integer getPolicyGroupId() {
+    return policyGroupId;
+  }
+  public void setPolicyGroupId(Integer policyGroupId) {
+    this.policyGroupId = policyGroupId;
+  }
+
+
   /**
    * Name of the policy group
    **/

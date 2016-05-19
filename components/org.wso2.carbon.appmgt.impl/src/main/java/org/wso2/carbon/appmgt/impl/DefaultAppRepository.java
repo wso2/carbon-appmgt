@@ -1,10 +1,10 @@
 package org.wso2.carbon.appmgt.impl;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -47,6 +47,8 @@ public class DefaultAppRepository implements AppRepository {
         this.registry = registry;
     }
 
+    // ------------------- START : Repository API implementation methods. ----------------------------------
+
     @Override
     public String saveApp(App app) throws AppManagementException {
 
@@ -57,11 +59,54 @@ public class DefaultAppRepository implements AppRepository {
         return null;
     }
 
-    /**
-     * Save static content into storage
-     * @param fileContent file content details
-     * @throws AppManagementException
-     */
+    @Override
+    public void updateApp(App app) throws AppManagementException {
+
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+            updateWebApp((WebApp) app);
+        }
+
+    }
+
+    @Override
+    public App getApp(String type, String uuid) throws AppManagementException {
+
+        Map<String, String> searchTerms = new HashMap<String, String>();
+        searchTerms.put("id", uuid);
+
+        List<App> result = searchApps(type, searchTerms);
+
+        if(result.size() == 1){
+            return result.get(0);
+        }else{
+            //flag an error.
+            throw new AppManagementException("Duplicate entries found for the given uuid.");
+        }
+
+    }
+
+    @Override
+    public List<App> searchApps(String type, Map<String, String> searchTerms) throws AppManagementException {
+
+        List<App> apps = new ArrayList<App>();
+        List<GenericArtifact> appArtifacts = null;
+
+        try {
+            appArtifacts = getAllAppArtifacts(type);
+        } catch (GovernanceException e) {
+            handleException(String.format("Error while retrieving registry artifacts during app search for the type '%s'", type), e);
+        }
+
+        for(GenericArtifact artifact : appArtifacts){
+            if(isSearchHit(artifact, searchTerms)){
+                apps.add(getApp(type, artifact));
+            }
+        }
+
+        return apps;
+
+    }
+
     @Override
     public void persistStaticContents(FileContent fileContent) throws AppManagementException {
         Connection connection = null;
@@ -126,6 +171,199 @@ public class DefaultAppRepository implements AppRepository {
 
     }
 
+    // ------------------- END : Repository API implementation methods. ----------------------------------
+
+    private WebApp getApp(String type, GenericArtifact appArtifact) throws AppManagementException {
+
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(type)) {
+            return getWebApp(appArtifact);
+        }
+        return null;
+
+    }
+
+    private boolean isSearchHit(GenericArtifact artifact, Map<String, String> searchTerms) throws AppManagementException {
+
+        boolean isSearchHit = true;
+
+        for(Map.Entry<String, String> term : searchTerms.entrySet()){
+            try {
+                if("ID".equalsIgnoreCase(term.getKey())) {
+                    if(!artifact.getId().equals(term.getValue())){
+                        isSearchHit = false;
+                        break;
+                    }
+                }else if(!term.getValue().equals(artifact.getAttribute(getRxtAttributeName(term.getKey())))){
+                    isSearchHit = false;
+                    break;
+                }
+            } catch (GovernanceException e) {
+                String errorMessage = String.format("Error while determining whether artifact '%s' is a search hit.", artifact.getId());
+                throw new AppManagementException(errorMessage, e);
+            }
+        }
+
+        return isSearchHit;
+    }
+
+    private String getRxtAttributeName(String searchKey) {
+
+        String rxtAttributeName = null;
+
+        if(searchKey.equalsIgnoreCase("NAME")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_NAME;
+        }else if(searchKey.equalsIgnoreCase("PROVIDER")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_PROVIDER;
+        }else if(searchKey.equalsIgnoreCase("VERSION")){
+            rxtAttributeName = AppMConstants.API_OVERVIEW_VERSION;
+        }
+
+        return rxtAttributeName;
+    }
+
+    private List<GenericArtifact> getAllAppArtifacts(String appType) throws GovernanceException, AppManagementException {
+
+        List<GenericArtifact> appArtifacts = new ArrayList<GenericArtifact>();
+
+        GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+        GenericArtifact[] artifacts = artifactManager.getAllGenericArtifacts();
+        for (GenericArtifact artifact : artifacts) {
+            appArtifacts.add(artifact);
+        }
+
+        return appArtifacts;
+    }
+
+    private WebApp getWebApp(GenericArtifact webAppArtifact) throws AppManagementException {
+
+        Connection connection = null;
+
+        try {
+
+            AppFactory appFactory = getAppFactory(AppMConstants.WEBAPP_ASSET_TYPE);
+            WebApp webApp = (WebApp) appFactory.createApp(webAppArtifact, registry);
+
+            try {
+                connection = getRDBMSConnectionWithoutAutoCommit();
+            } catch (SQLException e) {
+                handleException("Can't get the database connection.", e);
+            }
+
+            int webAppDatabaseId = getDatabaseId(webApp, connection);
+
+            List<EntitlementPolicyGroup> policyGroups = getPolicyGroups(webAppDatabaseId, connection);
+            webApp.setAccessPolicyGroups(policyGroups);
+
+            Set<URITemplate> uriTemplates = getURITemplates(webAppDatabaseId, connection);
+            webApp.setUriTemplates(uriTemplates);
+
+            return webApp;
+        } catch (SQLException e) {
+            handleException(String.format("Error while building the app for the web app registry artifact '%s'", webAppArtifact.getId()), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+
+        return null;
+    }
+
+    private Set<URITemplate> getURITemplates(int webAppDatabaseId, Connection connection) throws SQLException {
+
+        String query = "SELECT * FROM APM_APP_URL_MAPPING WHERE APP_ID=?";
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.setInt(1, webAppDatabaseId);
+            resultSet = preparedStatement.executeQuery();
+
+            Set<URITemplate> uriTemplates = new HashSet<URITemplate>();
+            while(resultSet.next()){
+                URITemplate uriTemplate = new URITemplate();
+                uriTemplate.setId(resultSet.getInt("URL_MAPPING_ID"));
+                uriTemplate.setUriTemplate(resultSet.getString("URL_PATTERN"));
+                uriTemplate.setHTTPVerb(resultSet.getString("HTTP_METHOD"));
+                uriTemplate.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
+
+                uriTemplates.add(uriTemplate);
+            }
+
+            return uriTemplates;
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, resultSet);
+        }
+
+    }
+
+    private List<EntitlementPolicyGroup> getPolicyGroups(int webAppDatabaseId, Connection connection) throws SQLException {
+
+        String query = "SELECT `GROUP`.*,PARTIAL_MAPPING.POLICY_PARTIAL_ID " +
+                                        "FROM " +
+                                        "APM_POLICY_GROUP `GROUP` " +
+                                        "LEFT JOIN APM_POLICY_GRP_PARTIAL_MAPPING PARTIAL_MAPPING " +
+                                        "ON `GROUP`.POLICY_GRP_ID=PARTIAL_MAPPING.POLICY_GRP_ID, " +
+                                        "APM_POLICY_GROUP_MAPPING MAPPING " +
+                                        "WHERE " +
+                                        "MAPPING.POLICY_GRP_ID=GROUP.POLICY_GRP_ID " +
+                                        "AND MAPPING.APP_ID=? " +
+                                        "ORDER BY `GROUP`.POLICY_GRP_ID";
+
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, webAppDatabaseId);
+
+            resultSet = preparedStatement.executeQuery();
+
+            List<EntitlementPolicyGroup> policyGroups = new ArrayList<EntitlementPolicyGroup>();
+            while(resultSet.next()){
+
+                EntitlementPolicyGroup policyGroup = new EntitlementPolicyGroup();
+
+                policyGroup.setPolicyGroupId(resultSet.getInt("POLICY_GRP_ID"));
+                policyGroup.setPolicyGroupName(resultSet.getString("NAME"));
+                policyGroup.setPolicyDescription(resultSet.getString("DESCRIPTION"));
+                policyGroup.setThrottlingTier(resultSet.getString("THROTTLING_TIER"));
+                policyGroup.setUserRoles(resultSet.getString("USER_ROLES"));
+                policyGroup.setAllowAnonymous(resultSet.getBoolean("URL_ALLOW_ANONYMOUS"));
+
+                Integer entitlementPolicyId = resultSet.getInt("POLICY_PARTIAL_ID");
+
+                if(entitlementPolicyId > 0){
+                    policyGroup.setEntitlementPolicyId(entitlementPolicyId);
+                }
+
+                policyGroups.add(policyGroup);
+
+            }
+
+            return policyGroups;
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, resultSet);
+        }
+
+    }
+
+    private AppFactory getAppFactory(String appType) {
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+            return new WebAppFactory();
+        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+            return new MobileAppFactory();
+        }else{
+            return null;
+        }
+    }
+
+    private GenericArtifact getRegistryArtifact(String type, String uuid) throws RegistryException {
+        GenericArtifactManager artifactManager = getArtifactManager(registry,type);
+        return artifactManager.getGenericArtifact(uuid);
+    }
 
     private String persistWebApp(WebApp webApp) throws AppManagementException {
 
@@ -179,6 +417,134 @@ public class DefaultAppRepository implements AppRepository {
 
         // Return null to make the compiler doesn't complain.
         return null;
+    }
+
+    private void updateWebApp(WebApp webApp) throws AppManagementException {
+
+        Connection connection = null;
+
+        try {
+            connection = getRDBMSConnectionWithoutAutoCommit();
+        } catch (SQLException e) {
+            handleException("Can't get the database connection.", e);
+        }
+
+        try {
+            int webAppDatabaseId = getDatabaseId(webApp, connection);
+            updatePolicyGroups(webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private int getDatabaseId(WebApp webApp, Connection connection) throws SQLException {
+
+        String query = "SELECT APP_ID FROM APM_APP WHERE UUID=? AND TENANT_ID=?";
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        preparedStatement = connection.prepareStatement(query);
+
+        preparedStatement.setString(1, webApp.getUUID());
+        preparedStatement.setInt(2, getTenantIdOfCurrentUser());
+
+        resultSet = preparedStatement.executeQuery();
+
+        while(resultSet.next()){
+            return resultSet.getInt("APP_ID");
+        }
+
+        return -1;
+    }
+
+    private void updatePolicyGroups(List<EntitlementPolicyGroup> accessPolicyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
+
+        List<EntitlementPolicyGroup> groupsToBeAdded = new ArrayList<>();
+        List<EntitlementPolicyGroup> groupsToBeUpdated = new ArrayList<>();
+
+        for(EntitlementPolicyGroup policyGroup : accessPolicyGroups){
+            if(policyGroup.getPolicyGroupId() > 0){
+                groupsToBeUpdated.add(policyGroup);
+            }else{
+                groupsToBeAdded.add(policyGroup);
+            }
+        }
+
+        // Update existing policy groups
+        String queryToUpdateGroups = String.format("UPDATE %s SET DESCRIPTION=?,THROTTLING_TIER=?,USER_ROLES=?,URL_ALLOW_ANONYMOUS=? WHERE POLICY_GRP_ID=?", POLICY_GROUP_TABLE_NAME);
+        PreparedStatement preparedStatementToUpdateGroups = connection.prepareStatement(queryToUpdateGroups);
+
+        for(EntitlementPolicyGroup policyGroup : groupsToBeUpdated){
+            preparedStatementToUpdateGroups.setString(1,policyGroup.getPolicyDescription());
+            preparedStatementToUpdateGroups.setString(2,policyGroup.getThrottlingTier());
+            preparedStatementToUpdateGroups.setString(3,policyGroup.getUserRoles());
+            preparedStatementToUpdateGroups.setBoolean(4, policyGroup.isAllowAnonymous());
+            preparedStatementToUpdateGroups.setInt(5, policyGroup.getPolicyGroupId());
+
+            preparedStatementToUpdateGroups.addBatch();
+
+        }
+        preparedStatementToUpdateGroups.executeBatch();
+        updateEntitlementPolicyMappings(groupsToBeUpdated, connection);
+        deleteUnlinkedEntitlementPolicyMappings(groupsToBeUpdated, connection);
+
+        // Add new policy groups
+        persistPolicyGroups(groupsToBeAdded, connection);
+        associatePolicyGroupsWithWebApp(groupsToBeAdded, webAppDatabaseId, connection);
+
+        // Remove unused policy groups.
+        deletePolicyGroupsNotIn(groupsToBeUpdated, webAppDatabaseId, connection);
+    }
+
+    private void deletePolicyGroupsNotIn(List<EntitlementPolicyGroup> groupsToBeRetained, int webAppDatabaseId, Connection connection) throws SQLException {
+
+        // Get all the policy groups for the web app.
+
+        String queryToGetPolicyGroupsForApp = "SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?";
+        PreparedStatement preparedStatementToGetPolicyGroupsForApp = null;
+        ResultSet policyGroupsResultSet = null;
+
+        try{
+            connection.prepareStatement(queryToGetPolicyGroupsForApp);
+            preparedStatementToGetPolicyGroupsForApp.setInt(1, webAppDatabaseId);
+
+            policyGroupsResultSet = preparedStatementToGetPolicyGroupsForApp.executeQuery();
+
+            List<Integer> policyGroupIdsForApp = new ArrayList<Integer>();
+
+            while (policyGroupsResultSet.next()){
+                policyGroupIdsForApp.add(policyGroupsResultSet.getInt("POLICY_GRP_ID"));
+            }
+
+            List<Integer> retainedPolicyGroupIds = new ArrayList<Integer>();
+            if(groupsToBeRetained != null){
+                for(EntitlementPolicyGroup policyGroup : groupsToBeRetained){
+                    retainedPolicyGroupIds.add(policyGroup.getPolicyGroupId());
+                }
+            }
+
+
+            List<Integer> policyGroupIdsToBeDeleted = ListUtils.subtract(policyGroupIdsForApp, retainedPolicyGroupIds);
+
+            disassociatePolicyGroupsWithWebApp(policyGroupIdsToBeDeleted, webAppDatabaseId, connection);
+
+            PreparedStatement preparedStatementToDeletePolicyGroups = null;
+            String queryToDeletePolicyMappings = String.format("DELETE FROM %s WHERE POLICY_GRP_ID=?", POLICY_GROUP_TABLE_NAME);
+            preparedStatementToDeletePolicyGroups = connection.prepareStatement(queryToDeletePolicyMappings);
+
+            for (Integer id : policyGroupIdsToBeDeleted) {
+                preparedStatementToDeletePolicyGroups.setInt(1, id);
+                preparedStatementToDeletePolicyGroups.addBatch();
+            }
+
+            preparedStatementToDeletePolicyGroups.executeBatch();
+
+        }finally {
+
+        }
 
     }
 
@@ -263,6 +629,19 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, Boolean.toString(webApp.getAllowAnonymous()));
         artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
+
+        // Add policy groups
+        if(webApp.getAccessPolicyGroups() != null){
+            int[] policyGroupIds = new int[webApp.getAccessPolicyGroups().size()];
+
+            for(int i = 0; i < webApp.getAccessPolicyGroups().size(); i++){
+                policyGroupIds[i] = webApp.getAccessPolicyGroups().get(i).getPolicyGroupId();
+            }
+
+            artifact.setAttribute("uriTemplate_policyGroupIds", policyGroupIds.toString());
+
+        }
+
 
         // Add URI Template attributes
         int counter = 0;
@@ -369,6 +748,9 @@ public class DefaultAppRepository implements AppRepository {
             // Don't try to use batch insert for the policy groups since we need the auto-generated IDs.
             persistPolicyGroup(policyGroup, connection);
         }
+
+        persistEntitlementPolicyMappings(policyGroups, connection);
+
     }
 
     private void persistPolicyGroup(EntitlementPolicyGroup policyGroup, Connection connection) throws SQLException {
@@ -395,10 +777,6 @@ public class DefaultAppRepository implements AppRepository {
             if (resultSet.next()) {
                 generatedPolicyGroupId = Integer.parseInt(resultSet.getString(1));
                 policyGroup.setPolicyGroupId(generatedPolicyGroupId);
-            }
-
-            if(policyGroup.getPolicyPartials() != null){
-                persistEntitlementPolicyMappings(policyGroup.getPolicyPartials(), generatedPolicyGroupId, connection);
             }
 
         } finally {
@@ -429,23 +807,91 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private void persistEntitlementPolicyMappings(JSONArray policyPartials, int policyGroupId, Connection connection) throws SQLException {
+    private void disassociatePolicyGroupsWithWebApp(List<Integer> policyGroupsIds, int appDatabaseId, Connection connection) throws SQLException {
 
-		String query = String.format("INSERT INTO APM_POLICY_GRP_PARTIAL_MAPPING(POLICY_GRP_ID, POLICY_PARTIAL_ID) VALUES(?,?) ", POLICY_GROUP_PARTIAL_MAPPING_TABLE_NAME);
+        PreparedStatement preparedStatementToDeletePolicyMappings = null;
+        String queryToDeletePolicyMappings = "DELETE FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=? AND POLICY_GRP_ID=?";
+
+        try{
+            preparedStatementToDeletePolicyMappings = connection.prepareStatement(queryToDeletePolicyMappings);
+
+            for (Integer policyGroupsId : policyGroupsIds) {
+
+                // Add mapping query to the batch
+                preparedStatementToDeletePolicyMappings.setInt(1, appDatabaseId);
+                preparedStatementToDeletePolicyMappings.setInt(2, policyGroupsId);
+                preparedStatementToDeletePolicyMappings.addBatch();
+            }
+
+            preparedStatementToDeletePolicyMappings.executeBatch();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatementToDeletePolicyMappings, null, null);
+        }
+    }
+
+    private void persistEntitlementPolicyMappings(List<EntitlementPolicyGroup> policyGroups, Connection connection) throws SQLException {
+
+		String query = String.format("INSERT INTO %s(POLICY_GRP_ID, POLICY_PARTIAL_ID) VALUES(?,?) ", POLICY_GROUP_PARTIAL_MAPPING_TABLE_NAME);
         PreparedStatement preparedStatement = null;
 
         try {
             preparedStatement = connection.prepareStatement(query);
 
-            for (int i = 0; i < policyPartials.size(); i++) {
+            for(EntitlementPolicyGroup policyGroup : policyGroups){
 
-                preparedStatement.setInt(1, policyGroupId);
-
-                int xacmlPolicyId = (Integer)(((JSONObject) policyPartials.get(i)).get("POLICY_PARTIAL_ID"));
-                preparedStatement.setInt(2, xacmlPolicyId);
-
-                preparedStatement.addBatch();
+                if(policyGroup.getPolicyPartials() != null){
+                    preparedStatement.setInt(1, policyGroup.getPolicyGroupId());
+                    preparedStatement.setInt(2, policyGroup.getFirstEntitlementPolicyId());
+                    preparedStatement.addBatch();
+                }
             }
+
+            preparedStatement.executeBatch();
+
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
+    }
+
+    private void updateEntitlementPolicyMappings(List<EntitlementPolicyGroup> policyGroups, Connection connection) throws SQLException {
+
+        String query = String.format("UPDATE %s SET POLICY_PARTIAL_ID=? WHERE POLICY_GRP_ID=? ", POLICY_GROUP_PARTIAL_MAPPING_TABLE_NAME);
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+
+            for(EntitlementPolicyGroup policyGroup : policyGroups){
+
+                if(policyGroup.getPolicyPartials() != null){
+                    preparedStatement.setInt(1, policyGroup.getFirstEntitlementPolicyId());
+                    preparedStatement.setInt(2, policyGroup.getPolicyGroupId());
+                    preparedStatement.addBatch();
+                }
+            }
+
+            preparedStatement.executeBatch();
+        } finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
+    }
+
+    private void deleteUnlinkedEntitlementPolicyMappings(List<EntitlementPolicyGroup> policyGroups, Connection connection) throws SQLException {
+
+        String query = String.format("DELETE FROM %s WHERE POLICY_GRP_ID=? ", POLICY_GROUP_PARTIAL_MAPPING_TABLE_NAME);
+        PreparedStatement preparedStatement = null;
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+
+            for(EntitlementPolicyGroup policyGroup : policyGroups){
+
+                if(policyGroup.getPolicyPartials() != null){
+                    preparedStatement.setInt(1, policyGroup.getPolicyGroupId());
+                    preparedStatement.addBatch();
+                }
+            }
+
             preparedStatement.executeBatch();
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
@@ -582,7 +1028,7 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    public void persistURLTemplates(Set<URITemplate> uriTemplates, List<EntitlementPolicyGroup> policyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
+    private void persistURLTemplates(Set<URITemplate> uriTemplates, List<EntitlementPolicyGroup> policyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
 
         PreparedStatement preparedStatement = null;
 

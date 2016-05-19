@@ -67,6 +67,12 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
+    public void updateApp(App app) throws AppManagementException {
+        checkWebappUpdatePermission();
+        super.updateApp(app);
+    }
+
+    @Override
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException {
         if (APIStatus.PUBLISHED.equals(status)) {
@@ -190,4 +196,6 @@ public class UserAwareAPIProvider extends APIProviderImpl {
         return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
                 policyPartialDesc);
     }
+
+
 }

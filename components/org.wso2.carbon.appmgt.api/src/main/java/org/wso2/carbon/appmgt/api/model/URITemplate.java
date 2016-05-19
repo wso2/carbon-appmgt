@@ -25,6 +25,7 @@ import java.util.List;
 
 public class URITemplate {
 
+	private int id;
 	private String uriTemplate;
 	private String resourceURI;
 	private String resourceSandboxURI;
@@ -40,6 +41,14 @@ public class URITemplate {
     private List<EntitlementPolicyPartialMapping> entitlementPolicyPartialMappings;
 	private int policyGroupId;
 	private String policyGroupName;
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getId() {
+		return id;
+	}
 
 	public String getPolicyGroupName() {
 		return policyGroupName;
