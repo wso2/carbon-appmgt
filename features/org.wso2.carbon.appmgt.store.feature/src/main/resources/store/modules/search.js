@@ -99,7 +99,13 @@ var build = function (query) {
         if (token.value) {
             //for the moment search has been restricted only to 'overview' section
             advanced = true;
-            obj['overview_' + token.key.toLowerCase()] = token.value;
+            var key;
+            if(token.key.equals("Name")){
+                key = "displayName";
+            }else{
+                key = token.key.toLowerCase();
+            }
+            obj['overview_' + key] = token.value;
         }
     });
     return advanced ? obj : query;
