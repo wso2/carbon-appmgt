@@ -61,7 +61,7 @@
                                     <overWrite>true</overWrite>
                                     <type>war</type>
                                     <outputDirectory>${basedir}/src/main/resources/</outputDirectory>
-                                    <destFileName>api#appm#publisher#v1.0.war</destFileName>
+                                    <destFileName>api#appm#publisher#v1.1.war</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -107,7 +107,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <delete file="src/main/resources/api#appm#publisher#v1.0.war" />
+                                <delete file="src/main/resources/api#appm#publisher#v1.1.war" />
                             </tasks>
                         </configuration>
                     </execution>
