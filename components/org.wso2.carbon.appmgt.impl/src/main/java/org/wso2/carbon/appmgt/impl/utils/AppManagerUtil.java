@@ -118,18 +118,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -206,7 +195,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -364,7 +353,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -470,7 +459,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -633,7 +622,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -717,11 +706,13 @@ public final class AppManagerUtil {
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, api.getContext());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, api.getId().getProviderName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, api.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, api.getTreatAsASite());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, api.getUrl());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, api.getLogoutURL());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL, api.getSandboxUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WSDL, api.getWsdlUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WADL, api.getWadlUrl());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, api.getDisplayName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL, api.getThumbnailUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_STATUS, apiStatus);
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER, api.getTechnicalOwner());
@@ -838,7 +829,7 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
             String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
-            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER, mobileApp.getBanner());
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, mobileApp.getBanner());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID, mobileApp.getAppId());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
@@ -853,8 +844,109 @@ public final class AppManagerUtil {
 		return artifact;
 	}
 
+    /**
+     * Generate WebApp GenericArtifact content from Webapp
+     * @param artifact Webapp GenericArtifact
+     * @param webApp WebApp
+     * @return GenericArtifact
+     * @throws AppManagementException
+     */
+    public static GenericArtifact createWebAppArtifactContent(GenericArtifact artifact, WebApp webApp)
+            throws
+            AppManagementException {
+        try {
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, webApp.getId().getApiName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, webApp.getId().getVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, webApp.getContext());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, webApp.getDisplayName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(webApp.getId().getProviderName()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl()); //
+            artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, ""); //webApp.getThumbnailUrl()
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, "");
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(webApp.getAppVisibility()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS, webApp.getVisibleTenants());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, webApp.getTransports());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TIER, "Unlimited");
+            artifact.setAttribute(AppMConstants.APP_TRACKING_CODE, webApp.getTrackingCode());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, webApp.getCreatedTime());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, Boolean.toString(webApp.getAllowAnonymous()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
 
-	/**
+        } catch (GovernanceException e) {
+            String msg = "Failed to create WebApp for : " + webApp.getId().getApiName();
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
+        return artifact;
+    }
+
+    /**
+     * This method used to Downloaded Uploaded Documents from publisher
+     *
+     * @param userName     logged in username
+     * @param resourceUrl  resource want to download
+     * @param tenantDomain loggedUserTenantDomain
+     * @return map that contains Data of the resource
+     * @throws AppManagementException
+     */
+    public static Map<String, Object> getDocument(String userName, String resourceUrl, String tenantDomain)
+            throws AppManagementException {
+        Map<String, Object> documentMap = new HashMap<String, Object>();
+
+        InputStream inStream = null;
+        String[] resourceSplitPath =
+                resourceUrl.split(RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH);
+        if (resourceSplitPath.length == 2) {
+            resourceUrl = resourceSplitPath[1];
+        } else {
+           handleException("Invalid resource Path " + resourceUrl);
+        }
+        Resource apiDocResource;
+        Registry registryType = null;
+        boolean isTenantFlowStarted = false;
+        try {
+            int tenantId;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                PrivilegedCarbonContext.startTenantFlow();
+                isTenantFlowStarted = true;
+
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            } else {
+                tenantId = MultitenantConstants.SUPER_TENANT_ID;
+            }
+
+            userName = MultitenantUtils.getTenantAwareUsername(userName);
+            registryType = ServiceReferenceHolder
+                    .getInstance().
+                            getRegistryService().getGovernanceUserRegistry(userName, tenantId);
+            if (registryType.resourceExists(resourceUrl)) {
+                apiDocResource = registryType.get(resourceUrl);
+                inStream = apiDocResource.getContentStream();
+                documentMap.put("Data", inStream);
+                documentMap.put("contentType", apiDocResource.getMediaType());
+                String[] content = apiDocResource.getPath().split("/");
+                documentMap.put("name", content[content.length - 1]);
+            }
+        } catch (RegistryException e) {
+            String msg = "Couldn't retrieve registry for User " + userName + " Tenant " + tenantDomain;
+            log.error(msg, e);
+            handleException(msg, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return documentMap;
+    }
+
+    /**
 	 * Create the Documentation from artifact
 	 * 
 	 * @param artifact
@@ -1864,7 +1956,7 @@ public final class AppManagerUtil {
 
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 			int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
 			try {
@@ -3614,4 +3706,35 @@ public final class AppManagerUtil {
             throw new AppManagementException("Error while reading tenant conf file content", e);
         }
     }
+
+    public static boolean isUserAuthorized(String username, String resourcePath) throws AppManagementException {
+
+        boolean isAuthorized = false;
+        try {
+            String tenantDomain =
+                    MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
+            int tenantId =
+                    ServiceReferenceHolder.getInstance().getRealmService()
+                            .getTenantManager().getTenantId(tenantDomain);
+            AuthorizationManager authManager = null;
+
+            authManager = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId).getAuthorizationManager();
+            isAuthorized = authManager.isUserAuthorized(username, resourcePath, "authorize");
+        } catch (UserStoreException e) {
+            throw new AppManagementException("User " + username + " is not authorized to perform lifecycle action");
+        }
+        return isAuthorized;
+    }
+
+    public static void handleException(String msg, Throwable t) throws AppManagementException {
+        log.error(msg, t);
+        throw new AppManagementException(msg, t);
+    }
+
+    private static void handleException(String msg) throws AppManagementException {
+        log.error(msg);
+        throw new AppManagementException(msg);
+    }
+
+
 }

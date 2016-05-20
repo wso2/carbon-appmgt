@@ -116,6 +116,27 @@ public interface APIManager {
                                           String docName) throws AppManagementException;
 
     /**
+     * Checks whether the given document already exists for the given app
+     *
+     * @param identifier API Identifier
+     * @param docName Name of the document
+     * @return true if document already exists for the given api
+     * @throws AppManagementException if failed to check existence of the documentation
+     */
+    boolean isDocumentationExist(APIIdentifier identifier, String docName) throws AppManagementException;
+
+    /**
+     * Get a documentation by artifact Id
+     *
+     * @param docId   DocumentID
+     * @param requestedTenantDomain tenant domain of the registry where the artifact is located
+     * @return Documentation
+     * @throws AppManagementException if failed to get Documentation
+     */
+    Documentation getDocumentation(String docId, String requestedTenantDomain) throws AppManagementException;
+
+
+    /**
      * This method used to get the content of a documentation
      *
      * @param identifier,        WebApp identifier

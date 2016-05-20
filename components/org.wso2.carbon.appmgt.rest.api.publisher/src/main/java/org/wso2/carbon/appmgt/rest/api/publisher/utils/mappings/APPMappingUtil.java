@@ -18,20 +18,20 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppInfoDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class APPMappingUtil {
@@ -90,11 +90,11 @@ public class APPMappingUtil {
         return appInfoDTO;
     }
 
-    public static AppInfoDTO fromAppToInfoDTO(App app){
+    public static AppInfoDTO fromAppToInfoDTO(App app) {
 
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
             return fromWebAppToInfoDTO((WebApp) app);
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
             return fromMobileAppToInfoDTO((MobileApp) app);
         }
 
@@ -109,7 +109,8 @@ public class APPMappingUtil {
         appInfoDTO.setVersion(app.getVersion());
         appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
         appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifecycleStatus().getStatus());
+        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -117,7 +118,18 @@ public class APPMappingUtil {
     private static AppInfoDTO fromWebAppToInfoDTO(WebApp app) {
 
         AppInfoDTO appInfoDTO = new AppInfoDTO();
+
+        appInfoDTO.setId(app.getUUID());
+
+        APIIdentifier apiId = app.getId();
+        appInfoDTO.setName(apiId.getApiName());
+        appInfoDTO.setVersion(apiId.getVersion());
+
+        String providerName = app.getId().getProviderName();
+        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+
         appInfoDTO.setDescription(app.getDescription());
+
         String context = app.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
@@ -125,13 +137,9 @@ public class APPMappingUtil {
             }
             appInfoDTO.setContext(context);
         }
-        appInfoDTO.setId(app.getUUID());
-        APIIdentifier apiId = app.getId();
-        appInfoDTO.setName(apiId.getApiName());
-        appInfoDTO.setVersion(apiId.getVersion());
-        String providerName = app.getId().getProviderName();
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+
         appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
         return appInfoDTO;
 
     }
@@ -156,13 +164,13 @@ public class APPMappingUtil {
         if (paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET) != null) {
             paginatedPrevious = RestApiUtil
                     .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_OFFSET),
-                                        paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), query);
+                            paginatedParams.get(RestApiConstants.PAGINATION_PREVIOUS_LIMIT), query);
         }
 
         if (paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET) != null) {
             paginatedNext = RestApiUtil
                     .getAPIPaginatedURL(paginatedParams.get(RestApiConstants.PAGINATION_NEXT_OFFSET),
-                                        paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
+                            paginatedParams.get(RestApiConstants.PAGINATION_NEXT_LIMIT), query);
         }
 
         appListDTO.setNext(paginatedNext);
@@ -238,7 +246,7 @@ public class APPMappingUtil {
             tiersToReturn.add(tier.getName());
         }
         if (model.getTransports() != null) {
-            dto.setTransport(Arrays.asList(model.getTransports().split(",")));
+            dto.setTransport(model.getTransports());
         }
         if (model.getVisibleRoles() != null) {
             dto.setVisibleRoles(Arrays.asList(model.getVisibleRoles().split(",")));
@@ -265,11 +273,11 @@ public class APPMappingUtil {
     }
 
 
-    public static AppDTO fromAppToDTO(App app){
+    public static AppDTO fromAppToDTO(App app) {
 
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
-            return fromWebAppToDTO((WebApp) app) ;
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())){
+        if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
+            return fromWebAppToDTO((WebApp) app);
+        } else if (AppMConstants.MOBILE_ASSET_TYPE.equals(app.getType())) {
             return fromMobileAppToDTO((MobileApp) app);
         }
 
@@ -277,14 +285,21 @@ public class APPMappingUtil {
 
     }
 
-    private static AppDTO fromWebAppToDTO(WebApp webapp){
+    private static AppDTO fromWebAppToDTO(WebApp webapp) {
 
         AppDTO dto = new AppDTO();
+
+        dto.setType(webapp.getType());
+        dto.setId(webapp.getUUID());
         dto.setName(webapp.getId().getApiName());
+        dto.setDisplayName(webapp.getDisplayName());
+        dto.setDescription(webapp.getDescription());
         dto.setVersion(webapp.getId().getVersion());
+
         String providerName = webapp.getId().getProviderName();
         dto.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-        dto.setId(webapp.getUUID());
+
+
         String context = webapp.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
@@ -292,50 +307,87 @@ public class APPMappingUtil {
             }
             dto.setContext(context);
         }
-        dto.setDescription(webapp.getDescription());
+
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
+        dto.setRating(BigDecimal.valueOf(webapp.getRating()));
+
         Set<String> apiTags = webapp.getTags();
-        List<String> tagsToReturn = new ArrayList<>();
-        tagsToReturn.addAll(apiTags);
-        dto.setTags(tagsToReturn);
-        Set<Tier> apiTiers = webapp.getAvailableTiers();
-        List<String> tiersToReturn = new ArrayList<>();
-        for (Tier tier : apiTiers) {
-            tiersToReturn.add(tier.getName());
+        dto.setTags(new ArrayList<String>(apiTags));
+
+        List<String> tiers = new ArrayList<>();
+        for (Tier tier : webapp.getAvailableTiers()) {
+            tiers.add(tier.getName());
         }
-        if (webapp.getTransports() != null) {
-            dto.setTransport(Arrays.asList(webapp.getTransports().split(",")));
-        }
+
+        dto.setTransport(webapp.getTransports());
+
         if (webapp.getVisibleRoles() != null) {
             dto.setVisibleRoles(Arrays.asList(webapp.getVisibleRoles().split(",")));
         }
+
         if (webapp.getLifeCycleName() != null) {
             dto.setLifecycle(webapp.getLifeCycleName());
         }
 
-        dto.setType(webapp.getType());
-
-        dto.setDisplayName(webapp.getDisplayName());
-        dto.setCreatedtime(webapp.getDisplayName());
+        dto.setCreatedTime(webapp.getCreatedTime());
 
         AppAppmetaDTO appAppmetaDTO = new AppAppmetaDTO();
         appAppmetaDTO.setPath(webapp.getPath());
         appAppmetaDTO.setVersion(webapp.getId().getVersion());
         dto.setAppmeta(appAppmetaDTO);
-
         dto.setMediaType(webapp.getMediaType());
-        dto.setCreatedTime(webapp.getCreatedTime());
 
+        // Set policy groups.
+        List<PolicyGroupsDTO> policyGroupsDTOs = new ArrayList<PolicyGroupsDTO>();
+
+        List<EntitlementPolicyGroup> policyGroups = webapp.getAccessPolicyGroups();
+        if(policyGroups != null){
+
+            for(EntitlementPolicyGroup policyGroup : policyGroups){
+                PolicyGroupsDTO policyGroupsDTO = new PolicyGroupsDTO();
+                policyGroupsDTO.setPolicyGroupId(policyGroup.getPolicyGroupId());
+                policyGroupsDTO.setPolicyGroupName(policyGroup.getPolicyGroupName());
+                policyGroupsDTO.setDescription(policyGroup.getPolicyDescription());
+                policyGroupsDTO.setUserRoles(policyGroup.getUserRolesAsList());
+                policyGroupsDTO.setAllowAnonymousAccess(String.valueOf(policyGroup.isAllowAnonymous()));
+                policyGroupsDTO.setThrottlingTier(policyGroup.getThrottlingTier());
+
+                int entitlementPolicyId = policyGroup.getFirstEntitlementPolicyId();
+                if(entitlementPolicyId > 0){
+                    policyGroupsDTO.setPolicyPartialMapping(Arrays.asList(new String[]{String.valueOf(entitlementPolicyId)}));
+                }
+
+                policyGroupsDTOs.add(policyGroupsDTO);
+            }
+        }
+        dto.setPolicyGroups(policyGroupsDTOs);
+
+
+        // Set URI Templates
+        List<UriTemplateDTO> uriTemplateDTOs = new ArrayList<UriTemplateDTO>();
+        Set<URITemplate> uriTemplates = webapp.getUriTemplates();
+
+        if(uriTemplates != null){
+            for(URITemplate uriTemplate : uriTemplates){
+                UriTemplateDTO uriTemplateDTO = new UriTemplateDTO();
+                uriTemplateDTO.setId(uriTemplate.getId());
+                uriTemplateDTO.setUrlPattern(uriTemplate.getUriTemplate());
+                uriTemplateDTO.setHttpVerb(uriTemplate.getHTTPVerb());
+                uriTemplateDTO.setPolicyGroupName(uriTemplate.getPolicyGroupName());
+                uriTemplateDTO.setPolicyGroupId(uriTemplate.getPolicyGroupId());
+
+                uriTemplateDTOs.add(uriTemplateDTO);
+            }
+        }
+        dto.setUriTemplates(uriTemplateDTOs);
 
         return dto;
-
-
     }
 
-    private static AppDTO fromMobileAppToDTO(MobileApp mobileApp){
+    private static AppDTO fromMobileAppToDTO(MobileApp mobileApp) {
 
         AppDTO dto = new AppDTO();
 
@@ -343,6 +395,7 @@ public class APPMappingUtil {
         dto.setName(mobileApp.getAppName());
         dto.setVersion(mobileApp.getVersion());
         dto.setDescription(mobileApp.getDescription());
+        dto.setRating(BigDecimal.valueOf(mobileApp.getRating()));
 
         Set<String> apiTags = mobileApp.getTags();
         List<String> tagsToReturn = new ArrayList<>();
@@ -379,12 +432,13 @@ public class APPMappingUtil {
 
 
     /**
-     * This method validates and converts AppDTO into a MobileApp
+     * Converts AppDTO into a MobileApp
+     *
      * @param appDTO AppDTO
      * @return if appDTO is valid, returns the converted MobileApp, else throws a BadRequestException
      * @throws AppManagementException
      */
-    public static MobileApp fromDTOtoMobileApp(AppDTO appDTO){
+    public static MobileApp fromDTOtoMobileApp(AppDTO appDTO) {
 
         String providerName = RestApiUtil.getLoggedInUsername();
 
@@ -448,11 +502,11 @@ public class APPMappingUtil {
         mobileAppModel.setThumbnail(appDTO.getIcon());
         List<String> screenShots = appDTO.getScreenshots();
         validateMandatoryField("screenshots", screenShots);
-        if(screenShots.size() > 3){
+        if (screenShots.size() > 3) {
             RestApiUtil.handleBadRequest("Attached screenshots count exceeds the maximum number of allowed screenshots",
                     log);
         }
-        while(screenShots.size() < 3){
+        while (screenShots.size() < 3) {
             screenShots.add("");
         }
         mobileAppModel.setScreenShots(appDTO.getScreenshots());
@@ -471,6 +525,105 @@ public class APPMappingUtil {
         }
         return mobileAppModel;
     }
+
+    /**
+     * Convert AppDTO to WebApp
+     *
+     * @param appDTO application data transfer object
+     * @return WebApp
+     */
+    public static WebApp fromDTOToWebapp(AppDTO appDTO) {
+
+        String providerName = AppManagerUtil.replaceEmailDomainBack(RestApiUtil.getLoggedInUsername());
+        String appName = appDTO.getName();
+        String appVersion = appDTO.getVersion();
+        APIIdentifier apiIdentifier = new APIIdentifier(providerName, appName, appVersion);
+        WebApp webApp = new WebApp(apiIdentifier);
+        webApp.setUUID(appDTO.getId());
+        webApp.setType(AppMConstants.WEBAPP_ASSET_TYPE);
+        webApp.setUrl(appDTO.getAppUrL());
+        webApp.setContext(appDTO.getContext());
+        webApp.setDisplayName(appDTO.getDisplayName());
+        webApp.setStatus(APIStatus.CREATED);
+        webApp.setTransports(appDTO.getTransport());
+        webApp.setTreatAsASite(appDTO.getIsSite());
+        webApp.setDescription(appDTO.getDescription());
+        webApp.setThumbnailUrl(appDTO.getThumbnailUrl());
+        webApp.setBanner(appDTO.getBanner());
+        webApp.setLogoutURL(appDTO.getLogoutURL());
+        webApp.setBusinessOwner(appDTO.getBusinessOwnerName());
+        webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(),","));
+        webApp.setSkipGateway(Boolean.parseBoolean(appDTO.getSkipGateway()));
+        webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
+        webApp.setAcsURL(appDTO.getAcsUrl());
+
+        List<PolicyGroupsDTO> policyGroupsDTOs = appDTO.getPolicyGroups();
+        List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
+
+        //Set Policy groups
+        for (PolicyGroupsDTO policyGroupsDTO : policyGroupsDTOs) {
+
+            EntitlementPolicyGroup entitlementPolicyGroup = new EntitlementPolicyGroup();
+
+            if(policyGroupsDTO.getPolicyGroupId() != null){
+                entitlementPolicyGroup.setPolicyGroupId(policyGroupsDTO.getPolicyGroupId());
+            }
+
+            entitlementPolicyGroup.setPolicyGroupName(policyGroupsDTO.getPolicyGroupName());
+            entitlementPolicyGroup.setAllowAnonymous(Boolean.parseBoolean(policyGroupsDTO.getAllowAnonymousAccess()));
+            entitlementPolicyGroup.setThrottlingTier(policyGroupsDTO.getThrottlingTier());
+            entitlementPolicyGroup.setUserRoles(StringUtils.join(policyGroupsDTO.getUserRoles(), ","));
+            entitlementPolicyGroup.setXacmlPolicyNames(policyGroupsDTO.getPolicyPartialMapping());
+
+            if(policyGroupsDTO.getPolicyPartialMapping() != null && policyGroupsDTO.getPolicyPartialMapping().size() > 0){
+                entitlementPolicyGroup.setEntitlementPolicyId(Integer.parseInt(policyGroupsDTO.getPolicyPartialMapping().get(0)));
+            }
+
+            accessPolicyGroups.add(entitlementPolicyGroup);
+        }
+        webApp.setAccessPolicyGroups(accessPolicyGroups);
+
+        //Set URITemplates
+        List<UriTemplateDTO> uriTemplateDTOs = appDTO.getUriTemplates();
+        Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
+        for (UriTemplateDTO uriTemplateDTO : uriTemplateDTOs) {
+            URITemplate uriTemplate = new URITemplate();
+
+            if(uriTemplateDTO.getId() != null){
+                uriTemplate.setId(uriTemplateDTO.getId());
+            }
+
+            uriTemplate.setHTTPVerb(uriTemplateDTO.getHttpVerb());
+            uriTemplate.setUriTemplate(uriTemplateDTO.getUrlPattern());
+            uriTemplate.setPolicyGroupName(uriTemplateDTO.getPolicyGroupName());
+
+            if(uriTemplateDTO.getPolicyGroupId() != null){
+                uriTemplate.setPolicyGroupId(uriTemplateDTO.getPolicyGroupId());
+            }
+
+            uriTemplates.add(uriTemplate);
+        }
+        webApp.setUriTemplates(uriTemplates);
+        if (appDTO.getTags() != null) {
+            Set<String> apiTags = new HashSet<>(appDTO.getTags());
+            webApp.addTags(apiTags);
+        }
+
+        List<String>  visibleRoleList = appDTO.getVisibleRoles();
+        if (visibleRoleList != null) {
+            String[] visibleRoles = new String[visibleRoleList.size()];
+            visibleRoles = visibleRoleList.toArray(visibleRoles);
+            webApp.setAppVisibility(visibleRoles);
+        }
+        List<String> claimsList = appDTO.getClaims();
+        if(claimsList != null){
+            webApp.setClaims(claimsList);
+        }
+        return webApp;
+    }
+
+
+
 
     private static boolean validateMandatoryField(String fieldName, Object fieldValue) {
 

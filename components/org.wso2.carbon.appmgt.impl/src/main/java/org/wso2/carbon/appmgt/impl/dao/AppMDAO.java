@@ -152,7 +152,7 @@ public class AppMDAO {
 
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
-        BusinessOwner businessOwner = new BusinessOwner();
+        BusinessOwner businessOwner = null;
         ResultSet businessOwnerResultSet = null;
 
         String queryToGetBusinessOwner = "SELECT OWNER_NAME, OWNER_EMAIL, OWNER_DESC, OWNER_SITE FROM BUSINESS_OWNER " +
@@ -165,6 +165,7 @@ public class AppMDAO {
             businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
 
             if (businessOwnerResultSet.next()) {
+                businessOwner = new BusinessOwner();
                 businessOwner.setBusinessOwnerId(businessOwnerId);
                 businessOwner.setBusinessOwnerName(businessOwnerResultSet.getString("OWNER_NAME"));
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
@@ -338,7 +339,7 @@ public class AppMDAO {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT KEY, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
+        String queryToGetKeyValue = "SELECT `KEY`, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
@@ -391,6 +392,7 @@ public class AppMDAO {
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
                 businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
                 businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
+                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId));
                 businessOwnersList.add(businessOwner);
             }
         } catch (SQLException e) {
@@ -5829,31 +5831,34 @@ public class AppMDAO {
 	public EntitlementPolicyPartial getPolicyPartial(int policyPartialId) throws
                                                                           AppManagementException {
 
-		Connection connection = null;
-		PreparedStatement statementToGetPolicyPartial = null;
-		EntitlementPolicyPartial entitlementPolicyPartial = null;
-		ResultSet rs = null;
-		String queryToGetPolicyPartial =
-				"SELECT NAME,CONTENT " +
-						"FROM APM_ENTITLEMENT_POLICY_PARTIAL " +
-						"WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ?";
+        Connection connection = null;
+        PreparedStatement statementToGetPolicyPartial = null;
+        EntitlementPolicyPartial entitlementPolicyPartial = null;
+        ResultSet rs = null;
+        String queryToGetPolicyPartial =
+                "SELECT NAME, CONTENT, SHARED, DESCRIPTION, AUTHOR " +
+                        "FROM APM_ENTITLEMENT_POLICY_PARTIAL " +
+                        "WHERE ENTITLEMENT_POLICY_PARTIAL_ID = ?";
 
-		try {
+        try {
 
-			if (log.isDebugEnabled()) {
-				log.debug("Retrieving policy content of policy partial with id : " + policyPartialId);
-			}
+            if (log.isDebugEnabled()) {
+                log.debug("Retrieving policy content of policy partial with id : " + policyPartialId);
+            }
 
-			connection = APIMgtDBUtil.getConnection();
-			statementToGetPolicyPartial = connection.prepareStatement(queryToGetPolicyPartial);
-			statementToGetPolicyPartial.setInt(1, policyPartialId);
+            connection = APIMgtDBUtil.getConnection();
+            statementToGetPolicyPartial = connection.prepareStatement(queryToGetPolicyPartial);
+            statementToGetPolicyPartial.setInt(1, policyPartialId);
 
-			rs = statementToGetPolicyPartial.executeQuery();
-			while (rs.next()) {
-				entitlementPolicyPartial = new EntitlementPolicyPartial();
-				entitlementPolicyPartial.setPolicyPartialName(rs.getString("NAME"));
-				entitlementPolicyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
-			}
+            rs = statementToGetPolicyPartial.executeQuery();
+            while (rs.next()) {
+                entitlementPolicyPartial = new EntitlementPolicyPartial();
+                entitlementPolicyPartial.setPolicyPartialName(rs.getString("NAME"));
+                entitlementPolicyPartial.setPolicyPartialContent(rs.getString("CONTENT"));
+                entitlementPolicyPartial.setAuthor(rs.getString("AUTHOR"));
+                entitlementPolicyPartial.setDescription(rs.getString("DESCRIPTION"));
+                entitlementPolicyPartial.setShared(rs.getBoolean("SHARED"));
+            }
 
 		} catch (SQLException e) {
 			handleException("Failed to retrieve application entitlement policy partial with id : " +
@@ -7841,62 +7846,57 @@ public class AppMDAO {
 		return policyPartialNamesList;
 	}
 
-	/**
-	 * Fetch predefined all the non mandatory Java policy list with the mapped Application Id
-	 * If each policy is mapped with the given appId it will return the same appId else it will return NULL
-	 * The mandatory policies are excluded from the returned list
-	 * And also only includes the Global (application level) policies
-	 *
-	 * @param applicationUUId
-	 * @param isGlobalPolicy :if application level policy - true else if resource level policy - false
-	 * @return array of all available java policies
-	 * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
-	 */
-	public static NativeArray getAvailableJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
-			throws AppManagementException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		NativeObject objPolicy;
-		NativeArray arrJavaPolicies = new NativeArray(0);
-		int count = 0;
+    /**
+     * Fetch predefined all the non mandatory Java policy list with the mapped Application Id If each policy is mapped
+     * with the given appId it will return the same appId else it will return NULL The mandatory policies are excluded
+     * from the returned list And also only includes the Global (application level) policies
+     *
+     * @param applicationUUId
+     * @param isGlobalPolicy  :if application level policy - true else if resource level policy - false
+     * @return array of all available java policies
+     * @throws org.wso2.carbon.appmgt.api.AppManagementException on error
+     */
+    public static JSONArray getAvailableJavaPolicyList(String applicationUUId, boolean isGlobalPolicy)
+            throws AppManagementException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         Boolean isMandatory = false; //no need to show the mandatory fields as options
+        JSONArray arrJavaPolicies = new JSONArray();
 
-		String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
-				",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
-				"FROM APM_APP_JAVA_POLICY POL " +
-				"LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
-				"LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
-				"WHERE IS_MANDATORY= ? AND IS_GLOBAL= ? " +
-				"ORDER BY DISPLAY_ORDER_SEQ_NO  ";
+        String query = " SELECT POL.JAVA_POLICY_ID AS JAVA_POLICY_ID ,DISPLAY_NAME ,DESCRIPTION " +
+                ",DISPLAY_ORDER_SEQ_NO ,APP.APP_ID AS APP_ID " +
+                "FROM APM_APP_JAVA_POLICY POL " +
+                "LEFT JOIN APM_APP_JAVA_POLICY_MAPPING MAP ON POL.JAVA_POLICY_ID=MAP.JAVA_POLICY_ID " +
+                "LEFT JOIN APM_APP APP ON APP.APP_ID=MAP.APP_ID AND APP.UUID = ? " +
+                "WHERE IS_MANDATORY= ? AND IS_GLOBAL= ? " +
+                "ORDER BY DISPLAY_ORDER_SEQ_NO  ";
 
-		try {
-			conn = APIMgtDBUtil.getConnection();
-			ps = conn.prepareStatement(query);
-			ps.setString(1, applicationUUId);
-			ps.setBoolean(2, isMandatory);
+        try {
+            conn = APIMgtDBUtil.getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, applicationUUId);
+            ps.setBoolean(2, isMandatory);
             ps.setBoolean(3, isGlobalPolicy);
             rs = ps.executeQuery();
-			while (rs.next()) {
-				objPolicy = new NativeObject();
-				objPolicy.put("javaPolicyId", objPolicy, rs.getInt("JAVA_POLICY_ID"));
-				objPolicy.put("displayName", objPolicy, rs.getString("DISPLAY_NAME"));
-				objPolicy.put("description", objPolicy, rs.getString("DESCRIPTION"));
-				objPolicy.put("displayOrder", objPolicy, rs.getInt("DISPLAY_ORDER_SEQ_NO"));
-				objPolicy.put("applicationId", objPolicy, rs.getString("APP_ID"));
+            while (rs.next()) {
+                JSONObject objPolicy = new JSONObject();
+                objPolicy.put("javaPolicyId", rs.getInt("JAVA_POLICY_ID"));
+                objPolicy.put("displayName", rs.getString("DISPLAY_NAME"));
+                objPolicy.put("description", rs.getString("DESCRIPTION"));
+                objPolicy.put("displayOrder", rs.getInt("DISPLAY_ORDER_SEQ_NO"));
+                objPolicy.put("applicationId", rs.getString("APP_ID"));
+                arrJavaPolicies.add(objPolicy);
+            }
 
-				arrJavaPolicies.put(count, arrJavaPolicies, objPolicy);
-				count++;
-			}
-
-		} catch (SQLException e) {
-			handleException("SQL Error while executing the query to get available Java Policies : "
-					+ query + e.getMessage(), e);
-		} finally {
-			APIMgtDBUtil.closeAllConnections(ps, conn, rs);
-		}
-		return arrJavaPolicies;
-	}
+        } catch (SQLException e) {
+            handleException("SQL Error while executing the query to get available Java Policies : "
+                                    + query + e.getMessage(), e);
+        } finally {
+            APIMgtDBUtil.closeAllConnections(ps, conn, rs);
+        }
+        return arrJavaPolicies;
+    }
 
 	/**
 	 * save java policy and application mapping

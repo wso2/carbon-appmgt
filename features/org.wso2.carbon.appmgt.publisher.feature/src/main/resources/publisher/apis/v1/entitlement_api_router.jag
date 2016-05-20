@@ -98,7 +98,8 @@ require('/modules/publisher.js').exec(function(ctx) {
     });
 
     routeManager.register('GET', 'publisher', '/publisher/api/entitlement/get/all/available/java/policy/handlers/details/list/{applicationUUID}/{isGlobalPolicy}', function (context) {
-        var javaPolicyList = getAvailableJavaPolicyList(context.params.applicationUUID, context.params.isGlobalPolicy);
+        var javaPolicyList = JSON.parse(getAvailableJavaPolicyList(context.params.applicationUUID,
+                                                                   context.params.isGlobalPolicy));
         response.contentType = CONTENT_TYPE_JSON;
         print(javaPolicyList);
     });

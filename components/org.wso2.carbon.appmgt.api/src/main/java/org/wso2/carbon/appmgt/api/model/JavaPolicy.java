@@ -26,6 +26,7 @@ public class JavaPolicy {
     private String fullQualifiName; //full qualified name
     private Integer order; //display order
     private JSONObject properties;
+    private String description;
 
     public void setPolicyID(Integer policyID) {
         this.policyID = policyID;
@@ -65,5 +66,13 @@ public class JavaPolicy {
 
     public JSONObject getProperties() {
         return properties;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

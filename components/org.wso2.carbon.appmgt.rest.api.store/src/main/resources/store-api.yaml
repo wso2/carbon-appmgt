@@ -1,12 +1,9 @@
 swagger: '2.0'
 info:
-  version: 1.0.0
+  version: 1.1.0
   title: WSO2 APP Manager - Store API
-  description: >
-    This document specifies a **RESTful API** for WSO2 **APP Manager**
-    - Publisher.
-
-
+  description: |
+    This document specifies a **RESTful API** for WSO2 **APP Manager** - Store.
 
     It is written with [swagger 2](http://swagger.io/).
   contact:
@@ -24,9 +21,30 @@ consumes:
   - application/json
 produces:
   - application/json
+x-wso2-security:
+  appm:
+    x-wso2-scopes:
+      - description: ''
+        roles: admin
+        name: 'appm:read'
+        key: 'appm:read'
+      - description: ''
+        roles: admin
+        name: 'appm:subscribe'
+        key: 'appm:subscribe'
+      - description: ''
+        roles: admin
+        name: 'appm:administration'
+        key: 'appm:administration'
 paths:
   '/apps/{appType}':
     get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        "http://localhost:9763/api/appm/store/v1.0/apps/mobileapp"
+      x-wso2-response: >-
+        {"previous":"","count":1,"next":"","appList":[{"name":"phone","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","version":"1.0","description":"phone","provider":"admin","lifecycleState":"CREATED","rating":0.0}]}
       summary: Get all Apps
       description: |
         Get a list of available Apps qualifying under a given search condition.
@@ -38,19 +56,15 @@ paths:
             **Search condition**.
 
 
-
             You can search in attributes by using an **"attribute:"** modifier.
-
 
 
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
 
 
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
 
 
             If no advanced attribute modifier has been specified, search will
@@ -58,6 +72,7 @@ paths:
 
             given query string against App Name.
           type: string
+        - $ref: '#/parameters/fieldFilter'
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/Accept'
@@ -66,7 +81,9 @@ paths:
         - Apps
       responses:
         '200':
-          description: "OK. \nList of qualifying Apps is returned.\n"
+          description: |
+            OK.
+            List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
           headers:
@@ -79,19 +96,31 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}':
     get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        "http://localhost:9763/api/appm/store/v1.0/apps/mobileapp/id/5c9c8551-d696-4c44-85a6-dcd86f1a1e25"
+      x-wso2-response: >-
+        {"name":"phone","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","type":"mobileapp","displayName":null,"transport":[],"lifecycle":null,"category":"Business","version":"1.0","icon":"/publisher/api/mobileapp/getfile/1KKX5LeQII1Ev8t.jpeg","description":"phone","provider":null,"lifecycleState":null,"tags":[],"rating":0.0,"thumbnailUrl":null,"banner":"/publisher/api/mobileapp/getfile/ABi7iIcbQYpyI8e.jpeg","marketType":null,"recentChanges":"-","platform":"ios","isSite":null,"appDefinition":null,"isDefaultVersion":null,"bundleversion":"1.0","screenshots":["/publisher/api/mobileapp/getfile/PiP8X797UcqF6De.jpeg"],"createdtime":null,"appType":"enterprise","lifecycleAvailableActions":null}
       summary: Get app details
       description: |
         Get details of an app.
@@ -105,7 +134,9 @@ paths:
         - Apps
       responses:
         '200':
-          description: "OK. \nQualifying App is returned.\n"
+          description: |
+            OK.
+            Qualifying App is returned.
           schema:
             $ref: '#/definitions/App'
           headers:
@@ -118,19 +149,697 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/rate':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate"
+      x-wso2-response: '{"rating": 1.6428571428571428}'
+      summary: Get app rating details
+      description: |
+        Get rating details of an app.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+            App rating is returned.
+          schema:
+            $ref: '#/definitions/AppRatingList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X PUT -H "Authorization: Bearer 3cdc86c3ee6edbe18260392fb488c4e7"
+        -d '{"rating": 4, "review": "good"}'
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: '{"rating": 4,"review": "good"}'
+      summary: Change App rating
+      description: |
+        Change App rating
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - in: body
+          name: rating
+          description: |
+            App rating object that needs to be added
+          required: true
+          schema:
+            $ref: '#/definitions/AppRatingInfo'
+        - $ref: '#/parameters/Content-Type'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            Ok.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/storage/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      x-wso2-request: ''
+      summary: Retrieving file
+      description: |
+        Retrieving a file saved with an App.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modified the last.
+                Used by caches, or in conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Requested entity does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/subscription':
+    post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer
+        c8c4399ba38982a21372012294ad1a54"  -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Subscribe App
+      description: |
+        Subscribe to an existing App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription"a
+      x-wso2-response: >-
+        {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
+      summary: Get subscriptions for current user
+      description: |
+        Get subscriptions for current user.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: |
+            OK.
+            Qualifying App is returned.
+          schema:
+            $ref: '#/definitions/AppList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/subscription/users':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription"
+      x-wso2-response: '{"userIds":["admin","user1","user2"]}'
+      summary: Get subscribed user list
+      description: |
+        Get subscribed user list for a given App.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: |
+            OK.
+            Qualifying App is returned.
+          schema:
+            $ref: '#/definitions/UserIdList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/unsubscription':
+    post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer
+        c8c4399ba38982a21372012294ad1a54"  -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Un subscribe App
+      description: |
+        Un subscribe to an existing App
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/subscription-workflow':
+    post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer
+        c8c4399ba38982a21372012294ad1a54"  -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription-workflow"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Check for subscription workflow
+      description: |
+        Check for subscription workflow.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/docs/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      summary: Retrieving document
+      description: |
+        Retrieving document.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+            Document Retrieved successfully.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modified the last.
+                Used by caches, or in conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Requested entity does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/favourite-page:
+    post:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Set as favourite page
+      description: |
+        Set as favourite page.
+      tags:
+        - Favourite
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X DELETE -H "Authorization: Bearer
+        c8c4399ba38982a21372012294ad1a54" -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: ''
+      summary: Remove from favourite page
+      description: |
+        Remove from favourite page.
+      tags:
+        - Favourite
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer
+        c8c4399ba38982a21372012294ad1a54""http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
+      x-wso2-response: '{"isDefaultPage": true}'
+      summary: check if it is the favourite page
+      description: |
+        check if it is the favourite page.
+      parameters:
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+          schema:
+            $ref: '#/definitions/FavouritePage'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/id/{appId}/favourite-app':
+    post:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Add to favourite Apps
+      description: |
+        Add to favourite Apps.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Favourite
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
+        -d ''
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app"
+      x-wso2-response: HTTP/1.1 200 OK
+      summary: Remove from favourite Apps
+      description: |
+        Remove from favourite Apps.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/appId'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Favourite
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
   /apps/download:
     post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -d '{"type":
+        "user","appId": "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        "http://localhost:9763/api/appm/store/v1.0/apps/download"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: '{"type": "user","appId": "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}'
       summary: Download App
       description: |
         Download an new App
@@ -147,19 +856,32 @@ paths:
           description: |
             OK.
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nResource to be deleted does not exist.\n"
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
   /apps/uninstallation:
     post:
+      x-scope: 'appm:subscribe'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -d '{"type":
+        "user","appId": "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        "http://localhost:9763/api/appm/store/v1.0/apps/uninstallation"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: '{"type": "user","appId": "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}'
       summary: Uninstall App
       description: |
         Uninstall an existing App
@@ -176,19 +898,41 @@ paths:
           description: |
             OK.
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nResource to be deleted does not exist.\n"
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
           schema:
             $ref: '#/definitions/Error'
   /devices:
     get:
+      x-scope: 'appm:read'
+      x-wso2-curl: 'curl -b cookies -X GET http://localhost:9763/store/api/devices'
+      x-wso2-response: >-
+        {"next": "","previous": "","count": 2,"deviceList":[{"name": "My
+        Nexus","id": "11","type": "phone","platform":
+        "android","platformVersion": "5.0","image":
+        "/store/extensions/assets/mobileapp/resources/models/nexus.png","model":
+        "Nexus"}]}
       summary: Get all Devices
       description: >
         Get a list of available Devices qualifying under a given search
@@ -200,19 +944,15 @@ paths:
             **Search condition**.
 
 
-
             You can search in attributes by using an **"attribute:"** modifier.
-
 
 
             Eg. "type:mobile" will match an App if the provider of the App
             contains "wso2".
 
 
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
 
 
             If no advanced attribute modifier has been specified, search will
@@ -228,7 +968,9 @@ paths:
         - Devices
       responses:
         '200':
-          description: "OK. \nList of qualifying Devices are returned.\n"
+          description: |
+            OK.
+            List of qualifying Devices are returned.
           schema:
             $ref: '#/definitions/DeviceList'
           headers:
@@ -241,22 +983,487 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /administration/roles:
+    get:
+      x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e"
+        "http://localhost:9763/api/appm/publisher/v1.0/administration/roles"
+      x-wso2-response: >-
+        {"roleIds": ["admin","Application/app_11_04_001",
+        "Application/app_11_04_002","Application/app_11_04_011"]}
+      summary: Get all Roles
+      description: |
+        Get a list of available Roles.
+      parameters:
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Roles
+      responses:
+        '200':
+          description: |
+            OK.
+            List of qualifying Roles are returned.
+          schema:
+            $ref: '#/definitions/RoleIdList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /administration/users:
+    get:
+      x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 282712e4f0ca2f3b1fbcef3c4d541027"
+        "http://localhost:9763/api/appm/store/v1.0/administration/users"
+      x-wso2-response: '{"userIds":["admin","user1","user2"]}'
+      summary: Get all Users
+      description: |
+        Get a list of available Users.
+      parameters:
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Users
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Users are returned.
+          schema:
+            $ref: '#/definitions/UserIdList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /administration/apps/download:
+    post:
+      x-scope: 'appm:administration'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -d '{"type":
+        "user","typeIds": [  "admin", "testuser" ],"appId":
+        "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+        "http://localhost:9763/api/appm/store/v1.0/administration/apps/download"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: >-
+        {"type": "user","typeIds": ["admin"],"appId":
+        "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}
+      summary: Enterprise Download/Install App
+      description: |
+        Enterprise Download an new App
+      parameters:
+        - in: body
+          name: install
+          schema:
+            $ref: '#/definitions/AdminInstall'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /administration/apps/uninstallation:
+    x-scope: 'appm:administration'
+    x-wso2-curl: >-
+      curl -X POST -H "Authorization: Basic YWRtaW46YWRtaW4=" -d '{"type":
+      "user","typeIds": [  "admin", "testuser" ],"appId":
+      "ee0a2cfe-6555-404c-b8e8-627f1711a36f"}'
+      "http://localhost:9763/api/appm/store/v1.0/apps/administration/apps/uninstallation"
+    x-wso2-response: HTTP/1.1 200 OK
+    x-wso2-request: >-
+      {"type": "user","typeIds": ["admin"],"appId":
+      "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}
+    post:
+      summary: Enterprise Uninstall App
+      description: |
+        Enterprise Uninstall an existing App
+      parameters:
+        - in: body
+          name: install
+          schema:
+            $ref: '#/definitions/AdminInstall'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '200':
+          description: |
+            OK.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/{appType}/tags':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06"
+        "http://localhost:9763/api/appm/store/v1.0/apps/webapp/tags"
+      x-wso2-response: >-
+        [{"name":"webapptag1","noOfOccurrences":1},{"name":"webapptag2","noOfOccurrences":1},{"name":"webapptag3","noOfOccurrences":1}]
+      summary: Get all Tags
+      description: |
+        Get a list of available Tags relevant to given App Type.
+      parameters:
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Tags is returned.
+          schema:
+            $ref: '#/definitions/TagList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  /apps/event-publish:
+    post:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X POST -H "Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d"
+        -d ' {"events":
+        [{"appId":"init","userId":"init","tenantId":-1234,"appName":"init","appVersion":"1","context":"/init","item":"My_App","action":"init","timestamp":1462277036369},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-load","timestamp":1462277038291},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"noname","action":"click","timestamp":1462277042436},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-unload","timestamp":1462277042437}]}'
+        "http://localhost:9763/api/appm/store/v1.0/apps/event-publish"
+      x-wso2-response: HTTP/1.1 200 OK
+      x-wso2-request: ' {"events":  [{"appId":"init","userId":"init","tenantId":-1234,"appName":"init","appVersion":"1","context":"/init","item":"My_App","action":"init","timestamp":1462277036369},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-load","timestamp":1462277038291},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"noname","action":"click","timestamp":1462277042436},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-unload","timestamp":1462277042437}]}'
+      summary: Publish Stats
+      description: |
+        Publish User hit Stats details.
+      parameters:
+        - in: body
+          name: events
+          required: true
+          schema:
+            $ref: '#/definitions/Events'
+        - $ref: '#/parameters/Content-Type'
+      tags:
+        - Apps
+      responses:
+        '202':
+          description: |
+            Accepted.
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/static-contents/{fileName}':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      summary: 'Retrieving images, pdf, documents files'
+      description: |
+        Retrieving images for banners, screenshots etc.
+      parameters:
+        - name: appType
+          description: Application type
+          in: query
+          type: string
+          required: true
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+            Static content Retrieved successfully.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modified the last.
+                Used by caches, or in conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Requested entity does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  '/apps/mobile/binaries/{fileName}':
+    get:
+      x-scope: 'appm:create'
+      x-wso2-curl: ''
+      x-wso2-response: ''
+      summary: Retrieving mobile application binaries
+      description: |
+        Retrieving .apk, .ipa binaries for mobile apps.
+      parameters:
+        - $ref: '#/parameters/fileName'
+        - $ref: '#/parameters/If-Match'
+        - $ref: '#/parameters/If-Unmodified-Since'
+      tags:
+        - MobileApps
+      responses:
+        '200':
+          description: |
+            OK.
+            Mobile app binary content retrieved successfully.
+          schema:
+            type: file
+          headers:
+            ETag:
+              description: >
+                Entity Tag of the changed App. Used by caches, or in conditional
+                request.
+              type: string
+            Last-Modified:
+              description: |
+                Date and time the resource has been modified the last.
+                Used by caches, or in conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            Requested entity does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
+          schema:
+            $ref: '#/definitions/Error'
+  '/tags/{tagName}/apps/{appType}':
+    get:
+      x-scope: 'appm:read'
+      x-wso2-curl: >-
+        curl -X GET -H "Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d"
+        "http://localhost:9763/api/appm/store/v1.0/tags/hr/apps"
+      x-wso2-response: >-
+        {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
+      summary: Get apps with given tag
+      description: |
+        Get app list with given tag for particular asset type.
+      parameters:
+        - $ref: '#/parameters/tagName'
+        - $ref: '#/parameters/appType'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/Accept'
+        - $ref: '#/parameters/If-None-Match'
+        - $ref: '#/parameters/If-Modified-Since'
+      tags:
+        - Tags
+      responses:
+        '200':
+          description: |
+            OK.
+            List of Apps Id's returned.
+          schema:
+            $ref: '#/definitions/AppIdList'
+          headers:
+            Content-Type:
+              description: The content type of the body.
+              type: string
+            ETag:
+              description: >
+                Entity Tag of the response resource. Used by caches, or in
+                conditional requests.
+              type: string
+        '400':
+          description: |
+            Bad Request.
+            Invalid request or validation error.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
 parameters:
   appId:
     name: appId
     in: path
-    description: "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    description: >
+      **APP ID** consisting of the **UUID** of the App.
+
+      The combination of the provider of the app, name of the appId and the
+      version is also accepted as a valid App ID.
+
+      Should be formatted as **provider-name-version**.
     required: true
     type: string
   appType:
@@ -266,6 +1473,22 @@ parameters:
       App Type. Either webapp or mobileapp
     required: true
     type: string
+  fieldFilter:
+    name: field-filter
+    description: |
+      Used to limit the fields in response.
+
+
+
+
+      Supported filters are [ **basic,all**]
+    in: query
+    type: string
+    required: false
+    default: basic
+    enum:
+      - basic
+      - all
   limit:
     name: limit
     in: query
@@ -276,9 +1499,24 @@ parameters:
   offset:
     name: offset
     in: query
-    description: "Starting point within the complete list of items qualified.  \n"
+    description: |
+      Starting point within the complete list of items qualified.
     default: 0
     type: integer
+  fileName:
+    name: fileName
+    in: path
+    description: |
+      file name.
+    required: true
+    type: string
+  tagName:
+    name: tagName
+    in: path
+    description: |
+      Tag name.
+    required: true
+    type: string
   Accept:
     name: Accept
     in: header
@@ -306,7 +1544,21 @@ parameters:
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n"
+    description: |
+      Validator for conditional requests; based on Last Modified header of the
+      formerly retrieved variant of the resource.
+    type: string
+  If-Match:
+    name: If-Match
+    in: header
+    description: |
+      Validator for conditional requests; based on ETag.
+    type: string
+  If-Unmodified-Since:
+    name: If-Unmodified-Since
+    in: header
+    description: |
+      Validator for conditional requests; based on Last Modified header.
     type: string
 definitions:
   AppList:
@@ -319,12 +1571,16 @@ definitions:
         example: 1
       next:
         type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/app?limit=1&offset=2&query='
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /app?limit=1&offset=2&query=
       previous:
         type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/app?limit=1&offset=0&query='
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /app?limit=1&offset=0&query=
       appList:
         type: array
         items:
@@ -356,6 +1612,11 @@ definitions:
       lifecycleState:
         type: string
         example: CREATED
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
   App:
     title: App object
     required:
@@ -386,7 +1647,8 @@ definitions:
         description: |
           the image icon of the application
         type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG
       isSite:
         type: string
         description: Either a webapp or site
@@ -411,7 +1673,12 @@ definitions:
           Swagger definition of the App which contains details about URI
           templates and scopes
         type: string
-        example: "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
+        example: >-
+          {"paths":{"\/substract":{"get":{"x-auth-type":"Application &
+          Application
+          User","x-throttling-tier":"Unlimited","parameters":[{"name":"x","required":true,"type":"string","in":"query"},{"name":"y","required":true,"type":"string","in":"query"}],"responses":{"200":{}}}},"\/add":{"get":{"x-auth-type":"Application
+          & Application
+          User","x-throttling-tier":"Unlimited","parameters":[{"name":"x","required":true,"type":"string","in":"query"},{"name":"y","required":true,"type":"string","in":"query"}],"responses":{"200":{}}}}},"swagger":"2.0","info":{"title":"CalculatorApp","version":"1.0.0"}}
       isDefaultVersion:
         type: boolean
         example: false
@@ -449,6 +1716,11 @@ definitions:
           Bundleversion of the asset
         type: string
         example: '1.0'
+      rating:
+        description: |
+          User rating for the app
+        type: number
+        example: 4
       category:
         description: |
           category of the asset
@@ -465,12 +1737,14 @@ definitions:
         type: array
         items:
           type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG
       banner:
         description: |
           /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg
         type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG
       appType:
         description: 'mobile app type (eg: webapp/ios/android)'
         type: string
@@ -500,12 +1774,16 @@ definitions:
         example: 1
       next:
         type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/devices?limit=1&offset=2&query='
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /devices?limit=1&offset=2&query=
       previous:
         type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/devices?limit=1&offset=0&query='
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /devices?limit=1&offset=0&query=
       deviceList:
         type: array
         items:
@@ -534,20 +1812,130 @@ definitions:
       type:
         type: string
         example: phone
+  UserIdList:
+    title: User List
+    properties:
+      userIds:
+        type: object
+        description: List of User Names
+  RoleIdList:
+    title: Role List
+    properties:
+      roleIds:
+        type: object
+        description: List of Role Id's
+  AppIdList:
+    title: App Id List
+    properties:
+      appIds:
+        type: object
+        description: List of App Id's
   Install:
     title: Install/Download App
     properties:
       type:
         type: string
         description: |
-          Download type (either use or devices).
+          Download type (either user or devices).
         example: user/device
       deviceIds:
         type: object
-        description: "List of device Id's"
+        description: List of device Id's
       appId:
         type: string
         description: Installing mobile app ID
+  AdminInstall:
+    title: Install/Download App
+    properties:
+      type:
+        type: string
+        description: |
+          Download type (either user or roles).
+        example: user/device
+      typeIds:
+        type: object
+        description: List of Id's against type (role/user)
+      appId:
+        type: string
+        description: App Id
+  TagList:
+    title: Tag List
+    properties:
+      tags:
+        type: array
+        items:
+          type: string
+        example:
+          - tag1
+          - tag2
+          - tag3
+        description: List of Tags
+  AppRatingList:
+    title: App Rating List
+    properties:
+      count:
+        type: integer
+        description: |
+          Number of Ratings returned.
+        example: 1
+      next:
+        type: string
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /rate?limit=1&offset=2
+      previous:
+        type: string
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /rate?limit=1&offset=0
+      overallRating:
+        type: number
+        description: List of Role Id's
+        example: 3
+      ratingDetails:
+        type: array
+        items:
+          $ref: '#/definitions/AppRatingInfo'
+  AppRatingInfo:
+    title: App rating details
+    properties:
+      rating:
+        type: integer
+        description: List of Role Id's
+        example: 3
+      review:
+        type: string
+        description: Comment/review about the app
+      id:
+        type: integer
+        description: Review Id
+        example: 1
+      likes:
+        type: integer
+        description: No of likes
+        example: 1
+      dislikes:
+        type: integer
+        description: No of dislikes
+        example: 1
+  Events:
+    title: Events details
+    required:
+      - events
+    properties:
+      events:
+        type: array
+        items:
+          type: object
+        description: User hit count per App related User Stats details stream
+  FavouritePage:
+    title: Favourite Page details
+    properties:
+      isDefaultPage:
+        type: boolean
+        example: true/false
   Error:
     title: Error object returned with 4XX HTTP status
     required:
@@ -570,7 +1958,9 @@ definitions:
           Preferably an url with more details about the error.
       error:
         type: array
-        description: "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n"
+        description: |
+          If there are more than one error list them out.
+          For example, list out validation errors by each field.
         items:
           $ref: '#/definitions/ErrorListItem'
   ErrorListItem:

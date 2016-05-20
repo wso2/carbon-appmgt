@@ -108,8 +108,13 @@
         <dependency>
             <groupId>org.wso2.uri.template</groupId>
             <artifactId>wso2-uri-templates</artifactId>
-           <version>${wso2-uri-templates.version}</version>
+            <version>${wso2-uri-templates.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring-web.version}</version>
         </dependency>
 
 

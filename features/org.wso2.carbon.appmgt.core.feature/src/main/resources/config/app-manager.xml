@@ -7,6 +7,9 @@
     This data source should be defined in the master-datasources.xml file in conf/datasources directory.
     -->
     <DataSourceName>jdbc/WSO2AM_DB</DataSourceName>
+    <DataSources>
+        <Storage>jdbc/ES_Storage</Storage>
+    </DataSources>
 
     <APPStoreConfiguration>
         <!--
