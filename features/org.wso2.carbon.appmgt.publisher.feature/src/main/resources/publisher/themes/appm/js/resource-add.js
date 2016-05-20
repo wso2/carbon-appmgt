@@ -65,7 +65,7 @@ $( document ).ready(function() {
     });
 
     //load all available global (applicaiton level) java policy list from DB
-    loadAvailableJavaPolicies(null, true);
+    loadAvailableJavaPolicies(null, true, "add");
 
     $("#add_resource").click(function () {
 

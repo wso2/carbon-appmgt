@@ -139,7 +139,7 @@ $( document ).ready(function() {
     });
 
     //load global (application level) dynamic optional java policies
-    loadAvailableJavaPolicies(uuid, true);
+    loadAvailableJavaPolicies(uuid, true, "edit");
 
    //fixed chrome issue with file paths
     $('input[type=file]').on('change', function(e) {
