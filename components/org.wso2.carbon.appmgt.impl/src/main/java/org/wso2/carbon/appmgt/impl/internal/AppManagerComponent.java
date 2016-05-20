@@ -37,6 +37,7 @@ import org.wso2.carbon.appmgt.impl.service.APIMGTSampleService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.APIMgtDBUtil;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
+import org.wso2.carbon.appmgt.impl.utils.AppMgtDataSourceProvider;
 import org.wso2.carbon.appmgt.impl.utils.RemoteAuthorizationManager;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -197,6 +198,7 @@ public class AppManagerComponent {
             RemoteAuthorizationManager authorizationManager = RemoteAuthorizationManager.getInstance();
             authorizationManager.init();
             APIMgtDBUtil.initialize();
+            AppMgtDataSourceProvider.initialize();
             //Check User add listener enabled or not
             boolean selfSignInProcessEnabled = Boolean.parseBoolean(
                     configuration.getFirstProperty("WorkFlowExtensions.SelfSignIn.ProcessEnabled"));

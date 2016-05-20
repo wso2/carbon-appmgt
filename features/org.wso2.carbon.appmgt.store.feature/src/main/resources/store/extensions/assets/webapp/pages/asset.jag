@@ -7,24 +7,24 @@ var authenticator;
 var businessOwnerCustomData;
 var log = new Log();
 var businessOwner = "";
-var  ownerName;
+var ownerName;
 var ownerEmail;
 include('../modules/jagg/jagg.jag');
 var DocumentService = require('../services/documentation.js').serviceModule;
 var docsManager = new DocumentService.DocumentationService();
 docsManager.init(jagg, session);
 
-var APIInformationService=require('../services/api-information.js').serviceModule;
-var apiInfoManager=new APIInformationService.APIInformationService();
-apiInfoManager.init(jagg,session);
+var APIInformationService = require('../services/api-information.js').serviceModule;
+var apiInfoManager = new APIInformationService.APIInformationService();
+apiInfoManager.init(jagg, session);
 
-AppService=require(getServiceDir('app.js')).serviceModule;
-appInfoApi=new AppService.AppService();
-appInfoApi.init(jagg,session);
+AppService = require(getServiceDir('app.js')).serviceModule;
+appInfoApi = new AppService.AppService();
+appInfoApi.init(jagg, session);
 
-AuthService=require(getServiceDir('authentication.js')).serviceModule;
-authenticator=new AuthService.Authenticator();
-authenticator.init(jagg,session);
+AuthService = require(getServiceDir('authentication.js')).serviceModule;
+authenticator = new AuthService.Authenticator();
+authenticator.init(jagg, session);
 //var getDocs=jagg.module('documentation').getAllDocumentations;
 
 
@@ -40,21 +40,21 @@ var isEnterpriseSubscriptionEnabled = subscriptionConfig.isEnterpriseSubscriptio
 
 require('/modules/store.js').exec(function (ctx) {
     var asset, aid, title, currentTenant, userTenant, tenantIdVal,
-            log = ctx.log,
-            sso = ctx.sso,
-            store = ctx.store,
-            user = ctx.user,
-            tenantId = ctx.tenantId,
-            tenant = ctx.tenant,
-            configs = ctx.configs,
-            tenantDomain = ctx.tenant.domain,
-            site = ctx.site,
-            matcher = ctx.matcher,
-            inDashboard = false,
-            isSubscribed = false,
-            skipGateway = false,
-            store = ctx.store,
-            webAppEndpoint;
+        log = ctx.log,
+        sso = ctx.sso,
+        store = ctx.store,
+        user = ctx.user,
+        tenantId = ctx.tenantId,
+        tenant = ctx.tenant,
+        configs = ctx.configs,
+        tenantDomain = ctx.tenant.domain,
+        site = ctx.site,
+        matcher = ctx.matcher,
+        inDashboard = false,
+        isSubscribed = false,
+        skipGateway = false,
+        store = ctx.store,
+        webAppEndpoint;
     var utility = require('/modules/util.js');
     var search = require('/modules/search.js');
     var social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
@@ -79,7 +79,7 @@ require('/modules/store.js').exec(function (ctx) {
     var defaultUrl = '/{context}' + configs.assetsUrlPrefix + '/{type}/{aid}';
 
     //Match the incoming request with tenanted and default URI patterns and extracts the relecant asset id
-    if(matcher.match(defaultUrl) || matcher.match(tenantedUrl)){
+    if (matcher.match(defaultUrl) || matcher.match(tenantedUrl)) {
         aid = matcher.elements().aid;
         title = store.assetLinks(type).title;
         currentTenant = matcher.elements().domain;
@@ -98,14 +98,14 @@ require('/modules/store.js').exec(function (ctx) {
         //If the asset is not in "Published" or "Deprecated" state, webapp overview page should not be accessible
         if (assetLifecycleState != "Published" && assetLifecycleState != "Deprecated") {
             response.sendError(404, 'Requested asset with assset is : ' + asset.id + 'cannot be found. It is in ' +
-            assetLifecycleState + 'state.');
+                                    assetLifecycleState + 'state.');
         }
     }
 
     var getRedirectURL = function (url) {
         var contextPath = caramel.configs().context,
-                reversProxyEnabled = caramel.configs().reverseProxyEnabled,
-                reverseProxyHost = caramel.configs().reverseProxyHost;
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost;
         var redirectURL = contextPath + url;
         if (reversProxyEnabled) {
             redirectURL = reverseProxyHost + contextPath + url;
@@ -115,8 +115,8 @@ require('/modules/store.js').exec(function (ctx) {
 
     var getReferer = function () {
         var contextPath = caramel.configs().context,
-        reversProxyEnabled = caramel.configs().reverseProxyEnabled,
-        reverseProxyHost = caramel.configs().reverseProxyHost;
+            reversProxyEnabled = caramel.configs().reverseProxyEnabled,
+            reverseProxyHost = caramel.configs().reverseProxyHost;
         var referer = request.getHeader("referer");
         if (!referer) {
             if (reversProxyEnabled) {
@@ -215,10 +215,12 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
             var overviewBusinessOwner = asset.attributes.overview_businessOwner;
-            if(overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
                 businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner);
-                if(businessOwner != null && businessOwner.businessOwnerName != null) {
-                    businessOwnerCustomData = require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
+
+                if (businessOwner != null && businessOwner.businessOwnerName != null) {
+                    businessOwnerCustomData =
+                    require('../themes/store/js/logic/businessOwners/businessOwners.js').transform(businessOwner);
                     ownerName = businessOwnerCustomData[0].value;
                     ownerEmail = businessOwnerCustomData[1].value;
                 }
@@ -261,10 +263,12 @@ require('/modules/store.js').exec(function (ctx) {
             var defaultApplicationName = "DefaultApplication";
 
             var enterpriseSubscription;
-            enterpriseSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", username).subscription;
+            enterpriseSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "ENTERPRISE", username).subscription;
 
             var individualSubscription;
-            individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", username).subscription;
+            individualSubscription =
+            subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL", username).subscription;
 
             // Get all available IDPs (enterprises)
             var enterprises = getEnterprises();
@@ -302,7 +306,7 @@ require('/modules/store.js').exec(function (ctx) {
             var ssoProviderInfo = asset.attributes.sso_ssoProvider.split("-");
 
             var authResult = subscriptionService.getEnterprisesForApplication(
-                    {appName: issuerName, ssoProviderName: ssoProviderInfo[0], ssoProviderVersion: ssoProviderInfo[1]})
+                {appName: issuerName, ssoProviderName: ssoProviderInfo[0], ssoProviderVersion: ssoProviderInfo[1]})
 
             return authResult.enterprises;
 
@@ -380,20 +384,20 @@ require('/modules/store.js').exec(function (ctx) {
         var docs;
         if (authenticator.getLoggedInUser()) {
             docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                    asset.attributes.overview_name,
-                    asset.attributes.overview_version,
-                    authenticator.getLoggedInUser().username);
+                                                   asset.attributes.overview_name,
+                                                   asset.attributes.overview_version,
+                                                   authenticator.getLoggedInUser().username);
         }
         else {
             docs = docsManager.getAllDocumentation(asset.attributes.overview_provider,
-                    asset.attributes.overview_name,
-                    asset.attributes.overview_version,
-                    null);
+                                                   asset.attributes.overview_name,
+                                                   asset.attributes.overview_version,
+                                                   null);
         }
 
         var apiData = apiInfoManager.getAPIDescription(asset.attributes.overview_provider,
-                asset.attributes.overview_name,
-                asset.attributes.overview_version);
+                                                       asset.attributes.overview_name,
+                                                       asset.attributes.overview_version);
 
         var myapps;
         myapps = appInfoApi.getApplications(username);
@@ -448,7 +452,7 @@ require('/modules/store.js').exec(function (ctx) {
         var assetBanner = asset.attributes.images_banner;
         if (!assetBanner || (assetBanner.trim().length == 0)) {
             asset.defaultBanner =
-                asset.defaultThumbnail || storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
+            asset.defaultThumbnail || storeHostObj.getDefaultThumbnail(asset.attributes.overview_displayName);
         }
 
         var process = require('process');
@@ -486,13 +490,15 @@ require('/modules/store.js').exec(function (ctx) {
         var subAvailability = asset.attributes.overview_subscriptionAvailability;
         if (subAvailability && currentTenant) {
             if (subAvailability == "current_tenant") {
-                if (userTenant != currentTenant)
+                if (userTenant != currentTenant) {
                     isSubscriptionAvailable = false;
+                }
 
             } else if (subAvailability == "specific_tenants") {
                 var tenants = stringify(asset.attributes.overview_tenants);
-                if ((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1))
+                if ((userTenant != currentTenant) && !(tenants.indexOf(userTenant) > -1)) {
                     isSubscriptionAvailable = false;
+                }
             }
         }
 
@@ -514,49 +520,49 @@ require('/modules/store.js').exec(function (ctx) {
             appVersion: asset.attributes.overview_version
         };
 
-        var searchQuery = { search: "", searchTerm: ""};
+        var searchQuery = {search: "", searchTerm: ""};
 
         caramel.render({
-            title: 'WebApp | Store',
-            user: user,
-            sso: sso,
-            header: headerData,
-            navigation: navigationData,
-            search: {
-                query: searchQuery
-            },
-            isSocial: configs.socialCommentsEnable,
-            type: type,
-            embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
-            inDashboard: inDashboard,
-            isSubscribed: isSubscribed,
-            skipGateway: skipGateway,
-            webAppEndpoint: webAppEndpoint,
-            subscriptionInfo: subscriptionInfo,
-            isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
-            isFavourite: isFavourite,
-            asset: asset,
-            tenantId: tenantIdVal,
-            tags: {
-                   data: {allTags: store.tags(type, isSite), searchedTag: ""}
-            },
-            myAssets: { user: user, type: type, title: title },
-            recentAssets: recentAssets,
-            assetsByProvider: assetsByProvider,
-            documentation: docs,
-            apiData: apiData,
-            metadata: metadata,
-            isSubscriptionAvailable: isSubscriptionAvailable,
-            config: {
-                isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
-                isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
-                enabledTypeList: enabledTypeList
-            },
+                           title: 'WebApp | Store',
+                           user: user,
+                           sso: sso,
+                           header: headerData,
+                           navigation: navigationData,
+                           search: {
+                               query: searchQuery
+                           },
+                           isSocial: configs.socialCommentsEnable,
+                           type: type,
+                           embedURL: configs.server.http + '/gadgets/ifr?url=' + asset.attributes.overview_url,
+                           inDashboard: inDashboard,
+                           isSubscribed: isSubscribed,
+                           skipGateway: skipGateway,
+                           webAppEndpoint: webAppEndpoint,
+                           subscriptionInfo: subscriptionInfo,
+                           isEnterpriseSubscriptionAllowed: isEnterpriseSubscriptionAllowed,
+                           isFavourite: isFavourite,
+                           asset: asset,
+                           tenantId: tenantIdVal,
+                           tags: {
+                               data: {allTags: store.tags(type, isSite), searchedTag: ""}
+                           },
+                           myAssets: {user: user, type: type, title: title},
+                           recentAssets: recentAssets,
+                           assetsByProvider: assetsByProvider,
+                           documentation: docs,
+                           apiData: apiData,
+                           metadata: metadata,
+                           isSubscriptionAvailable: isSubscriptionAvailable,
+                           config: {
+                               isSelfSubscriptionEnabled: isSelfSubscriptionEnabled,
+                               isEnterpriseSubscriptionEnabled: isEnterpriseSubscriptionEnabled,
+                               enabledTypeList: enabledTypeList
+                           },
                            assetType: 'webapp',
                            businessOwnerData: businessOwnerCustomData,
                            businessOwnerName: ownerName,
                            businessOwnerEmail: ownerEmail
-        });
+                       });
     }
 
 }, request, response, session);

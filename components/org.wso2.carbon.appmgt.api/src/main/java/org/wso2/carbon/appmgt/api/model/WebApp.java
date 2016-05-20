@@ -17,10 +17,12 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.Collections;
 
 /**
  * Provider's & system's view of WebApp
@@ -32,7 +34,6 @@ public class WebApp extends App{
 
     private String description;
     private String url;
-    private String displayName;
     private String sandboxUrl;
     private String wsdlUrl;
     private String wadlUrl;
@@ -44,7 +45,10 @@ public class WebApp extends App{
     private Date lastUpdated;
     private Set<Tier> availableTiers = new LinkedHashSet<Tier>();
     private AuthorizationPolicy authorizationPolicy;
+    private List<EntitlementPolicyGroup> accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
     private Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
+
+    private List<String> claims = new ArrayList<>();
 
     private String ssoEnabled;
     private String idpProviderUrl;
@@ -104,10 +108,6 @@ public class WebApp extends App{
     private String policyGroups; //Policy Groups Id's list
     private String javaPolicies; //Java policies(handlers) List
     private String treatAsASite;
-    /**
-     * The average rating provided by the WebApp subscribers
-     */
-    private float rating;
 
     private boolean isLatest;
 
@@ -118,9 +118,7 @@ public class WebApp extends App{
     private boolean isDefaultVersion;
     //TODO: missing - total user count, up time statistics,tier
 
-    private String lifeCycleName;
 
-    private APIStatus lifeCycleStatus;
 
     //Asset Type : either webapp or mobile app
     private String type;
@@ -257,14 +255,6 @@ public class WebApp extends App{
         return context;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
     public void setWsdlUrl(String wsdlUrl) {
         this.wsdlUrl = wsdlUrl;
     }
@@ -343,14 +333,6 @@ public class WebApp extends App{
 
     public void setStatus(APIStatus status) {
         this.status = status;
-    }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
     }
 
     public void setLatest(boolean latest) {
@@ -705,22 +687,6 @@ public class WebApp extends App{
         this.advertisedAppUuid = advertisedAppUuid;
     }
 
-    public void setLifeCycleName(String lifeCycleName) {
-        this.lifeCycleName = lifeCycleName;
-    }
-
-    public String getLifeCycleName() {
-        return lifeCycleName;
-    }
-
-    public void setLifeCycleStatus(APIStatus lifeCycleStatus) {
-        this.lifeCycleStatus = lifeCycleStatus;
-    }
-
-    public APIStatus getLifeCycleStatus() {
-        return lifeCycleStatus;
-    }
-
     public String getType() {
         return type;
     }
@@ -752,4 +718,30 @@ public class WebApp extends App{
     public void setCreatedTime(String createdTime) {
         this.createdTime = createdTime;
     }
+
+    public void addAccessPolicyGroup(EntitlementPolicyGroup policyGroup){
+
+        if(this.accessPolicyGroups == null){
+            this.accessPolicyGroups = new ArrayList<EntitlementPolicyGroup>();
+        }
+
+        this.accessPolicyGroups.add(policyGroup);
+    }
+
+    public void setAccessPolicyGroups(List<EntitlementPolicyGroup> accessPolicyGroups) {
+        this.accessPolicyGroups = accessPolicyGroups;
+    }
+
+    public List<EntitlementPolicyGroup> getAccessPolicyGroups(){
+        return this.accessPolicyGroups;
+    }
+
+    public List<String> getClaims() {
+        return claims;
+    }
+
+    public void setClaims(List<String> claims) {
+        this.claims = claims;
+    }
+
 }

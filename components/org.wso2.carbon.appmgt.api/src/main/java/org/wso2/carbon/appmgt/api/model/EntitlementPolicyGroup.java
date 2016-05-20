@@ -19,17 +19,34 @@
 package org.wso2.carbon.appmgt.api.model;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * EntitlementPolicyGroup class contains properties related to Policy Groups
  */
 public class EntitlementPolicyGroup {
+
+    public static final String _KEY_POLICY_PARTIAL_ID = "POLICY_PARTIAL_ID";
+
     private int policyGroupId;
     private String policyGroupName;
     private String throttlingTier;
     private String userRoles;
     private boolean allowAnonymous;
     private JSONArray policyPartials; //XACML policies
+    private List<String> xacmlPolicyNames;
+
+    public List<String> getXacmlPolicyNames() {
+        return xacmlPolicyNames;
+    }
+
+    public void setXacmlPolicyNames(List<String> xacmlPolicyNames) {
+        this.xacmlPolicyNames = xacmlPolicyNames;
+    }
+
     private String policyDescription;
 
     public void setPolicyGroupId(int policyGroupId) {
@@ -87,5 +104,42 @@ public class EntitlementPolicyGroup {
 
     public String getPolicyDescription() {
         return policyDescription;
+    }
+
+    public int getFirstEntitlementPolicyId(){
+        if(getPolicyPartials() != null){
+            return (int) ((JSONObject) getPolicyPartials().get(0)).get(_KEY_POLICY_PARTIAL_ID);
+        }else{
+            return -1;
+        }
+    }
+
+    public void setEntitlementPolicyId(int entitlementPolicyId){
+
+        if(policyPartials != null){
+            policyPartials.clear();
+        }else {
+            policyPartials = new JSONArray();
+        }
+
+        JSONObject entitlementPolicyIdObject = new JSONObject();
+        entitlementPolicyIdObject.put(_KEY_POLICY_PARTIAL_ID, entitlementPolicyId);
+
+        policyPartials.add(entitlementPolicyIdObject);
+    }
+
+    public List<String> getUserRolesAsList(){
+
+        List<String> roles = new ArrayList<String>();
+
+        if(userRoles != null){
+
+            for(String role : userRoles.split(",")){
+                roles.add(role);
+            }
+
+        }
+
+        return roles;
     }
 }
