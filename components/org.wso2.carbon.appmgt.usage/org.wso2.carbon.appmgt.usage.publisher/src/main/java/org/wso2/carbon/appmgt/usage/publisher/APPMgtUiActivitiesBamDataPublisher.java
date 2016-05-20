@@ -43,6 +43,8 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	private static final Log log = LogFactory.getLog(APPMgtUiActivitiesBamDataPublisher.class);
 
 	public APPMgtUiActivitiesBamDataPublisher() {
+		enableUiActivityBamPublishing = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().
+				isUiActivityBamPublishEnabled();
 		this.dataPublisher = DataPublisherUtil.getDataPublisher();
 	}
 
