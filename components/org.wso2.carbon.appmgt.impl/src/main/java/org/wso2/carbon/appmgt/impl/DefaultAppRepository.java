@@ -1,6 +1,8 @@
 package org.wso2.carbon.appmgt.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,6 +73,7 @@ public class DefaultAppRepository implements AppRepository {
         }
 
     }
+
 
     @Override
     public App getApp(String type, String uuid) throws AppManagementException {
@@ -461,7 +464,7 @@ public class DefaultAppRepository implements AppRepository {
 
             associatePolicyGroupsWithWebApp(webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
 
-            persistURLTemplates(webApp.getUriTemplates(), webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
+            persistURLTemplates(new ArrayList<URITemplate>(webApp.getUriTemplates()), webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
 
             if(!StringUtils.isEmpty(webApp.getJavaPolicies())){
                 persistJavaPolicyMappings(webApp.getJavaPolicies(), webAppDatabaseId, connection);
@@ -502,13 +505,110 @@ public class DefaultAppRepository implements AppRepository {
 
         try {
             int webAppDatabaseId = getDatabaseId(webApp, connection);
-            updatePolicyGroups(webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
 
+            // Add and/or update policy groups.
+            addAndUpdatePolicyGroups(webApp, webAppDatabaseId, connection);
+
+            // Add / Update / Delete URL templates.
+            addUpdateDeleteURLTemplates(webApp, webAppDatabaseId, connection);
+
+            // Delete the existing policy groups in the repository which are not in the updating web app.
+            // URI templates should be passed too, since the association between templates and policy groups should be checked.
+            deletePolicyGroupsNotIn(webApp.getAccessPolicyGroups(), webApp.getUriTemplates(),webAppDatabaseId, connection);
+
+
+            connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            rollbackTransactions(webApp, registry, connection);
+            handleException(String.format("Error while updating web app '%s'", webApp.getUUID()), e);
+        }finally {
+            APIMgtDBUtil.closeAllConnections(null, connection, null);
+        }
+
+    }
+
+    private void addUpdateDeleteURLTemplates(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
+
+        List<URITemplate> urlTemplatesToBeUpdated = new ArrayList<URITemplate>();
+        List<URITemplate> urlTemplatesToBeAdded = new ArrayList<URITemplate>();
+
+        for(URITemplate template : webApp.getUriTemplates()){
+            if(template.getId() > 0){
+                urlTemplatesToBeUpdated.add(template);
+            }else{
+                urlTemplatesToBeAdded.add(template);
+            }
         }
 
 
+        persistURLTemplates(urlTemplatesToBeAdded, webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
+
+        updateURLTemplates(urlTemplatesToBeUpdated, webApp.getAccessPolicyGroups(), connection);
+
+        deleteURLTemplatesNotIn(webApp.getUriTemplates(), webAppDatabaseId, connection);
+
+    }
+
+    private void deleteURLTemplatesNotIn(Set<URITemplate> uriTemplates, int webAppDatabaseId, Connection connection) throws SQLException {
+
+        String queryTemplate = "DELETE FROM APM_APP_URL_MAPPING WHERE APP_ID=%d AND URL_MAPPING_ID NOT IN (%s)";
+        PreparedStatement preparedStatement = null;
+        Array templateIdsArray = null;
+
+        try{
+
+            StringBuilder templateIdsBuilder = new StringBuilder();
+            for(URITemplate uriTemplate : uriTemplates){
+                templateIdsBuilder.append(uriTemplate.getId()).append(",");
+            }
+            String templateIds = templateIdsBuilder.toString();
+
+            if(templateIds.endsWith(",")){
+                templateIds = templateIds.substring(0, templateIds.length() - 1);
+            }
+
+            String query = String.format(queryTemplate, webAppDatabaseId, templateIds);
+
+            preparedStatement = connection.prepareStatement(query);
+
+            preparedStatement.executeUpdate();
+
+        }finally {
+            if(templateIdsArray != null){
+                templateIdsArray.free();
+            }
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
+    }
+
+    private void updateURLTemplates(List<URITemplate> urlTemplatesToBeUpdated, List<EntitlementPolicyGroup> accessPolicyGroups, Connection connection) throws SQLException {
+
+        String query = "UPDATE APM_APP_URL_MAPPING SET URL_PATTERN=?, HTTP_METHOD=?, POLICY_GRP_ID=? WHERE URL_MAPPING_ID=?";
+        PreparedStatement preparedStatement = null;
+
+        try{
+            preparedStatement = connection.prepareStatement(query);
+
+            for(URITemplate urlTemplate : urlTemplatesToBeUpdated){
+                preparedStatement.setString(1, urlTemplate.getUriTemplate());
+                preparedStatement.setString(2, urlTemplate.getHTTPVerb());
+
+                int policyGroupId = urlTemplate.getPolicyGroupId();
+                if(urlTemplate.getPolicyGroupId() <= 0){
+                    policyGroupId = getPolicyGroupId(accessPolicyGroups, urlTemplate.getPolicyGroupName());
+                }
+
+                preparedStatement.setInt(3, policyGroupId);
+                preparedStatement.setInt(4, urlTemplate.getId());
+
+                preparedStatement.addBatch();
+            }
+
+            preparedStatement.executeBatch();
+
+        }finally {
+            APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
+        }
     }
 
     private int getDatabaseId(WebApp webApp, Connection connection) throws SQLException {
@@ -531,12 +631,12 @@ public class DefaultAppRepository implements AppRepository {
         return -1;
     }
 
-    private void updatePolicyGroups(List<EntitlementPolicyGroup> accessPolicyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
+    private void addAndUpdatePolicyGroups(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
 
         List<EntitlementPolicyGroup> groupsToBeAdded = new ArrayList<>();
         List<EntitlementPolicyGroup> groupsToBeUpdated = new ArrayList<>();
 
-        for(EntitlementPolicyGroup policyGroup : accessPolicyGroups){
+        for(EntitlementPolicyGroup policyGroup : webApp.getAccessPolicyGroups()){
             if(policyGroup.getPolicyGroupId() > 0){
                 groupsToBeUpdated.add(policyGroup);
             }else{
@@ -565,21 +665,19 @@ public class DefaultAppRepository implements AppRepository {
         // Add new policy groups
         persistPolicyGroups(groupsToBeAdded, connection);
         associatePolicyGroupsWithWebApp(groupsToBeAdded, webAppDatabaseId, connection);
+	}
 
-        // Remove unused policy groups.
-        deletePolicyGroupsNotIn(groupsToBeUpdated, webAppDatabaseId, connection);
-    }
-
-    private void deletePolicyGroupsNotIn(List<EntitlementPolicyGroup> groupsToBeRetained, int webAppDatabaseId, Connection connection) throws SQLException {
+    private void deletePolicyGroupsNotIn(List<EntitlementPolicyGroup> groupsToBeRetained, Set<URITemplate> uriTemplates, int webAppDatabaseId, Connection connection) throws SQLException {
 
         // Get all the policy groups for the web app.
 
         String queryToGetPolicyGroupsForApp = "SELECT POLICY_GRP_ID FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=?";
         PreparedStatement preparedStatementToGetPolicyGroupsForApp = null;
         ResultSet policyGroupsResultSet = null;
+        PreparedStatement preparedStatementToDeletePolicyGroups = null;
 
         try{
-            connection.prepareStatement(queryToGetPolicyGroupsForApp);
+            preparedStatementToGetPolicyGroupsForApp = connection.prepareStatement(queryToGetPolicyGroupsForApp);
             preparedStatementToGetPolicyGroupsForApp.setInt(1, webAppDatabaseId);
 
             policyGroupsResultSet = preparedStatementToGetPolicyGroupsForApp.executeQuery();
@@ -597,12 +695,29 @@ public class DefaultAppRepository implements AppRepository {
                 }
             }
 
+            List<Integer> policyGroupIdsToBeDeleted = new ArrayList<Integer>();
 
-            List<Integer> policyGroupIdsToBeDeleted = ListUtils.subtract(policyGroupIdsForApp, retainedPolicyGroupIds);
+            // Omit the policy groups which has associations with URI templates.
+            List<Integer> candidatePolicyGroupIdsToBeDeleted = ListUtils.subtract(policyGroupIdsForApp, retainedPolicyGroupIds);
 
-            disassociatePolicyGroupsWithWebApp(policyGroupIdsToBeDeleted, webAppDatabaseId, connection);
 
-            PreparedStatement preparedStatementToDeletePolicyGroups = null;
+
+            for(final Integer id : candidatePolicyGroupIdsToBeDeleted){
+
+                if(!CollectionUtils.exists(uriTemplates, new Predicate() {
+                    @Override
+                    public boolean evaluate(Object o) {
+                        URITemplate template = (URITemplate) o;
+                        return template.getPolicyGroupId() == id;
+                    }
+                })){
+                    policyGroupIdsToBeDeleted.add(id);
+                }
+
+            }
+
+            disassociatePolicyGroupsFromWebApp(policyGroupIdsToBeDeleted, webAppDatabaseId, connection);
+
             String queryToDeletePolicyMappings = String.format("DELETE FROM %s WHERE POLICY_GRP_ID=?", POLICY_GROUP_TABLE_NAME);
             preparedStatementToDeletePolicyGroups = connection.prepareStatement(queryToDeletePolicyMappings);
 
@@ -614,9 +729,9 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatementToDeletePolicyGroups.executeBatch();
 
         }finally {
-
+            APIMgtDBUtil.closeAllConnections(preparedStatementToGetPolicyGroupsForApp, null, policyGroupsResultSet);
+            APIMgtDBUtil.closeAllConnections(preparedStatementToDeletePolicyGroups, null, null);
         }
-
     }
 
     private String saveRegistryArtifact(App app) throws AppManagementException, RegistryException {
@@ -878,7 +993,7 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private void disassociatePolicyGroupsWithWebApp(List<Integer> policyGroupsIds, int appDatabaseId, Connection connection) throws SQLException {
+    private void disassociatePolicyGroupsFromWebApp(List<Integer> policyGroupIds, int appDatabaseId, Connection connection) throws SQLException {
 
         PreparedStatement preparedStatementToDeletePolicyMappings = null;
         String queryToDeletePolicyMappings = "DELETE FROM APM_POLICY_GROUP_MAPPING WHERE APP_ID=? AND POLICY_GRP_ID=?";
@@ -886,11 +1001,11 @@ public class DefaultAppRepository implements AppRepository {
         try{
             preparedStatementToDeletePolicyMappings = connection.prepareStatement(queryToDeletePolicyMappings);
 
-            for (Integer policyGroupsId : policyGroupsIds) {
+            for (Integer policyGroupId : policyGroupIds) {
 
                 // Add mapping query to the batch
                 preparedStatementToDeletePolicyMappings.setInt(1, appDatabaseId);
-                preparedStatementToDeletePolicyMappings.setInt(2, policyGroupsId);
+                preparedStatementToDeletePolicyMappings.setInt(2, policyGroupId);
                 preparedStatementToDeletePolicyMappings.addBatch();
             }
 
@@ -957,7 +1072,8 @@ public class DefaultAppRepository implements AppRepository {
 
             for(EntitlementPolicyGroup policyGroup : policyGroups){
 
-                if(policyGroup.getPolicyPartials() != null){
+                // If the policy group doesn't have entitlement policy, then delete the possible existing entitlement policy mappings for those policy groups.
+                if(policyGroup.getPolicyPartials() == null){
                     preparedStatement.setInt(1, policyGroup.getPolicyGroupId());
                     preparedStatement.addBatch();
                 }
@@ -1099,13 +1215,14 @@ public class DefaultAppRepository implements AppRepository {
         }
     }
 
-    private void persistURLTemplates(Set<URITemplate> uriTemplates, List<EntitlementPolicyGroup> policyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
+    private void persistURLTemplates(List<URITemplate> uriTemplates, List<EntitlementPolicyGroup> policyGroups, int webAppDatabaseId, Connection connection) throws SQLException {
 
         PreparedStatement preparedStatement = null;
+        ResultSet generatedKeys = null;
 
         try {
             String query = "INSERT INTO APM_APP_URL_MAPPING (APP_ID, HTTP_METHOD, URL_PATTERN, POLICY_GRP_ID) VALUES (?,?,?,?)";
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = connection.prepareStatement(query, new String[]{"URL_MAPPING_ID"});
 
             for(URITemplate uriTemplate : uriTemplates){
 
@@ -1115,10 +1232,24 @@ public class DefaultAppRepository implements AppRepository {
 
                 // Set the database ID of the relevant policy group.
                 // The URL templates to be persisted, maintain the relationship to the policy groups using the indexes of the policy groups list.
-                preparedStatement.setInt(4, getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName()));
+                int policyGroupId = uriTemplate.getPolicyGroupId();
+                if(policyGroupId <= 0){
+                    policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
+                }
+                preparedStatement.setInt(4, policyGroupId);
 
                 preparedStatement.executeUpdate();
+
+                generatedKeys = preparedStatement.getGeneratedKeys();
+
+                int generatedURLTemplateId = 0;
+                if (generatedKeys.next()) {
+                    generatedURLTemplateId = Integer.parseInt(generatedKeys.getString(1));
+                    uriTemplate.setId(generatedURLTemplateId);
+                }
             }
+
+            preparedStatement.executeBatch();
         }finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
         }
