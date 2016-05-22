@@ -642,6 +642,9 @@ active: background 10% lighter, border 5% darker
 .background-color-windows {
     background-color: #00bcf2;
 }
+.background-color-webapps {
+    background-color: #32a5f2;
+}
 
 /*=============== MOBILE ENTERPRISE INSTALL MODAL =========*/
 .ep-install-modal {
