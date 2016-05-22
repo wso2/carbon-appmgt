@@ -2832,28 +2832,35 @@ public class AppMDAO {
                             + "FROM APM_SUBSCRIPTION SUB, APM_APP API, APM_SUBSCRIBER SUBR, "
                             + "APM_APPLICATION APP WHERE API.APP_ID = SUB.APP_ID AND "
                             + "SUB.APPLICATION_ID=APP.APPLICATION_ID AND "
-                            + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? "
-                            + "AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                            + "APP.SUBSCRIBER_ID=SUBR.SUBSCRIBER_ID AND SUBR.TENANT_ID = ? ";
+                    if (fromDate != null && toDate != null) {
+                        sqlQuery += " AND SUB.SUBSCRIPTION_TIME BETWEEN ";
+                    }
                 } else {
                     sqlQuery = "SELECT API.APP_NAME, API.APP_VERSION, API.APP_PROVIDER, " +
                             "API.UUID AS UUID, COUNT(DISTINCT HIT.USER_ID) AS SUB_ID " +
                             "FROM APM_APP API " +
                             "INNER JOIN APM_APP_HITS HIT ON API.UUID=HIT.UUID " +
-                            "WHERE HIT.TENANT_ID = ? " +
-                            "AND HIT.HIT_TIME BETWEEN ";
+                            "WHERE HIT.TENANT_ID = ? ";
+                    if (fromDate != null && toDate != null) {
+                        sqlQuery += " AND HIT.HIT_TIME BETWEEN ";
+                    }
                 }
-
-                if (!connection.getMetaData().getDriverName().contains("Oracle")) {
-                    sqlQuery += "? AND ? ";
-                } else {
-                    sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
-                            + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                if (fromDate != null && toDate != null) {
+                    if (!connection.getMetaData().getDriverName().contains("Oracle")) {
+                        sqlQuery += "? AND ? ";
+                    } else {
+                        sqlQuery += "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') AND "
+                                + "TO_TIMESTAMP(?, 'YYYY-MM-DD HH24:MI:SS') ";
+                    }
                 }
                 sqlQuery += "GROUP BY API.APP_NAME,API.APP_PROVIDER,APP_VERSION,API.UUID";
                 ps = connection.prepareStatement(sqlQuery);
                 ps.setInt(1, tenantId);
-                ps.setString(2, fromDate);
-                ps.setString(3, toDate);
+                if (fromDate != null && toDate != null) {
+                    ps.setString(2, fromDate);
+                    ps.setString(3, toDate);
+                }
             } else {
                 if (isSubscriptionOn) {
                     sqlQuery = "SELECT API.APP_NAME,APP_VERSION, API.APP_PROVIDER, API.UUID "
@@ -2928,9 +2935,12 @@ public class AppMDAO {
                         "FROM APM_SUBSCRIBER SUBR, APM_APPLICATION APP, APM_SUBSCRIPTION SUB, " +
                         "APM_APP API " +
                         "WHERE SUB.APPLICATION_ID = APP.APPLICATION_ID AND SUBR.SUBSCRIBER_ID = " +
-                        "APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? AND" +
-                        " SUB.SUBSCRIPTION_TIME BETWEEN ? AND ? " +
-                        "GROUP BY SUBR.USER_ID, API.APP_NAME, API.APP_VERSION";
+                        "APP.SUBSCRIBER_ID AND SUB.APP_ID = API.APP_ID AND SUBR.TENANT_ID = ? ";
+        if (fromDate != null && toDate != null) {
+            sqlQuery += addRangeCondition("SUB.SUBSCRIPTION_TIME", true);
+        }
+
+        sqlQuery += "GROUP BY SUBR.USER_ID, API.APP_NAME, API.APP_VERSION";
 
 
         Connection connection = null;
@@ -2942,8 +2952,10 @@ public class AppMDAO {
 
             ps = connection.prepareStatement(sqlQuery);
             ps.setInt(1, tenantId);
-            ps.setString(2, fromDate);
-            ps.setString(3, toDate);
+            if (fromDate != null && toDate != null) {
+                ps.setString(2, fromDate);
+                ps.setString(3, toDate);
+            }
             result = ps.executeQuery();
             if (result == null) {
                 return users;
@@ -9401,5 +9413,14 @@ public class AppMDAO {
             APIMgtDBUtil.closeAllConnections(ps, conn, rs);
         }
         return status;
+    }
+
+    private String addRangeCondition(String rangeField, boolean andNeeded){
+        String query = "";
+        if (andNeeded) {
+            query += " AND ";
+        }
+        query += rangeField + " BETWEEN ? AND ?";
+        return query;
     }
 }
