@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/businessowner/&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/3&quot;</code></div>
             
             
 
@@ -172,7 +172,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nResource successfully deleted.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -185,7 +185,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -198,7 +198,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -211,7 +211,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -246,7 +246,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1&quot;</code></div>
             
             
 
@@ -261,7 +261,7 @@
             </h4>
             </div>
             
-                <div id="response-administrationBusinessownerBusinessOwnerIdGet" class="pre collapse"><code class="json"></code></div>
+                <div id="response-administrationBusinessownerBusinessOwnerIdGet" class="pre collapse"><code class="json">{&quot;site&quot;: &quot;test.lk&quot;,&quot;email&quot;: &quot;testOwner@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;testOwner&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: false,&quot;value&quot;: &quot;903334238V&quot;,&quot;key&quot;: &quot;nic&quot;}],&quot;id&quot;: 1}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -407,7 +407,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -420,7 +420,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -433,7 +433,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -468,7 +468,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 
@@ -479,7 +479,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationBusinessownerBusinessOwnerIdPut"class="pre collapse"><code class="json"></code></div>
+                <div id="request-administrationBusinessownerBusinessOwnerIdPut"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;newSysUser.lk&quot;,&quot;email&quot;: &quot;newSysUser@gmail.com&quot;,&quot;description&quot;:&quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerBusinessOwnerIdPut">
@@ -699,7 +699,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -712,7 +712,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -725,7 +725,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -738,7 +738,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -773,7 +773,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 
@@ -788,7 +788,7 @@
             </h4>
             </div>
             
-                <div id="response-administrationBusinessownerGet" class="pre collapse"><code class="json"></code></div>
+                <div id="response-administrationBusinessownerGet" class="pre collapse"><code class="json">{&quot;businessOwnerList&quot;: [{&quot;site&quot;: &quot;test.lk&quot;,&quot;email&quot;: &quot;testOwner@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;testOwner&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: false,&quot;value&quot;: &quot;903334238V&quot;,&quot;key&quot;: &quot;nic&quot;}],&quot;id&quot;: 1}]}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -891,7 +891,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Business Owner List is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nList of qualifying Business Owner List is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -904,7 +904,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -917,7 +917,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -930,7 +930,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -965,7 +965,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 
@@ -976,7 +976,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationBusinessownerPost"class="pre collapse"><code class="json"></code></div>
+                <div id="request-administrationBusinessownerPost"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerPost">
@@ -988,7 +988,7 @@
             </h4>
             </div>
             
-                <div id="response-administrationBusinessownerPost" class="pre collapse"><code class="json"></code></div>
+                <div id="response-administrationBusinessownerPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -1088,7 +1088,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1123,7 +1123,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1136,7 +1136,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1149,7 +1149,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. \nThe entity of the request was in a not supported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 

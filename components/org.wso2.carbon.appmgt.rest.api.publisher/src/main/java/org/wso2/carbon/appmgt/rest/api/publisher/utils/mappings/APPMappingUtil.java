@@ -308,6 +308,8 @@ public class APPMappingUtil {
             dto.setContext(context);
         }
 
+        dto.setBusinessOwnerName(webapp.getBusinessOwner());
+        dto.setAppUrL(webapp.getUrl());
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
@@ -571,6 +573,7 @@ public class APPMappingUtil {
             }
 
             entitlementPolicyGroup.setPolicyGroupName(policyGroupsDTO.getPolicyGroupName());
+            entitlementPolicyGroup.setPolicyDescription(policyGroupsDTO.getDescription());
             entitlementPolicyGroup.setAllowAnonymous(Boolean.parseBoolean(policyGroupsDTO.getAllowAnonymousAccess()));
             entitlementPolicyGroup.setThrottlingTier(policyGroupsDTO.getThrottlingTier());
             entitlementPolicyGroup.setUserRoles(StringUtils.join(policyGroupsDTO.getUserRoles(), ","));

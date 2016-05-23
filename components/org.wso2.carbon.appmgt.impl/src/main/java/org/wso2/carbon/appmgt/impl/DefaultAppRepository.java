@@ -429,7 +429,7 @@ public class DefaultAppRepository implements AppRepository {
                                         "ON GRP.POLICY_GRP_ID=PARTIAL_MAPPING.POLICY_GRP_ID, " +
                                         "APM_POLICY_GROUP_MAPPING MAPPING " +
                                         "WHERE " +
-                                        "MAPPING.POLICY_GRP_ID=GROUP.POLICY_GRP_ID " +
+                                        "MAPPING.POLICY_GRP_ID=GRP.POLICY_GRP_ID " +
                                         "AND MAPPING.APP_ID=? " +
                                         "ORDER BY GRP.POLICY_GRP_ID";
 
@@ -563,15 +563,36 @@ public class DefaultAppRepository implements AppRepository {
             // URI templates should be passed too, since the association between templates and policy groups should be checked.
             deletePolicyGroupsNotIn(webApp.getAccessPolicyGroups(), webApp.getUriTemplates(),webAppDatabaseId, connection);
 
+            updateRegistryArtifact(webApp);
+
 
             connection.commit();
         } catch (SQLException e) {
             rollbackTransactions(webApp, registry, connection);
             handleException(String.format("Error while updating web app '%s'", webApp.getUUID()), e);
-        }finally {
+        } catch (RegistryException e) {
+            e.printStackTrace();
+        } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, null);
         }
 
+    }
+
+    private void updateRegistryArtifact(App app) throws RegistryException {
+
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(app.getType())){
+            updateWebAppRegistryArtifact((WebApp) app);
+        }
+
+    }
+
+    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException {
+
+        GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
+
+        GenericArtifact updatedWebAppArtifact = buildWebAppRegistryArtifact(artifactManager, webApp);
+        updatedWebAppArtifact.setId(webApp.getUUID());
+        artifactManager.updateGenericArtifact(updatedWebAppArtifact);
     }
 
     private void addUpdateDeleteURLTemplates(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
@@ -643,6 +664,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = urlTemplate.getPolicyGroupId();
                 if(urlTemplate.getPolicyGroupId() <= 0){
                     policyGroupId = getPolicyGroupId(accessPolicyGroups, urlTemplate.getPolicyGroupName());
+                    urlTemplate.setPolicyGroupId(policyGroupId);
                 }
 
                 preparedStatement.setInt(3, policyGroupId);
@@ -881,7 +903,13 @@ public class DefaultAppRepository implements AppRepository {
         for(URITemplate uriTemplate : webApp.getUriTemplates()){
             artifact.setAttribute("uriTemplate_urlPattern" + counter, uriTemplate.getUriTemplate());
             artifact.setAttribute("uriTemplate_httpVerb" + counter, uriTemplate.getHTTPVerb());
-            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName())));
+
+            int policyGroupId = uriTemplate.getPolicyGroupId();
+            if(policyGroupId <= 0){
+                policyGroupId = getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName());
+            }
+
+            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(policyGroupId));
 
             counter++;
         }
@@ -1293,6 +1321,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = uriTemplate.getPolicyGroupId();
                 if(policyGroupId <= 0){
                     policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
+                    uriTemplate.setPolicyGroupId(policyGroupId);
                 }
                 preparedStatement.setInt(4, policyGroupId);
 
