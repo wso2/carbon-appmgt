@@ -2769,7 +2769,7 @@
         "statType": {
             "name": "statType",
             "in": "path",
-            "description": "Stat Type.\n",
+            "description": "Stat Type.\n\n\n\n\nSupported stat types are [**getAppUsagePerPage,getSubscriptionCountsPerApp,getSubscriptionsPerApp,getAppUsagePerUser,getAppResponseTime,getCacheHit**]\n",
             "required": true,
             "type": "string",
             "enum": [
