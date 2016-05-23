@@ -204,6 +204,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_SAML2_SSO_ISSUER = "overview_saml2SsoIssuer";
     public static final String APP_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
+    public static final String APP_OVERVIEW_OLD_VERSION = "overview_oldVersion";
 
     public static final String APP_IMAGES_THUMBNAIL = "images_thumbnail";
     public static final String APP_IMAGES_BANNER = "images_banner";

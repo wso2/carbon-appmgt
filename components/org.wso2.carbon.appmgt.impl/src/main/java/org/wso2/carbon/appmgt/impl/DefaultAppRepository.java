@@ -454,6 +454,8 @@ public class DefaultAppRepository implements AppRepository {
 
         try {
 
+            webApp.setCreatedTime(String.valueOf(new Date().getTime()));
+
             // Persist master data first.
             persistPolicyGroups(webApp.getAccessPolicyGroups(), connection);
 
@@ -505,6 +507,8 @@ public class DefaultAppRepository implements AppRepository {
         sourceApp.setUUID(null);
 
         // Set New Version.
+
+        sourceApp.setOriginVersion(targetApp.getId().getVersion());
         sourceApp.setVersion(targetApp.getId().getVersion());
         sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
 
@@ -549,6 +553,8 @@ public class DefaultAppRepository implements AppRepository {
             // TODO : Only a thin version should be fetched from the database.
             WebApp existingApp = (WebApp) getApp(AppMConstants.WEBAPP_ASSET_TYPE, webApp.getUUID());
             webApp.setStatus(existingApp.getStatus());
+
+            webApp.setCreatedTime(String.valueOf(new Date().getTime()));
 
             // Add and/or update policy groups.
             addAndUpdatePolicyGroups(webApp, webAppDatabaseId, connection);
@@ -873,6 +879,10 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(webApp.isDefaultVersion()));
+
+        if(webApp.getOriginVersion() != null){
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_OLD_VERSION, webApp.getOriginVersion());
+        }
 
         // Add policy groups
         if(webApp.getAccessPolicyGroups() != null){
