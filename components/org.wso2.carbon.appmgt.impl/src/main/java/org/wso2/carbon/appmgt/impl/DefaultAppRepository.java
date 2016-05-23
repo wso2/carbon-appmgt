@@ -76,50 +76,12 @@ public class DefaultAppRepository implements AppRepository {
         return null;
     }
 
-    private WebApp createNewWebAppVersion(WebApp targetApp) throws AppManagementException {
-
-        // Get the attributes of the source.
-        WebApp sourceApp = (WebApp) getApp(targetApp.getType(), targetApp.getUUID());
-
-        // Clear the ID.
-        sourceApp.setUUID(null);
-
-        // Set New Version.
-        sourceApp.setVersion(targetApp.getId().getVersion());
-        sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
-
-        // Clear URL Template database IDs.
-        for(URITemplate template : sourceApp.getUriTemplates()){
-            template.setId(-1);
-
-            String policyGroupName = getPolicyGroupName(sourceApp.getAccessPolicyGroups(), template.getPolicyGroupId());
-            template.setPolicyGroupName(policyGroupName);
-
-            template.setPolicyGroupId(-1);
-        }
-
-        // Clear Policy Group database IDs.
-        for(EntitlementPolicyGroup policyGroup : sourceApp.getAccessPolicyGroups()){
-            policyGroup.setPolicyGroupId(-1);
-        }
-
-        // Set the other properties accordingly.
-        sourceApp.setDisplayName(targetApp.getDisplayName());
-        sourceApp.setCreatedTime(String.valueOf(new Date().getTime()));
-
-        saveApp(sourceApp);
-
-        return sourceApp;
-
-    }
-
     @Override
     public void updateApp(App app) throws AppManagementException {
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
             updateWebApp((WebApp) app);
         }
-
     }
 
     @Override
@@ -296,13 +258,22 @@ public class DefaultAppRepository implements AppRepository {
 
     // ------------------- END : Repository API implementation methods. ----------------------------------
 
+    private AppFactory getAppFactory(String appType) {
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+            return new WebAppFactory();
+        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
+            return new MobileAppFactory();
+        }else{
+            return null;
+        }
+    }
+
     private WebApp getApp(String type, GenericArtifact appArtifact) throws AppManagementException {
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(type)) {
             return getWebApp(appArtifact);
         }
         return null;
-
     }
 
     private boolean isSearchHit(GenericArtifact artifact, Map<String, String> searchTerms) throws AppManagementException {
@@ -419,7 +390,6 @@ public class DefaultAppRepository implements AppRepository {
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, resultSet);
         }
-
     }
 
     private List<EntitlementPolicyGroup> getPolicyGroups(int webAppDatabaseId, Connection connection) throws SQLException {
@@ -470,22 +440,6 @@ public class DefaultAppRepository implements AppRepository {
         } finally {
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, resultSet);
         }
-
-    }
-
-    private AppFactory getAppFactory(String appType) {
-        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
-            return new WebAppFactory();
-        }else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)){
-            return new MobileAppFactory();
-        }else{
-            return null;
-        }
-    }
-
-    private GenericArtifact getRegistryArtifact(String type, String uuid) throws RegistryException {
-        GenericArtifactManager artifactManager = getArtifactManager(registry,type);
-        return artifactManager.getGenericArtifact(uuid);
     }
 
     private String persistWebApp(WebApp webApp) throws AppManagementException {
@@ -542,6 +496,42 @@ public class DefaultAppRepository implements AppRepository {
         return null;
     }
 
+    private WebApp createNewWebAppVersion(WebApp targetApp) throws AppManagementException {
+
+        // Get the attributes of the source.
+        WebApp sourceApp = (WebApp) getApp(targetApp.getType(), targetApp.getUUID());
+
+        // Clear the ID.
+        sourceApp.setUUID(null);
+
+        // Set New Version.
+        sourceApp.setVersion(targetApp.getId().getVersion());
+        sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
+
+        // Clear URL Template database IDs.
+        for(URITemplate template : sourceApp.getUriTemplates()){
+            template.setId(-1);
+
+            String policyGroupName = getPolicyGroupName(sourceApp.getAccessPolicyGroups(), template.getPolicyGroupId());
+            template.setPolicyGroupName(policyGroupName);
+
+            template.setPolicyGroupId(-1);
+        }
+
+        // Clear Policy Group database IDs.
+        for(EntitlementPolicyGroup policyGroup : sourceApp.getAccessPolicyGroups()){
+            policyGroup.setPolicyGroupId(-1);
+        }
+
+        // Set the other properties accordingly.
+        sourceApp.setDisplayName(targetApp.getDisplayName());
+        sourceApp.setCreatedTime(String.valueOf(new Date().getTime()));
+
+        saveApp(sourceApp);
+
+        return sourceApp;
+    }
+
     private void updateWebApp(WebApp webApp) throws AppManagementException {
 
         Connection connection = null;
@@ -573,11 +563,11 @@ public class DefaultAppRepository implements AppRepository {
             rollbackTransactions(webApp, registry, connection);
             handleException(String.format("Error while updating web app '%s'", webApp.getUUID()), e);
         } catch (RegistryException e) {
-            e.printStackTrace();
+            rollbackTransactions(webApp, registry, connection);
+            handleException(String.format("Error while updating web app '%s'", webApp.getUUID()), e);
         } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, null);
         }
-
     }
 
     private void updateRegistryArtifact(App app) throws RegistryException {
@@ -585,7 +575,6 @@ public class DefaultAppRepository implements AppRepository {
         if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(app.getType())){
             updateWebAppRegistryArtifact((WebApp) app);
         }
-
     }
 
     private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException {
@@ -610,20 +599,15 @@ public class DefaultAppRepository implements AppRepository {
             }
         }
 
-
         persistURLTemplates(urlTemplatesToBeAdded, webApp.getAccessPolicyGroups(), webAppDatabaseId, connection);
-
         updateURLTemplates(urlTemplatesToBeUpdated, webApp.getAccessPolicyGroups(), connection);
-
         deleteURLTemplatesNotIn(webApp.getUriTemplates(), webAppDatabaseId, connection);
-
     }
 
     private void deleteURLTemplatesNotIn(Set<URITemplate> uriTemplates, int webAppDatabaseId, Connection connection) throws SQLException {
 
         String queryTemplate = "DELETE FROM APM_APP_URL_MAPPING WHERE APP_ID=%d AND URL_MAPPING_ID NOT IN (%s)";
         PreparedStatement preparedStatement = null;
-        Array templateIdsArray = null;
 
         try{
 
@@ -644,9 +628,6 @@ public class DefaultAppRepository implements AppRepository {
             preparedStatement.executeUpdate();
 
         }finally {
-            if(templateIdsArray != null){
-                templateIdsArray.free();
-            }
             APIMgtDBUtil.closeAllConnections(preparedStatement, null, null);
         }
     }
@@ -770,8 +751,6 @@ public class DefaultAppRepository implements AppRepository {
 
             // Omit the policy groups which has associations with URI templates.
             List<Integer> candidatePolicyGroupIdsToBeDeleted = ListUtils.subtract(policyGroupIdsForApp, retainedPolicyGroupIds);
-
-
 
             for(final Integer id : candidatePolicyGroupIdsToBeDeleted){
 
@@ -1022,7 +1001,6 @@ public class DefaultAppRepository implements AppRepository {
         }
 
         persistEntitlementPolicyMappings(policyGroups, connection);
-
     }
 
     private void persistPolicyGroup(EntitlementPolicyGroup policyGroup, Connection connection) throws SQLException {
@@ -1386,9 +1364,7 @@ public class DefaultAppRepository implements AppRepository {
         ssoProvider.setClaims(new String[0]);
 
         return ssoProvider;
-
     }
-
 
     private int persistSubscription(Connection connection, WebApp webApp, int applicationId, String subscriptionType,
                                     String trustedIDPs)throws AppManagementException {
@@ -1412,37 +1388,6 @@ public class DefaultAppRepository implements AppRepository {
             }
         }
         return subscriptionId;
-    }
-
-    private void executeWorkflow(WebApp webApp, int applicationId, String userId, int subscriptionId,String subscribedTier)throws WorkflowException{
-
-        try{
-
-            WorkflowExecutor addSubscriptionWFExecutor = WorkflowExecutorFactory.getInstance().
-                    getWorkflowExecutor(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
-
-            SubscriptionWorkflowDTO workflowDTO = new SubscriptionWorkflowDTO();
-            workflowDTO.setStatus(WorkflowStatus.CREATED);
-            workflowDTO.setCreatedTime(System.currentTimeMillis());
-            workflowDTO.setTenantDomain("carbon.super");
-            workflowDTO.setTenantId(-1234);
-            workflowDTO.setExternalWorkflowReference(addSubscriptionWFExecutor.generateUUID());
-            workflowDTO.setWorkflowReference(String.valueOf(subscriptionId));
-            workflowDTO.setWorkflowType(WorkflowConstants.WF_TYPE_AM_SUBSCRIPTION_CREATION);
-            workflowDTO.setCallbackUrl(addSubscriptionWFExecutor.getCallbackURL());
-            workflowDTO.setApiName(webApp.getId().getApiName());
-            workflowDTO.setApiContext(webApp.getContext());
-            workflowDTO.setApiVersion(webApp.getId().getVersion());
-            workflowDTO.setApiProvider(webApp.getId().getProviderName());
-            workflowDTO.setTierName(subscribedTier);
-            workflowDTO.setApplicationName(AppMConstants.DEFAULT_APPLICATION_NAME);
-            workflowDTO.setSubscriber(userId);
-
-            addSubscriptionWFExecutor.execute(workflowDTO);
-
-        }catch (Exception e){
-            throw new WorkflowException("Cannot execute workflow. ", e);
-        }
     }
 
     private int addSubscription(Connection connection, APIIdentifier appIdentifier, String subscriptionType, int applicationId,
@@ -1476,10 +1421,9 @@ public class DefaultAppRepository implements AppRepository {
             }
 
             // This query to update the APM_SUBSCRIPTION table
-            String sqlQuery =
-                    "INSERT INTO APM_SUBSCRIPTION (TIER_ID,SUBSCRIPTION_TYPE, APP_ID, " +
-                            "APPLICATION_ID,SUB_STATUS, TRUSTED_IDP, SUBSCRIPTION_TIME) "
-                            + "VALUES (?,?,?,?,?,?,?)";
+            String sqlQuery = "INSERT INTO APM_SUBSCRIPTION (TIER_ID,SUBSCRIPTION_TYPE, APP_ID, " +
+                                "APPLICATION_ID,SUB_STATUS, TRUSTED_IDP, SUBSCRIPTION_TIME) " +
+                                "VALUES (?,?,?,?,?,?,?)";
 
             // Adding data to the APM_SUBSCRIPTION table
             preparedStmtToInsertSubscription =
@@ -1691,10 +1635,9 @@ public class DefaultAppRepository implements AppRepository {
         int applicationId = -1;
         try {
             // This query to update the APM_APPLICATION table
-            String sqlQuery =
-                    "INSERT INTO APM_APPLICATION " +
-                            "(NAME, SUBSCRIBER_ID, APPLICATION_TIER, CALLBACK_URL, DESCRIPTION, APPLICATION_STATUS) " +
-                            "VALUES (?,?,?,?,?,?)";
+            String sqlQuery = "INSERT INTO APM_APPLICATION " +
+                                "(NAME, SUBSCRIBER_ID, APPLICATION_TIER, CALLBACK_URL, DESCRIPTION, APPLICATION_STATUS) " +
+                                "VALUES (?,?,?,?,?,?)";
 
             preparedStmtToAddApplication = connection.prepareStatement(sqlQuery, new String[]{AppMConstants.APPLICATION_ID});
             if (connection.getMetaData().getDriverName().contains("PostgreSQL")) {
@@ -1776,5 +1719,4 @@ public class DefaultAppRepository implements AppRepository {
         log.error(msg, e);
         throw new AppManagementException(msg, e);
     }
-
 }
