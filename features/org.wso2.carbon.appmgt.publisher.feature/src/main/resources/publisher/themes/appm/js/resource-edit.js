@@ -107,7 +107,7 @@ $( document ).ready(function() {
     });
 
     $(".selectOwnerName").change(function() {
-        var data = $('.selectOwnerName').select2('data')[0]['id'];
+        var data = $('.selectOwnerName').select2('data')[0]['id'].trim();
         $('#overview_businessOwner').val(data);
     });
 

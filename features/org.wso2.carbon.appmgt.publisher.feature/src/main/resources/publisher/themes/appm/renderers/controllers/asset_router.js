@@ -48,7 +48,7 @@ var render = function (theme, data, meta, require) {
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
             var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
-            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "") {
+            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {
 
                 var businessOwner = apiProvider.getBusinessOwner(businessOwnerAttribute);
                 data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
@@ -72,7 +72,7 @@ var render = function (theme, data, meta, require) {
             data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
             var businessOwnerId = data.artifact.attributes.overview_businessOwner;
-            if (businessOwnerId != null && businessOwnerId.trim() != "") {
+            if (businessOwnerId != null && businessOwnerId.trim() != "" && businessOwnerId != "null") {
                 var businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
                 data.businessOwner = businessOwner;
             }
