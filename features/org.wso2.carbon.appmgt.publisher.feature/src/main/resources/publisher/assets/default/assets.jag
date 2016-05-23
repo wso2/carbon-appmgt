@@ -60,7 +60,9 @@ var getArtifactsWithoutPagination = function(artifactManager, query, sortby, sor
     var artifacts;
 
     if(query) {
-        artifacts = artifactManager.search(query, DEFAULT_PAGING) || [];
+        var searchMap = {};
+        searchMap["overview_displayName"] = query;
+        artifacts = artifactManager.search(searchMap, DEFAULT_PAGING) || [];
     } else if (sortby && sort){
         DEFAULT_PAGING.sortBy = 'overview_'+sortby;
         DEFAULT_PAGING.sortOrder = sort.toUpperCase();
