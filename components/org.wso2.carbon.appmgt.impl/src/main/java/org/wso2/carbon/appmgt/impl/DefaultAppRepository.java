@@ -664,6 +664,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = urlTemplate.getPolicyGroupId();
                 if(urlTemplate.getPolicyGroupId() <= 0){
                     policyGroupId = getPolicyGroupId(accessPolicyGroups, urlTemplate.getPolicyGroupName());
+                    urlTemplate.setPolicyGroupId(policyGroupId);
                 }
 
                 preparedStatement.setInt(3, policyGroupId);
@@ -902,7 +903,13 @@ public class DefaultAppRepository implements AppRepository {
         for(URITemplate uriTemplate : webApp.getUriTemplates()){
             artifact.setAttribute("uriTemplate_urlPattern" + counter, uriTemplate.getUriTemplate());
             artifact.setAttribute("uriTemplate_httpVerb" + counter, uriTemplate.getHTTPVerb());
-            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName())));
+
+            int policyGroupId = uriTemplate.getPolicyGroupId();
+            if(policyGroupId <= 0){
+                policyGroupId = getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName());
+            }
+
+            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(policyGroupId));
 
             counter++;
         }
@@ -1314,6 +1321,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = uriTemplate.getPolicyGroupId();
                 if(policyGroupId <= 0){
                     policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
+                    uriTemplate.setPolicyGroupId(policyGroupId);
                 }
                 preparedStatement.setInt(4, policyGroupId);
 
