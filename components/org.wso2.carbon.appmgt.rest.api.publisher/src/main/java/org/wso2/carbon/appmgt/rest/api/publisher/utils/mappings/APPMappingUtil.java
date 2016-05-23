@@ -541,6 +541,7 @@ public class APPMappingUtil {
         WebApp webApp = new WebApp(apiIdentifier);
         webApp.setUUID(appDTO.getId());
         webApp.setType(AppMConstants.WEBAPP_ASSET_TYPE);
+        webApp.setDefaultVersion(appDTO.getIsDefaultVersion());
         webApp.setUrl(appDTO.getAppUrL());
         webApp.setContext(appDTO.getContext());
         webApp.setDisplayName(appDTO.getDisplayName());

@@ -662,6 +662,15 @@
                         "$ref": "#/parameters/appId"
                     },
                     {
+                        "in": "body",
+                        "name": "body",
+                        "description": "App object that needs to be added\n",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/App"
+                        }
+                    },
+                    {
                         "$ref": "#/parameters/Content-Type"
                     },
                     {

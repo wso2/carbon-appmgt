@@ -40,7 +40,7 @@ public abstract class AppsApiService {
     public abstract Response appsAppTypeIdAppIdGet(String appType,String appId,String accept,String ifNoneMatch,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdPut(String appType,String appId,AppDTO body,String contentType,String ifMatch,String ifUnmodifiedSince);
     public abstract Response appsAppTypeIdAppIdDelete(String appType,String appId,String ifMatch,String ifUnmodifiedSince);
-    public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,String contentType,String ifModifiedSince);
+    public abstract Response appsAppTypeIdAppIdCreateNewVersionPost(String appType,String appId,AppDTO body,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDiscoverPost(String appType,String appId,String contentType,String ifModifiedSince);
     public abstract Response appsAppTypeIdAppIdDocsGet(String appType,String appId,Integer limit,Integer offset,String accept,String ifNoneMatch);
     public abstract Response appsAppTypeIdAppIdDocsPost(String appId,String appType,DocumentDTO body,String contentType);

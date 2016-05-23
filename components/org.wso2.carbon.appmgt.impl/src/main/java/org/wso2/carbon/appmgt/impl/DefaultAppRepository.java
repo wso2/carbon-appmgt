@@ -66,6 +66,54 @@ public class DefaultAppRepository implements AppRepository {
     }
 
     @Override
+    public String createNewVersion(App app) throws AppManagementException {
+
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())){
+            WebApp newVersion = createNewWebAppVersion((WebApp)app);
+            return newVersion.getUUID();
+        }
+
+        return null;
+    }
+
+    private WebApp createNewWebAppVersion(WebApp targetApp) throws AppManagementException {
+
+        // Get the attributes of the source.
+        WebApp sourceApp = (WebApp) getApp(targetApp.getType(), targetApp.getUUID());
+
+        // Clear the ID.
+        sourceApp.setUUID(null);
+
+        // Set New Version.
+        sourceApp.setVersion(targetApp.getId().getVersion());
+        sourceApp.setDefaultVersion(targetApp.isDefaultVersion());
+
+        // Clear URL Template database IDs.
+        for(URITemplate template : sourceApp.getUriTemplates()){
+            template.setId(-1);
+
+            String policyGroupName = getPolicyGroupName(targetApp.getAccessPolicyGroups(), template.getPolicyGroupId());
+            template.setPolicyGroupName(policyGroupName);
+
+            template.setPolicyGroupId(-1);
+        }
+
+        // Clear Policy Group database IDs.
+        for(EntitlementPolicyGroup policyGroup : sourceApp.getAccessPolicyGroups()){
+            policyGroup.setPolicyGroupId(-1);
+        }
+
+        // Set the other properties accordingly.
+        sourceApp.setDisplayName(targetApp.getDisplayName());
+        sourceApp.setCreatedTime(String.valueOf(new Date().getTime()));
+
+        saveApp(sourceApp);
+
+        return sourceApp;
+
+    }
+
+    @Override
     public void updateApp(App app) throws AppManagementException {
 
         if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
@@ -73,7 +121,6 @@ public class DefaultAppRepository implements AppRepository {
         }
 
     }
-
 
     @Override
     public App getApp(String type, String uuid) throws AppManagementException {
@@ -851,6 +898,17 @@ public class DefaultAppRepository implements AppRepository {
         }
 
         return -1;
+    }
+
+    private String getPolicyGroupName(List<EntitlementPolicyGroup> accessPolicyGroups, int policyGroupId) {
+
+        for(EntitlementPolicyGroup policyGroup : accessPolicyGroups){
+            if(policyGroupId == policyGroup.getPolicyGroupId()){
+                return policyGroup.getPolicyGroupName();
+            }
+        }
+
+        return null;
     }
 
     private int persistWebAppToDatabase(WebApp webApp, Connection connection) throws SQLException, AppManagementException {
