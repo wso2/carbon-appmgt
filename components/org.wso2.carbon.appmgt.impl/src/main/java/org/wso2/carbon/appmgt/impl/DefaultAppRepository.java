@@ -92,7 +92,7 @@ public class DefaultAppRepository implements AppRepository {
         for(URITemplate template : sourceApp.getUriTemplates()){
             template.setId(-1);
 
-            String policyGroupName = getPolicyGroupName(targetApp.getAccessPolicyGroups(), template.getPolicyGroupId());
+            String policyGroupName = getPolicyGroupName(sourceApp.getAccessPolicyGroups(), template.getPolicyGroupId());
             template.setPolicyGroupName(policyGroupName);
 
             template.setPolicyGroupId(-1);
@@ -132,6 +132,8 @@ public class DefaultAppRepository implements AppRepository {
 
         if(result.size() == 1){
             return result.get(0);
+        }else if(result.isEmpty()) {
+            return null;
         }else{
             //flag an error.
             throw new AppManagementException("Duplicate entries found for the given uuid.");
@@ -869,9 +871,9 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(webApp.getId().getProviderName()));
         artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());
-        artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl()); //
-        artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, ""); //webApp.getThumbnailUrl()
-        artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, "");
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl());
+        artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, webApp.getThumbnailUrl());
+        artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, webApp.getBanner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
@@ -894,9 +896,7 @@ public class DefaultAppRepository implements AppRepository {
             }
 
             artifact.setAttribute("uriTemplate_policyGroupIds", policyGroupIds.toString());
-
         }
-
 
         // Add URI Template attributes
         int counter = 0;

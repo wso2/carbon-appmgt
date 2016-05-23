@@ -29,27 +29,7 @@ import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
-import org.wso2.carbon.appmgt.api.model.APIIdentifier;
-import org.wso2.carbon.appmgt.api.model.APIStatus;
-import org.wso2.carbon.appmgt.api.model.APPLifecycleActions;
-import org.wso2.carbon.appmgt.api.model.App;
-import org.wso2.carbon.appmgt.api.model.AppDefaultVersion;
-import org.wso2.carbon.appmgt.api.model.AppStore;
-import org.wso2.carbon.appmgt.api.model.BusinessOwner;
-import org.wso2.carbon.appmgt.api.model.BusinessOwnerProperty;
-import org.wso2.carbon.appmgt.api.model.Documentation;
-import org.wso2.carbon.appmgt.api.model.EntitlementPolicyGroup;
-import org.wso2.carbon.appmgt.api.model.ExternalAppStorePublisher;
-import org.wso2.carbon.appmgt.api.model.JavaPolicy;
-import org.wso2.carbon.appmgt.api.model.LifeCycleEvent;
-import org.wso2.carbon.appmgt.api.model.MobileApp;
-import org.wso2.carbon.appmgt.api.model.Provider;
-import org.wso2.carbon.appmgt.api.model.SSOProvider;
-import org.wso2.carbon.appmgt.api.model.Subscriber;
-import org.wso2.carbon.appmgt.api.model.Tag;
-import org.wso2.carbon.appmgt.api.model.Tier;
-import org.wso2.carbon.appmgt.api.model.Usage;
-import org.wso2.carbon.appmgt.api.model.WebApp;
+import org.wso2.carbon.appmgt.api.model.*;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
@@ -91,6 +71,7 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1576,6 +1557,47 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     * Add a file to a document of source type FILE
+     *
+     * @param webApp
+     * @param documentation document
+     * @param filename name of the file
+     * @param content content of the file as an Input Stream
+     * @param contentType content type of the file
+     * @throws AppManagementException if failed to add the file
+     */
+    public void addFileToDocumentation(WebApp webApp, Documentation documentation, String filename,
+                                       InputStream content, String contentType) throws AppManagementException {
+        if (Documentation.DocumentSourceType.FILE.equals(documentation.getSourceType())) {
+            FileContent documentContent = new FileContent();
+            documentContent.setContent(content);
+            documentContent.setContentType(contentType);
+
+            String filePath = AppManagerUtil.getDocumentationFilePath(webApp.getId(), filename);
+
+            try {
+                String visibleRolesList = webApp.getVisibleRoles();
+                String[] visibleRoles = new String[0];
+                if (visibleRolesList != null) {
+                    visibleRoles = visibleRolesList.split(",");
+                }
+                AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles,
+                        filePath);
+                documentation.setFilePath(addResourceFile(filePath, documentContent));
+                AppManagerUtil.setFilePermission(filePath);
+            } catch (AppManagementException e) {
+                handleException("Failed to add file to document " + documentation.getName(), e);
+            }
+        } else {
+            String errorMsg = "Cannot add file to the Document. Document " + documentation.getName()
+                    + "'s Source type is not FILE.";
+            handleException(errorMsg);
+        }
+    }
+
+
+
+    /**
      * This method used to update the WebApp definition content - Swagger
      *
      * @param identifier,        WebApp identifier
@@ -2866,6 +2888,32 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             PrivilegedCarbonContext.endTenantFlow();
         }
         return tagSet;
+    }
+
+    public String addResourceFile(String resourcePath, FileContent resourceFile) throws AppManagementException {
+        try {
+            Resource thumb = registry.newResource();
+            thumb.setContentStream(resourceFile.getContent());
+            thumb.setMediaType(resourceFile.getContentType());
+            registry.put(resourcePath, thumb);
+            if(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)){
+                return RegistryConstants.PATH_SEPARATOR + "registry"
+                        + RegistryConstants.PATH_SEPARATOR + "resource"
+                        + RegistryConstants.PATH_SEPARATOR + "_system"
+                        + RegistryConstants.PATH_SEPARATOR + "governance"
+                        + resourcePath;
+            }
+            else{
+                return "/t/"+tenantDomain+ RegistryConstants.PATH_SEPARATOR + "registry"
+                        + RegistryConstants.PATH_SEPARATOR + "resource"
+                        + RegistryConstants.PATH_SEPARATOR + "_system"
+                        + RegistryConstants.PATH_SEPARATOR + "governance"
+                        + resourcePath;
+            }
+        } catch (RegistryException e) {
+            handleException("Error while adding the resource to the registry", e);
+        }
+        return null;
     }
 
 }

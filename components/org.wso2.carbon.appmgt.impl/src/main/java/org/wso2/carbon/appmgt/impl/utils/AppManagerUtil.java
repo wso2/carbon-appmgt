@@ -887,10 +887,10 @@ public final class AppManagerUtil {
     }
 
     /**
-     * This method used to Downloaded Uploaded Documents from publisher
+     * This method used to retrive the Uploaded Documents from publisher
      *
      * @param userName     logged in username
-     * @param resourceUrl  resource want to download
+     * @param resourceUrl  resource to be downloaded
      * @param tenantDomain loggedUserTenantDomain
      * @return map that contains Data of the resource
      * @throws AppManagementException
@@ -979,6 +979,7 @@ public final class AppManagerUtil {
 				type = DocumentationType.OTHER;
 			}
 			documentation = new Documentation(type, artifact.getAttribute(AppMConstants.DOC_NAME));
+            documentation.setId(artifact.getId());
 			documentation.setSummary(artifact.getAttribute(AppMConstants.DOC_SUMMARY));
 
 			Documentation.DocumentSourceType docSourceType =
@@ -1293,14 +1294,17 @@ public final class AppManagerUtil {
 			switch (sourceType) {
 				case INLINE:
 					sourceType = Documentation.DocumentSourceType.INLINE;
+                    //TODO:Need to fix
+                    documentation.setSourceUrl("null");
 					break;
 				case URL:
 					sourceType = Documentation.DocumentSourceType.URL;
 					break;
 				case FILE: {
 					sourceType = Documentation.DocumentSourceType.FILE;
-					setFilePermission(documentation.getFilePath());
-				}
+                    //TODO:Need to fix
+                    documentation.setSourceUrl("null");
+                }
 					break;
 			}
 			artifact.setAttribute(AppMConstants.DOC_SOURCE_TYPE, sourceType.name());
@@ -1875,7 +1879,7 @@ public final class AppManagerUtil {
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 
-	private static void setFilePermission(String filePath) throws AppManagementException {
+	public static void setFilePermission(String filePath) throws AppManagementException {
 		try {
 			filePath = filePath.replaceFirst("/registry/resource/", "");
 			AuthorizationManager accessControlAdmin =
