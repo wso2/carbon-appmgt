@@ -293,10 +293,11 @@ public class AppsApi  {
 
     public Response appsAppTypeIdAppIdCreateNewVersionPost(@ApiParam(value = "App Type. Either webapp or mobileapp",required=true ) @PathParam("appType") String appType,
     @ApiParam(value = "**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.",required=true ) @PathParam("appId") String appId,
+    @ApiParam(value = "App object that needs to be added" ,required=true ) AppDTO body,
     @ApiParam(value = "Media type of the entity in the body. Default is JSON." ,required=true , defaultValue="JSON")@HeaderParam("Content-Type") String contentType,
     @ApiParam(value = "Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource."  )@HeaderParam("If-Modified-Since") String ifModifiedSince)
     {
-    return delegate.appsAppTypeIdAppIdCreateNewVersionPost(appType,appId,contentType,ifModifiedSince);
+    return delegate.appsAppTypeIdAppIdCreateNewVersionPost(appType,appId,body,contentType,ifModifiedSince);
     }
     @POST
     @Path("/{appType}/id/{appId}/discover")

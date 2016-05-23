@@ -583,6 +583,14 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     }
 
+    @Override
+    public void createNewVersion(App app) throws AppManagementException {
+
+        AppRepository appRepository = new DefaultAppRepository(registry);
+        String appId = appRepository.createNewVersion(app);
+
+    }
+
     /**
      * Retrieve webapp for the given uuid
      * @param uuid uuid of the Application

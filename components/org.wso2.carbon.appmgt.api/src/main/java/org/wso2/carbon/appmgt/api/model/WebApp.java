@@ -744,4 +744,7 @@ public class WebApp extends App{
         this.claims = claims;
     }
 
+    public void setVersion(String version) {
+        this.id.setVersion(version);
+    }
 }
