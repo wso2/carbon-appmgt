@@ -172,7 +172,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nResource successfully deleted.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -185,7 +185,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -198,7 +198,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -211,7 +211,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -246,7 +246,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&amp;action=Unpublish&quot;</code></div>
             
             
 
@@ -261,7 +261,7 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json"></code></div>
+                <div id="response-appsAppTypeChangeLifecyclePost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -380,7 +380,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**appId ID** consisting of the **UUID** of the App.\nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**appId ID** consisting of the **UUID** of the App. \nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -475,7 +475,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">202</p></td>
-                        <td class="parameter"><p class="marked">OK.\nLifecycle changed successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nLifecycle changed successfully.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -488,7 +488,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -501,7 +501,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nRequested App does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nRequested App does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -514,7 +514,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -729,7 +729,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
+                            <p class="param-description marked">Starting point within the complete list of items qualified.  \n</p>
                             
                         </td>
                         <td>
@@ -824,7 +824,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Apps is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nList of qualifying Apps is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -837,7 +837,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -850,7 +850,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -863,7 +863,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -979,12 +979,44 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
                             <span class="param-type">
                                 String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            
+                            <span class="param-in">Body </span>
+                        </td>
+                        <td class="param-name">
+                            <p>body</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">App object that needs to be added\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                App
+                                
+                                    (<a href="#!/models#App">App</a>)
                                 
                             </span>
                         </td>
@@ -1039,7 +1071,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1074,7 +1106,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1087,7 +1119,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1100,7 +1132,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. \nThe entity of the request was in a not supported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1218,7 +1250,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1313,7 +1345,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nResource successfully deleted.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1326,7 +1358,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1339,7 +1371,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1352,7 +1384,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1478,7 +1510,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1538,7 +1570,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1586,7 +1618,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1599,7 +1631,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. \nThe entity of the request was in a not supported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1634,7 +1666,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash"></code></div>
+                <div class="pre"><code class="bash">curl -H &quot;Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a&quot; -X DELETE http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058</code></div>
             
             
 
@@ -1717,7 +1749,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1842,7 +1874,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nResource successfully deleted.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nResource successfully deleted.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1855,7 +1887,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1868,7 +1900,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nResource to be deleted does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nResource to be deleted does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1903,7 +1935,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot;  &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
             
             
 
@@ -1986,7 +2018,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2076,7 +2108,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2111,7 +2143,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying App is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nQualifying App is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2124,7 +2156,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2137,7 +2169,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2150,7 +2182,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2276,7 +2308,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2433,7 +2465,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated App object\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nSuccessful response with updated App object\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2446,7 +2478,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2459,7 +2491,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2472,7 +2504,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2485,7 +2517,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">412</p></td>
-                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed. \nThe request has not been performed because one of the preconditions is not met.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2603,7 +2635,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2693,7 +2725,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2728,7 +2760,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying User List is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nQualifying User List is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2741,7 +2773,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2754,7 +2786,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2767,7 +2799,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2955,7 +2987,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2990,7 +3022,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created. \nSuccessful response with the newly created object as entity in the body. \nLocation header contains URL of newly created entity.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3003,7 +3035,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3016,7 +3048,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type. \nThe entity of the request was in a not supported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3242,7 +3274,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3255,7 +3287,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3268,7 +3300,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3303,7 +3335,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot;  &quot;http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp&quot;</code></div>
             
             
 
@@ -3446,7 +3478,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Starting point within the complete list of items qualified.\n</p>
+                            <p class="param-description marked">Starting point within the complete list of items qualified.  \n</p>
                             
                         </td>
                         <td>
@@ -3541,7 +3573,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of qualifying Apps is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK. \nList of qualifying Apps is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3554,7 +3586,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request. \nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3567,7 +3599,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">403</p></td>
-                        <td class="parameter"><p class="marked">Forbidden.\nThe request must be conditional but no condition has been specified.\n</p></td>
+                        <td class="parameter"><p class="marked">Forbidden. \nThe request must be conditional but no condition has been specified.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3580,7 +3612,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">404</p></td>
-                        <td class="parameter"><p class="marked">Not Found.\nThe resource to be updated does not exist.\n</p></td>
+                        <td class="parameter"><p class="marked">Not Found. \nThe resource to be updated does not exist.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
