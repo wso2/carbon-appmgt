@@ -422,16 +422,16 @@ public class DefaultAppRepository implements AppRepository {
 
     private List<EntitlementPolicyGroup> getPolicyGroups(int webAppDatabaseId, Connection connection) throws SQLException {
 
-        String query = "SELECT `GROUP`.*,PARTIAL_MAPPING.POLICY_PARTIAL_ID " +
+        String query = "SELECT GRP.*,PARTIAL_MAPPING.POLICY_PARTIAL_ID " +
                                         "FROM " +
-                                        "APM_POLICY_GROUP `GROUP` " +
+                                        "APM_POLICY_GROUP GRP " +
                                         "LEFT JOIN APM_POLICY_GRP_PARTIAL_MAPPING PARTIAL_MAPPING " +
-                                        "ON `GROUP`.POLICY_GRP_ID=PARTIAL_MAPPING.POLICY_GRP_ID, " +
+                                        "ON GRP.POLICY_GRP_ID=PARTIAL_MAPPING.POLICY_GRP_ID, " +
                                         "APM_POLICY_GROUP_MAPPING MAPPING " +
                                         "WHERE " +
                                         "MAPPING.POLICY_GRP_ID=GROUP.POLICY_GRP_ID " +
                                         "AND MAPPING.APP_ID=? " +
-                                        "ORDER BY `GROUP`.POLICY_GRP_ID";
+                                        "ORDER BY GRP.POLICY_GRP_ID";
 
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
