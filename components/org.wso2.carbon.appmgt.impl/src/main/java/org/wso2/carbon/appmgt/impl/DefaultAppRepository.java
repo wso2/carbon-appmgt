@@ -92,7 +92,7 @@ public class DefaultAppRepository implements AppRepository {
         for(URITemplate template : sourceApp.getUriTemplates()){
             template.setId(-1);
 
-            String policyGroupName = getPolicyGroupName(targetApp.getAccessPolicyGroups(), template.getPolicyGroupId());
+            String policyGroupName = getPolicyGroupName(sourceApp.getAccessPolicyGroups(), template.getPolicyGroupId());
             template.setPolicyGroupName(policyGroupName);
 
             template.setPolicyGroupId(-1);
@@ -132,6 +132,8 @@ public class DefaultAppRepository implements AppRepository {
 
         if(result.size() == 1){
             return result.get(0);
+        }else if(result.isEmpty()) {
+            return null;
         }else{
             //flag an error.
             throw new AppManagementException("Duplicate entries found for the given uuid.");
@@ -664,6 +666,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = urlTemplate.getPolicyGroupId();
                 if(urlTemplate.getPolicyGroupId() <= 0){
                     policyGroupId = getPolicyGroupId(accessPolicyGroups, urlTemplate.getPolicyGroupName());
+                    urlTemplate.setPolicyGroupId(policyGroupId);
                 }
 
                 preparedStatement.setInt(3, policyGroupId);
@@ -868,9 +871,9 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(webApp.getId().getProviderName()));
         artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());
-        artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl()); //
-        artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, ""); //webApp.getThumbnailUrl()
-        artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, "");
+        artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl());
+        artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, webApp.getThumbnailUrl());
+        artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, webApp.getBanner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
         artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
@@ -893,16 +896,20 @@ public class DefaultAppRepository implements AppRepository {
             }
 
             artifact.setAttribute("uriTemplate_policyGroupIds", policyGroupIds.toString());
-
         }
-
 
         // Add URI Template attributes
         int counter = 0;
         for(URITemplate uriTemplate : webApp.getUriTemplates()){
             artifact.setAttribute("uriTemplate_urlPattern" + counter, uriTemplate.getUriTemplate());
             artifact.setAttribute("uriTemplate_httpVerb" + counter, uriTemplate.getHTTPVerb());
-            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName())));
+
+            int policyGroupId = uriTemplate.getPolicyGroupId();
+            if(policyGroupId <= 0){
+                policyGroupId = getPolicyGroupId(webApp.getAccessPolicyGroups(), uriTemplate.getPolicyGroupName());
+            }
+
+            artifact.setAttribute("uriTemplate_policyGroupId" + counter, String.valueOf(policyGroupId));
 
             counter++;
         }
@@ -1314,6 +1321,7 @@ public class DefaultAppRepository implements AppRepository {
                 int policyGroupId = uriTemplate.getPolicyGroupId();
                 if(policyGroupId <= 0){
                     policyGroupId = getPolicyGroupId(policyGroups, uriTemplate.getPolicyGroupName());
+                    uriTemplate.setPolicyGroupId(policyGroupId);
                 }
                 preparedStatement.setInt(4, policyGroupId);
 

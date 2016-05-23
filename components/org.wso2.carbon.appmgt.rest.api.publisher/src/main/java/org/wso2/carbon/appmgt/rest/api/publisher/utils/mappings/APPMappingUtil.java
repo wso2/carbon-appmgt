@@ -308,9 +308,12 @@ public class APPMappingUtil {
             dto.setContext(context);
         }
 
+        dto.setBusinessOwnerName(webapp.getBusinessOwner());
+        dto.setAppUrL(webapp.getUrl());
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
+        dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
 
@@ -541,7 +544,13 @@ public class APPMappingUtil {
         WebApp webApp = new WebApp(apiIdentifier);
         webApp.setUUID(appDTO.getId());
         webApp.setType(AppMConstants.WEBAPP_ASSET_TYPE);
-        webApp.setDefaultVersion(appDTO.getIsDefaultVersion());
+
+        if(appDTO.getIsDefaultVersion() != null){
+            webApp.setDefaultVersion(appDTO.getIsDefaultVersion());
+        }else {
+            webApp.setDefaultVersion(false);
+        }
+
         webApp.setUrl(appDTO.getAppUrL());
         webApp.setContext(appDTO.getContext());
         webApp.setDisplayName(appDTO.getDisplayName());
@@ -551,6 +560,7 @@ public class APPMappingUtil {
         webApp.setDescription(appDTO.getDescription());
         webApp.setThumbnailUrl(appDTO.getThumbnailUrl());
         webApp.setBanner(appDTO.getBanner());
+        webApp.setTrackingCode(appDTO.getTrackingCode());
         webApp.setLogoutURL(appDTO.getLogoutURL());
         webApp.setBusinessOwner(appDTO.getBusinessOwnerName());
         webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(),","));
@@ -571,6 +581,7 @@ public class APPMappingUtil {
             }
 
             entitlementPolicyGroup.setPolicyGroupName(policyGroupsDTO.getPolicyGroupName());
+            entitlementPolicyGroup.setPolicyDescription(policyGroupsDTO.getDescription());
             entitlementPolicyGroup.setAllowAnonymous(Boolean.parseBoolean(policyGroupsDTO.getAllowAnonymousAccess()));
             entitlementPolicyGroup.setThrottlingTier(policyGroupsDTO.getThrottlingTier());
             entitlementPolicyGroup.setUserRoles(StringUtils.join(policyGroupsDTO.getUserRoles(), ","));

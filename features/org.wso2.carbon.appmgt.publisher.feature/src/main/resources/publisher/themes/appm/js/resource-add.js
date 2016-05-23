@@ -115,7 +115,7 @@ $( document ).ready(function() {
      * This contains the business owner id.
      */
     $(".selectOwnerName").change(function() {
-        var data = $('.selectOwnerName').select2('data')[0]['id'];
+        var data = $('.selectOwnerName').select2('data')[0]['id'].trim();
         $('#overview_businessOwner').val(data);
     });
 
