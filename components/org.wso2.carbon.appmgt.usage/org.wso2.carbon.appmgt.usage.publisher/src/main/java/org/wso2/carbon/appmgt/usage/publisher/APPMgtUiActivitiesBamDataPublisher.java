@@ -45,7 +45,9 @@ public class APPMgtUiActivitiesBamDataPublisher {
 	public APPMgtUiActivitiesBamDataPublisher() {
 		enableUiActivityBamPublishing = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().
 				isUiActivityBamPublishEnabled();
-		this.dataPublisher = DataPublisherUtil.getDataPublisher();
+		if (enableUiActivityBamPublishing) {
+			this.dataPublisher = DataPublisherUtil.getDataPublisher();
+		}
 	}
 
 	/**
