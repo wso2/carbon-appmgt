@@ -1385,9 +1385,8 @@
         "/apps/{appType}/stats/{statType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer ede4387e36fbf87c802026f1240b7e5d\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/stats/getAppUsagePerPage\"",
+                "x-wso2-response": "{\"result\": [{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step2.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 15,\"context\": \"/travel\"},{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step1.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 20,\"context\": \"/travel\"},{\"apiName\": \"PlanYourTrip_admin(v1.0.0)\",\"referer\": \"/planYourTrip/1.0.0\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\", \"count\": 10, \"context\": \"/planYourTrip\"}]}",
                 "summary": "Get Stat summary",
                 "description": "Get Stat summary results.\n",
                 "parameters": [
@@ -2772,7 +2771,16 @@
             "in": "path",
             "description": "Stat Type.\n",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "enum": [
+                "getAppUsagePerPage",
+                "getSubscriptionCountsPerApp",
+                "getSubscriptionsPerApp",
+                "getAppUsagePerUser",
+                "getAppResponseTime",
+                "getCacheHit"
+            ],
+            "example": "getAppUsagePerPage"
         },
         "businessOwnerId": {
             "name": "businessOwnerId",
