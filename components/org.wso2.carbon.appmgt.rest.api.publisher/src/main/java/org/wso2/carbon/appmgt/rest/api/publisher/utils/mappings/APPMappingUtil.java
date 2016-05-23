@@ -313,6 +313,7 @@ public class APPMappingUtil {
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
         dto.setThumbnailUrl(webapp.getThumbnailUrl());
+        dto.setTrackingCode(webapp.getTrackingCode());
         dto.setLifecycleState(webapp.getLifeCycleStatus().getStatus());
         dto.setRating(BigDecimal.valueOf(webapp.getRating()));
 
@@ -553,6 +554,7 @@ public class APPMappingUtil {
         webApp.setDescription(appDTO.getDescription());
         webApp.setThumbnailUrl(appDTO.getThumbnailUrl());
         webApp.setBanner(appDTO.getBanner());
+        webApp.setTrackingCode(appDTO.getTrackingCode());
         webApp.setLogoutURL(appDTO.getLogoutURL());
         webApp.setBusinessOwner(appDTO.getBusinessOwnerName());
         webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(),","));

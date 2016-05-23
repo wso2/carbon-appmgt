@@ -89,6 +89,7 @@ public class WebAppFactory extends AppFactory {
             webApp.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             webApp.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             webApp.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
+            webApp.setTrackingCode(artifact.getAttribute(AppMConstants.APP_TRACKING_CODE));
             webApp.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             webApp.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             webApp.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
