@@ -25,6 +25,15 @@ public interface AppRepository {
     String saveApp(App app) throws AppManagementException;
 
     /**
+     *
+     * Creates and persists a new version using the attributes in the given app.
+     *
+     * @param app
+     * @return
+     */
+    String createNewVersion(App app) throws AppManagementException;
+
+    /**
      * Updates the given app.
      *
      * @param app

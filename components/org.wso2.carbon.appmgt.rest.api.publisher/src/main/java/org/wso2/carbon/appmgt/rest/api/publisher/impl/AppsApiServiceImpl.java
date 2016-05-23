@@ -564,8 +564,27 @@ public class AppsApiServiceImpl extends AppsApiService {
     }
 
     @Override
-    public Response appsAppTypeIdAppIdCreateNewVersionPost(String appType, String appId, String contentType,
-                                                           String ifModifiedSince) {
+    public Response appsAppTypeIdAppIdCreateNewVersionPost(String appType, String appId, AppDTO body,String contentType,
+                                                           String ifModifiedSince){
+
+        APIProvider apiProvider = null;
+        try {
+            apiProvider = RestApiUtil.getLoggedInUserProvider();
+
+            App app = null;
+            if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                app = APPMappingUtil.fromDTOToWebapp(body);
+            }
+
+            apiProvider.createNewVersion(app);
+
+
+        } catch (AppManagementException e) {
+            e.printStackTrace();
+        }
+
+
+
         return null;
     }
 

@@ -111,7 +111,7 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
 
     @Override
     public boolean createProvider(WebApp webApp) {
-        String acsUrl = webApp.getAcsURL().trim();
+        String acsUrl = getACSUrl(webApp);
         SSOProvider ssoProvider = webApp.getSsoProviderDetails();
         boolean status = false;
         if (ssoProvider == null) {
@@ -138,6 +138,17 @@ public class IS500SAMLSSOConfigurator extends ISBaseSAMLSSOConfigurator implemen
             }
         }
         return status;
+    }
+
+    private String getACSUrl(WebApp webApp) {
+
+        String acsURL = webApp.getAcsURL();
+
+        if(acsURL == null){
+            acsURL = "";
+        }
+
+        return acsURL.trim();
     }
 
     @Override

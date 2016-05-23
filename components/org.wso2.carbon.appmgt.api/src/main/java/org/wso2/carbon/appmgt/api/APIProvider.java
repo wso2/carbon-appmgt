@@ -339,6 +339,15 @@ public interface APIProvider extends APIManager {
     public String createWebApp(WebApp webApp) throws AppManagementException;
 
     /**
+     *
+     * Creates a new versions using the attributes (inlcuding the new version number) of the given app.
+     *
+     * @param app
+     * @throws AppManagementException
+     */
+    void createNewVersion(App app)throws AppManagementException;
+
+    /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
      * should throw an exceptions when such attempts are made. All life cycle state changes
      * should be carried out using the changeAPIStatus method of this interface.
