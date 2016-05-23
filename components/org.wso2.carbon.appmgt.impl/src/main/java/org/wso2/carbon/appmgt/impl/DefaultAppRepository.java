@@ -92,7 +92,7 @@ public class DefaultAppRepository implements AppRepository {
         for(URITemplate template : sourceApp.getUriTemplates()){
             template.setId(-1);
 
-            String policyGroupName = getPolicyGroupName(targetApp.getAccessPolicyGroups(), template.getPolicyGroupId());
+            String policyGroupName = getPolicyGroupName(sourceApp.getAccessPolicyGroups(), template.getPolicyGroupId());
             template.setPolicyGroupName(policyGroupName);
 
             template.setPolicyGroupId(-1);
@@ -132,6 +132,8 @@ public class DefaultAppRepository implements AppRepository {
 
         if(result.size() == 1){
             return result.get(0);
+        }else if(result.isEmpty()) {
+            return null;
         }else{
             //flag an error.
             throw new AppManagementException("Duplicate entries found for the given uuid.");
@@ -894,9 +896,7 @@ public class DefaultAppRepository implements AppRepository {
             }
 
             artifact.setAttribute("uriTemplate_policyGroupIds", policyGroupIds.toString());
-
         }
-
 
         // Add URI Template attributes
         int counter = 0;

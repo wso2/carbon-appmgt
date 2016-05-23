@@ -575,14 +575,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                 app = APPMappingUtil.fromDTOToWebapp(body);
             }
 
+            app.setUUID(appId);
             apiProvider.createNewVersion(app);
 
 
         } catch (AppManagementException e) {
             e.printStackTrace();
         }
-
-
 
         return null;
     }
