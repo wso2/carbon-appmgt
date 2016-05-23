@@ -545,6 +545,11 @@ public class DefaultAppRepository implements AppRepository {
         try {
             int webAppDatabaseId = getDatabaseId(webApp, connection);
 
+            // Set the Status from the existing app in the repository.
+            // TODO : Only a thin version should be fetched from the database.
+            WebApp existingApp = (WebApp) getApp(AppMConstants.WEBAPP_ASSET_TYPE, webApp.getUUID());
+            webApp.setStatus(existingApp.getStatus());
+
             // Add and/or update policy groups.
             addAndUpdatePolicyGroups(webApp, webAppDatabaseId, connection);
 
@@ -557,6 +562,8 @@ public class DefaultAppRepository implements AppRepository {
 
             updateRegistryArtifact(webApp);
 
+            //Set default versioning details
+            persistDefaultVersionDetails(webApp, connection);
 
             connection.commit();
         } catch (SQLException e) {
@@ -865,6 +872,7 @@ public class DefaultAppRepository implements AppRepository {
         artifact.setAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, Boolean.toString(webApp.getAllowAnonymous()));
         artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
         artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
+        artifact.setAttribute(AppMConstants.APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION, String.valueOf(webApp.isDefaultVersion()));
 
         // Add policy groups
         if(webApp.getAccessPolicyGroups() != null){
