@@ -343,9 +343,10 @@ public interface APIProvider extends APIManager {
      * Creates a new versions using the attributes (inlcuding the new version number) of the given app.
      *
      * @param app
+     * @return The UUID of the newly created version.
      * @throws AppManagementException
      */
-    void createNewVersion(App app)throws AppManagementException;
+    public String createNewVersion(App app)throws AppManagementException;
 
     /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations

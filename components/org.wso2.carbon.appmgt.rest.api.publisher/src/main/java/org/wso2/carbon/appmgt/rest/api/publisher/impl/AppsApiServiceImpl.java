@@ -576,11 +576,14 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
 
             app.setUUID(appId);
-            apiProvider.createNewVersion(app);
+            String newUUID = apiProvider.createNewVersion(app);
 
+            Map<String, String> response = new HashMap<>();
+            response.put("AppId", newUUID);
 
+            return Response.ok(response).build();
         } catch (AppManagementException e) {
-            e.printStackTrace();
+            RestApiUtil.handleInternalServerError(String.format("Error while creating new version for the app '%s':'%s'", appType, appId), e, log);
         }
 
         return null;
