@@ -781,8 +781,8 @@
         "/apps/{appType}/id/{appId}/lifecycle-history": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 9659421d7eea4c3ed54ef0833fade8f8\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/44a49211-7b37-4b30-873e-4373343fdcda/lifecycle-history\"",
+                "x-wso2-response": "{\"lifeCycleHistoryList\":[{\"state\":\"Approved\",\"order\":4,\"timestamp\":\"2016-05-20 14:47:16.787\",\"user\":\"wso2.system.user\",\"targetState\":\"Published\"},{\"state\":\"In-Review\",\"order\":3,\"timestamp\":\"2016-05-20 14:47:15.309\",\"user\":\"wso2.system.user\",\"targetState\":\"Approved\"},{\"state\":\"Created\",\"order\":2,\"timestamp\":\"2016-05-20 14:47:13.548\",\"user\":\"wso2.system.user\",\"targetState\":\"In-Review\"},{\"state\":\"Initial\",\"order\":1,\"timestamp\":\"2016-05-20 14:46:59.978\",\"user\":\"admin\",\"targetState\":\"Created\"}]}",
                 "summary": "Get lifecycle details",
                 "description": "Get lifecycle details.\n",
                 "parameters": [
@@ -1263,8 +1263,8 @@
             "post": {
                 "summary": "Change App Status",
                 "x-scope": "appm:publish",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
                     {
@@ -1342,8 +1342,9 @@
         "/apps/{appType}/validate-context": {
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -d '{\"tags\":[\"aa\",\"bb\",\"cc\"]}' \"http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/validate-context\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
+                "x-wso2-request": "{\"tags\":[\"aa\",\"bb\",\"cc\"]}",
                 "summary": "Validate App Context",
                 "description": "Validate App Context.\n",
                 "parameters": [
@@ -1385,9 +1386,8 @@
         "/apps/{appType}/stats/{statType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer ede4387e36fbf87c802026f1240b7e5d\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/stats/getAppUsagePerPage\"",
+                "x-wso2-response": "{\"result\": [{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step2.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 15,\"context\": \"/travel\"},{\"apiName\": \"TravelBooking_admin(v1.0.0)\",\"referer\": \"/travel/1.0.0/booking-step1.jsp\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\",\"count\": 20,\"context\": \"/travel\"},{\"apiName\": \"PlanYourTrip_admin(v1.0.0)\",\"referer\": \"/planYourTrip/1.0.0\",\"userId\": \"subscriber_admin\",\"version\": \"1.0.0\", \"count\": 10, \"context\": \"/planYourTrip\"}]}",
                 "summary": "Get Stat summary",
                 "description": "Get Stat summary results.\n",
                 "parameters": [
@@ -1531,9 +1531,8 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: multipart/form-data\" -F \"file=@/home/user/sample.apk\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries\"",
+                "x-wso2-response": "{\"version\": \"1.0\",\"package\": \"home.jmstudios.calc\",\"path\": \"O0lsxdlhR998Hhc.apk\"}",
                 "summary": "Uploading binary files",
                 "description": "Uploading .apk/.IPA binary files.\n",
                 "parameters": [
@@ -1595,8 +1594,8 @@
         "/apps/mobile/binaries/{fileName}": {
             "get": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0763d28a85f20d6fd8954f955859055c\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobile/binaries/O0lsxdlhR998Hhc.apk\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving mobile application binaries",
                 "description": "Retrieving .apk, .ipa binaries for mobile apps.\n",
                 "parameters": [
@@ -1719,9 +1718,8 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 0763d28a85f20d6fd8954f955859055c\" -H \"Content-Type: multipart/form-data\" -F \"file=@/home/user/sample.jpg\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents?appType=webapp\"",
+                "x-wso2-response": "{\"id\": \"ZQCIsEEkYM2LJ9C.jpg\"}",
                 "summary": "Uploading images, pdf, documents files",
                 "description": "Uploading images for banners, screenshots etc.\n",
                 "parameters": [
@@ -1790,8 +1788,8 @@
         "/apps/static-contents/{fileName}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c7fff7b0307472345c8652d6595b1b1c\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/ZQCIsEEkYM2LJ9C.jpg?appType=mobileapp\"",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Retrieving images, pdf, documents files",
                 "description": "Retrieving images for banners, screenshots etc.\n",
                 "parameters": [
@@ -2770,9 +2768,18 @@
         "statType": {
             "name": "statType",
             "in": "path",
-            "description": "Stat Type.\n",
+            "description": "Stat Type.\n\n\n\n\nSupported stat types are [**getAppUsagePerPage,getSubscriptionCountsPerApp,getSubscriptionsPerApp,getAppUsagePerUser,getAppResponseTime,getCacheHit**]\n",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "enum": [
+                "getAppUsagePerPage",
+                "getSubscriptionCountsPerApp",
+                "getSubscriptionsPerApp",
+                "getAppUsagePerUser",
+                "getAppResponseTime",
+                "getCacheHit"
+            ],
+            "example": "getAppUsagePerPage"
         },
         "businessOwnerId": {
             "name": "businessOwnerId",
@@ -3629,7 +3636,7 @@
         "UriTemplate": {
             "title": "URI Template Definition",
             "properties": {
-				"id": {
+                "id": {
                     "type": "integer",
                     "description": "ID of the URI Template \n",
                     "example": "1"
@@ -3649,7 +3656,7 @@
                     "description": "The name of the uri template policy group\n",
                     "example": "default"
                 },
-				"policyGroupId": {
+                "policyGroupId": {
                     "type": "integer",
                     "description": "Database ID of the associated policy group.\n",
                     "example": "default"
@@ -3659,7 +3666,7 @@
         "PolicyGroups": {
             "title": "Policy Group Definition",
             "properties": {
-				"policyGroupId": {
+                "policyGroupId": {
                     "type": "integer",
                     "description": "Id of the policy group \n",
                     "example": "1"

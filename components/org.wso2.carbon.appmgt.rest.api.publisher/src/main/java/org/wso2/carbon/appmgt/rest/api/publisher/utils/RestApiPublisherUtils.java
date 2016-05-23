@@ -56,7 +56,7 @@ public class RestApiPublisherUtils {
         File binaryFile = new File(directoryLocation);
         //Generate UUID for the uploading file
         RestApiUtil.transferFile(fileContent.getContent(), fileContent.getFileName(), binaryFile.getAbsolutePath());
-        return directoryLocation + File.separator + fileContent;
+        return directoryLocation + File.separator + fileContent.getFileName();
     }
 
     public static String getCreatedTimeEpoch() {
