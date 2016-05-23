@@ -4,20 +4,23 @@
     {{#if assets}}
 
         <div class="row page-title">
-                <div class="container-fluid">
-                    <div class="title">{{plural}}</div><!--title-->
+            <div class="container-fluid">
+                <div class="title">{{plural}}</div>
+                <!--title-->
+                {{#if seeMoreUrl}}
                     <div class="float-right"><a class="more" href="{{url seeMoreUrl}}">See More</a></div>
-                </div>
-        </div>
-            {{#ifCond type "==" "mobileapp"}}
-                {{> page-content-home/mobileapp}}
-            {{else}}
-                {{#if ../../../subscriptionOn}}
-                    {{> page-content-home/subscription-on}}
-                {{else}}
-                    {{> page-content-home/subscription-off}}
                 {{/if}}
-            {{/ifCond}}
+            </div>
+        </div>
+        {{#ifCond type "==" "mobileapp"}}
+            {{> page-content-home/mobileapp}}
+        {{else}}
+            {{#if ../../../subscriptionOn}}
+                {{> page-content-home/subscription-on}}
+            {{else}}
+                {{> page-content-home/subscription-off}}
+            {{/if}}
+        {{/ifCond}}
 
 
     {{/if}}

@@ -55,9 +55,9 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
-    public void createNewVersion(App app) throws AppManagementException {
+    public String createNewVersion(App app) throws AppManagementException {
         checkCreatePermission();
-        super.createNewVersion(app);
+        return super.createNewVersion(app);
     }
 
     @Override
