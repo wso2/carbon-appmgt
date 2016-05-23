@@ -952,9 +952,8 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
-                "x-wso2-request": "",
+                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content\" > sample.pdf",
+                "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Uploading document",
                 "description": "Uploading document files against an App.\n",
                 "parameters": [
@@ -1153,8 +1152,8 @@
         "/apps/{appType}/id/{appId}/docs/{documentId}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "",
-                "x-wso2-response": "",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/app/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\"",
+                "x-wso2-response": "HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  \"sourceType\": \"INLINE\",\n   \"sourceUrl\": null,\n   \"otherTypeName\": null,\n   \"documentId\": \"0bcb7f05-599d-4e1a-adce-5cb89bfe58d5\",\n   \"summary\": \"This is a sample documentation\",\n   \"name\": \"PhoneVerification API Documentation\",\n   \"type\": \"HOWTO\"\n}",
                 "summary": "Retrieving document",
                 "description": "Retrieving document.\n",
                 "parameters": [
@@ -1216,7 +1215,7 @@
             },
             "delete": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "",
+                "x-wso2-curl": "curl -H \"Authorization: Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -X DELETE http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/ffd5790d-b7a9-4cb6-b76a-f8b83ecdd058",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Document",
                 "description": "Delete an existing Document\n",
