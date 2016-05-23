@@ -4,7 +4,7 @@ var render = function (theme, data, meta, require) {
     data.header.active = 'store';
     var enabledTypeList = data.config.enabledTypeList;
     //if only mobile app is enabled hide favourite link from navigation
-    if( enabledTypeList.length == 1 &&  enabledTypeList[0] == "mobileapp") {
+    if (enabledTypeList.length == 1 && enabledTypeList[0] == "mobileapp") {
         data.header.hideFavouriteMenu = true;
     }
 
@@ -79,7 +79,7 @@ function createLeftNavLinks(data) {
                 leftNavigationData.push({
                                             active: false, partial: enabledTypeList[i], url: "/extensions/assets/" +
                                                                                              enabledTypeList[i]
-                        + "/apps"
+                                                                                             + "/apps"
                                         });
             }
 
@@ -89,22 +89,49 @@ function createLeftNavLinks(data) {
     return leftNavigationData;
 }
 
+
 function getBodyContext(data, subscriptionOnStatus) {
     var assetTypes = data.topAssets.assets;
     var user = data.header.user;
     var enabledTypeList = data.config.enabledTypeList;
+
+    //set the total asset counts by types
+    setTotalAssetCount(assetTypes);
+
     for (var i = 0; i < assetTypes.length; i++) {
+        var pageSize = assetTypes[i].pageSize;
+
         assetTypes[i].user = user;
-        var type = assetTypes[i].singular.toLowerCase().replace(/ /g,'');
+        var type = assetTypes[i].singular.toLowerCase().replace(/ /g, '');
         if (type == "mobileapp") {
-            assetTypes[i].seeMoreUrl = "/assets/mobileapp/"
+            if (mobileAppCount > pageSize) {
+                assetTypes[i].seeMoreUrl = "/assets/mobileapp/"
+            }
         } else {
-            if (subscriptionOnStatus) {
-                assetTypes[i].seeMoreUrl = "/assets/" + type + "/"
-            } else {
-                assetTypes[i].seeMoreUrl = "/extensions/assets/" + type + "/apps/"
+            if (webAppCount > pageSize) {
+                if (subscriptionOnStatus) {
+                    assetTypes[i].seeMoreUrl = "/assets/" + type + "/"
+                } else {
+                    assetTypes[i].seeMoreUrl = "/extensions/assets/" + type + "/apps/"
+                }
             }
         }
     }
     return {assetTypes: assetTypes, subscriptionOn: subscriptionOnStatus};
+}
+
+var webAppCount;
+var mobileAppCount;
+function setTotalAssetCount(assetTypes) {
+    webAppCount = 0;
+    mobileAppCount = 0;
+    for (var i = 0; i < assetTypes.length; i++) {
+        var assetType = assetTypes[i].singular.toLowerCase();
+        var type = assetType.replace(/ /g, '');
+        if (type == "mobileapp") {
+            mobileAppCount++;
+        } else {
+            webAppCount++;
+        }
+    }
 }

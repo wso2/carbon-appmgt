@@ -180,7 +180,8 @@ require('/modules/store.js').exec(function (ctx) {
                        assets: assets,
                        plural: manager.pluralLabel,
                        singular: manager.singularLabel,
-                       type: manager.shortName
+                       type: manager.shortName,
+                       pageSize: store.getRecentAppCount().assetsPage
                    });
 
 
