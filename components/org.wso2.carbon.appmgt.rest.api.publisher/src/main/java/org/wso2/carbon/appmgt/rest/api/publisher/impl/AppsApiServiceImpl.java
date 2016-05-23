@@ -319,8 +319,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
         try {
             //check if a valid asset type is provided
-            if (!appType.equalsIgnoreCase(AppMConstants.APP_TYPE) &&
-                    !appType.equalsIgnoreCase(AppMConstants.MOBILE_ASSET_TYPE)) {
+            if (!(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType) || AppMConstants.MOBILE_ASSET_TYPE.equalsIgnoreCase(appType))) {
                 String errorMessage = "Invalid Asset Type : " + appType;
                 RestApiUtil.handleBadRequest(errorMessage, log);
             }
