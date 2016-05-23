@@ -429,7 +429,7 @@ public class DefaultAppRepository implements AppRepository {
                                         "ON GRP.POLICY_GRP_ID=PARTIAL_MAPPING.POLICY_GRP_ID, " +
                                         "APM_POLICY_GROUP_MAPPING MAPPING " +
                                         "WHERE " +
-                                        "MAPPING.POLICY_GRP_ID=GROUP.POLICY_GRP_ID " +
+                                        "MAPPING.POLICY_GRP_ID=GRP.POLICY_GRP_ID " +
                                         "AND MAPPING.APP_ID=? " +
                                         "ORDER BY GRP.POLICY_GRP_ID";
 
@@ -563,15 +563,36 @@ public class DefaultAppRepository implements AppRepository {
             // URI templates should be passed too, since the association between templates and policy groups should be checked.
             deletePolicyGroupsNotIn(webApp.getAccessPolicyGroups(), webApp.getUriTemplates(),webAppDatabaseId, connection);
 
+            updateRegistryArtifact(webApp);
+
 
             connection.commit();
         } catch (SQLException e) {
             rollbackTransactions(webApp, registry, connection);
             handleException(String.format("Error while updating web app '%s'", webApp.getUUID()), e);
-        }finally {
+        } catch (RegistryException e) {
+            e.printStackTrace();
+        } finally {
             APIMgtDBUtil.closeAllConnections(null, connection, null);
         }
 
+    }
+
+    private void updateRegistryArtifact(App app) throws RegistryException {
+
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(app.getType())){
+            updateWebAppRegistryArtifact((WebApp) app);
+        }
+
+    }
+
+    private void updateWebAppRegistryArtifact(WebApp webApp) throws RegistryException {
+
+        GenericArtifactManager artifactManager = getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
+
+        GenericArtifact updatedWebAppArtifact = buildWebAppRegistryArtifact(artifactManager, webApp);
+        updatedWebAppArtifact.setId(webApp.getUUID());
+        artifactManager.updateGenericArtifact(updatedWebAppArtifact);
     }
 
     private void addUpdateDeleteURLTemplates(WebApp webApp, int webAppDatabaseId, Connection connection) throws SQLException {
