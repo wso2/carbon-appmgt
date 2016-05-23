@@ -565,11 +565,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     @Override
-    public void createNewVersion(App app) throws AppManagementException {
+    public String createNewVersion(App app) throws AppManagementException {
 
         AppRepository appRepository = new DefaultAppRepository(registry);
-        String appId = appRepository.createNewVersion(app);
-
+        String uuid = appRepository.createNewVersion(app);
+        return uuid;
     }
 
     /**
