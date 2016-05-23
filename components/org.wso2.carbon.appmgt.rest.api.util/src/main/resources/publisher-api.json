@@ -2777,8 +2777,7 @@
                 "getAppUsagePerUser",
                 "getAppResponseTime",
                 "getCacheHit"
-            ],
-            "example": "getAppUsagePerPage"
+            ]
         },
         "businessOwnerId": {
             "name": "businessOwnerId",
