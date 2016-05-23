@@ -215,7 +215,7 @@ require('/modules/store.js').exec(function (ctx) {
             assetsFromProvider['type'] = type;
             assetsFromProvider['assets'] = store.search(searchOptions, paging)[asset.type] || [];
             var overviewBusinessOwner = asset.attributes.overview_businessOwner;
-            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "") {
+            if (overviewBusinessOwner != null && overviewBusinessOwner.trim() != "" && overviewBusinessOwner != "null") {
                 businessOwner = storeHostObj.getBusinessOwner(overviewBusinessOwner);
 
                 if (businessOwner != null && businessOwner.businessOwnerName != null) {
