@@ -311,6 +311,20 @@ public class RestApiUtil {
         throw internalServerErrorException;
     }
 
+
+    /**
+     * Logs the error, builds a internalServerErrorException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException
+     */
+    public static void handleInternalServerError(String msg, Log log)
+            throws InternalServerErrorException {
+        InternalServerErrorException internalServerErrorException = buildInternalServerErrorException();
+        throw internalServerErrorException;
+    }
+
     /**
      * Returns a new InternalServerErrorException
      *

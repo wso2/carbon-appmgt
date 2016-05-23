@@ -793,7 +793,63 @@ public class AppsApiServiceImpl extends AppsApiService {
     public Response appsAppTypeIdAppIdDocsDocumentIdContentPost(String appType, String appId, String documentId,
                                                                 InputStream fileInputStream, Attachment fileDetail,
                                                                 String inlineContent, String ifMatch, String ifUnmodifiedSince) {
-        Documentation documentation;
+
+        try {
+            String username = RestApiUtil.getLoggedInUsername();
+            APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
+            String tenantDomain = RestApiUtil.getLoggedInUserTenantDomain();
+
+            WebApp webApp = appProvider.getWebApp(appId);
+            APIIdentifier appIdentifier = webApp.getId();
+            if (fileInputStream != null && inlineContent != null) {
+                RestApiUtil.handleBadRequest("Only one of 'file' and 'inlineContent' should be specified", log);
+            }
+            Documentation documentation = appProvider.getDocumentation(documentId, tenantDomain);
+            if (documentation == null) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_DOCUMENTATION, documentId, log);
+                return null;
+            }
+            //add content depending on the availability of either input stream or inline content
+            if (fileInputStream != null) {
+                if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.FILE)) {
+                    RestApiUtil.handleBadRequest("Source type of document " + documentId + " is not FILE", log);
+                }
+                RestApiPublisherUtils.attachFileToDocument(webApp, documentation, fileInputStream, fileDetail);
+            } else if (inlineContent != null) {
+                if (!documentation.getSourceType().equals(Documentation.DocumentSourceType.INLINE)) {
+                    RestApiUtil.handleBadRequest("Source type of document " + documentId + " is not INLINE", log);
+                }
+                appProvider.addDocumentationContent(appIdentifier, documentation.getName(), inlineContent);
+            } else {
+                RestApiUtil.handleBadRequest("Either 'file' or 'inlineContent' should be specified", log);
+            }
+
+            //retrieving the updated doc and the URI
+            Documentation updatedDoc = appProvider.getDocumentation(documentId, tenantDomain);
+            DocumentDTO documentDTO = DocumentationMappingUtil.fromDocumentationToDTO(updatedDoc);
+            String uriString = RestApiConstants.RESOURCE_PATH_DOCUMENT_CONTENT
+                    .replace(RestApiConstants.APPID_PARAM, appId)
+                    .replace(RestApiConstants.DOCUMENTID_PARAM, documentId);
+            URI uri = new URI(uriString);
+            return Response.created(uri).entity(documentDTO).build();
+        } catch (AppManagementException e) {
+            //Auth failure occurs when cross tenant accessing APIs. Sends 404, since we don't need to expose the existence of the resource
+            if (RestApiUtil.isDueToResourceNotFound(e) || RestApiUtil.isDueToAuthorizationFailure(e)) {
+                RestApiUtil.handleResourceNotFoundError(RestApiConstants.RESOURCE_API, appId, e, log);
+            } else {
+                String errorMessage = "Error while retrieving document " + documentId + " of the API " + appId;
+                RestApiUtil.handleInternalServerError(errorMessage, e, log);
+            }
+        } catch (URISyntaxException e) {
+            String errorMessage = "Error while retrieving source URI location of " + documentId;
+            RestApiUtil.handleInternalServerError(errorMessage, e, log);
+        }
+
+        return null;
+
+
+
+        /*Documentation documentation;
         try {
             String username = RestApiUtil.getLoggedInUsername();
             APIProvider appProvider = RestApiUtil.getLoggedInUserProvider();
@@ -840,7 +896,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             String errorMessage = "Error while retrieving source URI location of " + documentId;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
-        return null;
+        return null;*/
     }
 
     @Override

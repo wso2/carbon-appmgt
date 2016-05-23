@@ -23,6 +23,7 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -436,6 +437,19 @@ public interface APIProvider extends APIManager {
      */
     public void addDocumentation(APIIdentifier apiId,
                                  Documentation documentation) throws AppManagementException;
+    /**
+     * Add a file to a document of source type FILE
+     *
+     * @param appId App identifier the document belongs to
+     * @param documentation document
+     * @param filename name of the file
+     * @param content content of the file as an Input Stream
+     * @param contentType content type of the file
+     * @throws AppManagementException if failed to add the file
+     */
+    void addFileToDocumentation(WebApp appId, Documentation documentation, String filename, InputStream content,
+                                String contentType) throws AppManagementException;
+
 
     /**
      * This method used to save the documentation content
