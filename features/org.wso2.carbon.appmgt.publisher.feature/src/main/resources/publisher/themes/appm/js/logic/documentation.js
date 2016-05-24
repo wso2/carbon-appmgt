@@ -1,4 +1,3 @@
-
 $(document).ready(function () {
 
     var docUrlDiv = $('#docUrl');
@@ -147,6 +146,54 @@ $(document).ready(function () {
         $('.nav-tabs a[href=#documentation]').tab('show');
     }
 
+    // Document Type selecting radio buttons
+    var documentTypeRadioBtns = $('#documentTypeRadioWrapper').find('input:radio');
+    documentTypeRadioBtns.on('click', function (event) {
+        documentTypeRadioBtns.each(function (index, element) {
+            element = $(element);
+            var isChecked = element.is(':checked');
+            var selectElementId = element.data('onclick-select');
+            if (isChecked && selectElementId) {
+                $(selectElementId).attr('checked', true);;
+                $(selectElementId).click();
+            }
+            var viewElementId = element.data('onclick-view');
+            if (viewElementId) {
+                var viewElement = $(viewElementId);
+                if (isChecked) {
+                    viewElement.show('slow');
+                } else {
+                    viewElement.hide('slow');
+                }
+            }
+            var enableElementId = element.data('onclick-enable');
+            if(isChecked && enableElementId){
+                $(enableElementId).prop('disabled', false);
+            }
+            var disableElementId = element.data('onclick-disable');
+            if(isChecked && disableElementId){
+                $(disableElementId).prop('disabled', true);
+            }
+        });
+    });
+
+    // Document Source selecting radio buttons
+    var documentSourceRadioBtns = $('#documentSourceRadioWrapper').find('input:radio');
+    documentSourceRadioBtns.on('click', function (event) {
+        documentSourceRadioBtns.each(function (index, element) {
+            element = $(element);
+            var isChecked = element.is(':checked');
+            var viewElementId = element.data('onclick-view');
+            if (viewElementId) {
+                var viewElement = $(viewElementId);
+                if (isChecked) {
+                    viewElement.show('slow');
+                } else {
+                    viewElement.hide('slow');
+                }
+            }
+        });
+    });
 });
 
 var newDocFormToggle = function () {
