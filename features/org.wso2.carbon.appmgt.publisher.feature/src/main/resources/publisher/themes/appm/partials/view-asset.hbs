@@ -292,38 +292,43 @@
 
                                                 <div class="col-md-6">
                                                     <div class="well">
-                                                        <div class="control-group">
+                                                        <div id="documentTypeRadioWrapper" class="control-group">
                                                             <label class="control-label">Document Type</label>
                                                             <div class="controls radio">
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios"
-                                                                           id="optionsRadios1" value="how to" checked=""
-                                                                           onChange="disableInline()" />
+                                                                           id="optionsRadios1" value="how to" checked
+                                                                           data-onclick-select="#optionsRadios7"
+                                                                           data-onclick-enable="#optionsRadios7, #optionsRadios9" />
                                                                     How To
                                                                 </label>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios"
                                                                            id="optionsRadios2" value="samples"
-                                                                           onChange="disableInline()" />
+                                                                           data-onclick-select="#optionsRadios7"
+                                                                           data-onclick-enable="#optionsRadios7, #optionsRadios9"/>
                                                                     Samples & SDK
                                                                 </label>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios"
                                                                            id="optionsRadios3" value="public forum"
-                                                                           onChange="disableInline('forum')" />
+                                                                           data-onclick-select="#optionsRadios8"
+                                                                           data-onclick-disable="#optionsRadios7, #optionsRadios9"/>
                                                                     Public Forum
                                                                 </label>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios"
                                                                            id="optionsRadios4" value="support forum"
-                                                                           onChange="disableInline('forum')" />
+                                                                           data-onclick-select="#optionsRadios8"
+                                                                           data-onclick-disable="#optionsRadios7, #optionsRadios9"/>
                                                                     Support Forum
                                                                 </label>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios"
                                                                            id="optionsRadios5" value="other"
-                                                                           onChange="disableInline()"
-                                                                           onclick="javascript:$('#otherTypeDiv').toggle('slow')" />
+                                                                           data-onclick-select="#optionsRadios7"
+                                                                           data-onclick-view="#otherTypeDiv"
+                                                                           data-onclick-enable="#optionsRadios7, #optionsRadios9"/>
                                                                     Other (specify)
                                                                 </label>
                                                                 <div id="otherTypeDiv" class="controls"
@@ -342,31 +347,27 @@
                                                     <div class="well">
                                                         <div class="control-group">
                                                             <label class="control-label">Document Source</label>
-                                                            <div class="controls radio">
+                                                            <div id="documentSourceRadioWrapper" class="controls radio">
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios1"
-                                                                           id="optionsRadios7" value="inline"
-                                                                           onclick="javascript:$('#sourceUrlDoc').hide('slow');$('#sourceFile').hide('slow')"
-                                                                           checked="" />
+                                                                           id="optionsRadios7" value="inline" checked />
                                                                     In-line
                                                                 </label>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios1"
                                                                            id="optionsRadios8" value="url"
-                                                                           onclick="javascript:$('#sourceUrlDoc').toggle('slow');$('#sourceFile').hide('slow')" />
+                                                                           data-onclick-view="#sourceUrlDoc" />
                                                                     URL
                                                                 </label>
                                                                 <div id="sourceUrlDoc" class="controls"
                                                                      style="display: none;">
-                                                                    <span class="label-required">*</span> <input
-                                                                        type="text"
-                                                                        class="required form-control" style="width: 98%"
-                                                                        id="docUrl">
+                                                                    <span class="label-required">*</span>
+                                                                    <input type="text" class="required form-control" style="width: 98%" id="docUrl" />
                                                                 </div>
                                                                 <label class="radio">
                                                                     <input type="radio" name="optionsRadios1"
                                                                            id="optionsRadios9" value="file"
-                                                                           onclick="javascript:$('#sourceFile').toggle('slow');$('#sourceUrlDoc').hide('slow')" />
+                                                                           data-onclick-view="#fileNameDiv" />
                                                                     File
                                                                 </label>
                                                                 <div id="fileNameDiv" style="display:none;"></div>
