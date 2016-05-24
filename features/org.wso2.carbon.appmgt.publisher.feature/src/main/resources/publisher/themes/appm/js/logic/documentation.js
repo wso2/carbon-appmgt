@@ -196,37 +196,6 @@ $(document).ready(function () {
     });
 });
 
-var newDocFormToggle = function () {
-    $('.asset-detail-top-row').hide();
-    $('#newDoc').slideToggle('slow');
-    $('#docName').removeAttr("disabled").val('');
-    $('#summary').val('');
-    $('#docUrl').val('');
-    $('#specifyBox').val('');
-    $('#optionsRadios7').attr("checked", "checked");
-    $('#optionsRadios1').attr("checked", "checked");
-    $('#sourceUrlDoc').hide();
-
-};
-
-var disableInline = function (type) {
-    if (type == 'forum') {
-        document.getElementById("optionsRadios7").disabled = true;
-        document.getElementById("optionsRadios9").disabled = true;
-        document.getElementById("optionsRadios8").checked = true;
-        $('#sourceUrlDoc').show('slow');
-        $('#sourceFile').hide('slow');
-        $('#otherTypeDiv').hide('slow');
-    } else {
-        document.getElementById("optionsRadios7").disabled = false;
-        document.getElementById("optionsRadios9").disabled = false;
-        document.getElementById("optionsRadios7").checked = true;
-        $('#sourceUrlDoc').hide('slow');
-        $('#sourceFile').hide('slow');
-        $('#otherTypeDiv').hide('slow');
-    }
-};
-
 var isAvailableDoc = function (id) {
     id = id.replace(/ /g, '__');
     var docEntry = $("#docTable #" + id).text();
@@ -248,51 +217,6 @@ var clearDocs = function () {
         window.location.href = window.location.href;
     } else {
         window.location.href = window.location.href + "?docs=true";
-    }
-};
-
-var updateDocumentation = function (rowId, docName, docType, summary, sourceType, docUrl, filePath, otherTypeName) {
-    $("#docTable").hide('fast');
-    $('#newDoc .btn-primary').text('Update');
-    $('#newDoc .btn-primary').val('Update');
-    $('#addDoc').hide('fast');
-    $('#updateDoc h4')[0].innerHTML = "Update Document - " + docName;
-    $('#updateDoc').show('fast');
-    $('#newDoc').show('fast');
-    $('#newDoc #docName').val(docName);
-    $('#newDoc #docName').attr('disabled', 'disabled');
-    if (summary != "{}" && summary != 'null') {
-        $('#newDoc #summary').val(summary);
-    }
-    if (sourceType == "INLINE") {
-        $('#optionsRadios7').attr('checked', true);
-        $('#sourceUrlDoc').hide('slow');
-        $('#docUrl').val('');
-    } else if (sourceType == "URL") {
-        if (docUrl != "{}") {
-            $('#newDoc #docUrl').val(docUrl);
-            $('#optionsRadios8').attr('checked', true);
-            $('#sourceUrlDoc').show('slow');
-        }
-    } else {
-        $('#optionsRadios7').attr('disabled', true);
-        $('#optionsRadios8').attr('disabled', true);
-        $('#optionsRadios9').attr('checked', true);
-        $('#sourceFile').show('slow');
-        if (filePath) {
-            $('#fileNameDiv').text(filePath.split("documentation/files/")[1]);
-            $('#fileNameDiv').show('slow');
-        }
-    }
-
-    for (var i = 1; i <= 6; i++) {
-        if ($('#optionsRadios' + i).val().toUpperCase().indexOf(docType.toUpperCase()) >= 0) {
-            $('#optionsRadios' + i).attr('checked', true);
-            if (docType.toLowerCase() == 'other') {
-                $('#specifyBox').val(otherTypeName);
-                $('#otherTypeDiv').show();
-            }
-        }
     }
 };
 
@@ -335,11 +259,6 @@ var removeDocumentation = function (provider, apiName, version, docName, docType
         return;
     });
     $('#messageModal').modal();
-};
-
-var editInlineContent = function (artifactID, type, docName, mode, tenantDomain) {
-    window.open(caramel.context + "/webapp/doc/inline?" + type + "&" + artifactID + "&" + docName + "&" + mode + "&"
-                + tenantDomain);
 };
 
 var validUrl = function (url) {
