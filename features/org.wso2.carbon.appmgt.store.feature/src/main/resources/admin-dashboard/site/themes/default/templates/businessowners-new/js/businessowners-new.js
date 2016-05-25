@@ -142,16 +142,8 @@ $(document).on("click", "#btn-owner-save", function () {
         Showalert("Enter a Valid E-mail address","alert-error", "statusError");
         return;
     }
-    if(ownerName == "" || ownerName == null){
-        Showalert("Owner Name Cannot be empty","alert-error", "statusError");
-        return;
-    }
-    if(description == "" || description == null){
-        Showalert("Owner businessOwnerDescription Cannot be empty","alert-error", "statusError");
-        return;
-    }
-    if(siteLink == "" || siteLink == null){
-        Showalert("Owner site Cannot be empty","alert-error", "statusError");
+    if(ownerName == null || ownerName.trim() == ""){
+        Showalert("Owner Name Cannot be null or empty","alert-error", "statusError");
         return;
     }
 
