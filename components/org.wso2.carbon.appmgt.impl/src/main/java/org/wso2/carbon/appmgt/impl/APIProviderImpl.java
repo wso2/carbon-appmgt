@@ -1960,7 +1960,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
-            artifactManager.removeGenericArtifact(artifactId);
+            artifactManager.removeGenericArtifact(appArtifact);
 
             String thumbPath = AppManagerUtil.getIconPath(identifier);
             if (registry.resourceExists(thumbPath)) {
