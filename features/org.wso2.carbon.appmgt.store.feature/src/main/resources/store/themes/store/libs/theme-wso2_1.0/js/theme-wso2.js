@@ -523,14 +523,22 @@ var responsiveTextRatio = 0.4,
                 if (targetSide == 'left'){
                     if((button !== undefined) && (button.attr('data-container-divide'))){
                         $(container).css(pushType+'-'+targetSide, targetWidth + targetOffsetLeft);
+                        $(target).css(targetSide, targetOffsetLeft);
                     }
-                    $(target).css(targetSide, targetOffsetLeft);
+                    else if((button !== undefined) && (button.attr('data-container-push'))){
+                        $(container).css(targetSide, targetWidth + targetOffsetLeft);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetLeft));
+                    }
                 }
                 else if (targetSide == 'right'){
                     if((button !== undefined) && (button.attr('data-container-divide'))){
                         $(container).css(pushType+'-'+targetSide, targetWidth + targetOffsetRight);
+                        $(target).css(targetSide, targetOffsetRight);
                     }
-                    $(target).css(targetSide, targetOffsetRight);
+                    else if((button !== undefined) && (button.attr('data-container-push'))){
+                        $(container).css(targetSide, targetWidth + targetOffsetRight);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetRight));
+                    }
                 }
 
                 $(target).trigger('shown.sidebar');
@@ -564,14 +572,22 @@ var responsiveTextRatio = 0.4,
                 if (targetSide == 'left'){
                     if((button !== undefined) && (button.attr('data-container-divide'))){
                         $(container).css(pushType+'-'+targetSide, targetOffsetLeft);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetRight));
                     }
-                    $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetLeft));
+                    else if((button !== undefined) && (button.attr('data-container-push'))){
+                        $(container).css(targetSide, targetOffsetLeft);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetLeft));
+                    }
                 }
                 else if (targetSide == 'right'){
                     if((button !== undefined) && (button.attr('data-container-divide'))){
                         $(container).css(pushType+'-'+targetSide, targetOffsetRight);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetRight));
                     }
-                    $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetRight));
+                    else if((button !== undefined) && (button.attr('data-container-push'))){
+                        $(container).css(targetSide, targetOffsetRight);
+                        $(target).css(targetSide, -Math.abs(targetWidth + targetOffsetRight));
+                    }
                 }
 
                 $(target).trigger('hidden.sidebar');
