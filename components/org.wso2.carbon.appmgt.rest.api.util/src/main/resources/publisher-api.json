@@ -2272,7 +2272,7 @@
         },
         "/administration/businessowner": {
             "get": {
-                "x-scope": "appm:administration",
+                "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
                 "x-wso2-response": "{\"businessOwnerList\": [{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}]}",
                 "summary": "Get all Business owners",
@@ -2390,7 +2390,7 @@
         },
         "/administration/businessowner/{businessOwnerId}": {
             "get": {
-                "x-scope": "appm:administration",
+                "x-scope": "appm:read",
                 "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner/1\"",
                 "x-wso2-response": "{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}",
                 "summary": "Get a Business owners by Id",
