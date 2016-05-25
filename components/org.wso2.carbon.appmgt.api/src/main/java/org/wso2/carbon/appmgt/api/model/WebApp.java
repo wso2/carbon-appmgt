@@ -126,6 +126,7 @@ public class WebApp extends App{
     private String mediaType;
     private String path;
     public String createdTime;
+    private String originVersion;
 
     public WebApp() {
     }
@@ -746,5 +747,13 @@ public class WebApp extends App{
 
     public void setVersion(String version) {
         this.id.setVersion(version);
+    }
+
+    public void setOriginVersion(String originVersion) {
+        this.originVersion = originVersion;
+    }
+
+    public String getOriginVersion() {
+        return originVersion;
     }
 }

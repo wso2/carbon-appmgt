@@ -1,17 +1,17 @@
 <div class="main-content">
-    <h1><a name="TiersApi"></a>TiersApi</h1>
+    <h1><a name="BusinessOwnerApi"></a>BusinessOwnerApi</h1>
 
     
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsAppTypeIdAppIdThrottlingtiersGet"></a>Get all Tiers</h3>
+            <h3 class="operation-heading"><a name="businessownerBusinessOwnerIdGet"></a>Get a Business owners by Id</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of Tiers.\n</p>
+            <p class="marked">Get a Business owners by Id.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}/throttlingtiers</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.0/businessowner/{businessOwnerId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -24,13 +24,13 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; &quot;http://localhost:9763/api/appm/store/v1.1/businessowner/1&quot;</code></div>
             
             
 
             
 
-            <div class="pointer" data-toggle="collapse" data-target="#response-appsAppTypeIdAppIdThrottlingtiersGet">
+            <div class="pointer" data-toggle="collapse" data-target="#response-businessownerBusinessOwnerIdGet">
                 <h4 class="section-heading">
                     Sample Response
                     
@@ -39,7 +39,7 @@
             </h4>
             </div>
             
-                <div id="response-appsAppTypeIdAppIdThrottlingtiersGet" class="pre collapse"><code class="json">{&quot;tierList&quot;:[{&quot;tierSortKey&quot;:1,&quot;tierName&quot;:&quot;Bronze&quot;,&quot;tierDisplayName&quot;:&quot;Bronze&quot;,&quot;tierDescription&quot;:&quot;Allows 1 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:20,&quot;tierName&quot;:&quot;Gold&quot;,&quot;tierDisplayName&quot;:&quot;Gold&quot;,&quot;tierDescription&quot;:&quot;Allows 20 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:5,&quot;tierName&quot;:&quot;Silver&quot;,&quot;tierDisplayName&quot;:&quot;Silver&quot;,&quot;tierDescription&quot;:&quot;Allows 5 request(s) per minute.&quot;},{&quot;tierSortKey&quot;:10000,&quot;tierName&quot;:&quot;Unlimited&quot;,&quot;tierDisplayName&quot;:&quot;Unlimited&quot;,&quot;tierDescription&quot;:&quot;Allows unlimited requests&quot;}]}</code></div>
+                <div id="response-businessownerBusinessOwnerIdGet" class="pre collapse"><code class="json">{&quot;site&quot;: &quot;test.lk&quot;,&quot;email&quot;: &quot;testOwner@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;testOwner&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: false,&quot;value&quot;: &quot;903334238V&quot;,&quot;key&quot;: &quot;nic&quot;}],&quot;id&quot;: 1}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
@@ -70,49 +70,19 @@
                             
                         </td>
                         <td class="param-name">
-                            <p>appType</p>
+                            <p>businessOwnerId</p>
                             <p class="param-required">
                                 required
                                 
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">Business Owner Id.\n</p>
                             
                         </td>
                         <td>
                             <span class="param-type">
-                                String
-                                
-                            </span>
-                        </td>
-                        <td>
-                            <p class="marked"></p>
-                        </td>
-                    </tr>
-                
-                    <tr>
-                        <td class="parameter">
-                            
-                            
-                            <span class="param-in">Path </span>
-                            
-                            
-                        </td>
-                        <td class="param-name">
-                            <p>appId</p>
-                            <p class="param-required">
-                                required
-                                
-                            </p>
-                        </td>
-                        <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
-                            
-                        </td>
-                        <td>
-                            <span class="param-type">
-                                String
+                                Integer
                                 
                             </span>
                         </td>
@@ -202,11 +172,11 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nList of Tiers is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
-                                    <a href="#!/models#TierList">TierList</a>
+                                    <a href="#!/models#BusinessOwner">BusinessOwner</a>
                                 
                                 
                             </span>
