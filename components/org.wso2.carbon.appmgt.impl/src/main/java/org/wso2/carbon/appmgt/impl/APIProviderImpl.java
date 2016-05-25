@@ -120,19 +120,6 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         appMDAO.updateBusinessOwner(businessOwner);
     }
 
-    /**
-     * Get custom properties of a given business owner.
-     * @param businessOwnerId
-     * @return
-     * @throws AppManagementException
-     */
-    @Override
-
-    public List<BusinessOwnerProperty> getBusinessOwnerCustomProperties(int businessOwnerId) throws
-                                                                                               AppManagementException {
-        return appMDAO.getBusinessOwnerCustomPropertiesById(businessOwnerId);
-    }
-
 
     /**
      * Get all business Owners.
@@ -1960,7 +1947,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
-            artifactManager.removeGenericArtifact(artifactId);
+            artifactManager.removeGenericArtifact(appArtifact);
 
             String thumbPath = AppManagerUtil.getIconPath(identifier);
             if (registry.resourceExists(thumbPath)) {

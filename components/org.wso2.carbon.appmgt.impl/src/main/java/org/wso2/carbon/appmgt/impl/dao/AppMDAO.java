@@ -171,9 +171,9 @@ public class AppMDAO {
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
                 businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
                 businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
-                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId));
+                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId,
+                                                                                                  connection));
             }
-
         } catch (SQLException e) {
             handleException("Failed to retrieve business owners.", e);
         } finally {
@@ -326,22 +326,22 @@ public class AppMDAO {
         }
     }
 
-
     /**
      * Get custom properties of a given business owner.
+     *
      * @param businessOwnerId
+     * @param connection
      * @return
      * @throws AppManagementException
      */
-    public List<BusinessOwnerProperty> getBusinessOwnerCustomPropertiesById(int businessOwnerId)
-            throws AppManagementException {
-        Connection connection = null;
+    private List<BusinessOwnerProperty> getBusinessOwnerCustomPropertiesById(int businessOwnerId, Connection connection)
+            throws AppManagementException, SQLException {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT `KEY`, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
+        String queryToGetKeyValue =
+                "SELECT `KEY`, VALUE, SHOW_IN_STORE FROM BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE OWNER_ID = ?";
         try {
-            connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
             statementToGetBusinessOwnersDetails.setInt(1, businessOwnerId);
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
@@ -354,9 +354,13 @@ public class AppMDAO {
                 businessOwnerPropertiesList.add(businessOwnerProperty);
             }
         } catch (SQLException e) {
-            handleException("Failed to retrieve business owners Data", e);
+            /* In the code it is using a single SQL connection passed from the parent function so the error is logged
+             here and throwing the SQLException so the connection will be disposed by the parent function. */
+            log.error("Error when getting the additional properties of Business Owner: " +
+                              businessOwnerId, e);
+            throw e;
         } finally {
-            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, connection,
+            APIMgtDBUtil.closeAllConnections(statementToGetBusinessOwnersDetails, null,
                                              resultSetOfbusinessOwnerDetails);
         }
         return businessOwnerPropertiesList;
@@ -392,7 +396,8 @@ public class AppMDAO {
                 businessOwner.setBusinessOwnerDescription(businessOwnerResultSet.getString("OWNER_DESC"));
                 businessOwner.setBusinessOwnerEmail(businessOwnerResultSet.getString("OWNER_EMAIL"));
                 businessOwner.setBusinessOwnerSite(businessOwnerResultSet.getString("OWNER_SITE"));
-                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId));
+                businessOwner.setBusinessOwnerPropertiesList(getBusinessOwnerCustomPropertiesById(businessOwnerId,
+                                                                                                  connection));
                 businessOwnersList.add(businessOwner);
             }
         } catch (SQLException e) {

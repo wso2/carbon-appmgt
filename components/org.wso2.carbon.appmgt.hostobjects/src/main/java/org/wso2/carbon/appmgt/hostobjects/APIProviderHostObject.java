@@ -357,48 +357,6 @@ public class APIProviderHostObject extends ScriptableObject {
         apiProvider.updateBusinessOwner(businessOwner);
     }
 
-    /**
-     * Retrieve business owners details
-     * @param cx      Rhino context
-     * @param thisObj Scriptable object
-     * @param args    Passing arguments
-     * @param funObj  Function object
-     * @return shared policy partials
-     * @throws org.wso2.carbon.appmgt.api.AppManagementException
-     */
-
-
-    public static NativeObject jsFunction_getBusinessOwnerCustomProperties(Context cx, Scriptable thisObj,
-                                                              Object[] args,
-                                                              Function funObj)
-                                                                        throws AppManagementException {
-        if (args == null || args.length != 1) {
-            handleException("Invalid number of input parameters.");
-        }
-        if (args[0] == null) {
-            handleException("Error while saving business owner. Owner content is null");
-        }
-        String ownerId = args[0].toString();
-        int businessOwnerId = Integer.parseInt(ownerId);
-
-        NativeObject businessOwnerDataObject = new NativeObject();
-        APIProvider apiProvider = getAPIProvider(thisObj);
-        List<BusinessOwnerProperty> businessOwnerPropertiesList = apiProvider
-                .getBusinessOwnerCustomProperties(businessOwnerId);
-        JSONObject businessOwnerPropertiesObject = new JSONObject();
-        if(businessOwnerPropertiesList != null) {
-            for(int i =0 ; i < businessOwnerPropertiesList.size(); i++) {
-                BusinessOwnerProperty businessOwnerProperties = businessOwnerPropertiesList.get(i);
-                businessOwnerPropertiesObject.put("PropertyId", businessOwnerProperties.getPropertyId());
-                businessOwnerPropertiesObject.put("PropertyValue", businessOwnerProperties.getPropertyValue());
-                businessOwnerPropertiesObject.put("ShowInStore", businessOwnerProperties.isShowingInStore());
-            }
-        }
-        businessOwnerDataObject.put("businessOwnerProperties", businessOwnerDataObject,
-                                    businessOwnerPropertiesObject.toJSONString());
-        return businessOwnerDataObject;
-    }
-
 
     /**
      * Retrieve business owners
