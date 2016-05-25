@@ -1526,7 +1526,7 @@
         },
         "/apps/mobile/binaries/{fileName}": {
             "get": {
-                "x-scope": "appm:create",
+                "x-scope": "appm:read",
                 "x-wso2-curl": "",
                 "x-wso2-response": "",
                 "summary": "Retrieving mobile application binaries",
@@ -1653,6 +1653,65 @@
                     }
                 }
             }
+        },
+        "/businessowner/{businessOwnerId}": {
+            "get": {
+                "x-scope": "appm:read",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" \"http://localhost:9763/api/appm/store/v1.1/businessowner/1\"",
+                "x-wso2-response": "{\"site\": \"test.lk\",\"email\": \"testOwner@gmail.com\",\"description\": \"this is a test description\",\"name\": \"testOwner\",\"properties\": [{\"isVisible\": false,\"value\": \"903334238V\",\"key\": \"nic\"}],\"id\": 1}",
+                "summary": "Get a Business owners by Id",
+                "description": "Get a Business owners by Id.\n",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/businessOwnerId"
+                    },
+                    {
+                        "$ref": "#/parameters/Accept"
+                    },
+                    {
+                        "$ref": "#/parameters/If-None-Match"
+                    }
+                ],
+                "tags": [
+                    "Business-Owner"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/BusinessOwner"
+                        },
+                        "headers": {
+                            "Content-Type": {
+                                "description": "The content type of the body.",
+                                "type": "string"
+                            },
+                            "ETag": {
+                                "description": "Entity Tag of the response resource. Used by caches, or in conditional requests.\n",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. \nInvalid request or validation error.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden. \nThe request must be conditional but no condition has been specified.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. \nThe resource to be updated does not exist.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -1709,6 +1768,13 @@
             "description": "Tag name.\n",
             "required": true,
             "type": "string"
+        },
+        "businessOwnerId": {
+            "name": "businessOwnerId",
+            "in": "path",
+            "description": "Business Owner Id.\n",
+            "required": true,
+            "type": "integer"
         },
         "Accept": {
             "name": "Accept",
@@ -2191,6 +2257,52 @@
                 "isDefaultPage": {
                     "type": "boolean",
                     "example": "true/false"
+                }
+            }
+        },
+        "BusinessOwner": {
+            "title": "BusinessOwner object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "admin"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "admin@wso2.com"
+                },
+                "site": {
+                    "type": "string",
+                    "example": "www.wso2.com"
+                },
+                "properties": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/BusinessOwnerProperties"
+                    }
+                }
+            }
+        },
+        "BusinessOwnerProperties": {
+            "title": "BusinessOwnerProperties object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "example": "age"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "20"
+                },
+                "isVisible": {
+                    "type": "boolean"
                 }
             }
         },
