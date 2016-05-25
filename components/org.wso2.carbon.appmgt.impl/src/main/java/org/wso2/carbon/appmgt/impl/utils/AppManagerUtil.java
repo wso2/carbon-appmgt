@@ -3268,7 +3268,7 @@ public final class AppManagerUtil {
 		}
 	}
 
-    public static String getConfigRegistryResourceContent(String tenantDomain, final String registryLocation)
+    public static String getGovernanceRegistryResourceContent(String tenantDomain, final String registryLocation)
             throws UserStoreException, RegistryException {
 
         String content = null;
@@ -3281,7 +3281,7 @@ public final class AppManagerUtil {
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
 
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomain);
-            Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry(tenantId);
+            Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getGovernanceSystemRegistry(tenantId);
             loadTenantRegistry(tenantId);
 
             if (registry.resourceExists(registryLocation)) {
@@ -3674,17 +3674,25 @@ public final class AppManagerUtil {
 	}
 
     public static void loadTenantConf(int tenantID) throws AppManagementException {
+        loadOAuthScopeRoleMapping(tenantID);
+    }
+
+    private static void loadOAuthScopeRoleMapping(int tenantID) throws AppManagementException {
+
         RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
         try {
-            UserRegistry registry = registryService.getConfigSystemRegistry(tenantID);
-            if (registry.resourceExists(AppMConstants.API_TENANT_CONF_LOCATION)) {
-                log.debug("Tenant conf already uploaded to the registry");
+            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            if (registry.resourceExists(AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH)) {
+                log.debug(String.format("OAuth scope role mapping (%s) registry resource already exists as '%s'",
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE,
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
                 return;
             }
 
             String tenantConfLocation = CarbonUtils.getCarbonHome() + File.separator +
-                    AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
-                    AppMConstants.API_TENANT_CONF;
+                                            AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
             File tenantConfFile = new File(tenantConfLocation);
 
@@ -3693,17 +3701,20 @@ public final class AppManagerUtil {
             if (tenantConfFile.exists()) { // Load conf from resources directory in pack if it exists
                 FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
                 data = IOUtils.toByteArray(fileInputStream);
-            } else { // Fallback to loading the conf that is stored at jar level if file does not exist in pack
-                InputStream inputStream = AppManagerComponent.class.getResourceAsStream("/tenant/" + AppMConstants.API_TENANT_CONF);
-                data = IOUtils.toByteArray(inputStream);
+
+                Resource resource = registry.newResource();
+                resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+                resource.setContent(data);
+
+                registry.put(AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH, resource);
+
+                log.debug(String.format("Added OAuth scope role mapping (%s) registry resource to '%s'",
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE,
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
+
+            }else{
+                log.warn(String.format("Can't find OAuth scope role mapping file in '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
             }
-
-            log.debug("Adding tenant config to the registry");
-            Resource resource = registry.newResource();
-            resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
-            resource.setContent(data);
-
-            registry.put(AppMConstants.API_TENANT_CONF_LOCATION, resource);
         } catch (RegistryException e) {
             throw new AppManagementException("Error while saving tenant conf to the registry", e);
         } catch (IOException e) {

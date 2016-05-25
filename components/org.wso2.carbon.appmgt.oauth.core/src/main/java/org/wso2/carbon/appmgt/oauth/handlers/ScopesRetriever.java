@@ -42,7 +42,7 @@ public class ScopesRetriever {
         Map<String, String> scopeRoleMapping = new HashMap<String, String>();
 
         try {
-            String tenantConfigContent = AppManagerUtil.getConfigRegistryResourceContent(tenantDomain, AppMConstants.TENANT_CONF_PATH);
+            String tenantConfigContent = AppManagerUtil.getGovernanceRegistryResourceContent(tenantDomain, AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH);
 
             if(tenantConfigContent!= null) {
                 JSONParser parser = new JSONParser();
@@ -69,13 +69,13 @@ public class ScopesRetriever {
                 }
             }
         } catch (UserStoreException e) {
-            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.TENANT_CONF_PATH));
+            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
         } catch (RegistryException e) {
-            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.TENANT_CONF_PATH));
+            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
         } catch (ParseException e) {
-            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.TENANT_CONF_PATH));
+            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
         } catch (org.wso2.carbon.user.api.UserStoreException e) {
-            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.TENANT_CONF_PATH));
+            log.error(String.format("Can't get the scope -> role mappings from '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
         }
 
         return scopeRoleMapping;

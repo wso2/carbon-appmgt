@@ -49,16 +49,7 @@ public interface APIProvider extends APIManager {
      */
     public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
-    /**
 
-     /* *
-     *Get business ower data.
-     * @param businessOwnerId
-     * @return
-     * @throws AppManagementException
-     */
-    public List<BusinessOwnerProperty> getBusinessOwnerCustomProperties(int businessOwnerId) throws
-                                                                                             AppManagementException;
     /**
      * @return
      * @throws AppManagementException
