@@ -756,8 +756,8 @@
     <carbon.multitenancy.version>4.5.0</carbon.multitenancy.version>
     <carbon.deployment.version>4.6.0</carbon.deployment.version>
     <carbon.commons.version>4.5.3</carbon.commons.version>
-    <carbon.registry.version>4.5.3-alpha</carbon.registry.version>
-    <carbon.governance.version>4.6.2-alpha2</carbon.governance.version>
+    <carbon.registry.version>4.5.3</carbon.registry.version>
+    <carbon.governance.version>4.6.2</carbon.governance.version>
     <carbon.throttle.version>4.2.1</carbon.throttle.version>
     <carbon.apimgt.version>4.2.1</carbon.apimgt.version>
     <carbon.logging.version>4.4.1</carbon.logging.version>
