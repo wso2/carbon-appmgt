@@ -1,7 +1,4 @@
 {
-  "EnableMonetization" : false,
-  "IsUnlimitedTierPaid" : false,
-  "ExtensionHandlerPosition": "bottom",
   "RESTAPIScopes": {
     "Scope": [
       {
@@ -10,7 +7,7 @@
       },
       {
         "Name": "appm:read",
-        "Roles": "Internal/everyone"
+        "Roles": "admin,Internal/creator,Internal/publisher,Internal/subscriber,Internal/store-admin,Internal/store"
       },
       {
         "Name": "appm:create",
