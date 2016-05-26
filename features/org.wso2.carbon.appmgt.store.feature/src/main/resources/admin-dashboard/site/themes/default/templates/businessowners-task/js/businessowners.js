@@ -78,7 +78,7 @@ $(document).ready(function() {
           "paging": true,
           "ordering": true,
           "order": [[1, "asc"]],
-          "ajax": context + '/apis/businessowners',
+          "ajax": context + '/apis/businessowners/filtered/datatable',
           "columnDefs": [
               {
                   "targets": [0],

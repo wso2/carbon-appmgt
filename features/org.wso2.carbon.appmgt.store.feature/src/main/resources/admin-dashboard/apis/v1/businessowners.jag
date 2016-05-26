@@ -24,7 +24,10 @@ var uriMatcher = new URIMatcher(request.getRequestURI());
 var log = new Log();
 //POST patterns
 var addBusinessOwner = '/{context}/apis/businessowners';
-var getBusinessOwners = '/{context}/apis/businessowners';
+var getBusinessOwners = '/{context}/apis/businessowners/filtered/datatable'; //To avoid the issue in request router
+                                                                             // used a context with multiple path
+                                                                             // params
+var getAllBusinessOwners = '/{context}/apis/businessowners';
 var ownerUpdate = '/{context}/apis/businessowners/update';
 var deleteBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
 var getBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
@@ -36,7 +39,7 @@ if (method == 'GET') {
         var start = request.getParameter("start");
         var length = request.getParameter("length");
         var search = request.getParameter("search[value]");
-        print(businessOwnerApi.getBusinessOwners(start, length, draw, search));
+        print(businessOwnerApi.searchBusinessOwners(start, length, draw, search));
     }
     if (uriMatcher.match(getBusinessOwner)) {
         response.contentType = CONTENT_TYPE_JSON;
@@ -52,6 +55,11 @@ if (method == 'GET') {
         } else {
             print(result);
         }
+    }
+    if (uriMatcher.match(getAllBusinessOwners)) {
+        response.contentType = CONTENT_TYPE_JSON;
+        var result = businessOwnerApi.getBusinessOwners();
+        print(result);
     }
 }
 
