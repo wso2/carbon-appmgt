@@ -73,7 +73,9 @@ public final class AppMConstants {
 
     public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
-    public static final String TENANT_CONF_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  "tenant-conf.json";
+    public static final String OAUTH_SCOPE_ROLE_MAPPING_FILE = "oauth-scope-role-mapping.json";
+
+    public static final String OAUTH_SCOPE_ROLE_MAPPING_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
@@ -137,11 +139,7 @@ public final class AppMConstants {
 
     public static final String RESOURCE_FOLDER_LOCATION = "repository"+ File.separator + "resources";
 
-    public static final String API_TENANT_CONF = "tenant-conf.json";
-
     public static final String APPLICATION_JSON_MEDIA_TYPE = "application/json";
-
-    public static final String API_TENANT_CONF_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/" + API_TENANT_CONF;
 
     public static final int ASSET_CREATED_DATE_LENGTH = 20;
 
@@ -204,6 +202,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_SAML2_SSO_ISSUER = "overview_saml2SsoIssuer";
     public static final String APP_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
+    public static final String APP_OVERVIEW_OLD_VERSION = "overview_oldVersion";
 
     public static final String APP_IMAGES_THUMBNAIL = "images_thumbnail";
     public static final String APP_IMAGES_BANNER = "images_banner";

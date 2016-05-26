@@ -10,6 +10,6 @@ org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../featur
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/database/WSO2AM_DB.h2.db/,target:${installFolder}/../../database/WSO2AM_DB.h2.db,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/resources/entitlement-templates/,target:${installFolder}/../../resources/entitlement-templates/,overwrite:true);\
 org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/resources/lifecycles/,target:${installFolder}/../../resources/lifecycles/,overwrite:true);\
-org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/resources/tenant-conf.json,target:${installFolder}/../../resources/tenant-conf.json,overwrite:true);\
+org.eclipse.equinox.p2.touchpoint.natives.copy(source:${installFolder}/../features/org.wso2.carbon.appmgt.core_${feature.version}/repository/resources/oauth-scope-role-mapping.json,target:${installFolder}/../../resources/oauth-scope-role-mapping.json,overwrite:true);\
 
 

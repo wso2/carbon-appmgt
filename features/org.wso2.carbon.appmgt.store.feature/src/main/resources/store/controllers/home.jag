@@ -181,9 +181,8 @@ require('/modules/store.js').exec(function (ctx) {
                        plural: manager.pluralLabel,
                        singular: manager.singularLabel,
                        type: manager.shortName,
-                       pageSize: store.getRecentAppCount().assetsPage
+                       pageSize: store.getRecentAppCount().topAssetPage
                    });
-
 
     });
 
