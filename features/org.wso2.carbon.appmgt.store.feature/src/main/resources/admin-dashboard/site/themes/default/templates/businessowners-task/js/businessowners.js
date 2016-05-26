@@ -276,7 +276,6 @@ $(document).on("click", ".owner-edit-button", function () {
 $(document).on("click", ".owner-delete-button", function () {
     var ownerId = $(this).data("ownerId");
     var ownerName = $(this).closest('tr').find("td:first").text();
-    $(".alert").alert();
     var isConfirmed = confirm("Are you sure you want to delete the business owner " + ownerName + "?");
     if (isConfirmed) {
         $.ajax({
