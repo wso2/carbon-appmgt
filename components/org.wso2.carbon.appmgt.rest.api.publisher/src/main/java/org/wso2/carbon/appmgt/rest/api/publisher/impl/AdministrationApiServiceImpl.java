@@ -128,25 +128,9 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
             //save business owner.
             int ownerId = apiProvider.saveBusinessOwner(businessOwner);
 
-            //Retrieve the added business owner to send in the response payload.
-            BusinessOwner addedBusinessOwner = apiProvider.getBusinessOwner(ownerId);
             businessOwnerDTO.setId(ownerId);
-            businessOwnerDTO.setName(addedBusinessOwner.getBusinessOwnerName());
-            businessOwnerDTO.setEmail(addedBusinessOwner.getBusinessOwnerEmail());
-            businessOwnerDTO.setDescription(addedBusinessOwner.getBusinessOwnerDescription());
-            businessOwnerDTO.setSite(addedBusinessOwner.getBusinessOwnerSite());
-
-            List<BusinessOwnerProperty> ownerPropertyList = businessOwner.getBusinessOwnerPropertiesList();
-            List<BusinessOwnerPropertiesDTO> ownerPropertiesDTOList = new ArrayList<>();
-            //save custom properties of the owner.
-            for (BusinessOwnerProperty ownerProperty : ownerPropertyList) {
-                BusinessOwnerPropertiesDTO businessOwnerPropertiesDTO = new BusinessOwnerPropertiesDTO();
-                businessOwnerPropertiesDTO.setKey(ownerProperty.getPropertyId());
-                businessOwnerPropertiesDTO.setValue(ownerProperty.getPropertyValue());
-                businessOwnerPropertiesDTO.setIsVisible(ownerProperty.isShowingInStore());
-                ownerPropertiesDTOList.add(businessOwnerPropertiesDTO);
-            }
-            businessOwnerDTO.setProperties(ownerPropertiesDTOList);
+            // remove properties from the response. need business owner id only.
+            businessOwnerDTO.setProperties(null);
         } catch (AppManagementException e) {
             String errorMessage = "Error while saving Business Owner.";
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -231,7 +215,10 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                 businessOwnerPropertyList.add(businessOwnerProperty);
             }
             businessOwner.setBusinessOwnerPropertiesList(businessOwnerPropertyList);
-            apiProvider.updateBusinessOwner(businessOwner);
+            boolean response = apiProvider.updateBusinessOwner(businessOwner);
+            if (!response) {
+               RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log );
+            }
         } catch (AppManagementException e) {
             String errorMessage = "Error while updating Business owner for business owner Id " + businessOwnerId;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -244,8 +231,19 @@ public class AdministrationApiServiceImpl extends AdministrationApiService {
                                                                      String ifUnmodifiedSince) {
         try {
             APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
-            //delete the business owner.
-            apiProvider.deleteBusinessOwner(businessOwnerId.toString());
+            // check whether business owner is exist or not.
+            BusinessOwner businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
+            if (businessOwner != null) {
+                //delete the business owner.
+                boolean isDeleted = apiProvider.deleteBusinessOwner(businessOwnerId.toString());
+                if (!isDeleted) {
+                    RestApiUtil.handlePreconditionFailedRequest("Business Owner is assigned to one or more apps. Please remove "
+                                                                        + "it from them before deleting." , log);
+                }
+            } else {
+                RestApiUtil.handleResourceNotFoundError("business owner", String.valueOf(businessOwnerId), log );
+            }
+
         } catch (AppManagementException e) {
             ErrorDTO errorDTO = RestApiUtil.getErrorDTO(e.getMessage(), 500l, e.getCause().getMessage());
             throw new InternalServerErrorException(errorDTO);

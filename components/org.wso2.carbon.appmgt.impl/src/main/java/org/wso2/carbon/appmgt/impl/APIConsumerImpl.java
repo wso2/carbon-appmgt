@@ -117,7 +117,7 @@ class APIConsumerImpl extends AbstractAPIManager implements APIConsumer {
      */
     @Override
     public BusinessOwner  getBusinessOwner(int businessOwnerId) throws AppManagementException {
-        return appMDAO.getBusinessOwner(businessOwnerId);
+        return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
     }
 
 

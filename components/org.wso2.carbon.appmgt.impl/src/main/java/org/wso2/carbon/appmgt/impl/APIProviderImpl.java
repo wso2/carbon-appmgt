@@ -125,8 +125,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.updateBusinessOwner(businessOwner);
+    public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        boolean isUpdated = false;
+        if (appMDAO.getBusinessOwner(businessOwner.getBusinessOwnerId(), tenantId) != null) {
+            appMDAO.updateBusinessOwner(businessOwner);
+            isUpdated =true;
+        }
+        return isUpdated;
     }
 
 
@@ -148,7 +153,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
     public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
-        return appMDAO.getBusinessOwner(businessOwnerId);
+        return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
     }
 
     /**
