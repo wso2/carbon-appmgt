@@ -11,7 +11,7 @@
             <p class="marked">Get policy partial.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/xacmlpolicies/{policyPartialId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40&quot;</code></div>
             
             
 
@@ -270,7 +270,7 @@
             <p class="marked">Update an existing policy partial\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/xacmlpolicies/{policyPartialId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>PUT</code>
@@ -283,14 +283,14 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; -d &#39;{  &quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
       &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
          &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
          &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
          &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
-&lt;/Rule&gt;&quot;, &quot;policyPartialName&quot;: &quot;ddd&quot;, &quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40&quot;</code></div>
+&lt;/Rule&gt;&quot;, &quot;policyPartialName&quot;: &quot;ddd&quot;, &quot;isSharedPartial&quot;: true,&quot;policyPartialDesc&quot;: null}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40&quot;</code></div>
             
             
 
@@ -589,7 +589,7 @@
             <p class="marked">Create a new Policy Partial.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/xacmlpolicies/</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -602,14 +602,14 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; -d &#39;{ &quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
       &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
          &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
          &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
          &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
       &lt;/Apply&gt;
 &lt;/Condition&gt;
-&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,  &quot;isSharedPartial&quot;: true, &quot;policyPartialDesc&quot;: null}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies&quot;</code></div>
+&lt;/Rule&gt;&quot;,&quot;policyPartialName&quot;: &quot;ddd&quot;,  &quot;isSharedPartial&quot;: true, &quot;policyPartialDesc&quot;: null}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies&quot;</code></div>
             
             
 
@@ -829,7 +829,7 @@
             <p class="marked">Create a new App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/xacmlpolicies/validate</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/validate</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -842,13 +842,13 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99&quot; -d &#39;{  &quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;policyPartial&quot;: &quot;&lt;Rule Effect=&quot;Permit&quot; RuleId=&quot;Rule001&quot;&gt;&lt;Condition&gt;
       &lt;Apply FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:any-of&quot;&gt;
          &lt;Function FunctionId=&quot;urn:oasis:names:tc:xacml:1.0:function:string-equal&quot;/&gt;
          &lt;AttributeValue DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot;&gt;admin&lt;/AttributeValue&gt;
          &lt;AttributeDesignator AttributeId=&quot;http://wso2.org/claims/role&quot; Category=&quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot; DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; MustBePresent=&quot;true&quot;/&gt;
       &lt;/Apply&gt;
-&lt;/Condition&gt;&lt;/Rule&gt;&quot;}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/validate&quot;</code></div>
+&lt;/Condition&gt;&lt;/Rule&gt;&quot;}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate&quot;</code></div>
             
             
 
@@ -1060,7 +1060,7 @@
             <p class="marked">Get a list of XACML policies.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/xacmlpolicies/</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/xacmlpolicies/</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -1073,7 +1073,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e819870696cc39494d12841b5094a411&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e819870696cc39494d12841b5094a411&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies&quot;</code></div>
             
             
 
