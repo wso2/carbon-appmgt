@@ -155,7 +155,7 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
+    public BusinessOwner getBusinessOwner(int businessOwnerId, int tenantId) throws AppManagementException {
 
         Connection connection = null;
         PreparedStatement statementToGetBusinessOwners = null;
@@ -163,12 +163,13 @@ public class AppMDAO {
         ResultSet businessOwnerResultSet = null;
 
         String queryToGetBusinessOwner = "SELECT OWNER_NAME, OWNER_EMAIL, OWNER_DESC, OWNER_SITE FROM " +
-                "APM_BUSINESS_OWNER WHERE OWNER_ID = ? ";
+                "APM_BUSINESS_OWNER WHERE OWNER_ID = ? AND TENANT_ID = ?";
 
         try {
             connection = APIMgtDBUtil.getConnection();
             statementToGetBusinessOwners = connection.prepareStatement(queryToGetBusinessOwner);
             statementToGetBusinessOwners.setInt(1, businessOwnerId);
+            statementToGetBusinessOwners.setInt(2, tenantId);
             businessOwnerResultSet = statementToGetBusinessOwners.executeQuery();
 
             if (businessOwnerResultSet.next()) {

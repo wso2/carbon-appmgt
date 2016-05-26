@@ -18,7 +18,7 @@
         "http"
     ],
     "host": "apis.wso2.com",
-    "basePath": "/api/appm/store/v1.0",
+    "basePath": "/api/appm/store/v1.1",
     "consumes": [
         "application/json"
     ],
@@ -53,7 +53,7 @@
         "/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.0/apps/mobileapp\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.1/apps/mobileapp\"",
                 "x-wso2-response": "{\"previous\":\"\",\"count\":1,\"next\":\"\",\"appList\":[{\"name\":\"phone\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"version\":\"1.0\",\"description\":\"phone\",\"provider\":\"admin\",\"lifecycleState\":\"CREATED\",\"rating\":0.0}]}",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
@@ -127,7 +127,7 @@
         "/apps/{appType}/id/{appId}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.0/apps/mobileapp/id/5c9c8551-d696-4c44-85a6-dcd86f1a1e25\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.1/apps/mobileapp/id/5c9c8551-d696-4c44-85a6-dcd86f1a1e25\"",
                 "x-wso2-response": "{\"name\":\"phone\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"type\":\"mobileapp\",\"displayName\":null,\"transport\":[],\"lifecycle\":null,\"category\":\"Business\",\"version\":\"1.0\",\"icon\":\"/publisher/api/mobileapp/getfile/1KKX5LeQII1Ev8t.jpeg\",\"description\":\"phone\",\"provider\":null,\"lifecycleState\":null,\"tags\":[],\"rating\":0.0,\"thumbnailUrl\":null,\"banner\":\"/publisher/api/mobileapp/getfile/ABi7iIcbQYpyI8e.jpeg\",\"marketType\":null,\"recentChanges\":\"-\",\"platform\":\"ios\",\"isSite\":null,\"appDefinition\":null,\"isDefaultVersion\":null,\"bundleversion\":\"1.0\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/PiP8X797UcqF6De.jpeg\"],\"createdtime\":null,\"appType\":\"enterprise\",\"lifecycleAvailableActions\":null}",
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
@@ -192,7 +192,7 @@
         "/apps/{appType}/id/{appId}/rate": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate\"",
                 "x-wso2-response": "{\"rating\": 1.6428571428571428}",
                 "summary": "Get app rating details",
                 "description": "Get rating details of an app.\n",
@@ -261,7 +261,7 @@
             },
             "put": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 3cdc86c3ee6edbe18260392fb488c4e7\" -d '{\"rating\": 4, \"review\": \"good\"}' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 3cdc86c3ee6edbe18260392fb488c4e7\" -d '{\"rating\": 4, \"review\": \"good\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"rating\": 4,\"review\": \"good\"}",
                 "summary": "Change App rating",
@@ -389,7 +389,7 @@
         "/apps/{appType}/id/{appId}/subscription": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"  -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Subscribe App",
                 "description": "Subscribe to an existing App\n",
@@ -439,7 +439,7 @@
             },
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"a",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"a",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get subscriptions for current user",
                 "description": "Get subscriptions for current user.\n",
@@ -504,7 +504,7 @@
         "/apps/{appType}/id/{appId}/subscription/users": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription\"",
                 "x-wso2-response": "{\"userIds\":[\"admin\",\"user1\",\"user2\"]}",
                 "summary": "Get subscribed user list",
                 "description": "Get subscribed user list for a given App.\n",
@@ -569,7 +569,7 @@
         "/apps/{appType}/id/{appId}/unsubscription": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"  -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Un subscribe App",
                 "description": "Un subscribe to an existing App\n",
@@ -621,7 +621,7 @@
         "/apps/{appType}/id/{appId}/subscription-workflow": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"  -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription-workflow\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription-workflow\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Check for subscription workflow",
                 "description": "Check for subscription workflow.\n",
@@ -738,7 +738,7 @@
         "/apps/favourite-page": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Set as favourite page",
                 "description": "Set as favourite page.\n",
@@ -777,7 +777,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "",
                 "summary": "Remove from favourite page",
@@ -817,7 +817,7 @@
             },
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\"\"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page\"",
                 "x-wso2-response": "{\"isDefaultPage\": true}",
                 "summary": "check if it is the favourite page",
                 "description": "check if it is the favourite page.\n",
@@ -873,7 +873,7 @@
         "/apps/{appType}/id/{appId}/favourite-app": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -H \"Content-Type: application/json\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Add to favourite Apps",
                 "description": "Add to favourite Apps.\n",
@@ -917,7 +917,7 @@
             },
             "delete": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer c8c4399ba38982a21372012294ad1a54\" -d '' \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-app\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Remove from favourite Apps",
                 "description": "Remove from favourite Apps.\n",
@@ -963,7 +963,7 @@
         "/apps/download": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.0/apps/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Download App",
@@ -1011,7 +1011,7 @@
         "/apps/uninstallation": {
             "post": {
                 "x-scope": "appm:subscribe",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.0/apps/uninstallation\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/uninstallation\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Uninstall App",
@@ -1133,7 +1133,7 @@
         "/administration/roles": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\"  \"http://localhost:9763/api/appm/publisher/v1.0/administration/roles\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/roles\"",
                 "x-wso2-response": "{\"roleIds\": [\"admin\",\"Application/app_11_04_001\", \"Application/app_11_04_002\",\"Application/app_11_04_011\"]}",
                 "summary": "Get all Roles",
                 "description": "Get a list of available Roles.\n",
@@ -1195,7 +1195,7 @@
         "/administration/users": {
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 282712e4f0ca2f3b1fbcef3c4d541027\" \"http://localhost:9763/api/appm/store/v1.0/administration/users\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 282712e4f0ca2f3b1fbcef3c4d541027\" \"http://localhost:9763/api/appm/store/v1.1/administration/users\"",
                 "x-wso2-response": "{\"userIds\":[\"admin\",\"user1\",\"user2\"]}",
                 "summary": "Get all Users",
                 "description": "Get a list of available Users.\n",
@@ -1257,7 +1257,7 @@
         "/administration/apps/download": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.0/administration/apps/download\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/administration/apps/download\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
                 "summary": "Enterprise Download/Install App",
@@ -1304,7 +1304,7 @@
         },
         "/administration/apps/uninstallation": {
             "x-scope": "appm:administration",
-            "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.0/apps/administration/apps/uninstallation\"",
+            "x-wso2-curl": "curl -X POST -H \"Authorization: Basic YWRtaW46YWRtaW4=\" -H \"Content-Type: application/json\" -d '{\"type\": \"user\",\"typeIds\": [  \"admin\", \"testuser\" ],\"appId\": \"ee0a2cfe-6555-404c-b8e8-627f1711a36f\"}' \"http://localhost:9763/api/appm/store/v1.1/apps/administration/apps/uninstallation\"",
             "x-wso2-response": "HTTP/1.1 200 OK",
             "x-wso2-request": "{\"type\": \"user\",\"typeIds\": [\"admin\"],\"appId\": \"cec2027d-2dd6-4826-97c5-33be4eb83ae1\"}",
             "post": {
@@ -1353,7 +1353,7 @@
         "/apps/{appType}/tags": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/tags\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags\"",
                 "x-wso2-response": "[{\"name\":\"webapptag1\",\"noOfOccurrences\":1},{\"name\":\"webapptag2\",\"noOfOccurrences\":1},{\"name\":\"webapptag3\",\"noOfOccurrences\":1}]",
                 "summary": "Get all Tags",
                 "description": "Get a list of available Tags relevant to given App Type.\n",
@@ -1412,7 +1412,7 @@
         "/apps/event-publish": {
             "post": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" -d ' {\"events\":  [{\"appId\":\"init\",\"userId\":\"init\",\"tenantId\":-1234,\"appName\":\"init\",\"appVersion\":\"1\",\"context\":\"/init\",\"item\":\"My_App\",\"action\":\"init\",\"timestamp\":1462277036369},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-load\",\"timestamp\":1462277038291},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"noname\",\"action\":\"click\",\"timestamp\":1462277042436},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-unload\",\"timestamp\":1462277042437}]}' \"http://localhost:9763/api/appm/store/v1.0/apps/event-publish\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" -H \"Content-Type: application/json\" -d ' {\"events\":  [{\"appId\":\"init\",\"userId\":\"init\",\"tenantId\":-1234,\"appName\":\"init\",\"appVersion\":\"1\",\"context\":\"/init\",\"item\":\"My_App\",\"action\":\"init\",\"timestamp\":1462277036369},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-load\",\"timestamp\":1462277038291},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"noname\",\"action\":\"click\",\"timestamp\":1462277042436},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-unload\",\"timestamp\":1462277042437}]}' \"http://localhost:9763/api/appm/store/v1.1/apps/event-publish\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": " {\"events\":  [{\"appId\":\"init\",\"userId\":\"init\",\"tenantId\":-1234,\"appName\":\"init\",\"appVersion\":\"1\",\"context\":\"/init\",\"item\":\"My_App\",\"action\":\"init\",\"timestamp\":1462277036369},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-load\",\"timestamp\":1462277038291},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"noname\",\"action\":\"click\",\"timestamp\":1462277042436},{\"appId\":\"80391fcb-45fc-4bb4-a83d-fc991a99084d\",\"userId\":\"admin\",\"tenantId\":\"-1234\",\"appName\":\"app3\",\"appVersion\":\"1.0\",\"context\":\"/app3\",\"item\":\"My_App\",\"action\":\"page-unload\",\"timestamp\":1462277042437}]}",
                 "summary": "Publish Stats",
@@ -1586,7 +1586,7 @@
         "/tags/{tagName}/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" \"http://localhost:9763/api/appm/store/v1.0/tags/hr/apps\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d\" \"http://localhost:9763/api/appm/store/v1.1/tags/hr/apps\"",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get apps with given tag",
                 "description": "Get app list with given tag for particular asset type.\n",

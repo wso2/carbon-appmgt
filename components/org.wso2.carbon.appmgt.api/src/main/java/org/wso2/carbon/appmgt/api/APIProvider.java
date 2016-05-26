@@ -47,7 +47,7 @@ public interface APIProvider extends APIManager {
      * @return Integer
      * @throws AppManagementException
      */
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+    public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
 
     /**
