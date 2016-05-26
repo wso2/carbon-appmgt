@@ -240,8 +240,8 @@ public class AppMDAO {
      * @return
      * @throws AppManagementException
      */
-    public boolean isAssociatedWithApps(String businessOwnerId, Registry registry, String tenantDomain) throws
-                                                                                          AppManagementException {
+    public boolean isBusinessOwnerAssociatedWithApps(String businessOwnerId, Registry registry, String tenantDomain)
+            throws AppManagementException {
         boolean isTenantFlowStarted = false;
         try {
             GovernanceUtils.loadGovernanceArtifacts((UserRegistry) registry);

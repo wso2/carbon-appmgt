@@ -109,8 +109,9 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
     public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
-        boolean isAssociatedWithApps = appMDAO.isAssociatedWithApps(businessOwnerId, registry,tenantDomain);
-        if (!isAssociatedWithApps) {
+        boolean isBusinessOwnerAssociatedWithApps = appMDAO.isBusinessOwnerAssociatedWithApps(businessOwnerId,
+                                                                                              registry, tenantDomain);
+        if (!isBusinessOwnerAssociatedWithApps) {
             appMDAO.deleteBusinessOwner(businessOwnerId);
             // return true if business owner is successfully deleted.
             return true;
