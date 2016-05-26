@@ -287,7 +287,7 @@ public class APIProviderHostObject extends ScriptableObject {
      * @return entitlement policy partial id
      * @throws org.wso2.carbon.appmgt.api.AppManagementException Wrapped exception by org.wso2.carbon.apimgt.api.AppManagementException
      */
-    public static void jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
+    public static boolean jsFunction_deleteBusinessOwner(Context context, Scriptable thisObj,
                                                      Object[] args,
                                                      Function funObj) throws
                                                                       AppManagementException {
@@ -299,7 +299,7 @@ public class APIProviderHostObject extends ScriptableObject {
         }
         String ownerId = args[0].toString();
         APIProvider apiProvider = getAPIProvider(thisObj);
-        apiProvider.deleteBusinessOwner(ownerId);
+        return apiProvider.deleteBusinessOwner(ownerId);
     }
 
     /**
