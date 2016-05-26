@@ -2986,9 +2986,9 @@
                     "type": "string",
                     "example": "http://logout/sample"
                 },
-                "businessOwnerName": {
+                "businessOwnerId": {
                     "type": "string",
-                    "example": "John"
+                    "example": "1"
                 },
                 "visibleTenants": {
                     "type": "array",

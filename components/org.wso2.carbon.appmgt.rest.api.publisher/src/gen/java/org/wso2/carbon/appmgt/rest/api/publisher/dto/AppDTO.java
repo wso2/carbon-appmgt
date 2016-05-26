@@ -1,15 +1,13 @@
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.UriTemplateDTO;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppAppmetaDTO;
-import java.math.BigDecimal;
-import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.PolicyGroupsDTO;
-
-import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
@@ -60,7 +58,7 @@ public class AppDTO  {
   private String logoutURL = null;
   
   
-  private String businessOwnerName = null;
+  private String businessOwnerId = null;
   
   
   private List<String> visibleTenants = new ArrayList<String>();
@@ -329,12 +327,12 @@ public class AppDTO  {
   /**
    **/
   @ApiModelProperty(value = "")
-  @JsonProperty("businessOwnerName")
-  public String getBusinessOwnerName() {
-    return businessOwnerName;
+  @JsonProperty("businessOwnerId")
+  public String getBusinessOwnerId() {
+    return businessOwnerId;
   }
-  public void setBusinessOwnerName(String businessOwnerName) {
-    this.businessOwnerName = businessOwnerName;
+  public void setBusinessOwnerId(String businessOwnerName) {
+    this.businessOwnerId = businessOwnerName;
   }
 
   
@@ -738,7 +736,7 @@ public class AppDTO  {
     sb.append("  context: ").append(context).append("\n");
     sb.append("  version: ").append(version).append("\n");
     sb.append("  logoutURL: ").append(logoutURL).append("\n");
-    sb.append("  businessOwnerName: ").append(businessOwnerName).append("\n");
+    sb.append("  businessOwnerId: ").append(businessOwnerId).append("\n");
     sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
     sb.append("  claims: ").append(claims).append("\n");
     sb.append("  trackingCode: ").append(trackingCode).append("\n");

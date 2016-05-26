@@ -21,7 +21,6 @@ package org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -308,7 +307,7 @@ public class APPMappingUtil {
             dto.setContext(context);
         }
 
-        dto.setBusinessOwnerName(webapp.getBusinessOwner());
+        dto.setBusinessOwnerId(webapp.getBusinessOwner());
         dto.setAppUrL(webapp.getUrl());
         dto.setIsDefaultVersion(webapp.isDefaultVersion());
         dto.setIsSite(webapp.getTreatAsASite());
@@ -562,7 +561,7 @@ public class APPMappingUtil {
         webApp.setBanner(appDTO.getBanner());
         webApp.setTrackingCode(appDTO.getTrackingCode());
         webApp.setLogoutURL(appDTO.getLogoutURL());
-        webApp.setBusinessOwner(appDTO.getBusinessOwnerName());
+        webApp.setBusinessOwner(appDTO.getBusinessOwnerId());
         webApp.setVisibleTenants(StringUtils.join(appDTO.getVisibleTenants(),","));
         webApp.setSkipGateway(Boolean.parseBoolean(appDTO.getSkipGateway()));
         webApp.setAllowAnonymous(Boolean.parseBoolean(appDTO.getAllowAnonymousAccess()));
