@@ -25,10 +25,10 @@
                     {{#if ../../notificationCount}}
                         <li class="dropdown-notification">
                             <a href="#"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                <span class="badge">{{../../notificationCount}}</span>
+                                <span class="badge">{{../../../notificationCount}}</span>
                                 Notifications <span class="caret"></span></a>
                             <ul class="dropdown-menu notifications" role="menu">
-                                {{#each ../../notifications}}
+                                {{#each ../../../notifications}}
                                     <li title="Webapp {{this.appname}} has been rejected due to: {{this.notification}}"><a href="{{this.url}}">Webapp <strong>{{this.appname}}</strong> has been rejected due to: {{this.notification}}</a></li>
                                 {{/each}}
                             </ul>
