@@ -472,9 +472,10 @@ public class AppMDAO {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    handleException("Failed the rollback of save business owner with name : " + businessOwnerName, e1);
+                    log.error("Failed the rollback of save business owner with name : " + businessOwnerName, e1);
                 }
             }
+            handleException("Failed to save business owner with name : " + businessOwnerName, e);
         } finally {
             APIMgtDBUtil.closeAllConnections(statementToInserBusinessOwner, connection, null);
         }

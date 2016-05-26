@@ -28,6 +28,7 @@ var getBusinessOwners = '/{context}/apis/businessowners';
 var ownerUpdate = '/{context}/apis/businessowners/update';
 var deleteBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
 var getBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
+var CONTENT_TYPE_JSON = "application/json";
 
 if (method == 'GET') {
     if (uriMatcher.match(getBusinessOwners)) {
@@ -38,13 +39,31 @@ if (method == 'GET') {
         print(businessOwnerApi.getBusinessOwners(start, length, draw, search));
     }
     if (uriMatcher.match(getBusinessOwner)) {
-        print(businessOwnerApi.getBusinessOwner(uriMatcher.elements().ownerId));
+        response.contentType = CONTENT_TYPE_JSON;
+        var result = null;
+        var businessOwnerId = uriMatcher.elements().ownerId;
+        try {
+            result = businessOwnerApi.getBusinessOwner(businessOwnerId);
+        } catch (e) {
+            log.error("Record(s) not found Business Owner : " + businessOwnerId);
+        }
+        if (result == null) {
+            print({'success': false});
+        } else {
+            print(result);
+        }
     }
 }
 
 if (method == 'DELETE') {
     if (uriMatcher.match(deleteBusinessOwner)) {
-        print(businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId));
+        var result = null;
+        try {
+            result = businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId)
+        } catch (e) {
+            log.error("Error while saving Business Owners.");
+        }
+        print(createResponseObject(result));
     }
 }
 if (method == 'POST') {
@@ -55,9 +74,14 @@ if (method == 'POST') {
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerProperties = request.getParameter("businessOwnerProperties");
 
-        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail,
-                                                              businessOwnerDescription, businessOwnerSite,
-                                                              businessOwnerProperties)));
+        var result = null;
+        try {
+            result = businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription,
+                                                businessOwnerSite, businessOwnerProperties);
+        } catch (e) {
+            log.error("Error while saving Business Owners.");
+        }
+        print(createResponseObject(result));
     }
 }
 if (method == 'POST') {
@@ -68,11 +92,21 @@ if (method == 'POST') {
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerDetails = request.getParameter("businessOwnerProperties");
-        print(createResponseObject(businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+
+        var result = null;
+        try {
+            result = businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail,
+                                                  businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
+        } catch (e) {
+            log.error("Error while updating Business Owners.");
+        }
+
+        print(createResponseObject(result));
     }
 }
 
 function createResponseObject(object) {
+    response.contentType = CONTENT_TYPE_JSON;
     if (object !== null) {
         return {'success': true, 'response': object};
     } else {

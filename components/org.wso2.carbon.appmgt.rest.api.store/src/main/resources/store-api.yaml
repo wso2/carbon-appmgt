@@ -1307,7 +1307,7 @@ paths:
         - $ref: '#/parameters/If-Match'
         - $ref: '#/parameters/If-Unmodified-Since'
       tags:
-        - MobileApps
+        - Apps
       responses:
         '200':
           description: |
