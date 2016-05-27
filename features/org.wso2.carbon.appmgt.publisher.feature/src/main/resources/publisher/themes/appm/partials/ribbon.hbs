@@ -20,7 +20,13 @@
                     </li>
 
                     {{#if ../../viewStats}}
-                        <li  {{#ifCond ../../active "==" "statistics"}}class="active"{{/ifCond}}><a href="{{url "/assets/statistics/webapp/"}}">Statistics</a></li>
+                        <li  {{#ifCond ../../active "==" "statistics"}}class="active"{{/ifCond}}><a href="
+                        {{#if ../../../isSubscriptionEnabled}}
+                            {{url "/assets/statistics/webapp/"}}
+                        {{else}}
+                            {{url "/assets/apps/webapp/"}}
+                        {{/if}}
+                        ">Statistics</a></li>
                     {{/if}}
                     {{#if ../../notificationCount}}
                         <li class="dropdown-notification">
