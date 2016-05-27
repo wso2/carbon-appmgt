@@ -75,7 +75,7 @@
                                 <parameter name="STATE_RULE1:Rejected" value="Internal/publisher:-get,-add,-delete,-authorize"/>
                                 <parameter name="STATE_RULE2:Rejected" value="Internal/private_{asset_author}:+get,+add,+delete,+authorize"/>
                                 <parameter name="STATE_RULE3:Rejected" value="Internal/everyone:-get,-add,-delete,-authorize"/>
-                                <parameter name="STATE_RULE4:Rejected" value="Internal/creator:-get,-add,-delete,-authorize"/>
+                                <parameter name="STATE_RULE4:Rejected" value="Internal/creator:+get,+add,+delete,+authorize"/>
                             </execution>
                         </data>	
                     </datamodel>
@@ -220,7 +220,7 @@
                                 <parameter name="STATE_RULE1:Created" value="Internal/private_{asset_author}:+get,+add,+delete,+authorize"/>
                                 <parameter name="STATE_RULE2:Created" value="Internal/publisher:-get,-add,-delete,-authorize"/>
                                 <parameter name="STATE_RULE3:Created" value="Internal/everyone:-get,-add,-delete,-authorize"/>
-                                <parameter name="STATE_RULE4:Created" value="Internal/creator:-get,-add,-delete,-authorize"/>
+                                <parameter name="STATE_RULE4:Created" value="Internal/creator:+get,+add,+delete,+authorize"/>
                             </execution>
                         </data>
                     </datamodel>
