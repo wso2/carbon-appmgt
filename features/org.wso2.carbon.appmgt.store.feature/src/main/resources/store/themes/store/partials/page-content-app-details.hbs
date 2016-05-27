@@ -72,10 +72,16 @@
                                 <i class="fw fw-heart"></i>{{t "Add to Favorites"}}
                             </a>
                         {{/if}}
-                        {{#if isSubscribed}}
-                            <a href="#" id="btnUnsubscribe" class="btn btn-default">
-                                {{t "Un-Subscribe"}}
-                            </a>
+                        {{#if isSelfSubscriptionEnabled}}
+                            {{#if isSubscribed}}
+                                <a href="#" id="btnUnsubscribe" class="btn btn-default">
+                                    {{t "Un-Subscribe"}}
+                                </a>
+                            {{else}}
+                                <a href="#" id="btnSubscribe" class="btn btn-subscribe">
+                                    <i class="fw fw-subscribe"></i>{{t "Subscribe"}}
+                                </a>
+                            {{/if}}
                         {{/if}}
                     {{else}}
                     {{!-- user cannot access this app --}}
