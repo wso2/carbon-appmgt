@@ -34,6 +34,7 @@ import org.wso2.carbon.registry.core.jdbc.handlers.RequestContext;
 import org.wso2.carbon.registry.core.session.CurrentSession;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.user.api.UserRealm;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.jaggery.scxml.generic.GenericExecutor;
 import org.wso2.jaggery.scxml.management.DynamicValueInjector;
 import org.wso2.jaggery.scxml.management.StateExecutor;
@@ -89,6 +90,7 @@ public class AppMGenericExecutor extends GenericExecutor {
 
         DynamicValueInjector dynamicValueInjector=new DynamicValueInjector();
 
+
         dynamicValueInjector.setDynamicValue(DynamicValueInjector.ASSET_AUTHOR_KEY, cleanUsername(providerName));
 
         //Execute all permissions for the current state
@@ -105,8 +107,14 @@ public class AppMGenericExecutor extends GenericExecutor {
         return true;
     }
 
-    private String cleanUsername(String username){
-        return username.replace("@","-AT-").replace("/","-AT-");
+    private String cleanUsername(String provider){
+
+        boolean isEmailEnabled =
+                Boolean.parseBoolean(CarbonUtils.getServerConfiguration().getFirstProperty("EnableEmailUserName"));
+        if (provider != null && !isEmailEnabled && provider.contains("-AT-")) {
+            provider = provider.substring(0, provider.indexOf("-AT-"));
+        }
+        return provider;
     }
 
     /*
