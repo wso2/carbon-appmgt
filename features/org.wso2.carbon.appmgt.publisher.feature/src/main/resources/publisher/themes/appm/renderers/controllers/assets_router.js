@@ -204,6 +204,13 @@ var render = function (theme, data, meta, require) {
     var breadCrumbData = require('/helpers/breadcrumb.js').generateBreadcrumbJson(data);
     var createActionAuthorized = permissions.isAuthorized(user.username, config.permissions.webapp_create, um);
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
+    var subscriptionConfiguration = apiProvider.getSubscriptionConfiguration();
+    var disableSubscriptionStats;
+    if(!subscriptionConfiguration.EnableSelfSubscription && !subscriptionConfiguration.EnableEnterpriseSubscription ){
+        disableSubscriptionStats = false;
+    }else{
+        disableSubscriptionStats = true;
+    }
 
     theme('single-col-fluid', {
         title: data.title,
@@ -223,6 +230,7 @@ var render = function (theme, data, meta, require) {
                         notifications : notifications,
                         um : um,
                         notificationCount: notificationCount,
+                        isSubscriptionEnabled: disableSubscriptionStats,
                         typeList: typeList
                 }
             }
