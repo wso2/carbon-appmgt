@@ -67,7 +67,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             if ("user".equals(install.getType())) {
                 parameters = new String[1];
-                parameters[0] = tenantDomainName;
+                parameters[0] = tenantUserName;
             } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
@@ -87,7 +87,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             appProvider.subscribeMobileApp(username, appId);
             reply = mobileOperation.performAction(user.toString(),
-                    action, tenantId, appId, install.getType(), parameters);
+                    action, tenantId, install.getType(), appId, parameters);
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
