@@ -3,11 +3,12 @@ include('/jagg/jagg.jag');
 var favourites = jagg.module("favourites");
 var auditLog = require('/modules/auditLog/logger.js');
 
+
 require('/modules/store.js').exec(function (ctx) {
     var log = new Log();
     var matcher = new URIMatcher(request.getRequestURI());
     var user = user = ctx.user;
-    var requestMethod =  request.getMethod();
+    var requestMethod = request.getMethod();
     var HTTP_POST = "POST";
 
     if (!user) {
@@ -20,7 +21,12 @@ require('/modules/store.js').exec(function (ctx) {
     var setFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.setFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
@@ -30,7 +36,13 @@ require('/modules/store.js').exec(function (ctx) {
     var removeFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
+
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.removeFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
@@ -43,16 +55,23 @@ require('/modules/store.js').exec(function (ctx) {
         var version = parameters.version;
         var provider = parameters.provider;
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
+
+
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.addToFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                     storeTenantDomain);
-        auditLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite","Webapp",  "{" +
+        auditLog.writeLog(tenantIdOfUser, userName, "AddedToFavourite", "Webapp", "{" +
                                                                                   "providerName='" + provider + '\'' +
                                                                                   ", apiName='" + name + '\'' +
-                                                                                  ", version='" +version + '\'' +
-                                                                                  '}' , "", "");
+                                                                                  ", version='" + version + '\'' +
+                                                                                  '}', "", "");
         return content;
     };
 
@@ -62,25 +81,35 @@ require('/modules/store.js').exec(function (ctx) {
         var version = parameters.version;
         var provider = parameters.provider;
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
         var tenantIdOfUser = user.tenantId;
 
         var content = favourites.removeFromFavouriteApps(provider, name, version, userName, tenantIdOfUser,
                                                          storeTenantDomain);
-        auditLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite","Webapp", "{" +
-                                                                                    "providerName='" + provider + '\'' +
-                                                                                    ", apiName='" +  name + '\'' +
-                                                                                    ", version='" + version + '\'' +
-                                                                                    '}' , "", "");
+        auditLog.writeLog(tenantIdOfUser, userName, "RemoveFromFavourite", "Webapp", "{" +
+                                                                                     "providerName='" + provider + '\''
+                                                                                     +
+                                                                                     ", apiName='" + name + '\'' +
+                                                                                     ", version='" + version + '\'' +
+                                                                                     '}', "", "");
         return content
     };
 
     var hasFavouritePage = function () {
         var parameters = request.getAllParameters();
         var storeTenantDomain = parameters.storeTenantDomain;
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
         var tenantIdOfUser = user.tenantId;
-
         var content = favourites.hasFavouritePage(userName, tenantIdOfUser, storeTenantDomain);
         return content;
     };
@@ -89,17 +118,22 @@ require('/modules/store.js').exec(function (ctx) {
         var action = matcher.elements().action;
         response.status = 200;
         response.contentType = "application/json";
-        var userName = user.username;
+        var userName;
+        if (user.tenantId == -1234) {
+            userName = user.username;
+        } else {
+            userName = user.username + "@" + user.tenantDomain;
+        }
         var tenantIdOfUser = user.tenantId;
 
         switch (action) {
             case "set-favourite-page":
                 response.content = setFavouritePage();
-                auditLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage","", "" , "", "");
+                auditLog.writeLog(tenantIdOfUser, userName, "SetTheFavoritePage", "", "", "", "");
                 return;
             case "remove-favourite-page":
                 response.content = removeFavouritePage();
-                auditLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage","", "" , "", "");
+                auditLog.writeLog(tenantIdOfUser, userName, "RemovedTheFavoritePage", "", "", "", "");
                 return;
             case "add-favourite-app":
                 response.content = addToFavouriteApps();
