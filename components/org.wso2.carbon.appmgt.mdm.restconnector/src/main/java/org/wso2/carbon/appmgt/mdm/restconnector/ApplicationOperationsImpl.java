@@ -60,7 +60,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	/**
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 */
-	@Override public void performAction(ApplicationOperationAction applicationOperationAction)
+	@Override
+	public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (remoteServer.isEmpty()) {
 			setRemoteServer(this.remoteServer);
@@ -193,17 +194,24 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		PostMethod postMethod = new PostMethod(requestURL + actionURL);
 		postMethod.setRequestEntity(requestEntity);
 		String action = applicationOperationAction.getAction();
-		if (RestUtils.executeMethod(remoteServer, httpClient, postMethod)) {
-			if (log.isDebugEnabled()) {
-				log.debug(action + " operation performed successfully on " + type + " " +
-				          params.toString());
-			}
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug(action + " operation unsuccessful.");
-			}
+		String result;
+		try {
+			result = RestUtils.execute(remoteServer, httpClient, postMethod);
+			if (result != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(action + " operation performed successfully on " + type + " " +
+                              params.toString());
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(action + " operation unsuccessful.");
+                }
+            }
+		} catch (HTTPConnectionException e) {
+			throw new MobileApplicationException("Error occurred while calling the admin services to install applications" +
+					" on devices.", e);
 		}
-
+		return result;
 	}
 
 	/**

@@ -58,7 +58,7 @@ public class Operations {
      * @param type Type of the resource (device, user or role)
      * @param params Collection of ids of the type
      */
-    public void performAction(String currentUser, String action, int tenantId, String type, String app, String[] params )
+    public String performAction(String currentUser, String action, int tenantId, String type, String app, String[] params )
             throws MobileApplicationException {
         if(log.isDebugEnabled()) log.debug("Action: " + action +  ", tenantId: " + tenantId + ", type: " + type + ", app: " + app);
         MobileConfigurations configurations = MobileConfigurations.getInstance();
@@ -93,7 +93,7 @@ public class Operations {
             ApplicationOperations applicationOperations =  MDMServiceReferenceHolder.getInstance().getMDMOperation();
             App appToInstall = AppDataLoader.load(new App(), artifact, action, tenantId);
             applicationOperationAction.setApp(appToInstall);
-            applicationOperations.performAction(applicationOperationAction);
+            return applicationOperations.performAction(applicationOperationAction);
 
 
         } catch (UserStoreException e) {
@@ -105,8 +105,7 @@ public class Operations {
         }  finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
-
-
+        return null;
     }
 
 }

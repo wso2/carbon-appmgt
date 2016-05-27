@@ -3,9 +3,8 @@ info:
   version: 1.0.0
   title: WSO2 APP Manager - Store API
   description: >
-    This document specifies a **RESTful API** for WSO2 **APP Manager**
-    - Publisher.
-
+    This document specifies a **RESTful API** for WSO2 **APP Manager** -
+    Publisher.
 
 
     It is written with [swagger 2](http://swagger.io/).
@@ -27,6 +26,7 @@ produces:
 paths:
   '/apps/{appType}':
     get:
+      x-scope: 'appm:read'
       summary: Get all Apps
       description: |
         Get a list of available Apps qualifying under a given search condition.
@@ -38,19 +38,15 @@ paths:
             **Search condition**.
 
 
-
             You can search in attributes by using an **"attribute:"** modifier.
-
 
 
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
 
 
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
 
 
             If no advanced attribute modifier has been specified, search will
@@ -66,7 +62,9 @@ paths:
         - Apps
       responses:
         '200':
-          description: "OK. \nList of qualifying Apps is returned.\n"
+          description: |
+            OK.
+            List of qualifying Apps is returned.
           schema:
             $ref: '#/definitions/AppList'
           headers:
@@ -79,19 +77,26 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   '/apps/{appType}/id/{appId}':
     get:
+      x-scope: 'appm:read'
       summary: Get app details
       description: |
         Get details of an app.
@@ -105,7 +110,9 @@ paths:
         - Apps
       responses:
         '200':
-          description: "OK. \nQualifying App is returned.\n"
+          description: |
+            OK.
+            Qualifying App is returned.
           schema:
             $ref: '#/definitions/App'
           headers:
@@ -118,19 +125,26 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
   /apps/download:
     post:
+      x-scope: 'appm:subscribe'
       summary: Download App
       description: |
         Download an new App
@@ -146,20 +160,29 @@ paths:
         '200':
           description: |
             OK.
+          schema:
+            $ref: '#/definitions/Activity'
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nResource to be deleted does not exist.\n"
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
           schema:
             $ref: '#/definitions/Error'
   /apps/uninstallation:
     post:
+      x-scope: 'appm:subscribe'
       summary: Uninstall App
       description: |
         Uninstall an existing App
@@ -175,20 +198,37 @@ paths:
         '200':
           description: |
             OK.
+          schema:
+            $ref: '#/definitions/Activity'
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nResource to be deleted does not exist.\n"
+          description: |
+            Not Found.
+            Resource to be deleted does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: >
+            Precondition Failed.
+
+            The request has not been performed because one of the preconditions
+            is not met.
           schema:
             $ref: '#/definitions/Error'
   /devices:
     get:
+      x-scope: 'appm:read'
       summary: Get all Devices
       description: >
         Get a list of available Devices qualifying under a given search
@@ -200,19 +240,15 @@ paths:
             **Search condition**.
 
 
-
             You can search in attributes by using an **"attribute:"** modifier.
-
 
 
             Eg. "type:mobile" will match an App if the provider of the App
             contains "wso2".
 
 
-
             Supported attribute modifiers are [*provider, app_name, app_version,
             app_id**]
-
 
 
             If no advanced attribute modifier has been specified, search will
@@ -228,7 +264,9 @@ paths:
         - Devices
       responses:
         '200':
-          description: "OK. \nList of qualifying Devices are returned.\n"
+          description: |
+            OK.
+            List of qualifying Devices are returned.
           schema:
             $ref: '#/definitions/DeviceList'
           headers:
@@ -241,22 +279,34 @@ paths:
                 conditional requests.
               type: string
         '400':
-          description: "Bad Request. \nInvalid request or validation error.\n"
+          description: |
+            Bad Request.
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
-          description: "Forbidden. \nThe request must be conditional but no condition has been specified.\n"
+          description: |
+            Forbidden.
+            The request must be conditional but no condition has been specified.
           schema:
             $ref: '#/definitions/Error'
         '404':
-          description: "Not Found. \nThe resource to be updated does not exist.\n"
+          description: |
+            Not Found.
+            The resource to be updated does not exist.
           schema:
             $ref: '#/definitions/Error'
 parameters:
   appId:
     name: appId
     in: path
-    description: "**APP ID** consisting of the **UUID** of the App. \nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n"
+    description: >
+      **APP ID** consisting of the **UUID** of the App.
+
+      The combination of the provider of the app, name of the appId and the
+      version is also accepted as a valid App ID.
+
+      Should be formatted as **provider-name-version**.
     required: true
     type: string
   appType:
@@ -276,7 +326,8 @@ parameters:
   offset:
     name: offset
     in: query
-    description: "Starting point within the complete list of items qualified.  \n"
+    description: |
+      Starting point within the complete list of items qualified.
     default: 0
     type: integer
   Accept:
@@ -306,7 +357,9 @@ parameters:
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: "Validator for conditional requests; based on Last Modified header of the \nformerly retrieved variant of the resource.\n"
+    description: |
+      Validator for conditional requests; based on Last Modified header of the
+      formerly retrieved variant of the resource.
     type: string
 definitions:
   AppList:
@@ -319,12 +372,16 @@ definitions:
         example: 1
       next:
         type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/app?limit=1&offset=2&query='
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /app?limit=1&offset=2&query=
       previous:
         type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/app?limit=1&offset=0&query='
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /app?limit=1&offset=0&query=
       appList:
         type: array
         items:
@@ -386,7 +443,8 @@ definitions:
         description: |
           the image icon of the application
         type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG
       isSite:
         type: string
         description: Either a webapp or site
@@ -411,7 +469,12 @@ definitions:
           Swagger definition of the App which contains details about URI
           templates and scopes
         type: string
-        example: "{\"paths\":{\"\\/substract\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}},\"\\/add\":{\"get\":{\"x-auth-type\":\"Application & Application User\",\"x-throttling-tier\":\"Unlimited\",\"parameters\":[{\"name\":\"x\",\"required\":true,\"type\":\"string\",\"in\":\"query\"},{\"name\":\"y\",\"required\":true,\"type\":\"string\",\"in\":\"query\"}],\"responses\":{\"200\":{}}}}},\"swagger\":\"2.0\",\"info\":{\"title\":\"CalculatorApp\",\"version\":\"1.0.0\"}}"
+        example: >-
+          {"paths":{"\/substract":{"get":{"x-auth-type":"Application &
+          Application
+          User","x-throttling-tier":"Unlimited","parameters":[{"name":"x","required":true,"type":"string","in":"query"},{"name":"y","required":true,"type":"string","in":"query"}],"responses":{"200":{}}}},"\/add":{"get":{"x-auth-type":"Application
+          & Application
+          User","x-throttling-tier":"Unlimited","parameters":[{"name":"x","required":true,"type":"string","in":"query"},{"name":"y","required":true,"type":"string","in":"query"}],"responses":{"200":{}}}}},"swagger":"2.0","info":{"title":"CalculatorApp","version":"1.0.0"}}
       isDefaultVersion:
         type: boolean
         example: false
@@ -465,12 +528,14 @@ definitions:
         type: array
         items:
           type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG
       banner:
         description: |
           /publisher/api/mobileapp/getfile/uWnObGDXigTO7pl.jpg
         type: string
-        example: '/publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG'
+        example: >-
+          /publisher/api/mobileapp/getfile/TJXfaEeHsdeYSFS.jpg,/publisher/api/mobileapp/getfile/aCJ1MXUXWGGHS3t.JPG,/publisher/api/mobileapp/getfile/FcFEWkaLroetXlq.JPG
       appType:
         description: 'mobile app type (eg: webapp/ios/android)'
         type: string
@@ -500,12 +565,16 @@ definitions:
         example: 1
       next:
         type: string
-        description: "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.\n"
-        example: '/devices?limit=1&offset=2&query='
+        description: |
+          Link to the next subset of resources qualified.
+          Empty if no more resources are to be returned.
+        example: /devices?limit=1&offset=2&query=
       previous:
         type: string
-        description: "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.\n"
-        example: '/devices?limit=1&offset=0&query='
+        description: |
+          Link to the previous subset of resources qualified.
+          Empty if current subset is the first subset returned.
+        example: /devices?limit=1&offset=0&query=
       deviceList:
         type: array
         items:
@@ -544,10 +613,34 @@ definitions:
         example: user/device
       deviceIds:
         type: object
-        description: "List of device Id's"
+        description: List of device Id's
       appId:
         type: string
         description: Installing mobile app ID
+  Activity:
+    title: Activity returned for the operation
+    properties:
+      activityId:
+        type: string
+        description: |
+          Activity Id return for the operation.
+        example: ACTIVITY_12
+      code:
+        type: string
+        description: 'Operation code '
+      type:
+        type: string
+        description: Type of the operation.
+        enum:
+          - CONFIG
+          - MESSAGE
+          - INFO
+          - COMMAND
+          - PROFILE
+          - POLICY
+      createdTimeStamp:
+        type: string
+        description: Time of the operation creation.
   Error:
     title: Error object returned with 4XX HTTP status
     required:
@@ -570,7 +663,9 @@ definitions:
           Preferably an url with more details about the error.
       error:
         type: array
-        description: "If there are more than one error list them out. \nFor example, list out validation errors by each field.\n"
+        description: |
+          If there are more than one error list them out.
+          For example, list out validation errors by each field.
         items:
           $ref: '#/definitions/ErrorListItem'
   ErrorListItem:

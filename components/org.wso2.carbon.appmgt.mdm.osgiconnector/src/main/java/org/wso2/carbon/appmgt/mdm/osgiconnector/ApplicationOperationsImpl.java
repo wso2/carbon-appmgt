@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.appmgt.mdm.osgiconnector;
 
+import com.google.gson.Gson;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
@@ -37,9 +38,11 @@ import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.Platform;
 import org.wso2.carbon.device.mgt.common.app.mgt.ApplicationManagementException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Activity;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,7 +54,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 * @throws MobileApplicationException
 	 */
-	public void performAction(ApplicationOperationAction applicationOperationAction)
+	public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (log.isDebugEnabled()) {
 			log.debug(applicationOperationAction.getAction() + " action is triggered for " +
@@ -155,8 +158,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		}
 		mobileApp.setProperties(properties);
 		try {
-			for (DeviceIdentifier deviceIdentifier : deviceIdentifiers) {
-				if (deviceIdentifier.getType().equals(Platform.android.toString())) {
+            this.filterDevicesForTypes(deviceIdentifiers, app.getPlatform());
+            if (deviceIdentifiers.isEmpty()) {
+                throw new MobileApplicationException("Number of devices cannot be zero..!");
+            }
+            if (deviceIdentifiers.get(0).getType().equals(Platform.android.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
 								.createInstallAppOperation(mobileApp);
@@ -164,7 +170,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						operation = AndroidApplicationOperationUtil
 								.createAppUninstallOperation(mobileApp);
 					}
-				} else if (deviceIdentifier.getType().equals(Platform.ios.toString())) {
+				} else if (deviceIdentifiers.isEmpty() && deviceIdentifiers.get(0).getType().equals(Platform.ios.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation =
 								IOSApplicationOperationUtil.createInstallAppOperation(mobileApp);
@@ -173,9 +179,11 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 								IOSApplicationOperationUtil.createAppUninstallOperation(mobileApp);
 					}
 				}
-				MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
+			Activity activity = MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
 				                  .installApplicationForDevices(operation, deviceIdentifiers);
-			}
+
+			Gson gson = new Gson();
+			return gson.toJson(activity);
 		} catch (DeviceApplicationException mdmExce) {
 			log.error("Error in creating operation object using app.", mdmExce);
 			throw new MobileApplicationException(mdmExce);
@@ -183,7 +191,6 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			log.error("Error in app installation.", appMgtExce);
 			throw new MobileApplicationException(appMgtExce);
 		}
-
 	}
 
 	/**
@@ -198,6 +205,16 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		deviceIdentifier.setType(device.getType());
 
 		return deviceIdentifier;
+	}
+
+	private  void filterDevicesForTypes(List<DeviceIdentifier> deviceIdentifiers, String type) {
+
+		for (Iterator<DeviceIdentifier> iter = deviceIdentifiers.listIterator(); iter.hasNext(); ) {
+			DeviceIdentifier a = iter.next();
+			if (!a.getType().equalsIgnoreCase(type)) {
+				iter.remove();
+			}
+		}
 	}
 
 	/**

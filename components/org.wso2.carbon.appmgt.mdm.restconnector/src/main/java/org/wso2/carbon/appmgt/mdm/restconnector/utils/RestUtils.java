@@ -26,6 +26,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.wso2.carbon.appmgt.mdm.restconnector.AuthHandler;
 import org.wso2.carbon.appmgt.mdm.restconnector.Constants;
+import org.wso2.carbon.appmgt.mdm.restconnector.HTTPConnectionException;
 import org.wso2.carbon.appmgt.mdm.restconnector.beans.RemoteServer;
 
 import java.io.IOException;
@@ -159,6 +160,63 @@ public class RestUtils {
 			String errorMessage = "No OK response received form the API.";
 			log.error(errorMessage, e);
 			return false;
+		}
+	}
+
+
+	/**
+	 * Execute HTTP method and return whether operation success or not.
+	 *
+	 * @param remoteServer Bean that holds information about remote server
+	 * @param httpClient HTTP client object
+	 * @param httpMethod HTTP method which should be executed
+	 * @return true if HTTP method successfully executed false if not
+	 */
+	public static String execute(RemoteServer remoteServer, HttpClient httpClient,
+										HttpMethodBase httpMethod) throws HTTPConnectionException {
+		String authKey = getAPIToken(remoteServer, false);
+		if (log.isDebugEnabled()) {
+			log.debug("Access token received : " + authKey);
+		}
+
+		try {
+			int statusCode = 401;
+			int tries = 0;
+			while (statusCode != 200) {
+
+				if (log.isDebugEnabled()) {
+					log.debug("Trying to call API : trying for " + (tries + 1) + " time(s).");
+				}
+
+				httpMethod.setRequestHeader(Constants.RestConstants.AUTHORIZATION,
+						Constants.RestConstants.BEARER + authKey);
+				if (log.isDebugEnabled()) {
+					log.debug("Sending " + httpMethod.getName() + " request to " +
+							httpMethod.getURI());
+				}
+
+				statusCode = httpClient.executeMethod(httpMethod);
+				if (log.isDebugEnabled()) {
+					log.debug("Status code received : " + statusCode);
+				}
+
+				if (++tries >= 3) {
+					log.info("API Call failed for the 3rd time: No or Unauthorized Access Aborting.");
+					throw new HTTPConnectionException("API Call failed for the 3rd time: No or Unauthorized Access Aborting.");
+				}
+				if (statusCode == 401) {
+					authKey = getAPIToken(remoteServer, true);
+					if (log.isDebugEnabled()) {
+						log.debug("Access token getting again, Access token received :  " + authKey +
+										" in try " + tries +".");
+					}
+				}
+			}
+			return httpMethod.getResponseBodyAsString();
+		} catch (IOException e) {
+			String errorMessage = "No OK response received form the API.";
+			log.error(errorMessage, e);
+			throw new HTTPConnectionException(errorMessage, e);
 		}
 	}
 

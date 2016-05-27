@@ -180,7 +180,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK.\n"
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Activity"
+                        }
                     },
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
@@ -225,7 +228,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK.\n"
+                        "description": "OK.\n",
+                        "schema": {
+                            "$ref": "#/definitions/Activity"
+                        }
                     },
                     "400": {
                         "description": "Bad Request. \nInvalid request or validation error.\n",
@@ -665,6 +671,29 @@
                 "appId": {
                     "type": "string",
                     "description": "Installing mobile app ID"
+                }
+            }
+        },
+        "Activity": {
+            "title": "Activity returned for the operation",
+            "properties": {
+                "activityId": {
+                    "type": "string",
+                    "description": "Activity Id return for the operation.\n",
+                    "example": "ACTIVITY_12"
+                },
+                "code": {
+                    "type": "string",
+                    "description": "Operation code "
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Type of the operation.",
+                    "enum": ["CONFIG", "MESSAGE", "INFO", "COMMAND", "PROFILE", "POLICY"]
+                },
+                "createdTimeStamp" :{
+                    "type": "string",
+                    "description": "Time of the operation creation."
                 }
             }
         },

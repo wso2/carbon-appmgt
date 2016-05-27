@@ -1,155 +1,140 @@
-/*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * you may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 @ApiModel(description = "")
-public class DeviceInfoDTO  {
-  
-  
-  
-  private String id = null;
-  
-  
-  private String platform = null;
-  
-  
-  private String model = null;
-  
-  
-  private String platformVersion = null;
-  
-  
-  private String name = null;
-  
-  
-  private String image = null;
-  
-  
-  private String type = null;
+public class DeviceInfoDTO {
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("id")
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("platform")
-  public String getPlatform() {
-    return platform;
-  }
-  public void setPlatform(String platform) {
-    this.platform = platform;
-  }
+    private String id = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("model")
-  public String getModel() {
-    return model;
-  }
-  public void setModel(String model) {
-    this.model = model;
-  }
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("platformVersion")
-  public String getPlatformVersion() {
-    return platformVersion;
-  }
-  public void setPlatformVersion(String platformVersion) {
-    this.platformVersion = platformVersion;
-  }
+    private String platform = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("name")
-  public String getName() {
-    return name;
-  }
-  public void setName(String name) {
-    this.name = name;
-  }
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("image")
-  public String getImage() {
-    return image;
-  }
-  public void setImage(String image) {
-    this.image = image;
-  }
+    private String model = null;
 
-  
-  /**
-   **/
-  @ApiModelProperty(value = "")
-  @JsonProperty("type")
-  public String getType() {
-    return type;
-  }
-  public void setType(String type) {
-    this.type = type;
-  }
 
-  
+    private String platformVersion = null;
 
-  @Override
-  public String toString()  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class DeviceInfoDTO {\n");
-    
-    sb.append("  id: ").append(id).append("\n");
-    sb.append("  platform: ").append(platform).append("\n");
-    sb.append("  model: ").append(model).append("\n");
-    sb.append("  platformVersion: ").append(platformVersion).append("\n");
-    sb.append("  name: ").append(name).append("\n");
-    sb.append("  image: ").append(image).append("\n");
-    sb.append("  type: ").append(type).append("\n");
-    sb.append("}\n");
-    return sb.toString();
-  }
+
+    private String name = null;
+
+
+    private String image = null;
+
+
+    private String type = null;
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("platform")
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("model")
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("platformVersion")
+    public String getPlatformVersion() {
+        return platformVersion;
+    }
+
+    public void setPlatformVersion(String platformVersion) {
+        this.platformVersion = platformVersion;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("image")
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+
+    /**
+     **/
+    @ApiModelProperty(value = "")
+    @JsonProperty("type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class DeviceInfoDTO {\n");
+
+        sb.append("  id: ").append(id).append("\n");
+        sb.append("  platform: ").append(platform).append("\n");
+        sb.append("  model: ").append(model).append("\n");
+        sb.append("  platformVersion: ").append(platformVersion).append("\n");
+        sb.append("  name: ").append(name).append("\n");
+        sb.append("  image: ").append(image).append("\n");
+        sb.append("  type: ").append(type).append("\n");
+        sb.append("}\n");
+        return sb.toString();
+    }
 }
