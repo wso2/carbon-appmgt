@@ -7,7 +7,7 @@
                 <state id='Initial'>
                     <datamodel>
                         <data name="transitionExecution">
-                            <execution forEvent="Create" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Create" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -63,7 +63,7 @@
                                 <parameter name="STATE_RULE3:Approved" value="Internal/private_{asset_author}:+get,-add,+delete,-authorize"/>
                                 <parameter name="STATE_RULE4:Approved" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Reject" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Reject" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -100,7 +100,7 @@
                                 <parameter name="STATE_RULE4:Published" value="Internal/publisher:+get,-add,-delete,+authorize"/>
                                 <parameter name="STATE_RULE5:Published" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Revert" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Revert" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -157,7 +157,7 @@
                                 <parameter name="STATE_RULE3:Unpublished" value="Internal/private_{asset_author}:+get,-add,+delete,-authorize"/>
                                 <parameter name="STATE_RULE4:Unpublished" value="Internal/creator:-get,+add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Deprecate" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Deprecate" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -194,7 +194,7 @@
                                 <parameter name="STATE_RULE4:Published" value="system/wso2.anonymous.role:+get,-add,-delete,-authorize"/>
                                 <parameter name="STATE_RULE5:Published" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Retire" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Retire" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
@@ -208,7 +208,7 @@
                                 <parameter name="STATE_RULE3:Retired" value="Internal/everyone:-get,-add,-delete,-authorize"/>
                                 <parameter name="STATE_RULE4:Retired" value="Internal/creator:-get,-add,-delete,-authorize"/>
                             </execution>
-                            <execution forEvent="Recycle" class="org.wso2.jaggery.scxml.generic.GenericExecutor">
+                            <execution forEvent="Recycle" class="org.wso2.carbon.appmgt.impl.extensions.custom.AppMGenericExecutor">
                                 <parameter name="PERMISSION:get"
                                            value="http://www.wso2.org/projects/registry/actions/get"/>
                                 <parameter name="PERMISSION:add"
