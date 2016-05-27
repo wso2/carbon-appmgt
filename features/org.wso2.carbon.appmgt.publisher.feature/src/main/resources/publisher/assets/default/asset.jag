@@ -823,11 +823,6 @@ function overridePermissions(assetId, artifactManager, permissions) {
         });
     });
 
-    if(denyEveryone){
-        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
-    }
-
-
     // But, there's an internal_everyone coming up with +GET. Let's nuke it.
     //um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
     //remove Internal/everyone role if there are roles added only.
@@ -840,11 +835,6 @@ function overridePermissions(assetId, artifactManager, permissions) {
     <!--}-->
     <!--}-->
     <!--});-->
-
-    if(denyEveryone){
-        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
-    }
-
 
     var username = server.current(session).username;
     var currentUserRole = USER_ROLE_PREFIX + username;
@@ -893,6 +883,13 @@ function overridePermissions(assetId, artifactManager, permissions) {
         });
 
     });
+
+    //Remove public visibility for role restricted apps
+    if(denyEveryone){
+        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
+        um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
+    }
+
 
     var registry = new carbon.registry.Registry(server, {
         username: server.current(session).username,
