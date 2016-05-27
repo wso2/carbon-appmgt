@@ -59,7 +59,7 @@ require('/modules/store.js').exec(function (ctx) {
     if (tenantId == -1234) {
         tenantUsername = user.username;
     } else {
-        tenantUsername = user.username + "@" + tenantDomain;
+        tenantUsername = user.username + "@" + user.tenantDomain;
     }
 
 

@@ -53,6 +53,16 @@ require('/modules/store.js').exec(function (ctx) {
             site = ctx.site,
             social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
+
+    //set tenant aware username
+    var tenantUsername;
+    if (tenantId == -1234) {
+        tenantUsername = user.username;
+    } else {
+        tenantUsername = user.username + "@" + user.tenantDomain;
+    }
+
+
     caramel = require('caramel');
     //Check whether to show register link in myapps page
     var isSelfSignupEnabledForTenant = storeHostObj.isSelfSignupEnabledForTenant(String(tenantDomain));
@@ -207,7 +217,7 @@ require('/modules/store.js').exec(function (ctx) {
                 var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
                 urlQuery = 'sort=' + paging.sort + '&';
                 server.privileged(function () {
-                    var userName = user ? user.username : "";
+                    var userName = user ? tenantUsername : "";
                     var index = 0, maxTry = 0;
                     var getNextAssetSet = function () {
                         var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -382,7 +392,7 @@ require('/modules/store.js').exec(function (ctx) {
             }
             query = require('/modules/search.js').build(query);
             if (user) {
-                assets = subsApp.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
+                assets = subsApp.searchUserAccessibleApps(tenantUsername, user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             } else {
                 assets = subsApp.searchUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain),
@@ -401,7 +411,7 @@ require('/modules/store.js').exec(function (ctx) {
             if (user) {
                 //get anonymous + subscribed apps
                 assets =
-                subsApp.getUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain), sortOption,
+                subsApp.getUserAccessibleApps(tenantUsername, user.tenantId, String(tenantDomain), sortOption,
                                               treatAsSite);
             } else {
                 //get anonymous apps
@@ -424,7 +434,7 @@ require('/modules/store.js').exec(function (ctx) {
         var status = false;
         if (user) {
             // check whether this is favourite app of user.
-            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+            status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                             tenantDomain).status;
         }
         return status;
