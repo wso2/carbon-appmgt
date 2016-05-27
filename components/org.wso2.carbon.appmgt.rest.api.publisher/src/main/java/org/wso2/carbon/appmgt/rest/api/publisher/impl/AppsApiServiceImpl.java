@@ -210,7 +210,8 @@ public class AppsApiServiceImpl extends AppsApiService {
         try {
             if (fileInputStream != null) {
                 FileContent fileContent = new FileContent();
-                if ("image".equals(fileDetail.getContentType().getType())) {
+                if ("image".equals(fileDetail.getContentType().getType()) ||
+                        "application".equals(fileDetail.getContentType().getType())) {
                     String fileExtension = FilenameUtils.getExtension(fileDetail.getContentDisposition().getParameter(
                             RestApiConstants.CONTENT_DISPOSITION_FILENAME));
                     String filename = RestApiPublisherUtils.generateBinaryUUID() + "." + fileExtension;
