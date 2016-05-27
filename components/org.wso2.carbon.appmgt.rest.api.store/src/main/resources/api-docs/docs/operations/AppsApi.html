@@ -11,7 +11,7 @@
             <p class="marked">Enterprise Download an new App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/administration/apps/download</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/administration/apps/download</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [  &quot;admin&quot;, &quot;testuser&quot; ],&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.0/administration/apps/download&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;typeIds&quot;: [ &quot;admin&quot;, &quot;testuser&quot; ],&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/administration/apps/download&quot;</code></div>
             
             
 
@@ -213,7 +213,7 @@
             <p class="marked">Enterprise Uninstall an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/administration/apps/uninstallation</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/administration/apps/uninstallation</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -405,7 +405,7 @@
             <p class="marked">Get a list of available Apps qualifying under a given search condition.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -418,7 +418,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.0/apps/mobileapp&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.1/apps/mobileapp&quot;</code></div>
             
             
 
@@ -754,7 +754,7 @@
             <p class="marked">Retrieving document.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/docs/{fileName}</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/docs/{fileName}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -1036,7 +1036,7 @@
             <p class="marked">Get details of an app.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -1049,7 +1049,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.0/apps/mobileapp/id/5c9c8551-d696-4c44-85a6-dcd86f1a1e25&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.1/apps/mobileapp/id/5c9c8551-d696-4c44-85a6-dcd86f1a1e25&quot;</code></div>
             
             
 
@@ -1318,7 +1318,7 @@
             <p class="marked">Get rating details of an app.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/rate</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/rate</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -1331,7 +1331,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate&quot;</code></div>
             
             
 
@@ -1660,7 +1660,7 @@
             <p class="marked">Change App rating\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/rate</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/rate</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>PUT</code>
@@ -1673,7 +1673,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 3cdc86c3ee6edbe18260392fb488c4e7&quot; -d &#39;{&quot;rating&quot;: 4, &quot;review&quot;: &quot;good&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 3cdc86c3ee6edbe18260392fb488c4e7&quot; -d &#39;{&quot;rating&quot;: 4, &quot;review&quot;: &quot;good&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate&quot;</code></div>
             
             
 
@@ -1995,7 +1995,7 @@
             <p class="marked">Un subscribe to an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/{appType}/id/{appId}/unsubscription</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/{appType}/id/{appId}/unsubscription</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -2008,7 +2008,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot;  -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot; -H &quot;Content-Type: application/json&quot; -d &#39;&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription&quot;</code></div>
             
             
 
@@ -2230,7 +2230,7 @@
             <p class="marked">Download an new App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/download</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/download</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -2243,7 +2243,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/download&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/download&quot;</code></div>
             
             
 
@@ -2432,7 +2432,7 @@
             <p class="marked">Publish User hit Stats details.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/event-publish</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/event-publish</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -2445,7 +2445,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d&quot; -d &#39; {&quot;events&quot;: [{&quot;appId&quot;:&quot;init&quot;,&quot;userId&quot;:&quot;init&quot;,&quot;tenantId&quot;:-1234,&quot;appName&quot;:&quot;init&quot;,&quot;appVersion&quot;:&quot;1&quot;,&quot;context&quot;:&quot;/init&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;init&quot;,&quot;timestamp&quot;:1462277036369},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;page-load&quot;,&quot;timestamp&quot;:1462277038291},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;noname&quot;,&quot;action&quot;:&quot;click&quot;,&quot;timestamp&quot;:1462277042436},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;page-unload&quot;,&quot;timestamp&quot;:1462277042437}]}&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/event-publish&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 62651cabf9c83f8f7379dcc9b2909f8d&quot; -H &quot;Content-Type: application/json&quot; -d &#39; {&quot;events&quot;: [{&quot;appId&quot;:&quot;init&quot;,&quot;userId&quot;:&quot;init&quot;,&quot;tenantId&quot;:-1234,&quot;appName&quot;:&quot;init&quot;,&quot;appVersion&quot;:&quot;1&quot;,&quot;context&quot;:&quot;/init&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;init&quot;,&quot;timestamp&quot;:1462277036369},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;page-load&quot;,&quot;timestamp&quot;:1462277038291},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;noname&quot;,&quot;action&quot;:&quot;click&quot;,&quot;timestamp&quot;:1462277042436},{&quot;appId&quot;:&quot;80391fcb-45fc-4bb4-a83d-fc991a99084d&quot;,&quot;userId&quot;:&quot;admin&quot;,&quot;tenantId&quot;:&quot;-1234&quot;,&quot;appName&quot;:&quot;app3&quot;,&quot;appVersion&quot;:&quot;1.0&quot;,&quot;context&quot;:&quot;/app3&quot;,&quot;item&quot;:&quot;My_App&quot;,&quot;action&quot;:&quot;page-unload&quot;,&quot;timestamp&quot;:1462277042437}]}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/event-publish&quot;</code></div>
             
             
 
@@ -2634,7 +2634,7 @@
             <p class="marked">check if it is the favourite page.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/favourite-page</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/favourite-page</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -2647,7 +2647,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot;&quot;http://localhost:9763/api/appm/store/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c8c4399ba38982a21372012294ad1a54&quot;&quot;http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page&quot;</code></div>
             
             
 
@@ -2819,6 +2819,258 @@
             </table>
         
             <hr/>
+            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf, documents files</h3>
+
+            <p class="marked"></p>
+
+            <p class="marked">Retrieving images for banners, screenshots etc.\n</p>
+
+            <h4 class="section-heading">URL</h4>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/static-contents/{fileName}</code>
+
+            <h4 class="section-heading">HTTP Method</h4>
+            <code>GET</code>
+
+            <h4 class="section-heading">Scope</h4>
+            
+                <code>appm:read</code>
+            
+            
+
+            <h4 class="section-heading">CURL Example</h4>
+            
+                <div class="pre"><code class="bash"></code></div>
+            
+            
+
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsStaticContentsFileNameGet">
+                <h4 class="section-heading">
+                    Sample Response
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
+            </h4>
+            </div>
+            
+                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json"></code></div>
+            
+            
+            <h4 class="section-heading">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appType</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Application type</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>fileName</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">file name.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Match</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Unmodified-Since</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">OK.\nStatic content Retrieved successfully.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#file">file</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">412</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
             <h3 class="operation-heading"><a name="appsUninstallationPost"></a>Uninstall App</h3>
 
             <p class="marked"></p>
@@ -2826,7 +3078,7 @@
             <p class="marked">Uninstall an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/store/v1.0/apps/uninstallation</code>
+            <code>http://apis.wso2.com/api/appm/store/v1.1/apps/uninstallation</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -2839,7 +3091,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.0/apps/uninstallation&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Basic YWRtaW46YWRtaW4=&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;type&quot;: &quot;user&quot;,&quot;appId&quot;: &quot;ee0a2cfe-6555-404c-b8e8-627f1711a36f&quot;}&#39; &quot;http://localhost:9763/api/appm/store/v1.1/apps/uninstallation&quot;</code></div>
             
             
 

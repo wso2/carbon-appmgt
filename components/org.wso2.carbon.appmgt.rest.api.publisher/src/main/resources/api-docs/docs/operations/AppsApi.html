@@ -11,7 +11,7 @@
             <p class="marked">Delete an existing policy partial\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/xacmlpolicies/{policyPartialId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/xacmlpolicies/{policyPartialId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>DELETE</code>
@@ -24,7 +24,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot;   -d &#39;&#39; &quot;http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer 5e3e12917945881407eaad1868ea4629&quot;   -d &#39;&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40&quot;</code></div>
             
             
 
@@ -233,7 +233,7 @@
             <p class="marked">Change the lifecycle of an App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/change-lifecycle</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/change-lifecycle</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -246,7 +246,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&amp;action=Unpublish&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 31b72e5a9158a413187532b052953f68&quot; -H &quot;Content-Type: application/json&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&amp;action=Unpublish&quot;</code></div>
             
             
 
@@ -536,7 +536,7 @@
             <p class="marked">Get a list of available Apps qualifying under a given search condition.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -549,7 +549,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/webapp&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp&quot;</code></div>
             
             
 
@@ -885,7 +885,7 @@
             <p class="marked">Create a new version of an App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}/create-new-version</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/create-new-version</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -1154,7 +1154,7 @@
             <p class="marked">Delete an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>DELETE</code>
@@ -1167,7 +1167,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X DELETE -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
             
             
 
@@ -1406,7 +1406,7 @@
             <p class="marked">Discover Apps.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}/discover</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/discover</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -1653,7 +1653,7 @@
             <p class="marked">Delete an existing Document\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}/docs/{documentId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs/{documentId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>DELETE</code>
@@ -1922,7 +1922,7 @@
             <p class="marked">Get details of an app.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -1935,7 +1935,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9&quot;</code></div>
             
             
 
@@ -2204,7 +2204,7 @@
             <p class="marked">Update an existing App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>PUT</code>
@@ -2217,7 +2217,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -v -X PUT &#39;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0&#39; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;,&quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;fdyefyeufuegfyugefyue&quot;,&quot;description&quot;:&quot;description&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;public&quot;}&#39;</code></div>
+                <div class="pre"><code class="bash">curl -v -X PUT -H &quot;Content-Type: application/json&quot; &#39;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0&#39; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;,&quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;fdyefyeufuegfyugefyue&quot;,&quot;description&quot;:&quot;description&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;public&quot;}&#39;</code></div>
             
             
 
@@ -2539,7 +2539,7 @@
             <p class="marked">Get subscribed user list for an App.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}/id/{appId}/subscriptions</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/subscriptions</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -2552,7 +2552,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e099014668a524870c2895fe0595f125&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer e099014668a524870c2895fe0595f125&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions&quot;</code></div>
             
             
 
@@ -2821,7 +2821,7 @@
             <p class="marked">Create a new App\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/{appType}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -2834,7 +2834,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -v -X POST &#39;http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp&#39; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;, &quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;SampleDisplay&quot;,&quot;description&quot;:&quot;sample calculator application&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;Business&quot;,”marketType”:”enterprise”}&#39;</code></div>
+                <div class="pre"><code class="bash">curl -v -X POST &#39;http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp&#39; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;appmeta&quot; :{&quot;path&quot; : &quot;/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk&quot;, &quot;package&quot; : &quot;home.jmstudios.calc&quot;, &quot;version&quot; : &quot;1.0&quot;},&quot;name&quot;:&quot;sample&quot;,&quot;provider&quot;:&quot;admin&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;version&quot;:&quot;1.0.0&quot;, &quot;banner&quot;:&quot;/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg&quot;,&quot;thumbnailUrl&quot;:&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;,&quot;screenshots&quot;:[&quot;/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg&quot;],&quot;displayName&quot;:&quot;SampleDisplay&quot;,&quot;description&quot;:&quot;sample calculator application&quot;,&quot;platform&quot;:&quot;android&quot;,&quot;category&quot;:&quot;Business&quot;,”marketType”:”enterprise”}&#39;</code></div>
             
             
 
@@ -3070,7 +3070,7 @@
             <p class="marked">Plist file of the specified iOS (Apple) mobile app.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -3315,14 +3315,14 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="xacmlpoliciesPolicyPartialIdAppsAppTypeGet"></a>Get all Apps mapped to a policy partial</h3>
+            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf, documents files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Get a list of available Apps mapped to a policy partial.\n</p>
+            <p class="marked">Retrieving images for banners, screenshots etc.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/xacmlpolicies/{policyPartialId}/apps/{appType}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/static-contents/{fileName}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -3335,7 +3335,511 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot; &quot;http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer c7fff7b0307472345c8652d6595b1b1c&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents/ZQCIsEEkYM2LJ9C.jpg?appType=mobileapp&quot;</code></div>
+            
+            
+
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsStaticContentsFileNameGet">
+                <h4 class="section-heading">
+                    Sample Response
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
+            </h4>
+            </div>
+            
+                <div id="response-appsStaticContentsFileNameGet" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+            
+            
+            <h4 class="section-heading">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appType</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Application type</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            <span class="param-in">Path </span>
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>fileName</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">File name.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Match</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Unmodified-Since</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">OK.\nStatic content Retrieved successfully.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#file">file</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">412</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="appsStaticContentsPost"></a>Uploading images, pdf, documents files</h3>
+
+            <p class="marked"></p>
+
+            <p class="marked">Uploading images for banners, screenshots etc.\n</p>
+
+            <h4 class="section-heading">URL</h4>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/static-contents</code>
+
+            <h4 class="section-heading">HTTP Method</h4>
+            <code>POST</code>
+
+            <h4 class="section-heading">Scope</h4>
+            
+                <code>appm:create</code>
+            
+            
+
+            <h4 class="section-heading">CURL Example</h4>
+            
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 0763d28a85f20d6fd8954f955859055c&quot; -H &quot;Content-Type: multipart/form-data&quot; -F &quot;file=@/home/user/sample.jpg&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/apps/static-contents?appType=webapp&quot;</code></div>
+            
+            
+
+            
+
+            <div class="pointer" data-toggle="collapse" data-target="#response-appsStaticContentsPost">
+                <h4 class="section-heading">
+                    Sample Response
+                    
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    
+            </h4>
+            </div>
+            
+                <div id="response-appsStaticContentsPost" class="pre collapse"><code class="json">{&quot;id&quot;: &quot;ZQCIsEEkYM2LJ9C.jpg&quot;}</code></div>
+            
+            
+            <h4 class="section-heading">Parameters</h4>
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                    <col style="width: 40%;"/>
+                    <col style="width: 10%;"/>
+                    <col style="width: 20%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                    <th>Default</th>
+                </tr>
+                </thead>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            <span class="param-in">Query </span>
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>appType</p>
+                            <p class="param-required">
+                                required
+                                
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Application type</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            <span class="param-in">Form </span>
+                            
+                            
+                            
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>file</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Document to upload</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                file
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Match</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter">
+                            
+                            
+                            
+                            <span class="param-in">Header </span>
+                            
+                        </td>
+                        <td class="param-name">
+                            <p>If-Unmodified-Since</p>
+                            <p class="param-required">
+                                
+                                optional
+                            </p>
+                        </td>
+                        <td>
+                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            
+                        </td>
+                        <td>
+                            <span class="param-type">
+                                String
+                                
+                            </span>
+                        </td>
+                        <td>
+                            <p class="marked"></p>
+                        </td>
+                    </tr>
+                
+            </table>
+
+            <h4 class="section-heading">Responses</h4>
+
+            <table class="table table-hover">
+                <colgroup>
+                    <col style="width: 15%;"/>
+                    <col style="width: 70%;"/>
+                    <col style="width: 15%;"/>
+                </colgroup>
+                <thead>
+                <tr class="active">
+                    <th>HTTP Code</th>
+                    <th>Description</th>
+                    <th>Schema</th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">200</p></td>
+                        <td class="parameter"><p class="marked">OK.\nStatic content uploaded successfully.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#StaticContent">StaticContent</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">400</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">404</p></td>
+                        <td class="parameter"><p class="marked">Not Found.\nRequested entity does not exist.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td class="parameter"><p class="marked">412</p></td>
+                        <td class="parameter"><p class="marked">Precondition Failed.\nThe request has not been performed because one of the preconditions is not met.\n</p></td>
+                        <td class="parameter">
+                            <span class="parameter">
+                                
+                                    <a href="#!/models#Error">Error</a>
+                                
+                                
+                            </span>
+                        </td>
+                    </tr>
+                
+                </tbody>
+            </table>
+        
+            <hr/>
+            <h3 class="operation-heading"><a name="xacmlpoliciesPolicyPartialIdAppsAppTypeGet"></a>Get all Apps mapped to a policy partial</h3>
+
+            <p class="marked"></p>
+
+            <p class="marked">Get a list of available Apps mapped to a policy partial.\n</p>
+
+            <h4 class="section-heading">URL</h4>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/xacmlpolicies/{policyPartialId}/apps/{appType}</code>
+
+            <h4 class="section-heading">HTTP Method</h4>
+            <code>GET</code>
+
+            <h4 class="section-heading">Scope</h4>
+            
+                <code>appm:read</code>
+            
+            
+
+            <h4 class="section-heading">CURL Example</h4>
+            
+                <div class="pre"><code class="bash">curl -X GET -H &quot;Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b&quot; &quot;http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp&quot;</code></div>
             
             
 

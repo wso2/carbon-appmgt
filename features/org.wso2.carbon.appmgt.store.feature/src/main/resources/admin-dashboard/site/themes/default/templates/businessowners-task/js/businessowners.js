@@ -78,7 +78,7 @@ $(document).ready(function() {
           "paging": true,
           "ordering": true,
           "order": [[1, "asc"]],
-          "ajax": context + '/apis/businessowners',
+          "ajax": context + '/apis/businessowners/filtered/datatable',
           "columnDefs": [
               {
                   "targets": [0],
@@ -275,20 +275,30 @@ $(document).on("click", ".owner-edit-button", function () {
 
 $(document).on("click", ".owner-delete-button", function () {
     var ownerId = $(this).data("ownerId");
-    $.ajax({
-               url: context + '/apis/businessowners/' + ownerId,
-               type: 'DELETE',
-               contentType: 'application/json',
-               dataType: 'json',
-               success: function (response) {
-                   updateOwners();
-                   Showalert("Owner Deleted Successfully ", "alert-success", "statusSuccess");
-                   location.reload();
-               },
-               error: function (response) {
-                   Showalert('Error occured while deleting the business owner', "alert-error", "statusError");
-               }
-           });
+    var ownerName = $(this).closest('tr').find("td:first").text();
+    var isConfirmed = confirm("Are you sure you want to delete the business owner " + ownerName + "?");
+    if (isConfirmed) {
+        $.ajax({
+                   url: context + '/apis/businessowners/' + ownerId,
+                   type: 'DELETE',
+                   contentType: 'application/json',
+                   dataType: 'json',
+                   success: function (response) {
+                       if(response) {
+                           updateOwners();
+                           Showalert("Business Owner : " + ownerName + " Deleted Successfully ", "alert-success", "statusSuccess");
+                           location.reload();
+                       } else {
+                           Showalert('Business Owner : ' + ownerName + ' is assigned to one or more apps. Please remove'
+                                     + ' it from them before deleting.', "alert-error", "statusError");
+                       }
+                   },
+                   error: function (response) {
+                       Showalert('Error occured while deleting the business owner : ' + ownerName, "alert-error", "statusError");
+                   }
+               });
+    }
+
 });
 
 $(document).on('click', '#btn-owner-cancel', function(){

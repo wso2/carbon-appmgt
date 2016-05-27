@@ -18,7 +18,7 @@
         "http"
     ],
     "host": "apis.wso2.com",
-    "basePath": "/api/appm/publisher/v1.0",
+    "basePath": "/api/appm/publisher/v1.1",
     "consumes": [
         "application/json"
     ],
@@ -65,7 +65,7 @@
         "/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp\"",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get all Apps",
                 "description": "Get a list of available Apps qualifying under a given search condition.\n",
@@ -137,7 +137,7 @@
             },
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -v -X POST 'http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp' -d '{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\", \"banner\":\"/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"SampleDisplay\",\"description\":\"sample calculator application\",\"platform\":\"android\",\"category\":\"Business\",”marketType”:”enterprise”}'",
+                "x-wso2-curl": "curl -v -X POST 'http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp' -H \"Content-Type: application/json\" -d '{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\", \"banner\":\"/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"SampleDisplay\",\"description\":\"sample calculator application\",\"platform\":\"android\",\"category\":\"Business\",”marketType”:”enterprise”}'",
                 "x-wso2-request": "{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\", \"banner\":\"/publisher/api/mobileapp/getfile/9YRDRWqOSvzu31IX.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"SampleDisplay\",\"description\":\"sample calculator application\",\"platform\":\"android\",\"category\":\"Business\",”marketType”:”enterprise”}",
                 "x-wso2-response": "{\"id\" : \"aff9fb92-7e17-4ce8-8024-a747ff5aea41\"}",
                 "summary": "Create a new App",
@@ -204,7 +204,7 @@
         "/apps/{appType}/id/{appId}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\"  \"http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9\"",
                 "x-wso2-response": "{\"displayName\":null,\"createdTime\":\"00000001461645676735\",\"bundleVersion\":\"1\",\"packageName\":\"undefined\",\"description\":\"asdasd\",\"version\":\"1\",\"category\":\"Business\",\"tags\":[],\"appType\":\"webapp\",\"appName\":\"asd\",\"appUrl\":\"http://wso2.com\",\"banner\":\"/publisher/api/mobileapp/getfile/pduoTTAgbWAuFxm.JPG\",\"marketType\":null,\"recentChanges\":\"-\",\"appProvider\":\"admin\",\"thumbnail\":\"/publisher/api/mobileapp/getfile/J3TM0iKb6OiapuG.JPG\",\"screenShots\":[\"/publisher/api/mobileapp/getfile/zq7kNCpZkfLsxic.JPG\"],\"appId\":null,\"platform\":\"webapp\",\"appVisibility\":null,\"availableLifecycleActions\":null,\"lifecycleStatus\":\"INREVIEW\",\"type\":\"mobileapp\",\"uuid\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0}",
                 "summary": "Get app details",
                 "description": "Get details of an app.\n",
@@ -267,7 +267,7 @@
             },
             "put": {
                 "x-scope": "appm:update",
-                "x-wso2-curl": "curl -v -X PUT 'http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0' -d '{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\",\"banner\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"fdyefyeufuegfyugefyue\",\"description\":\"description\",\"platform\":\"android\",\"category\":\"public\"}'",
+                "x-wso2-curl": "curl -v -X PUT -H \"Content-Type: application/json\" 'http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/906249f5-529b-41f3-bf18-d95e9403e9f0' -d '{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\",\"banner\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"fdyefyeufuegfyugefyue\",\"description\":\"description\",\"platform\":\"android\",\"category\":\"public\"}'",
                 "x-wso2-request": "{\"appmeta\" :{\"path\" : \"/publisher/api/mobileapp/getfile/D3PdRxvU24WK3EN.apk\", \"package\" : \"home.jmstudios.calc\", \"version\" : \"1.0\"},\"name\":\"sample\",\"provider\":\"admin\",\"platform\":\"android\",\"version\":\"1.0.0\",\"banner\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"thumbnailUrl\":\"/publisher/api/mobileapp/getfile/nzcYzFxpWpNHlyk.jpg\",\"screenshots\":[\"/publisher/api/mobileapp/getfile/62gKWqOSvzu31IX.jpg\"],\"displayName\":\"fdyefyeufuegfyugefyue\",\"description\":\"description\",\"platform\":\"android\",\"category\":\"public\"}",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Update an existing App",
@@ -354,7 +354,7 @@
             },
             "delete": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer f126676fc6fc2d2d7828220c992c9b15\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/id/af929140-1257-46ed-97c0-d26098e140e9\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete App",
                 "description": "Delete an existing App\n",
@@ -403,7 +403,7 @@
         "/apps/{appType}/id/{appId}/tags": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\"  \"http://localhost:9763/api/appm/store/v1.0/apps/webapp/tags\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags\"",
                 "x-wso2-response": "{\"tags\":[\"w1\",\"webapptag1\",\"webapptag2\"]}",
                 "summary": "Get all Tags of an App",
                 "description": "Get a list of available Tags relevant to given App Internal Id.\n",
@@ -463,7 +463,7 @@
             },
             "put": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" -d '{\"tags\":[\"tag1\"]}' \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" -H \"Content-Type: application/json\" -d '{\"tags\":[\"tag1\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"tags\":[\"tag1\"]}",
                 "summary": "Add a new tag",
@@ -529,7 +529,7 @@
             },
             "delete": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\"  -d '{\"tags\":[\"w2\"]}' \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\"  -d '{\"tags\":[\"w2\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/tags\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete Tags relevant to an App",
                 "description": "Delete Tags relevant to an App by AppId.\n",
@@ -587,7 +587,7 @@
         "/apps/{appType}/id/{appId}/subscriptions": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e099014668a524870c2895fe0595f125\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/299a478a-0df3-488d-8677-8644f8255222/subscriptions\"",
                 "x-wso2-response": "{\"userIds\":[\"admin\",\"user1\",\"user2\"]}",
                 "summary": "Get subscribed user list for an App",
                 "description": "Get subscribed user list for an App.\n",
@@ -719,7 +719,7 @@
         "/apps/{appType}/id/{appId}/lifecycle": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/c9ddf00d-c42f-4299-931c-bcda69c68050/lifecycle\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/c9ddf00d-c42f-4299-931c-bcda69c68050/lifecycle\"",
                 "x-wso2-response": "{\"actions\":[\"Reject\",\"Approve\"],\"state\":\"IN-REVIEW\",\"async\":true}",
                 "summary": "Get lifecycle details",
                 "description": "Get lifecycle details of an App.\n",
@@ -887,7 +887,7 @@
         "/apps/{appType}/id/{appId}/throttlingtiers": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/65c8485d-11d9-4f05-a418-17dfb737e165/throttlingtiers\"",
                 "x-wso2-response": "{\"tierList\":[{\"tierSortKey\":1,\"tierName\":\"Bronze\",\"tierDisplayName\":\"Bronze\",\"tierDescription\":\"Allows 1 request(s) per minute.\"},{\"tierSortKey\":20,\"tierName\":\"Gold\",\"tierDisplayName\":\"Gold\",\"tierDescription\":\"Allows 20 request(s) per minute.\"},{\"tierSortKey\":5,\"tierName\":\"Silver\",\"tierDisplayName\":\"Silver\",\"tierDescription\":\"Allows 5 request(s) per minute.\"},{\"tierSortKey\":10000,\"tierName\":\"Unlimited\",\"tierDisplayName\":\"Unlimited\",\"tierDescription\":\"Allows unlimited requests\"}]}",
                 "summary": "Get all Tiers",
                 "description": "Get a list of Tiers.\n",
@@ -952,7 +952,7 @@
                     "multipart/form-data"
                 ],
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content\" > sample.pdf",
+                "x-wso2-curl": "curl -k -H \"Authorization:Bearer b0982cd2aacd463ff5f63cd5ebe58f4a\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/id/890a4f4d-09eb-4877-a323-57f6ce2ed79b/docs/daf732d3-bda2-46da-b381-2c39d901ea61/content\" > sample.pdf",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Uploading document",
                 "description": "Uploading document files against an App.\n",
@@ -1262,7 +1262,7 @@
             "post": {
                 "summary": "Change App Status",
                 "x-scope": "appm:publish",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: application/json\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/change-lifecycle?appId=d88b826c-e560-499e-900d-eb24679b2fbf&action=Unpublish\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "description": "Change the lifecycle of an App\n",
                 "parameters": [
@@ -1341,7 +1341,7 @@
         "/apps/{appType}/validate-context": {
             "post": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -d '{\"tags\":[\"aa\",\"bb\",\"cc\"]}' \"http://localhost:9763/api/appm/publisher/v1.0/apps/mobileapp/validate-context\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 31b72e5a9158a413187532b052953f68\" -H \"Content-Type: application/json\" -d '{\"tags\":[\"aa\",\"bb\",\"cc\"]}' \"http://localhost:9763/api/appm/publisher/v1.1/apps/mobileapp/validate-context\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"tags\":[\"aa\",\"bb\",\"cc\"]}",
                 "summary": "Validate App Context",
@@ -1468,7 +1468,7 @@
         "/apps/{appType}/tags": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.0/apps/webapp/tags\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 0c0338592beefe7225bd6d869e93ca06\" \"http://localhost:9763/api/appm/publisher/v1.1/apps/webapp/tags\"",
                 "x-wso2-response": "[{\"name\":\"webapptag1\",\"noOfOccurrences\":1},{\"name\":\"webapptag2\",\"noOfOccurrences\":1},{\"name\":\"webapptag3\",\"noOfOccurrences\":1}]",
                 "summary": "Get all Tags",
                 "description": "Get a list of available Tags relevant to given App Type.\n",
@@ -1744,7 +1744,7 @@
                     }
                 ],
                 "tags": [
-                    "MobileApps"
+                    "Apps"
                 ],
                 "responses": {
                     "200": {
@@ -1810,7 +1810,7 @@
                     }
                 ],
                 "tags": [
-                    "MobileApps"
+                    "Apps"
                 ],
                 "responses": {
                     "200": {
@@ -1853,7 +1853,7 @@
         "/xacmlpolicies/": {
             "get": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e819870696cc39494d12841b5094a411\" \"http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer e819870696cc39494d12841b5094a411\" \"http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies\"",
                 "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": policy1,\"isSharedPartial\": true,\"policyPartialDesc\": null,,\"policyPartialId\": 1}",
                 "summary": "Get all XACML policies",
                 "description": "Get a list of XACML policies.\n",
@@ -1915,7 +1915,7 @@
         "/xacmlpolicies/{policyPartialId}/apps/{appType}": {
             "get": {
                 "x-scope": "appm:read",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b\"  \"http://localhost:9763/api/appm/publisher/v1.0/xacmlpolicies/38/apps/webapp\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 64697c7a75c8db3a5b852aa7786b024b\" \"http://localhost:9763/api/appm/publisher/v1.1/xacmlpolicies/38/apps/webapp\"",
                 "x-wso2-response": "{\"previous\":\"\",\"next\":\"\",\"count\":2,\"appList\":[{\"name\":\"app1\",\"context\":null,\"id\":\"af929140-1257-46ed-97c0-d26098e140e9\",\"rating\":0.0,\"lifecycleState\":\"IN-REVIEW\",\"provider\":\"admin\",\"description\":\"asdasd\",\"version\":\"1\"},{\"name\":\"app2\",\"context\":null,\"id\":\"5c9c8551-d696-4c44-85a6-dcd86f1a1e25\",\"rating\":0.0,\"lifecycleState\":\"CREATED\",\"provider\":\"admin\",\"description\":\"phone\",\"version\":\"1.0\"}]}",
                 "summary": "Get all Apps mapped to a policy partial",
                 "description": "Get a list of available Apps mapped to a policy partial.\n",
@@ -1983,7 +1983,7 @@
         "/administration/xacmlpolicies/validate": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99\" -d '{  \"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}' \"http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/validate\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 2719fd2c8aace567c7ce50301f785d99\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/validate\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition></Rule>\"}",
                 "summary": "Validate Policy content",
@@ -2030,7 +2030,7 @@
         "/administration/xacmlpolicies/": {
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -d '{ \"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",  \"isSharedPartial\": true,  \"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies\"",
+                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",  \"isSharedPartial\": true,  \"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies\"",
                 "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null,\"policyPartialIc\": 2}",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null}",
                 "summary": "Create a new Policy Partial",
@@ -2094,7 +2094,7 @@
         "/administration/xacmlpolicies/{policyPartialId}": {
             "put": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -d '{  \"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\", \"policyPartialName\": \"ddd\", \"isSharedPartial\": true,\"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" -H \"Content-Type: application/json\" -d '{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\", \"policyPartialName\": \"ddd\", \"isSharedPartial\": true,\"policyPartialDesc\": null}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "x-wso2-request": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null}",
                 "summary": "Update an existing policy partial",
@@ -2167,7 +2167,7 @@
             },
             "get": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" \"http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\" \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40\"",
                 "x-wso2-response": "{\"policyPartial\": \"<Rule Effect=\"Permit\" RuleId=\"Rule001\"><Condition>\n      <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\"/>\n         <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">admin</AttributeValue>\n         <AttributeDesignator AttributeId=\"http://wso2.org/claims/role\" Category=\"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" DataType=\"http://www.w3.org/2001/XMLSchema#string\" MustBePresent=\"true\"/>\n      </Apply>\n</Condition>\n</Rule>\",\"policyPartialName\": \"ddd\",\"isSharedPartial\": true,\"policyPartialDesc\": null,\"policyPartialIc\": 2}",
                 "summary": "Get policy partial details",
                 "description": "Get policy partial.\n",
@@ -2227,7 +2227,7 @@
             },
             "delete": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\"   -d '' \"http://localhost:9763/api/appm/publisher/v1.0/administration/xacmlpolicies/40\"",
+                "x-wso2-curl": "curl -X DELETE -H \"Authorization: Bearer 5e3e12917945881407eaad1868ea4629\"   -d '' \"http://localhost:9763/api/appm/publisher/v1.1/administration/xacmlpolicies/40\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
                 "summary": "Delete policy partial",
                 "description": "Delete an existing policy partial\n",
@@ -2327,9 +2327,9 @@
             },
             "post": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
-                "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}",
+                "x-wso2-curl": "curl -X POST -H \"Content-Type: application/json\" -d '{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-response": "{\"id\": 4}",
+                "x-wso2-request": "{\"site\": \"testUser.lk\",\"email\": \"testUser@gmail.com\",\"description\": \"this is a test description\",\"name\":\"testUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
                 "summary": "Create a new Business Owner",
                 "description": "Create a new Business Owner\n",
                 "parameters": [
@@ -2448,9 +2448,9 @@
             },
             "put": {
                 "x-scope": "appm:administration",
-                "x-wso2-curl": "curl -X POST -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
+                "x-wso2-curl": "curl -X PUT -H \"Authorization: Bearer 68f8872882b2dca493328564942251b6\" -H \"Content-Type: application/json\" -d '{\"site\": \"sysUser.lk\",\"email\": \"sysUser@gmail.com\",\"description\": \"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}' \"http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner\"",
                 "x-wso2-response": "HTTP/1.1 200 OK",
-                "x-wso2-request": "{\"site\": \"newSysUser.lk\",\"email\": \"newSysUser@gmail.com\",\"description\":\"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}],\"id\": 1}",
+                "x-wso2-request": "{\"site\": \"newSysUser.lk\",\"email\": \"newSysUser@gmail.com\",\"description\":\"this is a test description\",\"name\": \"sysUser\",\"properties\": [{\"isVisible\": true,\"value\": \"0112345678\",\"key\": \"telephone\"}]}",
                 "summary": "Update an existing Business Owner",
                 "description": "Update an existing Business Owner.\n",
                 "parameters": [
@@ -2557,7 +2557,7 @@
         "/roles": {
             "get": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\"  \"http://localhost:9763/api/appm/publisher/v1.0/roles\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\"  \"http://localhost:9763/api/appm/publisher/v1.1/roles\"",
                 "x-wso2-response": "{\"roleIds\": [\"admin\",\"Application/app_11_04_001\", \"Application/app_11_04_002\",\"Application/app_11_04_011\"]}",
                 "summary": "Get all Roles",
                 "description": "Get a list of available Roles.\n",
@@ -2613,7 +2613,7 @@
         "/javapolicies": {
             "get": {
                 "x-scope": "appm:create",
-                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.0/javapolicies\"",
+                "x-wso2-curl": "curl -X GET -H \"Authorization: Bearer 303c73b076f1aeeb16ebee6b96bd250e\" \"http://localhost:9763/api/appm/publisher/v1.1/javapolicies\"",
                 "x-wso2-response": "{\"policyList\": [{\"id\": 5,\"displayName\": \"Publish Statistics:\",\"displayOrder\": 5,\"description\": \"\"}]}",
                 "summary": "Get available java policies",
                 "description": "Get available java policies.\n",
@@ -2986,9 +2986,9 @@
                     "type": "string",
                     "example": "http://logout/sample"
                 },
-                "businessOwnerName": {
+                "businessOwnerId": {
                     "type": "string",
-                    "example": "John"
+                    "example": "1"
                 },
                 "visibleTenants": {
                     "type": "array",
@@ -3525,7 +3525,7 @@
                 },
                 "url": {
                     "type": "string",
-                    "example": "http://localhost:9763/api/appm/store/v1.0/apps/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
+                    "example": "http://localhost:9763/api/appm/store/v1.1/apps/publisher/api/mobileapp/getfile/XURc4DnX0LEfRBm.apk,/publisher/api/mobileapp/getfile/OUGc8DnX0LEGRBm.ipa"
                 }
             }
         },

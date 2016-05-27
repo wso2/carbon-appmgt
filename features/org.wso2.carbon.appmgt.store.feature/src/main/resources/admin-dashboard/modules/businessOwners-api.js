@@ -36,7 +36,7 @@ function updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, bus
     return response;
 }
 
-function getBusinessOwners(start, length, draw, search) {
+function searchBusinessOwners(start, length, draw, search) {
     return apiProvider.searchBusinessOwners(start, length, draw, search);
 };
 
@@ -44,6 +44,6 @@ function getBusinessOwner(ownerId) {
     return apiProvider.getBusinessOwner(ownerId);
 };
 
-function searchBusinessOwners(searchValue) {
-    return apiProvider.searchBusinessOwners(searchValue);
+function getBusinessOwners() {
+    return apiProvider.getBusinessOwners();
 };

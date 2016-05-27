@@ -40,14 +40,14 @@ public interface APIProvider extends APIManager {
      * @param businessOwnerId ID of the owner.
      * @throws AppManagementException
      */
-    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
+    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
 
     /**
      * update a Business Owner.
      * @return Integer
      * @throws AppManagementException
      */
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+    public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
 
     /**

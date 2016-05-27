@@ -11,7 +11,7 @@
             <p class="marked">Delete an existing Business Owner.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/businessowner/{businessOwnerId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>DELETE</code>
@@ -233,7 +233,7 @@
             <p class="marked">Get a Business owners by Id.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/businessowner/{businessOwnerId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -455,7 +455,7 @@
             <p class="marked">Update an existing Business Owner.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/businessowner/{businessOwnerId}</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner/{businessOwnerId}</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>PUT</code>
@@ -468,7 +468,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X PUT -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 
@@ -479,7 +479,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationBusinessownerBusinessOwnerIdPut"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;newSysUser.lk&quot;,&quot;email&quot;: &quot;newSysUser@gmail.com&quot;,&quot;description&quot;:&quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}</code></div>
+                <div id="request-administrationBusinessownerBusinessOwnerIdPut"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;newSysUser.lk&quot;,&quot;email&quot;: &quot;newSysUser@gmail.com&quot;,&quot;description&quot;:&quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerBusinessOwnerIdPut">
@@ -760,7 +760,7 @@
             <p class="marked">Get a list of available Apps qualifying under a given search condition.\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/businessowner</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>GET</code>
@@ -952,7 +952,7 @@
             <p class="marked">Create a new Business Owner\n</p>
 
             <h4 class="section-heading">URL</h4>
-            <code>http://apis.wso2.com/api/appm/publisher/v1.0/administration/businessowner</code>
+            <code>http://apis.wso2.com/api/appm/publisher/v1.1/administration/businessowner</code>
 
             <h4 class="section-heading">HTTP Method</h4>
             <code>POST</code>
@@ -965,7 +965,7 @@
 
             <h4 class="section-heading">CURL Example</h4>
             
-                <div class="pre"><code class="bash">curl -X POST -H &quot;Authorization: Bearer 68f8872882b2dca493328564942251b6&quot; -d &#39;{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
+                <div class="pre"><code class="bash">curl -X POST -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}&#39; &quot;http://localhost:9763/api/appm/publisher/v1.1/administration/businessowner&quot;</code></div>
             
             
 
@@ -976,7 +976,7 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </h4>
                 </div>
-                <div id="request-administrationBusinessownerPost"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;sysUser.lk&quot;,&quot;email&quot;: &quot;sysUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;: &quot;sysUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}],&quot;id&quot;: 1}</code></div>
+                <div id="request-administrationBusinessownerPost"class="pre collapse"><code class="json">{&quot;site&quot;: &quot;testUser.lk&quot;,&quot;email&quot;: &quot;testUser@gmail.com&quot;,&quot;description&quot;: &quot;this is a test description&quot;,&quot;name&quot;:&quot;testUser&quot;,&quot;properties&quot;: [{&quot;isVisible&quot;: true,&quot;value&quot;: &quot;0112345678&quot;,&quot;key&quot;: &quot;telephone&quot;}]}</code></div>
             
 
             <div class="pointer" data-toggle="collapse" data-target="#response-administrationBusinessownerPost">
@@ -988,7 +988,7 @@
             </h4>
             </div>
             
-                <div id="response-administrationBusinessownerPost" class="pre collapse"><code class="json">HTTP/1.1 200 OK</code></div>
+                <div id="response-administrationBusinessownerPost" class="pre collapse"><code class="json">{&quot;id&quot;: 4}</code></div>
             
             
             <h4 class="section-heading">Parameters</h4>
