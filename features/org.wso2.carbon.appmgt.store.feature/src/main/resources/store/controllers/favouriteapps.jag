@@ -82,6 +82,13 @@ require('/modules/store.js').exec(function (ctx) {
 
     var searchQuery = {search: "", searchTerm: ""};
 
+    var tenantUsername;
+    if (user.tenantId == -1234) {
+        tenantUsername = user.username;
+    } else {
+        tenantUsername = user.username + "@" + user.tenantDomain;
+    }
+
     var apps;
     if(query) {
         var array = query.split(":");
@@ -96,7 +103,7 @@ require('/modules/store.js').exec(function (ctx) {
             searchQuery.searchTerm = "overview_name";
         }
         searchQuery.search = searchValue;
-        result = favourites.searchFavouriteApps(user.username, user.tenantId, storeTenantDomain,
+        result = favourites.searchFavouriteApps(tenantUsername, user.tenantId, storeTenantDomain,
                                               searchOption, searchValue);
         apps = (result.apps) ? result.apps : [];
     } else {
@@ -109,7 +116,7 @@ require('/modules/store.js').exec(function (ctx) {
             sortOption = "INSERTED_ORDER";
         }
         //Get the all favourite apps of logged in user based on sort option
-        var result = favourites.getAllFavouriteApps(user.username, user.tenantId,
+        var result = favourites.getAllFavouriteApps(tenantUsername, user.tenantId,
                                                     storeTenantDomain, sortOption);
         apps = (result.apps) ? result.apps : [];
     }
@@ -119,7 +126,7 @@ require('/modules/store.js').exec(function (ctx) {
     //Check whether use has selected favourite page as default landing page
     //This is needed to show correct icon(set as home page /remove from home page) to user.
     var hasFavouritePage = false;
-    result = favourites.hasFavouritePage(user.username, user.tenantId, storeTenantDomain);
+    result = favourites.hasFavouritePage(tenantUsername, user.tenantId, storeTenantDomain);
     if (!result.error) {
         hasFavouritePage = result.status;
     }
