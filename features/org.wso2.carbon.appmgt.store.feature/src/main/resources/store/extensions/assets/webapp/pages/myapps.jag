@@ -53,13 +53,15 @@ require('/modules/store.js').exec(function (ctx) {
         site = ctx.site,
         social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
 
-
+    log.info("user: " + stringify(user));
     //set tenant aware username
-    var tenantUsername;
-    if (tenantId == -1234) {
-        tenantUsername = user.username;
-    } else {
-        tenantUsername = user.username + "@" + user.tenantDomain;
+    var tenantUsername = null;
+    if (user != null) {
+        if (tenantId == -1234) {
+            tenantUsername = user.username;
+        } else {
+            tenantUsername = user.username + "@" + user.tenantDomain;
+        }
     }
 
 
