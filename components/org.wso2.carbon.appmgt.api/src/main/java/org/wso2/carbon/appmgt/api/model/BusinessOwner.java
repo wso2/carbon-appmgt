@@ -17,8 +17,11 @@
 */
 package org.wso2.carbon.appmgt.api.model;
 
-import java.util.Map;
+import java.util.List;
 
+/**
+ * Business owner model class.
+ */
 public class BusinessOwner {
 
     private int businessOwnerId;
@@ -26,17 +29,7 @@ public class BusinessOwner {
     private String businessOwnerEmail;
     private String businessOwnerDescription;
     private String businessOwnerSite;
-    private Map<String, String> businessOwnerCustomProperties;
-
-
-
-    public BusinessOwner() {
-
-    }
-
-    public void setBusinessOwnerCustomProperties(Map<String, String> businessOwnerCustomProperties) {
-        this.businessOwnerCustomProperties = businessOwnerCustomProperties;
-    }
+    private List<BusinessOwnerProperty> businessOwnerPropertiesList;
 
     public void setBusinessOwnerId(int businessOwnerId) {
         this.businessOwnerId = businessOwnerId;
@@ -78,7 +71,12 @@ public class BusinessOwner {
         return businessOwnerSite;
     }
 
-    public Map<String, String> getBusinessOwnerCustomProperties() {
-        return businessOwnerCustomProperties;
+    public List<BusinessOwnerProperty> getBusinessOwnerPropertiesList() {
+        return businessOwnerPropertiesList;
     }
+
+    public void setBusinessOwnerPropertiesList(List<BusinessOwnerProperty> businessOwnerPropertiesList) {
+        this.businessOwnerPropertiesList = businessOwnerPropertiesList;
+    }
+
 }

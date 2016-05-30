@@ -26,7 +26,7 @@ import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationService;
 import org.wso2.carbon.appmgt.impl.AppManagerConfigurationServiceImpl;
 import org.wso2.carbon.appmgt.usage.publisher.service.APIMGTConfigReaderService;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.tomcat.api.CarbonTomcatService;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -52,7 +52,7 @@ public class APPManagerConfigurationServiceComponent {
 
     private static APIMGTConfigReaderService apimgtConfigReaderService;
     private static AppManagerConfigurationService amConfigService;
-    private static Map<String, LoadBalancingDataPublisher> dataPublisherMap;
+    private static Map<String, DataPublisher> dataPublisherMap;
 
     protected void activate(ComponentContext componentContext) throws Exception {
 
@@ -67,7 +67,7 @@ public class APPManagerConfigurationServiceComponent {
             configuration.load(filePath);
             amConfigService = new AppManagerConfigurationServiceImpl(configuration);
             apimgtConfigReaderService = new APIMGTConfigReaderService(amConfigService.getAPIManagerConfiguration());
-            dataPublisherMap = new ConcurrentHashMap<String, LoadBalancingDataPublisher>();
+            dataPublisherMap = new ConcurrentHashMap<String, DataPublisher>();
 
             if (log.isDebugEnabled()) {
                 log.debug("WebApp Management Usage Publisher bundle is activated from file path : " + filePath);
@@ -101,7 +101,7 @@ public class APPManagerConfigurationServiceComponent {
         return apimgtConfigReaderService;
     }
 
-    public static Map<String, LoadBalancingDataPublisher> getDataPublisherMap() {
+    public static Map<String, DataPublisher> getDataPublisherMap() {
         return dataPublisherMap;
     }
 

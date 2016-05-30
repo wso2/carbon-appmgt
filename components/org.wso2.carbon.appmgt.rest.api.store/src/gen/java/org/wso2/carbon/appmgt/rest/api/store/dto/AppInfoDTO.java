@@ -1,27 +1,11 @@
-/*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * you may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
+import java.math.BigDecimal;
 
+import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
@@ -49,6 +33,9 @@ public class AppInfoDTO  {
   
   
   private String lifecycleState = null;
+  
+  
+  private BigDecimal rating = null;
 
   
   /**
@@ -136,6 +123,19 @@ public class AppInfoDTO  {
   }
 
   
+  /**
+   * User rating for the app
+   **/
+  @ApiModelProperty(value = "User rating for the app")
+  @JsonProperty("rating")
+  public BigDecimal getRating() {
+    return rating;
+  }
+  public void setRating(BigDecimal rating) {
+    this.rating = rating;
+  }
+
+  
 
   @Override
   public String toString()  {
@@ -149,6 +149,7 @@ public class AppInfoDTO  {
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
+    sb.append("  rating: ").append(rating).append("\n");
     sb.append("}\n");
     return sb.toString();
   }

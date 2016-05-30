@@ -49,6 +49,18 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     }
 
     @Override
+    public String createWebApp(WebApp webApp) throws AppManagementException {
+        checkCreatePermission();
+        return super.createWebApp(webApp);
+    }
+
+    @Override
+    public String createNewVersion(App app) throws AppManagementException {
+        checkCreatePermission();
+        return super.createNewVersion(app);
+    }
+
+    @Override
     public void copyWebappDocumentations(WebApp api, String newVersion) throws AppManagementException {
         checkDocumentAddPermission();
         super.copyWebappDocumentations(api, newVersion);
@@ -58,6 +70,12 @@ public class UserAwareAPIProvider extends APIProviderImpl {
     public void updateAPI(WebApp api) throws AppManagementException {
         checkWebappUpdatePermission();
         super.updateAPI(api);
+    }
+
+    @Override
+    public void updateApp(App app) throws AppManagementException {
+        checkWebappUpdatePermission();
+        super.updateApp(app);
     }
 
     @Override
@@ -184,4 +202,6 @@ public class UserAwareAPIProvider extends APIProviderImpl {
         return super.saveEntitlementPolicyPartial(policyPartialName, policyPartial, isSharedPartial, policyAuthor,
                 policyPartialDesc);
     }
+
+
 }

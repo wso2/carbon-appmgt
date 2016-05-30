@@ -23,8 +23,8 @@ var caramel;
 include('../modules/jagg/jagg.jag');
 var manager = jagg.module("manager");
 var storeHostObj = manager.getAPIStoreObj();
-if(!storeHostObj.isAssetTypeEnabled("webapp")) {
-    response.sendError(404,'Resource does not exist');
+if (!storeHostObj.isAssetTypeEnabled("webapp")) {
+    response.sendError(404, 'Resource does not exist');
 }
 
 var storeServer = require('store').server;
@@ -40,18 +40,28 @@ var WEBAPP_TYPE = 'webapp';
 
 require('/modules/store.js').exec(function (ctx) {
     var options, assets, paging, url,
-            log = ctx.log,
-            sso = ctx.sso,
-            query = ctx.params.query,
-            tag = encodeURIComponent(ctx.params.tag),
-            store = ctx.store,
-            user = ctx.user,
-            server = ctx.server,
-            tenantId = ctx.tenant.tenantId,
-            tenantDomain = ctx.tenant.domain,
-            configs = ctx.configs,
-            site = ctx.site,
-            social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+        log = ctx.log,
+        sso = ctx.sso,
+        query = ctx.params.query,
+        tag = encodeURIComponent(ctx.params.tag),
+        store = ctx.store,
+        user = ctx.user,
+        server = ctx.server,
+        tenantId = ctx.tenant.tenantId,
+        tenantDomain = ctx.tenant.domain,
+        configs = ctx.configs,
+        site = ctx.site,
+        social = carbon.server.osgiService('org.wso2.carbon.social.core.service.SocialActivityService');
+
+    //set tenant aware username
+    var tenantUsername = null;
+    if (user != null) {
+        if (tenantId == -1234) {
+            tenantUsername = user.username;
+        } else {
+            tenantUsername = user.username + "@" + user.tenantDomain;
+        }
+    }
 
 
     caramel = require('caramel');
@@ -73,7 +83,7 @@ require('/modules/store.js').exec(function (ctx) {
     var isSite = 'false';//To get the webapp tags
     var context = caramel.configs().context;
     var leftnav, rightnav, urlQuery;//For pagination
-    
+
     var headerData = site.header(tenantId, {
         sso: sso,
         user: user,
@@ -166,7 +176,7 @@ require('/modules/store.js').exec(function (ctx) {
 
                     var ratingApi = require('/modules/rating-api.js').api;
                     registry = storeServer.systemRegistry(tenantId),
-                            am = store.assetManager(type, registry);
+                        am = store.assetManager(type, registry);
 
                     var getNextAssetSet = function () {
                         var result = ratingApi.getPopularAssets(type, tenantId, am, paging.start + index, PAGE_SIZE,
@@ -191,7 +201,7 @@ require('/modules/store.js').exec(function (ctx) {
                                 asset = store.asset(type, aid);
                                 asset.indashboard = store.isuserasset(aid, type);
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
-                                        >= 0) {
+                                    >= 0) {
                                     assets.push(asset);
                                 }
                             } catch (e) {
@@ -207,7 +217,7 @@ require('/modules/store.js').exec(function (ctx) {
                 var totalAppCount = store.getTotalAssetCount(type, ctx.request, ctx.session);
                 urlQuery = 'sort=' + paging.sort + '&';
                 server.privileged(function () {
-                    var userName = user ? user.username : "";
+                    var userName = user ? tenantUsername : "";
                     var index = 0, maxTry = 0;
                     var getNextAssetSet = function () {
                         var appMgtDaoService = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
@@ -220,7 +230,7 @@ require('/modules/store.js').exec(function (ctx) {
                                 recordCount = JSON.parse(result).length;
                             }
                             log.debug("Query executed successfully to get the assets hit count. " + recordCount
-                                              + " records found");
+                                      + " records found");
                         }
                         index += PAGE_SIZE;
                         if (JSON.parse(result).length > 0) {
@@ -248,7 +258,7 @@ require('/modules/store.js').exec(function (ctx) {
                                     continue;
                                 }
                                 if (configs.lifeCycleBehaviour.visibleIn.indexOf(String(asset.lifecycleState), 0)
-                                        >= 0) {
+                                    >= 0) {
                                     //filter web apps
                                     if (asset.attributes.overview_treatAsASite != "TRUE") {
                                         assets.push(asset);
@@ -263,7 +273,7 @@ require('/modules/store.js').exec(function (ctx) {
                 });
             }
             else { //myapps page request
-                if(paging.sort != "null") {
+                if (paging.sort != "null") {
                     urlQuery = 'sort=' + paging.sort + '&'
                 }
                 assets = store.search(SITE_OPTIONS, paging);
@@ -372,7 +382,7 @@ require('/modules/store.js').exec(function (ctx) {
         if (query) {
             var array = query.split(":");
             var searchOption = array[0];
-            var searchValue = array[1].replace(/\"/g,"");// replace all the occurrences of double quote with empty
+            var searchValue = array[1].replace(/\"/g, "");// replace all the occurrences of double quote with empty
 
             if (searchOption.toLowerCase() == "provider") {
                 searchOption = "SEARCH_BY_APP_PROVIDER";
@@ -381,7 +391,7 @@ require('/modules/store.js').exec(function (ctx) {
             }
             query = require('/modules/search.js').build(query);
             if (user) {
-                assets = subsApi.searchUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain),
+                assets = subsApi.searchUserAccessibleApps(tenantUsername, user.tenantId, String(tenantDomain),
                                                           treatAsSite, searchOption, searchValue);
             } else {
                 assets = subsApi.searchUserAccessibleApps(carbon.user.anonUser, tenantId, String(tenantDomain),
@@ -400,7 +410,7 @@ require('/modules/store.js').exec(function (ctx) {
             if (user) {
                 //get anonymous + subscribed apps
                 assets =
-                subsApi.getUserAccessibleApps(String(user.username), user.tenantId, String(tenantDomain), sortOption,
+                subsApi.getUserAccessibleApps(tenantUsername, user.tenantId, String(tenantDomain), sortOption,
                                               treatAsSite);
             } else {
                 //get anonymous apps
@@ -421,7 +431,7 @@ require('/modules/store.js').exec(function (ctx) {
         var status = false;
         if (user) {
             // check whether this is favourite app of user.
-            status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+            status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                             tenantDomain).status;
         }
         return status;

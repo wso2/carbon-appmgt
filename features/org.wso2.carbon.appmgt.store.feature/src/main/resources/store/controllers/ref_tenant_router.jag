@@ -25,6 +25,7 @@ var configs = require('/config/store.json');
 var store = '/{context}/t/{domain}/';
 var apiEndpoint = store + 'apis/assets/{type}/{+suffix}';
 var assetEndpoint = store + 'assets/{type}';
+var topAssetPage = store + 'assets/';
 var assetsEndpoint = store + 'assets/{type}/{+suffix}';
 var extensionsEndpoint = store + 'extensions/assets/{type}/{+suffix}';
 var storageEndpoint = store + 'storage/{+suffix}';
@@ -72,8 +73,7 @@ if (matcher.match(apiEndpoint)) {
     path = '/controllers/login.jag';
     resolveRouter(elements.domain, path, null);
 
-} else if (matcher.match(store)) {
-
+} else if (matcher.match(store) || matcher.match(topAssetPage)) {
     var elements = matcher.elements();
     path = '/controllers/home.jag';
     resolveRouter(elements.domain, path, null);

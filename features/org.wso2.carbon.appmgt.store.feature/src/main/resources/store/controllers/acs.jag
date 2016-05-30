@@ -143,7 +143,7 @@ var auditLog = require('/modules/auditLog/logger.js');
                             }
                             response.sendRedirect(relayState);
                         } else {
-                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the store role.');
+                            log.warn('User ' + sessionObj.loggedInUser + ' does not have permission to access the store application. Make sure the user has the subscribe permission.');
                             response.sendError(401, 'You do not have permission to login to this application.Please contact your administrator and request permission.');
 
                         }

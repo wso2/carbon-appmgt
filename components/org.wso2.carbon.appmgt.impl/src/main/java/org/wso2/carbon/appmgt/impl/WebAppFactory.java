@@ -44,7 +44,7 @@ public class WebAppFactory extends AppFactory {
     private static final Log log = LogFactory.getLog(WebAppFactory.class);
 
     @Override
-    public App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
+    public App doCreateApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
 
         WebApp webApp;
 
@@ -64,9 +64,6 @@ public class WebAppFactory extends AppFactory {
 
             String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
             webApp.setLastUpdated(registry.get(artifactPath).getLastModified());
-
-            // TODO revert this once proper db saving is done
-            webApp.setRating(1f);
 
             webApp.setUrl(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL));
             webApp.setLogoutURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL));
@@ -91,13 +88,21 @@ public class WebAppFactory extends AppFactory {
             webApp.setOutSequence(artifact.getAttribute(AppMConstants.API_OVERVIEW_OUTSEQUENCE));
             webApp.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             webApp.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
-            webApp.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            webApp.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
+            webApp.setTrackingCode(artifact.getAttribute(AppMConstants.APP_TRACKING_CODE));
             webApp.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             webApp.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             webApp.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
 
-            int cacheTimeout = Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
-            webApp.setCacheTimeout(cacheTimeout);
+            int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
+            if(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT) != null){
+                try {
+                    cacheTimeout = Integer.parseInt(artifact.getAttribute(AppMConstants.API_OVERVIEW_CACHE_TIMEOUT));
+                } catch (NumberFormatException e) {
+                    log.warn(String.format("Error while parsing cache timeout for the web app '%s'. Setting the default value ''", webApp.getUUID(), cacheTimeout));
+                }
+            }
+            webApp.setCacheTimeout(cacheTimeout);webApp.setCacheTimeout(cacheTimeout);
 
             webApp.setEndpointConfig(artifact.getAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_CONFIG));
             webApp.setRedirectURL(artifact.getAttribute(AppMConstants.API_OVERVIEW_REDIRECT_URL));
@@ -140,45 +145,6 @@ public class WebAppFactory extends AppFactory {
             }
 
             webApp.setLatest(Boolean.valueOf(artifact.getAttribute(AppMConstants.API_OVERVIEW_IS_LATEST)));
-
-            Set<URITemplate> uriTemplates = new LinkedHashSet<URITemplate>();
-            List<String> uriTemplateNames = new ArrayList<String>();
-            List<URLMapping> urlPatterns = AppMDAO.getURITemplatesPerAPIAsString(apiId);
-
-            for (URLMapping urlMapping : urlPatterns) {
-                URITemplate uriTemplate = new URITemplate();
-                String uTemplate = urlMapping.getUrlPattern();
-                String method = urlMapping.getHttpMethod();
-                String authType = urlMapping.getHttpMethod();
-                String throttlingTier = urlMapping.getThrottlingTier();
-                String userRoles = urlMapping.getUserRoles();
-
-                uriTemplate.setHTTPVerb(method);
-                uriTemplate.setAuthType(authType);
-                uriTemplate.setThrottlingTier(throttlingTier);
-                uriTemplate.setHttpVerbs(method);
-                uriTemplate.setAuthTypes(authType);
-                uriTemplate.setUriTemplate(uTemplate);
-                uriTemplate.setResourceURI(webApp.getUrl());
-                uriTemplate.setResourceSandboxURI(webApp.getSandboxUrl());
-                uriTemplate.setThrottlingTiers(throttlingTier);
-                uriTemplate.setUserRoles(userRoles);
-                // Checking for duplicate uri template names
-                if (uriTemplateNames.contains(uTemplate)) {
-                    for (URITemplate tmp : uriTemplates) {
-                        if (uTemplate.equals(tmp.getUriTemplate())) {
-                            tmp.setHttpVerbs(method);
-                            tmp.setAuthTypes(authType);
-                            tmp.setThrottlingTiers(throttlingTier);
-                            break;
-                        }
-                    }
-                } else {
-                    uriTemplates.add(uriTemplate);
-                }
-                uriTemplateNames.add(uTemplate);
-            }
-            webApp.setUriTemplates(uriTemplates);
 
             Set<String> tags = new HashSet<String>();
             org.wso2.carbon.registry.core.Tag[] tag = registry.getTags(artifactPath);

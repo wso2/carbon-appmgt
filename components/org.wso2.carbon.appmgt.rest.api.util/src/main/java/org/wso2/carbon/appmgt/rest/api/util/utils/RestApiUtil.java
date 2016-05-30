@@ -23,11 +23,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.appmgt.api.APIProvider;
-import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtAuthorizationFailedException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceNotFoundException;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.wso2.carbon.appmgt.api.*;
 import org.wso2.carbon.appmgt.impl.APIManagerFactory;
+import org.wso2.carbon.appmgt.impl.AppMConstants;
+import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.dto.ErrorDTO;
@@ -41,18 +41,23 @@ import org.wso2.carbon.user.api.UserRealm;
 import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import javax.validation.ConstraintViolation;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RestApiUtil {
 
@@ -86,6 +91,37 @@ public class RestApiUtil {
 
     public static APIProvider getProvider(String username) throws AppManagementException {
         return APIManagerFactory.getInstance().getAPIProvider(username);
+    }
+
+
+    public static APIConsumer getConsumer(String subscriberName) throws AppManagementException {
+        return APIManagerFactory.getInstance().getAPIConsumer(subscriberName);
+    }
+
+    /**
+     * Returns an APIConsumer which is corresponding to the current logged in user taken from the carbon context
+     *
+     * @return an APIConsumer which is corresponding to the current logged in user
+     * @throws AppManagementException
+     */
+    public static APIConsumer getLoggedInUserConsumer() throws AppManagementException {
+        String loggedInUser = CarbonContext.getThreadLocalCarbonContext().getUsername();
+        return APIManagerFactory.getInstance().getAPIConsumer(loggedInUser);
+    }
+
+    /**
+     * Url validator, Allow any url with https and http.
+     * Allow any url without fully qualified domain
+     *
+     * @param url Url as string
+     * @return boolean type stating validated or not
+     */
+    public static boolean isURL(String url) {
+
+        Pattern pattern = Pattern.compile("^(http|https)://(.)+", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(url);
+        return matcher.matches();
+
     }
 
     /**
@@ -193,6 +229,34 @@ public class RestApiUtil {
     }
 
     /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAPIPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APIS_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
+     * Returns the paginated url for APIs API
+     *
+     * @param offset starting index
+     * @param limit  max number of objects returned
+     * @return constructed paginated url
+     */
+    public static String getAppRatingPaginatedURL(Integer offset, Integer limit) {
+        String paginatedURL = RestApiConstants.APP_RATE_GET_PAGINATION_URL;
+        paginatedURL = paginatedURL.replace(RestApiConstants.LIMIT_PARAM, String.valueOf(limit));
+        paginatedURL = paginatedURL.replace(RestApiConstants.OFFSET_PARAM, String.valueOf(offset));
+        return paginatedURL;
+    }
+
+    /**
      * Returns the next/previous offset/limit parameters properly when current offset, limit and size parameters are
      * specified
      *
@@ -247,6 +311,20 @@ public class RestApiUtil {
         throw internalServerErrorException;
     }
 
+
+    /**
+     * Logs the error, builds a internalServerErrorException with specified details and throws it
+     *
+     * @param msg error message
+     * @param log Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.InternalServerErrorException
+     */
+    public static void handleInternalServerError(String msg, Log log)
+            throws InternalServerErrorException {
+        InternalServerErrorException internalServerErrorException = buildInternalServerErrorException();
+        throw internalServerErrorException;
+    }
+
     /**
      * Returns a new InternalServerErrorException
      *
@@ -274,6 +352,18 @@ public class RestApiUtil {
         Throwable rootCause = getPossibleErrorCause(e);
         return rootCause instanceof AppMgtResourceNotFoundException
                 || rootCause instanceof ResourceNotFoundException;
+    }
+
+    /**
+     * Check if the specified throwable e is happened as the required resource cannot be found
+     *
+     * @param e throwable to check
+     * @return true if the specified throwable e is happened as the required resource cannot be found, false otherwise
+     */
+    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    public static boolean isDueToResourceAlreadyExisting(Throwable e) {
+        Throwable rootCause = getPossibleErrorCause(e);
+        return rootCause instanceof AppMgtResourceAlreadyExistsException;
     }
 
     /**
@@ -318,6 +408,35 @@ public class RestApiUtil {
     }
 
     /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
+     * @param resource requested resource
+     * @param id       id of resource
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleResourceNotFoundError(String resource, String id, Log log)
+            throws NotFoundException {
+        NotFoundException notFoundException = buildNotFoundException(resource, id);
+        throw notFoundException;
+    }
+
+    /**
+     * Logs the error, builds a NotFoundException with specified details and throws it
+     *
+     * @param description error description
+     * @param t        Throwable instance
+     * @param log      Log instance
+     * @throws org.wso2.carbon.appmgt.rest.api.util.exception.NotFoundException
+     */
+    public static void handleAuthorizationFailedError(String description, Throwable t, Log log)
+            throws ForbiddenException{
+        ForbiddenException forbiddenException = buildAuthorizationFailedException(description);
+        log.error(forbiddenException.getMessage(), t);
+        throw forbiddenException;
+    }
+
+    /**
      * Returns a new NotFoundException
      *
      * @param resource Resource type
@@ -333,6 +452,17 @@ public class RestApiUtil {
         }
         ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_NOT_FOUND_MESSAGE_DEFAULT, 404l, description);
         return new NotFoundException(errorDTO);
+    }
+
+    /**
+     * Returns a new ForbiddenException
+     *
+     * @param description  Error description
+     * @return a new NotFoundException with the specified details as a response DTO
+     */
+    public static ForbiddenException buildAuthorizationFailedException(String description) {
+        ErrorDTO errorDTO = getErrorDTO(RestApiConstants.STATUS_BAD_REQUEST_MESSAGE_DEFAULT, 403l, description);
+        return new ForbiddenException(errorDTO);
     }
 
     /**
@@ -384,6 +514,26 @@ public class RestApiUtil {
         }
     }
 
+    public static File readFileFromStorage(String fileName) throws AppManagementException {
+        File storageFile = null;
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String filePath = CarbonUtils.getCarbonHome() + File.separator +
+                appManagerConfiguration.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION) + fileName;
+        storageFile = new File(filePath);
+        return storageFile;
+    }
+
+    public static String readFileContentType(String filePath) throws AppManagementException{
+        String fileContentType = null;
+        try {
+         fileContentType = Files.probeContentType(Paths.get(filePath));
+        } catch (IOException e) {
+            throw new AppManagementException("Error occurred while reading file details from file "+filePath);
+        }
+        return fileContentType;
+    }
+
     public static boolean isExistingUser(String username) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         RealmService realmService = (RealmService) carbonContext.getOSGiService(RealmService.class, null);
@@ -414,6 +564,18 @@ public class RestApiUtil {
             log.error(e);
             return false;
         }
+    }
+
+    public static boolean isSubscriptionEnable() {
+        AppManagerConfiguration appManagerConfiguration = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        Boolean selfSubscriptionStatus = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_SELF_SUBSCRIPTION));
+        Boolean enterpriseSubscriptionStatus = Boolean.valueOf(appManagerConfiguration.getFirstProperty(
+                AppMConstants.ENABLE_ENTERPRISE_SUBSCRIPTION));
+
+        boolean isSubscriptionEnable = (selfSubscriptionStatus || enterpriseSubscriptionStatus);
+        return isSubscriptionEnable;
     }
 
     /**

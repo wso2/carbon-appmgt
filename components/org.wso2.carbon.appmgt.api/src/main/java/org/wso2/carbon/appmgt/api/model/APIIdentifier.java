@@ -29,7 +29,7 @@ public class APIIdentifier {
 
     private final String providerName;
     private final String apiName;
-    private final String version;
+    private String version;
     private String tier;
     private String applicationId;
 
@@ -77,6 +77,10 @@ public class APIIdentifier {
 
     public String getVersion() {
         return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override

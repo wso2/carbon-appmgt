@@ -24,7 +24,7 @@ var javaPolicyIndexArray = []; //used to maintain the selected Java Policy ID's 
  * @param applicationUUID
  * @param isGlobalPolicy - if application level policy : true else if resource level policy : false
  */
-function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy) {
+function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy, action) {
     $.ajax({
         url: caramel.context + '/api/entitlement/get/all/available/java/policy/handlers/details/list/' + applicationUUID + '/' + isGlobalPolicy,
         type: 'GET',
@@ -45,7 +45,7 @@ function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy) {
                 };
                 javaPolicyArray.push(obj);
             }
-            updateJavaPolicyPartial();
+            updateJavaPolicyPartial(action);
 
         },
         error: function () {
@@ -56,7 +56,7 @@ function loadAvailableJavaPolicies(applicationUUID, isGlobalPolicy) {
 /**
  * draw java policies list
  */
-function updateJavaPolicyPartial() {
+function updateJavaPolicyPartial(action) {
     var checkedStatus = "";
     $.each(javaPolicyArray, function (index, obj) {
         if (obj != null) {
@@ -66,6 +66,10 @@ function updateJavaPolicyPartial() {
                 checkedStatus = "checked";
                 //push the id's of saved policies to array
                 javaPolicyIndexArray.push(obj.javaPolicyId);
+            }
+
+            if(action == "add" && obj.displayName == "Publish Statistics:"){
+                checkedStatus = "checked";
             }
 
             //draw div's to each policy

@@ -106,6 +106,11 @@ $( document ).ready(function() {
         }
     });
 
+    $(".selectOwnerName").change(function() {
+        var data = $('.selectOwnerName').select2('data')[0]['id'].trim();
+        $('#overview_businessOwner').val(data);
+    });
+
     $(".anonymous_checkbox").click(function(){
         var output = [];
         $( ".anonymous_checkbox" ).each(function( index ) {
@@ -134,7 +139,7 @@ $( document ).ready(function() {
     });
 
     //load global (application level) dynamic optional java policies
-    loadAvailableJavaPolicies(uuid, true);
+    loadAvailableJavaPolicies(uuid, true, "edit");
 
    //fixed chrome issue with file paths
     $('input[type=file]').on('change', function(e) {

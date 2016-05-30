@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONObject;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.AppMgtResourceAlreadyExistsException;
 import org.wso2.carbon.appmgt.api.EntitlementService;
 import org.wso2.carbon.appmgt.api.dto.UserApplicationAPIUsage;
 import org.wso2.carbon.appmgt.api.model.*;
@@ -55,6 +54,7 @@ import org.wso2.carbon.registry.common.CommonConstants;
 import org.wso2.carbon.registry.core.ActionConstants;
 import org.wso2.carbon.registry.core.Association;
 import org.wso2.carbon.registry.core.CollectionImpl;
+import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.RegistryConstants;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.config.RegistryContext;
@@ -71,6 +71,7 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,11 +104,20 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     /**
      * Delete business owner.
      * @param businessOwnerId ID of the owner.
+     * @return
      * @throws AppManagementException
      */
     @Override
-    public void deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
-         appMDAO.deleteBusinessOwner(businessOwnerId);
+    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException{
+        boolean isBusinessOwnerAssociatedWithApps = appMDAO.isBusinessOwnerAssociatedWithApps(businessOwnerId,
+                                                                                              registry, tenantDomain);
+        if (!isBusinessOwnerAssociatedWithApps) {
+            appMDAO.deleteBusinessOwner(businessOwnerId);
+            // return true if business owner is successfully deleted.
+            return true;
+        }
+        // return false if business owner is associated with one or more web apps.
+        return false;
     }
     /**
      *Update a business owner.
@@ -115,20 +125,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.updateBusinessOwner(businessOwner);
-    }
-
-    /**
-     * Get custom properties of a given business owner.
-     * @param ownerId
-     * @return
-     * @throws AppManagementException
-     */
-    @Override
-
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException {
-        return appMDAO.getBusinessOwnerCustomPropertiesById(ownerId);
+    public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        boolean isUpdated = false;
+        if (appMDAO.getBusinessOwner(businessOwner.getBusinessOwnerId(), tenantId) != null) {
+            appMDAO.updateBusinessOwner(businessOwner);
+            isUpdated =true;
+        }
+        return isUpdated;
     }
 
 
@@ -138,9 +141,38 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException {
-        return appMDAO.getBusinessOwners();
+        return appMDAO.getBusinessOwners(tenantId);
+    }
+
+    /**
+     * Get business owners.
+     * @param businessOwnerId Business owner Id.
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException {
+        return appMDAO.getBusinessOwner(businessOwnerId, tenantId);
+    }
+
+    /**
+     * Search business owners with pagination.
+     * @param startIndex
+     * @param pageSize
+     * @param searchValue
+     * @return
+     * @throws AppManagementException
+     */
+    @Override
+    public  List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
+                                                                                          AppManagementException {
+        return appMDAO.searchBusinessOwners(startIndex, pageSize, searchValue, tenantId);
+    }
+
+    @Override
+    public  int getBusinessOwnersCount() throws AppManagementException {
+        return appMDAO.getBusinessOwnersCount(tenantId);
     }
 
     /**
@@ -149,8 +181,8 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @throws AppManagementException
      */
     @Override
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
-        appMDAO.saveBusinessOwner(businessOwner);
+    public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException {
+        return appMDAO.saveBusinessOwner(businessOwner, tenantId);
     }
 
     /**
@@ -453,17 +485,17 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     public void addWebApp(WebApp app) throws AppManagementException {
         try {
             createAPI(app);
-            appMDAO.addWebApp(app);
-            if (AppManagerUtil.isAPIManagementEnabled()) {
-            	Cache contextCache = AppManagerUtil.getAPIContextCache();
-            	Boolean apiContext = null;
-            	if (contextCache.get(app.getContext()) != null) {
-            		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
-            	}
-            	if (apiContext == null) {
-                    contextCache.put(app.getContext(), true);
-                }
-            }
+//            appMDAO.addWebApp(app);
+//            if (AppManagerUtil.isAPIManagementEnabled()) {
+//            	Cache contextCache = AppManagerUtil.getAPIContextCache();
+//            	Boolean apiContext = null;
+//            	if (contextCache.get(app.getContext()) != null) {
+//            		apiContext = Boolean.parseBoolean(contextCache.get(app.getContext()).toString());
+//            	}
+//            	if (apiContext == null) {
+//                    contextCache.put(app.getContext(), true);
+//                }
+//            }
         } catch (AppManagementException e) {
             throw new AppManagementException("Error in adding WebApp :"+app.getId().getApiName(),e);
         }
@@ -520,6 +552,104 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                                 + mobileApp.getAppName(), re);
             }
             handleException("Error occurred while creating the mobile application : " + mobileApp.getAppName(), e);
+        }
+        return artifactId;
+    }
+
+    @Override
+    public String createWebApp(WebApp webApp) throws AppManagementException {
+
+        AppRepository appRepository = new DefaultAppRepository(registry);
+        String appId = appRepository.saveApp(webApp);
+        return appId;
+
+    }
+
+    @Override
+    public String createNewVersion(App app) throws AppManagementException {
+
+        AppRepository appRepository = new DefaultAppRepository(registry);
+        String uuid = appRepository.createNewVersion(app);
+        return uuid;
+    }
+
+    /**
+     * Retrieve webapp for the given uuid
+     * @param uuid uuid of the Application
+     * @return Webapp
+     * @throws AppManagementException
+     */
+    @Override
+    public WebApp getWebApp(String uuid) throws AppManagementException {
+        GenericArtifact artifact = null;
+        WebApp webApp = null;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, AppMConstants.WEBAPP_ASSET_TYPE);
+            artifact = artifactManager.getGenericArtifact(uuid);
+            if (artifact == null) {
+                handleResourceNotFoundException("Webapp does not exist with app id :" + uuid);
+            }
+            webApp = AppManagerUtil.getAPI(artifact, registry);
+
+        } catch (GovernanceException e) {
+            handleException("Error occurred while retrieving webapp registry artifact with uuid " + uuid);
+        }
+        return webApp;
+    }
+
+
+    private String createWebAppArtifact(WebApp webApp) throws AppManagementException {
+        String artifactId = null;
+
+        GenericArtifactManager artifactManager = null;
+        try {
+            final String webAppName = webApp.getId().getApiName();
+            Map<String, List<String>> attributeListMap = new HashMap<String, List<String>>();
+
+            artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.WEBAPP_ASSET_TYPE);
+
+            attributeListMap.put(AppMConstants.API_OVERVIEW_NAME, new ArrayList<String>() {{
+                add(webAppName);
+            }});
+            GenericArtifact[] existingArtifacts = artifactManager.findGenericArtifacts(attributeListMap);
+            if (existingArtifacts != null && existingArtifacts.length > 0) {
+                handleResourceAlreadyExistsException("A duplicate web application already exists for name : " +
+                        webAppName);
+            }
+            registry.beginTransaction();
+            GenericArtifact genericArtifact =
+                    artifactManager.newGovernanceArtifact(new QName(webApp.getId().getApiName()));
+            GenericArtifact artifact = AppManagerUtil.createWebAppArtifactContent(genericArtifact, webApp);
+            artifactManager.addGenericArtifact(artifact);
+            artifactId = artifact.getId();
+            changeLifeCycleStatus(AppMConstants.WEBAPP_LIFE_CYCLE, artifactId, APPLifecycleActions.CREATE.getStatus());
+            String artifactPath = GovernanceUtils.getArtifactPath(registry, artifact.getId());
+
+            Set<String> tagSet = webApp.getTags();
+            if (tagSet != null) {
+                for (String tag : tagSet) {
+                    registry.applyTag(artifactPath, tag);
+                }
+            }
+            if (webApp.getAppVisibility() != null) {
+                AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(),
+                        AppMConstants.API_RESTRICTED_VISIBILITY, webApp.getAppVisibility(), artifactPath);
+            }
+            String providerPath = AppManagerUtil.getAPIProviderPath(webApp.getId());
+            //provider ------provides----> WebApp
+            registry.addAssociation(providerPath, artifactPath, AppMConstants.PROVIDER_ASSOCIATION);
+            registry.commitTransaction();
+        } catch (RegistryException e) {
+            try {
+                registry.rollbackTransaction();
+            } catch (RegistryException re) {
+                handleException(
+                        "Error while rolling back the transaction for web application: "
+                                + webApp.getId().getApiName(), re);
+            }
+            handleException("Error occurred while creating the web application : " + webApp.getId().getApiName(), e);
         }
         return artifactId;
     }
@@ -808,6 +938,13 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             throw new AppManagementException("Invalid WebApp update operation involving WebApp status changes");
         }
     }
+
+    @Override
+    public void updateApp(App app) throws AppManagementException {
+        AppRepository appRepository = new DefaultAppRepository(registry);
+        appRepository.updateApp(app);
+    }
+
     /**
      * Updates an existing WebApp
      *
@@ -1320,6 +1457,45 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     }
 
     /**
+     *
+     * @param apiId   APIIdentifier
+     * @param docId UUID of the doc
+     * @throws AppManagementException if failed to remove documentation
+     */
+    public void removeDocumentation(APIIdentifier apiId, String docId)
+            throws AppManagementException {
+        String docPath ;
+
+        try {
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry,
+                    AppMConstants.DOCUMENTATION_KEY);
+            GenericArtifact artifact = artifactManager.getGenericArtifact(docId);
+            docPath = artifact.getPath();
+            String docFilePath =  artifact.getAttribute(AppMConstants.DOC_FILE_PATH);
+
+            if(docFilePath!=null)
+            {
+                File tempFile = new File(docFilePath);
+                String fileName = tempFile.getName();
+                docFilePath = AppManagerUtil.getDocumentationFilePath(apiId,fileName);
+                if(registry.resourceExists(docFilePath))
+                {
+                    registry.delete(docFilePath);
+                }
+            }
+
+            Association[] associations = registry.getAssociations(docPath,
+                    AppMConstants.DOCUMENTATION_KEY);
+
+            for (Association association : associations) {
+                registry.delete(association.getDestinationPath());
+            }
+        } catch (RegistryException e) {
+            handleException("Failed to delete documentation", e);
+        }
+    }
+
+    /**
      * Adds Documentation to an WebApp
      *
      * @param apiId         APIIdentifier
@@ -1380,6 +1556,47 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException(msg, e);
         }
     }
+
+    /**
+     * Add a file to a document of source type FILE
+     *
+     * @param webApp
+     * @param documentation document
+     * @param filename name of the file
+     * @param content content of the file as an Input Stream
+     * @param contentType content type of the file
+     * @throws AppManagementException if failed to add the file
+     */
+    public void addFileToDocumentation(WebApp webApp, Documentation documentation, String filename,
+                                       InputStream content, String contentType) throws AppManagementException {
+        if (Documentation.DocumentSourceType.FILE.equals(documentation.getSourceType())) {
+            FileContent documentContent = new FileContent();
+            documentContent.setContent(content);
+            documentContent.setContentType(contentType);
+
+            String filePath = AppManagerUtil.getDocumentationFilePath(webApp.getId(), filename);
+
+            try {
+                String visibleRolesList = webApp.getVisibleRoles();
+                String[] visibleRoles = new String[0];
+                if (visibleRolesList != null) {
+                    visibleRoles = visibleRolesList.split(",");
+                }
+                AppManagerUtil.setResourcePermissions(webApp.getId().getProviderName(), webApp.getVisibility(), visibleRoles,
+                        filePath);
+                documentation.setFilePath(addResourceFile(filePath, documentContent));
+                AppManagerUtil.setFilePermission(filePath);
+            } catch (AppManagementException e) {
+                handleException("Failed to add file to document " + documentation.getName(), e);
+            }
+        } else {
+            String errorMsg = "Cannot add file to the Document. Document " + documentation.getName()
+                    + "'s Source type is not FILE.";
+            handleException(errorMsg);
+        }
+    }
+
+
 
     /**
      * This method used to update the WebApp definition content - Swagger
@@ -1609,6 +1826,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                     artifactManager.newGovernanceArtifact(new QName(documentation.getName()));
             artifactManager.addGenericArtifact(
                     AppManagerUtil.createDocArtifactContent(artifact, apiId, documentation));
+            documentation.setId(artifact.getId());
             String apiPath = AppManagerUtil.getAPIPath(apiId);
             //Adding association from api to documentation . (WebApp -----> doc)
             registry.addAssociation(apiPath, artifact.getPath(),
@@ -1667,7 +1885,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     public void updateSubscription(APIIdentifier apiId,String subStatus,int appId) throws
                                                                                    AppManagementException {
-        appMDAO.updateSubscription(apiId,subStatus,appId);
+        appMDAO.updateSubscription(apiId, subStatus, appId);
     }
 
 	/**
@@ -1743,6 +1961,7 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
                 }
             }
 
+            artifactManager.removeGenericArtifact(appArtifact);
             artifactManager.removeGenericArtifact(artifactId);
 
             String thumbPath = AppManagerUtil.getIconPath(identifier);
@@ -1899,17 +2118,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
     @Override
     public List<App> searchApps(String appType, Map<String, String> searchTerms) throws AppManagementException {
 
-        List<App> apps = new ArrayList<App>();
-        List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
 
-        for(GenericArtifact artifact : appArtifacts){
-            if(isSearchHit(artifact, searchTerms)){
-                apps.add(createApp(artifact, appType));
+        // If the app type is 'webapp' use the App Repository implementation path.
+        if(AppMConstants.WEBAPP_ASSET_TYPE.equalsIgnoreCase(appType)){
+            return new DefaultAppRepository(registry).searchApps(appType, searchTerms);
+        }else{
+            List<App> apps = new ArrayList<App>();
+            List<GenericArtifact> appArtifacts = getAppArtifacts(appType);
+
+            for(GenericArtifact artifact : appArtifacts){
+                if(isSearchHit(artifact, searchTerms)){
+                    apps.add(createApp(artifact, appType));
+                }
             }
+            return apps;
         }
-
-        return apps;
     }
+
 
     /**
      * Update the Tier Permissions
@@ -2287,40 +2512,102 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      */
     @Override
     public WebApp getAppDetailsFromUUID(String uuid) throws AppManagementException {
-        return appMDAO.getAppDetailsFromUUID(uuid);
+        WebApp webApp = appMDAO.getAppDetailsFromUUID(uuid);
+        if (webApp == null) {
+            handleResourceNotFoundException("Webapp does not exist with requested appID : " + uuid);
+        }
+        return webApp;
     }
 
     /**
      * Change the lifecycle state of a given application
      *
-     * @param appType application type
-     * @param appId   application type
-     * @param action  lifecycle action perform on the application
+     * @param appType         application type ie: webapp, mobileapp
+     * @param appId           application uuid
+     * @param lifecycleAction lifecycle action perform on the application
      * @throws AppManagementException
      */
-    public void changeLifeCycleStatus(String appType, String appId, String action) throws AppManagementException {
+    public void changeLifeCycleStatus(String appType, String appId, String lifecycleAction) throws AppManagementException {
+
         try {
+            String requiredPermission = null;
+
+            if (AppMConstants.LifecycleActions.SUBMIT_FOR_REVIEW.equals(lifecycleAction)) {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_CREATE;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_CREATE;
+                }
+            } else {
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.MOBILE_APP_PUBLISH;
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    requiredPermission = AppMConstants.Permissions.WEB_APP_PUBLISH;
+                }
+            }
+
+            if (!AppManagerUtil.checkPermissionQuietly(this.username, requiredPermission)) {
+                handleResourceAuthorizationException("The user " + this.username +
+                        " is not authorized to perform lifecycle action " + lifecycleAction + " on " +
+                        appType + " with uuid " + appId);
+            }
+            //Check whether the user has enough permissions to change lifecycle
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
 
-            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().
+                    getTenantId(this.tenantDomain);
+
+            AuthorizationManager authManager = ServiceReferenceHolder.getInstance().getRealmService().
+                    getTenantUserRealm(tenantId).getAuthorizationManager();
+
+            //Get system registry for logged in tenant domain
+            Registry systemRegistry = ServiceReferenceHolder.getInstance().
+                    getRegistryService().getGovernanceSystemRegistry(tenantId);
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(systemRegistry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            String resourcePath = RegistryUtils.getAbsolutePath(RegistryContext.getBaseInstance(),
+                    RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH + appArtifact.getPath());
 
             if (appArtifact != null) {
-                appArtifact.invokeAction(action, AppMConstants.MOBILE_LIFE_CYCLE);
+                if (!authManager.isUserAuthorized(username, resourcePath, "authorize")) {
+                    //Throws resource authorization exception
+                    handleResourceAuthorizationException("The user " + this.username +
+                            " is not authorized to" + appType + " with uuid " + appId);
+                }
+                //Change lifecycle status
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.MOBILE_LIFE_CYCLE);
+                } else if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)) {
+                    appArtifact.invokeAction(lifecycleAction, AppMConstants.WEBAPP_LIFE_CYCLE);
+                }
+
+                //If application is role restricted, deny read rights for Internal/everyone and system/wso2.anonymous.role roles
+                if ((AppMConstants.LifecycleActions.PUBLISH.equals(lifecycleAction) ||
+                        AppMConstants.LifecycleActions.RE_PUBLISH.equals(lifecycleAction)) &&
+                        !StringUtils.isBlank(appArtifact.getAttribute("overview_visibleRoles"))) {
+
+                    authManager.denyRole(AppMConstants.EVERYONE_ROLE, resourcePath, ActionConstants.GET);
+                    authManager.denyRole(AppMConstants.ANONYMOUS_ROLE, resourcePath, ActionConstants.GET);
+                }
+
                 if (log.isDebugEnabled()) {
                     String logMessage =
-                            "Application with appId : " + appId + " lifecycle has been changed successfully.";
+                            "Lifecycle action " + lifecycleAction + " has been successfully performed on " + appType
+                                    + " with id" + appId;
                     log.debug(logMessage);
                 }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
-
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving GenericArtifactManager for appType : " + appType, e);
-        } catch (GovernanceException e) {
-            handleException("Error occurred while changing lifecycle state of application with appId : " +
-                    appId + " for action : " + action, e);
+        } catch (UserStoreException e) {
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
+                    " with id : " + appId + ". Failed to retrieve tenant id for user : ", e);
+        } catch (RegistryException e) {
+            handleException("Error occurred while performing lifecycle action : " + lifecycleAction + " on " + appType +
+                    " with id : " + appId, e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -2334,23 +2621,28 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
      * @return
      */
     public String[] getAllowedLifecycleActions(String appId, String appType) throws AppManagementException {
-        PrivilegedCarbonContext.startTenantFlow();
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
-        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
         String[] actions = null;
         try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
             GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
             GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
             if (appArtifact != null) {
-                //Get all the actions corresponding to current state of the api artifact
-                actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                if (AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                    //Get all the actions corresponding to current state of the api artifact
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.MOBILE_LIFE_CYCLE);
+                }else if(AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                    actions = appArtifact.getAllLifecycleActions(AppMConstants.WEBAPP_LIFE_CYCLE);
+                } else {
+                    handleException("Unsupported application type : " + appType +" provided");
+                }
             } else {
-                handleResourceNotFoundException(
-                        "Failed to get "+appType+" artifact corresponding to artifactId " + appId + ". Artifact does not exist");
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
             }
-        } catch (AppManagementException e) {
-            handleException("Error occurred while retrieving allowed lifecycle actions to perform on "+appType+
-                    " with id : "+appId, e);
         } catch (GovernanceException e) {
             handleException("Error occurred while retrieving allowed lifecycle actions to perform on " + appType +
                     " with id : " + appId, e);
@@ -2481,6 +2773,149 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         }
 
         return rxtAttributeName;
+    }
+
+    @Override
+    public void addTags(String appType, String appId, List<String> tags) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                for(String tag : tags){
+                    registry.applyTag(appArtifact.getPath(), tag);
+                }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while adding tags"+StringUtils.join(tags, ",")+" to " + appType +" with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    @Override
+    public void removeTag(String appType, String appId, List<String> tags) throws AppManagementException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+                for(String tag : tags) {
+                    registry.removeTag(appArtifact.getPath(), tag);
+                }
+            } else {
+                handleResourceNotFoundException("Failed to retrieve " + appType +
+                        " artifact corresponding to artifactId " +appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while removing tags '" + StringUtils.join(tags, ",") + "' from "
+                    + appType + " with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    @Override
+    public Set<Tag> getAllTags(String appType) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            Map<String, String> params = new HashMap<String, String>();
+            if (AppMConstants.WEBAPP_ASSET_TYPE.equals(appType)){
+                params.put("1",AppMConstants.MediaType.WEB_APP);
+                params.put("2",AppMConstants.WEB_APP_LIFECYCLE_STATUS);
+                params.put("3","%");
+            } else if(AppMConstants.MOBILE_ASSET_TYPE.equals(appType)) {
+                params.put("1",AppMConstants.MediaType.MOBILE_APP);
+                params.put("2",AppMConstants.MOBILE_APP_LIFECYCLE_STATUS);
+                params.put("3","%");
+            } else {
+                handleException("Could not retrieve tags. Unsupported applictaion type :" + appType +" provided");
+            }
+
+            String tagsQueryPath = RegistryConstants.QUERIES_COLLECTION_PATH + "/tag-summary";
+
+            org.wso2.carbon.registry.core.Collection collection = registry.executeQuery(tagsQueryPath, params);
+            for (String fullTag : collection.getChildren()) {
+
+                String tagName = fullTag.substring(fullTag.indexOf(";") + 1, fullTag.indexOf(":"));
+                int numberOfOccurrence = Integer.parseInt(fullTag.substring(fullTag.indexOf(":")+1));
+                tagSet.add(new Tag(tagName, numberOfOccurrence));
+            }
+
+        } catch (RegistryException e) {
+            handleException("Error occurred while retrieving tags for " + appType +"s" , e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+        return tagSet;
+    }
+
+    @Override
+    public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException {
+        Set<Tag> tagSet = new HashSet<>();
+        try {
+            org.wso2.carbon.registry.core.Tag[] tags = null;
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(this.username);
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(this.tenantDomain, true);
+
+            GenericArtifactManager artifactManager = AppManagerUtil.getArtifactManager(registry, appType);
+            GenericArtifact appArtifact = artifactManager.getGenericArtifact(appId);
+            if (appArtifact != null) {
+              String artifactPath = appArtifact.getPath();
+                tags = registry.getTags(artifactPath);
+                for(org.wso2.carbon.registry.core.Tag tag : tags){
+                    tagSet.add(new Tag(tag.getTagName()));
+                }
+            } else {
+                handleResourceNotFoundException("Failed to get " + appType + " artifact corresponding to artifactId " +
+                        appId + ". Artifact does not exist");
+            }
+        } catch (RegistryException e) {
+            handleException("Error occurred while retrieving tags from " + appType +" with id : " + appId, e);
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+        return tagSet;
+    }
+
+    public String addResourceFile(String resourcePath, FileContent resourceFile) throws AppManagementException {
+        try {
+            Resource thumb = registry.newResource();
+            thumb.setContentStream(resourceFile.getContent());
+            thumb.setMediaType(resourceFile.getContentType());
+            registry.put(resourcePath, thumb);
+            if(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equalsIgnoreCase(tenantDomain)){
+                return RegistryConstants.PATH_SEPARATOR + "registry"
+                        + RegistryConstants.PATH_SEPARATOR + "resource"
+                        + RegistryConstants.PATH_SEPARATOR + "_system"
+                        + RegistryConstants.PATH_SEPARATOR + "governance"
+                        + resourcePath;
+            }
+            else{
+                return "/t/"+tenantDomain+ RegistryConstants.PATH_SEPARATOR + "registry"
+                        + RegistryConstants.PATH_SEPARATOR + "resource"
+                        + RegistryConstants.PATH_SEPARATOR + "_system"
+                        + RegistryConstants.PATH_SEPARATOR + "governance"
+                        + resourcePath;
+            }
+        } catch (RegistryException e) {
+            handleException("Error while adding the resource to the registry", e);
+        }
+        return null;
     }
 
 }

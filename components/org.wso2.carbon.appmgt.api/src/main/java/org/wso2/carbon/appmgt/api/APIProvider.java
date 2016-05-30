@@ -23,6 +23,7 @@ import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicy;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyPartial;
 import org.wso2.carbon.appmgt.api.model.entitlement.EntitlementPolicyValidationResult;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,25 +40,16 @@ public interface APIProvider extends APIManager {
      * @param businessOwnerId ID of the owner.
      * @throws AppManagementException
      */
-    public void deleteBusinessOwner(String businessOwnerId) throws
-                                                   AppManagementException;
+    public boolean deleteBusinessOwner(String businessOwnerId) throws AppManagementException;
 
     /**
      * update a Business Owner.
      * @return Integer
      * @throws AppManagementException
      */
-    public void updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+    public boolean updateBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
 
-    /**
 
-     /* *
-     *Get business ower data.
-     * @param ownerId
-     * @return
-     * @throws AppManagementException
-     */
-    public Map<String, String> getBusinessOwnerCustomProperties(int ownerId) throws AppManagementException;
     /**
      * @return
      * @throws AppManagementException
@@ -65,11 +57,37 @@ public interface APIProvider extends APIManager {
     public List<BusinessOwner> getBusinessOwners() throws AppManagementException;
 
     /**
+     * Return the owner properties of the given owner Id.
+     *
+     * @param businessOwnerId Business owner Id.
+     * @return
+     * @throws AppManagementException if failed to get business owner.
+     */
+    public BusinessOwner getBusinessOwner(int businessOwnerId) throws AppManagementException;
+
+    /**
+     * Search the business owners with page limitation.
+     * @param startIndex
+     * @param pageSize
+     * @param searchValue
+     * @return
+     * @throws AppManagementException
+     */
+    public List<BusinessOwner> searchBusinessOwners(int startIndex, int pageSize, String searchValue) throws
+                                                                                              AppManagementException;
+
+    /**
+     * Get the count of business owners.
+     * @return
+     * @throws AppManagementException
+     */
+    public  int getBusinessOwnersCount() throws AppManagementException;
+    /**
      * Save a Business Owner.
      * @return Integer
      * @throws AppManagementException
      */
-    public void saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
+    public int saveBusinessOwner(BusinessOwner businessOwner) throws AppManagementException;
     /**
      * Returns a list of all #{@link org.wso2.carbon.apimgt.api.model.Provider} available on the system.
      *
@@ -305,6 +323,24 @@ public interface APIProvider extends APIManager {
     public String createMobileApp(MobileApp mobileApp) throws AppManagementException;
 
     /**
+     * Add new webapp
+     * @param webApp
+     * @return
+     * @throws AppManagementException
+     */
+    public String createWebApp(WebApp webApp) throws AppManagementException;
+
+    /**
+     *
+     * Creates a new versions using the attributes (inlcuding the new version number) of the given app.
+     *
+     * @param app
+     * @return The UUID of the newly created version.
+     * @throws AppManagementException
+     */
+    public String createNewVersion(App app)throws AppManagementException;
+
+    /**
      * Updates an existing WebApp. This method must not be used to change WebApp status. Implementations
      * should throw an exceptions when such attempts are made. All life cycle state changes
      * should be carried out using the changeAPIStatus method of this interface.
@@ -333,6 +369,16 @@ public interface APIProvider extends APIManager {
      * @param updateGatewayConfig Whether the changes should be pushed to the WebApp gateway or not
      * @throws AppManagementException on error
      */
+
+    /**
+     * Returns details of an WebApp
+     *
+     * @param uuid uuid of the A
+     * @return An WebApp object related to the given identifier or null
+     * @throws AppManagementException if failed get WebApp from APIIdentifier
+     */
+    public WebApp getWebApp(String uuid) throws AppManagementException;
+
     public void changeAPIStatus(WebApp api, APIStatus status, String userId,
                                 boolean updateGatewayConfig) throws AppManagementException;
 
@@ -364,6 +410,16 @@ public interface APIProvider extends APIManager {
     public void removeDocumentation(APIIdentifier apiId,
                                     String docType, String docName) throws AppManagementException;
 
+
+    /**
+     * Removes a given documentation
+     *
+     * @param appId   APIIdentifier
+     * @param documentId UUID of the doc
+     * @throws AppManagementException if failed to remove documentation
+     */
+    public void removeDocumentation(APIIdentifier appId, String documentId)throws AppManagementException;
+
     /**
      * Adds Documentation to an WebApp
      *
@@ -373,6 +429,19 @@ public interface APIProvider extends APIManager {
      */
     public void addDocumentation(APIIdentifier apiId,
                                  Documentation documentation) throws AppManagementException;
+    /**
+     * Add a file to a document of source type FILE
+     *
+     * @param appId App identifier the document belongs to
+     * @param documentation document
+     * @param filename name of the file
+     * @param content content of the file as an Input Stream
+     * @param contentType content type of the file
+     * @throws AppManagementException if failed to add the file
+     */
+    void addFileToDocumentation(WebApp appId, Documentation documentation, String filename, InputStream content,
+                                String contentType) throws AppManagementException;
+
 
     /**
      * This method used to save the documentation content
@@ -391,7 +460,7 @@ public interface APIProvider extends APIManager {
      * @param identifier,        WebApp identifier
      * @param documentationName, name of the inline documentation
      * @param text,              content of the inline documentation
-     * @throws org.wso2.carbon.apimgt.api.APIManagementException
+     * @throws AppManagementException
      *          if failed to add the document as a resource to registry
      */
     public void addAPIDefinitionContent(APIIdentifier identifier, String documentationName, String text)
@@ -647,6 +716,64 @@ public interface APIProvider extends APIManager {
      * @return list of allowed lifecycle actions perform on the app
      */
     public String[] getAllowedLifecycleActions(String appType, String appId) throws AppManagementException;
+
+    /**
+     * Add mobile application subscription for a given user
+     * @param userId userId
+     * @param appId application id
+     * @return
+     * @throws AppManagementException
+     */
     public boolean subscribeMobileApp(String userId, String appId) throws AppManagementException;
+
+    /**
+     * Remove mobile application subscription for a given user
+     * @param userId username
+     * @param appId application id
+     * @return
+     * @throws AppManagementException
+     */
     public boolean unSubscribeMobileApp(String userId, String appId) throws AppManagementException;
+
+    /**
+     * Add tags to a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @param tags tag list to be added
+     * @return
+     * @throws AppManagementException
+     */
+    public void addTags(String appType,String appId, List<String> tags) throws AppManagementException;
+
+    /**
+     * Remove tag from a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @param tags tag list to be deleted
+     * @throws AppManagementException
+     */
+    public void removeTag(String appType, String appId, List<String> tags) throws AppManagementException;
+
+    /**
+     * Retrieve all tags for a given application type
+     * @param appType application type ie: webapp or mobileapp
+     * @throws AppManagementException
+     */
+    public Set<Tag> getAllTags(String appType) throws AppManagementException;
+
+    /**
+     * Retrieve all tags for a given application
+     * @param appType application type ie: webapp or mobileapp
+     * @param appId application uuid
+     * @throws AppManagementException
+     */
+    public Set<Tag> getAllTags(String appType, String appId) throws AppManagementException;
+
+    /**
+     * Updates the given app.
+     *
+     * @param app
+     * @throws AppManagementException
+     */
+    void updateApp(App app)throws AppManagementException;
 }

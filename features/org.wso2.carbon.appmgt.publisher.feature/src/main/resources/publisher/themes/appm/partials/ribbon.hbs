@@ -20,15 +20,21 @@
                     </li>
 
                     {{#if ../../viewStats}}
-                        <li  {{#ifCond ../../active "==" "statistics"}}class="active"{{/ifCond}}><a href="{{url "/assets/statistics/webapp/"}}">Statistics</a></li>
+                        <li  {{#ifCond ../../active "==" "statistics"}}class="active"{{/ifCond}}><a href="
+                        {{#if ../../../isSubscriptionEnabled}}
+                            {{url "/assets/statistics/webapp/"}}
+                        {{else}}
+                            {{url "/assets/apps/webapp/"}}
+                        {{/if}}
+                        ">Statistics</a></li>
                     {{/if}}
                     {{#if ../../notificationCount}}
                         <li class="dropdown-notification">
                             <a href="#"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                <span class="badge">{{../../notificationCount}}</span>
+                                <span class="badge">{{../../../notificationCount}}</span>
                                 Notifications <span class="caret"></span></a>
                             <ul class="dropdown-menu notifications" role="menu">
-                                {{#each ../../notifications}}
+                                {{#each ../../../notifications}}
                                     <li title="Webapp {{this.appname}} has been rejected due to: {{this.notification}}"><a href="{{this.url}}">Webapp <strong>{{this.appname}}</strong> has been rejected due to: {{this.notification}}</a></li>
                                 {{/each}}
                             </ul>

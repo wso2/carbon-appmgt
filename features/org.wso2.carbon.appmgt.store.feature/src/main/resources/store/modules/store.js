@@ -286,7 +286,7 @@ Store.prototype.commentsPageSize = function () {
 
 Store.prototype.assetsPaging = function (request) {
     var page = request.getParameter('page'),
-        size = this.assetsPageSize();
+        size = this.getRecentAppCount().topAssetPage;
     page = page ? page - 1 : 0;
     return {
         start: page * size,

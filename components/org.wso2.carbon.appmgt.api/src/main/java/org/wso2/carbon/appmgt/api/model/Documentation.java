@@ -26,6 +26,7 @@ import java.util.Date;
  */
 @SuppressWarnings("unused")
 public class Documentation {
+    private String id;
     private DocumentationType type;
     private String name;
     private String summary;
@@ -125,4 +126,13 @@ public class Documentation {
             this.type = type;
         }
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 }

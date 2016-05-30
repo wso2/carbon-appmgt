@@ -7,6 +7,9 @@
     This data source should be defined in the master-datasources.xml file in conf/datasources directory.
     -->
     <DataSourceName>jdbc/WSO2AM_DB</DataSourceName>
+    <DataSources>
+        <Storage>jdbc/ES_Storage</Storage>
+    </DataSources>
 
     <APPStoreConfiguration>
         <!--
@@ -197,7 +200,7 @@
         e.g. - Multiple Receiver Groups with two receivers each
                  {tcp://localhost:7612/,tcp://localhost:7613},{tcp://localhost:7712/,tcp://localhost:7713/}
         -->
-        <BAMServerURL>tcp://localhost:7612/</BAMServerURL>
+        <BAMServerURL>tcp://localhost:7612</BAMServerURL>
 
         <!--
         Administrator username to login to the remote BAM server.

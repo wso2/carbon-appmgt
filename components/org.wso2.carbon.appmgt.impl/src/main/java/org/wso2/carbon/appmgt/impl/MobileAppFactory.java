@@ -20,17 +20,11 @@ package org.wso2.carbon.appmgt.impl;
 
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.*;
-import org.wso2.carbon.appmgt.impl.dao.AppMDAO;
-import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
-import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
-import org.wso2.carbon.appmgt.impl.utils.URLMapping;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
 import org.wso2.carbon.governance.api.util.GovernanceUtils;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.user.api.UserStoreException;
-import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.util.*;
 
@@ -40,7 +34,7 @@ import java.util.*;
 public class MobileAppFactory extends AppFactory {
 
     @Override
-    public App createApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
+    public App doCreateApp(GenericArtifact artifact, Registry registry) throws AppManagementException {
 
         try {
 
@@ -65,16 +59,16 @@ public class MobileAppFactory extends AppFactory {
             //Set Lifecycle status
             if (artifact.getLifecycleState() != null && artifact.getLifecycleState() != "") {
                 if (artifact.getLifecycleState().toUpperCase().equalsIgnoreCase(APIStatus.INREVIEW.getStatus())) {
-                    mobileApp.setLifecycleStatus(APIStatus.INREVIEW);
+                    mobileApp.setLifeCycleStatus(APIStatus.INREVIEW);
                 } else {
-                    mobileApp.setLifecycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
+                    mobileApp.setLifeCycleStatus(APIStatus.valueOf(artifact.getLifecycleState().toUpperCase()));
                 }
             }
 
             mobileApp.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
             mobileApp.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
             mobileApp.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            mobileApp.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
+            mobileApp.setBanner(artifact.getAttribute(AppMConstants.APP_IMAGES_BANNER));
             if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
                 List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
                         AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
@@ -87,6 +81,9 @@ public class MobileAppFactory extends AppFactory {
 
             mobileApp.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             mobileApp.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
+            if (artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY) != null) {
+                mobileApp.setAppVisibility(artifact.getAttribute(AppMConstants.API_OVERVIEW_VISIBILITY).split(","));
+            }
 
             return mobileApp;
 

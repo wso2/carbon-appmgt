@@ -49,11 +49,15 @@ public final class AppMConstants {
     public static final String WEB_APP_LIFECYCLE_STATUS = "registry.lifecycle.WebAppLifeCycle.state";
     public static final String MOBILE_APP_LIFECYCLE_STATUS = "registry.lifecycle.MobileAppLifeCycle.state";
     public static final String MOBILE_LIFE_CYCLE = "MobileAppLifeCycle";
+    public static final String WEBAPP_LIFE_CYCLE = "WebAppLifeCycle";
 
     //Association between documentation and its content
     public static final String DOCUMENTATION_CONTENT_ASSOCIATION = "hasContent";
 
     public static final String DOCUMENTATION_KEY = "document";
+    public static final String DOCUMENTATION_RESOURCE_MAP_DATA = "Data";
+    public static final String DOCUMENTATION_RESOURCE_MAP_CONTENT_TYPE = "contentType";
+    public static final String DOCUMENTATION_RESOURCE_MAP_NAME = "name";
 
     //association type between provider and APIImpl
     public static final String PROVIDER_ASSOCIATION = "provides";
@@ -69,7 +73,9 @@ public final class AppMConstants {
 
     public static final String APPMGT_APPLICATION_DATA_LOCATION = APPMGT_REGISTRY_LOCATION +"/applicationdata";
 
-    public static final String TENANT_CONF_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  "tenant-conf.json";
+    public static final String OAUTH_SCOPE_ROLE_MAPPING_FILE = "oauth-scope-role-mapping.json";
+
+    public static final String OAUTH_SCOPE_ROLE_MAPPING_PATH = APPMGT_APPLICATION_DATA_LOCATION + "/" +  OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
     //registry location of WebApp
     public static final String API_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/provider";
@@ -133,11 +139,9 @@ public final class AppMConstants {
 
     public static final String RESOURCE_FOLDER_LOCATION = "repository"+ File.separator + "resources";
 
-    public static final String API_TENANT_CONF = "tenant-conf.json";
-
     public static final String APPLICATION_JSON_MEDIA_TYPE = "application/json";
 
-    public static final String API_TENANT_CONF_LOCATION = APPMGT_APPLICATION_DATA_LOCATION + "/" + API_TENANT_CONF;
+    public static final int ASSET_CREATED_DATE_LENGTH = 20;
 
     // Those constance are used in WebApp artifact.
     public static final String API_OVERVIEW_NAME = "overview_name";
@@ -146,7 +150,7 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_CONTEXT = "overview_context";
     public static final String API_OVERVIEW_DESCRIPTION = "overview_description";
     public static final String API_OVERVIEW_ENDPOINT_URL = "overview_webAppUrl";//ES converts names to Camel case
-    public static final String API_OVERVIEW_LOGOUT_URL = "overview_webAppUrl";
+    public static final String API_OVERVIEW_LOGOUT_URL = "overview_logoutUrl";
     public static final String API_OVERVIEW_SANDBOX_URL = "overview_sandboxUrl";
     public static final String API_OVERVIEW_WSDL = "overview_wsdl";
     public static final String API_OVERVIEW_WADL = "overview_wadl";
@@ -198,8 +202,13 @@ public final class AppMConstants {
     public static final String API_OVERVIEW_SAML2_SSO_ISSUER = "overview_saml2SsoIssuer";
     public static final String APP_OVERVIEW_TREAT_AS_A_SITE = "overview_treatAsASite";
     public static final String APP_OVERVIEW_MAKE_AS_DEFAULT_VERSION = "overview_makeAsDefaultVersion";
+    public static final String APP_OVERVIEW_OLD_VERSION = "overview_oldVersion";
 
-    public static final String IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String APP_IMAGES_THUMBNAIL = "images_thumbnail";
+    public static final String APP_IMAGES_BANNER = "images_banner";
+    public static final String APP_TRACKING_CODE = "overview_trackingCode";
+    public static final String APP_OVERVIEW_ACS_URL = "overview_acsUrl";
+
     public static final String MOBILE_APP_OVERVIEW_NAME = "overview_name";
     public static final String MOBILE_APP_OVERVIEW_PROVIDER = "overview_provider";
     public static final String MOBILE_APP_OVERVIEW_VERSION = "overview_version";
@@ -213,7 +222,6 @@ public final class AppMConstants {
     public static final String MOBILE_APP_OVERVIEW_APP_ID = "overview_appid";
     public static final String MOBILE_APP_IMAGES_SCREENSHOTS = "images_screenshots";
     public static final String MOBILE_APP_IMAGES_THUMBNAIL= "images_thumbnail";
-    public static final String MOBILE_APP_IMAGES_BANNER = "images_banner";
 
     //Those constance are used in Provider artifact.
     public static final String PROVIDER_OVERVIEW_NAME= "overview_name";
@@ -235,10 +243,12 @@ public final class AppMConstants {
     //tables columns for subscription
     public static final String SUBSCRIPTION_FIELD_SUBSCRIPTION_ID = "SUBSCRIPTION_ID";
     public static final String SUBSCRIPTION_FIELD_TIER_ID = "TIER_ID";
-    public static final String SUBSCRIPTION_FIELD_API_ID = "APP_ID";
+    public static final String SUBSCRIPTION_FIELD_APP_ID = "APP_ID";
     public static final String SUBSCRIPTION_FIELD_ACCESS_TOKEN = "ACCESS_TOKEN";
     public static final String SUBSCRIPTION_FIELD_LAST_ACCESS = "LAST_ACCESSED";
     public static final String SUBSCRIPTION_FIELD_SUB_STATUS = "SUB_STATUS";
+    public static final String SUBSCRIPTION_FIELD_TYPE = "SUBSCRIPTION_TYPE";
+    public static final String SUBSCRIPTION_FIELD_TRUSTED_IDP = "TRUSTED_IDP";
 
     public static final String SUBSCRIPTION_KEY_TYPE = "KEY_TYPE";
     public static final String SUBSCRIPTION_USER_TYPE = "USER_TYPE";
@@ -418,6 +428,10 @@ public final class AppMConstants {
     public static final String CORS_CONFIGURATION_ACCESS_CTL_ALLOW_METHODS = CORS_CONFIGURATION + "Access-Control-Allow-Methods";
 
     public static final String SSO_CONFIGURATION = "SSOConfiguration.";
+    public static final String SSO_CONFIGURATORS = SSO_CONFIGURATION + "Configurators.";
+    public static final String SSO_CONFIGURATOR = SSO_CONFIGURATORS + "Configurator.";
+    public static final String SSO_CONFIGURATOR_NAME = SSO_CONFIGURATOR + "name";
+    public static final String SSO_CONFIGURATOR_VERSION = SSO_CONFIGURATOR + "version";
     public static final String SSO_CONFIGURATION_IDENTITY_PROVIDER_URL = SSO_CONFIGURATION + "IdentityProviderUrl";
     public static final String SSO_CONFIGURATION_ENABLE_SSO_CONFIGURATION = SSO_CONFIGURATION + "EnableSamlSSOConfig";
     public static final String SSO_CONFIGURATION_IDENTITY_PROVIDER_MANAGER = SSO_CONFIGURATION + "IdPManager";
@@ -510,6 +524,9 @@ public final class AppMConstants {
     public static final String SELF_SIGN_UP_REG_ROLE_IS_EXTERNAL = "IsExternalRole";
     public static final String SELF_SIGN_UP_REG_ROLE_PERMISSIONS = "Permissions";
 
+    public static final String APPM_DATA_SOURCES = "DataSources.";
+    public static final String APPM_DATA_SOURCES_STORAGE = APPM_DATA_SOURCES + "Storage";
+
     //TODO: move this to a common place (& Enum) to be accessible by all components
     public static class KeyValidationStatus {
         public static final int API_AUTH_GENERAL_ERROR       = 900900;
@@ -577,7 +594,7 @@ public final class AppMConstants {
     public static final String CREATOR_ROLE = "internal/creator";
     public static final String PUBLISHER_ROLE = "internal/publisher";
     public static final String STORE_ADMIN_ROLE = "internal/store-admin";
-    public static final String ANONYMOUS_ROLE = "SYSTEM/wso2.anonymous.role";
+    public static final String ANONYMOUS_ROLE = "system/wso2.anonymous.role";
 
     public static final String READ_ACTION = "2";
     public static final String WRITE_ACTION = "3";
@@ -712,5 +729,11 @@ public final class AppMConstants {
         public static final String MOBILE_APP = "application/vnd.wso2-mobileapp+xml";
     }
 
+    public static class LifecycleActions{
+        public static final String SUBMIT_FOR_REVIEW = "Submit for Review";
+        public static final String PUBLISH = "Publish";
+        public static final String RE_PUBLISH = "Re-Publish";
+        public static final String CREATE = "Create";
+    }
 
 }
