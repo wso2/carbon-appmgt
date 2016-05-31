@@ -463,6 +463,7 @@ public class DefaultAppRepository implements AppRepository {
             registry.beginTransaction();
             String uuid = saveRegistryArtifact(webApp);
             webApp.setUUID(uuid);
+            registry.commitTransaction();
 
             // Persist web app data to the database (RDBMS)
             int webAppDatabaseId = persistWebAppToDatabase(webApp, connection);
@@ -480,7 +481,6 @@ public class DefaultAppRepository implements AppRepository {
             createSSOProvider(webApp);
 
             // Commit JDBC and Registry transactions.
-            registry.commitTransaction();
             connection.commit();
 
             return uuid;
