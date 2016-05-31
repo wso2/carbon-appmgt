@@ -46,7 +46,11 @@ public class AppDTO  {
   
   
   private String provider = null;
-  
+
+
+  private String businessOwnerId = null;
+
+
   @NotNull
   private String appDefinition = null;
   
@@ -235,7 +239,19 @@ public class AppDTO  {
     this.provider = provider;
   }
 
-  
+
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("businessOwnerId")
+  public String getBusinessOwnerId() {
+    return businessOwnerId;
+  }
+  public void setBusinessOwnerId(String businessOwnerId) {
+    this.businessOwnerId = businessOwnerId;
+  }
+
+
   /**
    * Swagger definition of the App which contains details about URI templates and scopes
    **/
@@ -471,6 +487,7 @@ public class AppDTO  {
     sb.append("  context: ").append(context).append("\n");
     sb.append("  version: ").append(version).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
+    sb.append("  businessOwnerId: ").append(businessOwnerId).append("\n");
     sb.append("  appDefinition: ").append(appDefinition).append("\n");
     sb.append("  isDefaultVersion: ").append(isDefaultVersion).append("\n");
     sb.append("  transport: ").append(transport).append("\n");

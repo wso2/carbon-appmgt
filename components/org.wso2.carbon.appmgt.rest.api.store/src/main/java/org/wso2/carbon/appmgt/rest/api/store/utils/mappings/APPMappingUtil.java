@@ -363,6 +363,7 @@ public class APPMappingUtil {
         dto.setVersion(webapp.getId().getVersion());
         String providerName = webapp.getId().getProviderName();
         dto.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+        dto.setBusinessOwnerId(webapp.getBusinessOwner());
         dto.setId(webapp.getUUID());
         String context = webapp.getContext();
         if (context != null) {
