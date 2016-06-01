@@ -23,37 +23,76 @@ var businessOwnerApi = require('/modules/businessOwners-api.js');
 var uriMatcher = new URIMatcher(request.getRequestURI());
 var log = new Log();
 //POST patterns
-var saveOwner = '/{context}/apis/businessowners/save';
-var ownerList = '/{context}/apis/businessowners/list';
+var addBusinessOwner = '/{context}/apis/businessowners';
+var getBusinessOwners = '/{context}/apis/businessowners/filtered/datatable'; //To avoid the issue in request router
+                                                                             // used a context with multiple path
+                                                                             // params
+var getAllBusinessOwners = '/{context}/apis/businessowners';
 var ownerUpdate = '/{context}/apis/businessowners/update';
-var ownerDelete = '/{context}/apis/businessowners/delete/{ownerId}';
-var OwnerCustomProperties = '/{context}/apis/businessowners/details/{ownerId}';
+var deleteBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
+var getBusinessOwner = '/{context}/apis/businessowners/{ownerId}';
+var CONTENT_TYPE_JSON = "application/json";
 
 if (method == 'GET') {
-    if (uriMatcher.match(ownerList)) {
-        print(businessOwnerApi.getBusinessOwner());
+    if (uriMatcher.match(getBusinessOwners)) {
+        var draw = request.getParameter("draw");
+        var start = request.getParameter("start");
+        var length = request.getParameter("length");
+        var search = request.getParameter("search[value]");
+        print(businessOwnerApi.searchBusinessOwners(start, length, draw, search));
     }
-    if (uriMatcher.match(OwnerCustomProperties)) {
-        print(businessOwnerApi.getBusineeOwnerDataCustomProperties(uriMatcher.elements().ownerId));
+    if (uriMatcher.match(getBusinessOwner)) {
+        response.contentType = CONTENT_TYPE_JSON;
+        var result = null;
+        var businessOwnerId = uriMatcher.elements().ownerId;
+        try {
+            result = businessOwnerApi.getBusinessOwner(businessOwnerId);
+        } catch (e) {
+            log.error("Record(s) not found Business Owner : " + businessOwnerId);
+        }
+        if (result == null) {
+            print({'success': false});
+        } else {
+            print(result);
+        }
+    }
+    if (uriMatcher.match(getAllBusinessOwners)) {
+        response.contentType = CONTENT_TYPE_JSON;
+        var result = businessOwnerApi.getBusinessOwners();
+        print(result);
     }
 }
 
 if (method == 'DELETE') {
-    if (uriMatcher.match(ownerDelete)) {
-        print(businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId));
+    if (uriMatcher.match(deleteBusinessOwner)) {
+        var result = null;
+        try {
+            result = businessOwnerApi.deleteOwner(uriMatcher.elements().ownerId)
+        } catch (e) {
+            log.error("Error while saving Business Owners.");
+        }
+        print(createResponseObject(result));
     }
 }
 if (method == 'POST') {
-    if (uriMatcher.match(saveOwner)) {
+    if (uriMatcher.match(addBusinessOwner)) {
         var businessOwnerName = request.getParameter("businessOwnerName");
         var businessOwnerEmail = request.getParameter("businessOwnerEmail");
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerProperties = request.getParameter("businessOwnerProperties");
 
-        print(createResponseObject(businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerProperties)));
+        var result = null;
+        try {
+            result = businessOwnerApi.saveOwner(businessOwnerName, businessOwnerEmail, businessOwnerDescription,
+                                                businessOwnerSite, businessOwnerProperties);
+        } catch (e) {
+            log.error("Error while saving Business Owners.");
+        }
+        print(createResponseObject(result));
     }
-
+}
+if (method == 'POST') {
     if (uriMatcher.match(ownerUpdate)) {
         var businessOwnerId = request.getParameter("businessOwnerId");
         var businessOwnerName = request.getParameter("businessOwnerName");
@@ -61,11 +100,21 @@ if (method == 'POST') {
         var businessOwnerDescription = request.getParameter("businessOwnerDescription");
         var businessOwnerSite = request.getParameter("businessOwnerSite");
         var businessOwnerDetails = request.getParameter("businessOwnerProperties");
-        print(createResponseObject(businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail, businessOwnerDescription, businessOwnerSite, businessOwnerDetails)));
+
+        var result = null;
+        try {
+            result = businessOwnerApi.updateOwner(businessOwnerId, businessOwnerName, businessOwnerEmail,
+                                                  businessOwnerDescription, businessOwnerSite, businessOwnerDetails);
+        } catch (e) {
+            log.error("Error while updating Business Owners.");
+        }
+
+        print(createResponseObject(result));
     }
 }
 
 function createResponseObject(object) {
+    response.contentType = CONTENT_TYPE_JSON;
     if (object !== null) {
         return {'success': true, 'response': object};
     } else {

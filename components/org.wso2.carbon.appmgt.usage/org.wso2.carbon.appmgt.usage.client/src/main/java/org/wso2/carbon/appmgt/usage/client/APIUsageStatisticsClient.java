@@ -179,7 +179,8 @@ public class APIUsageStatisticsClient {
             throws APIMgtUsageQueryServiceClientException {
 
         OMElement omElement = this.queryBetweenTwoDays(
-                APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, fromDate, toDate, null, tenantDomainName);
+                APIUsageStatisticsClientConstants.API_VERSION_USAGE_SUMMARY, fromDate, toDate, null,
+                tenantDomainName, limit);
         Collection<APIUsage> usageData = getUsageData(omElement);
         List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         Map<String, APIUsageDTO> usageByAPIs = new TreeMap<String, APIUsageDTO>();
@@ -512,7 +513,8 @@ public class APIUsageStatisticsClient {
             throws APIMgtUsageQueryServiceClientException {
 
         OMElement omElement = this.queryBetweenTwoDays(
-                APIUsageStatisticsClientConstants.API_VERSION_SERVICE_TIME_SUMMARY, fromDate, toDate, null, tenantDomain);
+                APIUsageStatisticsClientConstants.API_VERSION_SERVICE_TIME_SUMMARY, fromDate, toDate, null,
+                tenantDomain, limit);
         Collection<APIResponseTime> responseTimes = getResponseTimeData(omElement);
         List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomain);
 
@@ -559,7 +561,8 @@ public class APIUsageStatisticsClient {
             throws APIMgtUsageQueryServiceClientException {
 
         OMElement omElement = this.queryBetweenTwoDays(
-                APIUsageStatisticsClientConstants.API_VERSION_KEY_LAST_ACCESS_SUMMARY,fromDate,toDate, null, tenantDomainName);
+                APIUsageStatisticsClientConstants.API_VERSION_KEY_LAST_ACCESS_SUMMARY,fromDate,toDate, null,
+                tenantDomainName, limit);
         Collection<APIAccessTime> accessTimes = getAccessTimeData(omElement);
         List<WebApp> providerAPIs = getAPIsByProvider(providerName, tenantDomainName);
         Map<String, APIAccessTime> lastAccessTimes = new TreeMap<String, APIAccessTime>();
@@ -987,7 +990,7 @@ public class APIUsageStatisticsClient {
     }
 
     private OMElement queryBetweenTwoDays(String columnFamily, String fromDate,String toDate,
-                                    QueryServiceStub.CompositeIndex[] compositeIndex, String tenantDomain)
+                                    QueryServiceStub.CompositeIndex[] compositeIndex, String tenantDomain, int limit)
             throws APIMgtUsageQueryServiceClientException {
 
         if (dataSource == null) {
@@ -1013,9 +1016,10 @@ public class APIUsageStatisticsClient {
             if (!columnFamily.equals(APIUsageStatisticsClientConstants.API_FAULT_SUMMARY)) {
                 if (selectRowsByColumnName != null) {
                     query = "SELECT * FROM  " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\' AND " 
-                    		+ selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\' AND " 
-                    		+ APIUsageStatisticsClientConstants.TIME + " BETWEEN " + "\'" + fromDate + "\' AND \'" 
-                    		+ toDate + "\'";
+                    		+ selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\'";
+                    if (toDate != null && fromDate != null) {
+                        query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
+                    }
                 } else {
                     query = "SELECT * FROM " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\'";
                 }
@@ -1025,6 +1029,13 @@ public class APIUsageStatisticsClient {
                     		+ selectRowsByColumnName + "=\'" + selectRowsByColumnValue + "\'";
                 } else {
                 	query = "SELECT * FROM " + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomain + "\'";
+                }
+            }
+            if (limit != Integer.MIN_VALUE) {
+                if ((connection.getMetaData().getDriverName()).contains("Oracle")) {
+                    query += " ROWNUM <= " + limit;
+                } else {
+                    query += " LIMIT " + limit;
                 }
             }
             rs = statement.executeQuery(query);
@@ -1257,13 +1268,18 @@ public class APIUsageStatisticsClient {
             if (selectRowsByColumnName != null) {
                 query = "SELECT api,version,apiPublisher,context,referer,userid,SUM(total_request_count) as total_request_count FROM  " +
                         columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomainName + "\' AND " + selectRowsByColumnName +
-                        "=\'" + selectRowsByColumnValue + "\' AND " + APIUsageStatisticsClientConstants.TIME + " BETWEEN " +
-                        "\'" + fromDate + "\' AND \'" + toDate + "\'" + " GROUP BY api,version,apiPublisher,context,userid,referer";
+                        "=\'" + selectRowsByColumnValue + "\' ";
+                if (fromDate != null && toDate != null) {
+                    query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
+                }
+                query += " GROUP BY api,version,apiPublisher,context,userid,referer";
             } else {
                 query = "SELECT api,version,apiPublisher,context,referer,userid,SUM(total_request_count) as total_request_count FROM  "
-                        + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomainName + "\' AND " 
-                		+ APIUsageStatisticsClientConstants.TIME + " BETWEEN " + "\'" + fromDate + "\' AND \'" 
-                        + toDate + "\'" + " GROUP BY api,version,apiPublisher,context,userid,referer";
+                        + columnFamily + " WHERE APIPUBLISHER = \'" + tenantDomainName + "\' ";
+                if (fromDate != null && toDate != null) {
+                    query += addRangeCondition(APIUsageStatisticsClientConstants.TIME, "AND", fromDate, toDate);
+                }
+                query += " GROUP BY api,version,apiPublisher,context,userid,referer";
             }
             rs = statement.executeQuery(query);
             StringBuilder returnStringBuilder = new StringBuilder("<omElement><rows>");
@@ -1560,8 +1576,8 @@ public class APIUsageStatisticsClient {
                         "FROM CACHE_REQUEST_SUMMARY WHERE TIME BETWEEN" +
                         "\'" + fromDate + "\' AND \'" + toDate + "\'" +" AND ROWNUM <= " + resultsLimit + "  GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
             } else {
-                query = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME"+
-                        "FROM CACHE_REQUEST_SUMMARY GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time ,CACHEHIT DESC";
+                query = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT," +
+                        "TIME FROM CACHE_REQUEST_SUMMARY GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time ,CACHEHIT DESC";
 
                 oracleQuery = "SELECT API,version, CACHEHIT,FULLREQUESTPATH  , sum(TOTAL_REQUEST_COUNT) AS TOTAL_REQUEST_COUNT,TIME "+
                         "\"FROM CACHE_REQUEST_SUMMARY WHERE ROWNUM <= "+ resultsLimit + " GROUP BY CACHEHIT,TIME,API,version,FULLREQUESTPATH ORDER BY time,CACHEHIT DESC";
@@ -2235,6 +2251,11 @@ public class APIUsageStatisticsClient {
                 }
             }
         }
+    }
+
+    private String addRangeCondition(String rangeField, String preFix, String fromDate, String toDate){
+        String query = preFix + " " + rangeField + " BETWEEN '" + fromDate + "' AND '" + toDate + "'";
+        return query;
     }
 
 }

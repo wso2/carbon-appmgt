@@ -180,9 +180,9 @@ require('/modules/store.js').exec(function (ctx) {
                        assets: assets,
                        plural: manager.pluralLabel,
                        singular: manager.singularLabel,
-                       type: manager.shortName
+                       type: manager.shortName,
+                       pageSize: store.getRecentAppCount().topAssetPage
                    });
-
 
     });
 
@@ -292,8 +292,15 @@ function setDefaultThumbnail(asset) {
 function isFavouriteApp(appName, version, provider, user, storeTenantDomain) {
     var status = false;
     if (user) {
+        var tenantUsername;
+        if (user.tenantId == -1234) {
+            tenantUsername = user.username;
+        } else {
+            tenantUsername = user.username + "@" + user.tenantDomain;
+        }
+
         // check whether this is favourite app of user.
-        status = manager.isFavouriteApp(provider, appName, version, user.username, user.tenantId,
+        status = manager.isFavouriteApp(provider, appName, version, tenantUsername, user.tenantId,
                                         storeTenantDomain).status;
     }
     return status;
@@ -312,8 +319,14 @@ function isSubscribed(asset, user, subscriptionService) {
     appInfo["provider"] = asset.attributes.overview_provider;
 
     var defaultApplicationName = "DefaultApplication";
+    var tenantUsername;
+    if (user.tenantId == -1234) {
+        tenantUsername = user.username;
+    } else {
+        tenantUsername = user.username + "@" + user.tenantDomain;
+    }
     var individualSubscription = subscriptionService.getSubscription(appInfo, defaultApplicationName, "INDIVIDUAL",
-                                                                     String(user.username)).subscription;
+                                                                     tenantUsername).subscription;
     if (individualSubscription && individualSubscription.subscriptionStatus === "UNBLOCKED") {
         return true;
     }

@@ -100,6 +100,8 @@ var manager = jagg.module("manager").getAPIStoreObj();
         var uname = username;
         if(!isEmailLoginEnabled) {
             uname = username.split('@')[0];
+        }else{
+
         }
         var action = "ui.execute";
         var user = userManager.getUser(uname);

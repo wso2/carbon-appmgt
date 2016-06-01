@@ -30,8 +30,11 @@ public final class RestApiConstants {
     public static final String APPLICATION_JSON = "application/json";
     public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public static final String AUTHENTICATION_REQUIRED = "authentication_required";
+    public static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
 
     public static final String DEFAULT_RESPONSE_CONTENT_TYPE = APPLICATION_JSON;
+
+    public static final String STATS_ALL_PROVIDERS = "__all_providers__";
 
     public static final String RESOURCE = "resource";
     public static final String RESOURCE_API = "App";
@@ -50,17 +53,19 @@ public final class RestApiConstants {
     public static final String TIER_LEVEL_PARAM = "{tierLevel}";
     public static final String SUBSCRIBER_PARAM = "{subscriber}";
     public static final String GROUPID_PARAM = "{groupId}";
-    public static final String APIID_PARAM = "{apiId}";
+    public static final String APPID_PARAM = "{appId}";
     public static final String APPLICATIONID_PARAM = "{applicationId}";
     public static final String DOCUMENTID_PARAM = "{documentId}";
     public static final String API_VERSION_PARAM = "{version}";
 
     //todo better to take from cxf level
+    public static final String RESOURCE_PATH_RATE = "/rate";
     public static final String RESOURCE_PATH_APPS = "/apps";
     public static final String RESOURCE_PATH_DEVICES = "/devices";
     public static final String RESOURCE_PATH_ROLES = "/roles";
     public static final String RESOURCE_PATH_USERS = "/users";
     public static final String RESOURCE_PATH_APPLICATIONS = "/applications";
+    public static final String RESOURCE_PATH_XACML_POLICIES = "/xacmlpolicies";
     public static final String SERVER_URL = "/applications";
     public static final String SERVER_USER_NAME = "/applications";
     public static final String SERVER_PASSWORD = "/applications";
@@ -70,7 +75,7 @@ public final class RestApiConstants {
     public static final String RESOURCE_PATH_TIERS_APPLICATION = RESOURCE_PATH_TIERS + "/application";
     public static final String RESOURCE_PATH_TIERS_RESOURCE = RESOURCE_PATH_TIERS + "/resource";
     public static final String RESOURCE_PATH_TAGS = "/tags";
-    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APIID_PARAM + "/documents";
+    public static final String RESOURCE_PATH_DOCUMENTS = RESOURCE_PATH_APPS + "/" + APPID_PARAM + "/documents";
     public static final String RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID = RESOURCE_PATH_DOCUMENTS + "/" + DOCUMENTID_PARAM;
     public static final String RESOURCE_PATH_DOCUMENT_CONTENT = RESOURCE_PATH_DOCUMENTS_DOCUMENT_ID + "/content";
     public static final String REST_API_STORE_CONTEXT = "store_rest_api";
@@ -91,6 +96,9 @@ public final class RestApiConstants {
     public static final String APIS_GET_PAGINATION_URL =
             RESOURCE_PATH_APPS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
 
+    public static final String APP_RATE_GET_PAGINATION_URL =
+            RESOURCE_PATH_RATE + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM;
+
     public static final String DEVICES_GET_PAGINATION_URL =
             RESOURCE_PATH_DEVICES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&query=" + QUERY_PARAM;
 
@@ -104,9 +112,13 @@ public final class RestApiConstants {
             RESOURCE_PATH_APPLICATIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
                     + GROUPID_PARAM;
 
+    public static final String XACML_POLICIES_GET_PAGINATION_URL =
+            RESOURCE_PATH_XACML_POLICIES + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&groupId="
+                    + GROUPID_PARAM;
+
     public static final String SUBSCRIPTIONS_GET_PAGINATION_URL_APIID =
             RESOURCE_PATH_SUBSCRIPTIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&apiId="
-                    + APIID_PARAM + "&groupId=" + GROUPID_PARAM;
+                    + APPID_PARAM + "&groupId=" + GROUPID_PARAM;
 
     public static final String SUBSCRIPTIONS_GET_PAGINATION_URL_APPLICATIONID =
             RESOURCE_PATH_SUBSCRIPTIONS + "?limit=" + LIMIT_PARAM + "&offset=" + OFFSET_PARAM + "&applicationId="
@@ -135,4 +147,8 @@ public final class RestApiConstants {
             + "an internal error. Please contact administrator.";
 
     public static final int SUPER_USER_TENANT_ID = -1234;
+
+    public static final String HISTORY_PATH =
+            "/repository/components/org.wso2.carbon.governance/lifecycles/history/";
+
 }

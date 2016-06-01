@@ -65,7 +65,7 @@ $( document ).ready(function() {
     });
 
     //load all available global (applicaiton level) java policy list from DB
-    loadAvailableJavaPolicies(null, true);
+    loadAvailableJavaPolicies(null, true, "add");
 
     $("#add_resource").click(function () {
 
@@ -109,6 +109,14 @@ $( document ).ready(function() {
         $('#overview_transports').val(output);
 
 
+    });
+
+    /**
+     * This contains the business owner id.
+     */
+    $(".selectOwnerName").change(function() {
+        var data = $('.selectOwnerName').select2('data')[0]['id'].trim();
+        $('#overview_businessOwner').val(data);
     });
 
     /**

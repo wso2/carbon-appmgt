@@ -7,8 +7,7 @@ $( document ).ready(function() {
     var storeTenantDomain = $('#store-tenant-domain').val();
     var loggedInUserName = $('#user-name').val();
     var loggedInUserTenantId = $('#user-tenant-id').val();
-
-
+    var loggedInUserTenantDomain = $('#logged-in-user-tenant-domain').val();
 
     var jsonObj = {
         "isActive": "1",
@@ -36,7 +35,11 @@ $( document ).ready(function() {
             jsonObj.appData.appName = $(this).data("name");
             jsonObj.appData.appVersion = $(this).data("version");
             jsonObj.appData.context = $(this).data("context");
-            jsonObj.appData.userId = loggedInUserName;
+            if (loggedInUserTenantId != -1234) {
+                jsonObj.appData.userId = loggedInUserName + "@" + loggedInUserTenantDomain;
+            } else {
+                jsonObj.appData.userId = loggedInUserName;
+            }
             jsonObj.appData.tenantId = loggedInUserTenantId;
             //only tag -"page-load"  is currently filtered in backend
             //so even though this is a click event add the tag as 'page-load'

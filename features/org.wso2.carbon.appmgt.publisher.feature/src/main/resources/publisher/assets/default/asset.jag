@@ -53,12 +53,13 @@ require('/modules/publisher.js').exec(function(ctx) {
     function getBusinessOwner() {
         var businessOwnerList = apiProvider.getBusinessOwners();
         var ownersList = JSON.parse(stringify(businessOwnerList));
-        var nameList = new Array();
-        var nameList = new Array();
+        var nameList = [];
+        var businessOwnerNameAndEmail;
         for (var i = 0; i < ownersList.length; i++) {
-            nameList.push(ownersList[i].businessOwnerName);
+            ownerNameAndEmail = ownersList[i].businessOwnerName + " (" + ownersList[i].businessOwnerEmail + ")";
+            nameList.push({id:ownersList[i].businessOwnerId, text:ownerNameAndEmail});
         }
-        return nameList;
+        return stringify(nameList);
     }
 
     routeManager.register('GET', 'publisher', '/publisher/asset/{type}', function(context) {
@@ -170,7 +171,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var path = artifact.path;
         var tags = rxtManager.registry.tags(path);
         var title = assetName;
-
         //get document related data
         var apiData = {};
         apiData.provider = model.get('overview.provider').value;
@@ -183,7 +183,6 @@ routeManager.register('GET', 'publisher', '/publisher/asset/{type}/{id}', functi
         var appStoresDetail = {};
         appStoresDetail.app = apiData;
         appStoresDetail.externalStores = externalAppStores;
-
         // getting the user roles
         var server = require('store').server;
         var user = server.current(session);
@@ -785,6 +784,12 @@ function overridePermissions(assetId, artifactManager, permissions) {
         transitionExecution = lc.transitionExecution("Created", "Submit for Review");
     }else if(currentState=="Rejected"){
         transitionExecution = lc.transitionExecution("In-Review", "Reject");
+    }else if(currentState=="Unpublished"){
+        transitionExecution = lc.transitionExecution("Published", "Unpublish");
+    }else if(currentState=="Deprecated"){
+        transitionExecution = lc.transitionExecution("Unpublished", "Deprecate");
+    }else if(currentState=="Published"){
+        transitionExecution = lc.transitionExecution("Approved", "Publish");
     }
     var tenantId = server.current(session).tenantId;
 
@@ -818,11 +823,6 @@ function overridePermissions(assetId, artifactManager, permissions) {
         });
     });
 
-    if(denyEveryone){
-        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
-    }
-
-
     // But, there's an internal_everyone coming up with +GET. Let's nuke it.
     //um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
     //remove Internal/everyone role if there are roles added only.
@@ -835,11 +835,6 @@ function overridePermissions(assetId, artifactManager, permissions) {
     <!--}-->
     <!--}-->
     <!--});-->
-
-    if(denyEveryone){
-        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
-    }
-
 
     var username = server.current(session).username;
     var currentUserRole = USER_ROLE_PREFIX + username;
@@ -888,6 +883,13 @@ function overridePermissions(assetId, artifactManager, permissions) {
         });
 
     });
+
+    //Remove public visibility for role restricted apps
+    if(denyEveryone){
+        um.denyRole('Internal/everyone', artifact.path, carbon.registry.actions.GET);
+        um.denyRole('system/wso2.anonymous.role', artifact.path, carbon.registry.actions.GET);
+    }
+
 
     var registry = new carbon.registry.Registry(server, {
         username: server.current(session).username,

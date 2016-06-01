@@ -38,6 +38,7 @@ var render = function (theme, data, meta, require) {
         metadata:data.metadata,
         businessOwnerData: data.businessOwnerData,
         businessOwnerName: data.businessOwnerName,
+        businessOwnerEmail: data.businessOwnerEmail,
         tabs:{
             documentation:{
                 data:data.documentation,

@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * This class is used to store and process mobile application details
  */
-public class MobileApp {
+public class MobileApp extends App{
 
     private String appName;
     private String appId;
@@ -38,13 +38,10 @@ public class MobileApp {
     private String platform;
     private String marketType;
     private String appType;
-    private String banner;
     private String description;
-    private String displayName;
     private String thumbnail;
     private String[] availableLifecycleActions;
     private String recentChanges;
-    private APIStatus lifecycleStatus;
     private List<String> screenShots;
     private String createdTime;
 
@@ -56,7 +53,6 @@ public class MobileApp {
         this.createdTime = createdTime;
     }
 
-    private String[] appVisibility;
     private Set<String> tags = new LinkedHashSet<String>();
 
     public Set<String> getTags() {
@@ -160,22 +156,6 @@ public class MobileApp {
         this.appType = appType;
     }
 
-    public String getBanner() {
-        return banner;
-    }
-
-    public void setBanner(String banner) {
-        this.banner = banner;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -208,14 +188,6 @@ public class MobileApp {
         this.recentChanges = recentChanges;
     }
 
-    public APIStatus getLifecycleStatus() {
-        return lifecycleStatus;
-    }
-
-    public void setLifecycleStatus(APIStatus lifecycleStatus) {
-        this.lifecycleStatus = lifecycleStatus;
-    }
-
     public List<String> getScreenShots() {
         return screenShots;
     }
@@ -224,11 +196,4 @@ public class MobileApp {
         this.screenShots = screenShots;
     }
 
-    public String[] getAppVisibility() {
-        return appVisibility;
-    }
-
-    public void setAppVisibility(String[] appVisibility) {
-        this.appVisibility = appVisibility;
-    }
 }

@@ -60,7 +60,9 @@ var getArtifactsWithoutPagination = function(artifactManager, query, sortby, sor
     var artifacts;
 
     if(query) {
-        artifacts = artifactManager.search(query, DEFAULT_PAGING) || [];
+        var searchMap = {};
+        searchMap["overview_displayName"] = query;
+        artifacts = artifactManager.search(searchMap, DEFAULT_PAGING) || [];
     } else if (sortby && sort){
         DEFAULT_PAGING.sortBy = 'overview_'+sortby;
         DEFAULT_PAGING.sortOrder = sort.toUpperCase();
@@ -289,7 +291,7 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
     }
     if (operation == 'apps') {
             try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
 
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -301,7 +303,7 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
         }
     if (operation == 'app_sub_user') {
                 try {
-                    caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                    caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
 
                 } catch (e) {
                     response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -313,14 +315,14 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
     }
     if (operation == 'app-by-endpoint') {
         try {
-            caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type});
+            caramel.render({op: operation, cuser: server.current(session), shortName: type, title: type, isSubsriptionEnabled:disableSubscriptionStats});
         } catch (e) {
             response.sendError(404, 'Asset type not found');
         }
     }
     if (operation == 'response-time') {
                             try {
-                                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
 
                             } catch (e) {
                                 response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -332,7 +334,7 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
                         }
     if (operation == 'usage-page') {
             try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
 
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
@@ -344,14 +346,14 @@ routeMnger.register('GET', 'publisher', '/publisher/assets/{operation}/{type}/',
         }
         if (operation == 'cache-stat') {
             try {
-                  caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                  caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
             }
         }
         if (operation == 'app-by-popularity-over-time') {
             try {
-                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type});
+                caramel.render({op: operation,cuser: server.current(session),shortName: type,title: type, isSubsriptionEnabled:disableSubscriptionStats});
             } catch (e) {
                 response.sendError(404, 'Asset type not found'); //TODO: Replace
             }

@@ -118,18 +118,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -206,7 +195,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -364,7 +353,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -398,24 +387,8 @@ public final class AppManagerUtil {
             }
             api.setLifeCycleName(artifact.getLifecycleName());
 
-            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
-            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
-            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
-
-            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
-                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
-                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
-                api.setScreenShots(screenShots);
-            }
-
-            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
-            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
-            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
             api.setMediaType(artifact.getMediaType());
             api.setPath(artifact.getPath());
-            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
 
         } catch (GovernanceException e) {
@@ -486,7 +459,7 @@ public final class AppManagerUtil {
             api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_singleSignOn"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
             api.setSkipGateway(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY)));
             api.setTreatAsASite(artifact.getAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE));
             api.setAllowAnonymous(Boolean.parseBoolean(artifact.getAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS)));
@@ -609,22 +582,8 @@ public final class AppManagerUtil {
             }
             api.setLifeCycleName(artifact.getLifecycleName());
 
-            api.setCategory(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_CATEGORY));
-            api.setPlatform(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM));
-            api.setAppType(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_TYPE));
-            api.setBanner(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER));
-            if (artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS) != null) {
-                List<String> screenShots = new ArrayList<>(Arrays.asList(artifact.getAttribute(
-                        AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS).split(",")));
-                api.setScreenShots(screenShots);
-            }
-            api.setBundleVersion(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_BUNDLE_VERSION));
-            api.setPackageName(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PACKAGE_NAME));
-            api.setThumbnail(artifact.getAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL));
-            api.setAppUrl(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_URL));
             api.setMediaType(artifact.getMediaType());
             api.setPath(artifact.getPath());
-            api.setRecentChanges(artifact.getAttribute(AppMConstants.MOBILE_APP_OVERVIEW_RECENT_CHANGES));
             api.setCreatedTime(artifact.getAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME));
 
         } catch (GovernanceException e) {
@@ -663,7 +622,7 @@ public final class AppManagerUtil {
 			api.setResponseCache(artifact.getAttribute(AppMConstants.API_OVERVIEW_RESPONSE_CACHING));
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 
             int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
@@ -747,11 +706,13 @@ public final class AppManagerUtil {
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, api.getContext());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, api.getId().getProviderName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, api.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, api.getTreatAsASite());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, api.getUrl());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, api.getLogoutURL());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_SANDBOX_URL, api.getSandboxUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WSDL, api.getWsdlUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_WADL, api.getWadlUrl());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, api.getDisplayName());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_THUMBNAIL_URL, api.getThumbnailUrl());
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_STATUS, apiStatus);
 			artifact.setAttribute(AppMConstants.API_OVERVIEW_TEC_OWNER, api.getTechnicalOwner());
@@ -868,7 +829,7 @@ public final class AppManagerUtil {
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_THUMBNAIL, mobileApp.getThumbnail());
             String screenShots = StringUtils.join(mobileApp.getScreenShots(), ",");
             artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_SCREENSHOTS, screenShots);
-            artifact.setAttribute(AppMConstants.MOBILE_APP_IMAGES_BANNER, mobileApp.getBanner());
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, mobileApp.getBanner());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_APP_ID, mobileApp.getAppId());
             artifact.setAttribute(AppMConstants.MOBILE_APP_OVERVIEW_PLATFORM, mobileApp.getPlatform());
             artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, mobileApp.getCreatedTime());
@@ -883,8 +844,109 @@ public final class AppManagerUtil {
 		return artifact;
 	}
 
+    /**
+     * Generate WebApp GenericArtifact content from Webapp
+     * @param artifact Webapp GenericArtifact
+     * @param webApp WebApp
+     * @return GenericArtifact
+     * @throws AppManagementException
+     */
+    public static GenericArtifact createWebAppArtifactContent(GenericArtifact artifact, WebApp webApp)
+            throws
+            AppManagementException {
+        try {
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_NAME, webApp.getId().getApiName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VERSION, webApp.getId().getVersion());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CONTEXT, webApp.getContext());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DISPLAY_NAME, webApp.getDisplayName());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_PROVIDER, AppManagerUtil.replaceEmailDomainBack(webApp.getId().getProviderName()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_DESCRIPTION, webApp.getDescription());
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_TREAT_AS_A_SITE, webApp.getTreatAsASite());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ENDPOINT_URL, webApp.getUrl()); //
+            artifact.setAttribute(AppMConstants.APP_IMAGES_THUMBNAIL, ""); //webApp.getThumbnailUrl()
+            artifact.setAttribute(AppMConstants.APP_IMAGES_BANNER, "");
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_LOGOUT_URL, webApp.getLogoutURL());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER, webApp.getBusinessOwner());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_BUSS_OWNER_EMAIL, webApp.getBusinessOwnerEmail());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBILITY, StringUtils.join(webApp.getAppVisibility()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_VISIBLE_TENANTS, webApp.getVisibleTenants());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TRANSPORTS, webApp.getTransports());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_TIER, "Unlimited");
+            artifact.setAttribute(AppMConstants.APP_TRACKING_CODE, webApp.getTrackingCode());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_CREATED_TIME, webApp.getCreatedTime());
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_ALLOW_ANONYMOUS, Boolean.toString(webApp.getAllowAnonymous()));
+            artifact.setAttribute(AppMConstants.API_OVERVIEW_SKIP_GATEWAY, Boolean.toString(webApp.getSkipGateway()));
+            artifact.setAttribute(AppMConstants.APP_OVERVIEW_ACS_URL, webApp.getAcsURL());
 
-	/**
+        } catch (GovernanceException e) {
+            String msg = "Failed to create WebApp for : " + webApp.getId().getApiName();
+            log.error(msg, e);
+            throw new AppManagementException(msg, e);
+        }
+        return artifact;
+    }
+
+    /**
+     * This method used to retrive the Uploaded Documents from publisher
+     *
+     * @param userName     logged in username
+     * @param resourceUrl  resource to be downloaded
+     * @param tenantDomain loggedUserTenantDomain
+     * @return map that contains Data of the resource
+     * @throws AppManagementException
+     */
+    public static Map<String, Object> getDocument(String userName, String resourceUrl, String tenantDomain)
+            throws AppManagementException {
+        Map<String, Object> documentMap = new HashMap<String, Object>();
+
+        InputStream inStream = null;
+        String[] resourceSplitPath =
+                resourceUrl.split(RegistryConstants.GOVERNANCE_REGISTRY_BASE_PATH);
+        if (resourceSplitPath.length == 2) {
+            resourceUrl = resourceSplitPath[1];
+        } else {
+           handleException("Invalid resource Path " + resourceUrl);
+        }
+        Resource apiDocResource;
+        Registry registryType = null;
+        boolean isTenantFlowStarted = false;
+        try {
+            int tenantId;
+            if (tenantDomain != null && !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+                PrivilegedCarbonContext.startTenantFlow();
+                isTenantFlowStarted = true;
+
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            } else {
+                tenantId = MultitenantConstants.SUPER_TENANT_ID;
+            }
+
+            userName = MultitenantUtils.getTenantAwareUsername(userName);
+            registryType = ServiceReferenceHolder
+                    .getInstance().
+                            getRegistryService().getGovernanceUserRegistry(userName, tenantId);
+            if (registryType.resourceExists(resourceUrl)) {
+                apiDocResource = registryType.get(resourceUrl);
+                inStream = apiDocResource.getContentStream();
+                documentMap.put("Data", inStream);
+                documentMap.put("contentType", apiDocResource.getMediaType());
+                String[] content = apiDocResource.getPath().split("/");
+                documentMap.put("name", content[content.length - 1]);
+            }
+        } catch (RegistryException e) {
+            String msg = "Couldn't retrieve registry for User " + userName + " Tenant " + tenantDomain;
+            log.error(msg, e);
+            handleException(msg, e);
+        } finally {
+            if (isTenantFlowStarted) {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        }
+        return documentMap;
+    }
+
+    /**
 	 * Create the Documentation from artifact
 	 * 
 	 * @param artifact
@@ -917,6 +979,7 @@ public final class AppManagerUtil {
 				type = DocumentationType.OTHER;
 			}
 			documentation = new Documentation(type, artifact.getAttribute(AppMConstants.DOC_NAME));
+            documentation.setId(artifact.getId());
 			documentation.setSummary(artifact.getAttribute(AppMConstants.DOC_SUMMARY));
 
 			Documentation.DocumentSourceType docSourceType =
@@ -1231,14 +1294,17 @@ public final class AppManagerUtil {
 			switch (sourceType) {
 				case INLINE:
 					sourceType = Documentation.DocumentSourceType.INLINE;
+                    //TODO:Need to fix
+                    documentation.setSourceUrl("null");
 					break;
 				case URL:
 					sourceType = Documentation.DocumentSourceType.URL;
 					break;
 				case FILE: {
 					sourceType = Documentation.DocumentSourceType.FILE;
-					setFilePermission(documentation.getFilePath());
-				}
+                    //TODO:Need to fix
+                    documentation.setSourceUrl("null");
+                }
 					break;
 			}
 			artifact.setAttribute(AppMConstants.DOC_SOURCE_TYPE, sourceType.name());
@@ -1813,7 +1879,7 @@ public final class AppManagerUtil {
 	 * @throws org.wso2.carbon.appmgt.api.AppManagementException
 	 */
 
-	private static void setFilePermission(String filePath) throws AppManagementException {
+	public static void setFilePermission(String filePath) throws AppManagementException {
 		try {
 			filePath = filePath.replaceFirst("/registry/resource/", "");
 			AuthorizationManager accessControlAdmin =
@@ -1894,7 +1960,7 @@ public final class AppManagerUtil {
 
             api.setSsoEnabled(artifact.getAttribute("sso_enableSso"));
             api.setUUID(artifact.getId());
-            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.IMAGES_THUMBNAIL));
+            api.setThumbnailUrl(artifact.getAttribute(AppMConstants.APP_IMAGES_THUMBNAIL));
 
 			int cacheTimeout = AppMConstants.API_RESPONSE_CACHE_TIMEOUT;
 			try {
@@ -3202,7 +3268,7 @@ public final class AppManagerUtil {
 		}
 	}
 
-    public static String getConfigRegistryResourceContent(String tenantDomain, final String registryLocation)
+    public static String getGovernanceRegistryResourceContent(String tenantDomain, final String registryLocation)
             throws UserStoreException, RegistryException {
 
         String content = null;
@@ -3215,7 +3281,7 @@ public final class AppManagerUtil {
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
 
             int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(tenantDomain);
-            Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getConfigSystemRegistry(tenantId);
+            Registry registry = ServiceReferenceHolder.getInstance().getRegistryService().getGovernanceSystemRegistry(tenantId);
             loadTenantRegistry(tenantId);
 
             if (registry.resourceExists(registryLocation)) {
@@ -3608,17 +3674,25 @@ public final class AppManagerUtil {
 	}
 
     public static void loadTenantConf(int tenantID) throws AppManagementException {
+        loadOAuthScopeRoleMapping(tenantID);
+    }
+
+    private static void loadOAuthScopeRoleMapping(int tenantID) throws AppManagementException {
+
         RegistryService registryService = ServiceReferenceHolder.getInstance().getRegistryService();
         try {
-            UserRegistry registry = registryService.getConfigSystemRegistry(tenantID);
-            if (registry.resourceExists(AppMConstants.API_TENANT_CONF_LOCATION)) {
-                log.debug("Tenant conf already uploaded to the registry");
+            UserRegistry registry = registryService.getGovernanceSystemRegistry(tenantID);
+
+            if (registry.resourceExists(AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH)) {
+                log.debug(String.format("OAuth scope role mapping (%s) registry resource already exists as '%s'",
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE,
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
                 return;
             }
 
             String tenantConfLocation = CarbonUtils.getCarbonHome() + File.separator +
-                    AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
-                    AppMConstants.API_TENANT_CONF;
+                                            AppMConstants.RESOURCE_FOLDER_LOCATION + File.separator +
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE;
 
             File tenantConfFile = new File(tenantConfLocation);
 
@@ -3627,21 +3701,55 @@ public final class AppManagerUtil {
             if (tenantConfFile.exists()) { // Load conf from resources directory in pack if it exists
                 FileInputStream fileInputStream = new FileInputStream(tenantConfFile);
                 data = IOUtils.toByteArray(fileInputStream);
-            } else { // Fallback to loading the conf that is stored at jar level if file does not exist in pack
-                InputStream inputStream = AppManagerComponent.class.getResourceAsStream("/tenant/" + AppMConstants.API_TENANT_CONF);
-                data = IOUtils.toByteArray(inputStream);
+
+                Resource resource = registry.newResource();
+                resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
+                resource.setContent(data);
+
+                registry.put(AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH, resource);
+
+                log.debug(String.format("Added OAuth scope role mapping (%s) registry resource to '%s'",
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_FILE,
+                                            AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
+
+            }else{
+                log.warn(String.format("Can't find OAuth scope role mapping file in '%s'", AppMConstants.OAUTH_SCOPE_ROLE_MAPPING_PATH));
             }
-
-            log.debug("Adding tenant config to the registry");
-            Resource resource = registry.newResource();
-            resource.setMediaType(AppMConstants.APPLICATION_JSON_MEDIA_TYPE);
-            resource.setContent(data);
-
-            registry.put(AppMConstants.API_TENANT_CONF_LOCATION, resource);
         } catch (RegistryException e) {
             throw new AppManagementException("Error while saving tenant conf to the registry", e);
         } catch (IOException e) {
             throw new AppManagementException("Error while reading tenant conf file content", e);
         }
     }
+
+    public static boolean isUserAuthorized(String username, String resourcePath) throws AppManagementException {
+
+        boolean isAuthorized = false;
+        try {
+            String tenantDomain =
+                    MultitenantUtils.getTenantDomain(AppManagerUtil.replaceEmailDomainBack(username));
+            int tenantId =
+                    ServiceReferenceHolder.getInstance().getRealmService()
+                            .getTenantManager().getTenantId(tenantDomain);
+            AuthorizationManager authManager = null;
+
+            authManager = ServiceReferenceHolder.getInstance().getRealmService().getTenantUserRealm(tenantId).getAuthorizationManager();
+            isAuthorized = authManager.isUserAuthorized(username, resourcePath, "authorize");
+        } catch (UserStoreException e) {
+            throw new AppManagementException("User " + username + " is not authorized to perform lifecycle action");
+        }
+        return isAuthorized;
+    }
+
+    public static void handleException(String msg, Throwable t) throws AppManagementException {
+        log.error(msg, t);
+        throw new AppManagementException(msg, t);
+    }
+
+    private static void handleException(String msg) throws AppManagementException {
+        log.error(msg);
+        throw new AppManagementException(msg);
+    }
+
+
 }

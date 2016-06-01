@@ -4,11 +4,11 @@
  Created Date: 29/7/2013
  */
 var server = require('store').server;
-var permissions=require('/modules/permissions.js').permissions;
+var permissions = require('/modules/permissions.js').permissions;
 var config = require('/config/publisher.json');
 var appmPublisher = require('appmgtpublisher');
 
-var render=function(theme,data,meta,require){
+var render = function (theme, data, meta, require) {
 
     var log = new Log();
     var apiProvider = jagg.module('manager').getAPIProviderObj();
@@ -19,7 +19,7 @@ var render=function(theme,data,meta,require){
     var viewStatsAuthorized = permissions.isAuthorized(user.username, config.permissions.view_statistics, um);
     var appMgtProviderObj = new appmPublisher.APIProvider(String(user.username));
     //var _url = "/publisher/asset/"  + data.meta.shortName + "/" + data.info.id + "/edit"
-    var listPartial='view-asset';
+    var listPartial = 'view-asset';
     var heading = "";
     var newViewData;
     var notifications = session.get('notifications');
@@ -28,19 +28,18 @@ var render=function(theme,data,meta,require){
     var appMDAO = Packages.org.wso2.carbon.appmgt.impl.dao.AppMDAO;
     var appMDAOObj = new appMDAO();
     //Determine what view to show
-    switch(data.op){
+    switch (data.op) {
 
         case 'create':
-            listPartial='add-asset';
+            listPartial = 'add-asset';
             heading = "Create New Web Application";
             break;
         case 'view':
-            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             data = require('/helpers/view-asset.js').merge(data);
             data.typeList = typeList;
             listPartial = 'view-asset';
             var copyOfData = parse(stringify(data));
-            data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             var assetThumbnail = data.newViewData.images.images_thumbnail;
             if (!assetThumbnail || (assetThumbnail.trim().length == 0)) {
                 var appName = String(data.newViewData.displayName.value);
@@ -48,44 +47,53 @@ var render=function(theme,data,meta,require){
             }
             data.newViewData.publishActionAuthorized = publishActionAuthorized;
             heading = data.newViewData.displayName.value;
-            data.businessOwnerName = businessOwnerName;
+            var businessOwnerAttribute = data.artifact.attributes.overview_businessOwner;
+            if (businessOwnerAttribute != null && businessOwnerAttribute.trim() != "" && businessOwnerAttribute != "null") {
+
+                var businessOwner = apiProvider.getBusinessOwner(businessOwnerAttribute);
+                data.businessOwnerViewData = require('/helpers/splitter.js').transform(businessOwner);
+                data.businessOwner = businessOwner;
+            }
             break;
         case 'edit':
-            var businessOwnerName =  appMDAOObj.getBusinessOwnerName(data.artifact.id);
             var editEnabled = permissions.isEditPermitted(user.username, data.artifact.path, um);
-            if(data.artifact.lifecycleState == "Published"){
+            if (data.artifact.lifecycleState == "Published") {
                 editEnabled = false;
             }
-            if(user.hasRoles(["admin"])){
+            if (user.hasRoles(["admin"])) {
                 editEnabled = true;
             }
-            if(!editEnabled){
+            if (!editEnabled) {
                 response.sendError(404);
             }
             data = require('/helpers/edit-asset.js').processData(data);
-            listPartial='edit-asset';
+            listPartial = 'edit-asset';
             var copyOfData = parse(stringify(data));
-            data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
-            data.businessOwnerName = businessOwnerName;
+            var businessOwnerId = data.artifact.attributes.overview_businessOwner;
+            if (businessOwnerId != null && businessOwnerId.trim() != "" && businessOwnerId != "null") {
+                var businessOwner = apiProvider.getBusinessOwner(businessOwnerId);
+                data.businessOwner = businessOwner;
+            }
             break;
         case 'lifecycle':
-            listPartial='lifecycle-asset';
+            listPartial = 'lifecycle-asset';
             var copyOfData = parse(stringify(data));
-            data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value + " - Lifecycle";
             break;
         case 'versions':
-            listPartial='versions-asset';
+            listPartial = 'versions-asset';
             var copyOfData = parse(stringify(data));
-            data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value + " - Versions";
             break;
         case 'copyapp':
             data = require('/helpers/copy-app.js').processData(data);
-            listPartial='copy-app';
+            listPartial = 'copy-app';
             var copyOfData = parse(stringify(data));
-            data.newViewData =  require('/helpers/splitter.js').splitData(copyOfData);
+            data.newViewData = require('/helpers/splitter.js').splitData(copyOfData);
             heading = data.newViewData.displayName.value;
             break;
         default:
@@ -93,48 +101,50 @@ var render=function(theme,data,meta,require){
     }
 
 
-        theme('single-col-fluid', {
-            title: data.title,
-            header: [
-                {
-                    partial: 'header',
-                    context: data
+    theme('single-col-fluid', {
+        title: data.title,
+        header: [
+            {
+                partial: 'header',
+                context: data
+            }
+        ],
+        ribbon: [
+            {
+                partial: 'ribbon',
+                context: {
+                    active: listPartial,
+                    createPermission: createActionAuthorized,
+                    viewStats: viewStatsAuthorized,
+                    um: um,
+                    notifications: notifications,
+                    notificationCount: notificationCount,
+                    typeList: typeList
                 }
-            ],
-            ribbon: [
-                {
-                    partial: 'ribbon',
-                    context: {
-                        active:listPartial,
-                        createPermission : createActionAuthorized,
-                        viewStats : viewStatsAuthorized,
-                        um : um,
-                        notifications : notifications,
-                        notificationCount: notificationCount,
-                        typeList: typeList
-                    }
+            }
+        ],
+        leftnav: [
+            {
+                partial: 'left-nav',
+                context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
+            }
+        ],
+        listassets: [
+            {
+                partial: listPartial,
+                context: data
+            }
+        ],
+        heading: [
+            {
+                partial: 'heading',
+                context: {
+                    title: heading,
+                    menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
                 }
-            ],
-            leftnav: [
-                {
-                    partial: 'left-nav',
-                    context: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)
-                }
-            ],
-            listassets: [
-                {
-                    partial:listPartial,
-                    context: data
-                }
-            ],
-            heading: [
-                {
-                    partial: 'heading',
-                    context: {title:heading, menuItems: require('/helpers/left-nav.js').generateLeftNavJson(data, listPartial)}
-                }
-            ]
-        });
-
+            }
+        ]
+    });
 
 
 };

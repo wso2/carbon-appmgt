@@ -1,29 +1,12 @@
-/*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * you may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.*;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
 
 
 
@@ -58,9 +41,9 @@ public class AppListDTO  {
 
   
   /**
-   * Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.
+   * Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.
    **/
-  @ApiModelProperty(value = "Link to the next subset of resources qualified. \nEmpty if no more resources are to be returned.")
+  @ApiModelProperty(value = "Link to the next subset of resources qualified.\nEmpty if no more resources are to be returned.")
   @JsonProperty("next")
   public String getNext() {
     return next;
@@ -71,9 +54,9 @@ public class AppListDTO  {
 
   
   /**
-   * Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.
+   * Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.
    **/
-  @ApiModelProperty(value = "Link to the previous subset of resources qualified. \nEmpty if current subset is the first subset returned.")
+  @ApiModelProperty(value = "Link to the previous subset of resources qualified.\nEmpty if current subset is the first subset returned.")
   @JsonProperty("previous")
   public String getPrevious() {
     return previous;

@@ -1,21 +1,3 @@
-/*
- * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * you may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.wso2.carbon.appmgt.rest.api.publisher.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +28,12 @@ public class AppDTO  {
   private AppAppmetaDTO appmeta = null;
   
   
+  private List<UriTemplateDTO> uriTemplates = new ArrayList<UriTemplateDTO>();
+  
+  
+  private List<PolicyGroupsDTO> policyGroups = new ArrayList<PolicyGroupsDTO>();
+  
+  
   private String marketType = null;
   
   
@@ -65,7 +54,31 @@ public class AppDTO  {
   @NotNull
   private String version = null;
   
-  @NotNull
+  
+  private String logoutURL = null;
+  
+  
+  private String businessOwnerId = null;
+  
+  
+  private List<String> visibleTenants = new ArrayList<String>();
+  
+  
+  private List<String> claims = new ArrayList<String>();
+  
+  
+  private String trackingCode = null;
+  
+  
+  private String skipGateway = null;
+  
+  
+  private String allowAnonymousAccess = null;
+  
+  
+  private String acsUrl = null;
+  
+  
   private String provider = null;
   
   
@@ -75,7 +88,7 @@ public class AppDTO  {
   private Boolean isDefaultVersion = null;
   
   
-  private List<String> transport = new ArrayList<String>();
+  private String transport = null;
   
   
   private List<String> tags = new ArrayList<String>();
@@ -99,6 +112,9 @@ public class AppDTO  {
   private String lifecycleState = null;
   
   
+  private BigDecimal rating = null;
+  
+  
   private String appUrL = null;
   
   
@@ -107,7 +123,7 @@ public class AppDTO  {
   
   private String category = null;
   
-  
+  @NotNull
   private String displayName = null;
   
   
@@ -182,6 +198,30 @@ public class AppDTO  {
   }
   public void setAppmeta(AppAppmetaDTO appmeta) {
     this.appmeta = appmeta;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("uriTemplates")
+  public List<UriTemplateDTO> getUriTemplates() {
+    return uriTemplates;
+  }
+  public void setUriTemplates(List<UriTemplateDTO> uriTemplates) {
+    this.uriTemplates = uriTemplates;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("policyGroups")
+  public List<PolicyGroupsDTO> getPolicyGroups() {
+    return policyGroups;
+  }
+  public void setPolicyGroups(List<PolicyGroupsDTO> policyGroups) {
+    this.policyGroups = policyGroups;
   }
 
   
@@ -273,9 +313,105 @@ public class AppDTO  {
 
   
   /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("logoutURL")
+  public String getLogoutURL() {
+    return logoutURL;
+  }
+  public void setLogoutURL(String logoutURL) {
+    this.logoutURL = logoutURL;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("businessOwnerId")
+  public String getBusinessOwnerId() {
+    return businessOwnerId;
+  }
+  public void setBusinessOwnerId(String businessOwnerName) {
+    this.businessOwnerId = businessOwnerName;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("visibleTenants")
+  public List<String> getVisibleTenants() {
+    return visibleTenants;
+  }
+  public void setVisibleTenants(List<String> visibleTenants) {
+    this.visibleTenants = visibleTenants;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("claims")
+  public List<String> getClaims() {
+    return claims;
+  }
+  public void setClaims(List<String> claims) {
+    this.claims = claims;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("trackingCode")
+  public String getTrackingCode() {
+    return trackingCode;
+  }
+  public void setTrackingCode(String trackingCode) {
+    this.trackingCode = trackingCode;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("skipGateway")
+  public String getSkipGateway() {
+    return skipGateway;
+  }
+  public void setSkipGateway(String skipGateway) {
+    this.skipGateway = skipGateway;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("allowAnonymousAccess")
+  public String getAllowAnonymousAccess() {
+    return allowAnonymousAccess;
+  }
+  public void setAllowAnonymousAccess(String allowAnonymousAccess) {
+    this.allowAnonymousAccess = allowAnonymousAccess;
+  }
+
+  
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("acsUrl")
+  public String getAcsUrl() {
+    return acsUrl;
+  }
+  public void setAcsUrl(String acsUrl) {
+    this.acsUrl = acsUrl;
+  }
+
+  
+  /**
    * If the provider value is not given user invoking the api will be used as the provider.
    **/
-  @ApiModelProperty(required = true, value = "If the provider value is not given user invoking the api will be used as the provider.")
+  @ApiModelProperty(value = "If the provider value is not given user invoking the api will be used as the provider.")
   @JsonProperty("provider")
   public String getProvider() {
     return provider;
@@ -315,10 +451,10 @@ public class AppDTO  {
    **/
   @ApiModelProperty(value = "Supported transports for the App (http and/or https).")
   @JsonProperty("transport")
-  public List<String> getTransport() {
+  public String getTransport() {
     return transport;
   }
-  public void setTransport(List<String> transport) {
+  public void setTransport(String transport) {
     this.transport = transport;
   }
 
@@ -412,6 +548,19 @@ public class AppDTO  {
 
   
   /**
+   * User rating for the app
+   **/
+  @ApiModelProperty(value = "User rating for the app")
+  @JsonProperty("rating")
+  public BigDecimal getRating() {
+    return rating;
+  }
+  public void setRating(BigDecimal rating) {
+    this.rating = rating;
+  }
+
+  
+  /**
    * URL of the asset
    **/
   @ApiModelProperty(value = "URL of the asset")
@@ -453,7 +602,7 @@ public class AppDTO  {
   /**
    * displayName of the asset
    **/
-  @ApiModelProperty(value = "displayName of the asset")
+  @ApiModelProperty(required = true, value = "displayName of the asset")
   @JsonProperty("displayName")
   public String getDisplayName() {
     return displayName;
@@ -577,6 +726,8 @@ public class AppDTO  {
     sb.append("  name: ").append(name).append("\n");
     sb.append("  type: ").append(type).append("\n");
     sb.append("  appmeta: ").append(appmeta).append("\n");
+    sb.append("  uriTemplates: ").append(uriTemplates).append("\n");
+    sb.append("  policyGroups: ").append(policyGroups).append("\n");
     sb.append("  marketType: ").append(marketType).append("\n");
     sb.append("  recentChanges: ").append(recentChanges).append("\n");
     sb.append("  icon: ").append(icon).append("\n");
@@ -584,6 +735,14 @@ public class AppDTO  {
     sb.append("  description: ").append(description).append("\n");
     sb.append("  context: ").append(context).append("\n");
     sb.append("  version: ").append(version).append("\n");
+    sb.append("  logoutURL: ").append(logoutURL).append("\n");
+    sb.append("  businessOwnerId: ").append(businessOwnerId).append("\n");
+    sb.append("  visibleTenants: ").append(visibleTenants).append("\n");
+    sb.append("  claims: ").append(claims).append("\n");
+    sb.append("  trackingCode: ").append(trackingCode).append("\n");
+    sb.append("  skipGateway: ").append(skipGateway).append("\n");
+    sb.append("  allowAnonymousAccess: ").append(allowAnonymousAccess).append("\n");
+    sb.append("  acsUrl: ").append(acsUrl).append("\n");
     sb.append("  provider: ").append(provider).append("\n");
     sb.append("  appDefinition: ").append(appDefinition).append("\n");
     sb.append("  isDefaultVersion: ").append(isDefaultVersion).append("\n");
@@ -595,6 +754,7 @@ public class AppDTO  {
     sb.append("  resourceId: ").append(resourceId).append("\n");
     sb.append("  lifecycle: ").append(lifecycle).append("\n");
     sb.append("  lifecycleState: ").append(lifecycleState).append("\n");
+    sb.append("  rating: ").append(rating).append("\n");
     sb.append("  appUrL: ").append(appUrL).append("\n");
     sb.append("  bundleversion: ").append(bundleversion).append("\n");
     sb.append("  category: ").append(category).append("\n");

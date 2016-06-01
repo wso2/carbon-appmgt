@@ -313,6 +313,16 @@ header .header-action:active {
 .app-tile .summery > h4 {
     margin-top: 5px;
     margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.app-tile .summery a h4 {
+    margin-top: 5px;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .app-tile .summery > h5 {
@@ -631,6 +641,9 @@ active: background 10% lighter, border 5% darker
 
 .background-color-windows {
     background-color: #00bcf2;
+}
+.background-color-webapps {
+    background-color: #32a5f2;
 }
 
 /*=============== MOBILE ENTERPRISE INSTALL MODAL =========*/

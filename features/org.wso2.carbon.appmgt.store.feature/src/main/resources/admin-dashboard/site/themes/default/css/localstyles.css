@@ -887,3 +887,17 @@ legend + .control-group {
     text-align: center;
     margin-top: 60px;
 }
+
+.no-owner {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.div-custom {
+    text-align: center;
+    vertical-align:middle;
+}
+
+.header-div {
+    font-weight: bold;
+}
