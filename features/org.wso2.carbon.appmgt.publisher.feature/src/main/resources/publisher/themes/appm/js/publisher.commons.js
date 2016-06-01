@@ -286,7 +286,7 @@ $(document).ready(function() {
 	}
 
 	function checkNonSpecial(value){
-        	var non_special_regex = /^[A-Za-z][A-Za-z0-9\s-]*$/;
+        	var non_special_regex = /^[A-Za-z][A-Za-z0-9\s_-]*$/;
         	return non_special_regex.test(value);
     }
 
