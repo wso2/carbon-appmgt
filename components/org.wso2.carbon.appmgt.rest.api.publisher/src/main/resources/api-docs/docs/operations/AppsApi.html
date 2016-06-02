@@ -77,7 +77,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">policy partial id\n</p>
+                            <p class="param-description marked">Policy partial ID\n</p>
                             
                         </td>
                         <td>
@@ -107,7 +107,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -137,7 +137,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -230,7 +230,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Change the lifecycle of an App\n</p>
+            <p class="marked">Change the lifecycle of an App.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/change-lifecycle</code>
@@ -299,7 +299,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -329,7 +329,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">The action to demote or promote the state of the App.\n\n\n\n\nSupported actions are [ **Publish,Approve,Reject,Unpublish,Deprecate,Retire,Recycle,Re-Publish,Submit#for#Review **]\n</p>
+                            <p class="param-description marked">The action determining whether to demote or promote the state of the App.\n\n\n\n\nSupported actions are [**Publish, Approve, Reject, Unpublish, Deprecate, Retire, Recycle, Re-Publish, Submit for Review**]\n</p>
                             
                                 <p><b>Accepted values: </b></p>
 
@@ -380,7 +380,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**appId ID** consisting of the **UUID** of the App.\nThe combination of the provider of the appId, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid App ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -410,7 +410,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -440,7 +440,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -488,7 +488,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -602,7 +602,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -632,7 +632,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**Search condition**.\n\n\n\n\nYou can search in attributes by using an **\&quot;attribute:\&quot;** modifier.\n\n\n\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\n\n\n\nSupported attribute modifiers are [*provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, search will match the\ngiven query string against App Name.\n</p>
+                            <p class="param-description marked">A search condition.\n\n\n\n\nYou can search attributes by using an **\&quot;attribute:\&quot;** modifier.\n\n\n\n\nEg. \&quot;provider:wso2\&quot; will match an App if the provider of the App contains \&quot;wso2\&quot;.\n\n\n\n\nSupported attribute modifiers are [**provider, app_name, app_version, app_id**]\n\n\n\n\nIf no advanced attribute modifier has been specified, the search will match the\ngiven query string against the App name.\n</p>
                             
                         </td>
                         <td>
@@ -662,7 +662,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Used to limit the fields in response.\n\n\n\n\nSupported filters are [ **basic,all**]\n</p>
+                            <p class="param-description marked">Used to limit the fields in the response.\n\n\n\n\nSupported filters are [ **basic, all**]\n</p>
                             
                                 <p><b>Accepted values: </b></p>
 
@@ -789,7 +789,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -949,7 +949,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -979,7 +979,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1009,7 +1009,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added\n</p>
+                            <p class="param-description marked">App object that needs to be added.\n</p>
                             
                         </td>
                         <td>
@@ -1071,7 +1071,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1106,7 +1106,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1132,7 +1132,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1220,7 +1220,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1250,7 +1250,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1280,7 +1280,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -1310,7 +1310,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -1480,7 +1480,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1510,7 +1510,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1570,7 +1570,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -1631,7 +1631,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -1650,7 +1650,7 @@
 
             <p class="marked"></p>
 
-            <p class="marked">Delete an existing Document\n</p>
+            <p class="marked">Delete an existing document.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/{appType}/id/{appId}/docs/{documentId}</code>
@@ -1719,7 +1719,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -1749,7 +1749,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -1779,7 +1779,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document uuid.\n</p>
+                            <p class="param-description marked">Document UUID.\n</p>
                             
                         </td>
                         <td>
@@ -1809,7 +1809,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -1839,7 +1839,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -1988,7 +1988,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -2018,7 +2018,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2078,7 +2078,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2108,7 +2108,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2278,7 +2278,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -2308,7 +2308,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2338,7 +2338,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added\n</p>
+                            <p class="param-description marked">App object that needs to be added.\n</p>
                             
                         </td>
                         <td>
@@ -2400,7 +2400,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -2430,7 +2430,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -2465,7 +2465,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated App object\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\nSuccessful response with updated App object.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2478,7 +2478,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2605,7 +2605,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -2635,7 +2635,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe combination of the provider of the app, name of the appId and the version is also accepted as a valid App ID.\nShould be formatted as **provider-name-version**.\n</p>
+                            <p class="param-description marked">**APP ID** consisting of the **UUID** of the App.\nThe following combination is also accepted as a valid APP ID: the provider of the app, name of the app and the version.\nShould be formatted as **provider-name-version**.\n</p>
                             
                         </td>
                         <td>
@@ -2695,7 +2695,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2725,7 +2725,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -2760,7 +2760,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nQualifying User List is returned.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\nQualifying user list is returned.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -2895,7 +2895,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -2925,7 +2925,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App object that needs to be added\n</p>
+                            <p class="param-description marked">App object that needs to be added.\n</p>
                             
                         </td>
                         <td>
@@ -2987,7 +2987,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header of the\nformerly retrieved variant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -3022,7 +3022,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">201</p></td>
-                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as entity in the body.\nLocation header contains URL of newly created entity.\n</p></td>
+                        <td class="parameter"><p class="marked">Created.\nSuccessful response with the newly created object as the entity in the body.\nLocation header contains the URL of the newly created entity.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3048,7 +3048,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">415</p></td>
-                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in a not supported format.\n</p></td>
+                        <td class="parameter"><p class="marked">Unsupported Media Type.\nThe entity of the request was in an unsupported format.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3063,11 +3063,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsMobileGetplistTenantTenantIdFileFileNameGet"></a>Get plist</h3>
+            <h3 class="operation-heading"><a name="appsMobileGetplistTenantTenantIdFileFileNameGet"></a>Get Plist</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Plist file of the specified iOS (Apple) mobile app.\n</p>
+            <p class="marked">Get the plist file of the specified iOS (Apple) mobile app.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/mobile/getplist/tenant/{tenantId}/file/{fileName}</code>
@@ -3136,7 +3136,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Tenant Id.\n</p>
+                            <p class="param-description marked">Tenant ID.\n</p>
                             
                         </td>
                         <td>
@@ -3166,7 +3166,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">File name.\n</p>
+                            <p class="param-description marked">The file name.\n</p>
                             
                         </td>
                         <td>
@@ -3226,7 +3226,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
@@ -3315,11 +3315,11 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf, documents files</h3>
+            <h3 class="operation-heading"><a name="appsStaticContentsFileNameGet"></a>Retrieving images, pdf and documents files</h3>
 
             <p class="marked"></p>
 
-            <p class="marked">Retrieving images for banners, screenshots etc.\n</p>
+            <p class="marked">Retrieving images for banners, screenshots, etc.\n</p>
 
             <h4 class="section-heading">URL</h4>
             <code>http://apis.wso2.com/api/appm/publisher/v1.1/apps/static-contents/{fileName}</code>
@@ -3388,7 +3388,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Application type</p>
+                            <p class="param-description marked">The application type.</p>
                             
                         </td>
                         <td>
@@ -3418,7 +3418,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">File name.\n</p>
+                            <p class="param-description marked">The file name.\n</p>
                             
                         </td>
                         <td>
@@ -3448,7 +3448,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -3478,7 +3478,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -3513,7 +3513,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">200</p></td>
-                        <td class="parameter"><p class="marked">OK.\nStatic content Retrieved successfully.\n</p></td>
+                        <td class="parameter"><p class="marked">OK.\nStatic content retrieved successfully.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3526,7 +3526,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3567,7 +3567,7 @@
             </table>
         
             <hr/>
-            <h3 class="operation-heading"><a name="appsStaticContentsPost"></a>Uploading images, pdf, documents files</h3>
+            <h3 class="operation-heading"><a name="appsStaticContentsPost"></a>Uploading images, pdf and document files</h3>
 
             <p class="marked"></p>
 
@@ -3640,7 +3640,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Application type</p>
+                            <p class="param-description marked">The application type.</p>
                             
                         </td>
                         <td>
@@ -3670,7 +3670,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Document to upload</p>
+                            <p class="param-description marked">Document to be uploaded.</p>
                             
                         </td>
                         <td>
@@ -3700,7 +3700,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on ETag.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag.\n</p>
                             
                         </td>
                         <td>
@@ -3730,7 +3730,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on Last Modified header.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the Last Modified header.\n</p>
                             
                         </td>
                         <td>
@@ -3778,7 +3778,7 @@
                 
                     <tr>
                         <td class="parameter"><p class="marked">400</p></td>
-                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error\n</p></td>
+                        <td class="parameter"><p class="marked">Bad Request.\nInvalid request or validation error.\n</p></td>
                         <td class="parameter">
                             <span class="parameter">
                                 
@@ -3892,7 +3892,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">policy partial id\n</p>
+                            <p class="param-description marked">Policy partial ID\n</p>
                             
                         </td>
                         <td>
@@ -3922,7 +3922,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">App Type. Either webapp or mobileapp\n</p>
+                            <p class="param-description marked">The App type (either Webapp/Mobile app).\n</p>
                             
                         </td>
                         <td>
@@ -4042,7 +4042,7 @@
                             </p>
                         </td>
                         <td>
-                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resourec.\n</p>
+                            <p class="param-description marked">Validator for conditional requests; based on the ETag of the formerly retrieved\nvariant of the resource.\n</p>
                             
                         </td>
                         <td>
