@@ -25,6 +25,30 @@
     "produces": [
         "application/json"
     ],
+    "x-wso2-security": {
+        "appm": {
+            "x-wso2-scopes": [
+                {
+                    "description": "",
+                    "roles": "admin",
+                    "name": "appm:read",
+                    "key": "appm:read"
+                },
+                {
+                    "description": "",
+                    "roles": "admin",
+                    "name": "appm:subscribe",
+                    "key": "appm:subscribe"
+                },
+                {
+                    "description": "",
+                    "roles": "admin",
+                    "name": "appm:administration",
+                    "key": "appm:administration"
+                }
+            ]
+        }
+    },
     "paths": {
         "/apps/mobile/binaries/{fileName}": {
             "get": {
@@ -948,11 +972,13 @@
                 },
                 "deviceIds": {
                     "type": "object",
-                    "description": "List of device Id's"
+                    "description": "List of device Id's",
+                    "example": "[{\"id\":\"358812061121105\",\"type\":\"ANDROID\"}]"
                 },
                 "appId": {
                     "type": "string",
-                    "description": "Installing mobile app ID"
+                    "description": "Installing mobile app ID",
+                    "example": "aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c"
                 }
             }
         },
