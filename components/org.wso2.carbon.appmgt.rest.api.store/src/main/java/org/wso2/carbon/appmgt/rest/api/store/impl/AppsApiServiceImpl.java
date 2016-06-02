@@ -101,7 +101,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = (String[]) install.getDeviceIds().toArray();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
                                                  log);
@@ -429,7 +429,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = username;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = (String[]) install.getDeviceIds().toArray();
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
                                                  log);
