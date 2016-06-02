@@ -858,7 +858,7 @@ definitions:
           Download type (either user or devices).
         example: user/device
       deviceIds:
-        type: object
+        type: array
         description: List of device Id's
         example: '[{"id":"358812061121105","type":"ANDROID"}]'
       appId:
