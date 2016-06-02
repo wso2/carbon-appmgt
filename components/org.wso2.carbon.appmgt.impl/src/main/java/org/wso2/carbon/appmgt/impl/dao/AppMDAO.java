@@ -6733,7 +6733,7 @@ public class AppMDAO {
                 "APP.APP_VERSION AS APP_VERSION, " +
                 "APP.CONTEXT AS CONTEXT, " +
                 "APP.APP_ENDPOINT AS APP_ENDPOINT, " +
-                "DEF.DEFAULT_APP_VERSION AS DEFAULT_APP_VERSION " +
+                "COALESCE(DEF.DEFAULT_APP_VERSION,'') AS DEFAULT_APP_VERSION " +
                 "FROM " +
                 "APM_APP APP " +
                 "LEFT JOIN APM_APP_DEFAULT_VERSION DEF " +
