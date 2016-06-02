@@ -42,6 +42,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = tenantDomainName;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
                                                  log);
@@ -87,7 +88,8 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantId", tenantId);
 
             appProvider.subscribeMobileApp(username, appId);
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
+            mobileOperation.performAction(user.toString(),
+                    action, tenantId, install.getType(), appId, parameters, null);
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -157,7 +159,7 @@ public class AppsApiServiceImpl extends AppsApiService {
                 parameters = new String[1];
                 parameters[0] = tenantDomainName;
             } else if ("device".equals(install.getType())) {
-                parameters = (String[]) install.getDeviceIds();
+                parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {
                     RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
                                                  log);
@@ -179,7 +181,8 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            mobileOperation.performAction(user.toString(), action, tenantId, appId, install.getType(), parameters, null);
+            mobileOperation.performAction(user.toString(),
+                    action, tenantId, install.getType(), appId, parameters, null);
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
         } catch (UserStoreException e) {
