@@ -6732,9 +6732,12 @@ public class AppMDAO {
                 "APP.APP_NAME AS APP_NAME, " +
                 "APP.APP_VERSION AS APP_VERSION, " +
                 "APP.CONTEXT AS CONTEXT, " +
-                "APP.APP_ENDPOINT AS APP_ENDPOINT " +
+                "APP.APP_ENDPOINT AS APP_ENDPOINT, " +
+                "COALESCE(DEF.DEFAULT_APP_VERSION,'') AS DEFAULT_APP_VERSION " +
                 "FROM " +
-                "APM_APP APP";
+                "APM_APP APP " +
+                "LEFT JOIN APM_APP_DEFAULT_VERSION DEF " +
+                "ON DEF.APP_NAME = APP.APP_NAME AND DEF.APP_PROVIDER = APP.APP_PROVIDER ";
 
         try {
             connection = APIMgtDBUtil.getConnection();
@@ -6751,6 +6754,8 @@ public class AppMDAO {
                 webApp = new WebApp(identifier);
                 webApp.setContext(appInfoResult.getString("CONTEXT"));
                 webApp.setUrl(appInfoResult.getString("APP_ENDPOINT"));
+                webApp.setDefaultVersion(appInfoResult.getString("DEFAULT_APP_VERSION").equals(appInfoResult.getString(
+                        "APP_VERSION")));
                 webApps.add(webApp);
             }
 
