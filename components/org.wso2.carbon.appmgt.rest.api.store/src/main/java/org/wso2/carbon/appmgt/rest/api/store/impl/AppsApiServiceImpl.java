@@ -93,7 +93,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-            return Response.ok().entity(response).build();
+            return Response.ok().entity(response.toString()).build();
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -189,7 +189,7 @@ public class AppsApiServiceImpl extends AppsApiService {
             JSONObject response = new JSONObject();
             response.put("activityId", activityId);
 
-            return Response.ok().entity(response).build();
+            return Response.ok().entity(response.toString()).build();
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);

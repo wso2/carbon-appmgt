@@ -189,7 +189,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 			log.error("Error in app installation.", appMgtExce);
 			throw new MobileApplicationException(appMgtExce);
 		}
-
+		return null;
 	}
 
 	/**
