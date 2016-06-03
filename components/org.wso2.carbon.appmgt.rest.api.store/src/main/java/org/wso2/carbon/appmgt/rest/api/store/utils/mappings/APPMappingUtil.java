@@ -32,7 +32,7 @@ import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.AppSummaryDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppRatingListDTO;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
@@ -68,22 +68,22 @@ public class APPMappingUtil {
      */
     public static AppListDTO fromAPIListToDTO(List<App> appList, int offset, int limit) {
         AppListDTO appListDTO = new AppListDTO();
-        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppInfoList();
-        if (appInfoDTOs == null) {
-            appInfoDTOs = new ArrayList<>();
-            appListDTO.setAppInfoList(appInfoDTOs);
+        List<AppSummaryDTO> appSummaryDTOs = appListDTO.getAppSummaryList();
+        if (appSummaryDTOs == null) {
+            appSummaryDTOs = new ArrayList<>();
+            appListDTO.setAppSummaryList(appSummaryDTOs);
         }
 
         //add the required range of objects to be returned
         int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
         int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            AppInfoDTO appInfoDTO = fromAppToInfoDTO(appList.get(i));
-            if (appInfoDTO != null) {
-                appInfoDTOs.add(appInfoDTO);
+            AppSummaryDTO appSummaryDTO = fromAppToInfoDTO(appList.get(i));
+            if (appSummaryDTO != null) {
+                appSummaryDTOs.add(appSummaryDTO);
             }
         }
-        appListDTO.setCount(appInfoDTOs.size());
+        appListDTO.setCount(appSummaryDTOs.size());
         return appListDTO;
     }
 
@@ -97,22 +97,22 @@ public class APPMappingUtil {
      */
     public static AppListDTO getAppListDTOWithBasicFields(List<App> appList, int offset, int limit) {
         AppListDTO appListDTO = new AppListDTO();
-        List<AppInfoDTO> appInfoDTOs = appListDTO.getAppInfoList();
-        if (appInfoDTOs == null) {
-            appInfoDTOs = new ArrayList<>();
-            appListDTO.setAppInfoList(appInfoDTOs);
+        List<AppSummaryDTO> appSummaryDTOs = appListDTO.getAppSummaryList();
+        if (appSummaryDTOs == null) {
+            appSummaryDTOs = new ArrayList<>();
+            appListDTO.setAppSummaryList(appSummaryDTOs);
         }
 
         //add the required range of objects to be returned
         int start = offset < appList.size() && offset >= 0 ? offset : Integer.MAX_VALUE;
         int end = offset + limit - 1 <= appList.size() - 1 ? offset + limit - 1 : appList.size() - 1;
         for (int i = start; i <= end; i++) {
-            AppInfoDTO appInfoDTO = fromAppToInfoDTO(appList.get(i));
-            if (appInfoDTO != null) {
-                appInfoDTOs.add(appInfoDTO);
+            AppSummaryDTO appSummaryDTO = fromAppToInfoDTO(appList.get(i));
+            if (appSummaryDTO != null) {
+                appSummaryDTOs.add(appSummaryDTO);
             }
         }
-        appListDTO.setCount(appInfoDTOs.size());
+        appListDTO.setCount(appSummaryDTOs.size());
         return appListDTO;
     }
 
@@ -152,27 +152,27 @@ public class APPMappingUtil {
      * @param app WebApp object
      * @return a minimal representation DTO
      */
-    public static AppInfoDTO fromAPIToInfoDTO(WebApp app) {
-        AppInfoDTO appInfoDTO = new AppInfoDTO();
-        appInfoDTO.setDescription(app.getDescription());
+    public static AppSummaryDTO fromAPIToInfoDTO(WebApp app) {
+        AppSummaryDTO appSummaryDTO = new AppSummaryDTO();
+        appSummaryDTO.setDescription(app.getDescription());
         String context = app.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
                 context = context.replace("/" + RestApiConstants.API_VERSION_PARAM, "");
             }
-            appInfoDTO.setContext(context);
+            appSummaryDTO.setContext(context);
         }
-        appInfoDTO.setId(app.getUUID());
+        appSummaryDTO.setId(app.getUUID());
         APIIdentifier appId = app.getId();
-        appInfoDTO.setName(appId.getApiName());
-        appInfoDTO.setVersion(appId.getVersion());
+        appSummaryDTO.setName(appId.getApiName());
+        appSummaryDTO.setVersion(appId.getVersion());
         String providerName = app.getId().getProviderName();
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
-        return appInfoDTO;
+        appSummaryDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+        appSummaryDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        return appSummaryDTO;
     }
 
-    public static AppInfoDTO fromAppToInfoDTO(App app) {
+    public static AppSummaryDTO fromAppToInfoDTO(App app) {
         //check if app visibility is permitted and the lifecycle status published
         if (isVisibilityAllowed(app) && (APIStatus.PUBLISHED).equals(app.getLifeCycleStatus())) {
             if (AppMConstants.WEBAPP_ASSET_TYPE.equals(app.getType())) {
@@ -184,40 +184,40 @@ public class APPMappingUtil {
         return null;
     }
 
-    private static AppInfoDTO fromMobileAppToInfoDTO(MobileApp app) {
+    private static AppSummaryDTO fromMobileAppToInfoDTO(MobileApp app) {
 
-        AppInfoDTO appInfoDTO = new AppInfoDTO();
-        appInfoDTO.setId(app.getUUID());
-        appInfoDTO.setName(app.getAppName());
-        appInfoDTO.setVersion(app.getVersion());
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
-        appInfoDTO.setDescription(app.getDescription());
-        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
-        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
-        return appInfoDTO;
+        AppSummaryDTO appSummaryDTO = new AppSummaryDTO();
+        appSummaryDTO.setId(app.getUUID());
+        appSummaryDTO.setName(app.getAppName());
+        appSummaryDTO.setVersion(app.getVersion());
+        appSummaryDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(app.getAppProvider()));
+        appSummaryDTO.setDescription(app.getDescription());
+        appSummaryDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        appSummaryDTO.setRating(BigDecimal.valueOf(app.getRating()));
+        return appSummaryDTO;
 
     }
 
-    private static AppInfoDTO fromWebAppToInfoDTO(WebApp app) {
+    private static AppSummaryDTO fromWebAppToInfoDTO(WebApp app) {
 
-        AppInfoDTO appInfoDTO = new AppInfoDTO();
-        appInfoDTO.setDescription(app.getDescription());
+        AppSummaryDTO appSummaryDTO = new AppSummaryDTO();
+        appSummaryDTO.setDescription(app.getDescription());
         String context = app.getContext();
         if (context != null) {
             if (context.endsWith("/" + RestApiConstants.API_VERSION_PARAM)) {
                 context = context.replace("/" + RestApiConstants.API_VERSION_PARAM, "");
             }
-            appInfoDTO.setContext(context);
+            appSummaryDTO.setContext(context);
         }
-        appInfoDTO.setId(app.getUUID());
+        appSummaryDTO.setId(app.getUUID());
         APIIdentifier apiId = app.getId();
-        appInfoDTO.setName(apiId.getApiName());
-        appInfoDTO.setVersion(apiId.getVersion());
+        appSummaryDTO.setName(apiId.getApiName());
+        appSummaryDTO.setVersion(apiId.getVersion());
         String providerName = app.getId().getProviderName();
-        appInfoDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
-        appInfoDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
-        appInfoDTO.setRating(BigDecimal.valueOf(app.getRating()));
-        return appInfoDTO;
+        appSummaryDTO.setProvider(AppManagerUtil.replaceEmailDomainBack(providerName));
+        appSummaryDTO.setLifecycleState(app.getLifeCycleStatus().getStatus());
+        appSummaryDTO.setRating(BigDecimal.valueOf(app.getRating()));
+        return appSummaryDTO;
 
     }
 
