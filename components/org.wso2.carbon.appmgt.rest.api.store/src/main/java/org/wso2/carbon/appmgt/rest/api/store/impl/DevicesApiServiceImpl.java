@@ -115,13 +115,13 @@ public class DevicesApiServiceImpl extends DevicesApiService {
         for (int i = 0; i < deviceArr.size(); i++) {
             JSONObject jsonObject = (JSONObject) deviceArr.get(i);
             DeviceInfoDTO deviceInfoDTO = new DeviceInfoDTO();
-            deviceInfoDTO.setId(jsonObject.get("id").toString());
-            deviceInfoDTO.setImage(jsonObject.get("image").toString());
-            deviceInfoDTO.setModel(jsonObject.get("model").toString());
-            deviceInfoDTO.setName(jsonObject.get("name").toString());
-            deviceInfoDTO.setPlatform(jsonObject.get("platform").toString());
-            deviceInfoDTO.setPlatformVersion(jsonObject.get("platform_version").toString());
-            deviceInfoDTO.setType(jsonObject.get("type").toString());
+            deviceInfoDTO.setId((String)jsonObject.get("id"));
+            deviceInfoDTO.setImage((String)jsonObject.get("image"));
+            deviceInfoDTO.setModel((String)jsonObject.get("model"));
+            deviceInfoDTO.setName((String)jsonObject.get("name"));
+            deviceInfoDTO.setPlatform((String) jsonObject.get("platform"));
+            deviceInfoDTO.setPlatformVersion((String)jsonObject.get("platform_version"));
+            deviceInfoDTO.setType((String)jsonObject.get("type"));
             allMatchedDevices.add(deviceInfoDTO);
         }
 
