@@ -69,7 +69,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             if ("user".equals(install.getType())) {
                 parameters = new String[1];
-                parameters[0] = tenantDomainName;
+                parameters[0] = username;
             } else if ("device".equals(install.getType())) {
                 parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {
@@ -157,7 +157,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             if ("user".equals(install.getType())) {
                 parameters = new String[1];
-                parameters[0] = tenantDomainName;
+                parameters[0] = username;
             } else if ("device".equals(install.getType())) {
                 parameters = Arrays.copyOf(install.getDeviceIds().toArray(), install.getDeviceIds().toArray().length, String[].class);
                 if (parameters == null) {

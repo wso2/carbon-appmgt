@@ -156,7 +156,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 		mobileApp.setProperties(properties);
 		try {
 			for (DeviceIdentifier deviceIdentifier : deviceIdentifiers) {
-				if (deviceIdentifier.getType().equals(Platform.ANDROID.toString())) {
+				if (deviceIdentifier.getType().equalsIgnoreCase(Platform.ANDROID.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation = AndroidApplicationOperationUtil
 								.createInstallAppOperation(mobileApp, applicationOperationAction.getSchedule());
@@ -167,7 +167,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 						operation = AndroidApplicationOperationUtil
 								.createAppUninstallOperation(mobileApp, applicationOperationAction.getSchedule());
 					}
-				} else if (deviceIdentifier.getType().equals(Platform.IOS.toString())) {
+				} else if (deviceIdentifier.getType().equalsIgnoreCase(Platform.IOS.toString())) {
 					if (MDMAppConstants.INSTALL.equals(applicationOperationAction.getAction())) {
 						operation =
 								IOSApplicationOperationUtil.createInstallAppOperation(mobileApp);
