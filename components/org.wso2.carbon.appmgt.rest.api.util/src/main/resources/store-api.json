@@ -1838,13 +1838,19 @@
                 "appList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/AppInfo"
+                        "$ref": "#/definitions/App"
+                    }
+                },
+                "appSummaryList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AppSummary"
                     }
                 }
             }
         },
-        "AppInfo": {
-            "title": "App Info object with basic App details.",
+        "AppSummary": {
+            "title": "App summary object with basic App details.",
             "properties": {
                 "id": {
                     "type": "string",
