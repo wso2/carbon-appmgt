@@ -2135,11 +2135,13 @@
                 },
                 "deviceIds": {
                     "type": "object",
-                    "description": "List of device Id's"
+                    "description": "List of device Id's",
+                    "example": "[{\"id\":\"358812061121105\",\"type\":\"ANDROID\"}]"
                 },
                 "appId": {
                     "type": "string",
-                    "description": "Installing mobile app ID"
+                    "description": "Installing mobile app ID",
+                    "example": "aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c"
                 }
             }
         },

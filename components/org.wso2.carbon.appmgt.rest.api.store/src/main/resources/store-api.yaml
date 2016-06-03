@@ -63,12 +63,12 @@ paths:
             contains "wso2".
 
 
-            Supported attribute modifiers are [**provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id**]
 
 
-            If no advanced attribute modifier has been specified, the search will
-            match the
+            If no advanced attribute modifier has been specified, the search
+            will match the
 
             given query string against the App name.
           type: string
@@ -953,8 +953,8 @@ paths:
             contains "mobile".
 
 
-            Supported attribute modifiers are [**provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id**]
 
 
             If no advanced attribute modifier has been specified, search will
@@ -1514,8 +1514,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The following combination is also accepted as a valid APP ID: the provider of the app, name of the App and the
-      version.
+      The following combination is also accepted as a valid APP ID: the provider
+      of the app, name of the App and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -1605,8 +1605,10 @@ parameters:
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: |
-      Validator for conditional requests; based on the Last Modified header of the
+    description: >
+      Validator for conditional requests; based on the Last Modified header of
+      the
+
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -1902,9 +1904,11 @@ definitions:
       deviceIds:
         type: object
         description: List of device Id's
+        example: '[{"id":"358812061121105","type":"ANDROID"}]'
       appId:
         type: string
         description: Installing mobile app ID
+        example: aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c
   AdminInstall:
     title: Install/Download App
     properties:

@@ -115,7 +115,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             if ("user".equals(install.getType())) {
                 parameters = new String[1];
-                parameters[0] = tenantDomainName;
+                parameters[0] = username;
             } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
@@ -399,7 +399,7 @@ public class AppsApiServiceImpl extends AppsApiService {
 
             if ("user".equals(install.getType())) {
                 parameters = new String[1];
-                parameters[0] = tenantDomainName;
+                parameters[0] = username;
             } else if ("device".equals(install.getType())) {
                 parameters = (String[]) install.getDeviceIds();
                 if (parameters == null) {
