@@ -438,7 +438,6 @@ public class AppsApiServiceImpl extends AppsApiService {
     @Override
     public Response appsAppTypeGet(String appType, String query, String fieldFilter, Integer limit, Integer offset,
                                    String accept, String ifNoneMatch) {
-        AppListDTO appListDTO;
 
         //setting default limit and offset values if they are not set
         limit = limit != null ? limit : RestApiConstants.PAGINATION_LIMIT_DEFAULT;
@@ -463,10 +462,12 @@ public class AppsApiServiceImpl extends AppsApiService {
                 return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
             }
 
-            appListDTO = APPMappingUtil.fromAPIListToDTO(result, offset, limit);
-            if (appListDTO.getCount() == 0) {
-                String errorMessage = "No result found.";
-                return RestApiUtil.buildNotFoundException(errorMessage, null).getResponse();
+            AppListDTO appListDTO = null;
+            if(fieldFilter == null || "BASIC".equalsIgnoreCase(fieldFilter)){
+                appListDTO = APPMappingUtil.getAppListDTOWithBasicFields(result, offset, limit);
+
+            }else{
+                appListDTO = APPMappingUtil.getAppListDTOWithAllFields(result, offset, limit);
             }
 
             APPMappingUtil.setPaginationParams(appListDTO, query, offset, limit, result.size());

@@ -12,21 +12,24 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel(description = "")
 public class AppListDTO  {
-  
-  
-  
-  private Integer count = null;
-  
-  
-  private String next = null;
-  
-  
-  private String previous = null;
-  
-  
-  private List<AppInfoDTO> appList = new ArrayList<AppInfoDTO>();
 
-  
+
+
+  private Integer count = null;
+
+
+  private String next = null;
+
+
+  private String previous = null;
+
+
+  private List<AppDTO> appList = new ArrayList<AppDTO>();
+
+
+  private List<AppInfoDTO> appInfoList = new ArrayList<AppInfoDTO>();
+
+
   /**
    * Number of App returned.
    **/
@@ -65,15 +68,27 @@ public class AppListDTO  {
     this.previous = previous;
   }
 
-  
+
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("appInfoList")
+  public List<AppInfoDTO> getAppInfoList() {
+    return appInfoList;
+  }
+  public void setAppInfoList(List<AppInfoDTO> appInfoList) {
+    this.appInfoList = appInfoList;
+  }
+
+
   /**
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("appList")
-  public List<AppInfoDTO> getAppList() {
+  public List<AppDTO> getAppList() {
     return appList;
   }
-  public void setAppList(List<AppInfoDTO> appList) {
+  public void setAppList(List<AppDTO> appList) {
     this.appList = appList;
   }
 
@@ -88,6 +103,7 @@ public class AppListDTO  {
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
     sb.append("  appList: ").append(appList).append("\n");
+    sb.append("  appInfoList: ").append(appInfoList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
