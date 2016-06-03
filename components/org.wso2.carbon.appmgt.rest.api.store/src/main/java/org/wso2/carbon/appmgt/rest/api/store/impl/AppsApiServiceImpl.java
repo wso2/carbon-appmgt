@@ -88,8 +88,12 @@ public class AppsApiServiceImpl extends AppsApiService {
             user.put("tenantId", tenantId);
 
             appProvider.subscribeMobileApp(username, appId);
-            mobileOperation.performAction(user.toString(),
-                    action, tenantId, install.getType(), appId, parameters, null);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters, null);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response).build();
 
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
@@ -98,8 +102,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
         }
-        return Response.ok().build();
-
+        return Response.serverError().build();
     }
 
     @Override
@@ -181,8 +184,13 @@ public class AppsApiServiceImpl extends AppsApiService {
                         "Application is not installed yet. Application with id : " + appId +
                                 "must be installed prior to uninstall.", log);
             }
-            mobileOperation.performAction(user.toString(),
-                    action, tenantId, install.getType(), appId, parameters, null);
+            String activityId = mobileOperation.performAction(user.toString(), action, tenantId, install.getType(), appId, parameters, null);
+
+            JSONObject response = new JSONObject();
+            response.put("activityId", activityId);
+
+            return Response.ok().entity(response).build();
+
         } catch (AppManagementException | MobileApplicationException e) {
             RestApiUtil.handleInternalServerError("Internal Error occurred while uninstalling", e, log);
         } catch (UserStoreException e) {
@@ -190,8 +198,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (JSONException e) {
             RestApiUtil.handleInternalServerError("JSON casting related Error occurred while uninstalling", e, log);
         }
-
-        return Response.ok().build();
+        return Response.serverError().build();
     }
 
     @Override

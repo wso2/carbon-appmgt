@@ -37,6 +37,7 @@ import org.wso2.carbon.device.mgt.common.DeviceIdentifier;
 import org.wso2.carbon.device.mgt.common.DeviceManagementException;
 import org.wso2.carbon.device.mgt.common.Platform;
 import org.wso2.carbon.device.mgt.common.app.mgt.ApplicationManagementException;
+import org.wso2.carbon.device.mgt.common.operation.mgt.Activity;
 import org.wso2.carbon.device.mgt.common.operation.mgt.Operation;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 * @throws MobileApplicationException
 	 */
-	public void performAction(ApplicationOperationAction applicationOperationAction)
+	public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (log.isDebugEnabled()) {
 			log.debug(applicationOperationAction.getAction() + " action is triggered for " +
@@ -176,8 +177,10 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 								IOSApplicationOperationUtil.createAppUninstallOperation(mobileApp);
 					}
 				}
-				MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
+				Activity activity = MDMServiceAPIUtils.getAppManagementService(applicationOperationAction.getTenantId())
 				                  .installApplicationForDevices(operation, deviceIdentifiers);
+
+				return activity.getActivityId();
 			}
 		} catch (DeviceApplicationException mdmExce) {
 			log.error("Error in creating operation object using app.", mdmExce);
