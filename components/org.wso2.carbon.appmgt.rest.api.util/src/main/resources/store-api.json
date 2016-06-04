@@ -2151,7 +2151,7 @@
                 "type": {
                     "type": "string",
                     "description": "Download type (either user or roles).\n",
-                    "example": "user/device"
+                    "example": "user/role"
                 },
                 "typeIds": {
                     "type": "object",

@@ -1916,7 +1916,7 @@ definitions:
         type: string
         description: |
           Download type (either user or roles).
-        example: user/device
+        example: user/role
       typeIds:
         type: object
         description: List of Id's against type (role/user)
