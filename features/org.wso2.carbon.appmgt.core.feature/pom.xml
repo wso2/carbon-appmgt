@@ -216,6 +216,8 @@
                                 <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub:compatible:${carbon.identity.base.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy:compatible:${carbon.identity.base.version}</bundleDef>
 				<bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.sample.deployer:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.appmgt:org.wso2.carbon.appmgt.gateway.stub:${carbon.appmgt.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.webapp.mgt.stub:${carbon.webapp.mgt.stub}</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.authentication:compatible:${carbon.identity.auth.version}</importBundleDef>
