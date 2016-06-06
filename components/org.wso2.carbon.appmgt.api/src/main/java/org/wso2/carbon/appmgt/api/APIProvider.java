@@ -776,6 +776,4 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     void updateApp(App app)throws AppManagementException;
-
-    public void removeBinariesFromStorage(String fileName);
 }
