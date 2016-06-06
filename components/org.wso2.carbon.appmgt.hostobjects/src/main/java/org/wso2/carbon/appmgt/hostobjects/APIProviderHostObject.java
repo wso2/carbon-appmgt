@@ -4218,6 +4218,14 @@ public class APIProviderHostObject extends ScriptableObject {
         return HostObjectUtils.getBinaryStorageConfiguration();
     }
 
+    /**
+     * Remove mobile application binary files
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @throws AppManagementException
+     */
     public static void jsFunction_removeBinaryFilesFromStorage(Context cx, Scriptable thisObj, Object[] args,
                                                          Function funObj) throws AppManagementException {
         if (args == null || args.length != 1) {

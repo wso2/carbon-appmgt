@@ -2892,6 +2892,11 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
         return null;
     }
 
+    /**
+     * Remove mobile applications binary files from storage
+     * @param fileName file name of the banner image, thumbnail, screenshots and app binary
+     * @throws AppManagementException
+     */
     public void removeBinaryFromStorage(String fileName) throws AppManagementException {
         AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
                 getAPIManagerConfigurationService().getAPIManagerConfiguration();
