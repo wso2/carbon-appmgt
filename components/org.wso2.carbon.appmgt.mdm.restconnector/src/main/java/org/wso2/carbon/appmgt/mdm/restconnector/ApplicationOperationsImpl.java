@@ -60,7 +60,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 	/**
 	 * @param applicationOperationAction holds the information needs to perform an action on mdm.
 	 */
-	@Override public void performAction(ApplicationOperationAction applicationOperationAction)
+	@Override public String performAction(ApplicationOperationAction applicationOperationAction)
 			throws MobileApplicationException {
 		if (remoteServer.isEmpty()) {
 			setRemoteServer(this.remoteServer);
@@ -205,6 +205,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
 				log.debug(action + " operation unsuccessful.");
 			}
 		}
+
+		return null;
 
 	}
 

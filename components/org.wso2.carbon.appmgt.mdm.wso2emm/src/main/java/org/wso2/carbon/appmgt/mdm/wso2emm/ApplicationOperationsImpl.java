@@ -58,7 +58,7 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
      * @param applicationOperationAction holds the information needs to perform an action on mdm
      */
 
-    public void performAction(ApplicationOperationAction applicationOperationAction) {
+    public String performAction(ApplicationOperationAction applicationOperationAction) {
 
         HashMap<String, String> configProperties = applicationOperationAction.getConfigParams();
 
@@ -154,6 +154,8 @@ public class ApplicationOperationsImpl implements ApplicationOperations {
                 log.error(errorMessage);
             }
         }
+
+        return null;
 
     }
 
