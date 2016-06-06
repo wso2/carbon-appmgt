@@ -776,4 +776,11 @@ public interface APIProvider extends APIManager {
      * @throws AppManagementException
      */
     void updateApp(App app)throws AppManagementException;
+
+    /**
+     * Remove mobile application binary file from storage
+     * @param fileName
+     * @throws AppManagementException
+     */
+    public void removeBinaryFromStorage(String fileName) throws AppManagementException;
 }

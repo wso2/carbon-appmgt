@@ -34,6 +34,29 @@ $(document).ready(function () {
 
     });
 
+    $('#optionsRadios7, #optionsRadios8').click(function () {
+        document.getElementById("fileNameDiv").innerHTML = "";
+        $('#docUrl').val('');
+    });
+
+    $('#optionsRadios9').click(function () {
+        document.getElementById("fileNameDiv").innerHTML = "";
+        $('#docLocation').val('');
+        $('#fileNameDiv').show('slow');
+    });
+
+    $('#optionsRadios1 ,#optionsRadios2 ,#optionsRadios3 ,#optionsRadios4 ,#optionsRadios5').click(function () {
+        $('#docUrl').val('');
+        $('#docLocation').val('');
+        document.getElementById("fileNameDiv").innerHTML = "";
+    });
+
+
+
+    $('#optionsRadios5').click(function () {
+        $('#specifyBox').val('');
+    });
+
     $('#saveDoc').click(function () {
         var sourceType = getRadioValue($('input[name=optionsRadios1]:radio:checked'));
         var docUrlDiv = $("#docUrl");
@@ -67,7 +90,7 @@ $(document).ready(function () {
             return;
         } else if (sourceType == 'url' && !validInputUrl(docUrlDiv)) {
             return;
-        } else if ($(this).val() != "Update" && sourceType == 'file' && !validInput(fileDiv, 'This field is required.',
+        } else if (sourceType == 'file' && !validInput(fileDiv, 'This field is required.',
                                                                                     isFilePathEmpty)) {
             return;
         } else if (docType.toLowerCase() == 'other' && !validInput($('#specifyBox'), 'This field is required.',
@@ -264,6 +287,10 @@ var updateDocumentation = function (rowId, docName, docType, summary, sourceType
     if (summary != "{}" && summary != 'null') {
         $('#newDoc #summary').val(summary);
     }
+    if ((docType.toLowerCase() == "public forum") || (docType.toLowerCase() == "support forum")) {
+        document.getElementById("optionsRadios7").disabled = true;
+        document.getElementById("optionsRadios9").disabled = true;
+    }
     if (sourceType == "INLINE") {
         $('#optionsRadios7').attr('checked', true);
         $('#sourceUrlDoc').hide('slow');
@@ -275,8 +302,6 @@ var updateDocumentation = function (rowId, docName, docType, summary, sourceType
             $('#sourceUrlDoc').show('slow');
         }
     } else {
-        $('#optionsRadios7').attr('disabled', true);
-        $('#optionsRadios8').attr('disabled', true);
         $('#optionsRadios9').attr('checked', true);
         $('#sourceFile').show('slow');
         if (filePath) {

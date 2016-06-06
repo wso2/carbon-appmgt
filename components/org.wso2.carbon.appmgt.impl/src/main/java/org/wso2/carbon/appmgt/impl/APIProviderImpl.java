@@ -64,6 +64,7 @@ import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.utils.RegistryUtils;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -71,6 +72,7 @@ import javax.cache.Cache;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -2889,6 +2891,32 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
             handleException("Error while adding the resource to the registry", e);
         }
         return null;
+    }
+
+    /**
+     * Remove mobile applications binary files from storage
+     * @param fileName file name of the banner image, thumbnail, screenshots and app binary
+     * @throws AppManagementException
+     */
+    public void removeBinaryFromStorage(String fileName) throws AppManagementException {
+        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
+                getAPIManagerConfigurationService().getAPIManagerConfiguration();
+        String storageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
+        if(StringUtils.isEmpty(storageLocation)){
+            handleException("Mobile Application BinaryFileStorage Configuration cannot be found." +
+                    " Pleas check the configuration in app-management.xml ");
+        }
+        String fullFilePath = CarbonUtils.getCarbonHome() + File.separator + storageLocation + fileName;
+
+            File binaryFile = new File(fullFilePath);
+        if (!binaryFile.exists()){
+            handleException("Binary file "+ fullFilePath+ " does not exist");
+        }
+
+        boolean isDeleted = binaryFile.delete();
+        if(!isDeleted){
+            handleException("Error occurred while deleting file "+ fullFilePath);
+        }
     }
 
 }
