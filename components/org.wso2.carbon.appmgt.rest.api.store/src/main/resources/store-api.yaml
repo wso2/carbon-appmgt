@@ -3,7 +3,7 @@ info:
   version: 1.1.0
   title: WSO2 APP Manager - Store API
   description: |
-    This document specifies a **RESTful API** for WSO2 **APP Manager** - Store.
+    This document specifies a **RESTful API** for **WSO2 APP Manager - Store**.
 
     It is written with [swagger 2](http://swagger.io/).
   contact:
@@ -53,24 +53,24 @@ paths:
         - name: query
           in: query
           description: >
-            **Search condition**.
+            A search condition.
 
 
-            You can search in attributes by using an **"attribute:"** modifier.
+            You can search attributes by using an **"attribute:"** modifier.
 
 
             Eg. "provider:wso2" will match an App if the provider of the App
             contains "wso2".
 
 
-            Supported attribute modifiers are [*provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id**]
 
 
-            If no advanced attribute modifier has been specified, search will
-            match the
+            If no advanced attribute modifier has been specified, the search
+            will match the
 
-            given query string against App Name.
+            given query string against the App name.
           type: string
         - $ref: '#/parameters/fieldFilter'
         - $ref: '#/parameters/limit'
@@ -92,7 +92,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -123,7 +123,7 @@ paths:
         {"name":"phone","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","type":"mobileapp","displayName":null,"transport":[],"lifecycle":null,"category":"Business","version":"1.0","icon":"/publisher/api/mobileapp/getfile/1KKX5LeQII1Ev8t.jpeg","description":"phone","provider":null,"lifecycleState":null,"tags":[],"rating":0.0,"thumbnailUrl":null,"banner":"/publisher/api/mobileapp/getfile/ABi7iIcbQYpyI8e.jpeg","marketType":null,"recentChanges":"-","platform":"ios","isSite":null,"appDefinition":null,"isDefaultVersion":null,"bundleversion":"1.0","screenshots":["/publisher/api/mobileapp/getfile/PiP8X797UcqF6De.jpeg"],"createdtime":null,"appType":"enterprise","lifecycleAvailableActions":null}
       summary: Get app details
       description: |
-        Get details of an app.
+        Get details of an App.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -145,7 +145,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -173,9 +173,9 @@ paths:
         curl -X GET -H "Authorization: Bearer c8c4399ba38982a21372012294ad1a54"
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/rate"
       x-wso2-response: '{"rating": 1.6428571428571428}'
-      summary: Get app rating details
+      summary: Get App rating details
       description: |
-        Get rating details of an app.
+        Get rating details of an App.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -199,7 +199,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -237,7 +237,7 @@ paths:
         - in: body
           name: rating
           description: |
-            App rating object that needs to be added
+            App rating object that needs to be added.
           required: true
           schema:
             $ref: '#/definitions/AppRatingInfo'
@@ -249,11 +249,11 @@ paths:
       responses:
         '200':
           description: |
-            Ok.
+            OK.
         '400':
           description: |
             Bad Request.
-            Invalid request or validation error
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '403':
@@ -302,18 +302,18 @@ paths:
           headers:
             ETag:
               description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
-                request.
+                Entity Tag of the changed App. Used by caches or in conditional
+                requests.
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last.
-                Used by caches, or in conditional requests.
+                Date and time at which the resource was last modified.
+                Used by caches or in conditional requests.
               type: string
         '400':
           description: |
             Bad Request.
-            Invalid request or validation error
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '404':
@@ -330,7 +330,7 @@ paths:
         -H "Content-Type: application/json" -d ''
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/subscription"
       x-wso2-response: HTTP/1.1 200 OK
-      summary: Subscribe App
+      summary: Subscribe to an App
       description: |
         Subscribe to an existing App
       parameters:
@@ -400,7 +400,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -452,7 +452,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -481,9 +481,9 @@ paths:
         -H "Content-Type: application/json" -d ''
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/unsubscription"
       x-wso2-response: HTTP/1.1 200 OK
-      summary: Un subscribe App
+      summary: Unsubscribe to an App
       description: |
-        Un subscribe to an existing App
+        Unsubscribe to an existing App
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/appId'
@@ -593,18 +593,18 @@ paths:
           headers:
             ETag:
               description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
+                Entity Tag of the changed App. Used by caches or in conditional
                 request.
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last.
-                Used by caches, or in conditional requests.
+                Date and time at which the resource was last modified.
+                Used by caches or in conditional requests.
               type: string
         '400':
           description: |
             Bad Request.
-            Invalid request or validation error
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '404':
@@ -629,9 +629,9 @@ paths:
         -H "Content-Type: application/json" -d ''
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
       x-wso2-response: HTTP/1.1 200 OK
-      summary: Set as favourite page
+      summary: Set as a favourite page
       description: |
-        Set as favourite page.
+        Set as a favourite page.
       tags:
         - Favourite
       responses:
@@ -672,9 +672,9 @@ paths:
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
       x-wso2-response: HTTP/1.1 200 OK
       x-wso2-request: ''
-      summary: Remove from favourite page
+      summary: Remove from the favourite page
       description: |
-        Remove from favourite page.
+        Remove from the favourite page.
       tags:
         - Favourite
       responses:
@@ -713,9 +713,9 @@ paths:
         curl -X GET -H "Authorization: Bearer
         c8c4399ba38982a21372012294ad1a54""http://localhost:9763/api/appm/store/v1.1/apps/webapp/id/80391fcb-45fc-4bb4-a83d-fc991a99084d/favourite-page"
       x-wso2-response: '{"isDefaultPage": true}'
-      summary: check if it is the favourite page
+      summary: Check if it is a favourite page
       description: |
-        check if it is the favourite page.
+        Check if it is a favourite page.
       parameters:
         - $ref: '#/parameters/Accept'
         - $ref: '#/parameters/If-None-Match'
@@ -733,7 +733,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -843,7 +843,7 @@ paths:
       x-wso2-request: '{"type": "user","appId": "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}'
       summary: Download App
       description: |
-        Download an new App
+        Download a new App
       parameters:
         - in: body
           name: install
@@ -937,30 +937,30 @@ paths:
         "Nexus"}]}
       summary: Get all Devices
       description: >
-        Get a list of available Devices qualifying under a given search
+        Get a list of available devices qualifying under a given search
         condition.
       parameters:
         - name: query
           in: query
           description: >
-            **Search condition**.
+            A search condition.
 
 
-            You can search in attributes by using an **"attribute:"** modifier.
+            You can search attributes by using an **"attribute:"** modifier.
 
 
             Eg. "type:mobile" will match an App if the provider of the App
-            contains "wso2".
+            contains "mobile".
 
 
-            Supported attribute modifiers are [*provider, app_name, app_version,
-            app_id**]
+            Supported attribute modifiers are [**provider, app_name,
+            app_version, app_id**]
 
 
             If no advanced attribute modifier has been specified, search will
             match the
 
-            given query string against App Name.
+            given query string against the App name.
           type: string
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
@@ -972,7 +972,7 @@ paths:
         '200':
           description: |
             OK.
-            List of qualifying Devices are returned.
+            List of qualifying devices is returned.
           schema:
             $ref: '#/definitions/DeviceList'
           headers:
@@ -981,7 +981,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1011,9 +1011,9 @@ paths:
       x-wso2-response: >-
         {"roleIds": ["admin","Application/app_11_04_001",
         "Application/app_11_04_002","Application/app_11_04_011"]}
-      summary: Get all Roles
+      summary: Get all roles
       description: |
-        Get a list of available Roles.
+        Get a list of available roles.
       parameters:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
@@ -1025,7 +1025,7 @@ paths:
         '200':
           description: |
             OK.
-            List of qualifying Roles are returned.
+            List of qualifying roles is returned.
           schema:
             $ref: '#/definitions/RoleIdList'
           headers:
@@ -1034,7 +1034,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1064,7 +1064,7 @@ paths:
       x-wso2-response: '{"userIds":["admin","user1","user2"]}'
       summary: Get all Users
       description: |
-        Get a list of available Users.
+        Get a list of available users.
       parameters:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
@@ -1076,7 +1076,7 @@ paths:
         '200':
           description: |
             OK.
-            List of Users are returned.
+            List of users is returned.
           schema:
             $ref: '#/definitions/UserIdList'
           headers:
@@ -1085,7 +1085,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1120,7 +1120,7 @@ paths:
         "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}
       summary: Enterprise Download/Install App
       description: |
-        Enterprise Download an new App
+        Enterprise Download a new App
       parameters:
         - in: body
           name: install
@@ -1163,9 +1163,9 @@ paths:
       {"type": "user","typeIds": ["admin"],"appId":
       "cec2027d-2dd6-4826-97c5-33be4eb83ae1"}
     post:
-      summary: Enterprise Uninstall App
+      summary: Enterprise uninstall App
       description: |
-        Enterprise Uninstall an existing App
+        Enterprise uninstall an existing App
       parameters:
         - in: body
           name: install
@@ -1204,9 +1204,9 @@ paths:
         "http://localhost:9763/api/appm/store/v1.1/apps/webapp/tags"
       x-wso2-response: >-
         [{"name":"webapptag1","noOfOccurrences":1},{"name":"webapptag2","noOfOccurrences":1},{"name":"webapptag3","noOfOccurrences":1}]
-      summary: Get all Tags
+      summary: Get all tags
       description: |
-        Get a list of available Tags relevant to given App Type.
+        Get a list of available tags relevant to the given App type.
       parameters:
         - $ref: '#/parameters/appType'
         - $ref: '#/parameters/Accept'
@@ -1217,7 +1217,7 @@ paths:
         '200':
           description: |
             OK.
-            List of Tags is returned.
+            List of tags is returned.
           schema:
             $ref: '#/definitions/TagList'
           headers:
@@ -1226,7 +1226,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1259,7 +1259,7 @@ paths:
       x-wso2-request: ' {"events":  [{"appId":"init","userId":"init","tenantId":-1234,"appName":"init","appVersion":"1","context":"/init","item":"My_App","action":"init","timestamp":1462277036369},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-load","timestamp":1462277038291},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"noname","action":"click","timestamp":1462277042436},{"appId":"80391fcb-45fc-4bb4-a83d-fc991a99084d","userId":"admin","tenantId":"-1234","appName":"app3","appVersion":"1.0","context":"/app3","item":"My_App","action":"page-unload","timestamp":1462277042437}]}'
       summary: Publish Stats
       description: |
-        Publish User hit Stats details.
+        Publish user hit stat details.
       parameters:
         - in: body
           name: events
@@ -1296,12 +1296,12 @@ paths:
       x-scope: 'appm:read'
       x-wso2-curl: ''
       x-wso2-response: ''
-      summary: 'Retrieving images, pdf, documents files'
+      summary: 'Retrieving images, pdf and document files'
       description: |
-        Retrieving images for banners, screenshots etc.
+        Retrieving images for banners, screenshots, etc.
       parameters:
         - name: appType
-          description: Application type
+          description: The application type.
           in: query
           type: string
           required: true
@@ -1314,13 +1314,13 @@ paths:
         '200':
           description: |
             OK.
-            Static content Retrieved successfully.
+            Static content retrieved successfully.
           schema:
             type: file
           headers:
             ETag:
               description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
+                Entity Tag of the changed App. Used by caches or in conditional
                 request.
               type: string
             Last-Modified:
@@ -1355,7 +1355,7 @@ paths:
       x-wso2-response: ''
       summary: Retrieving mobile application binaries
       description: |
-        Retrieving .apk, .ipa binaries for mobile apps.
+        Retrieving .apk and .ipa binaries for mobile apps.
       parameters:
         - $ref: '#/parameters/fileName'
         - $ref: '#/parameters/If-Match'
@@ -1372,18 +1372,18 @@ paths:
           headers:
             ETag:
               description: >
-                Entity Tag of the changed App. Used by caches, or in conditional
+                Entity Tag of the changed App. Used by caches or in conditional
                 request.
               type: string
             Last-Modified:
               description: |
-                Date and time the resource has been modified the last.
-                Used by caches, or in conditional requests.
+                Date and time at which the resource was last modified.
+                Used by caches or in conditional requests.
               type: string
         '400':
           description: |
             Bad Request.
-            Invalid request or validation error
+            Invalid request or validation error.
           schema:
             $ref: '#/definitions/Error'
         '404':
@@ -1410,7 +1410,7 @@ paths:
         {"previous":"","next":"","count":2,"appList":[{"name":"app1","context":null,"id":"af929140-1257-46ed-97c0-d26098e140e9","rating":0.0,"lifecycleState":"IN-REVIEW","provider":"admin","description":"asdasd","version":"1"},{"name":"app2","context":null,"id":"5c9c8551-d696-4c44-85a6-dcd86f1a1e25","rating":0.0,"lifecycleState":"CREATED","provider":"admin","description":"phone","version":"1.0"}]}
       summary: Get apps with given tag
       description: |
-        Get app list with given tag for particular asset type.
+        Get app list with the given tag for a particular asset type.
       parameters:
         - $ref: '#/parameters/tagName'
         - $ref: '#/parameters/appType'
@@ -1425,7 +1425,7 @@ paths:
         '200':
           description: |
             OK.
-            List of Apps Id's returned.
+            List of App IDs is returned.
           schema:
             $ref: '#/definitions/AppIdList'
           headers:
@@ -1434,7 +1434,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1465,9 +1465,9 @@ paths:
         {"site": "test.lk","email": "testOwner@gmail.com","description": "this
         is a test description","name": "testOwner","properties": [{"isVisible":
         false,"value": "903334238V","key": "nic"}],"id": 1}
-      summary: Get a Business owners by Id
+      summary: Get business owners by ID
       description: |
-        Get a Business owners by Id.
+        Get business owners by ID.
       parameters:
         - $ref: '#/parameters/businessOwnerId'
         - $ref: '#/parameters/Accept'
@@ -1486,7 +1486,7 @@ paths:
               type: string
             ETag:
               description: >
-                Entity Tag of the response resource. Used by caches, or in
+                Entity Tag of the response resource. Used by caches or in
                 conditional requests.
               type: string
         '400':
@@ -1514,8 +1514,8 @@ parameters:
     description: >
       **APP ID** consisting of the **UUID** of the App.
 
-      The combination of the provider of the app, name of the appId and the
-      version is also accepted as a valid App ID.
+      The following combination is also accepted as a valid APP ID: the provider
+      of the app, name of the App and the version.
 
       Should be formatted as **provider-name-version**.
     required: true
@@ -1524,18 +1524,18 @@ parameters:
     name: appType
     in: path
     description: |
-      App Type. Either webapp or mobileapp
+      The App type (either Webapp/Mobile app).
     required: true
     type: string
   fieldFilter:
     name: field-filter
     description: |
-      Used to limit the fields in response.
+      Used to limit the fields in the response.
 
 
 
 
-      Supported filters are [ **basic,all**]
+      Supported filters are [**basic, all**]
     in: query
     type: string
     required: false
@@ -1561,7 +1561,7 @@ parameters:
     name: fileName
     in: path
     description: |
-      file name.
+      The file name.
     required: true
     type: string
   tagName:
@@ -1600,13 +1600,15 @@ parameters:
       Validator for conditional requests; based on the ETag of the formerly
       retrieved
 
-      variant of the resourec.
+      variant of the resource.
     type: string
   If-Modified-Since:
     name: If-Modified-Since
     in: header
-    description: |
-      Validator for conditional requests; based on Last Modified header of the
+    description: >
+      Validator for conditional requests; based on the Last Modified header of
+      the
+
       formerly retrieved variant of the resource.
     type: string
   If-Match:
@@ -1619,7 +1621,7 @@ parameters:
     name: If-Unmodified-Since
     in: header
     description: |
-      Validator for conditional requests; based on Last Modified header.
+      Validator for conditional requests; based on the Last Modified header.
     type: string
 definitions:
   AppList:
@@ -1902,9 +1904,11 @@ definitions:
       deviceIds:
         type: object
         description: List of device Id's
+        example: '[{"id":"358812061121105","type":"ANDROID"}]'
       appId:
         type: string
         description: Installing mobile app ID
+        example: aff3b9ad-3d7b-4d8e-8bf9-600e86edf88c
   AdminInstall:
     title: Install/Download App
     properties:
@@ -1912,7 +1916,7 @@ definitions:
         type: string
         description: |
           Download type (either user or roles).
-        example: user/device
+        example: user/role
       typeIds:
         type: object
         description: List of Id's against type (role/user)

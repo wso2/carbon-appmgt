@@ -303,7 +303,7 @@ public class AppMDAO {
             statementToDelete = connection.prepareStatement(queryToDelete);
             statementToDelete.setInt(1, businessOwner.getBusinessOwnerId());
             statementToDelete.executeUpdate();
-            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE, " +
+            String queryToInsertRecordTwo = "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, " +
                     "SHOW_IN_STORE) VALUES(?,?,?, ?)";
 
             statementToInsertRecordTwo = connection.prepareStatement(queryToInsertRecordTwo);
@@ -350,7 +350,7 @@ public class AppMDAO {
         PreparedStatement statementToGetBusinessOwnersDetails = null;
         List<BusinessOwnerProperty> businessOwnerPropertiesList = new ArrayList<BusinessOwnerProperty>();
         ResultSet resultSetOfbusinessOwnerDetails = null;
-        String queryToGetKeyValue = "SELECT KEY, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE" +
+        String queryToGetKeyValue = "SELECT NAME, VALUE, SHOW_IN_STORE FROM APM_BUSINESS_OWNER_CUSTOM_PROPERTIES WHERE" +
                 " OWNER_ID = ?";
         try {
             statementToGetBusinessOwnersDetails = connection.prepareStatement(queryToGetKeyValue);
@@ -358,7 +358,7 @@ public class AppMDAO {
             resultSetOfbusinessOwnerDetails = statementToGetBusinessOwnersDetails.executeQuery();
             while (resultSetOfbusinessOwnerDetails.next()) {
                 BusinessOwnerProperty businessOwnerProperty = new BusinessOwnerProperty();
-                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("KEY"));
+                businessOwnerProperty.setPropertyId(resultSetOfbusinessOwnerDetails.getNString("NAME"));
                 businessOwnerProperty.setPropertyValue(resultSetOfbusinessOwnerDetails.getNString("VALUE"));
                 businessOwnerProperty.setShowingInStore(Boolean.parseBoolean(resultSetOfbusinessOwnerDetails.getNString
                         ("SHOW_IN_STORE")));
@@ -461,7 +461,7 @@ public class AppMDAO {
                    }
 
             String queryToInsertRecordTwo =
-                    "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, KEY, VALUE, SHOW_IN_STORE) VALUES" +
+                    "INSERT INTO APM_BUSINESS_OWNER_CUSTOM_PROPERTIES(OWNER_ID, NAME, VALUE, SHOW_IN_STORE) VALUES" +
                             "(LAST_INSERT_ID(),?,?,?)";
 
             statementToInsertBusinessOwnerDetails = connection.prepareStatement(queryToInsertRecordTwo);
@@ -6732,9 +6732,12 @@ public class AppMDAO {
                 "APP.APP_NAME AS APP_NAME, " +
                 "APP.APP_VERSION AS APP_VERSION, " +
                 "APP.CONTEXT AS CONTEXT, " +
-                "APP.APP_ENDPOINT AS APP_ENDPOINT " +
+                "APP.APP_ENDPOINT AS APP_ENDPOINT, " +
+                "COALESCE(DEF.DEFAULT_APP_VERSION,'') AS DEFAULT_APP_VERSION " +
                 "FROM " +
-                "APM_APP APP";
+                "APM_APP APP " +
+                "LEFT JOIN APM_APP_DEFAULT_VERSION DEF " +
+                "ON DEF.APP_NAME = APP.APP_NAME AND DEF.APP_PROVIDER = APP.APP_PROVIDER ";
 
         try {
             connection = APIMgtDBUtil.getConnection();
@@ -6751,6 +6754,8 @@ public class AppMDAO {
                 webApp = new WebApp(identifier);
                 webApp.setContext(appInfoResult.getString("CONTEXT"));
                 webApp.setUrl(appInfoResult.getString("APP_ENDPOINT"));
+                webApp.setDefaultVersion(appInfoResult.getString("DEFAULT_APP_VERSION").equals(appInfoResult.getString(
+                        "APP_VERSION")));
                 webApps.add(webApp);
             }
 

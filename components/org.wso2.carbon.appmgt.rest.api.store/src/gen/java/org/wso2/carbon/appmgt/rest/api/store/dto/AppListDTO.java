@@ -1,32 +1,31 @@
 package org.wso2.carbon.appmgt.rest.api.store.dto;
 
 import java.util.*;
-import org.wso2.carbon.appmgt.rest.api.store.dto.AppInfoDTO;
 
 import io.swagger.annotations.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.NotNull;
-
-
 
 @ApiModel(description = "")
 public class AppListDTO  {
-  
-  
-  
-  private Integer count = null;
-  
-  
-  private String next = null;
-  
-  
-  private String previous = null;
-  
-  
-  private List<AppInfoDTO> appList = new ArrayList<AppInfoDTO>();
 
-  
+
+
+  private Integer count = null;
+
+
+  private String next = null;
+
+
+  private String previous = null;
+
+
+  private List<AppDTO> appList = new ArrayList<AppDTO>();
+
+
+  private List<AppSummaryDTO> appSummaryList = new ArrayList<AppSummaryDTO>();
+
+
   /**
    * Number of App returned.
    **/
@@ -65,15 +64,27 @@ public class AppListDTO  {
     this.previous = previous;
   }
 
-  
+
+  /**
+   **/
+  @ApiModelProperty(value = "")
+  @JsonProperty("appSummaryList")
+  public List<AppSummaryDTO> getAppSummaryList() {
+    return appSummaryList;
+  }
+  public void setAppSummaryList(List<AppSummaryDTO> appSummaryList) {
+    this.appSummaryList = appSummaryList;
+  }
+
+
   /**
    **/
   @ApiModelProperty(value = "")
   @JsonProperty("appList")
-  public List<AppInfoDTO> getAppList() {
+  public List<AppDTO> getAppList() {
     return appList;
   }
-  public void setAppList(List<AppInfoDTO> appList) {
+  public void setAppList(List<AppDTO> appList) {
     this.appList = appList;
   }
 
@@ -88,6 +99,7 @@ public class AppListDTO  {
     sb.append("  next: ").append(next).append("\n");
     sb.append("  previous: ").append(previous).append("\n");
     sb.append("  appList: ").append(appList).append("\n");
+    sb.append("  appSummaryList: ").append(appSummaryList).append("\n");
     sb.append("}\n");
     return sb.toString();
   }
