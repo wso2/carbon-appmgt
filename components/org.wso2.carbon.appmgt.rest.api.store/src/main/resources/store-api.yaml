@@ -300,7 +300,7 @@ paths:
             $ref: '#/definitions/Schedule'
         - $ref: '#/parameters/Content-Type'
       tags:
-        - Apps
+        - MobileApps
       responses:
         '200':
           description: |
@@ -336,7 +336,7 @@ paths:
             $ref: '#/definitions/Schedule'
         - $ref: '#/parameters/Content-Type'
       tags:
-        - Apps
+        - MobileApps
       responses:
         '200':
           description: |

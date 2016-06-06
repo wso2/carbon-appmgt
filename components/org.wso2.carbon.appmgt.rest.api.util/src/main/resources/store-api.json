@@ -349,7 +349,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "MobileApps"
                 ],
                 "responses": {
                     "200": {
@@ -394,7 +394,7 @@
                     }
                 ],
                 "tags": [
-                    "Apps"
+                    "MobileApps"
                 ],
                 "responses": {
                     "200": {
