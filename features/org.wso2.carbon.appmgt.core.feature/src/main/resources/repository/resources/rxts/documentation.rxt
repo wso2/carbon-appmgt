@@ -17,7 +17,7 @@
             <field type="text" required="true">
                 <name>ApiBasePath</name>
             </field>
-            <field type="text" required="true">
+            <field type="text">
                 <name>Summary</name>
             </field>
             <field type="text" required="true" readonly="true">
