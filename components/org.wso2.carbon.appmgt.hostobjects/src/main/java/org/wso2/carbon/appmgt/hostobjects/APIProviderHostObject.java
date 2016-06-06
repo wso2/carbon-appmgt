@@ -102,6 +102,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -4216,6 +4217,37 @@ public class APIProviderHostObject extends ScriptableObject {
     public static String jsFunction_getBinaryFileStorage(Context cx, Scriptable thisObj, Object[] args,
                                                          Function funObj) throws AppManagementException {
         return HostObjectUtils.getBinaryStorageConfiguration();
+    }
+
+    /**
+     * Remove mobile binary files from storage
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     */
+    public static void jsFunction_removeBinary(Context cx, Scriptable thisObj, Object[] args,
+                                               Function funObj) {
+        if (args == null || args.length != 1) {
+            throw new AppManagementException(
+                    "Invalid number of arguments. Arguments length should be one.");
+        }
+        if (!(args[0] instanceof String)) {
+            throw new AppManagementException("Invalid argument type. Binary file name should be a String.");
+        }
+        String fileName = (String) args[0];
+        String storageLocation = HostObjectUtils.getBinaryStorageConfiguration();
+//        try{
+//        Files.delete(CarbonUtils.getCarbonHome());
+//        } catch (NoSuchFileException x) {
+//            handleException();
+//        } catch (DirectoryNotEmptyException x) {
+//            System.err.format("%s not empty%n", path);
+//        } catch (IOException x) {
+//            // File permission problems are caught here.
+//            System.err.println(x);
+//        }
+
     }
 
 }
