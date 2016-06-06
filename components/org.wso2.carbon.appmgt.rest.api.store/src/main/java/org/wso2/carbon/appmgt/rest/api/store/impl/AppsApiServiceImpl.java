@@ -34,6 +34,7 @@ import org.wso2.carbon.appmgt.rest.api.store.AppsApiService;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.AppListDTO;
 import org.wso2.carbon.appmgt.rest.api.store.dto.InstallDTO;
+import org.wso2.carbon.appmgt.rest.api.store.dto.ScheduleDTO;
 import org.wso2.carbon.appmgt.rest.api.store.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
@@ -41,6 +42,7 @@ import org.wso2.carbon.user.api.UserStoreException;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -276,6 +278,106 @@ public class AppsApiServiceImpl extends AppsApiService {
             }
         }
         return Response.ok().entity(appToReturn).build();
+    }
+
+    @Override
+    public Response appsMobileScheduleInstallPost(String contentType, ScheduleDTO schedule,
+                                                  SecurityContext securityContext) {
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", schedule.getAppId());
+
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, schedule.getAppId()).getResponse();
+            }
+
+
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = schedule.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "install";
+            String type = "device";
+            String[] parameters;
+            parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
+                                       String[].class);
+            if (parameters == null) {
+                RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                                             log);
+            }
+            String scheduleTime = schedule.getScheduleTime();
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
+        } catch (AppManagementException | MobileApplicationException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        }
+        return Response.ok().build();
+    }
+
+    @Override
+    public Response appsMobileScheduleUpdatePost(String contentType, ScheduleDTO schedule,
+                                                 SecurityContext securityContext) {
+        String username = RestApiUtil.getLoggedInUsername();
+        try {
+            Map<String, String> searchTerms = new HashMap<String, String>();
+            searchTerms.put("id", schedule.getAppId());
+
+            APIProvider apiProvider = RestApiUtil.getLoggedInUserProvider();
+            List<App> result = apiProvider.searchApps(AppMConstants.MOBILE_ASSET_TYPE, searchTerms);
+            if (result.isEmpty()) {
+                String errorMessage = "Could not find requested application.";
+                return RestApiUtil.buildNotFoundException(errorMessage, schedule.getAppId()).getResponse();
+            }
+
+
+            String tenantDomainName = MultitenantUtils.getTenantDomain(username);
+            int tenantId = ServiceReferenceHolder.getInstance().getRealmService().getTenantManager().getTenantId(
+                    tenantDomainName);
+            String tenantUserName = MultitenantUtils.getTenantAwareUsername(username);
+            String appId = schedule.getAppId();
+            Operations mobileOperation = new Operations();
+            String action = "update";
+            String type = "device";
+            String[] parameters;
+            parameters = Arrays.copyOf(schedule.getDeviceIds().toArray(), schedule.getDeviceIds().toArray().length,
+                                       String[].class);
+            if (parameters == null) {
+                RestApiUtil.handleBadRequest("Device IDs should be provided to perform device app installation",
+                                             log);
+            }
+            String scheduleTime = schedule.getScheduleTime();
+
+            JSONObject user = new JSONObject();
+            user.put("username", tenantUserName);
+            user.put("tenantDomain", tenantDomainName);
+            user.put("tenantId", tenantId);
+
+            mobileOperation.performAction(user.toString(), action, tenantId, type, appId, parameters, scheduleTime);
+
+        } catch (AppManagementException | MobileApplicationException e) {
+            RestApiUtil.handleInternalServerError("Internal Error occurred while installing", e, log);
+        } catch (UserStoreException e) {
+            RestApiUtil.handleInternalServerError("User store related Error occurred while installing", e, log);
+        } catch (JSONException e) {
+            RestApiUtil.handleInternalServerError("Json casting Error occurred while installing", e, log);
+        }
+        return Response.ok().build();
     }
 
 
