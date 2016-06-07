@@ -63,7 +63,7 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
-import org.wso2.carbon.appmgt.usage.publisher.APPMgtUiActivitiesBamDataPublisher;
+import org.wso2.carbon.appmgt.usage.publisher.AppMUIActivitiesDASDataPublisher;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.social.core.SocialActivityException;
@@ -156,7 +156,7 @@ public class AppsApiServiceImpl extends AppsApiService {
         if (events.getEvents().size() == 0) {
             RestApiUtil.handleBadRequest("Invalid event stream", log);
         }
-        APPMgtUiActivitiesBamDataPublisher appMgtBAMPublishObj = new APPMgtUiActivitiesBamDataPublisher();
+        AppMUIActivitiesDASDataPublisher appMgtBAMPublishObj = new AppMUIActivitiesDASDataPublisher();
 
         NativeObject[] statsObjectArr = new NativeObject[events.getEvents().size()];
         for (int i = 0; i < events.getEvents().size(); i++) {

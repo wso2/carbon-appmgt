@@ -75,7 +75,7 @@ public class APIStatsPublisher {
             publisher.publishEvent(requestPublisherDTO);
         }catch (Throwable e){
             //Log the error and continue since we do not want the message flow to be effected due to stats not being published.
-            log.error("Could not publish request event to BAM. " + e.getMessage());
+            log.error("Could not publish request event to DAS. " + e.getMessage());
             return false;
         }
 
@@ -121,7 +121,7 @@ public class APIStatsPublisher {
             publisher.publishEvent(responsePublisherDTO);
         }catch (Throwable e){
             //Log the error and continue since we do not want the message flow to be effected due to stats not being published.
-            log.error("Could not publish response event to BAM. " + e.getMessage());
+            log.error("Could not publish response event to DAS. " + e.getMessage());
             return false;
         }
 

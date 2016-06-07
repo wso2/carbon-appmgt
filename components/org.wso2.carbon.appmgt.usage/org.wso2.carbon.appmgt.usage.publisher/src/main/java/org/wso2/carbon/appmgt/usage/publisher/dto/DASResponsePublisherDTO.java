@@ -21,47 +21,48 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BAMRequestPublisherDTO extends RequestPublisherDTO{
+public class DASResponsePublisherDTO extends ResponsePublisherDTO {
 
-    public BAMRequestPublisherDTO (RequestPublisherDTO requestPublisherDTO){
-        //setConsumerKey(requestPublisherDTO.getConsumerKey());
-        setContext(requestPublisherDTO.getContext());
-        setApi_version(requestPublisherDTO.getApi_version());
-        setApi(requestPublisherDTO.getApi());
-        setResource(requestPublisherDTO.getResource());
-        setMethod(requestPublisherDTO.getMethod());
-        setVersion(requestPublisherDTO.getVersion());
-        setRequestTime(requestPublisherDTO.getRequestTime());
-        setUsername(requestPublisherDTO.getUsername());
-        setTenantDomain(requestPublisherDTO.getTenantDomain());
-        setApplicationName(requestPublisherDTO.getApplicationName());
-        setApplicationId(requestPublisherDTO.getApplicationId());
-        setTrackingCode(requestPublisherDTO.getTrackingCode());
-        //setLoggedInUSer(requestPublisherDTO.getLoggedInUSer());
-        setReferer(requestPublisherDTO.getReferer());
-        setServiceTimeOfPage(requestPublisherDTO.getServiceTimeOfPage());
+    public DASResponsePublisherDTO(ResponsePublisherDTO responsePublisherDTO){
+       // setConsumerKey(responsePublisherDTO.getConsumerKey());
+        setContext(responsePublisherDTO.getContext());
+        setApi_version(responsePublisherDTO.getApi_version());
+        setApi(responsePublisherDTO.getApi());
+        setResource(responsePublisherDTO.getResource());
+        setMethod(responsePublisherDTO.getMethod());
+        setVersion(responsePublisherDTO.getVersion());
+        setResponseTime(responsePublisherDTO.getResponseTime());
+        setServiceTime(responsePublisherDTO.getServiceTime());
+        setUsername(responsePublisherDTO.getUsername());
+        setTenantDomain(responsePublisherDTO.getTenantDomain());
+        setApplicationName(responsePublisherDTO.getApplicationName());
+        setApplicationId(responsePublisherDTO.getApplicationId());
+        setTrackingCode(responsePublisherDTO.getTrackingCode());
+        //setLoggedInUSer(responsePublisherDTO.getLoggedInUSer());
+        setReferer(responsePublisherDTO.getReferer());
+        setResponseTime(responsePublisherDTO.getResponseTime());
     }
 
-    public Map<String, ByteBuffer> createEventDataMap() {
+        public Map<String, ByteBuffer> createEventDataMap() {
         Map<String, ByteBuffer> eventMap = new HashMap<String, ByteBuffer>();
-        //eventMap.put("consumerKey", ByteBuffer.wrap(getConsumerKey().getBytes()));
+       // eventMap.put("consumerKey", ByteBuffer.wrap(getConsumerKey().getBytes()));
         eventMap.put("context", ByteBuffer.wrap(getContext().getBytes()));
         eventMap.put("api_version", ByteBuffer.wrap(getApi_version().getBytes()));
         eventMap.put("api", ByteBuffer.wrap(getApi().getBytes()));
         eventMap.put("resource", ByteBuffer.wrap(getResource().getBytes()));
         eventMap.put("method", ByteBuffer.wrap(getMethod().getBytes()));
         eventMap.put("version", ByteBuffer.wrap(getVersion().getBytes()));
-        eventMap.put("request", ByteBuffer.wrap(String.valueOf(getRequestCount()).getBytes()));
-        eventMap.put("requestTime", ByteBuffer.wrap(String.valueOf(getRequestTime()).getBytes()));
+        eventMap.put("response", ByteBuffer.wrap(String.valueOf(getResponse()).getBytes()));
+        eventMap.put("responseTime", ByteBuffer.wrap(String.valueOf(getResponseTime()).getBytes()));
+        eventMap.put("serviceTime", ByteBuffer.wrap(String.valueOf(getServiceTime()).getBytes()));
         eventMap.put("userId", ByteBuffer.wrap(getUsername().getBytes()));
-        eventMap.put("tenantDomain", ByteBuffer.wrap(String.valueOf(getTenantDomain()).getBytes()));
         eventMap.put("applicationName", ByteBuffer.wrap(getApplicationName().getBytes()));
         eventMap.put("applicationId", ByteBuffer.wrap(getApplicationId().getBytes()));
         eventMap.put("trackingCode",ByteBuffer.wrap(getTrackingCode().getBytes()));
         eventMap.put("referer",ByteBuffer.wrap(getReferer().getBytes()));
-        eventMap.put("serviceTimeOfPage",ByteBuffer.wrap(String.valueOf(getServiceTimeOfPage()).getBytes()));
+        eventMap.put("serviceTime",ByteBuffer.wrap(String.valueOf(getServiceTime()).getBytes()));
 
-        return eventMap;
+            return eventMap;
     }
 
 }

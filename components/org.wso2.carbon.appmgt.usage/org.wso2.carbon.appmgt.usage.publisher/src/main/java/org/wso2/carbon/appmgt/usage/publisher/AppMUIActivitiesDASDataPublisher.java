@@ -32,20 +32,20 @@ import java.math.BigDecimal;
 
 /*
  * This class is used to capture the UI activity changes events and publish to
- * BAM or directly write to database
+ * DAS or directly write to database
  */
-public class APPMgtUiActivitiesBamDataPublisher {
+public class AppMUIActivitiesDASDataPublisher {
 	private DataPublisher dataPublisher;
 
-	// used to check if the BAM is configured or not
-	private boolean enableUiActivityBamPublishing = false;
+	// used to check if the DAS is configured or not
+	private boolean enableUiActivityDASPublishing = false;
 
-	private static final Log log = LogFactory.getLog(APPMgtUiActivitiesBamDataPublisher.class);
+	private static final Log log = LogFactory.getLog(AppMUIActivitiesDASDataPublisher.class);
 
-	public APPMgtUiActivitiesBamDataPublisher() {
-		enableUiActivityBamPublishing = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().
-				isUiActivityBamPublishEnabled();
-		if (enableUiActivityBamPublishing) {
+	public AppMUIActivitiesDASDataPublisher() {
+		enableUiActivityDASPublishing = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService().
+				isUiActivityDASPublishEnabled();
+		if (enableUiActivityDASPublishing) {
 			this.dataPublisher = DataPublisherUtil.getDataPublisher();
 		}
 	}
@@ -106,10 +106,10 @@ public class APPMgtUiActivitiesBamDataPublisher {
          try {
              Long timeStamp = new BigDecimal(timestampStr).longValue();
              // if BAM is configured
-			 if (enableUiActivityBamPublishing) {
+			 if (enableUiActivityDASPublishing) {
 				 APIMGTConfigReaderService apimgtConfigReaderService = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService();
-				 String streamId = apimgtConfigReaderService.getApiManagerBamUiActivityStreamName() + ":"
-						 + apimgtConfigReaderService.getApiManagerBamUiActivityStreamVersion();
+				 String streamId = apimgtConfigReaderService.getApiManagerDasUiActivityStreamName() + ":"
+						 + apimgtConfigReaderService.getApiManagerDasUiActivityStreamVersion();
 
 				 //Publish UIActivity Data
 				 dataPublisher.publish(streamId, System.currentTimeMillis(), new Object[]{"external"}, null,

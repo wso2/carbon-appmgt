@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.appmgt.usage.client.dto;
+package org.wso2.carbon.appmgt.api.dto;
 
 /**
  * Store user name and no of hits per an app.
