@@ -61,15 +61,16 @@ function updateJavaPolicyPartial(action) {
     $.each(javaPolicyArray, function (index, obj) {
         if (obj != null) {
 
+            if(action == "add" && obj.displayName == "Publish Statistics:"){
+                checkedStatus = "checked";
+                javaPolicyIndexArray.push(obj.javaPolicyId);
+            }
+
             //if policy is saved, tick the java policy checkbox
             if (obj.applicationId != null) {
                 checkedStatus = "checked";
                 //push the id's of saved policies to array
                 javaPolicyIndexArray.push(obj.javaPolicyId);
-            }
-
-            if(action == "add" && obj.displayName == "Publish Statistics:"){
-                checkedStatus = "checked";
             }
 
             //draw div's to each policy
