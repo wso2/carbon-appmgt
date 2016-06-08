@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.appmgt.rest.api.publisher.impl;
 
-import java.text.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -32,15 +31,43 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.wso2.carbon.appmgt.api.APIProvider;
 import org.wso2.carbon.appmgt.api.AppManagementException;
-import org.wso2.carbon.appmgt.api.model.*;
+import org.wso2.carbon.appmgt.api.dto.AppPageUsageDTO;
+import org.wso2.carbon.appmgt.api.dto.AppResponseTimeDTO;
+import org.wso2.carbon.appmgt.api.dto.AppUsageByUserDTO;
+import org.wso2.carbon.appmgt.api.exception.AppUsageQueryServiceClientException;
+import org.wso2.carbon.appmgt.api.model.APIIdentifier;
+import org.wso2.carbon.appmgt.api.model.App;
+import org.wso2.carbon.appmgt.api.model.Documentation;
+import org.wso2.carbon.appmgt.api.model.FileContent;
+import org.wso2.carbon.appmgt.api.model.MobileApp;
+import org.wso2.carbon.appmgt.api.model.Subscriber;
+import org.wso2.carbon.appmgt.api.model.SubscriptionCount;
+import org.wso2.carbon.appmgt.api.model.Subscriptions;
+import org.wso2.carbon.appmgt.api.model.Tag;
+import org.wso2.carbon.appmgt.api.model.Tier;
+import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.impl.AppMConstants;
 import org.wso2.carbon.appmgt.impl.AppManagerConfiguration;
 import org.wso2.carbon.appmgt.impl.AppRepository;
 import org.wso2.carbon.appmgt.impl.DefaultAppRepository;
+import org.wso2.carbon.appmgt.impl.service.AppUsageStatisticsService;
 import org.wso2.carbon.appmgt.impl.service.ServiceReferenceHolder;
 import org.wso2.carbon.appmgt.impl.utils.AppManagerUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.AppsApiService;
-import org.wso2.carbon.appmgt.rest.api.publisher.dto.*;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.AppListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.BinaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.DocumentListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.LifeCycleHistoryListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.ResponseMessageDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.StatSummaryDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TagListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.TierListDTO;
+import org.wso2.carbon.appmgt.rest.api.publisher.dto.UserIdListDTO;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.RestApiPublisherUtils;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.APPMappingUtil;
 import org.wso2.carbon.appmgt.rest.api.publisher.utils.mappings.DocumentationMappingUtil;
@@ -49,12 +76,6 @@ import org.wso2.carbon.appmgt.rest.api.util.RestApiConstants;
 import org.wso2.carbon.appmgt.rest.api.util.utils.RestApiUtil;
 import org.wso2.carbon.appmgt.rest.api.util.validation.BeanValidator;
 import org.wso2.carbon.appmgt.rest.api.util.validation.CommonValidator;
-import org.wso2.carbon.appmgt.usage.client.APIUsageStatisticsClient;
-import org.wso2.carbon.appmgt.usage.client.dto.APIPageUsageDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIResponseTimeDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APIUsageByUserDTO;
-import org.wso2.carbon.appmgt.usage.client.dto.APPMCacheCountDTO;
-import org.wso2.carbon.appmgt.usage.client.exception.APIMgtUsageQueryServiceClientException;
 import org.wso2.carbon.governance.api.exception.GovernanceException;
 import org.wso2.carbon.governance.api.generic.GenericArtifactManager;
 import org.wso2.carbon.governance.api.generic.dataobjects.GenericArtifact;
@@ -65,11 +86,23 @@ import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 import org.wso2.mobile.utils.utilities.ZipFileReading;
 
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * This is the service implementation class for Publisher API related operations
@@ -1210,9 +1243,6 @@ public class AppsApiServiceImpl extends AppsApiService {
                         statSummaryDTO = getAppUsagePerPage(providerName, username, tenantDomainName, startTimeStamp,
                                                             endTimeStamp);
                         break;
-                    case "getCacheHit":
-                        statSummaryDTO = getCacheHits(providerName, username, startTimeStamp, endTimeStamp);
-                        break;
                     default:
                         RestApiUtil.handleBadRequest("Unsupported statistics type '" + statType + "' has provided",
                                                      log);
@@ -1242,15 +1272,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             startTimeStamp, String endTimeStamp) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient statisticsClient = new APIUsageStatisticsClient(userName);
-            List<APIUsageByUserDTO> appUsageByUserList = statisticsClient.getAPIUsageByUser(providerName, startTimeStamp,
-                                                                                  endTimeStamp, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppUsageByUserDTO> appUsageByUserList = appUsageStatisticsService.getAppUsageByUser
+                    (providerName, startTimeStamp, endTimeStamp, tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIUsageByUserDTO appUsageByUser : appUsageByUserList) {
+            for (AppUsageByUserDTO appUsageByUser : appUsageByUserList) {
                 appObjectList.add(appUsageByUser);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app usage per users for the period " +
                     startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1262,15 +1293,18 @@ public class AppsApiServiceImpl extends AppsApiService {
             tenantDomainName, String startTimeStamp, String endTimeStamp) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            List<APIPageUsageDTO> appUsageByPageList = client.getAPIUsageByPage(providerName, startTimeStamp,
-                                                                                endTimeStamp, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppPageUsageDTO> appUsageByPageList = appUsageStatisticsService.getAppUsageByPage(providerName,
+                                                                                                   startTimeStamp,
+                                                                                                   endTimeStamp,
+                                                                                                   tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIPageUsageDTO appUsageByPage : appUsageByPageList) {
+            for (AppPageUsageDTO appUsageByPage : appUsageByPageList) {
                 appObjectList.add(appUsageByPage);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app usage per page for the period " +
                     startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1282,15 +1316,16 @@ public class AppsApiServiceImpl extends AppsApiService {
             tenantDomainName, String startTimeStamp, String endTimeStamp, int limit) {
         StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
         try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(userName);
-            List<APIResponseTimeDTO> appResponseTimeList = client.getResponseTimesByAPIs(providerName, startTimeStamp,
-                                                                    endTimeStamp, limit, tenantDomainName);
+            AppUsageStatisticsService appUsageStatisticsService = new
+                    AppUsageStatisticsService(userName);
+            List<AppResponseTimeDTO> appResponseTimeList = appUsageStatisticsService.getResponseTimesByApps
+                    (providerName, startTimeStamp, endTimeStamp, limit, tenantDomainName);
             List<Object> appObjectList = new ArrayList<>();
-            for (APIResponseTimeDTO appResponseTime : appResponseTimeList) {
+            for (AppResponseTimeDTO appResponseTime : appResponseTimeList) {
                 appObjectList.add(appResponseTime);
             }
             statSummaryDTO.setResult(appObjectList);
-        } catch (APIMgtUsageQueryServiceClientException e) {
+        } catch (AppUsageQueryServiceClientException e) {
             String errorMessage = "Error occurred while retrieving statistics of app response time for the period "
                     + startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
@@ -1355,26 +1390,6 @@ public class AppsApiServiceImpl extends AppsApiService {
         } catch (AppManagementException e) {
             String errorMessage = "Error occurred while retrieving statistics of subscriptions per app for the period" +
                     " " + startTimeStamp + "to " + endTimeStamp;
-            RestApiUtil.handleInternalServerError(errorMessage, e, log);
-        }
-        return statSummaryDTO;
-    }
-
-    private StatSummaryDTO getCacheHits(String providerName, String username, String startTimeStamp, String
-            endTimeStamp) {
-        StatSummaryDTO statSummaryDTO = new StatSummaryDTO();
-        try {
-            APIUsageStatisticsClient client = new APIUsageStatisticsClient(username);
-            List<APPMCacheCountDTO> cacheHitCountList = client.getCacheHitCount(providerName, startTimeStamp,
-                                                                                endTimeStamp);
-            List<Object> listObject = new ArrayList<>();
-            for (APPMCacheCountDTO cacheHitCount : cacheHitCountList) {
-                listObject.add(cacheHitCount);
-            }
-            statSummaryDTO.setResult(listObject);
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while retrieving statistics of cache hits for the period " +
-                    startTimeStamp + "to " + endTimeStamp;
             RestApiUtil.handleInternalServerError(errorMessage, e, log);
         }
         return statSummaryDTO;

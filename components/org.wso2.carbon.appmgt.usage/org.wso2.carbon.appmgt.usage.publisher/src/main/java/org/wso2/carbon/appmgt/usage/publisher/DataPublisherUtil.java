@@ -108,10 +108,10 @@ public class DataPublisherUtil {
         APIMGTConfigReaderService apimgtConfigReaderService = APPManagerConfigurationServiceComponent.getApiMgtConfigReaderService();
 
         //If a DataPublisher had not been registered for the tenant.
-        if (dataPublisher == null && apimgtConfigReaderService.getBamServerURL() != null) {
-            String serverUser = apimgtConfigReaderService.getBamServerUser();
-            String serverPassword = apimgtConfigReaderService.getBamServerPassword();
-            String serverURL = apimgtConfigReaderService.getBamServerURL();
+        if (dataPublisher == null && apimgtConfigReaderService.getDasServerURL() != null) {
+            String serverUser = apimgtConfigReaderService.getDasServerUser();
+            String serverPassword = apimgtConfigReaderService.getDasServerPassword();
+            String serverURL = apimgtConfigReaderService.getDasServerURL();
 
             try {
                 //Create new DataPublisher for the tenant.

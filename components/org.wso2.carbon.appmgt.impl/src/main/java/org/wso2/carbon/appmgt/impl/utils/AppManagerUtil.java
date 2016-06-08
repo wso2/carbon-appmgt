@@ -3440,11 +3440,11 @@ public final class AppManagerUtil {
      * @return boolean value.
      */
 
-    public static boolean isUIActivityBAMPublishEnabled() {
+    public static boolean isUIActivityDASPublishEnabled() {
         AppManagerConfiguration configuration = ServiceReferenceHolder.getInstance()
                 .getAPIManagerConfigurationService().getAPIManagerConfiguration();
         String isEnabled = configuration
-                .getFirstProperty(AppMConstants.APP_USAGE_BAM_UI_ACTIVITY_ENABLED);
+                .getFirstProperty(AppMConstants.APP_USAGE_DAS_UI_ACTIVITY_ENABLED);
         return isEnabled != null && Boolean.parseBoolean(isEnabled);
     }
 

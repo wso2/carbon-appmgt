@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.usage.client.dto;
+package org.wso2.carbon.appmgt.api.dto;
 
 public class PerUserAPIUsageDTO {
 

@@ -16,27 +16,57 @@
 * under the License.
 */
 
-package org.wso2.carbon.appmgt.usage.client.dto;
+package org.wso2.carbon.appmgt.api.dto;
 
-public class APIVersionUsageDTO {
+public class AppVersionUserUsageDTO {
 
+    private String apiname;
+    private String context;
     private String version;
     private long count;
+    private String cost;
+    private String costPerAPI;
 
     public long getCount() {
         return count;
+    }
+    public String getCost() {
+        return cost;
+    }public String getCostPerAPI() {
+        return costPerAPI;
     }
 
     public String getVersion() {
         return version;
     }
 
+    public String getApiname() {
+        return apiname;
+    }
+
+    public String getContext() {
+        return context;
+    }
+
     public void setCount(long count) {
         this.count = count;
+    }
+    public void setCost(String cost) {
+        this.cost = cost;
+    } public void setCostPerAPI(String costPerAPI) {
+        this.costPerAPI = costPerAPI;
     }
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public void setApiname(String apiName) {
+        this.apiname = apiName;
+    }
+
+    public void setContext(String context) {
+        this.context = context;
     }
 
 }

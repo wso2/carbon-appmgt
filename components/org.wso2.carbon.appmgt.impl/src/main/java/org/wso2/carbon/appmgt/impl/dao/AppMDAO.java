@@ -103,7 +103,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
@@ -7152,7 +7151,7 @@ public class AppMDAO {
             //get the connection for the AM data source
             conn = APIMgtDBUtil.getConnection();
             List<String> uuidsList;
-            if (AppManagerUtil.isUIActivityBAMPublishEnabled()) {
+            if (AppManagerUtil.isUIActivityDASPublishEnabled()) {
                 uuidsList = getAppHitStatsFromBamDBAndAppmDB(conn, userId, startIndex, pageSize,
                                                              builderDataContext);
             } else {
@@ -7175,7 +7174,7 @@ public class AppMDAO {
     }
 
     /**
-     * Get app hits when ui data activity data source hasn't set to BAM data source.
+     * Get app hits when ui data activity data source hasn't set to DAS data source.
      * @param conn Connection.
      * @param userId user Id.
      * @param startIndex pagination start index.
@@ -7235,7 +7234,7 @@ public class AppMDAO {
     }
 
     /**
-     * Get app hits when ui data activity data source has set to BAM data source.
+     * Get app hits when ui data activity data source has set to DAS data source.
      * @param appMCon Connection to App Manager database.
      * @param userId user Id.
      * @param pageSize No of elements per page.
@@ -7307,7 +7306,7 @@ public class AppMDAO {
             }
         } catch (SQLException ex) {
             throw new AppManagementException(
-                    "SQL Exception is occurred while reading driver name of BAM database connection "
+                    "SQL Exception is occurred while reading driver name of DAS database connection "
                             + " : " + ex.getMessage(), ex);
         }
         return uuidRetrivealBamQuery;
