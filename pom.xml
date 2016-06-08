@@ -38,6 +38,7 @@
     <module>components/org.wso2.carbon.appmgt.sample.deployer</module>
     <module>components/org.wso2.carbon.appmgt.custom.mediators</module>
     <module>components/org.wso2.carbon.appmgt.mdm.osgiconnector</module>
+    <module>components/org.wso2.carbon.appmgt.publisher</module>
     <module>features/org.wso2.carbon.appmgt.core.feature</module>
   	<module>features/org.wso2.carbon.appmgt.gateway.feature</module>
   	<module>features/org.wso2.carbon.appmgt.publisher.feature</module>
@@ -526,6 +527,11 @@
       <dependency>
         <groupId>org.wso2.carbon.appmgt</groupId>
         <artifactId>org.wso2.carbon.appmgt.hostobjects</artifactId>
+        <version>${carbon.appmgt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wso2.carbon.appmgt</groupId>
+        <artifactId>org.wso2.carbon.appmgt.publisher</artifactId>
         <version>${carbon.appmgt.version}</version>
       </dependency>
       <dependency>

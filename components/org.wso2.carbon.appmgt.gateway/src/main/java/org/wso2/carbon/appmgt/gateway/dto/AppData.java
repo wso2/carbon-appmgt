@@ -18,7 +18,7 @@ package org.wso2.carbon.appmgt.gateway.dto;
 public class AppData {
     private String name;
     private String host;
-    private int port = -1;
+    private int port;
     private String context;
     private String fileName;
     private ResourceData[] resources;

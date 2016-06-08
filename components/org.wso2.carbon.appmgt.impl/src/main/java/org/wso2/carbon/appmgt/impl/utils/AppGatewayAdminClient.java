@@ -18,6 +18,7 @@
 package org.wso2.carbon.appmgt.impl.utils;
 
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringUtils;
 import org.wso2.carbon.appmgt.api.AppManagementException;
 import org.wso2.carbon.appmgt.api.model.WebApp;
 import org.wso2.carbon.appmgt.gateway.dto.stub.AppData;
@@ -47,9 +48,11 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
     private Environment environment;
 
     public AppGatewayAdminClient(APIIdentifier apiId, Environment environment) throws AppManagementException {
-        this.qualifiedName = apiId.getProviderName() + "--" + apiId.getApiName() + ":v" + apiId.getVersion();
-        this.qualifiedDefaultApiName = apiId.getProviderName() + "--" + apiId.getApiName();
-        String providerDomain = apiId.getProviderName();
+        String providerName = apiId.getProviderName();
+        String appName = apiId.getProviderName();
+        String appVersion = apiId.getProviderName();
+        this.qualifiedName = providerName + "--" + appName+ ":v" + appVersion;
+        this.qualifiedDefaultApiName = providerName + "--" + appName;
         try {
             appGatewayAdminStub = new AppGatewayAdminStub(null, environment.getServerURL() + "AppGatewayAdmin");
             setup(appGatewayAdminStub, environment);
@@ -68,22 +71,26 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public void addVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
-        String errorMsg = "Error while adding new WebApp.";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-            if (tenantDomain != null && !("").equals(tenantDomain)
-                    && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appGatewayAdminStub.addVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig, tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.addVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
+                                                                tenantDomain);
             } else {
-                appGatewayAdminStub.addVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig);
+                appGatewayAdminStub.addVersionedWebApp(appProvider, appName, appVersion, apiConfig);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while adding new WebApp. App Name : " + appName + " App Version: " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while adding new WebApp. App Name : " + appName + " App Version: " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (APITemplateException e) {
+            String errorMsg = "Error while adding new WebApp. App Name : " + appName + " App Version: " + appVersion;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -96,21 +103,26 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public AppData getVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while obtaining WebApp information from gateway.";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             AppData appData;
-            if (tenantDomain != null && !("").equals(tenantDomain)
-                    && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appData = appGatewayAdminStub.getVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(),
-                                                                          apiId.getVersion(), tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appData = appGatewayAdminStub.getVersionedWebAppForTenant(appProvider, appName, appVersion,
+                                                                          tenantDomain);
             } else {
-                appData = appGatewayAdminStub.getVersionedWebApp(apiId.getProviderName(), apiId.getApiName(),
-                                                                 apiId.getVersion());
+                appData = appGatewayAdminStub.getVersionedWebApp(appProvider, appName, appVersion);
             }
             return appData;
         } catch (RemoteException e) {
+            String errorMsg = "Error while obtaining WebApp information from gateway. App Name : " + appName + " App " +
+                    "Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while obtaining WebApp information from gateway. App Name : " + appName + " App " +
+                    "Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -124,23 +136,26 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public void updateVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
-        String errorMsg = "Error while updating WebApp";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForVersionedWebAppTemplate(environment);
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-
-                appGatewayAdminStub.updateVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig, tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.updateVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
+                                                                   tenantDomain);
             } else {
-                appGatewayAdminStub.updateVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig);
+                appGatewayAdminStub.updateVersionedWebApp(appProvider, appName, appVersion, apiConfig);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while updating WebApp. App Name : " + appName + " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while updating WebApp. App Name : " + appName + " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (APITemplateException e) {
+            String errorMsg = "Error while updating WebApp. App Name : " + appName + " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -152,19 +167,21 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public void deleteVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while updating WebApp";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appGatewayAdminStub.deleteVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.deleteVersionedWebAppForTenant(appProvider, appName, appVersion, tenantDomain);
             } else {
-                appGatewayAdminStub.deleteVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion());
+                appGatewayAdminStub.deleteVersionedWebApp(appProvider, appName, appVersion);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while updating WebApp. App Name : " + appName + " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while updating WebApp. App Name : " + appName + " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -178,22 +195,25 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public void addNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
-        String errorMsg = "Error publishing non-versioned web app to the gateway";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-            if (tenantDomain != null && !("").equals(tenantDomain)
-                    && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appGatewayAdminStub.addNonVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig, tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.addNonVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig, tenantDomain);
             } else {
-                appGatewayAdminStub.addNonVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig);
+                appGatewayAdminStub.addNonVersionedWebApp(appProvider, appName, appVersion, apiConfig);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error publishing non-versioned web app to the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error publishing non-versioned web app to the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         } catch (APITemplateException e) {
+            String errorMsg = "Error publishing non-versioned web app to the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -207,22 +227,26 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      */
     public void updateNonVersionedWebApp(APITemplateBuilder builder, APIIdentifier apiId, String tenantDomain)
             throws AppManagementException {
-        String errorMsg = "Error while updating non-versioned web app in the gateway";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             String apiConfig = builder.getConfigStringForNonVersionedWebAppTemplate();
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appGatewayAdminStub.updateNonVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig, tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.updateNonVersionedWebAppForTenant(appProvider, appName, appVersion, apiConfig,
+                                                                      tenantDomain);
             } else {
-                appGatewayAdminStub.updateNonVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), apiConfig);
+                appGatewayAdminStub.updateNonVersionedWebApp(appProvider, appName, appVersion, apiConfig);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while updating non-versioned web app in the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while updating non-versioned web app in the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         } catch (APITemplateException e) {
+            String errorMsg = "Error while updating non-versioned web app in the gateway. App Name : " + appName;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -234,19 +258,23 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public void deleteNonVersionedWebApp(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while deleting non-versioned web app from the gateway";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appGatewayAdminStub.deleteNonVersionedWebAppForTenant(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion(), tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.deleteNonVersionedWebAppForTenant(appProvider, appName, appVersion, tenantDomain);
             } else {
-                appGatewayAdminStub.deleteNonVersionedWebApp(apiId.getProviderName(), apiId.getApiName(), apiId
-                        .getVersion());
+                appGatewayAdminStub.deleteNonVersionedWebApp(appProvider, appName, appVersion);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while deleting non-versioned web app from the gateway. App Name : " + appName +
+                    " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while deleting non-versioned web app from the gateway. App Name : " + appName +
+                    " App Version : " + appVersion;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -259,22 +287,26 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public AppData getNonVersionedWebAppData(APIIdentifier apiId, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while obtaining non-versioned web app information from gateway";
+        String appName = apiId.getApiName();
+        String appVersion = apiId.getVersion();
+        String appProvider = apiId.getProviderName();
         try {
             AppData appData;
-            if (tenantDomain != null && !("").equals(tenantDomain)
-                    && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                appData = appGatewayAdminStub.getNonVersionedWebAppDataForTenant(apiId.getProviderName(),
-                                                                                 apiId.getApiName(),
-                                                                                 apiId.getVersion(), tenantDomain);
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appData = appGatewayAdminStub.getNonVersionedWebAppDataForTenant(appProvider, appName, appVersion,
+                                                                                 tenantDomain);
             } else {
-                appData = appGatewayAdminStub.getNonVersionedWebAppData(apiId.getProviderName(), apiId.getApiName(),
-                                                                        apiId.getVersion());
+                appData = appGatewayAdminStub.getNonVersionedWebAppData(appProvider, appName, appVersion);
             }
             return appData;
         } catch (RemoteException e) {
+            String errorMsg = "Error while obtaining non-versioned web app information from gateway. App Name : " +
+                    appName;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while obtaining non-versioned web app information from gateway. App Name : " +
+                    appName;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -287,21 +319,24 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public void addSequence(OMElement sequence, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while adding new sequence";
         try {
             StringWriter writer = new StringWriter();
             sequence.serializeAndConsume(writer);
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
-                appGatewayAdminStub.addSequenceForTenant(writer.toString(), tenantDomain);
+            String addedSequence = writer.toString();
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
+                appGatewayAdminStub.addSequenceForTenant(addedSequence, tenantDomain);
             } else {
-                appGatewayAdminStub.addSequence(writer.toString());
+                appGatewayAdminStub.addSequence(addedSequence);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while adding new sequence. Tenant : " + tenantDomain;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while adding new sequence. Tenant : " + tenantDomain;
             throw new AppManagementException(errorMsg, e);
         } catch (XMLStreamException e) {
+            String errorMsg = "Error while adding new sequence. Tenant : " + tenantDomain;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -314,17 +349,18 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public void deleteSequence(String sequenceName, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while deleting sequence";
         try {
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
                 appGatewayAdminStub.deleteSequenceForTenant(sequenceName, tenantDomain);
             } else {
                 appGatewayAdminStub.deleteSequence(sequenceName);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while deleting sequence. Sequence Name : " + sequenceName;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while deleting sequence. Sequence Name : " + sequenceName;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -337,17 +373,18 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public OMElement getSequence(String sequenceName, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while retrieving the sequence";
         try {
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
                 return (OMElement) appGatewayAdminStub.getSequenceForTenant(sequenceName, tenantDomain);
             } else {
                 return (OMElement) appGatewayAdminStub.getSequence(sequenceName);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while retrieving the sequence. Sequence Name : " + sequenceName;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while retrieving the sequence. Sequence Name : " + sequenceName;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -360,18 +397,20 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException on errors.
      */
     public boolean isExistingSequence(String sequenceName, String tenantDomain) throws AppManagementException {
-        String errorMsg = "Error while checking for existence of sequence : " + sequenceName + " in tenant " +
-                tenantDomain;
         try {
-            if (tenantDomain != null && !("").equals(tenantDomain) &&
-                    !MultitenantConstants.SUPER_TENANT_DOMAIN_NAME.equals(tenantDomain)) {
+            if (StringUtils.isEmpty(tenantDomain) && !tenantDomain.equals(MultitenantConstants
+                                                                                  .SUPER_TENANT_DOMAIN_NAME)) {
                 return appGatewayAdminStub.isExistingSequenceForTenant(sequenceName, tenantDomain);
             } else {
                 return appGatewayAdminStub.isExistingSequence(sequenceName);
             }
         } catch (RemoteException e) {
+            String errorMsg = "Error while checking for existence of sequence : " + sequenceName + " in tenant " +
+                    tenantDomain;
             throw new AppManagementException(errorMsg, e);
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Error while checking for existence of sequence : " + sequenceName + " in tenant " +
+                    tenantDomain;
             throw new AppManagementException(errorMsg, e);
         }
     }
@@ -384,14 +423,15 @@ public class AppGatewayAdminClient extends AbstractAPIGatewayAdminClient {
      * @throws AppManagementException
      */
     private String doEncryption(String plainTextPass) throws AppManagementException {
-        String errorMsg = "Failed to encrypt the secured endpoint password ,";
         String encodedValue = null;
         try {
             encodedValue = appGatewayAdminStub.doEncryption(plainTextPass);
 
         } catch (AppGatewayAdminAppManagementExceptionException e) {
+            String errorMsg = "Failed to encrypt the secured endpoint password ,";
             throw new AppManagementException(errorMsg + e.getMessage(), e);
         } catch (RemoteException e) {
+            String errorMsg = "Failed to encrypt the secured endpoint password ,";
             throw new AppManagementException(errorMsg + e.getMessage(), e);
         }
         return encodedValue;

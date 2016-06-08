@@ -20,6 +20,7 @@ package org.wso2.carbon.appmgt.gateway.service;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.appmgt.gateway.dto.AppData;
@@ -37,15 +38,14 @@ import java.util.List;
 
 public class AppGatewayAdmin extends AbstractAdmin {
     private static Log log = LogFactory.getLog(AppGatewayAdmin.class);
-
     /**
      * Add versioned webapp configuration to the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on Errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void addVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                             String tenantDomain)
@@ -56,11 +56,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add versioned webapp configuration to the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @throws AppManagementException on Errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @throws AppManagementException
      */
     public void addVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -70,12 +70,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Return versioned webapp configuration from the gateway for tenant user.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param tenantDomain String.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param tenantDomain
      * @return versioned webapp configuration data.
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public AppData getVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                String tenantDomain) throws AppManagementException {
@@ -86,11 +86,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Return versioned webapp configuration from the gateway for super tenant user.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
+     * @param appProviderName
+     * @param appName
+     * @param version
      * @return versioned webapp configuration data.
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public AppData getVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -99,14 +99,15 @@ public class AppGatewayAdmin extends AbstractAdmin {
         return convert(apiData);
     }
 
+
     /**
      * Update versioned webapp configuration in the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void updateVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                                String tenantDomain) throws AppManagementException {
@@ -116,11 +117,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update versioned webapp configuration in the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @throws AppManagementException
      */
     public void updateVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -130,11 +131,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void deleteVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                String tenantDomain) throws AppManagementException {
@@ -144,10 +145,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @throws AppManagementException
      */
     public void deleteVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -157,12 +158,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add non versioned webapp configuration to the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void addNonVersionedWebAppForTenant(String appProviderName, String appName, String version, String appConfig,
                                                String tenantDomain) throws AppManagementException {
@@ -172,11 +173,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Add non versioned webapp configuration to the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @throws AppManagementException
      */
     public void addNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -186,12 +187,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update non versioned webapp configuration in the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void updateNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                   String appConfig, String tenantDomain) throws AppManagementException {
@@ -201,11 +202,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Update non versioned webapp configuration in the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param appConfig String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param appConfig
+     * @throws AppManagementException
      */
     public void updateNonVersionedWebApp(String appProviderName, String appName, String version, String appConfig)
             throws AppManagementException {
@@ -215,11 +216,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete non versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param tenantDomain String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param tenantDomain
+     * @throws AppManagementException
      */
     public void deleteNonVersionedWebAppForTenant(String appProviderName, String appName, String version,
                                                   String tenantDomain)
@@ -230,10 +231,10 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Delete non versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @throws AppManagementException on errors.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @throws AppManagementException
      */
     public void deleteNonVersionedWebApp(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -243,12 +244,12 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Get non versioned webapp configuration from the gateway for tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
-     * @param tenantDomain String.
+     * @param appProviderName
+     * @param appName
+     * @param version
+     * @param tenantDomain
      * @return non versioned webapp configuration data.
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public AppData getNonVersionedWebAppDataForTenant(String appProviderName, String appName, String version,
                                                       String tenantDomain) throws AppManagementException {
@@ -259,11 +260,11 @@ public class AppGatewayAdmin extends AbstractAdmin {
 
     /**
      * Get non versioned webapp configuration from the gateway for super tenant users.
-     * @param appProviderName String.
-     * @param appName String.
-     * @param version String.
+     * @param appProviderName
+     * @param appName
+     * @param version
      * @return non versioned webapp configuration data.
-     * @throws AppManagementException on errors.
+     * @throws AppManagementException
      */
     public AppData getNonVersionedWebAppData(String appProviderName, String appName, String version)
             throws AppManagementException {
@@ -300,18 +301,28 @@ public class AppGatewayAdmin extends AbstractAdmin {
     private ResourceData convert(org.wso2.carbon.rest.api.stub.types.carbon.ResourceData data) {
         ResourceData resource = new ResourceData();
         resource.setContentType(data.getContentType());
+        resource.setFaultSequenceXml(processSequenceXml(data.getFaultSeqXml()));
         resource.setFaultSequenceKey(data.getFaultSequenceKey());
-        resource.setFaultSeqXml(data.getFaultSeqXml());
-        resource.setInSequenceKey(data.getInSequenceKey());
-        resource.setInSeqXml(data.getInSeqXml());
-        resource.setMethods(data.getMethods());
+        resource.setInSequenceXml(data.getInSequenceKey());
+        resource.setInSequenceXml(processSequenceXml(data.getInSeqXml()));
         resource.setOutSequenceKey(data.getOutSequenceKey());
-        resource.setOutSeqXml(data.getOutSeqXml());
+        resource.setOutSequenceXml(processSequenceXml(data.getOutSeqXml()));
+        resource.setHttpMethods(data.getMethods());
         resource.setProtocol(data.getProtocol());
         resource.setUriTemplate(data.getUriTemplate());
         resource.setUrlMapping(data.getUrlMapping());
         resource.setUserAgent(data.getUserAgent());
         return resource;
+    }
+
+    private String processSequenceXml(String sequence) {
+        if (StringUtils.isEmpty(sequence)) {
+            return null;
+        }
+        String processedSequence = StringUtils.replaceEach(sequence, new String[]{"&gt", "&lt", "\n", "\t" }, new
+                String[]{">", "<", "", " "});
+        return  processedSequence;
+
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.appmgt.gateway.internal;
+package org.wso2.carbon.appmgt.publisher.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,47 +27,46 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 
 /**
  *
- * Application manager gateway component
+ * Application manager publisher component
  *
- * @scr.component name="org.wso2.carbon.appmgt.gateway.services" immediate="true"
+ * @scr.component name="org.wso2.appmgt.services.publisher" immediate="true"
  * @scr.reference name="arg.wso2.appmgt.impl.services.appm"
  * interface="org.wso2.carbon.appmgt.impl.AppManagerConfigurationService" cardinality="1..1"
  * policy="dynamic" bind="setAppManagerConfigurationService" unbind="unsetAppManagerConfigurationService"
- */
-public class AppManagerGatewayComponent {
+ **/
+public class AppManagerPublisherComponent {
 
-    private static final Log log = LogFactory.getLog(AppManagerGatewayComponent.class);
+    private static final Log log = LogFactory.getLog(AppManagerPublisherComponent.class);
 
     protected void activate(ComponentContext componentContext) throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Gateway manager component activated");
+            log.debug("Publisher component activated");
         }
         BundleContext bundleContext = componentContext.getBundleContext();
 
         //Register Tenant service creator to deploy tenant specific common synapse configurations
-        TenantLoadGatewayObserver listener = new TenantLoadGatewayObserver();
+        TenantLoadPublisherObserver listener = new TenantLoadPublisherObserver();
         bundleContext.registerService(Axis2ConfigurationContextObserver.class.getName(), listener, null);
-
     }
 
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
-            log.debug("Deactivating Gateway manager component");
+            log.debug("Deactivating Publisher component");
         }
     }
 
     protected void setAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
-            log.debug("App manager configuration service is set to gateway bundle");
+            log.debug("App manager configuration service is set to publisher bundle");
         }
-        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(amcService);
+
+        ServiceReferenceHolder.getInstance().setAppManagerConfigurationService(amcService);
     }
 
     protected void unsetAppManagerConfigurationService(AppManagerConfigurationService amcService) {
         if (log.isDebugEnabled()) {
-            log.debug("App manager configuration service is unset to gateway bundle");
+            log.debug("App manager configuration service is unset from publisher bundle");
         }
-        ServiceReferenceHolder.getInstance().setAPIManagerConfigurationService(null);
+        ServiceReferenceHolder.getInstance().setAppManagerConfigurationService(null);
     }
-
 }

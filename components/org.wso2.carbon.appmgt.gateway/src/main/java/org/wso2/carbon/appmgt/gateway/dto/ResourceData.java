@@ -19,8 +19,11 @@ package org.wso2.carbon.appmgt.gateway.dto;
 
 import org.apache.synapse.rest.RESTConstants;
 
+/**
+ * Http Resources Data.
+ */
 public class ResourceData {
-    private String[] methods = new String[4];
+    private String[] httpMethods;
     private String contentType;
     private String userAgent;
     private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;
@@ -29,24 +32,24 @@ public class ResourceData {
     private String faultSequenceKey;
     private String uriTemplate;
     private String urlMapping;
-    private String inSeqXml;
-    private String outSeqXml;
-    private String faultSeqXml;
+    private String inSequenceXml;
+    private String outSequenceXml;
+    private String faultSequenceXml;
 
     /**
      * Get Http methods.
      * @return http methods as a string array.
      */
-    public String[] getMethods() {
-        return methods;
+    public String[] getHttpMethods() {
+        return httpMethods;
     }
 
     /**
      * Set Http methods.
-     * @param methods in String[].
+     * @param httpMethods in String[].
      */
-    public void setMethods(String[] methods) {
-        this.methods = methods;
+    public void setHttpMethods(String[] httpMethods) {
+        this.httpMethods = httpMethods;
     }
 
     /**
@@ -181,60 +184,48 @@ public class ResourceData {
      * Get In Sequence Xml.
      * @return in sequence xml in String.
      */
-    public String getInSeqXml() {
-        return inSeqXml;
+    public String getInSequenceXml() {
+        return inSequenceXml;
     }
 
     /**
      * Set In Sequence Xml.
-     * @param inSeqXml in String.
+     * @param inSequenceXml in String.
      */
-    public void setInSeqXml(String inSeqXml) {
-        if (inSeqXml == null) {
-            return;
-        }
-        this.inSeqXml = inSeqXml.trim().replaceAll("&gt", ">").replaceAll("&lt", "<").replaceAll("\n", "").replaceAll(
-                "\t", " ");
+    public void setInSequenceXml(String inSequenceXml) {
+        this.inSequenceXml = inSequenceXml;
     }
 
     /**
      * Get Out Sequence Xml.
      * @return out sequence xml in String.
      */
-    public String getOutSeqXml() {
-        return outSeqXml;
+    public String getOutSequenceXml() {
+        return outSequenceXml;
     }
 
     /**
      * Set Out Sequence Xml.
-     * @param outSeqXml in String.
+     * @param outSequenceXml in String.
      */
-    public void setOutSeqXml(String outSeqXml) {
-        if (outSeqXml == null) {
-            return;
-        }
-        this.outSeqXml = outSeqXml.trim().replaceAll("&gt", ">").replaceAll("&lt", "<").replaceAll("\n", "").replaceAll(
-                "\t", " ");
+    public void setOutSequenceXml(String outSequenceXml) {
+        this.outSequenceXml = outSequenceXml;
     }
 
     /**
      * Get Fault Sequence Xml.
      * @return fault sequence xml in String.
      */
-    public String getFaultSeqXml() {
-        return faultSeqXml;
+    public String getFaultSequenceXml() {
+        return faultSequenceXml;
     }
 
     /**
      * Set Fault Sequence Xml.
-     * @param faultSeqXml in String.
+     * @param faultSequenceXml in String.
      */
-    public void setFaultSeqXml(String faultSeqXml) {
-        if (faultSeqXml == null) {
-            return;
-        }
-        this.faultSeqXml = faultSeqXml.trim().replaceAll("&gt", ">").replaceAll("&lt", "<").replaceAll("\n", "")
-                .replaceAll("\t", " ");
+    public void setFaultSequenceXml(String faultSequenceXml) {
+        this.faultSequenceXml = faultSequenceXml;
     }
 
 }
