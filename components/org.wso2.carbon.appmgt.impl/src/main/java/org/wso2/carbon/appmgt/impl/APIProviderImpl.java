@@ -2894,27 +2894,23 @@ class APIProviderImpl extends AbstractAPIManager implements APIProvider {
 
     /**
      * Remove mobile applications binary files from storage
-     * @param fileName file name of the banner image, thumbnail, screenshots and app binary
+     * @param filePath file path of the banner image, thumbnail, screenshots and app binary
      * @throws AppManagementException
      */
-    public void removeBinaryFromStorage(String fileName) throws AppManagementException {
-        AppManagerConfiguration config = ServiceReferenceHolder.getInstance().
-                getAPIManagerConfigurationService().getAPIManagerConfiguration();
-        String storageLocation = config.getFirstProperty(AppMConstants.MOBILE_APPS_FILE_PRECISE_LOCATION);
-        if(StringUtils.isEmpty(storageLocation)){
+    public void removeBinaryFromStorage(String filePath) throws AppManagementException {
+        if (StringUtils.isEmpty(filePath)) {
             handleException("Mobile Application BinaryFileStorage Configuration cannot be found." +
                     " Pleas check the configuration in app-management.xml ");
         }
-        String fullFilePath = CarbonUtils.getCarbonHome() + File.separator + storageLocation + fileName;
 
-            File binaryFile = new File(fullFilePath);
-        if (!binaryFile.exists()){
-            handleException("Binary file "+ fullFilePath+ " does not exist");
+        File binaryFile = new File(filePath);
+        if (!binaryFile.exists()) {
+            handleException("Binary file " + filePath + " does not exist");
         }
 
         boolean isDeleted = binaryFile.delete();
-        if(!isDeleted){
-            handleException("Error occurred while deleting file "+ fullFilePath);
+        if (!isDeleted) {
+            handleException("Error occurred while deleting file " + filePath);
         }
     }
 
